@@ -1,0 +1,71 @@
+# ============================================================
+# Laravel
+# ============================================================
+/backend/vendor/
+/backend/node_modules/
+/backend/.env
+/backend/.env.backup
+/backend/.env.production
+/backend/storage/app/public/*
+!/backend/storage/app/public/.gitkeep
+/backend/storage/framework/cache/*
+!/backend/storage/framework/cache/.gitkeep
+/backend/storage/framework/sessions/*
+!/backend/storage/framework/sessions/.gitkeep
+/backend/storage/framework/testing/*
+!/backend/storage/framework/testing/.gitkeep
+/backend/storage/framework/views/*
+!/backend/storage/framework/views/.gitkeep
+/backend/storage/logs/*
+!/backend/storage/logs/.gitkeep
+/backend/bootstrap/cache/*.php
+/backend/public/hot
+/backend/public/storage
+/backend/public/mix-manifest.json
+/backend/public/build/
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php
+*.cache
+Homestead.json
+Homestead.yaml
+auth.json
+/backend/.phpunit.result.cache
+/backend/.php-cs-fixer.cache
+
+# ============================================================
+# Node / Frontend
+# ============================================================
+/frontend/node_modules/
+/frontend/.env
+/frontend/.env.local
+/frontend/.env.*.local
+/frontend/dist/
+/frontend/build/
+/frontend/.nuxt/
+/frontend/.output/
+/frontend/.vite/
+
+# ============================================================
+# OS / Editor
+# ============================================================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*.orig
+
+# ============================================================
+# Docker / Infra
+# ============================================================
+docker-compose.override.yml
+.docker/data/
+
+# ============================================================
+# Misc
+# ============================================================
+*.log
+*.zip
+*.tar.gz
