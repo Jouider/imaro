@@ -29,6 +29,20 @@
     "title": "Bienvenue sur SyndikPro",
     "subtitle": "Plateforme de gestion de copropriété conforme à la Loi 18-00",
     "ctaLogin": "Se connecter",
-    "stackHeading": "Stack"
+    "stackHeading": "Stack",
+    "cards": {
+      "residences": {
+        "title": "Résidences",
+        "desc": "Lots, tantièmes, copropriétaires"
+      },
+      "appelsFonds": {
+        "title": "Appels de fonds",
+        "desc": "Calcul auto par tantième"
+      },
+      "loi": {
+        "title": "Loi 18-00",
+        "desc": "PDF conformes & multi-tenant"
+      }
+    }
   }
 }

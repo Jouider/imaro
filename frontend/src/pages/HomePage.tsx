@@ -50,9 +50,11 @@ export function HomePage() {
           <Card>
             <CardHeader>
               <Building2 className="size-5 text-primary" />
-              <CardTitle className="mt-2 text-base">Résidences</CardTitle>
+              <CardTitle className="mt-2 text-base">
+                {t('home.cards.residences.title')}
+              </CardTitle>
               <CardDescription>
-                Lots, tantièmes, copropriétaires
+                {t('home.cards.residences.desc')}
               </CardDescription>
             </CardHeader>
             <CardContent />
@@ -60,16 +62,22 @@ export function HomePage() {
           <Card>
             <CardHeader>
               <Wallet className="size-5 text-primary" />
-              <CardTitle className="mt-2 text-base">Appels de fonds</CardTitle>
-              <CardDescription>Calcul auto par tantième</CardDescription>
+              <CardTitle className="mt-2 text-base">
+                {t('home.cards.appelsFonds.title')}
+              </CardTitle>
+              <CardDescription>
+                {t('home.cards.appelsFonds.desc')}
+              </CardDescription>
             </CardHeader>
             <CardContent />
           </Card>
           <Card>
             <CardHeader>
               <ShieldCheck className="size-5 text-primary" />
-              <CardTitle className="mt-2 text-base">Loi 18-00</CardTitle>
-              <CardDescription>PDF conformes & multi-tenant</CardDescription>
+              <CardTitle className="mt-2 text-base">
+                {t('home.cards.loi.title')}
+              </CardTitle>
+              <CardDescription>{t('home.cards.loi.desc')}</CardDescription>
             </CardHeader>
             <CardContent />
           </Card>
