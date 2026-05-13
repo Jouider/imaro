@@ -60,12 +60,12 @@ class Residence extends Model
     public function getTauxRecouvrementAttribute(): float
     {
         $total = $this->appelsFonds()
-            ->where('statut', '!=', 'brouillon')
+            ->where('appels_fonds.statut', '!=', 'brouillon')
             ->join('appels_fonds_lignes', 'appels_fonds.id', '=', 'appels_fonds_lignes.appel_fonds_id')
             ->sum('appels_fonds_lignes.montant_du');
 
         $paye = $this->appelsFonds()
-            ->where('statut', '!=', 'brouillon')
+            ->where('appels_fonds.statut', '!=', 'brouillon')
             ->join('appels_fonds_lignes', 'appels_fonds.id', '=', 'appels_fonds_lignes.appel_fonds_id')
             ->sum('appels_fonds_lignes.montant_paye');
 
