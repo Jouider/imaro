@@ -1,0 +1,34 @@
+{
+  "app": {
+    "name": "SyndikPro",
+    "tagline": "إدارة الملكية المشتركة — المغرب"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "dashboard": "لوحة التحكم"
+  },
+  "language": {
+    "fr": "Français",
+    "ar": "العربية",
+    "switch": "تغيير اللغة"
+  },
+  "auth": {
+    "title": "تسجيل الدخول إلى SyndikPro",
+    "subtitle": "تلقَّ رمزًا من 6 أرقام عبر واتساب",
+    "phone": "الهاتف",
+    "phonePlaceholder": "+212 6XX XX XX XX",
+    "requestOtp": "إرسال الرمز",
+    "otp": "رمز التحقق",
+    "otpPlaceholder": "123456",
+    "verifyOtp": "تحقق",
+    "back": "رجوع"
+  },
+  "home": {
+    "title": "مرحبًا بكم في SyndikPro",
+    "subtitle": "منصة لإدارة الملكية المشتركة وفق القانون 18-00",
+    "ctaLogin": "تسجيل الدخول",
+    "stackHeading": "المكدس التقني"
+  }
+}
