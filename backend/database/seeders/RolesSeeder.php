@@ -19,7 +19,7 @@ class RolesSeeder extends Seeder
         ];
 
         foreach ($roles as $role) {
-            Role::firstOrCreate(['name' => $role, 'guard_name' => 'sanctum']);
+            Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
         }
 
         $this->command->info('✅ 6 rôles créés');

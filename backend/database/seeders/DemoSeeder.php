@@ -83,9 +83,9 @@ class DemoSeeder extends Seeder
             'Younes Sabri', 'Rajaa Filali',
         ];
 
-        // Tantièmes : 20 lots, somme = 1000 ✓
+        // Tantièmes : 20 lots, somme = 1000 ✓ (65+55+700+180)
         $tantiemes = [
-            60, 55, 50, 50, 50, 50, 50, 50, 50, 50,
+            65, 55, 50, 50, 50, 50, 50, 50, 50, 50,
             50, 50, 50, 50, 50, 50, 45, 45, 45, 45,
         ];
 
