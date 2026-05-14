@@ -40,6 +40,29 @@
     "add": "Ajouter",
     "save": "Enregistrer"
   },
+  "portail": {
+    "login": {
+      "title": "Portail copropriétaire",
+      "subtitle": "Recevez un code à 6 chiffres sur WhatsApp",
+      "phone": "Numéro de téléphone",
+      "phonePlaceholder": "6XX XX XX XX",
+      "sendCode": "Recevoir le code WhatsApp",
+      "sending": "Envoi en cours…",
+      "otp": "Code de vérification",
+      "otpHint": "Entrez le code à 6 chiffres reçu sur WhatsApp",
+      "verify": "Accéder à mon espace",
+      "verifying": "Vérification…",
+      "resend": "Renvoyer le code",
+      "resendIn": "Renvoyer dans {{s}}s",
+      "changePhone": "Changer de numéro",
+      "noCode": "Vous n'avez pas reçu le code ?",
+      "smsFallback": "Recevoir par SMS"
+    },
+    "dashboard": {
+      "welcome": "Bonjour, {{name}} !",
+      "subtitle": "Portail copropriétaire"
+    }
+  },
   "home": {
     "title": "Bienvenue sur Imaro",
     "subtitle": "Plateforme marocaine de gestion de copropriété — conforme à la Loi 18-00",
