@@ -128,5 +128,51 @@
         "desc": "PDF conformes & multi-tenant"
       }
     }
+  },
+  "gestionnaire": {
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "residences": "Résidences",
+      "coproprietaires": "Copropriétaires",
+      "appelsFonds": "Appels de fonds",
+      "paiements": "Paiements",
+      "tickets": "Tickets",
+      "assemblees": "Assemblées"
+    },
+    "dashboard": {
+      "title": "Tableau de bord",
+      "filterAll": "Toutes les résidences",
+      "kpi": {
+        "residences": "Résidences",
+        "coproprietaires": "Copropriétaires",
+        "caMensuel": "Recouvré ce mois",
+        "impayes": "Total impayés"
+      },
+      "chart": {
+        "title": "Recouvrement mensuel",
+        "recouvre": "Recouvré",
+        "restant": "Restant"
+      },
+      "topImpayes": {
+        "title": "Top impayés",
+        "jours": "{{n}}j"
+      },
+      "ticketsUrgents": {
+        "title": "Tickets urgents",
+        "empty": "Aucun ticket urgent"
+      },
+      "assemblees": {
+        "title": "Assemblées à venir",
+        "empty": "Aucune assemblée programmée"
+      },
+      "actions": {
+        "title": "Actions rapides",
+        "appelFonds": "Créer appel de fonds",
+        "paiement": "Saisir un paiement",
+        "ticket": "Nouveau ticket",
+        "ag": "Convoquer une AG",
+        "soon": "Bientôt disponible"
+      }
+    }
   }
 }

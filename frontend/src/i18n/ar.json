@@ -128,5 +128,51 @@
         "desc": "ملفات PDF مطابقة + متعدد المستأجرين"
       }
     }
+  },
+  "gestionnaire": {
+    "nav": {
+      "dashboard": "لوحة التحكم",
+      "residences": "الإقامات",
+      "coproprietaires": "الملاك المشاركون",
+      "appelsFonds": "استدعاءات الأموال",
+      "paiements": "المدفوعات",
+      "tickets": "التذاكر",
+      "assemblees": "الجمعيات العامة"
+    },
+    "dashboard": {
+      "title": "لوحة التحكم",
+      "filterAll": "جميع الإقامات",
+      "kpi": {
+        "residences": "الإقامات",
+        "coproprietaires": "الملاك المشاركون",
+        "caMensuel": "المحصّل هذا الشهر",
+        "impayes": "إجمالي المتأخرات"
+      },
+      "chart": {
+        "title": "التحصيل الشهري",
+        "recouvre": "محصَّل",
+        "restant": "متبقي"
+      },
+      "topImpayes": {
+        "title": "أكبر المتأخرات",
+        "jours": "{{n}}ي"
+      },
+      "ticketsUrgents": {
+        "title": "التذاكر العاجلة",
+        "empty": "لا توجد تذاكر عاجلة"
+      },
+      "assemblees": {
+        "title": "الجمعيات العامة القادمة",
+        "empty": "لا توجد جمعيات مبرمجة"
+      },
+      "actions": {
+        "title": "إجراءات سريعة",
+        "appelFonds": "إنشاء استدعاء أموال",
+        "paiement": "تسجيل دفعة",
+        "ticket": "تذكرة جديدة",
+        "ag": "دعوة جمعية عامة",
+        "soon": "قريبًا"
+      }
+    }
   }
 }

@@ -8,7 +8,9 @@ type Props = {
   colorize?: boolean
 }
 
-const formatter = new Intl.NumberFormat('fr-MA', {
+// fr-FR gives the correct narrow no-break space thousands separator (e.g. "1 500,00")
+// fr-MA uses a dot which is incorrect per the Imaro spec
+const formatter = new Intl.NumberFormat('fr-FR', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 })
