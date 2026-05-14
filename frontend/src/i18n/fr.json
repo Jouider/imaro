@@ -78,7 +78,8 @@
       "hint": "Vos réclamations sont traitées dans un délai de 48h ouvrées.",
       "addPhoto": "Ajouter une photo",
       "removePhoto": "Supprimer la photo",
-      "photoHint": "JPG, PNG ou HEIC · max 10 Mo"
+      "photoHint": "JPEG, PNG ou WebP · max 5 photos · 5 Mo/photo",
+      "photoSizeError": "Fichier trop grand (max 5 Mo par photo)"
     },
     "profil": {
       "title": "Mon profil",
