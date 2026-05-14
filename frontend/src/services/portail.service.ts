@@ -152,8 +152,13 @@ export async function getAnnonces(): Promise<Annonce[]> {
 
 export async function createReclamation(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _data: { categorie: string; sujet: string; description: string },
+  _data: {
+    categorie: string
+    sujet: string
+    description: string
+    photo?: File | null
+  },
 ): Promise<void> {
-  // Mock — resolves immediately; real endpoint: POST /api/portail/reclamations
+  // TODO: use FormData once POST /api/portail/reclamations is ready
   return Promise.resolve()
 }

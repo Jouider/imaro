@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { Camera, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -35,6 +36,9 @@ export function PortailReclamationsPage() {
   const { t } = useTranslation()
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
   const [errors, setErrors] = useState<Partial<FormState>>({})
+  const [photo, setPhoto] = useState<File | null>(null)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const mutation = useMutation({
     mutationFn: createReclamation,
@@ -42,6 +46,11 @@ export function PortailReclamationsPage() {
       toast.success(t('portail.reclamations.success'))
       setForm(EMPTY_FORM)
       setErrors({})
+      if (photoPreview) {
+        URL.revokeObjectURL(photoPreview)
+      }
+      setPhoto(null)
+      setPhotoPreview(null)
     },
     onError: () => {
       toast.error(t('actions.loading'))
@@ -66,7 +75,28 @@ export function PortailReclamationsPage() {
       categorie: form.categorie,
       sujet: form.sujet.trim(),
       description: form.description.trim(),
+      photo,
     })
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] ?? null
+    if (!file) return
+    if (photoPreview) {
+      URL.revokeObjectURL(photoPreview)
+    }
+    setPhoto(file)
+    setPhotoPreview(URL.createObjectURL(file))
+    // Reset input value so the same file can be re-selected after removal
+    e.target.value = ''
+  }
+
+  function handleRemovePhoto() {
+    if (photoPreview) {
+      URL.revokeObjectURL(photoPreview)
+    }
+    setPhoto(null)
+    setPhotoPreview(null)
   }
 
   return (
@@ -145,6 +175,51 @@ export function PortailReclamationsPage() {
           )}
         </div>
 
+        {/* Photo upload */}
+        <div className="space-y-1.5">
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+
+          {photo && photoPreview ? (
+            /* Thumbnail with remove button */
+            <div className="relative inline-block">
+              <img
+                src={photoPreview}
+                alt={t('portail.reclamations.removePhoto')}
+                className="h-20 w-20 rounded-lg object-cover"
+              />
+              <button
+                type="button"
+                onClick={handleRemovePhoto}
+                aria-label={t('portail.reclamations.removePhoto')}
+                className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-white shadow"
+              >
+                <X className="size-3.5" aria-hidden="true" />
+              </button>
+            </div>
+          ) : (
+            /* Add photo trigger button */
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-md border border-dashed border-input px-4 py-3 text-sm text-muted-foreground transition-colors hover:border-[var(--color-imaro-primary)] hover:text-[var(--color-imaro-primary)]"
+            >
+              <Camera className="size-5 shrink-0" aria-hidden="true" />
+              {t('portail.reclamations.addPhoto')}
+            </button>
+          )}
+
+          <p className="text-xs text-muted-foreground">
+            {t('portail.reclamations.photoHint')}
+          </p>
+        </div>
+
         {/* Submit */}
         <Button
           type="submit"
@@ -159,7 +234,7 @@ export function PortailReclamationsPage() {
 
       {/* Hint card */}
       <div className="rounded-xl bg-muted px-4 py-3 text-sm text-muted-foreground">
-        💡 {t('portail.reclamations.hint')}
+        {t('portail.reclamations.hint')}
       </div>
     </div>
   )

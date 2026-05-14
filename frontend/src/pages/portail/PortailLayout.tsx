@@ -4,6 +4,7 @@ import { Home, Wallet, MessageSquare, User } from 'lucide-react'
 import { Wordmark } from '@/components/Wordmark'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { useThemeStore } from '@/stores/themeStore'
 
 type NavItem = {
   to: string
@@ -41,12 +42,13 @@ const NAV_ITEMS: NavItem[] = [
  */
 export function PortailLayout() {
   const { t } = useTranslation()
+  const theme = useThemeStore((s) => s.theme)
 
   return (
     <div className="flex min-h-svh flex-col bg-[var(--color-imaro-surface)] dark:bg-background">
       {/* Top bar */}
       <header className="flex items-center justify-between border-b bg-white px-4 py-2 dark:bg-card dark:border-border">
-        <Wordmark className="h-10 w-36" />
+        <Wordmark inverted={theme === 'dark'} className="h-10 w-36" />
         <div className="flex items-center gap-1">
           <LanguageSwitcher />
           <ThemeToggle />
