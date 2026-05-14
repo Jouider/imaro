@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Gestionnaire\AppelFondsController;
 use App\Http\Controllers\Api\Gestionnaire\CoproprietaireController;
 use App\Http\Controllers\Api\Gestionnaire\DashboardController;
+use App\Http\Controllers\Api\Gestionnaire\ExerciceController;
 use App\Http\Controllers\Api\Gestionnaire\ImpayeController;
 use App\Http\Controllers\Api\Gestionnaire\LotController;
 use App\Http\Controllers\Api\Gestionnaire\PaiementController;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 // Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index']);
 
-// Résidences + lots + copropriétaires (KAN-13)
+// Résidences + lots + copropriétaires + exercices (KAN-13)
 Route::apiResource('residences', ResidenceController::class)->only(['index', 'show', 'update']);
 
 Route::prefix('residences/{residence}')->group(function () {
@@ -22,6 +23,10 @@ Route::prefix('residences/{residence}')->group(function () {
     Route::put('/lots/{lot}', [LotController::class, 'update']);
     Route::delete('/lots/{lot}', [LotController::class, 'destroy']);
     Route::get('/coproprietaires', [CoproprietaireController::class, 'index']);
+    // Exercices
+    Route::get('/exercices', [ExerciceController::class, 'index']);
+    Route::post('/exercices', [ExerciceController::class, 'store']);
+    Route::post('/exercices/{exercice}/cloture', [ExerciceController::class, 'cloture']);
 });
 
 // Appels de fonds (KAN-14)
