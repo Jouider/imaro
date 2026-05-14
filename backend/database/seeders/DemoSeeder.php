@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\AppelFonds;
 use App\Models\Coproprietaire;
+use App\Models\Exercice;
 use App\Models\Lot;
 use App\Models\Paiement;
 use App\Models\Residence;
@@ -72,7 +73,17 @@ class DemoSeeder extends Seeder
             'status' => 'active',
         ]);
 
-        // ── 4. Lots avec tantièmes (somme = 1000) ──────────────
+        // ── 4. Exercice actif 2026 ─────────────────────────────
+        $exercice = Exercice::withoutGlobalScope('tenant')->create([
+            'tenant_id'  => $tenant->id,
+            'residence_id' => $residence->id,
+            'annee'      => 2026,
+            'date_debut' => '2026-01-01',
+            'date_fin'   => '2026-12-31',
+            'statut'     => 'actif',
+        ]);
+
+        // ── 5. Lots avec tantièmes (somme = 1000) ──────────────
         $nomsMarocains = [
             'Hassan Benali', 'Fatima Chraibi', 'Youssef Tazi',
             'Nadia Berrada', 'Omar Fassi', 'Amina Kettani',
@@ -124,10 +135,11 @@ class DemoSeeder extends Seeder
             $coproprietaires[] = ['copro' => $copro, 'lot' => $lot];
         }
 
-        // ── 5. Appel de fonds ──────────────────────────────────
+        // ── 6. Appel de fonds ──────────────────────────────────
         $appelFonds = AppelFonds::withoutGlobalScope('tenant')->create([
             'tenant_id' => $tenant->id,
             'residence_id' => $residence->id,
+            'exercice_id' => $exercice->id,
             'created_by' => $gestionnaire1->id,
             'libelle' => 'Charges Q2 2026',
             'description' => 'Charges communes : gardiennage, ascenseur, nettoyage',
@@ -139,12 +151,13 @@ class DemoSeeder extends Seeder
 
         $appelFonds->genererLignes();
 
-        // ── 6. Paiements (75% payés = 15 sur 20) ──────────────
+        // ── 7. Paiements (75% payés = 15 sur 20) ──────────────
         $lignes = $appelFonds->lignes()->with('coproprietaire')->get();
 
         foreach ($lignes->take(15) as $ligne) {
             Paiement::create([
                 'tenant_id' => $tenant->id,
+                'exercice_id' => $exercice->id,
                 'coproprietaire_id' => $ligne->coproprietaire_id,
                 'appel_fonds_ligne_id' => $ligne->id,
                 'saisi_par' => $gestionnaire1->id,
@@ -169,7 +182,7 @@ class DemoSeeder extends Seeder
 
         $appelFonds->update(['statut' => 'partiel']);
 
-        // ── 7. Tickets ─────────────────────────────────────────
+        // ── 8. Tickets ─────────────────────────────────────────
         Ticket::create([
             'tenant_id' => $tenant->id,
             'residence_id' => $residence->id,
@@ -204,6 +217,7 @@ class DemoSeeder extends Seeder
         $this->command->info('   Tenant    : Blanca Syndic (subdomain: blanca)');
         $this->command->info('   Manager   : Mohammed Fikri (+212600000001)');
         $this->command->info('   Résidence : Résidence Atlas · 20 lots · 1 000 tantièmes');
+        $this->command->info('   Exercice  : 2026 (actif) · 01/01/2026 → 31/12/2026');
         $this->command->info('   Appel     : Charges Q2 2026 · 18 000 DH · 15/20 payés');
         $this->command->info('   Tickets   : 3 (1 urgent, 1 en cours, 1 faible)');
     }
