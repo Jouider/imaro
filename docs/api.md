@@ -1,9 +1,9 @@
-# SyndikPro — API Contract
+# imaro — API Contract
 
-**Base URL:** `https://{subdomain}.syndikpro.ma/api`
+**Base URL:** `https://{subdomain}.imaro.ma/api`
 **Local dev:** `http://localhost:8000/api`
 **Auth:** `Authorization: Bearer {sanctum_token}`
-**Content-Type:** `application/json`
+**Content-Type:** `application/json` (sauf upload fichiers → `multipart/form-data`)
 **Currency:** MAD (DH) — always
 **Languages:** FR (primary), AR (secondary, RTL)
 
@@ -33,7 +33,7 @@
 
 ## Multi-Tenant
 
-Tenant is resolved from the subdomain: `blanca.syndikpro.ma` → tenant `blanca`.
+Tenant is resolved from the subdomain: `blanca.imaro.ma` → tenant `blanca`.
 `SetTenant` middleware auto-injects `tenant_id` on every request. All resources are scoped to the current tenant.
 
 ---
@@ -42,12 +42,11 @@ Tenant is resolved from the subdomain: `blanca.syndikpro.ma` → tenant `blanca`
 
 | Role | Description |
 |---|---|
-| `super_admin` | SyndikPro team — full platform access |
-| `manager` | Syndic company owner |
-| `gestionnaire` | Employee managing N residences |
-| `agent_recouvrement` | Collections specialist |
-| `conseil` | Elected copropriétaire — read-only |
-| `resident` | End copropriétaire — own data only |
+| `super_admin` | imaro team (Digitoyou) — full platform access |
+| `manager` | Cabinet syndic owner |
+| `gestionnaire` | Employee managing N résidences |
+| `conseil` | Elected copropriétaire — read + complaints only |
+| `resident` | End copropriétaire — own data only (mobile app) |
 
 ---
 
@@ -225,7 +224,82 @@ List residences assigned to the authenticated gestionnaire.
 
 ---
 
-## 3. Gestionnaire — Lots & Tantièmes (KAN-13)
+## 3. Gestionnaire — Exercices
+
+`auth:sanctum` · `role:gestionnaire`
+
+Chaque résidence fonctionne par exercices annuels. Toutes les données financières (appels de fonds, paiements, dépenses) sont rattachées à un exercice.
+
+### GET /api/gestionnaire/residences/{id}/exercices
+
+**Response 200**
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 1,
+      "annee": 2026,
+      "date_debut": "2026-01-01",
+      "date_fin": "2026-12-31",
+      "statut": "actif"
+    },
+    {
+      "id": 2,
+      "annee": 2025,
+      "date_debut": "2025-01-01",
+      "date_fin": "2025-12-31",
+      "statut": "cloture"
+    }
+  ]
+}
+```
+
+---
+
+### POST /api/gestionnaire/residences/{id}/exercices
+
+**Body**
+```json
+{
+  "annee": 2027,
+  "date_debut": "2027-01-01",
+  "date_fin": "2027-12-31"
+}
+```
+
+**Validation :** Un seul exercice par année par résidence — retourne 422 si l'année existe déjà.
+
+**Response 201**
+```json
+{
+  "status": "success",
+  "message": "Exercice 2027 créé.",
+  "data": { "id": 3, "annee": 2027, "statut": "actif" }
+}
+```
+
+---
+
+### POST /api/gestionnaire/residences/{id}/exercices/{exercice}/cloture
+
+Clôture un exercice actif. Action irréversible.
+
+**Response 200**
+```json
+{
+  "status": "success",
+  "message": "Exercice 2026 clôturé.",
+  "data": { "id": 1, "annee": 2026, "statut": "cloture" }
+}
+```
+
+**Erreurs**
+- `422` — exercice déjà clôturé
+
+---
+
+## 4. Gestionnaire — Lots & Tantièmes (KAN-13)
 
 `auth:sanctum` · `role:gestionnaire`
 
@@ -295,7 +369,7 @@ Soft delete. Blocked if lot has unpaid appels de fonds.
 
 ---
 
-## 4. Manager — Résidences CRUD
+## 5. Manager — Résidences CRUD
 
 `auth:sanctum` · `role:manager`
 
@@ -321,7 +395,7 @@ Soft delete only.
 
 ---
 
-## 5. Copropriétaires
+## 6. Copropriétaires
 
 `auth:sanctum` · roles: `manager`, `gestionnaire`
 
@@ -350,7 +424,7 @@ Soft delete only.
 
 ---
 
-## 6. Appels de Fonds (KAN-14)
+## 7. Appels de Fonds (KAN-14)
 
 `auth:sanctum` · roles: `manager`, `gestionnaire`
 
@@ -458,7 +532,7 @@ Returns a signed URL if already generated, or queues generation and returns 202.
 
 ---
 
-## 7. Paiements (KAN-15)
+## 8. Paiements (KAN-15)
 
 `auth:sanctum` · roles: `manager`, `gestionnaire`, `agent_recouvrement`
 
@@ -551,14 +625,16 @@ Envoyer une relance manuelle via WhatsApp/SMS.
 
 ---
 
-## 8. Tickets Maintenance (KAN-21)
+## 9. Tickets / Réclamations (KAN-21)
 
 `auth:sanctum`
 
-### GET /api/tickets
-`roles: manager, gestionnaire`
+> Upload de photos : utiliser `Content-Type: multipart/form-data`
 
-**Query params:** `residence_id`, `statut` (`ouvert`|`en_cours`|`résolu`|`fermé`), `priorite` (`urgent`|`normal`|`faible`), `per_page`
+### GET /api/gestionnaire/tickets
+`role: gestionnaire`
+
+**Query params:** `residence_id`, `statut` (`ouvert`|`en_cours`|`resolu`|`clos`), `priorite` (`urgent`|`normal`|`faible`), `categorie`, `per_page`
 
 **Response 200**
 ```json
@@ -568,63 +644,108 @@ Envoyer une relance manuelle via WhatsApp/SMS.
     "tickets": [
       {
         "id": 1,
-        "titre": "Ascenseur en panne",
-        "description": "Ascenseur bloc A bloqué au 3ème étage",
+        "categorie": "ascenseur",
+        "description": "L'ascenseur est en panne depuis ce matin.",
         "priorite": "urgent",
         "statut": "ouvert",
-        "residence": { "id": 1, "name": "Résidence Atlas" },
-        "coproprietaire": { "id": 1, "name": "Hassan Benali" },
-        "created_at": "2026-05-10T09:00:00Z"
+        "images": [
+          "https://blanca.imaro.ma/storage/tickets/1/photo1.jpg"
+        ],
+        "closed_at": null,
+        "created_at": "2026-05-10T09:00:00Z",
+        "residence": { "id": 1, "name": "Résidence Atlas", "city": "Casablanca" },
+        "lot": { "id": 1, "numero": "Apt 1" },
+        "user": { "id": 5, "name": "Hassan Benali", "phone": "+212600000010" }
       }
-    ]
+    ],
+    "meta": { "total": 3, "per_page": 15, "current_page": 1, "last_page": 1 }
   }
 }
 ```
 
 ---
 
-### POST /api/tickets
-`roles: resident, conseil, gestionnaire, manager`
+### POST /api/gestionnaire/tickets
+`role: gestionnaire` · `Content-Type: multipart/form-data`
 
-**Body**
-```json
-{
-  "titre": "Ascenseur en panne",
-  "description": "Ascenseur bloc A bloqué au 3ème étage",
-  "priorite": "urgent",
-  "residence_id": 1,
-  "lot_id": 1
-}
-```
+**Body (form-data)**
+| Champ | Type | Requis | Description |
+|---|---|---|---|
+| `residence_id` | integer | ✅ | ID de la résidence |
+| `lot_id` | integer | — | ID du lot concerné |
+| `categorie` | string | ✅ | `plomberie` \| `electricite` \| `ascenseur` \| `proprete` \| `securite` \| `autre` |
+| `description` | string | ✅ | Min 10, max 2000 caractères |
+| `priorite` | string | ✅ | `urgent` \| `normal` \| `faible` |
+| `images[]` | file | — | Max 5 photos · jpeg/png/webp · max 5 MB/photo |
 
 **Response 201**
-
----
-
-### GET /api/tickets/{id}
-
----
-
-### PUT /api/tickets/{id}
-`roles: gestionnaire, manager` — update statut, assign prestataire
-
-**Body**
 ```json
 {
-  "statut": "en_cours",
-  "prestataire_id": 1,
-  "notes_internes": "Technicien contacté"
+  "status": "success",
+  "message": "Ticket créé",
+  "data": {
+    "ticket": {
+      "id": 4,
+      "categorie": "plomberie",
+      "description": "Fuite d'eau au 2ème étage.",
+      "priorite": "normal",
+      "statut": "ouvert",
+      "images": [
+        "https://blanca.imaro.ma/storage/tickets/4/fuite1.jpg",
+        "https://blanca.imaro.ma/storage/tickets/4/fuite2.jpg"
+      ],
+      "created_at": "2026-05-14T10:30:00Z"
+    }
+  }
 }
 ```
 
 ---
 
-### POST /api/tickets/{id}/close
-`roles: gestionnaire, manager`
+### GET /api/gestionnaire/tickets/{id}
 
 ---
 
-## 9. Prestataires
+### PUT /api/gestionnaire/tickets/{id}
+`role: gestionnaire` · `Content-Type: multipart/form-data`
+
+**Body (form-data)**
+| Champ | Type | Description |
+|---|---|---|
+| `statut` | string | `ouvert` \| `en_cours` \| `resolu` \| `clos` |
+| `priorite` | string | `urgent` \| `normal` \| `faible` |
+| `prestataire_id` | integer | Assigner un prestataire |
+| `cout_estime` | numeric | Coût estimé (MAD) |
+| `cout_reel` | numeric | Coût réel après travaux (MAD) |
+| `note_satisfaction` | integer | 1 à 5 |
+| `images[]` | file | Nouvelles photos à ajouter (max 5 au total) |
+| `supprimer_images[]` | string | Chemins relatifs à supprimer (ex: `tickets/4/fuite1.jpg`) |
+
+**Response 200**
+
+---
+
+### POST /api/gestionnaire/tickets/{id}/clos
+`role: gestionnaire`
+
+Clôture le ticket — action irréversible.
+
+**Response 200**
+```json
+{
+  "status": "success",
+  "message": "Ticket clos",
+  "data": { "ticket": { "statut": "clos", "closed_at": "2026-05-14T15:00:00Z" } }
+}
+```
+
+**Erreurs**
+- `422` — ticket déjà clos
+- `403` — résidence non assignée à ce gestionnaire
+
+---
+
+## 10. Prestataires
 
 `auth:sanctum` · roles: `manager`, `gestionnaire`
 
@@ -665,7 +786,7 @@ Envoyer une relance manuelle via WhatsApp/SMS.
 
 ---
 
-## 10. Assemblées Générales
+## 11. Assemblées Générales
 
 `auth:sanctum` · roles: `manager`, `gestionnaire`
 
@@ -702,7 +823,7 @@ Enregistrer un vote.
 
 ---
 
-## 11. Notifications Log
+## 12. Notifications Log
 
 `auth:sanctum` · roles: `manager`, `gestionnaire`
 
@@ -733,7 +854,7 @@ Historique des notifications envoyées (WhatsApp / SMS / email).
 
 ---
 
-## 12. Super Admin
+## 13. Super Admin
 
 `auth:sanctum` · `role:super_admin`
 
@@ -791,4 +912,4 @@ Platform-wide stats: tenants count, MRR, active users.
 
 ---
 
-*Last updated: 2026-05-13 — KAN-13 gestionnaire routes added (/api/gestionnaire/)*
+*Last updated: 2026-05-14 — exercices API + ticket photo upload + imaro rename*
