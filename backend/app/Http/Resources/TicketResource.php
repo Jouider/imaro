@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class TicketResource extends JsonResource
 {
@@ -18,7 +19,9 @@ class TicketResource extends JsonResource
             'cout_estime' => $this->cout_estime,
             'cout_reel' => $this->cout_reel,
             'note_satisfaction' => $this->note_satisfaction,
-            'images' => $this->images ?? [],
+            'images' => collect($this->images ?? [])->map(
+                fn ($path) => Storage::disk('public')->url($path)
+            )->values()->all(),
             'closed_at' => $this->closed_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),
             'residence' => $this->when($this->relationLoaded('residence'), fn () => [
