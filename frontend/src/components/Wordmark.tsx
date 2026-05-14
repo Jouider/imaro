@@ -1,28 +1,41 @@
 import { cn } from '@/lib/utils'
 
+type Variant = 'horizontal' | 'stacked'
+
 type Props = {
+  /** Additional classes applied to the <img> element (use for sizing: h-8, h-24, etc.) */
   className?: string
-  /** When true, the navy half ("Ima") flips to white — for navy backgrounds */
+  /** Layout variant. 'horizontal' = icon + text side-by-side (default). 'stacked' = icon above text. */
+  variant?: Variant
+  /** Use the white/outlined version — for navy or dark backgrounds */
   inverted?: boolean
 }
 
+const SRC: Record<`${Variant}${'' | '-inverted'}`, string> = {
+  horizontal: '/logo-horizontal.png',
+  'horizontal-inverted': '/logo-horizontal-inverted.png',
+  stacked: '/logo-stacked.png',
+  'stacked-inverted': '/logo-stacked-inverted.png',
+}
+
 /**
- * Imaro wordmark. Two-tone: navy "Ima" + orange "ro".
- * Uses `font-display` (DM Serif Display) — heading-only font per the spec.
- * Pure text — no PNG dependency until we have an Imaro logo asset.
+ * Imaro logo. Renders the official PNG asset.
+ *
+ * Usage in nav (light bg):      <Wordmark className="h-10 w-auto" />
+ * Usage in login card (centred): <Wordmark variant="stacked" className="h-28 w-auto mx-auto" />
+ * Usage in navy sidebar:         <Wordmark inverted className="h-10 w-auto" />
  */
-export function Wordmark({ className, inverted = false }: Props) {
+export function Wordmark({
+  className,
+  variant = 'horizontal',
+  inverted = false,
+}: Props) {
+  const key: keyof typeof SRC = inverted ? `${variant}-inverted` : variant
   return (
-    <span
-      className={cn(
-        'font-display text-2xl leading-none tracking-tight',
-        className,
-      )}
-    >
-      <span className={inverted ? 'text-white' : 'text-[var(--primary)]'}>
-        Ima
-      </span>
-      <span className="text-[var(--accent)]">ro</span>
-    </span>
+    <img
+      src={SRC[key]}
+      alt="Imaro"
+      className={cn('object-contain', className)}
+    />
   )
 }

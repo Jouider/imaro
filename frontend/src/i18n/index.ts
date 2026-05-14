@@ -2,8 +2,8 @@ import i18n from 'i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
 
-import fr from '@/locales/fr/common.json'
-import ar from '@/locales/ar/common.json'
+import fr from './fr.json'
+import ar from './ar.json'
 
 export const SUPPORTED_LANGUAGES = ['fr', 'ar'] as const
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number]

@@ -18,9 +18,9 @@ import { Label } from '@/components/ui/label'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { Wordmark } from '@/components/Wordmark'
 
-import { requestOtp, verifyOtp } from '@/features/auth/api'
-import { setStoredToken } from '@/api/client'
-import { useAuthStore } from '@/store/auth'
+import { requestOtp, verifyOtp } from '@/services/auth.service'
+import { setStoredToken } from '@/lib/axios'
+import { useAuthStore } from '@/stores/authStore'
 
 type Step = 'phone' | 'otp'
 
@@ -60,7 +60,7 @@ export function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <div className="mx-auto mb-1 flex justify-center">
-            <Wordmark className="text-3xl" />
+            <Wordmark variant="stacked" className="h-32 w-auto" />
           </div>
           <CardTitle className="mt-2 font-display text-[var(--primary)]">
             {t('auth.title')}

@@ -1,5 +1,5 @@
-import { api, type ApiEnvelope } from '@/api/client'
-import type { AuthTenant, AuthUser } from '@/store/auth'
+import { api, type ApiEnvelope } from '@/lib/axios'
+import type { AuthTenant, AuthUser } from '@/stores/authStore'
 
 export type RequestOtpResponse = ApiEnvelope<{ expires_in: number }>
 export type VerifyOtpResponse = ApiEnvelope<{

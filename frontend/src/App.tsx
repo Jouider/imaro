@@ -1,8 +1,8 @@
 import { RouterProvider } from 'react-router-dom'
 import { QueryProvider } from '@/providers/QueryProvider'
 import { Toaster } from '@/components/ui/sonner'
-import { router } from '@/routes/router'
-import '@/lib/i18n'
+import { router } from '@/router'
+import '@/i18n'
 
 export default function App() {
   return (
