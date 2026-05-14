@@ -93,10 +93,12 @@ export function PortailHomePage() {
           </p>
 
           {/* Balance amount */}
-          <MontantDisplay
-            value={dashboard.balance}
-            className="text-4xl font-bold text-white dark:text-foreground"
-          />
+          <div>
+            <MontantDisplay
+              value={dashboard.balance}
+              className="text-4xl font-bold text-white dark:text-foreground"
+            />
+          </div>
 
           {/* Status chip */}
           {dashboard.statut === 'a_jour' ? (
