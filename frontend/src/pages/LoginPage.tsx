@@ -138,6 +138,51 @@ export function LoginPage() {
           <p className="text-center text-xs text-muted-foreground">
             <Link to="/">← {t('nav.home')}</Link>
           </p>
+
+          {/* ── Dev bypass — tree-shaken in production ── */}
+          {import.meta.env.DEV && (
+            <div className="border-t border-dashed border-amber-300 bg-amber-50 -mx-6 -mb-6 px-4 py-3 rounded-b-xl">
+              <p className="mb-2 text-center text-xs font-semibold text-amber-700">
+                ⚙️ Dev mode — accès direct
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 border-amber-400 text-amber-700 hover:bg-amber-100"
+                  onClick={() => {
+                    setStoredToken('dev-mock-token-gestionnaire')
+                    setSession({
+                      token: 'dev-mock-token-gestionnaire',
+                      user: { id: 2, name: 'Ahmed Berrada', phone: '+212612000002', role: 'gestionnaire' as const },
+                      tenant: { id: 1, name: 'Atlas Casablanca', subdomain: 'atlas', plan: 'standard' },
+                    })
+                    void navigate('/gestionnaire/dashboard', { replace: true })
+                  }}
+                >
+                  Gestionnaire
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 border-amber-400 text-amber-700 hover:bg-amber-100"
+                  onClick={() => {
+                    setStoredToken('dev-mock-token-manager')
+                    setSession({
+                      token: 'dev-mock-token-manager',
+                      user: { id: 3, name: 'Sara Alaoui', phone: '+212612000003', role: 'manager' as const },
+                      tenant: { id: 1, name: 'Atlas Casablanca', subdomain: 'atlas', plan: 'standard' },
+                    })
+                    void navigate('/gestionnaire/dashboard', { replace: true })
+                  }}
+                >
+                  Manager
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
