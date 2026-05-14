@@ -41,6 +41,48 @@
     "save": "Enregistrer"
   },
   "portail": {
+    "nav": {
+      "home": "Accueil",
+      "finances": "Finances",
+      "reclamations": "Réclamations",
+      "profil": "Profil"
+    },
+    "home": {
+      "balance": "Mon solde",
+      "aJour": "À jour",
+      "enRetard": "En retard",
+      "prochainAppel": "Prochain appel",
+      "le": "le",
+      "annonces": "Annonces de la résidence",
+      "noAnnonces": "Aucune annonce",
+      "kpiPaidYear": "Payé cette année",
+      "kpiPending": "Reste à payer"
+    },
+    "finances": {
+      "title": "Mes finances",
+      "filter": {
+        "all": "Tout",
+        "appels": "Appels de fonds",
+        "paiements": "Paiements"
+      },
+      "empty": "Aucune opération",
+      "recu": "Télécharger le reçu"
+    },
+    "reclamations": {
+      "title": "Signaler un problème",
+      "categorie": "Catégorie",
+      "sujet": "Sujet",
+      "description": "Description",
+      "submit": "Signaler le problème",
+      "success": "Réclamation envoyée",
+      "hint": "Vos réclamations sont traitées dans un délai de 48h ouvrées."
+    },
+    "profil": {
+      "title": "Mon profil",
+      "apparence": "Apparence",
+      "darkMode": "Mode sombre",
+      "logout": "Se déconnecter"
+    },
     "login": {
       "title": "Portail copropriétaire",
       "subtitle": "Recevez un code à 6 chiffres sur WhatsApp",

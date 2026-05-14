@@ -46,9 +46,9 @@ imaro/                      ← repo (local path encore /Users/mouadsmac/Code/sy
 Tokens définis dans `src/index.css` (Tailwind v4 `@theme`) :
 
 ```css
---color-imaro-primary: #1b4f72;      /* sidebar, headings, primary buttons */
+--color-imaro-primary: #1b4f72; /* sidebar, headings, primary buttons */
 --color-imaro-primary-light: #2980b9; /* focus rings, hover */
---color-imaro-accent: #e67e22;        /* CTA orange */
+--color-imaro-accent: #e67e22; /* CTA orange */
 --color-imaro-success: #27ae60;
 --color-imaro-warning: #f39c12;
 --color-imaro-danger: #e74c3c;
