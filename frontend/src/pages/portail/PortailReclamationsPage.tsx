@@ -24,6 +24,9 @@ const CATEGORIES = [
   'Autre',
 ]
 
+const MAX_IMAGES = 5
+const MAX_SIZE_BYTES = 5 * 1024 * 1024 // 5 MB
+
 type FormState = {
   categorie: string
   sujet: string
@@ -36,8 +39,8 @@ export function PortailReclamationsPage() {
   const { t } = useTranslation()
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
   const [errors, setErrors] = useState<Partial<FormState>>({})
-  const [photo, setPhoto] = useState<File | null>(null)
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [images, setImages] = useState<File[]>([])
+  const [previews, setPreviews] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const mutation = useMutation({
@@ -46,11 +49,9 @@ export function PortailReclamationsPage() {
       toast.success(t('portail.reclamations.success'))
       setForm(EMPTY_FORM)
       setErrors({})
-      if (photoPreview) {
-        URL.revokeObjectURL(photoPreview)
-      }
-      setPhoto(null)
-      setPhotoPreview(null)
+      previews.forEach((url) => URL.revokeObjectURL(url))
+      setImages([])
+      setPreviews([])
     },
     onError: () => {
       toast.error(t('actions.loading'))
@@ -75,28 +76,35 @@ export function PortailReclamationsPage() {
       categorie: form.categorie,
       sujet: form.sujet.trim(),
       description: form.description.trim(),
-      photo,
+      images,
     })
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0] ?? null
-    if (!file) return
-    if (photoPreview) {
-      URL.revokeObjectURL(photoPreview)
-    }
-    setPhoto(file)
-    setPhotoPreview(URL.createObjectURL(file))
-    // Reset input value so the same file can be re-selected after removal
+    const files = Array.from(e.target.files ?? [])
     e.target.value = ''
+    if (!files.length) return
+
+    // Validate size
+    const oversized = files.find((f) => f.size > MAX_SIZE_BYTES)
+    if (oversized) {
+      toast.error(t('portail.reclamations.photoSizeError'))
+      return
+    }
+
+    // Take only what fits under the cap
+    const slots = MAX_IMAGES - images.length
+    const toAdd = files.slice(0, slots)
+    const newPreviews = toAdd.map((f) => URL.createObjectURL(f))
+
+    setImages((prev) => [...prev, ...toAdd])
+    setPreviews((prev) => [...prev, ...newPreviews])
   }
 
-  function handleRemovePhoto() {
-    if (photoPreview) {
-      URL.revokeObjectURL(photoPreview)
-    }
-    setPhoto(null)
-    setPhotoPreview(null)
+  function handleRemoveImage(index: number) {
+    URL.revokeObjectURL(previews[index])
+    setImages((prev) => prev.filter((_, i) => i !== index))
+    setPreviews((prev) => prev.filter((_, i) => i !== index))
   }
 
   return (
@@ -175,45 +183,52 @@ export function PortailReclamationsPage() {
           )}
         </div>
 
-        {/* Photo upload */}
-        <div className="space-y-1.5">
-          {/* Hidden file input */}
+        {/* Images upload — max 5 · jpeg/png/webp · 5 MB each */}
+        <div className="space-y-2">
+          {/* Hidden file input — multiple allowed */}
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
             className="hidden"
             onChange={handleFileChange}
           />
 
-          {photo && photoPreview ? (
-            /* Thumbnail with remove button */
-            <div className="relative inline-block">
-              <img
-                src={photoPreview}
-                alt={t('portail.reclamations.removePhoto')}
-                className="h-20 w-20 rounded-lg object-cover"
-              />
+          {/* Thumbnails row + add button */}
+          <div className="flex flex-wrap gap-2">
+            {previews.map((src, i) => (
+              <div key={src} className="relative shrink-0">
+                <img
+                  src={src}
+                  alt={`Photo ${i + 1}`}
+                  className="h-20 w-20 rounded-lg object-cover border border-border"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(i)}
+                  aria-label={t('portail.reclamations.removePhoto')}
+                  className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-white shadow"
+                >
+                  <X className="size-3.5" aria-hidden="true" />
+                </button>
+              </div>
+            ))}
+
+            {/* Show add button only when under the cap */}
+            {images.length < MAX_IMAGES && (
               <button
                 type="button"
-                onClick={handleRemovePhoto}
-                aria-label={t('portail.reclamations.removePhoto')}
-                className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-white shadow"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex h-20 w-20 shrink-0 flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-input text-xs text-muted-foreground transition-colors hover:border-[var(--color-imaro-primary)] hover:text-[var(--color-imaro-primary)]"
               >
-                <X className="size-3.5" aria-hidden="true" />
+                <Camera className="size-5" aria-hidden="true" />
+                {images.length === 0
+                  ? t('portail.reclamations.addPhoto')
+                  : `+${MAX_IMAGES - images.length}`}
               </button>
-            </div>
-          ) : (
-            /* Add photo trigger button */
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="flex min-h-12 w-full items-center justify-center gap-2 rounded-md border border-dashed border-input px-4 py-3 text-sm text-muted-foreground transition-colors hover:border-[var(--color-imaro-primary)] hover:text-[var(--color-imaro-primary)]"
-            >
-              <Camera className="size-5 shrink-0" aria-hidden="true" />
-              {t('portail.reclamations.addPhoto')}
-            </button>
-          )}
+            )}
+          </div>
 
           <p className="text-xs text-muted-foreground">
             {t('portail.reclamations.photoHint')}

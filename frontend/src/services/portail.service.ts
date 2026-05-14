@@ -156,9 +156,15 @@ export async function createReclamation(
     categorie: string
     sujet: string
     description: string
-    photo?: File | null
+    images?: File[]
   },
 ): Promise<void> {
-  // TODO: use FormData once POST /api/portail/reclamations is ready
+  // TODO: POST /api/gestionnaire/tickets — multipart/form-data
+  // const fd = new FormData()
+  // fd.append('titre', _data.sujet)
+  // fd.append('description', _data.description)
+  // fd.append('categorie', _data.categorie)
+  // _data.images?.forEach((f) => fd.append('images[]', f))
+  // await api.post('/gestionnaire/tickets', fd)
   return Promise.resolve()
 }
