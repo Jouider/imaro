@@ -1,6 +1,6 @@
-# SyndikPro
+# imaro
 
-SaaS B2B multi-tenant — gestion de copropriété pour le Maroc.
+SaaS B2B multi-tenant — gestion de copropriété pour le Maroc (by Digitoyou).
 **Stack:** Laravel 11 · MySQL 8 · Redis · PHP 8.3 · Loi 18-00
 
 ---
@@ -8,9 +8,9 @@ SaaS B2B multi-tenant — gestion de copropriété pour le Maroc.
 ## Structure du mono-repo
 
 ```
-syndikpro/
+imaro/
 ├── backend/          # Laravel 11 API (Abdellah)
-├── frontend/         # Vue/React app  (Mouad)
+├── frontend/         # Next.js app  (Mouad)
 ├── docs/api.md       # Contrat API
 ├── docker-compose.yml
 └── .gitignore
@@ -36,7 +36,7 @@ syndikpro/
 ```bash
 # 1. Cloner le repo
 git clone https://github.com/Jouider/syndikpro.git
-cd syndikpro/backend
+cd imaro/backend
 
 # 2. Installer les dépendances PHP
 composer install
@@ -49,7 +49,7 @@ cp .env.example .env
 php artisan key:generate
 
 # 5. Créer la base de données
-mysql -u root -p -e "CREATE DATABASE syndikpro CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p -e "CREATE DATABASE imaro CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
 # 6. Lancer les migrations + seed de démo
 php artisan migrate:fresh --seed
@@ -67,14 +67,14 @@ php artisan serve
 Copier `backend/.env.example` et remplir :
 
 ```env
-APP_NAME=SyndikPro
+APP_NAME=imaro
 APP_URL=http://localhost:8000
 FRONTEND_URL=http://localhost:5173
 
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=syndikpro
+DB_DATABASE=imaro
 DB_USERNAME=root
 DB_PASSWORD=secret
 
@@ -97,7 +97,7 @@ SENTRY_LARAVEL_DSN=
 ## Setup Frontend
 
 ```bash
-cd syndikpro/frontend
+cd imaro/frontend
 npm install
 cp .env.example .env.local
 # Éditer VITE_API_URL=http://localhost:8000/api
@@ -128,7 +128,7 @@ php artisan migrate:fresh --seed         # Reset + données de démo
 php artisan db:seed --class=DemoSeeder  # Seed uniquement
 php artisan horizon                      # Queue worker (Redis)
 php artisan route:list --path=api        # Lister les routes API
-./vendor/bin/pest                        # Tests
+./vendor/bin/pest                        # Tests (39 tests)
 ./vendor/bin/pest --filter=AuthTest      # Test unitaire ciblé
 ```
 
@@ -141,12 +141,13 @@ Après `migrate:fresh --seed` :
 | Compte | Téléphone | Rôle |
 |---|---|---|
 | Mohammed Fikri | +212600000001 | manager |
-| Youssef Benali | +212600000002 | gestionnaire |
-| Karim Tazi | +212600000003 | gestionnaire |
+| Karim Alaoui | +212600000002 | gestionnaire |
+| Leila Mansouri | +212600000003 | gestionnaire |
 
-- **Tenant :** Blanca Syndic (`blanca.syndikpro.ma`)
+- **Tenant :** Blanca Syndic (`blanca.imaro.ma`)
 - **Résidence :** Résidence Atlas — 20 lots, tantièmes = 1 000/1 000
-- **Appel de fonds :** Charges Q2 2026 — 18 000 DH
+- **Exercice :** 2026 (actif) — 01/01/2026 → 31/12/2026
+- **Appel de fonds :** Charges Q2 2026 — 18 000 DH — lié à l'exercice 2026
 - **15 paiements** (75 % réglé, 5 impayés)
 - **3 tickets** (1 urgent : ascenseur, 2 normal)
 
@@ -154,12 +155,65 @@ Après `migrate:fresh --seed` :
 
 ## Architecture multi-tenant
 
-Chaque client = 1 tenant avec données isolées.
+Chaque client = 1 tenant (cabinet syndic) avec données isolées.
 Le tenant est résolu depuis le sous-domaine :
-`blanca.syndikpro.ma` → tenant `subdomain=blanca`
+`blanca.imaro.ma` → tenant `subdomain=blanca`
 
 Toutes les tables ont une colonne `tenant_id`.
 Le middleware `SetTenant` l'injecte automatiquement sur chaque requête.
+
+---
+
+## Concept Exercice (année fiscale)
+
+Chaque résidence fonctionne par exercices annuels.
+Toutes les données financières (appels de fonds, paiements, dépenses, budgets) sont rattachées à un exercice.
+
+```
+Tenant (cabinet syndic)
+  └── Résidence (ex: Résidence Atlas)
+        ├── Exercice 2024 (clôturé)
+        ├── Exercice 2025 (clôturé)
+        └── Exercice 2026 (actif)
+              ├── Appels de fonds
+              ├── Paiements
+              └── Dépenses (sprint 2)
+```
+
+---
+
+## Rôles
+
+| Rôle | Qui | Accès |
+|---|---|---|
+| `super_admin` | Équipe imaro (Digitoyou) | Tout |
+| `manager` | Propriétaire du cabinet syndic | Son tenant |
+| `gestionnaire` | Employé gérant N résidences | Résidences assignées |
+| `conseil` | Copropriétaire élu | Lecture + réclamations |
+| `resident` | Copropriétaire final | Ses données uniquement |
+
+---
+
+## Modules
+
+| Module | Statut |
+|---|---|
+| Auth OTP WhatsApp | ✅ Sprint 1 |
+| Dashboard gestionnaire | ✅ Sprint 1 |
+| Résidences + lots + tantièmes | ✅ Sprint 1 |
+| Copropriétaires | ✅ Sprint 1 |
+| Appels de fonds auto-génération | ✅ Sprint 1 |
+| Paiements + impayés | ✅ Sprint 1 |
+| Tickets / Réclamations | ✅ Sprint 1 |
+| Exercices (années fiscales) | ✅ Sprint 2 |
+| Budgets (3 types) | ❌ Sprint 2 |
+| Dépenses | ❌ Sprint 2 |
+| Prestataires / Contrats | ❌ Sprint 2 |
+| Annonces | ❌ Sprint 2 |
+| Manager API | ❌ Sprint 2 |
+| Suivi des travaux | ❌ Sprint 3 |
+| Documents GED | ❌ Sprint 3 |
+| Assemblées Générales + votes | ❌ Sprint 3 |
 
 ---
 
@@ -177,11 +231,11 @@ fix/*       ← corrections de bugs
 # Démarrage d'une feature
 git checkout develop
 git pull origin develop
-git checkout -b feat/backend-auth-otp
+git checkout -b feat/backend-exercices
 
 # Fin de feature → PR vers develop
-git push origin feat/backend-auth-otp
-gh pr create --base develop --title "feat(auth): add OTP endpoint"
+git push origin feat/backend-exercices
+gh pr create --base develop --title "feat(exercices): add annual fiscal year"
 ```
 
 **Règles :**
@@ -202,29 +256,39 @@ Voir [`docs/api.md`](docs/api.md) pour le contrat complet.
 {
   "status": "success",
   "message": "...",
-  "data": { }
+  "data": {}
 }
 ```
 
-**Auth :** OTP WhatsApp → Sanctum token
-**Base URL :** `https://{subdomain}.syndikpro.ma/api`
+**Auth :** OTP WhatsApp → token Sanctum (30 jours)
+**Base URL :** `https://{subdomain}.imaro.ma/api`
+
+**Tester avec Postman :** importer `backend/postman/SyndikPro.postman_collection.json`
 
 ---
 
-## Sprint 1 — Priorités (Jira)
+## Sprints
 
+### Sprint 1 — DONE ✅
 | Ticket | Description |
 |---|---|
 | KAN-9 | Repo GitHub + invitations équipe |
 | KAN-10 | Init Laravel 11 |
 | KAN-12 | Schéma DB + migrations |
-| KAN-22 | VPS + domaine + SSL + CI/CD |
 | KAN-13 | API Résidences + lots + tantièmes |
 | KAN-14 | Auto-génération appels de fonds |
 | KAN-15 | Paiements + suivi impayés |
-| KAN-16 | WhatsApp Business API (démarrer maintenant — 7-14 j) |
-| KAN-17 | Système de relances automatiques |
 | KAN-21 | Système de tickets maintenance |
+
+### Sprint 2 — EN COURS
+| Ticket | Description | Statut |
+|---|---|---|
+| KAN-22 | VPS + domaine + SSL + CI/CD | ❌ |
+| KAN-16 | WhatsApp Business API | ⏳ Bloqué Meta (7-14j) |
+| KAN-17 | Relances automatiques | ⏳ Bloqué KAN-16 |
+| — | Exercices (années fiscales) | ✅ |
+| — | Budgets, Dépenses, Prestataires | ❌ |
+| — | Annonces, Manager API | ❌ |
 
 ---
 
