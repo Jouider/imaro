@@ -25,6 +25,21 @@
     "verifyOtp": "Vérifier",
     "back": "Retour"
   },
+  "statut": {
+    "paye": "Payé",
+    "impaye": "Impayé",
+    "partiel": "Partiel",
+    "retard": "En retard"
+  },
+  "actions": {
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "loading": "Chargement…",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "save": "Enregistrer"
+  },
   "home": {
     "title": "Bienvenue sur Imaro",
     "subtitle": "Plateforme marocaine de gestion de copropriété — conforme à la Loi 18-00",
