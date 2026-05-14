@@ -1,5 +1,5 @@
 const apiBase = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api'
-const appName = import.meta.env.VITE_APP_NAME ?? 'SyndikPro'
+const appName = import.meta.env.VITE_APP_NAME ?? 'Imaro'
 
 export const env = {
   apiBase,

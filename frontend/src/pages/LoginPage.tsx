@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Building2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { isAxiosError } from 'axios'
 
@@ -17,6 +16,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { Wordmark } from '@/components/Wordmark'
 
 import { requestOtp, verifyOtp } from '@/features/auth/api'
 import { setStoredToken } from '@/api/client'
@@ -59,10 +59,12 @@ export function LoginPage() {
       </div>
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto flex size-10 items-center justify-center rounded-md bg-primary/10">
-            <Building2 className="size-5 text-primary" />
+          <div className="mx-auto mb-1 flex justify-center">
+            <Wordmark className="text-3xl" />
           </div>
-          <CardTitle className="mt-2">{t('auth.title')}</CardTitle>
+          <CardTitle className="mt-2 font-display text-[var(--primary)]">
+            {t('auth.title')}
+          </CardTitle>
           <CardDescription>{t('auth.subtitle')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -88,7 +90,7 @@ export function LoginPage() {
               </div>
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full bg-[var(--accent)] text-white hover:bg-[var(--color-imaro-accent-dark)]"
                 disabled={requestMutation.isPending || !phone}
               >
                 {t('auth.requestOtp')}
@@ -118,7 +120,7 @@ export function LoginPage() {
               </div>
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full bg-[var(--accent)] text-white hover:bg-[var(--color-imaro-accent-dark)]"
                 disabled={verifyMutation.isPending || otp.length !== 6}
               >
                 {t('auth.verifyOtp')}

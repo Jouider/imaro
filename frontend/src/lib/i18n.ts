@@ -24,7 +24,7 @@ void i18n
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
-      lookupLocalStorage: 'syndikpro.lang',
+      lookupLocalStorage: 'imaro.lang',
     },
   })
 

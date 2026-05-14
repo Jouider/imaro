@@ -41,6 +41,6 @@ export const useAuthStore = create<AuthState>()(
       setSession: ({ token, user, tenant }) => set({ token, user, tenant }),
       clear: () => set({ token: null, user: null, tenant: null }),
     }),
-    { name: 'syndikpro.auth' },
+    { name: 'imaro.auth' },
   ),
 )

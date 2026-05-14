@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "SyndikPro",
+    "name": "Imaro",
     "tagline": "Gestion de copropriété — Maroc"
   },
   "nav": {
@@ -15,7 +15,7 @@
     "switch": "Changer de langue"
   },
   "auth": {
-    "title": "Connexion à SyndikPro",
+    "title": "Connexion à Imaro",
     "subtitle": "Recevez un code à 6 chiffres sur WhatsApp",
     "phone": "Téléphone",
     "phonePlaceholder": "+212 6XX XX XX XX",
@@ -26,18 +26,18 @@
     "back": "Retour"
   },
   "home": {
-    "title": "Bienvenue sur SyndikPro",
-    "subtitle": "Plateforme de gestion de copropriété conforme à la Loi 18-00",
+    "title": "Bienvenue sur Imaro",
+    "subtitle": "Plateforme marocaine de gestion de copropriété — conforme à la Loi 18-00",
     "ctaLogin": "Se connecter",
     "stackHeading": "Stack",
     "cards": {
       "residences": {
-        "title": "Résidences",
+        "title": "Copropriétés",
         "desc": "Lots, tantièmes, copropriétaires"
       },
       "appelsFonds": {
         "title": "Appels de fonds",
-        "desc": "Calcul auto par tantième"
+        "desc": "Calcul auto par tantième + relances"
       },
       "loi": {
         "title": "Loi 18-00",

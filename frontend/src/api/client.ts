@@ -9,7 +9,7 @@ export const api = axios.create({
   },
 })
 
-const TOKEN_STORAGE_KEY = 'syndikpro.token'
+const TOKEN_STORAGE_KEY = 'imaro.token'
 
 export function getStoredToken(): string | null {
   return localStorage.getItem(TOKEN_STORAGE_KEY)

@@ -1,157 +1,261 @@
-# SyndikPro — CLAUDE.md (Mouad · Frontend)
+# Imaro — CLAUDE.md (Mouad · Frontend)
 
 ## My role
 
-I am Mouad. I own everything inside `frontend/`.
-I NEVER touch `backend/`. If I find a backend bug I open a GitHub Issue against `Jouider/syndikpro`.
-The source of truth for what I can call is `docs/api.md` (owned by Abdellah).
+I am Mouad. I own everything inside `frontend/`. I NEVER touch `backend/`.
+If I find a backend bug I open a GitHub Issue and tag Abdellah.
+Every morning I read `docs/api.md` (contract) and the relevant module of `docs/imaro-specs.md` (cahier des charges) before writing any component that needs data.
 
 ## Project
 
-SaaS B2B multi-tenant — condo management for Morocco (Loi 18-00).
-Stack: React 19 · Vite 8 · TypeScript 6 · Tailwind v4 · shadcn/ui.
+**Imaro** — SaaS B2B multi-tenant de gestion de copropriété pour le marché marocain.
+Concurrent direct analysé : **SyndicConnect** (`app.syndicconnect.ma`). Notre angle d'attaque : meilleure UX, vraie sécurité, finance analytique, app mobile copropriétaire, conformité Loi 18-00, **100 % français**.
 
-## Repo zones
+Deux interfaces :
+
+- **Admin desktop** — Super Admin, Syndic Owner, Manager, Conseil syndical (sidebar gauche).
+- **Portail résident** — copropriétaire (mobile-first, bottom nav 4 onglets max).
+
+> Note repo : le dépôt git est encore nommé `syndikpro` (`Jouider/syndikpro`). On ne renomme pas le remote tant que la décision n'est pas prise avec Abdellah. Le produit s'appelle Imaro dans tout l'UI et les configs.
+
+## Mono-repo structure
 
 ```
-syndikpro/
-├── backend/         ← Abdellah's zone — NEVER TOUCH
-├── frontend/        ← MY ZONE
-├── docs/api.md      ← API contract Abdellah writes, I consume
-├── docker-compose.yml
+syndikpro/                  ← repo name (legacy, may be renamed later)
+├── backend/                ← Abdellah's zone — NEVER TOUCH
+├── frontend/               ← MY ZONE (the Imaro web app)
+├── docs/
+│   ├── api.md              ← API contract (Abdellah writes, I consume)
+│   └── imaro-specs.md      ← cahier des charges complet (16 modules)
 └── README.md
 ```
 
-## My stack
+## My stack (actual installed versions)
 
-- React 19 + Vite 8 + TypeScript 6 (path alias `@/*` → `src/*`)
-- Tailwind CSS v4 (`@tailwindcss/vite`) + **shadcn/ui** (style: `new-york`, base: `neutral`)
-- React Router 7 (`createBrowserRouter` — v6-compatible APIs)
-- TanStack Query 5 (server state) + Axios (transport)
-- Zustand 5 with `persist` middleware (auth/session)
-- i18next + react-i18next (FR primary, AR with auto RTL on `<html dir>`)
-- Sonner (toasts), lucide-react (icons)
-- ESLint flat + Prettier + Storybook 10
+- **React 19** + **TypeScript 6** + **Vite 8** (path alias `@/*` → `src/*`)
+- **Tailwind CSS v4** (`@tailwindcss/vite`) + **shadcn/ui** (style `new-york`)
+- **React Router 7** (v6-compatible APIs via `createBrowserRouter`)
+- **TanStack Query 5** — toute la donnée passe ici, jamais d'axios brut dans un composant
+- **Axios** — instance unique dans `src/api/client.ts` (à renommer `src/lib/axios.ts` à terme)
+- **Zustand 5** (avec `persist`) — auth, token, role, tenant
+- **i18next** + `react-i18next` — FR primaire, AR avec RTL automatique sur `<html dir>`
+- **Sonner** (toasts), **lucide-react** (icônes)
+- **ESLint flat** + **Prettier** + **Storybook 10**
+- À installer dès le premier formulaire : **React Hook Form** + **Zod**
 
-## Folder structure inside frontend/
+> Le `docs/imaro-specs.md` mentionne Next.js 14 dans la stack recommandée — c'est obsolète. On reste sur **Vite + React 18/19 SPA** : décidé le 2026-05-13 avec Mouad.
+
+## Imaro design system (palette officielle, non-négociable)
+
+Tokens définis dans `src/index.css` (Tailwind v4 `@theme`) :
+
+```css
+--color-imaro-primary: #1b4f72; /* Bleu marine professionnel — sidebar, headings, primary buttons */
+--color-imaro-primary-light: #2980b9; /* Bleu action — focus rings, hover */
+--color-imaro-accent: #e67e22; /* Orange CTA — boutons d'action principale, badges accent */
+--color-imaro-success: #27ae60; /* Statut payé, validation */
+--color-imaro-warning: #f39c12; /* Statut partiel, alertes */
+--color-imaro-danger: #e74c3c; /* Statut impayé, erreur, suppression */
+--color-imaro-text: #2c3e50;
+--color-imaro-text-muted: #7f8c8d;
+--color-imaro-surface: #f8f9fa; /* Background secondaire */
+```
+
+Les variables shadcn `--primary`, `--accent`, `--ring`, `--destructive` sont déjà remappées vers Imaro — donc `<Button>` est navy par défaut. Pour un CTA orange explicite : `className="bg-[var(--accent)] text-white"`.
+
+- **Fonts** : `Nunito Sans` (body) + `DM Serif Display` (headings only). Chargées via Google Fonts dans `index.html`. **Jamais Inter, Roboto, Arial.**
+- **Admin** : sidebar `bg-[var(--primary)]` (#1B4F72) + contenu blanc + accents orange.
+- **Portail** : fond blanc + texte navy + CTA orange.
+- **Montants** : toujours formatés `1 500,00 DH` (locale `fr-MA`, **DH** jamais MAD/€/$).
+- **Wordmark** : composant `@/components/Wordmark` — "Ima" navy + "ro" orange en DM Serif Display. Utiliser tant qu'on n'a pas de logo Imaro officiel (les PNG `logo-*.png` dans `public/` sont des restes SyndikPro à remplacer).
+
+## Folder structure inside frontend/ (cible, certaines parties à migrer)
 
 ```
 src/
-├── api/
-│   └── client.ts          ← axios instance, ApiEnvelope<T>, token storage
+├── pages/
+│   ├── superadmin/         ← (à venir)
+│   ├── syndic-owner/       ← (à venir)
+│   ├── manager/            ← gestionnaire d'immeuble
+│   ├── conseil/            ← (à venir, lecture seule)
+│   └── portail/            ← copropriétaire (mobile-first)
 ├── components/
-│   ├── ui/                ← shadcn/ui (generated, DO NOT hand-edit)
-│   └── LanguageSwitcher.tsx
-├── features/              ← one folder per domain
-│   ├── auth/api.ts
-│   ├── residences/        ← (to come)
-│   ├── lots/              ← (to come)
-│   ├── coproprietaires/   ← (to come)
-│   ├── appels-fonds/      ← (to come)
-│   ├── paiements/         ← (to come)
-│   └── tickets/           ← (to come)
-├── hooks/
+│   ├── ui/                 ← shadcn — DO NOT hand-edit
+│   ├── Wordmark.tsx
+│   ├── LanguageSwitcher.tsx
+│   └── shared/             ← (à construire) KpiCard, StatutBadge, DataTable, ...
+├── layouts/                ← (à construire) AdminLayout, PortailLayout
 ├── lib/
-│   ├── env.ts             ← reads VITE_* env vars
-│   ├── i18n.ts            ← i18next init + dir/lang sync
-│   └── utils.ts           ← cn() from shadcn
-├── locales/
-│   ├── fr/common.json     ← FR keys (primary)
-│   └── ar/common.json     ← AR keys (RTL)
-├── pages/                 ← route-level pages
-├── providers/             ← React context providers (QueryProvider, ...)
-├── routes/router.tsx      ← createBrowserRouter
-├── store/auth.ts          ← Zustand auth/session store (persisted)
-└── types/                 ← shared types
+│   ├── env.ts
+│   ├── i18n.ts
+│   └── utils.ts            ← cn(), formatMontant(), formatDate()
+├── api/
+│   └── client.ts           ← axios instance (sera renommé src/lib/axios.ts)
+├── features/               ← (sera renommé src/services/, pattern service.ts)
+│   └── auth/api.ts
+├── store/                  ← (sera renommé src/stores/, pluriel)
+│   └── auth.ts             ← Zustand persisted
+├── locales/                ← (sera renommé src/i18n/, fichiers fr.json / ar.json plats)
+│   ├── fr/common.json
+│   └── ar/common.json
+├── providers/
+├── routes/                 ← (sera renommé src/router/)
+│   └── router.tsx
+└── types/
 ```
 
-## API contract I follow
+## Critical rules
 
-- Base URL from `VITE_API_URL` (default `http://localhost:8000/api`).
-- All responses: `{ status: 'success' | 'error', message?, data, errors? }` — typed `ApiEnvelope<T>` in `@/api/client`.
-- Auth: OTP WhatsApp → Sanctum token, stored in `localStorage` under `syndikpro.token`, auto-injected by axios interceptor as `Authorization: Bearer …`.
-- 401 → axios interceptor clears token + redirects to `/login`.
+```ts
+// ALWAYS — instance axios unique, jamais d'URL en dur
+import { api } from '@/api/client'
+// baseURL = import.meta.env.VITE_API_URL
 
-## Multi-tenant in local dev
+// ALWAYS — TanStack Query pour la donnée
+const { data, isLoading, error } = useQuery({
+  queryKey: ['appels-fonds', residenceId],
+  queryFn: () => appelsFondsService.getAll(residenceId),
+})
 
-Backend resolves tenant from subdomain (`blanca.syndikpro.ma`).
-Local convention: **nip.io**, no `/etc/hosts` edits.
+// ALWAYS — Zustand pour l'auth state
+const { user, token, role } = useAuthStore()
+
+// ALWAYS — Zod pour la validation de formulaire (dès le 1er form)
+const schema = z.object({ montant: z.number().positive() })
+
+// NEVER — pas de `any`
+// NEVER — pas d'axios brut dans un composant (passer par services/)
+// NEVER — pas de localStorage direct (passer par stores)
+// NEVER — pas de style inline (Tailwind uniquement)
+// NEVER — pas de chaîne UI codée en dur (i18next sur toutes les chaînes, FR + AR)
+```
+
+## Multi-tenant local (nip.io)
 
 ```
-Frontend: http://blanca.127.0.0.1.nip.io:5173
-Backend : http://blanca.127.0.0.1.nip.io:8000
+http://blanca.127.0.0.1.nip.io:5173   ← frontend (Vite host: true)
+http://blanca.127.0.0.1.nip.io:8000   ← backend (SetTenant lit le sous-domaine)
 ```
 
-`vite.config.ts` already sets `server.host = true` so Vite accepts any hostname.
+## Rôles — état des lieux
 
-## Business rules I must respect on screen
+⚠ **Conflit ouvert** entre le backend (déjà migré) et le `docs/imaro-specs.md` :
 
-- **Currency:** MAD/DH only — never € or $.
-- **Tantièmes:** sum per résidence must equal exactly 1000.
-- **Loi 18-00** must be referenced on documents/PDFs that come from the API.
-- **Languages:** FR (default), AR (RTL). Every UI string goes through `t()` — no hardcoded copy.
-- **WhatsApp priority:** OTP comes via WhatsApp (Twilio); SMS fallback is backend's concern, not mine.
+| backend (`RolesSeeder`) | spec `imaro-specs.md` §1.2 |
+| ----------------------- | -------------------------- |
+| `super_admin`           | `super_admin`              |
+| `manager`               | `syndic_owner`             |
+| `gestionnaire`          | `syndic_manager`           |
+| `agent_recouvrement`    | —                          |
+| `conseil`               | `conseil_syndical`         |
+| `resident`              | `copropriétaire`           |
 
-## Conventions I follow
+Tant que ce n'est pas tranché avec Abdellah, on utilise les noms **backend** dans le code (c'est ce que renvoie l'API) mais on affiche les libellés **spec** à l'utilisateur via i18n.
 
-- **No hardcoded UI text.** Always add to both `locales/fr/common.json` and `locales/ar/common.json` before rendering. If I render English/French/Arabic literally in a component, that's a bug to fix before declaring done.
-- **shadcn primitives** come from `npx shadcn@latest add <name>` — I never edit `src/components/ui/**` by hand. To customize, wrap.
-- **Server state goes through TanStack Query**, never directly into Zustand.
-- **Forms** use the shadcn primitives (`Input`, `Label`, `Button`). I don't bring in a form library until a real form needs one.
-- **Imports use the `@/` alias.**
-- **Conventional Commits** (`feat(frontend): …`, `fix(frontend): …`, `chore(frontend): …`).
-- **Branches** are cut from `develop`, named `feat/frontend-*` or `fix/frontend-*`, max 2 days, then PR to `develop`.
-- **Never push to `main` or `develop` directly.** Never commit `node_modules`, `.env.local`, or `dist`.
+## API contract (résumé)
+
+Base URL : `import.meta.env.VITE_API_URL` (défaut `http://localhost:8000/api`).
+Auth : Bearer Sanctum token (`Authorization: Bearer …`) — stocké dans `localStorage` clé `imaro.token`, injecté par l'interceptor axios.
+Enveloppe : `{ status: 'success' | 'error', message?, data, errors? }`.
+
+Endpoints actuellement implémentés côté backend (cf. `docs/api.md`) :
+
+```
+POST /api/auth/request-otp     {phone}
+POST /api/auth/verify-otp      {phone, otp} → {token, user, tenant}
+GET  /api/auth/me
+POST /api/auth/logout
+
+GET  /api/gestionnaire/dashboard
+GET  /api/gestionnaire/residences           (index/show/update)
+GET  /api/gestionnaire/residences/:id/lots  (CRUD)
+GET  /api/gestionnaire/coproprietaires      (index)
+```
+
+Tout le reste de `docs/imaro-specs.md` (budgets, dépenses, fournisseurs, contrats, réclamations, annonces, travaux, échéances, GED, appels de fonds, AG) n'est **pas encore** côté backend — je dois soit attendre Abdellah, soit utiliser le pattern de mock dans `services/`.
+
+## Components shared à construire en premier (avant toute page complète)
+
+Dans l'ordre, dès que la décision folder-structure est tranchée :
+
+1. **MontantDisplay** — formate `1500` en `1 500,00 DH` (locale `fr-MA`).
+2. **StatutBadge** — payé = success (vert), impayé = danger (rouge), partiel = warning (orange), retard = danger.
+3. **KpiCard** — icône + valeur + label + variation vs période précédente (+ sparkline optionnel).
+4. **LoadingSkeleton** — squelette pour cartes et tables (utilisé sur tout état `isLoading`).
+5. **EmptyState** — icône + message + CTA, pour tables/listes vides.
+6. **ConfirmModal** — confirmation avant toute suppression (avec récap).
+7. **DataTable** — tri, filtre, pagination, sélection multiple, export CSV/PDF.
+8. **PageHeader** — breadcrumb + titre + actions.
+
+## Portail résident — règles mobile-first
+
+- Tester systématiquement sur largeur **375 px** (iPhone SE).
+- Police minimum **16 px** (évite le zoom iOS).
+- Touch target minimum **48 px** sur tous les boutons / liens.
+- Bottom nav : 4 onglets maximum (Accueil, Finances, Réclamations, Profil).
+- **Pas de sidebar** sur le portail — bottom nav uniquement.
+- État de chargement sur chaque action async.
+- Feedback (toast succès/erreur) < 300 ms après l'action.
+
+## Definition of Done (every feature)
+
+Avant de dire "fini" :
+
+1. `npm run typecheck` clean
+2. `npm run lint` clean
+3. `npm run format:check` clean (ou `npm run format` puis re-check)
+4. `npm run build` succeeds
+5. Vérifié dans le navigateur via Claude Preview MCP (`preview_start` → `preview_snapshot` → `preview_screenshot` → `preview_console_logs level: warn`) — page rend, **0 warning console**, FR et AR rendent si du texte a été ajouté.
+6. **Étapes de test manuelles écrites pour Mouad** — pas "ça marche", des étapes numérotées avec URLs, clics, attentes.
+7. Nouvelle variable d'env ajoutée à `frontend/.env.example`.
+8. Tous les appels API matchent `docs/api.md` exactement ; si le contrat manque, GitHub Issue contre `Jouider/syndikpro` plutôt que de deviner.
+9. Tous les statuts financiers (payé/impayé/partiel/retard) utilisent `StatutBadge` une fois construit.
+10. Tous les montants utilisent `MontantDisplay` une fois construit.
+
+## Stratégie de mock (avant que Abdellah ait l'endpoint)
+
+Dans le fichier service, jamais dans le composant :
+
+```ts
+// services/appels-fonds.service.ts
+export const appelsFondsService = {
+  async getAll(residenceId: string) {
+    // TODO: replace with real API call once available
+    return MOCK_APPELS_FONDS
+  },
+}
+```
+
+Bascule = remplacer le `return MOCK_*` par un `api.get(...)`.
+
+## Git rules
+
+- Branche cuttée de `develop`, jamais de `main`.
+- Naming : `feat/frontend-portail-login`, `fix/frontend-rtl-overflow`, etc.
+- Conventional Commits : `feat(frontend): …`, `fix(frontend): …`, `chore(frontend): …`.
+- Max 2 jours par branche, sinon découper.
+- Rebase quotidien : `git fetch origin && git rebase origin/develop`.
+- PR vers `develop`. **Jamais push direct sur `main` ou `develop`.**
+- Screenshot obligatoire dans la description de PR pour toute modif UI.
+- Tag Abdellah dans la PR dès qu'il faut un nouvel endpoint API.
+
+## Ce que je NE touche pas
+
+- `backend/**`
+- `docker-compose.yml`, `docs/api.md`, `README.md` racine (partagés — coordination Abdellah)
+- `src/components/ui/**` (généré par shadcn, on customise par wrapper)
+- Le remote git `Jouider/syndikpro` (ne pas créer de remote `imaro/*` sans accord d'Abdellah)
 
 ## Commands
 
 ```bash
 # from frontend/
-npm run dev               # Vite dev server (http://localhost:5173)
+npm run dev               # Vite (http://localhost:5173)
 npm run build             # tsc -b && vite build
 npm run typecheck         # tsc -b --noEmit
-npm run lint              # eslint .
+npm run lint
 npm run format            # prettier --write .
-npm run format:check      # prettier --check .
-npm run storybook         # Storybook on :6006
-npm run build-storybook   # static Storybook in storybook-static/
-
-# from repo root
-docker-compose up -d      # spin up MySQL + Redis for the backend
+npm run format:check
+npm run storybook         # :6006
+npm run build-storybook
 ```
-
-## Definition of done (every feature)
-
-A feature is NOT done until all of these pass:
-
-1. `npm run typecheck` clean
-2. `npm run lint` clean
-3. `npm run format:check` clean (or run `npm run format` then re-check)
-4. `npm run build` succeeds
-5. Verified in the browser preview (`mcp__Claude_Preview__preview_start`/`screenshot`/`snapshot`) — at minimum: page loads, no console errors, both FR and AR render correctly if any new strings were added.
-6. **Manual test steps written for Mouad** in the response — not just "it works", but a numbered list of clicks/URLs/expectations.
-7. New env vars added to `frontend/.env.example`.
-8. New API calls match `docs/api.md` exactly; if the contract is missing or ambiguous, file a GitHub Issue against `Jouider/syndikpro` instead of guessing.
-
-## Git rules
-
-- Branch off `develop`, never `main`.
-- Naming: `feat/frontend-auth-login`, `fix/frontend-tantieme-display`, etc.
-- Commit format: `feat(frontend): add residences list page`.
-- Daily rebase: `git fetch origin && git rebase origin/develop`.
-- PR target: `develop`. Never push to `main` or `develop`.
-
-## What I do NOT touch
-
-- `backend/**` (Abdellah's zone)
-- `docker-compose.yml` (shared, coordinate with Abdellah)
-- `docs/api.md` (Abdellah writes it; I read it)
-- `README.md` at repo root (shared)
-- `src/components/ui/**` (shadcn-generated)
-
-## Performance rules
-
-- Always pass query keys + `staleTime` to TanStack Query; default `staleTime: 30s` is set in `QueryProvider`.
-- Lazy-load route-level pages once we have >5 (`React.lazy` + Suspense boundary).
-- Images go in `public/` with explicit width/height to avoid CLS.
-- Bundle alerts at >800 kB ungzipped — split with `import()`.
