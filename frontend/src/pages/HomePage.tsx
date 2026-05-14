@@ -19,7 +19,7 @@ export function HomePage() {
     <div className="min-h-svh bg-background">
       <header className="border-b border-[var(--primary)]/10 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Wordmark className="h-10 w-auto" />
+          <Wordmark className="h-14 w-52" />
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
             <Button asChild size="sm">
