@@ -152,12 +152,34 @@ Revokes current Sanctum token.
 
 ---
 
-## 2. Residences (KAN-13)
+## 2. Gestionnaire — Dashboard & Résidences (KAN-13)
 
-`auth:sanctum` · roles: `manager`, `gestionnaire`
+`auth:sanctum` · `role:gestionnaire`
 
-### GET /api/residences
-List all residences for the current tenant.
+### GET /api/gestionnaire/dashboard
+KPIs scoped to residences assigned to the authenticated gestionnaire. Cached in Redis (TTL 5 min).
+
+**Response 200**
+```json
+{
+  "status": "success",
+  "data": {
+    "residences_count": 1,
+    "lots_count": 20,
+    "taux_recouvrement": 75.0,
+    "montant_recouvre": 13500.00,
+    "montant_restant": 4500.00,
+    "tickets_ouverts": 2,
+    "tickets_urgents": 1,
+    "appels_fonds_actifs": 1
+  }
+}
+```
+
+---
+
+### GET /api/gestionnaire/residences
+List residences assigned to the authenticated gestionnaire.
 
 **Query params**
 | Param | Type | Description |
@@ -176,9 +198,10 @@ List all residences for the current tenant.
         "name": "Résidence Atlas",
         "address": "Bd Mohammed V, Casablanca",
         "city": "Casablanca",
-        "lots_count": 20,
-        "total_tantiemes": 1000,
-        "gestionnaire": { "id": 2, "name": "Youssef Benali" }
+        "nb_lots": 20,
+        "total_tantieme": 1000,
+        "status": "active",
+        "taux_recouvrement": 75.0
       }
     ],
     "meta": { "total": 1, "per_page": 15, "current_page": 1 }
@@ -188,8 +211,96 @@ List all residences for the current tenant.
 
 ---
 
-### POST /api/residences
-`role:manager`
+### GET /api/gestionnaire/residences/{id}
+**Response 200** — includes lots list and gestionnaire info.
+
+---
+
+### PUT /api/gestionnaire/residences/{id}
+
+**Body**
+```json
+{ "name": "Résidence Atlas", "address": "Bd Mohammed V", "city": "Casablanca" }
+```
+
+---
+
+## 3. Gestionnaire — Lots & Tantièmes (KAN-13)
+
+`auth:sanctum` · `role:gestionnaire`
+
+**Business rule:** Sum of all `tantieme` values in a résidence MUST equal exactly **1000**.
+**Calculation:** `montant_du = montant_total × (tantieme / 1000)`
+
+### GET /api/gestionnaire/residences/{id}/lots
+
+**Response 200**
+```json
+{
+  "status": "success",
+  "data": {
+    "lots": [
+      {
+        "id": 1,
+        "numero": "A01",
+        "type": "appartement",
+        "etage": 1,
+        "superficie": 85.00,
+        "tantieme": 45,
+        "coproprietaire": {
+          "id": 1,
+          "name": "Hassan Benali",
+          "phone": "+212600000010"
+        }
+      }
+    ],
+    "total_tantieme": 1000
+  }
+}
+```
+
+---
+
+### POST /api/gestionnaire/residences/{id}/lots
+
+**Body**
+```json
+{
+  "numero": "A01",
+  "type": "appartement",
+  "etage": 1,
+  "superficie": 85.00,
+  "tantieme": 45
+}
+```
+
+**Validation:** After insert, sum of tantièmes in the résidence must not exceed `total_tantieme` (1000).
+
+**Response 201**
+
+---
+
+### PUT /api/gestionnaire/residences/{id}/lots/{lot}
+
+---
+
+### DELETE /api/gestionnaire/residences/{id}/lots/{lot}
+Soft delete. Blocked if lot has unpaid appels de fonds.
+
+---
+
+### GET /api/gestionnaire/residences/{id}/coproprietaires
+
+**Query params:** `search`, `per_page`
+
+---
+
+## 4. Manager — Résidences CRUD
+
+`auth:sanctum` · `role:manager`
+
+### GET /api/manager/residences
+### POST /api/manager/residences
 
 **Body**
 ```json
@@ -203,96 +314,20 @@ List all residences for the current tenant.
 
 **Response 201**
 
----
-
-### GET /api/residences/{id}
-
-**Response 200** — includes lots list
-
----
-
-### PUT /api/residences/{id}
-`role:manager`
+### GET /api/manager/residences/{id}
+### PUT /api/manager/residences/{id}
+### DELETE /api/manager/residences/{id}
+Soft delete only.
 
 ---
 
-### DELETE /api/residences/{id}
-`role:manager` — soft delete only
-
----
-
-## 3. Lots & Tantièmes (KAN-13)
+## 5. Copropriétaires
 
 `auth:sanctum` · roles: `manager`, `gestionnaire`
 
-**Business rule:** Sum of all `tantieme` values in a résidence MUST equal exactly **1000**.
-**Calculation:** `montant_du = montant_total × (tantieme / 1000)`
+### GET /api/gestionnaire/residences/{id}/coproprietaires
 
-### GET /api/residences/{residence_id}/lots
-
-**Response 200**
-```json
-{
-  "status": "success",
-  "data": {
-    "lots": [
-      {
-        "id": 1,
-        "numero": "A01",
-        "type": "appartement",
-        "etage": 1,
-        "surface_m2": 85,
-        "tantieme": 45,
-        "coproprietaire": {
-          "id": 1,
-          "name": "Hassan Benali",
-          "phone": "+212600000010"
-        }
-      }
-    ],
-    "total_tantiemes": 1000
-  }
-}
-```
-
----
-
-### POST /api/residences/{residence_id}/lots
-
-**Body**
-```json
-{
-  "numero": "A01",
-  "type": "appartement",
-  "etage": 1,
-  "surface_m2": 85,
-  "tantieme": 45,
-  "coproprietaire_id": 1
-}
-```
-
-**Validation:** After insert, sum of tantièmes in the résidence must not exceed 1000.
-
-**Response 201**
-
----
-
-### PUT /api/residences/{residence_id}/lots/{id}
-
----
-
-### DELETE /api/residences/{residence_id}/lots/{id}
-Soft delete. Blocked if lot has unpaid appels de fonds.
-
----
-
-## 4. Copropriétaires
-
-`auth:sanctum` · roles: `manager`, `gestionnaire`
-
-### GET /api/coproprietaires
-
-**Query params:** `residence_id`, `search`, `per_page`
+**Query params:** `search`, `per_page`
 
 **Response 200**
 ```json
@@ -304,43 +339,18 @@ Soft delete. Blocked if lot has unpaid appels de fonds.
         "id": 1,
         "name": "Hassan Benali",
         "phone": "+212600000010",
-        "email": "h.benali@example.com",
-        "lots": [{ "id": 1, "numero": "A01", "tantieme": 45 }],
-        "solde_du": 850.00
+        "lot": { "id": 1, "numero": "A01", "tantieme": 45 },
+        "solde_actuel": -850.00
       }
-    ]
+    ],
+    "meta": { "total": 20, "per_page": 15, "current_page": 1 }
   }
 }
 ```
 
 ---
 
-### POST /api/coproprietaires
-
-**Body**
-```json
-{
-  "name": "Hassan Benali",
-  "phone": "+212600000010",
-  "email": "h.benali@example.com",
-  "cin": "BE123456",
-  "lot_ids": [1]
-}
-```
-
----
-
-### GET /api/coproprietaires/{id}
-
-Includes lots, paiements, and impayés.
-
----
-
-### PUT /api/coproprietaires/{id}
-
----
-
-## 5. Appels de Fonds (KAN-14)
+## 6. Appels de Fonds (KAN-14)
 
 `auth:sanctum` · roles: `manager`, `gestionnaire`
 
@@ -448,7 +458,7 @@ Returns a signed URL if already generated, or queues generation and returns 202.
 
 ---
 
-## 6. Paiements (KAN-15)
+## 7. Paiements (KAN-15)
 
 `auth:sanctum` · roles: `manager`, `gestionnaire`, `agent_recouvrement`
 
@@ -541,7 +551,7 @@ Envoyer une relance manuelle via WhatsApp/SMS.
 
 ---
 
-## 7. Tickets Maintenance (KAN-21)
+## 8. Tickets Maintenance (KAN-21)
 
 `auth:sanctum`
 
@@ -614,7 +624,7 @@ Envoyer une relance manuelle via WhatsApp/SMS.
 
 ---
 
-## 8. Prestataires
+## 9. Prestataires
 
 `auth:sanctum` · roles: `manager`, `gestionnaire`
 
@@ -655,7 +665,7 @@ Envoyer une relance manuelle via WhatsApp/SMS.
 
 ---
 
-## 9. Assemblées Générales
+## 10. Assemblées Générales
 
 `auth:sanctum` · roles: `manager`, `gestionnaire`
 
@@ -692,7 +702,7 @@ Enregistrer un vote.
 
 ---
 
-## 10. Notifications Log
+## 11. Notifications Log
 
 `auth:sanctum` · roles: `manager`, `gestionnaire`
 
@@ -723,7 +733,7 @@ Historique des notifications envoyées (WhatsApp / SMS / email).
 
 ---
 
-## 11. Super Admin (KAN-13 setup)
+## 12. Super Admin
 
 `auth:sanctum` · `role:super_admin`
 
@@ -749,32 +759,6 @@ Historique des notifications envoyées (WhatsApp / SMS / email).
 Platform-wide stats: tenants count, MRR, active users.
 
 ---
-
-## 12. Dashboard KPIs
-
-`auth:sanctum` · roles: `manager`, `gestionnaire`
-
-### GET /api/dashboard
-
-Cached in Redis (TTL 5 min).
-
-**Response 200**
-```json
-{
-  "status": "success",
-  "data": {
-    "residences_count": 3,
-    "lots_count": 60,
-    "taux_recouvrement": 75,
-    "montant_recouvre": 13500.00,
-    "montant_restant": 4500.00,
-    "tickets_ouverts": 3,
-    "tickets_urgents": 1,
-    "appels_fonds_actifs": 1,
-    "paiements_ce_mois": 8
-  }
-}
-```
 
 ---
 
@@ -807,4 +791,4 @@ Cached in Redis (TTL 5 min).
 
 ---
 
-*Last updated: 2026-05-12 — sprint 1 (KAN-13, KAN-14, KAN-15, KAN-21)*
+*Last updated: 2026-05-13 — KAN-13 gestionnaire routes added (/api/gestionnaire/)*
