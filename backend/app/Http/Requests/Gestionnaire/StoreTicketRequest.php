@@ -15,10 +15,12 @@ class StoreTicketRequest extends FormRequest
     {
         return [
             'residence_id' => ['required', 'integer', 'exists:residences,id'],
-            'lot_id' => ['nullable', 'integer', 'exists:lots,id'],
-            'categorie' => ['required', 'in:plomberie,electricite,ascenseur,proprete,securite,autre'],
-            'description' => ['required', 'string', 'min:10', 'max:2000'],
-            'priorite' => ['required', 'in:urgent,normal,faible'],
+            'lot_id'       => ['nullable', 'integer', 'exists:lots,id'],
+            'categorie'    => ['required', 'in:plomberie,electricite,ascenseur,proprete,securite,autre'],
+            'description'  => ['required', 'string', 'min:10', 'max:2000'],
+            'priorite'     => ['required', 'in:urgent,normal,faible'],
+            'images'       => ['nullable', 'array', 'max:5'],
+            'images.*'     => ['image', 'mimes:jpeg,png,webp', 'max:5120'],
         ];
     }
 }

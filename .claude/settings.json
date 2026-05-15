@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "Bash(cat:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(* backend/*)",
+      "Bash(php:*)",
+      "Bash(composer:*)",
+      "Bash(docker:*)"
+    ]
+  },
+  "model": "claude-sonnet-4-20250514",
+  "customApiKeyEnabled": false
+}

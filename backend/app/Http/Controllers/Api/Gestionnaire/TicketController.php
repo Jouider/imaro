@@ -10,6 +10,7 @@ use App\Models\Ticket;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class TicketController extends Controller
 {
@@ -60,22 +61,26 @@ class TicketController extends Controller
     public function store(StoreTicketRequest $request): JsonResponse
     {
         $ticket = Ticket::create([
-            'tenant_id' => config('app.tenant_id'),
-            'residence_id' => $request->residence_id,
-            'lot_id' => $request->lot_id,
-            'user_id' => $request->user()->id,
-            'categorie' => $request->categorie,
+            'tenant_id'   => config('app.tenant_id'),
+            'residence_id'=> $request->residence_id,
+            'lot_id'      => $request->lot_id,
+            'user_id'     => $request->user()->id,
+            'categorie'   => $request->categorie,
             'description' => $request->description,
-            'priorite' => $request->priorite,
-            'statut' => 'ouvert',
+            'priorite'    => $request->priorite,
+            'statut'      => 'ouvert',
         ]);
+
+        if ($request->hasFile('images')) {
+            $ticket->update(['images' => $this->uploadImages($request->file('images'), $ticket->id)]);
+        }
 
         $ticket->load(['residence', 'lot', 'user']);
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Ticket créé',
-            'data' => ['ticket' => new TicketResource($ticket)],
+            'data'    => ['ticket' => new TicketResource($ticket)],
         ], 201);
     }
 
@@ -107,13 +112,34 @@ class TicketController extends Controller
             $data['closed_at'] = Carbon::now();
         }
 
+        // Supprimer des photos existantes
+        if (!empty($data['supprimer_images'])) {
+            $remaining = collect($ticket->images ?? [])
+                ->reject(fn ($path) => in_array($path, $data['supprimer_images']))
+                ->values()
+                ->all();
+
+            foreach ($data['supprimer_images'] as $path) {
+                Storage::disk('public')->delete($path);
+            }
+
+            $data['images'] = $remaining;
+        }
+
+        // Ajouter de nouvelles photos (cumul avec existantes)
+        if ($request->hasFile('images')) {
+            $nouvelles = $this->uploadImages($request->file('images'), $ticket->id);
+            $data['images'] = array_merge($ticket->images ?? [], $nouvelles);
+        }
+
+        unset($data['supprimer_images']);
         $ticket->update($data);
         $ticket->load(['residence', 'lot', 'user', 'prestataire']);
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Ticket mis à jour',
-            'data' => ['ticket' => new TicketResource($ticket)],
+            'data'    => ['ticket' => new TicketResource($ticket)],
         ]);
     }
 
@@ -141,6 +167,19 @@ class TicketController extends Controller
             'message' => 'Ticket clos',
             'data' => ['ticket' => new TicketResource($ticket->load(['residence', 'lot', 'user']))],
         ]);
+    }
+
+    /**
+     * Upload les fichiers images et retourne un tableau de chemins relatifs.
+     * Stocké dans public/tickets/{ticket_id}/
+     */
+    private function uploadImages(array $files, int $ticketId): array
+    {
+        $paths = [];
+        foreach ($files as $file) {
+            $paths[] = $file->store("tickets/{$ticketId}", 'public');
+        }
+        return $paths;
     }
 
     private function authorizeTicket(Request $request, Ticket $ticket): void
