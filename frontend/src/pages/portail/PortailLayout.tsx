@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Home, Wallet, MessageSquare, User } from 'lucide-react'
+import { Home, Wallet, MessageSquare, User, Newspaper } from 'lucide-react'
 import { Wordmark } from '@/components/Wordmark'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
@@ -19,6 +19,11 @@ const NAV_ITEMS: NavItem[] = [
     end: true,
     icon: <Home className="size-5" aria-hidden="true" />,
     labelKey: 'portail.nav.home',
+  },
+  {
+    to: '/portail/actualites',
+    icon: <Newspaper className="size-5" aria-hidden="true" />,
+    labelKey: 'portail.nav.actualites',
   },
   {
     to: '/portail/finances',

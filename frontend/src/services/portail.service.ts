@@ -1,4 +1,15 @@
-// TODO: replace mocks with real API calls once endpoints are ready
+import { api, type ApiEnvelope } from '@/lib/axios'
+
+async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
+  if (!import.meta.env.DEV) return call()
+  try {
+    return await call()
+  } catch {
+    return mock
+  }
+}
+
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 export type OperationType = 'appel_fonds' | 'paiement' | 'penalite'
 export type OperationStatut = 'paye' | 'impaye' | 'partiel' | 'retard'
@@ -8,9 +19,9 @@ export type Operation = {
   type: OperationType
   libelle: string
   montant: number // négatif = débit (appel), positif = crédit (paiement)
-  date: string // ISO date string
+  date: string
   statut: OperationStatut
-  recu_url?: string // present only for 'paye' ops
+  recu_url?: string
 }
 
 export type Annonce = {
@@ -23,10 +34,44 @@ export type Annonce = {
 
 export type DashboardData = {
   resident: { name: string; lot: string; residence: string }
-  balance: number // positive = overpaid/credit, negative = owes money
+  balance: number
   statut: 'a_jour' | 'en_retard'
   prochain_appel: { montant: number; date: string } | null
 }
+
+export type Reclamation = {
+  id: number
+  reference: string
+  categorie: string
+  sujet: string
+  statut: 'ouvert' | 'en_cours' | 'resolu' | 'clos'
+  priorite: 'urgent' | 'normal' | 'faible'
+  created_at: string
+  nb_photos: number
+}
+
+export type ResidentProfile = {
+  name: string
+  phone: string
+  lot: string
+  residence: string
+  email?: string
+}
+
+export type AssembleePortail = {
+  id: number
+  titre: string
+  type: 'ordinaire' | 'extraordinaire'
+  date: string
+  lieu: string
+  statut: 'convoquee' | 'tenue' | 'annulee'
+  quorum_requis: number
+  participants_count: number | null
+  ordre_du_jour: string
+  residence_name: string
+}
+
+// ─── Mock data ───────────────────────────────────────────────────────────────
 
 const MOCK_OPERATIONS: Operation[] = [
   {
@@ -138,33 +183,152 @@ const MOCK_DASHBOARD: DashboardData = {
   prochain_appel: { montant: 750, date: '2026-06-05' },
 }
 
+const MOCK_RECLAMATIONS: Reclamation[] = [
+  {
+    id: 1,
+    reference: 'REC-2026-001',
+    categorie: 'Ascenseur',
+    sujet: 'Panne ascenseur depuis 3 jours',
+    statut: 'resolu',
+    priorite: 'urgent',
+    created_at: '2026-04-10T09:00:00Z',
+    nb_photos: 2,
+  },
+  {
+    id: 2,
+    reference: 'REC-2026-002',
+    categorie: 'Eau/Plomberie',
+    sujet: 'Fuite dans le couloir du 2e étage',
+    statut: 'en_cours',
+    priorite: 'urgent',
+    created_at: '2026-05-02T14:30:00Z',
+    nb_photos: 3,
+  },
+  {
+    id: 3,
+    reference: 'REC-2026-003',
+    categorie: 'Parties communes',
+    sujet: 'Éclairage défectueux cage d\'escalier',
+    statut: 'ouvert',
+    priorite: 'normal',
+    created_at: '2026-05-12T11:00:00Z',
+    nb_photos: 1,
+  },
+]
+
+const MOCK_ASSEMBLEES_PORTAIL: AssembleePortail[] = [
+  {
+    id: 1,
+    titre: 'Assemblée Générale Ordinaire 2026',
+    type: 'ordinaire',
+    date: '2026-06-15T10:00:00Z',
+    lieu: 'Salle de réunion, RDC',
+    statut: 'convoquee',
+    quorum_requis: 50,
+    participants_count: null,
+    ordre_du_jour: "1. Approbation des comptes 2025\n2. Budget prévisionnel 2026\n3. Élection du syndic\n4. Questions diverses",
+    residence_name: 'Résidence Al Blanca',
+  },
+  {
+    id: 2,
+    titre: 'AG Extraordinaire — Travaux façade',
+    type: 'extraordinaire',
+    date: '2026-07-05T09:00:00Z',
+    lieu: 'Salle commune, 1er étage',
+    statut: 'convoquee',
+    quorum_requis: 75,
+    participants_count: null,
+    ordre_du_jour: "1. Validation du devis travaux façade\n2. Modalités de financement\n3. Calendrier des travaux",
+    residence_name: 'Résidence Al Blanca',
+  },
+  {
+    id: 3,
+    titre: 'AG Ordinaire 2025',
+    type: 'ordinaire',
+    date: '2025-06-20T10:00:00Z',
+    lieu: 'Salle de réunion, RDC',
+    statut: 'tenue',
+    quorum_requis: 50,
+    participants_count: 18,
+    ordre_du_jour: "1. Approbation des comptes 2024\n2. Budget prévisionnel 2025\n3. Questions diverses",
+    residence_name: 'Résidence Al Blanca',
+  },
+]
+
+const MOCK_PROFILE: ResidentProfile = {
+  name: 'Mouad Baamrane',
+  phone: '+212661000001',
+  lot: 'A-102',
+  residence: 'Résidence Al Blanca',
+}
+
+// ─── Service functions ────────────────────────────────────────────────────────
+
 export async function getPortailDashboard(): Promise<DashboardData> {
-  return MOCK_DASHBOARD
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<DashboardData>>('/portail/dashboard')
+    return res.data.data
+  }, MOCK_DASHBOARD)
 }
 
 export async function getOperations(): Promise<Operation[]> {
-  return MOCK_OPERATIONS
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<{ operations: Operation[] }>>('/portail/paiements')
+    return res.data.data.operations
+  }, MOCK_OPERATIONS)
 }
 
 export async function getAnnonces(): Promise<Annonce[]> {
-  return MOCK_ANNONCES
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<{ annonces: Annonce[] }>>('/portail/annonces')
+    return res.data.data.annonces
+  }, MOCK_ANNONCES)
 }
 
-export async function createReclamation(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _data: {
-    categorie: string
-    sujet: string
-    description: string
-    images?: File[]
-  },
-): Promise<void> {
-  // TODO: POST /api/gestionnaire/tickets — multipart/form-data
-  // const fd = new FormData()
-  // fd.append('titre', _data.sujet)
-  // fd.append('description', _data.description)
-  // fd.append('categorie', _data.categorie)
-  // _data.images?.forEach((f) => fd.append('images[]', f))
-  // await api.post('/gestionnaire/tickets', fd)
-  return Promise.resolve()
+export async function getAssembleesPortail(): Promise<AssembleePortail[]> {
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<{ assemblees: AssembleePortail[] }>>('/portail/assemblees')
+    return res.data.data.assemblees
+  }, MOCK_ASSEMBLEES_PORTAIL)
+}
+
+export async function getMyReclamations(): Promise<Reclamation[]> {
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<{ reclamations: Reclamation[] }>>('/portail/reclamations')
+    return res.data.data.reclamations
+  }, MOCK_RECLAMATIONS)
+}
+
+export async function getProfile(): Promise<ResidentProfile> {
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<ResidentProfile>>('/portail/profil')
+    return res.data.data
+  }, MOCK_PROFILE)
+}
+
+export async function updateProfile(data: Partial<Pick<ResidentProfile, 'name' | 'email'>>): Promise<ResidentProfile> {
+  return withMock(async () => {
+    const res = await api.put<ApiEnvelope<ResidentProfile>>('/portail/profil', data)
+    return res.data.data
+  }, { ...MOCK_PROFILE, ...data })
+}
+
+export async function createReclamation(data: {
+  categorie: string
+  sujet: string
+  description: string
+  images?: File[]
+}): Promise<void> {
+  const fd = new FormData()
+  fd.append('categorie', data.categorie)
+  fd.append('description', `${data.sujet}\n\n${data.description}`)
+  fd.append('priorite', 'normal')
+  data.images?.forEach((f) => fd.append('images[]', f))
+
+  await withMock(async () => {
+    // Change to '/portail/reclamations' when resident routes are ready
+    await api.post('/gestionnaire/tickets', fd, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  }, undefined)
 }

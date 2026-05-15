@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import {
   Building2,
   Users,
@@ -15,7 +16,6 @@ import {
   ShieldAlert,
   Zap,
 } from 'lucide-react'
-import { toast } from 'sonner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -278,6 +278,7 @@ const ALL_RESIDENCES = '__all__'
 
 export function DashboardPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [residenceFilter, setResidenceFilter] = useState<string>(ALL_RESIDENCES)
 
   const residenceId =
@@ -286,7 +287,7 @@ export function DashboardPage() {
   // Queries
   const residencesQuery = useQuery({
     queryKey: ['gestionnaire', 'residences'],
-    queryFn: getResidences,
+    queryFn: () => getResidences(),
   })
 
   const kpiQuery = useQuery({
@@ -296,7 +297,7 @@ export function DashboardPage() {
 
   const chartQuery = useQuery({
     queryKey: ['gestionnaire', 'recouvrement', residenceId],
-    queryFn: () => getRecouvrementMensuel(residenceId),
+    queryFn: () => getRecouvrementMensuel(),
   })
 
   const impayesQuery = useQuery({
@@ -317,9 +318,6 @@ export function DashboardPage() {
   const kpi = kpiQuery.data
   const residences = residencesQuery.data ?? []
 
-  const handleSoon = () => {
-    toast.info(t('gestionnaire.dashboard.actions.soon'))
-  }
 
   return (
     <div className="p-6 space-y-6">
@@ -523,7 +521,7 @@ export function DashboardPage() {
           <div className="flex flex-wrap gap-3">
             <Button
               className="bg-[var(--color-imaro-accent)] text-white hover:opacity-90"
-              onClick={handleSoon}
+              onClick={() => void navigate('/gestionnaire/appels-fonds?create=1')}
             >
               <FilePlus className="me-2 size-4" />
               {t('gestionnaire.dashboard.actions.appelFonds')}
@@ -531,7 +529,7 @@ export function DashboardPage() {
             <Button
               variant="outline"
               className="border-[var(--color-imaro-accent)] text-[var(--color-imaro-accent)] hover:bg-[var(--color-imaro-accent)]/10"
-              onClick={handleSoon}
+              onClick={() => void navigate('/gestionnaire/paiements?create=1')}
             >
               <CreditCard className="me-2 size-4" />
               {t('gestionnaire.dashboard.actions.paiement')}
@@ -539,7 +537,7 @@ export function DashboardPage() {
             <Button
               variant="outline"
               className="border-[var(--color-imaro-accent)] text-[var(--color-imaro-accent)] hover:bg-[var(--color-imaro-accent)]/10"
-              onClick={handleSoon}
+              onClick={() => void navigate('/gestionnaire/tickets')}
             >
               <Wrench className="me-2 size-4" />
               {t('gestionnaire.dashboard.actions.ticket')}
@@ -547,7 +545,7 @@ export function DashboardPage() {
             <Button
               variant="outline"
               className="border-[var(--color-imaro-accent)] text-[var(--color-imaro-accent)] hover:bg-[var(--color-imaro-accent)]/10"
-              onClick={handleSoon}
+              onClick={() => void navigate('/gestionnaire/assemblees?create=1')}
             >
               <CalendarPlus className="me-2 size-4" />
               {t('gestionnaire.dashboard.actions.ag')}

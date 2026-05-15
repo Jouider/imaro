@@ -9,6 +9,9 @@ import {
   CreditCard,
   Wrench,
   CalendarDays,
+  Megaphone,
+  Hammer,
+  PiggyBank,
   LogOut,
   Menu,
   X,
@@ -61,6 +64,21 @@ const NAV_ITEMS: NavItem[] = [
     to: '/gestionnaire/assemblees',
     icon: <CalendarDays className="size-5" aria-hidden="true" />,
     labelKey: 'gestionnaire.nav.assemblees',
+  },
+  {
+    to: '/gestionnaire/annonces',
+    icon: <Megaphone className="size-5" aria-hidden="true" />,
+    labelKey: 'gestionnaire.nav.annonces',
+  },
+  {
+    to: '/gestionnaire/prestataires',
+    icon: <Hammer className="size-5" aria-hidden="true" />,
+    labelKey: 'gestionnaire.nav.prestataires',
+  },
+  {
+    to: '/gestionnaire/budgets',
+    icon: <PiggyBank className="size-5" aria-hidden="true" />,
+    labelKey: 'gestionnaire.nav.budgets',
   },
 ]
 

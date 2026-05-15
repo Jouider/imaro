@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
@@ -7,6 +7,7 @@ import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { useAuthStore } from '@/stores/authStore'
 import { setStoredToken } from '@/lib/axios'
 import { logout } from '@/services/auth.service'
+import { getProfile } from '@/services/portail.service'
 
 function getInitials(name: string): string {
   return name
@@ -30,13 +31,16 @@ export function PortailProfilPage() {
     },
   })
 
-  const name = user?.name ?? '—'
+  const { data: profile } = useQuery({
+    queryKey: ['portail-profile'],
+    queryFn: getProfile,
+  })
+
+  const name = profile?.name ?? user?.name ?? '—'
   const phone = user?.phone ?? '—'
   const initials = getInitials(name)
-
-  // TODO: lot and residence will come from real API
-  const lot = 'A-102'
-  const residence = 'Résidence Al Blanca'
+  const lot = profile?.lot ?? '—'
+  const residence = profile?.residence ?? '—'
 
   return (
     <div className="px-4 py-6 space-y-6">

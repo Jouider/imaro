@@ -43,6 +43,7 @@
   "portail": {
     "nav": {
       "home": "Accueil",
+      "actualites": "Actualités",
       "finances": "Finances",
       "reclamations": "Réclamations",
       "profil": "Profil"
@@ -53,10 +54,31 @@
       "enRetard": "En retard",
       "prochainAppel": "Prochain appel",
       "le": "le",
-      "annonces": "Annonces de la résidence",
+      "annonces": "Annonces",
+      "voirTout": "Voir tout",
       "noAnnonces": "Aucune annonce",
       "kpiPaidYear": "Payé cette année",
-      "kpiPending": "Reste à payer"
+      "kpiPending": "Reste à payer",
+      "assemblees": "Prochaines assemblées",
+      "noAssemblees": "Aucune assemblée prévue"
+    },
+    "actualites": {
+      "title": "Actualités",
+      "tabAnnonces": "Annonces",
+      "tabAssemblees": "Assemblées",
+      "noAnnonces": "Aucune annonce pour votre résidence",
+      "noAssemblees": "Aucune assemblée programmée",
+      "urgente": "Urgent",
+      "lectures": "{{n}} lecture{{s}}",
+      "quorum": "Quorum : {{n}} %",
+      "participants": "{{n}} participant(s)",
+      "agNonTenue": "AG non encore tenue",
+      "ordreDuJour": "Ordre du jour",
+      "convoquee": "Convoquée",
+      "tenue": "Tenue",
+      "annulee": "Annulée",
+      "ordinaire": "Ordinaire",
+      "extraordinaire": "Extraordinaire"
     },
     "finances": {
       "title": "Mes finances",
@@ -127,6 +149,58 @@
         "title": "Loi 18-00",
         "desc": "PDF conformes & multi-tenant"
       }
+    },
+    "nav": {
+      "gestionnaire": "Gestionnaire",
+      "coproprietaire": "Copropriétaire"
+    },
+    "hero": {
+      "headline1": "La gestion de",
+      "headline2": "copropriété réinventée",
+      "sub": "Plateforme tout-en-un pour syndics et copropriétaires marocains — conforme Loi 18-00.",
+      "ctaGestionnaire": "Accès Gestionnaire",
+      "ctaCoproprietaire": "Accès Copropriétaire",
+      "badge": "Loi 18-00 ✓"
+    },
+    "stats": {
+      "residences": "Copropriétés",
+      "coproprietaires": "Copropriétaires",
+      "dispo": "Disponibilité",
+      "loi": "Loi 18-00 Conforme"
+    },
+    "features": {
+      "title": "Tout ce dont vous avez besoin",
+      "sub": "Une solution complète pour la gestion moderne de copropriété",
+      "residences": { "title": "Gestion des résidences", "desc": "Lots, tantièmes et copropriétaires centralisés" },
+      "appels": { "title": "Appels de fonds automatisés", "desc": "Calcul par tantième, envoi WhatsApp instantané" },
+      "paiements": { "title": "Suivi des paiements", "desc": "Historique complet et impayés en temps réel" },
+      "tickets": { "title": "Tickets & réclamations", "desc": "Traitement avec photos et suivi de statut" },
+      "assemblees": { "title": "Assemblées générales", "desc": "Convocations, ordres du jour et procès-verbaux" },
+      "portail": { "title": "Portail copropriétaire", "desc": "Application mobile pour chaque résident" }
+    },
+    "howItWorks": {
+      "title": "Opérationnel en 3 étapes",
+      "sub": "Démarrez en quelques minutes, sans formation technique",
+      "step1": { "title": "Créez votre résidence", "desc": "Ajoutez vos lots, tantièmes et copropriétaires en quelques clics" },
+      "step2": { "title": "Invitez vos copropriétaires", "desc": "Ils reçoivent un accès WhatsApp à leur portail personnel" },
+      "step3": { "title": "Gérez en temps réel", "desc": "Tableau de bord, relances automatiques, rapports instantanés" }
+    },
+    "portals": {
+      "gestionnaire": {
+        "title": "Espace Gestionnaire",
+        "desc": "Gérez votre portefeuille de copropriétés depuis un tableau de bord unifié.",
+        "cta": "Accès Gestionnaire →"
+      },
+      "coproprietaire": {
+        "title": "Espace Copropriétaire",
+        "desc": "Consultez vos charges, payez en ligne et signalez des problèmes.",
+        "cta": "Accès Copropriétaire →"
+      }
+    },
+    "footer": {
+      "tagline": "La gestion de copropriété simplifiée pour le Maroc",
+      "legal": "Conforme Loi 18-00 · Maroc",
+      "copyright": "© 2026 Imaro. Tous droits réservés."
     }
   },
   "gestionnaire": {
@@ -137,7 +211,168 @@
       "appelsFonds": "Appels de fonds",
       "paiements": "Paiements",
       "tickets": "Tickets",
-      "assemblees": "Assemblées"
+      "assemblees": "Assemblées",
+      "annonces": "Annonces",
+      "prestataires": "Prestataires",
+      "budgets": "Budgets"
+    },
+    "residences": {
+      "title": "Résidences",
+      "subtitle": "Toutes les copropriétés gérées",
+      "searchPlaceholder": "Rechercher par nom ou ville…",
+      "colNom": "Nom",
+      "colAdresse": "Adresse",
+      "colVille": "Ville",
+      "colLots": "Lots",
+      "colRecouvrement": "Recouvrement",
+      "empty": "Aucune résidence",
+      "emptyDesc": "Votre compte ne gère aucune résidence pour l'instant."
+    },
+    "residence": {
+      "tabLots": "Lots",
+      "tabCoproprietaires": "Copropriétaires",
+      "tabExercices": "Exercices",
+      "colNumero": "N°",
+      "colType": "Type",
+      "colEtage": "Étage",
+      "colSuperficie": "Superficie",
+      "colTantieme": "Tantième",
+      "colProprietaire": "Propriétaire",
+      "colNom": "Nom",
+      "colTelephone": "Téléphone",
+      "colSolde": "Solde",
+      "colAnnee": "Année",
+      "colStatut": "Statut",
+      "addLot": "Ajouter un lot",
+      "editLot": "Modifier le lot",
+      "deleteLot": "Supprimer le lot",
+      "deleteLotDesc": "Le lot {{numero}} sera supprimé définitivement.",
+      "addExercice": "Nouvel exercice",
+      "lotTypes": {
+        "appartement": "Appartement",
+        "commerce": "Commerce",
+        "parking": "Parking",
+        "cave": "Cave",
+        "bureau": "Bureau",
+        "autre": "Autre"
+      },
+      "exerciceStatut": {
+        "actif": "Actif",
+        "cloture": "Clôturé"
+      },
+      "totalTantieme": "Total tantièmes : {{val}} / 1000",
+      "backToList": "Résidences"
+    },
+    "coproprietaires": {
+      "title": "Copropriétaires",
+      "subtitle": "Sélectionnez une résidence pour afficher ses copropriétaires",
+      "selectResidence": "Choisir une résidence",
+      "allResidences": "Toutes les résidences",
+      "colNom": "Nom",
+      "colTelephone": "Téléphone",
+      "colLot": "Lot",
+      "colSolde": "Solde",
+      "colResidence": "Résidence",
+      "empty": "Aucun copropriétaire",
+      "emptyDesc": "Sélectionnez une résidence ci-dessus pour afficher ses copropriétaires."
+    },
+    "appelsFonds": {
+      "title": "Appels de fonds",
+      "subtitle": "Gérez les appels de fonds et suivez le recouvrement",
+      "newAppel": "Nouvel appel",
+      "colTitre": "Titre",
+      "colResidence": "Résidence",
+      "colMontant": "Montant total",
+      "colRecouvre": "Recouvré",
+      "colEcheance": "Échéance",
+      "colStatut": "Statut",
+      "colActions": "Actions",
+      "statut": {
+        "brouillon": "Brouillon",
+        "publie": "Publié",
+        "cloture": "Clôturé"
+      },
+      "envoyer": "Envoyer",
+      "envoyerConfirm": "Envoyer l'appel de fonds aux copropriétaires ?",
+      "envoyerDesc": "Cette action enverra une notification WhatsApp à tous les copropriétaires.",
+      "envoyerSuccess": "Appel de fonds envoyé",
+      "form": {
+        "titre": "Titre",
+        "residence": "Résidence",
+        "montant": "Montant total (DH)",
+        "echeance": "Date d'échéance",
+        "description": "Description (optionnel)"
+      },
+      "empty": "Aucun appel de fonds",
+      "emptyDesc": "Créez votre premier appel de fonds."
+    },
+    "paiements": {
+      "title": "Paiements",
+      "tabHistorique": "Historique",
+      "tabImpayes": "Impayés",
+      "newPaiement": "Enregistrer un paiement",
+      "colDate": "Date",
+      "colReference": "Référence",
+      "colCoproprietaire": "Copropriétaire",
+      "colLot": "Lot",
+      "colAppel": "Appel de fonds",
+      "colMontant": "Montant",
+      "colMode": "Mode",
+      "colStatut": "Statut",
+      "colMontantDu": "Montant dû",
+      "colRestant": "Restant",
+      "colJoursRetard": "Jours retard",
+      "modes": {
+        "especes": "Espèces",
+        "virement": "Virement",
+        "cheque": "Chèque",
+        "mobile": "Mobile"
+      },
+      "form": {
+        "appelLigne": "Lot / Appel de fonds",
+        "montant": "Montant (DH)",
+        "date": "Date du paiement",
+        "mode": "Mode de paiement",
+        "reference": "Référence (optionnel)",
+        "notes": "Notes (optionnel)"
+      },
+      "emptyHistorique": "Aucun paiement enregistré",
+      "emptyImpayes": "Aucun impayé"
+    },
+    "tickets": {
+      "title": "Tickets",
+      "subtitle": "Suivi des réclamations et interventions",
+      "colRef": "Référence",
+      "colTitre": "Description",
+      "colResidence": "Résidence",
+      "colPriorite": "Priorité",
+      "colStatut": "Statut",
+      "colDate": "Date",
+      "colActions": "Actions",
+      "filterAll": "Tous",
+      "filterStatut": "Statut",
+      "filterPriorite": "Priorité",
+      "statut": {
+        "ouvert": "Ouvert",
+        "en_cours": "En cours",
+        "resolu": "Résolu",
+        "clos": "Clôturé"
+      },
+      "priorite": {
+        "urgent": "Urgent",
+        "normal": "Normal",
+        "faible": "Faible"
+      },
+      "detail": "Détail du ticket",
+      "closeTicket": "Clore le ticket",
+      "closeConfirm": "Clore définitivement ce ticket ?",
+      "closeDesc": "Cette action est irréversible. Le ticket passera en statut 'Clôturé'.",
+      "closeSuccess": "Ticket clôturé",
+      "updateSuccess": "Ticket mis à jour",
+      "images": "Photos",
+      "noImages": "Aucune photo",
+      "empty": "Aucun ticket",
+      "emptyDesc": "Aucun ticket ne correspond aux filtres sélectionnés."
     },
     "dashboard": {
       "title": "Tableau de bord",
@@ -173,6 +408,193 @@
         "ag": "Convoquer une AG",
         "soon": "Bientôt disponible"
       }
+    },
+    "assemblees": {
+      "title": "Assemblées générales",
+      "subtitle": "Convocations, procès-verbaux et suivi des AG",
+      "newAG": "Nouvelle AG",
+      "tabAVenir": "À venir",
+      "tabPassees": "Passées",
+      "colTitre": "Titre",
+      "colType": "Type",
+      "colResidence": "Résidence",
+      "colDate": "Date & Heure",
+      "colLieu": "Lieu",
+      "colStatut": "Statut",
+      "type": {
+        "ordinaire": "Ordinaire",
+        "extraordinaire": "Extraordinaire"
+      },
+      "statut": {
+        "convoquee": "Convoquée",
+        "tenue": "Tenue",
+        "annulee": "Annulée"
+      },
+      "form": {
+        "titre": "Titre",
+        "type": "Type",
+        "residence": "Résidence",
+        "date": "Date",
+        "heure": "Heure",
+        "lieu": "Lieu",
+        "quorum": "Quorum requis",
+        "ordreDuJour": "Ordre du jour"
+      },
+      "empty": "Aucune assemblée",
+      "emptyDesc": "Aucune assemblée générale programmée pour le moment."
+    },
+    "annonces": {
+      "title": "Annonces",
+      "subtitle": "Communiquez avec les copropriétaires de vos résidences",
+      "newAnnonce": "Nouvelle annonce",
+      "tabToutes": "Toutes",
+      "tabPubliees": "Publiées",
+      "tabBrouillons": "Brouillons",
+      "tabArchivees": "Archivées",
+      "colTitre": "Titre",
+      "colResidence": "Résidence",
+      "colStatut": "Statut",
+      "colPriorite": "Priorité",
+      "colDate": "Date",
+      "colLectures": "Lectures",
+      "statut": {
+        "brouillon": "Brouillon",
+        "publiee": "Publiée",
+        "archivee": "Archivée"
+      },
+      "priorite": {
+        "normale": "Normale",
+        "urgente": "Urgente"
+      },
+      "toutes": "Toutes résidences",
+      "publier": "Publier",
+      "archiver": "Archiver",
+      "publishConfirm": "Publier cette annonce ?",
+      "publishDesc": "Les copropriétaires concernés pourront voir cette annonce dès maintenant.",
+      "publishSuccess": "Annonce publiée",
+      "archiveConfirm": "Archiver cette annonce ?",
+      "archiveDesc": "L'annonce ne sera plus visible par les copropriétaires.",
+      "archiveSuccess": "Annonce archivée",
+      "deleteConfirm": "Supprimer cette annonce ?",
+      "deleteDesc": "Cette action est irréversible.",
+      "deleteSuccess": "Annonce supprimée",
+      "form": {
+        "titre": "Titre",
+        "contenu": "Contenu",
+        "priorite": "Priorité",
+        "residence": "Résidence (laisser vide = toutes)"
+      },
+      "empty": "Aucune annonce",
+      "emptyDesc": "Créez votre première annonce pour informer les copropriétaires."
+    },
+    "prestataires": {
+      "title": "Prestataires & Contrats",
+      "subtitle": "Gérez vos fournisseurs et les contrats de maintenance",
+      "tabPrestataires": "Prestataires",
+      "tabContrats": "Contrats",
+      "newPrestataire": "Nouveau prestataire",
+      "newContrat": "Nouveau contrat",
+      "colNom": "Nom",
+      "colSpecialite": "Spécialité",
+      "colTelephone": "Téléphone",
+      "colNote": "Note",
+      "colInterventions": "Interventions",
+      "colStatut": "Statut",
+      "colTitre": "Titre",
+      "colPrestataire": "Prestataire",
+      "colResidence": "Résidence",
+      "colMontant": "Montant/an",
+      "colDebut": "Début",
+      "colFin": "Fin",
+      "colRenouvellement": "Auto",
+      "statut": {
+        "actif": "Actif",
+        "blackliste": "Blacklisté",
+        "expire": "Expiré",
+        "resilie": "Résilié"
+      },
+      "specialite": {
+        "ascenseurs": "Ascenseurs",
+        "electricite": "Électricité",
+        "proprete": "Propreté",
+        "plomberie": "Plomberie",
+        "securite": "Sécurité",
+        "autre": "Autre"
+      },
+      "typeContrat": {
+        "maintenance": "Maintenance",
+        "nettoyage": "Nettoyage",
+        "gardiennage": "Gardiennage",
+        "autre": "Autre"
+      },
+      "expiresIn": "Expire dans {{n}} j",
+      "expired": "Expiré",
+      "form": {
+        "nom": "Nom",
+        "specialite": "Spécialité",
+        "telephone": "Téléphone",
+        "email": "Email",
+        "adresse": "Adresse",
+        "titre": "Titre du contrat",
+        "prestataire": "Prestataire",
+        "residence": "Résidence",
+        "typeContrat": "Type de contrat",
+        "montant": "Montant annuel (DH)",
+        "dateDebut": "Date de début",
+        "dateFin": "Date de fin",
+        "renouvellementAuto": "Renouvellement automatique"
+      },
+      "emptyPrestataires": "Aucun prestataire",
+      "emptyPrestatairesDesc": "Ajoutez votre premier prestataire.",
+      "emptyContrats": "Aucun contrat",
+      "emptyContratsDesc": "Créez votre premier contrat de maintenance."
+    },
+    "budgets": {
+      "title": "Budgets",
+      "subtitle": "Budget prévisionnel et suivi des dépenses par résidence",
+      "selectResidence": "Choisir une résidence",
+      "selectExercice": "Choisir l'exercice",
+      "newPoste": "Ajouter un poste",
+      "editPoste": "Modifier le poste",
+      "deletePoste": "Supprimer le poste",
+      "deletePosteDesc": "Ce poste sera supprimé définitivement.",
+      "colCategorie": "Catégorie",
+      "colDescription": "Description",
+      "colPrevu": "Prévu (DH)",
+      "colRealise": "Réalisé (DH)",
+      "colEcart": "Écart",
+      "colExecution": "Exécution",
+      "totalPrevu": "Total prévu",
+      "totalRealise": "Total réalisé",
+      "tauxExecution": "Taux d'exécution",
+      "categories": {
+        "maintenance": "Maintenance",
+        "nettoyage": "Nettoyage",
+        "gardiennage": "Gardiennage",
+        "electricite": "Électricité",
+        "eau": "Eau",
+        "assurance": "Assurance",
+        "administratif": "Administratif",
+        "travaux": "Travaux",
+        "autre": "Autre"
+      },
+      "statut": {
+        "brouillon": "Brouillon",
+        "approuve": "Approuvé"
+      },
+      "approve": "Approuver le budget",
+      "approveConfirm": "Approuver ce budget ?",
+      "approveDesc": "Une fois approuvé, les postes ne pourront plus être modifiés.",
+      "approveSuccess": "Budget approuvé",
+      "form": {
+        "categorie": "Catégorie",
+        "description": "Description",
+        "montantPrevu": "Montant prévu (DH)",
+        "montantRealise": "Montant réalisé (DH)"
+      },
+      "empty": "Aucun budget créé",
+      "emptyDesc": "Sélectionnez une résidence et un exercice pour afficher ou créer le budget.",
+      "noExercice": "Aucun exercice actif"
     }
   }
 }
