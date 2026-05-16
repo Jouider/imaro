@@ -7,20 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Assemblee extends Model
+class Budget extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'tenant_id', 'residence_id', 'created_by', 'titre', 'type',
-        'date', 'lieu', 'quorum_requis', 'ordre_du_jour', 'statut', 'quorum_atteint', 'pv_pdf_path',
+        'tenant_id', 'residence_id', 'exercice_id', 'statut', 'approuve_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'date' => 'datetime',
-            'quorum_atteint' => 'boolean',
+            'approuve_at' => 'datetime',
         ];
     }
 
@@ -29,13 +27,13 @@ class Assemblee extends Model
         return $this->belongsTo(Residence::class);
     }
 
-    public function createdBy(): BelongsTo
+    public function exercice(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(Exercice::class);
     }
 
-    public function votes(): HasMany
+    public function postes(): HasMany
     {
-        return $this->hasMany(VoteAg::class);
+        return $this->hasMany(PosteBudgetaire::class);
     }
 }

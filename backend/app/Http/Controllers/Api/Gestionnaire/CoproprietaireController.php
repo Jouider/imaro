@@ -12,6 +12,25 @@ use Illuminate\Http\Request;
 class CoproprietaireController extends Controller
 {
     /**
+     * GET /api/gestionnaire/coproprietaires — liste globale de toutes les résidences du gestionnaire
+     */
+    public function indexGlobal(Request $request): JsonResponse
+    {
+        $residenceIds = Residence::where('gestionnaire_id', $request->user()->id)
+            ->where('tenant_id', config('app.tenant_id'))
+            ->pluck('id');
+
+        $coproprietaires = Coproprietaire::whereHas('lot', fn ($q) => $q->whereIn('residence_id', $residenceIds))
+            ->with(['user', 'lot.residence'])
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => ['coproprietaires' => CoproprietaireResource::collection($coproprietaires)],
+        ]);
+    }
+
+    /**
      * GET /api/gestionnaire/residences/{residence}/coproprietaires
      */
     public function index(Request $request, Residence $residence): JsonResponse

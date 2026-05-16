@@ -5,22 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Assemblee extends Model
+class Annonce extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'tenant_id', 'residence_id', 'created_by', 'titre', 'type',
-        'date', 'lieu', 'quorum_requis', 'ordre_du_jour', 'statut', 'quorum_atteint', 'pv_pdf_path',
+        'tenant_id', 'residence_id', 'created_by',
+        'titre', 'contenu', 'priorite', 'statut', 'publiee_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'date' => 'datetime',
-            'quorum_atteint' => 'boolean',
+            'publiee_at' => 'datetime',
         ];
     }
 
@@ -32,10 +30,5 @@ class Assemblee extends Model
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
-    }
-
-    public function votes(): HasMany
-    {
-        return $this->hasMany(VoteAg::class);
     }
 }

@@ -13,7 +13,7 @@ class Prestataire extends Model
 
     protected $fillable = [
         'tenant_id', 'nom', 'telephone', 'specialite',
-        'email', 'note_moyenne', 'nb_interventions',
+        'email', 'note_moyenne', 'nb_interventions', 'statut',
     ];
 
     public function tenant(): BelongsTo

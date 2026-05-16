@@ -137,6 +137,28 @@ class LotController extends Controller
         ]);
     }
 
+    /**
+     * PUT /api/gestionnaire/lots/{lot}  — route plate attendue par le frontend
+     */
+    public function updateFlat(UpdateLotRequest $request, Lot $lot): JsonResponse
+    {
+        $residence = $lot->residence;
+        $this->authorizeResidence($request, $residence);
+
+        return $this->update($request, $residence, $lot);
+    }
+
+    /**
+     * DELETE /api/gestionnaire/lots/{lot}  — route plate attendue par le frontend
+     */
+    public function destroyFlat(Request $request, Lot $lot): JsonResponse
+    {
+        $residence = $lot->residence;
+        $this->authorizeResidence($request, $residence);
+
+        return $this->destroy($request, $residence, $lot);
+    }
+
     private function authorizeResidence(Request $request, Residence $residence): void
     {
         abort_if(

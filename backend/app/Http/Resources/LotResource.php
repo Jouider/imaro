@@ -16,12 +16,11 @@ class LotResource extends JsonResource
             'etage' => $this->etage,
             'superficie' => $this->superficie,
             'tantieme' => $this->tantieme,
-            'coproprietaire' => $this->when(
+            'proprietaire' => $this->when(
                 $this->relationLoaded('coproprietairePrincipal') && $this->coproprietairePrincipal,
                 fn () => [
-                    'id' => $this->coproprietairePrincipal->user->id ?? null,
+                    'id'   => $this->coproprietairePrincipal->user->id ?? null,
                     'name' => $this->coproprietairePrincipal->user->name ?? null,
-                    'phone' => $this->coproprietairePrincipal->user->phone ?? null,
                 ]
             ),
         ];

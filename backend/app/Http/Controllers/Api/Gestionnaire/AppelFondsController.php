@@ -19,7 +19,7 @@ class AppelFondsController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = AppelFonds::with(['residence', 'createdBy', 'lignes'])
+        $query = AppelFonds::with(['residence', 'exercice', 'createdBy', 'lignes'])
             ->whereHas('residence', fn ($q) => $q->where('gestionnaire_id', $request->user()->id));
 
         if ($request->filled('residence_id')) {
@@ -61,19 +61,20 @@ class AppelFondsController extends Controller
         );
 
         $appelFonds = AppelFonds::create([
-            'tenant_id' => config('app.tenant_id'),
+            'tenant_id'    => config('app.tenant_id'),
             'residence_id' => $request->residence_id,
-            'created_by' => $request->user()->id,
-            'libelle' => $request->libelle,
-            'description' => $request->description,
-            'montant_total' => $request->montant_total,
-            'date_echeance' => $request->date_echeance,
-            'statut' => 'brouillon',
+            'exercice_id'  => $request->exercice_id,
+            'created_by'   => $request->user()->id,
+            'libelle'      => $request->titre ?? $request->libelle,  // frontend envoie 'titre'
+            'description'  => $request->description,
+            'montant_total'=> $request->montant_total,
+            'date_echeance'=> $request->date_echeance,
+            'statut'       => 'brouillon',
         ]);
 
         $appelFonds->genererLignes();
 
-        $appelFonds->load(['residence', 'createdBy', 'lignes.coproprietaire.user', 'lignes.coproprietaire.lot']);
+        $appelFonds->load(['residence', 'exercice', 'createdBy', 'lignes.coproprietaire.user', 'lignes.coproprietaire.lot']);
         $appelFonds->setRelation('lignesDetail', $appelFonds->getRelation('lignes'));
 
         return response()->json([
@@ -90,7 +91,7 @@ class AppelFondsController extends Controller
     {
         $this->authorizeAppelFonds($request, $appelFonds);
 
-        $appelFonds->load(['residence', 'createdBy', 'lignes.coproprietaire.user', 'lignes.coproprietaire.lot']);
+        $appelFonds->load(['residence', 'exercice', 'createdBy', 'lignes.coproprietaire.user', 'lignes.coproprietaire.lot']);
         $appelFonds->setRelation('lignesDetail', $appelFonds->getRelation('lignes'));
 
         return response()->json([
