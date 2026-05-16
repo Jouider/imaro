@@ -454,12 +454,16 @@ export async function getTicket(id: number): Promise<Ticket> {
 }
 
 export async function updateTicket(id: number, data: { statut?: string; priorite?: string; cout_estime?: number }): Promise<Ticket> {
-  const res = await api.put<ApiEnvelope<{ ticket: Ticket }>>(`/gestionnaire/tickets/${id}`, data)
-  return res.data.data.ticket
+  return withMock(async () => {
+    const res = await api.put<ApiEnvelope<{ ticket: Ticket }>>(`/gestionnaire/tickets/${id}`, data)
+    return res.data.data.ticket
+  }, { ...(MOCK_TICKETS.find((t) => t.id === id) ?? MOCK_TICKETS[0]), ...data } as Ticket)
 }
 
 export async function closTicket(id: number): Promise<void> {
-  await api.post(`/gestionnaire/tickets/${id}/clos`)
+  return withMock(async () => {
+    await api.post(`/gestionnaire/tickets/${id}/clos`)
+  }, undefined)
 }
 
 export async function getTicketsUrgents(residenceId?: number): Promise<Ticket[]> {
