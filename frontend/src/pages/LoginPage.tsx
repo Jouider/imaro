@@ -139,8 +139,8 @@ export function LoginPage() {
             <Link to="/">← {t('nav.home')}</Link>
           </p>
 
-          {/* ── Dev bypass — tree-shaken in production ── */}
-          {import.meta.env.DEV && (
+          {/* ── Dev bypass — shown in DEV or when VITE_SHOW_DEV_BYPASS=true ── */}
+          {(import.meta.env.DEV || import.meta.env.VITE_SHOW_DEV_BYPASS === 'true') && (
             <div className="border-t border-dashed border-amber-300 bg-amber-50 -mx-6 -mb-6 px-4 py-3 rounded-b-xl">
               <p className="mb-2 text-center text-xs font-semibold text-amber-700">
                 ⚙️ Dev mode — accès direct
