@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Wrench, XCircle, ChevronDown } from 'lucide-react'
+import { Wrench, XCircle, ChevronDown, LayoutGrid, List } from 'lucide-react'
 import {
   getTickets,
   updateTicket,
@@ -37,6 +37,13 @@ const STATUT_STYLES: Record<string, string> = {
   clos: 'bg-gray-100 text-gray-600',
 }
 
+const STATUT_DOT: Record<string, string> = {
+  ouvert: 'bg-red-500',
+  en_cours: 'bg-blue-500',
+  resolu: 'bg-green-500',
+  clos: 'bg-gray-400',
+}
+
 const PRIORITE_STYLES: Record<string, string> = {
   urgent: 'bg-red-100 text-red-800',
   normal: 'bg-yellow-100 text-yellow-800',
@@ -46,6 +53,189 @@ const PRIORITE_STYLES: Record<string, string> = {
 const STATUTS = ['ouvert', 'en_cours', 'resolu', 'clos'] as const
 const PRIORITES = ['urgent', 'normal', 'faible'] as const
 
+type StatutKey = (typeof STATUTS)[number]
+
+// ---------------------------------------------------------------------------
+// KanbanCard
+// ---------------------------------------------------------------------------
+interface KanbanCardProps {
+  ticket: Ticket
+  onDragStart: (e: React.DragEvent<HTMLDivElement>, id: number) => void
+  onClick: (ticket: Ticket) => void
+}
+
+function KanbanCard({ ticket, onDragStart, onClick }: KanbanCardProps) {
+  const { t } = useTranslation()
+  const isClos = ticket.statut === 'clos'
+  const priorityCls =
+    PRIORITE_STYLES[ticket.priorite] ?? 'bg-gray-100 text-gray-600'
+
+  return (
+    <div
+      draggable={!isClos}
+      onDragStart={isClos ? undefined : (e) => onDragStart(e, ticket.id)}
+      onClick={() => onClick(ticket)}
+      className={cn(
+        'rounded-lg border bg-white p-3 shadow-sm transition-shadow',
+        isClos
+          ? 'cursor-default opacity-70'
+          : 'cursor-grab hover:shadow-md active:cursor-grabbing',
+      )}
+    >
+      <div className="mb-1.5 flex items-center justify-between gap-2">
+        <span className="font-mono text-xs text-muted-foreground">
+          #{ticket.id}
+        </span>
+        <Badge className={`${priorityCls} hover:${priorityCls} border-0 text-[10px]`}>
+          {t(`gestionnaire.tickets.priorite.${ticket.priorite}`, {
+            defaultValue: ticket.priorite,
+          })}
+        </Badge>
+      </div>
+      <p className="mb-2 line-clamp-2 text-sm leading-snug">
+        {ticket.description}
+      </p>
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <span className="truncate max-w-[110px]">{ticket.residence.name}</span>
+        <span>{ticket.created_at.slice(0, 10)}</span>
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// KanbanColumn
+// ---------------------------------------------------------------------------
+interface KanbanColumnProps {
+  statut: StatutKey
+  tickets: Ticket[]
+  onDragStart: (e: React.DragEvent<HTMLDivElement>, id: number) => void
+  onDrop: (e: React.DragEvent<HTMLDivElement>, statut: StatutKey) => void
+  onCardClick: (ticket: Ticket) => void
+}
+
+function KanbanColumn({
+  statut,
+  tickets,
+  onDragStart,
+  onDrop,
+  onCardClick,
+}: KanbanColumnProps) {
+  const { t } = useTranslation()
+  const [isOver, setIsOver] = useState(false)
+
+  const headerBadgeCls = STATUT_STYLES[statut] ?? 'bg-gray-100 text-gray-600'
+  const dotCls = STATUT_DOT[statut] ?? 'bg-gray-400'
+
+  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault()
+    setIsOver(true)
+  }
+
+  function handleDragLeave() {
+    setIsOver(false)
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    setIsOver(false)
+    onDrop(e, statut)
+  }
+
+  return (
+    <div
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      className={cn(
+        'flex min-w-[220px] flex-col rounded-xl border bg-muted/30 p-3 transition-colors',
+        isOver && 'border-[var(--color-imaro-primary)] bg-blue-50/40',
+      )}
+    >
+      {/* Column header */}
+      <div className="mb-3 flex items-center gap-2">
+        <span className={cn('size-2 shrink-0 rounded-full', dotCls)} />
+        <span className="text-sm font-semibold capitalize">
+          {t(`gestionnaire.tickets.statut.${statut}`, { defaultValue: statut })}
+        </span>
+        <Badge
+          className={cn(headerBadgeCls, 'ms-auto border-0 text-xs tabular-nums')}
+        >
+          {tickets.length}
+        </Badge>
+      </div>
+
+      {/* Cards */}
+      <div className="flex flex-col gap-2 overflow-y-auto">
+        {tickets.map((ticket) => (
+          <KanbanCard
+            key={ticket.id}
+            ticket={ticket}
+            onDragStart={onDragStart}
+            onClick={onCardClick}
+          />
+        ))}
+        {tickets.length === 0 && (
+          <p className="py-6 text-center text-xs text-muted-foreground">
+            Aucun ticket
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// KanbanBoard
+// ---------------------------------------------------------------------------
+interface KanbanBoardProps {
+  tickets: Ticket[]
+  onCardClick: (ticket: Ticket) => void
+  onMove: (id: number, statut: string) => void
+}
+
+function KanbanBoard({ tickets, onCardClick, onMove }: KanbanBoardProps) {
+  const [dragId, setDragId] = useState<number | null>(null)
+
+  function handleDragStart(e: React.DragEvent<HTMLDivElement>, id: number) {
+    setDragId(id)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>, targetStatut: StatutKey) {
+    e.preventDefault()
+    if (dragId === null) return
+    const ticket = tickets.find((t) => t.id === dragId)
+    if (!ticket) return
+    if (ticket.statut !== targetStatut) {
+      onMove(dragId, targetStatut)
+    }
+    setDragId(null)
+  }
+
+  const byStatut = (statut: StatutKey) =>
+    tickets.filter((t) => t.statut === statut)
+
+  return (
+    <div className="overflow-x-auto pb-2">
+      <div className="grid min-w-[880px] grid-cols-4 gap-4">
+        {STATUTS.map((statut) => (
+          <KanbanColumn
+            key={statut}
+            statut={statut}
+            tickets={byStatut(statut)}
+            onDragStart={handleDragStart}
+            onDrop={handleDrop}
+            onCardClick={onCardClick}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// TicketsPage
+// ---------------------------------------------------------------------------
 export function TicketsPage() {
   const { t } = useTranslation()
   const qc = useQueryClient()
@@ -55,6 +245,7 @@ export function TicketsPage() {
   const [detailTicket, setDetailTicket] = useState<Ticket | null>(null)
   const [closeTarget, setCloseTarget] = useState<Ticket | null>(null)
   const [newStatut, setNewStatut] = useState<string>('')
+  const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table')
 
   const { data: tickets = [], isLoading } = useQuery({
     queryKey: ['tickets', filterStatut, filterPriorite],
@@ -176,8 +367,8 @@ export function TicketsPage() {
         subtitle={t('gestionnaire.tickets.subtitle')}
       />
 
-      {/* Filters */}
-      <div className="mb-4 flex flex-wrap gap-3">
+      {/* Filters + view toggle */}
+      <div className="mb-4 flex flex-wrap items-center gap-3">
         <Select value={filterStatut} onValueChange={setFilterStatut}>
           <SelectTrigger className="w-40">
             <SelectValue />
@@ -205,18 +396,57 @@ export function TicketsPage() {
             ))}
           </SelectContent>
         </Select>
+
+        {/* View mode toggle — pushed to the right */}
+        <div className="ms-auto flex overflow-hidden rounded-md border">
+          <button
+            type="button"
+            aria-label="Vue tableau"
+            onClick={() => setViewMode('table')}
+            className={cn(
+              'flex items-center justify-center px-2.5 py-1.5 transition-colors',
+              viewMode === 'table'
+                ? 'bg-[var(--color-imaro-primary)] text-white'
+                : 'bg-white text-muted-foreground hover:bg-muted',
+            )}
+          >
+            <List className="size-4" />
+          </button>
+          <button
+            type="button"
+            aria-label="Vue kanban"
+            onClick={() => setViewMode('kanban')}
+            className={cn(
+              'flex items-center justify-center px-2.5 py-1.5 transition-colors',
+              viewMode === 'kanban'
+                ? 'bg-[var(--color-imaro-primary)] text-white'
+                : 'bg-white text-muted-foreground hover:bg-muted',
+            )}
+          >
+            <LayoutGrid className="size-4" />
+          </button>
+        </div>
       </div>
 
-      <DataTable
-        data={tickets}
-        columns={columns}
-        rowKey="id"
-        isLoading={isLoading}
-        searchable
-        emptyIcon={<Wrench className="size-12 text-muted-foreground" />}
-        emptyTitle={t('gestionnaire.tickets.empty')}
-        emptyDescription={t('gestionnaire.tickets.emptyDesc')}
-      />
+      {/* Main content */}
+      {viewMode === 'kanban' ? (
+        <KanbanBoard
+          tickets={tickets}
+          onCardClick={openDetail}
+          onMove={(id, statut) => updateMutation.mutate({ id, statut })}
+        />
+      ) : (
+        <DataTable
+          data={tickets}
+          columns={columns}
+          rowKey="id"
+          isLoading={isLoading}
+          searchable
+          emptyIcon={<Wrench className="size-12 text-muted-foreground" />}
+          emptyTitle={t('gestionnaire.tickets.empty')}
+          emptyDescription={t('gestionnaire.tickets.emptyDesc')}
+        />
+      )}
 
       {/* Ticket detail dialog */}
       <Dialog

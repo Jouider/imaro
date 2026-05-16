@@ -60,12 +60,15 @@
       "kpiPaidYear": "المدفوع هذا العام",
       "kpiPending": "المبلغ المتبقي",
       "assemblees": "الجمعيات القادمة",
-      "noAssemblees": "لا توجد جمعيات مبرمجة"
+      "noAssemblees": "لا توجد جمعيات مبرمجة",
+      "prochainPaiement": "الدفعة القادمة",
+      "payer": "الدفع ←"
     },
     "actualites": {
       "title": "الأخبار",
       "tabAnnonces": "الإعلانات",
       "tabAssemblees": "الجمعيات",
+      "tabCalendrier": "التقويم",
       "noAnnonces": "لا توجد إعلانات لإقامتك",
       "noAssemblees": "لا توجد جمعيات مبرمجة",
       "urgente": "عاجل",
@@ -78,17 +81,30 @@
       "tenue": "منعقدة",
       "annulee": "ملغاة",
       "ordinaire": "عادية",
-      "extraordinaire": "غير عادية"
+      "extraordinaire": "غير عادية",
+      "calendarHint": "انقر على يوم محدد لعرض الأحداث",
+      "calendarEmpty": "لا توجد أحداث هذا الشهر"
     },
     "finances": {
       "title": "ماليتي",
+      "tabFinances": "الماليات",
+      "tabDocuments": "الوثائق",
       "filter": {
         "all": "الكل",
         "appels": "استدعاءات الأموال",
         "paiements": "المدفوعات"
       },
       "empty": "لا توجد عمليات",
-      "recu": "تحميل الإيصال"
+      "recu": "تحميل الإيصال",
+      "documents": {
+        "title": "وثائقي",
+        "empty": "لا توجد وثائق متاحة",
+        "download": "تحميل",
+        "groupReglement": "نظام الملكية المشتركة",
+        "groupPvAg": "محاضر الجمعيات",
+        "groupContratFacture": "العقود / الفواتير",
+        "groupAutre": "وثائق أخرى"
+      }
     },
     "reclamations": {
       "title": "الإبلاغ عن مشكلة",
@@ -214,7 +230,8 @@
       "assemblees": "الجمعيات العامة",
       "annonces": "الإعلانات",
       "prestataires": "المزودون",
-      "budgets": "الميزانية"
+      "budgets": "الميزانية",
+      "documents": "الوثائق"
     },
     "residences": {
       "title": "الإقامات",
@@ -372,7 +389,45 @@
       "images": "الصور",
       "noImages": "لا توجد صور",
       "empty": "لا توجد تذاكر",
-      "emptyDesc": "لا توجد تذاكر تطابق الفلاتر المحددة."
+      "emptyDesc": "لا توجد تذاكر تطابق الفلاتر المحددة.",
+      "viewKanban": "كانبان",
+      "viewTable": "جدول"
+    },
+    "documents": {
+      "title": "الوثائق",
+      "subtitle": "مركز وثائق مجمعاتك",
+      "add": "إضافة وثيقة",
+      "filterType": "النوع",
+      "filterResidence": "الإقامة",
+      "filterAll": "الكل",
+      "colNom": "الاسم",
+      "colType": "النوع",
+      "colResidence": "الإقامة",
+      "colDate": "التاريخ",
+      "colTaille": "الحجم",
+      "download": "تحميل",
+      "delete": "حذف",
+      "deleteConfirm": "حذف هذه الوثيقة؟",
+      "deleteDesc": "ستُحذف هذه الوثيقة نهائيًا.",
+      "toutes": "جميع الإقامات",
+      "empty": "لا توجد وثائق",
+      "emptyDesc": "أضف أول وثيقة لمشاركتها مع الملاك المشاركين.",
+      "addSuccess": "تمت إضافة الوثيقة",
+      "deleteSuccess": "تم حذف الوثيقة",
+      "form": {
+        "nom": "اسم الوثيقة",
+        "type": "النوع",
+        "residence": "الإقامة (اختياري)",
+        "date": "التاريخ",
+        "file": "الملف"
+      },
+      "types": {
+        "reglement": "النظام الداخلي",
+        "pv_ag": "محضر جمعية",
+        "contrat": "عقد",
+        "facture": "فاتورة",
+        "autre": "أخرى"
+      }
     },
     "assemblees": {
       "title": "الجمعيات العامة",

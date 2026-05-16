@@ -131,21 +131,6 @@ export function PortailHomePage() {
               {t('portail.home.enRetard')}
             </span>
           )}
-
-          {/* Next call */}
-          {dashboard.prochain_appel && (
-            <p className="text-sm text-white/70 dark:text-muted-foreground">
-              {t('portail.home.prochainAppel')}:{' '}
-              <span className="font-semibold text-white dark:text-foreground">
-                <MontantDisplay
-                  value={dashboard.prochain_appel.montant}
-                  className="text-white dark:text-foreground"
-                />{' '}
-                {t('portail.home.le')}{' '}
-                {formatDate(dashboard.prochain_appel.date)}
-              </span>
-            </p>
-          )}
         </div>
       ) : null}
 
@@ -169,6 +154,11 @@ export function PortailHomePage() {
             label={t('portail.home.kpiPending')}
           />
         </div>
+      )}
+
+      {/* Prochain paiement reminder card */}
+      {!dashLoading && dashboard?.prochain_appel && (
+        <ProchainPaiementCard prochain_appel={dashboard.prochain_appel} t={t} />
       )}
 
       {/* Assemblées section */}
@@ -233,6 +223,68 @@ export function PortailHomePage() {
           </div>
         )}
       </section>
+    </div>
+  )
+}
+
+// ─── ProchainPaiementCard ─────────────────────────────────────────────────────
+
+function ProchainPaiementCard({
+  prochain_appel,
+  t,
+}: {
+  prochain_appel: { montant: number; date: string }
+  t: (key: string, opts?: Record<string, unknown>) => string
+}) {
+  const isOverdue = new Date(prochain_appel.date) < new Date()
+
+  return (
+    <div
+      className={cn(
+        'rounded-xl border p-4 flex items-center gap-3',
+        isOverdue
+          ? 'bg-orange-50 border-orange-200 dark:bg-orange-950/10'
+          : 'bg-blue-50 border-blue-200 dark:bg-blue-950/10',
+      )}
+    >
+      {/* Bell icon in circle */}
+      <div
+        className={cn(
+          'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
+          isOverdue ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600',
+        )}
+      >
+        <Bell className="size-5" aria-hidden="true" />
+      </div>
+
+      {/* Label + amount + date */}
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-muted-foreground">
+          {t('portail.home.prochainPaiement', { defaultValue: 'Prochain paiement' })}
+        </p>
+        <div className="flex items-baseline gap-1.5 flex-wrap">
+          <MontantDisplay
+            value={prochain_appel.montant}
+            className="font-semibold text-base"
+          />
+          <span className="text-xs text-muted-foreground">
+            {t('portail.home.le', { defaultValue: 'le' })} {formatDate(prochain_appel.date)}
+          </span>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <Link
+        to="/portail/finances"
+        className={cn(
+          'shrink-0 text-sm font-semibold',
+          isOverdue
+            ? 'text-[var(--color-imaro-accent)]'
+            : 'text-[var(--color-imaro-primary)]',
+        )}
+      >
+        {t('portail.home.payer', { defaultValue: 'Payer →' })}
+      </Link>
     </div>
   )
 }

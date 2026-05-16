@@ -60,12 +60,15 @@
       "kpiPaidYear": "Payé cette année",
       "kpiPending": "Reste à payer",
       "assemblees": "Prochaines assemblées",
-      "noAssemblees": "Aucune assemblée prévue"
+      "noAssemblees": "Aucune assemblée prévue",
+      "prochainPaiement": "Prochain paiement",
+      "payer": "Payer →"
     },
     "actualites": {
       "title": "Actualités",
       "tabAnnonces": "Annonces",
       "tabAssemblees": "Assemblées",
+      "tabCalendrier": "Calendrier",
       "noAnnonces": "Aucune annonce pour votre résidence",
       "noAssemblees": "Aucune assemblée programmée",
       "urgente": "Urgent",
@@ -78,17 +81,30 @@
       "tenue": "Tenue",
       "annulee": "Annulée",
       "ordinaire": "Ordinaire",
-      "extraordinaire": "Extraordinaire"
+      "extraordinaire": "Extraordinaire",
+      "calendarHint": "Cliquez sur un jour marqué pour voir les événements",
+      "calendarEmpty": "Aucun événement ce mois"
     },
     "finances": {
       "title": "Mes finances",
+      "tabFinances": "Finances",
+      "tabDocuments": "Documents",
       "filter": {
         "all": "Tout",
         "appels": "Appels de fonds",
         "paiements": "Paiements"
       },
       "empty": "Aucune opération",
-      "recu": "Télécharger le reçu"
+      "recu": "Télécharger le reçu",
+      "documents": {
+        "title": "Mes documents",
+        "empty": "Aucun document disponible",
+        "download": "Télécharger",
+        "groupReglement": "Règlement de copropriété",
+        "groupPvAg": "PV Assemblées",
+        "groupContratFacture": "Contrats / Factures",
+        "groupAutre": "Autres documents"
+      }
     },
     "reclamations": {
       "title": "Signaler un problème",
@@ -214,7 +230,8 @@
       "assemblees": "Assemblées",
       "annonces": "Annonces",
       "prestataires": "Prestataires",
-      "budgets": "Budgets"
+      "budgets": "Budgets",
+      "documents": "Documents"
     },
     "residences": {
       "title": "Résidences",
@@ -372,7 +389,9 @@
       "images": "Photos",
       "noImages": "Aucune photo",
       "empty": "Aucun ticket",
-      "emptyDesc": "Aucun ticket ne correspond aux filtres sélectionnés."
+      "emptyDesc": "Aucun ticket ne correspond aux filtres sélectionnés.",
+      "viewKanban": "Kanban",
+      "viewTable": "Tableau"
     },
     "dashboard": {
       "title": "Tableau de bord",
@@ -595,6 +614,42 @@
       "empty": "Aucun budget créé",
       "emptyDesc": "Sélectionnez une résidence et un exercice pour afficher ou créer le budget.",
       "noExercice": "Aucun exercice actif"
+    },
+    "documents": {
+      "title": "Documents",
+      "subtitle": "Centralisez les documents de vos copropriétés",
+      "add": "Ajouter un document",
+      "filterType": "Type",
+      "filterResidence": "Résidence",
+      "filterAll": "Tous",
+      "colNom": "Nom",
+      "colType": "Type",
+      "colResidence": "Résidence",
+      "colDate": "Date",
+      "colTaille": "Taille",
+      "download": "Télécharger",
+      "delete": "Supprimer",
+      "deleteConfirm": "Supprimer ce document ?",
+      "deleteDesc": "Ce document sera supprimé définitivement.",
+      "toutes": "Toutes les résidences",
+      "empty": "Aucun document",
+      "emptyDesc": "Ajoutez votre premier document pour le partager avec les copropriétaires.",
+      "addSuccess": "Document ajouté",
+      "deleteSuccess": "Document supprimé",
+      "form": {
+        "nom": "Nom du document",
+        "type": "Type",
+        "residence": "Résidence (optionnel)",
+        "date": "Date",
+        "file": "Fichier"
+      },
+      "types": {
+        "reglement": "Règlement",
+        "pv_ag": "PV Assemblée",
+        "contrat": "Contrat",
+        "facture": "Facture",
+        "autre": "Autre"
+      }
     }
   }
 }
