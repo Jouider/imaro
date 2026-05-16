@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('auth')->group(function () {
     Route::post('/request-otp', [AuthController::class, 'requestOtp']);
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
+    // Aliases attendus par le frontend (otp/request + otp/verify)
+    Route::post('/otp/request', [AuthController::class, 'requestOtp']);
+    Route::post('/otp/verify', [AuthController::class, 'verifyOtp']);
 });
 
 /*
@@ -50,8 +53,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->prefix('conseil')
         ->group(base_path('routes/api/conseil.php'));
 
-    // Résident (portail mobile)
+    // Résident (portail copropriétaire)
     Route::middleware('role:resident')
-        ->prefix('resident')
+        ->prefix('portail')
         ->group(base_path('routes/api/resident.php'));
 });
