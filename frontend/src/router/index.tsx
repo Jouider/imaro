@@ -22,6 +22,7 @@ import { AssembleesPage } from '@/pages/gestionnaire/AssembleesPage'
 import { AnnoncesPage } from '@/pages/gestionnaire/AnnoncesPage'
 import { PrestatairesPage } from '@/pages/gestionnaire/PrestatairesPage'
 import { BudgetsPage } from '@/pages/gestionnaire/BudgetsPage'
+import { DocumentsPage } from '@/pages/gestionnaire/DocumentsPage'
 
 export const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
@@ -69,6 +70,7 @@ export const router = createBrowserRouter([
       { path: 'annonces', element: <AnnoncesPage /> },
       { path: 'prestataires', element: <PrestatairesPage /> },
       { path: 'budgets', element: <BudgetsPage /> },
+      { path: 'documents', element: <DocumentsPage /> },
     ],
   },
 ])

@@ -1,7 +1,7 @@
 import { api, type ApiEnvelope } from '@/lib/axios'
 
 async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
-  if (!import.meta.env.DEV) return call()
+  if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS) return call()
   try {
     return await call()
   } catch {
@@ -331,4 +331,59 @@ export async function createReclamation(data: {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
   }, undefined)
+}
+
+// ─── Portail Documents ────────────────────────────────────────────────────────
+
+export type PortailDocumentType = 'reglement' | 'pv_ag' | 'contrat_facture' | 'autre'
+
+export type PortailDocument = {
+  id: number
+  nom: string
+  type: PortailDocumentType
+  date: string
+  url: string
+  taille_ko: number
+}
+
+const MOCK_PORTAIL_DOCUMENTS: PortailDocument[] = [
+  {
+    id: 1,
+    nom: 'Règlement de copropriété — Résidence Al Blanca',
+    type: 'reglement',
+    date: '2023-03-01',
+    url: 'https://example.com/docs/reglement.pdf',
+    taille_ko: 1240,
+  },
+  {
+    id: 2,
+    nom: 'PV Assemblée Générale Ordinaire 2025',
+    type: 'pv_ag',
+    date: '2025-06-22',
+    url: 'https://example.com/docs/pv-ago-2025.pdf',
+    taille_ko: 340,
+  },
+  {
+    id: 3,
+    nom: 'PV Assemblée Générale Ordinaire 2024',
+    type: 'pv_ag',
+    date: '2024-07-10',
+    url: 'https://example.com/docs/pv-ago-2024.pdf',
+    taille_ko: 290,
+  },
+  {
+    id: 4,
+    nom: 'Contrat entretien ascenseur 2026',
+    type: 'contrat_facture',
+    date: '2026-01-15',
+    url: 'https://example.com/docs/contrat-ascenseur-2026.pdf',
+    taille_ko: 185,
+  },
+]
+
+export async function getPortailDocuments(): Promise<PortailDocument[]> {
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<{ documents: PortailDocument[] }>>('/portail/documents')
+    return res.data.data.documents
+  }, MOCK_PORTAIL_DOCUMENTS)
 }

@@ -3,13 +3,15 @@ import { useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Plus, Send, FileText } from 'lucide-react'
+import { Plus, Send, FileText, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import {
   getAppelsFonds,
   getResidences,
+  getLots,
   storeAppelFonds,
   envoyerAppelFonds,
   type AppelFonds,
+  type Lot,
 } from '@/services/gestionnaire.service'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
@@ -58,6 +60,94 @@ const EMPTY_FORM: AppelForm = {
   description: '',
 }
 
+// ---------------------------------------------------------------------------
+// Répartition preview
+// ---------------------------------------------------------------------------
+const fmt = new Intl.NumberFormat('fr-MA', { minimumFractionDigits: 2 })
+
+interface RepartitionPreviewProps {
+  lots: Lot[]
+  totalTantieme: number
+  montantTotal: number
+}
+
+function RepartitionPreview({
+  lots,
+  totalTantieme,
+  montantTotal,
+}: RepartitionPreviewProps) {
+  const [open, setOpen] = useState(true)
+
+  return (
+    <div className="rounded-lg border bg-muted/30 p-3">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between text-sm font-medium"
+      >
+        <span>Répartition par tantième</span>
+        {open ? (
+          <ChevronUp className="size-4 text-muted-foreground" />
+        ) : (
+          <ChevronDown className="size-4 text-muted-foreground" />
+        )}
+      </button>
+
+      {open && (
+        <div className="mt-2 max-h-40 overflow-y-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b text-muted-foreground">
+                <th className="py-1 text-left font-medium">Lot</th>
+                <th className="py-1 text-right font-medium">Tantième</th>
+                <th className="py-1 text-right font-medium">%</th>
+                <th className="py-1 text-right font-medium">Montant</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lots.map((lot) => {
+                const pct =
+                  totalTantieme > 0 ? (lot.tantieme / totalTantieme) * 100 : 0
+                const montantLot =
+                  totalTantieme > 0
+                    ? (lot.tantieme / totalTantieme) * montantTotal
+                    : 0
+                return (
+                  <tr key={lot.id} className="border-b border-muted last:border-0">
+                    <td className="py-1 font-mono">{lot.numero}</td>
+                    <td className="py-1 text-right tabular-nums">
+                      {lot.tantieme}
+                    </td>
+                    <td className="py-1 text-right tabular-nums">
+                      {pct.toFixed(2)} %
+                    </td>
+                    <td className="py-1 text-right tabular-nums">
+                      {fmt.format(montantLot)}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+            <tfoot>
+              <tr className="border-t font-bold">
+                <td className="py-1">Total</td>
+                <td className="py-1 text-right tabular-nums">{totalTantieme}</td>
+                <td className="py-1 text-right tabular-nums">100 %</td>
+                <td className="py-1 text-right tabular-nums">
+                  {fmt.format(montantTotal)}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// AppelsFondsPage
+// ---------------------------------------------------------------------------
 export function AppelsFondsPage() {
   const { t } = useTranslation()
   const qc = useQueryClient()
@@ -76,6 +166,19 @@ export function AppelsFondsPage() {
     queryKey: ['residences'],
     queryFn: () => getResidences(),
   })
+
+  // Lots for the répartition preview — only fetch when a residence is selected
+  const { data: lotsData, isLoading: lotsLoading } = useQuery({
+    queryKey: ['lots', form.residence_id],
+    queryFn: () => getLots(Number(form.residence_id)),
+    enabled: !!form.residence_id,
+  })
+
+  const lots: Lot[] = lotsData?.lots ?? []
+  const totalTantieme: number = lotsData?.total_tantieme ?? 0
+  const montantTotal = Number(form.montant_total) || 0
+  const showRepartition =
+    !!form.residence_id && montantTotal > 0 && !lotsLoading && lots.length > 0
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -273,6 +376,23 @@ export function AppelsFondsPage() {
                 />
               </div>
             </div>
+
+            {/* Répartition par tantième preview */}
+            {!!form.residence_id && montantTotal > 0 && (
+              lotsLoading ? (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Loader2 className="size-3.5 animate-spin" />
+                  Calcul de la répartition…
+                </div>
+              ) : showRepartition ? (
+                <RepartitionPreview
+                  lots={lots}
+                  totalTantieme={totalTantieme}
+                  montantTotal={montantTotal}
+                />
+              ) : null
+            )}
+
             <div className="space-y-1">
               <Label>{t('gestionnaire.appelsFonds.form.description')}</Label>
               <Input

@@ -71,6 +71,11 @@ const NAV_ITEMS: NavItem[] = [
     labelKey: 'gestionnaire.nav.annonces',
   },
   {
+    to: '/gestionnaire/documents',
+    icon: <FileText className="size-5" aria-hidden="true" />,
+    labelKey: 'gestionnaire.nav.documents',
+  },
+  {
     to: '/gestionnaire/prestataires',
     icon: <Hammer className="size-5" aria-hidden="true" />,
     labelKey: 'gestionnaire.nav.prestataires',
