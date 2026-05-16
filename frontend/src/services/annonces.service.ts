@@ -1,7 +1,7 @@
 import { api, type ApiEnvelope } from '@/lib/axios'
 
 async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
-  if (!import.meta.env.DEV) return call()
+  if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS) return call()
   try {
     return await call()
   } catch {
