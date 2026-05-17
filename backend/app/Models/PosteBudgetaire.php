@@ -10,6 +10,8 @@ class PosteBudgetaire extends Model
 {
     use HasFactory;
 
+    protected $table = 'postes_budgetaires';
+
     protected $fillable = [
         'budget_id', 'categorie', 'description', 'montant_prevu', 'montant_realise',
     ];
