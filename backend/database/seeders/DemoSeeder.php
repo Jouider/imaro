@@ -451,7 +451,7 @@ class DemoSeeder extends Seeder
             'lieu' => 'Salle de réunion RDC, Résidence Atlas',
             'quorum_requis' => 50,
             'ordre_du_jour' => "Approbation des comptes 2024\nBudget prévisionnel 2025\nÉlection nouveau syndic\nQuestions diverses",
-            'statut' => 'terminee',
+            'statut' => 'tenue',
             'quorum_atteint' => true,
         ]);
 
