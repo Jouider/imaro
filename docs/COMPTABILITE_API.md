@@ -112,11 +112,11 @@ Crée un nouvel exercice comptable.
   "status": "success",
   "data": [
     {
-      "id": 1,
+      "id": 3,
       "exercice_id": 1,
-      "date": "2026-01-05",
-      "numero_compte": "6111",
-      "libelle_compte": "Gardiennage/Surveillance",
+      "date": "2026-01-15",
+      "numero_compte": "6138",
+      "libelle_compte": "Autres rémunérations",
       "description": "Gardiennage Janvier 2026 — Sécurité Atlas SARL",
       "debit": 3500,
       "credit": 0,
@@ -143,8 +143,8 @@ Retourne le détail des écritures pour un compte PCG donné, avec le solde prog
 {
   "status": "success",
   "data": {
-    "numero": "6171",
-    "libelle": "Nettoyage",
+    "numero": "6131",
+    "libelle": "Nettoyage des locaux",
     "solde_ouverture": 0,
     "lignes": [
       {
@@ -195,7 +195,7 @@ Retourne la balance de vérification (tous comptes mouvementés).
     },
     {
       "numero": "7111",
-      "libelle": "Cotisations copropriétaires",
+      "libelle": "Provisions sur opérations courantes",
       "classe": 7,
       "total_debit": 0,
       "total_credit": 2750,
@@ -227,8 +227,8 @@ Retourne la balance de vérification (tous comptes mouvementés).
       "date": "2026-01-05",
       "prestataire_id": 1,
       "prestataire_nom": "Sécurité Atlas SARL",
-      "compte_charge": "6111",
-      "libelle_compte": "Gardiennage/Surveillance",
+      "compte_charge": "6138",
+      "libelle_compte": "Autres rémunérations",
       "mode_paiement": "virement",
       "justificatif_path": "facture-gardiennage-jan26.pdf",
       "ecriture_id": 1
@@ -351,7 +351,7 @@ Tu es un assistant comptable marocain. Analyse cette facture et retourne un JSON
     "montant": 3500,
     "date": "2026-06-01",
     "fournisseur": "Sécurité Atlas SARL",
-    "compte_charge_suggere": "6111",
+    "compte_charge_suggere": "6138",
     "confiance": "haute"
   }
 }
@@ -385,29 +385,85 @@ Si une condition n'est pas remplie : HTTP 422 avec message explicite.
 
 ### GET `/comptabilite/comptes-pcg`
 
-Retourne la liste des comptes du Plan Comptable Général marocain.
+Retourne la liste des comptes du Plan Comptable Général marocain (118 comptes).
+
+**Query params (filtres) :**
+- `utilisable_depense=true` → classe 6 uniquement (formulaire Dépense)
+- `utilisable_produit=true` → classe 7 uniquement (formulaire Budget Produit)
+- `utilisable_budget=true` → classes 6 et 7 (Tableau Budget Annexe 5)
+- `classe=5` → comptes trésorerie uniquement
 
 **Réponse :**
 ```json
 {
   "status": "success",
   "data": [
-    { "numero": "5121", "libelle": "Banque principale", "classe": 5, "type": "actif" },
-    { "numero": "6111", "libelle": "Gardiennage/Surveillance", "classe": 6, "type": "charge" },
-    { "numero": "7111", "libelle": "Cotisations copropriétaires", "classe": 7, "type": "produit" }
+    {
+      "numero": "6111",
+      "libelle": "Eau",
+      "classe": 6,
+      "type": "charge",
+      "nature": "courant",
+      "est_sous_compte": true,
+      "compte_parent": "611",
+      "utilisable_depense": true,
+      "utilisable_budget": true,
+      "utilisable_produit": false,
+      "ordre": 401
+    },
+    {
+      "numero": "6138",
+      "libelle": "Autres rémunérations",
+      "classe": 6,
+      "type": "charge",
+      "nature": "courant",
+      "est_sous_compte": true,
+      "compte_parent": "613",
+      "utilisable_depense": true,
+      "utilisable_budget": true,
+      "utilisable_produit": false,
+      "ordre": 428
+    },
+    {
+      "numero": "7111",
+      "libelle": "Provisions sur opérations courantes",
+      "classe": 7,
+      "type": "produit",
+      "nature": "courant",
+      "est_sous_compte": true,
+      "compte_parent": "711",
+      "utilisable_depense": false,
+      "utilisable_budget": true,
+      "utilisable_produit": true,
+      "ordre": 501
+    }
   ]
 }
 ```
 
-**Note :** Seeder initial avec les 20 comptes utiles (voir service frontend). Possibilité d'étendre.
+**Mapping des charges courantes copropriété :**
+| Charge | Compte | Libellé |
+|--------|--------|---------|
+| Gardiennage (externalisé) | `6138` | Autres rémunérations |
+| Nettoyage des locaux | `6131` | Nettoyage des locaux |
+| Maintenance ascenseur | `6134` | Contrats de maintenance |
+| Électricité | `6112` | Électricité |
+| Eau | `6111` | Eau |
+| Assurance immeuble | `6136` | Primes d'assurances |
+| Entretien divers | `6135` | Entretien et petites réparations |
+| Frais bancaires | `6141` | Frais bancaires |
+
+**Note :** Seeder complet avec 118 comptes — voir `docs/PCG_MIGRATION.md`.
 
 **Classes par type :**
-- Classe 1-2 : Immobilisations
-- Classe 3 : Créances (actif)
-- Classe 4 : Dettes fournisseurs (passif)
-- Classe 5 : Trésorerie (actif)
-- Classe 6 : Charges
-- Classe 7 : Produits
+- Classe 1 : Capitaux permanents (fonds de réserve, provisions, résultat)
+- Classe 3 : Actif circulant (créances copropriétaires, fournisseurs débiteurs)
+- Classe 4 : Passif circulant (fournisseurs, copropriétaires créditeurs)
+- Classe 5 : Trésorerie (banques, caisse)
+- Classe 6 : Charges (courant + non courant)
+- Classe 7 : Produits (appels de fonds + produits non courants)
+
+**Champ `nature` :** `courant` = Annexe 5 sections I et II / `non_courant` = sections IV et V.
 
 ---
 
@@ -520,7 +576,14 @@ type ComptePcg = {
   numero: string
   libelle: string
   classe: number
-  type: 'actif' | 'passif' | 'charge' | 'produit'
+  type: 'capitaux' | 'actif' | 'passif' | 'tresorerie' | 'charge' | 'produit'
+  nature: 'courant' | 'non_courant' | 'both'
+  est_sous_compte: boolean
+  compte_parent: string | null
+  utilisable_depense: boolean
+  utilisable_budget: boolean
+  utilisable_produit: boolean
+  ordre: number
 }
 ```
 
@@ -589,12 +652,19 @@ Schema::create('encaissements', function (Blueprint $table) {
     $table->timestamps();
 });
 
-// comptes_pcg (seed data)
+// comptes_pcg (seed data) — voir docs/PCG_MIGRATION.md pour le seeder complet (118 comptes)
 Schema::create('comptes_pcg', function (Blueprint $table) {
     $table->string('numero', 10)->primary();
-    $table->string('libelle', 100);
+    $table->string('libelle', 150);
     $table->tinyInteger('classe');
-    $table->enum('type', ['actif', 'passif', 'charge', 'produit']);
+    $table->enum('type', ['capitaux', 'actif', 'passif', 'tresorerie', 'charge', 'produit']);
+    $table->enum('nature', ['courant', 'non_courant', 'both'])->default('courant');
+    $table->boolean('est_sous_compte')->default(false);
+    $table->string('compte_parent', 10)->nullable();
+    $table->boolean('utilisable_depense')->default(false);
+    $table->boolean('utilisable_budget')->default(false);
+    $table->boolean('utilisable_produit')->default(false);
+    $table->unsignedSmallInteger('ordre')->default(0);
 });
 ```
 
