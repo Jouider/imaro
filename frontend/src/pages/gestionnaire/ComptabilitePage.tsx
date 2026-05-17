@@ -1352,8 +1352,6 @@ function TabDepenses({
         rowKey="id"
         isLoading={isLoading}
         searchable
-        exportable
-        exportFilename="depenses"
         emptyIcon={<FileText className="size-12 text-muted-foreground" />}
         emptyTitle={t('gestionnaire.comptabilite.depenses.title', { defaultValue: 'Aucune dépense' })}
       />

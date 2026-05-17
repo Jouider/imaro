@@ -1068,8 +1068,6 @@ export function PaiementsPage() {
             rowKey="id"
             isLoading={loadingAppels}
             searchable
-            exportable
-            exportFilename="appels-fonds"
             emptyIcon={<FileText className="size-12 text-muted-foreground" />}
             emptyTitle="Aucun appel de fonds"
           />

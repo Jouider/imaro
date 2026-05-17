@@ -222,18 +222,21 @@
   "gestionnaire": {
     "nav": {
       "dashboard": "لوحة التحكم",
+      "sectionCopropriete": "الملكية المشتركة",
       "residences": "الإقامات",
       "coproprietaires": "الملاك المشاركون",
+      "prestataires": "المزودون",
+      "sectionFinances": "المالية",
       "appelsFonds": "استدعاءات الأموال",
       "paiements": "المدفوعات",
       "depenses": "المصاريف",
+      "budgets": "الميزانية",
+      "comptabilite": "المحاسبة",
+      "sectionOperations": "العمليات",
       "tickets": "التذاكر",
       "assemblees": "الجمعيات العامة",
       "annonces": "الإعلانات",
-      "prestataires": "المزودون",
-      "budgets": "الميزانية",
-      "documents": "الوثائق",
-      "comptabilite": "المحاسبة"
+      "documents": "الوثائق"
     },
     "residences": {
       "title": "الإقامات",

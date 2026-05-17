@@ -845,8 +845,6 @@ export function DepensesPage() {
           rowKey="id"
           isLoading={isLoading}
           pageSize={10}
-          exportable
-          exportFilename="depenses"
           emptyIcon={<Receipt className="size-12 text-muted-foreground" />}
           emptyTitle="Aucune dépense"
         />

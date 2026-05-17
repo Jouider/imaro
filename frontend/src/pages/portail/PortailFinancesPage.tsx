@@ -128,10 +128,17 @@ function DocumentPreviewModal({
           <Button
             size="sm"
             className="bg-[var(--color-imaro-primary)] hover:bg-[var(--color-imaro-primary)]/90"
-            onClick={() => window.open(doc.url, '_blank')}
+            asChild
           >
-            <Download className="me-1.5 size-4" />
-            {t('portail.finances.documents.download', { defaultValue: 'Télécharger' })}
+            <a
+              href={doc.url}
+              download={doc.nom.endsWith('.pdf') ? doc.nom : `${doc.nom}.pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Download className="me-1.5 size-4" />
+              {t('portail.finances.documents.download', { defaultValue: 'Télécharger' })}
+            </a>
           </Button>
         </div>
       </DialogContent>
@@ -286,9 +293,16 @@ function DocumentCard({
             size="sm"
             variant="outline"
             className="h-7 px-2.5 text-xs gap-1 text-[var(--color-imaro-primary)] border-[var(--color-imaro-primary)]/30 hover:bg-[var(--color-imaro-primary)]/5"
-            onClick={() => window.open(doc.url, '_blank')}
+            asChild
           >
-            <Download className="size-3" aria-hidden="true" />
+            <a
+              href={doc.url}
+              download={doc.nom.endsWith('.pdf') ? doc.nom : `${doc.nom}.pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Download className="size-3" aria-hidden="true" />
+            </a>
           </Button>
         </div>
       </div>

@@ -222,18 +222,21 @@
   "gestionnaire": {
     "nav": {
       "dashboard": "Tableau de bord",
+      "sectionCopropriete": "Copropriété",
       "residences": "Résidences",
       "coproprietaires": "Copropriétaires",
+      "prestataires": "Prestataires",
+      "sectionFinances": "Finances",
       "appelsFonds": "Appels de fonds",
       "paiements": "Paiements",
       "depenses": "Dépenses",
+      "budgets": "Budgets",
+      "comptabilite": "Comptabilité",
+      "sectionOperations": "Opérations",
       "tickets": "Tickets",
       "assemblees": "Assemblées",
       "annonces": "Annonces",
-      "prestataires": "Prestataires",
-      "budgets": "Budgets",
-      "documents": "Documents",
-      "comptabilite": "Comptabilité"
+      "documents": "Documents"
     },
     "residences": {
       "title": "Résidences",
