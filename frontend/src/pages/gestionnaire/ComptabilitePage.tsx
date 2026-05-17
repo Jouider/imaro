@@ -190,7 +190,7 @@ function NouvelleDepenseModal({
 
   const { data: comptes = [] } = useQuery({
     queryKey: ['comptes-pcg'],
-    queryFn: getComptesPcg,
+    queryFn: () => getComptesPcg(),
   })
 
   const compteClasse6 = comptes.filter(
@@ -1100,7 +1100,7 @@ function TabGrandLivre({ exerciceId }: { exerciceId: number }) {
 
   const { data: comptes = [] } = useQuery({
     queryKey: ['comptes-pcg'],
-    queryFn: getComptesPcg,
+    queryFn: () => getComptesPcg(),
   })
 
   const { data: grandLivre, isLoading } = useQuery({
@@ -1368,6 +1368,21 @@ function TabDepenses({
   )
 }
 
+// ─── CheckItem (used in TabCloture) ──────────────────────────────────────────
+
+function CheckItem({ ok, label }: { ok: boolean; label: string }) {
+  return (
+    <div className="flex items-center gap-3 rounded-lg bg-muted/40 px-4 py-3">
+      {ok ? (
+        <CheckCircle2 className="size-5 shrink-0 text-green-600" />
+      ) : (
+        <XCircle className="size-5 shrink-0 text-red-500" />
+      )}
+      <span className={cn('text-sm', ok ? 'text-foreground' : 'text-muted-foreground')}>{label}</span>
+    </div>
+  )
+}
+
 // ─── Tab: Clôture ─────────────────────────────────────────────────────────────
 
 function TabCloture({
@@ -1427,17 +1442,6 @@ function TabCloture({
       </Card>
     )
   }
-
-  const CheckItem = ({ ok, label }: { ok: boolean; label: string }) => (
-    <div className="flex items-center gap-3 rounded-lg bg-muted/40 px-4 py-3">
-      {ok ? (
-        <CheckCircle2 className="size-5 shrink-0 text-green-600" />
-      ) : (
-        <XCircle className="size-5 shrink-0 text-red-500" />
-      )}
-      <span className={cn('text-sm', ok ? 'text-foreground' : 'text-muted-foreground')}>{label}</span>
-    </div>
-  )
 
   return (
     <div className="max-w-xl space-y-6">
