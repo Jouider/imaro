@@ -38,8 +38,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->prefix('manager')
         ->group(base_path('routes/api/manager.php'));
 
-    // Gestionnaire
-    Route::middleware('role:gestionnaire')
+    // Gestionnaire (accessible par manager aussi)
+    Route::middleware('role:manager|gestionnaire')
         ->prefix('gestionnaire')
         ->group(base_path('routes/api/gestionnaire.php'));
 
