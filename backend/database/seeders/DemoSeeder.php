@@ -119,7 +119,7 @@ class DemoSeeder extends Seeder
             50, 50, 50, 50, 50, 50, 45, 45, 45, 45,
         ];
 
-        $types = ['appartement', 'appartement', 'appartement', 'studio', 'appartement'];
+        $types = ['appartement', 'appartement', 'appartement', 'local_commercial', 'appartement'];
         $coproprietaires = [];
 
         foreach ($nomsMarocains as $i => $nom) {
@@ -258,7 +258,7 @@ class DemoSeeder extends Seeder
             'residence_id' => $residence->id,
             'prestataire_id' => $prestataires[4]->id,
             'titre' => 'Entretien jardin',
-            'type' => 'espaces_verts',
+            'type' => 'autre',
             'montant' => 18000,
             'date_debut' => '2025-06-01',
             'date_fin' => '2026-05-31',
@@ -278,12 +278,12 @@ class DemoSeeder extends Seeder
         $postes = [
             ['categorie' => 'gardiennage', 'description' => 'Salaire gardien + charges', 'montant_prevu' => 60000, 'montant_realise' => 25000],
             ['categorie' => 'nettoyage', 'description' => 'Nettoyage parties communes', 'montant_prevu' => 36000, 'montant_realise' => 15000],
-            ['categorie' => 'ascenseur', 'description' => 'Contrat maintenance + réparations', 'montant_prevu' => 30000, 'montant_realise' => 12000],
-            ['categorie' => 'electricite', 'description' => 'Éclairage parties communes', 'montant_prevu' => 18000, 'montant_realise' => 7500],
-            ['categorie' => 'eau', 'description' => 'Consommation eau commune', 'montant_prevu' => 12000, 'montant_realise' => 5200],
-            ['categorie' => 'espaces_verts', 'description' => 'Entretien jardin et espaces verts', 'montant_prevu' => 18000, 'montant_realise' => 0],
+            ['categorie' => 'entretien', 'description' => 'Contrat maintenance ascenseur + réparations', 'montant_prevu' => 30000, 'montant_realise' => 12000],
+            ['categorie' => 'entretien', 'description' => 'Éclairage parties communes', 'montant_prevu' => 18000, 'montant_realise' => 7500],
+            ['categorie' => 'entretien', 'description' => 'Consommation eau commune', 'montant_prevu' => 12000, 'montant_realise' => 5200],
+            ['categorie' => 'autre', 'description' => 'Entretien jardin et espaces verts', 'montant_prevu' => 18000, 'montant_realise' => 0],
             ['categorie' => 'assurance', 'description' => 'Assurance multirisque immeuble', 'montant_prevu' => 8000, 'montant_realise' => 8000],
-            ['categorie' => 'divers', 'description' => 'Frais administratifs et imprévus', 'montant_prevu' => 10000, 'montant_realise' => 3200],
+            ['categorie' => 'administratif', 'description' => 'Frais administratifs et imprévus', 'montant_prevu' => 10000, 'montant_realise' => 3200],
         ];
 
         foreach ($postes as $poste) {
@@ -376,7 +376,7 @@ class DemoSeeder extends Seeder
             'created_by' => $gestionnaire1->id,
             'titre' => 'Coupure d\'eau prévue le 20 mai',
             'contenu' => "Chers copropriétaires,\n\nLa LYDEC effectuera des travaux de maintenance sur le réseau d'eau le mardi 20 mai de 8h à 14h.\n\nMerci de prévoir vos réserves d'eau.\n\nCordialement,\nLa Gestion",
-            'priorite' => 'haute',
+            'priorite' => 'urgente',
             'statut' => 'publiee',
             'publiee_at' => now()->subDays(2),
         ]);
@@ -387,7 +387,7 @@ class DemoSeeder extends Seeder
             'created_by' => $gestionnaire1->id,
             'titre' => 'Assemblée Générale Ordinaire - Convocation',
             'contenu' => "L'Assemblée Générale Ordinaire de la copropriété Résidence Atlas se tiendra le samedi 14 juin 2026 à 15h00 dans la salle de réunion au RDC.\n\nOrdre du jour :\n1. Approbation des comptes 2025\n2. Budget prévisionnel 2026\n3. Travaux de ravalement\n4. Questions diverses\n\nVotre présence est indispensable.",
-            'priorite' => 'haute',
+            'priorite' => 'urgente',
             'statut' => 'publiee',
             'publiee_at' => now()->subDays(7),
         ]);
@@ -461,7 +461,7 @@ class DemoSeeder extends Seeder
             'residence_id' => $residence->id,
             'uploaded_by' => $gestionnaire1->id,
             'nom' => 'PV AG Ordinaire 2025',
-            'type' => 'pv_assemblee',
+            'type' => 'pv_ag',
             'file_path' => 'documents/pv-ag-2025.pdf',
             'mime_type' => 'application/pdf',
             'taille_ko' => 245,
@@ -497,7 +497,7 @@ class DemoSeeder extends Seeder
             'residence_id' => $residence->id,
             'uploaded_by' => $manager->id,
             'nom' => 'Assurance multirisque 2026',
-            'type' => 'assurance',
+            'type' => 'autre',
             'file_path' => 'documents/assurance-2026.pdf',
             'mime_type' => 'application/pdf',
             'taille_ko' => 410,
@@ -509,7 +509,7 @@ class DemoSeeder extends Seeder
             'residence_id' => null,
             'uploaded_by' => $manager->id,
             'nom' => 'Loi 18-00 copropriété',
-            'type' => 'legal',
+            'type' => 'autre',
             'file_path' => 'documents/loi-18-00.pdf',
             'mime_type' => 'application/pdf',
             'taille_ko' => 890,
