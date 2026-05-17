@@ -19,8 +19,10 @@ class DashboardController extends Controller
         $userId   = $request->user()->id;
         $cacheKey = "gestionnaire:dashboard:{$userId}";
 
-        $data = Cache::remember($cacheKey, 300, function () use ($userId) {
-            $residences   = Residence::where('gestionnaire_id', $userId)->get();
+        $data = Cache::remember($cacheKey, 300, function () use ($userId, $request) {
+            $residences = $request->user()->role === 'manager'
+                ? Residence::where('tenant_id', $request->user()->tenant_id)->get()
+                : Residence::where('gestionnaire_id', $userId)->get();
             $residenceIds = $residences->pluck('id');
 
             $nbCoproprietaires = Coproprietaire::whereHas(
