@@ -12,6 +12,7 @@ import {
   Megaphone,
   Hammer,
   PiggyBank,
+  BookOpen,
   LogOut,
   Menu,
   X,
@@ -84,6 +85,11 @@ const NAV_ITEMS: NavItem[] = [
     to: '/gestionnaire/budgets',
     icon: <PiggyBank className="size-5" aria-hidden="true" />,
     labelKey: 'gestionnaire.nav.budgets',
+  },
+  {
+    to: '/gestionnaire/comptabilite',
+    icon: <BookOpen className="size-5" aria-hidden="true" />,
+    labelKey: 'gestionnaire.nav.comptabilite',
   },
 ]
 

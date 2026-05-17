@@ -231,7 +231,8 @@
       "annonces": "الإعلانات",
       "prestataires": "المزودون",
       "budgets": "الميزانية",
-      "documents": "الوثائق"
+      "documents": "الوثائق",
+      "comptabilite": "المحاسبة"
     },
     "residences": {
       "title": "الإقامات",
@@ -649,6 +650,144 @@
         "ticket": "تذكرة جديدة",
         "ag": "دعوة جمعية عامة",
         "soon": "قريبًا"
+      }
+    },
+    "comptabilite": {
+      "title": "المحاسبة",
+      "exercice": "الدورة",
+      "statut": {
+        "ouvert": "مفتوحة",
+        "clos": "مغلقة 🔒"
+      },
+      "tabs": {
+        "dashboard": "لوحة التحكم",
+        "journal": "اليومية",
+        "grandLivre": "الأستاذ العام",
+        "depenses": "المصاريف",
+        "cloture": "إقفال الدورة"
+      },
+      "kpi": {
+        "produits": "الإيرادات",
+        "charges": "المصاريف",
+        "resultat": "النتيجة الصافية",
+        "tresorerie": "الخزينة",
+        "creances": "الديون"
+      },
+      "tresorerie": {
+        "title": "تفاصيل الخزينة",
+        "banque": "البنك (5121)",
+        "cheque": "الشيكات (5122)",
+        "caisse": "الصندوق (5161)",
+        "depot": "إيداع",
+        "retrait": "سحب",
+        "remise": "تحويل"
+      },
+      "recouvrement": "نسبة التحصيل",
+      "couverture": "تغطية الخزينة",
+      "mois": "أشهر",
+      "journal": {
+        "titre": "يومية القيود",
+        "date": "التاريخ",
+        "compte": "الحساب",
+        "description": "البيان",
+        "type": "النوع",
+        "debit": "مدين",
+        "credit": "دائن",
+        "piece": "الوثيقة",
+        "totalDebit": "إجمالي المدين",
+        "totalCredit": "إجمالي الدائن",
+        "types": {
+          "depense": "مصروف",
+          "encaissement": "تحصيل",
+          "virement": "تحويل",
+          "cloture": "إقفال",
+          "report": "ترحيل"
+        }
+      },
+      "grandLivre": {
+        "title": "الأستاذ العام",
+        "selectCompte": "اختر حسابًا...",
+        "soldeOuverture": "رصيد الافتتاح",
+        "soldeFinal": "الرصيد النهائي",
+        "hint": "اختر حساب المخطط المحاسبي لعرض تفاصيل القيود."
+      },
+      "depenses": {
+        "title": "المصاريف",
+        "add": "مصروف جديد",
+        "colDate": "التاريخ",
+        "colTitre": "العنوان",
+        "colCompte": "الحساب",
+        "colPrestataire": "المورد",
+        "colMode": "طريقة الدفع",
+        "colMontant": "المبلغ",
+        "modes": {
+          "virement": "تحويل بنكي",
+          "cheque": "شيك",
+          "especes": "نقدًا",
+          "cb": "بطاقة بنكية",
+          "prelevement": "خصم تلقائي",
+          "autre": "أخرى"
+        },
+        "form": {
+          "titre": "العنوان",
+          "montant": "المبلغ (درهم)",
+          "date": "التاريخ",
+          "compte": "حساب الأعباء",
+          "mode": "طريقة الدفع",
+          "prestataire": "المورد (اختياري)",
+          "justificatif": "وثيقة مثبتة",
+          "importIa": "استيراد بالذكاء الاصطناعي",
+          "analyser": "تحليل",
+          "utiliser": "استخدام هذه البيانات",
+          "confiance": "الثقة"
+        }
+      },
+      "encaissement": {
+        "title": "تسجيل دفعة",
+        "recherche": "البحث عن مالك أو رقم القطعة",
+        "step1": "اختيار الدين",
+        "step2": "إدخال الدفعة",
+        "soldeImpaye": "الرصيد غير المدفوع",
+        "montant": "المبلغ",
+        "date": "التاريخ",
+        "mode": "طريقة الدفع",
+        "compteDestination": "الحساب المستهدف",
+        "refCheque": "مرجع الشيك",
+        "comptes": {
+          "5121": "الحساب البنكي (5121)",
+          "5122": "حساب الشيكات (5122)",
+          "5161": "الصندوق (5161)"
+        }
+      },
+      "cloture": {
+        "title": "إقفال الدورة",
+        "checklist": "قائمة التحقق قبل الإقفال",
+        "equilibre": "القيود متوازنة (مدين = دائن)",
+        "classe6": "تم تحريك حسابات الأعباء (ص. 6)",
+        "classe7": "تم تحريك حسابات الإيرادات (ص. 7)",
+        "hasEcritures": "يوجد قيد واحد على الأقل",
+        "totalDebit": "إجمالي المدين",
+        "totalCredit": "إجمالي الدائن",
+        "btn": "إقفال الدورة",
+        "confirmTitle": "تأكيد الإقفال",
+        "confirmMsg": "هذا الإجراء لا رجعة فيه. سيتم قفل جميع القيود. هل تريد المتابعة؟",
+        "warning": "تحذير — بعد الإقفال، لا يمكن تعديل أي قيد.",
+        "already_clos": "الدورة مغلقة",
+        "clos_msg": "تم إقفال هذه الدورة بتاريخ"
+      },
+      "export": {
+        "title": "تصدير",
+        "excelJournal": "Excel — اليومية الكاملة",
+        "excelGrandLivre": "Excel — الأستاذ العام",
+        "sageFec": "Sage FEC",
+        "pdfJournal": "PDF — اليومية",
+        "pdfBalance": "PDF — ميزان المراجعة"
+      },
+      "seuil": {
+        "label": "العتبة المحاسبية",
+        "moins200": "≤ 200,000 درهم — نظام مبسط",
+        "entre200et500": "200–500 ألف درهم — النظام العادي",
+        "plus500": "≥ 500,000 درهم — النظام الشامل"
       }
     }
   }

@@ -231,7 +231,8 @@
       "annonces": "Annonces",
       "prestataires": "Prestataires",
       "budgets": "Budgets",
-      "documents": "Documents"
+      "documents": "Documents",
+      "comptabilite": "Comptabilité"
     },
     "residences": {
       "title": "Résidences",
@@ -649,6 +650,144 @@
         "contrat": "Contrat",
         "facture": "Facture",
         "autre": "Autre"
+      }
+    },
+    "comptabilite": {
+      "title": "Comptabilité",
+      "exercice": "Exercice",
+      "statut": {
+        "ouvert": "Ouvert",
+        "clos": "Clôturé 🔒"
+      },
+      "tabs": {
+        "dashboard": "Tableau de bord",
+        "journal": "Journal",
+        "grandLivre": "Grand-Livre",
+        "depenses": "Dépenses",
+        "cloture": "Clôture"
+      },
+      "kpi": {
+        "produits": "Produits",
+        "charges": "Charges",
+        "resultat": "Résultat net",
+        "tresorerie": "Trésorerie",
+        "creances": "Créances"
+      },
+      "tresorerie": {
+        "title": "Détail trésorerie",
+        "banque": "Banques (5121)",
+        "cheque": "Chèques (5122)",
+        "caisse": "Caisse (5161)",
+        "depot": "Dépôt",
+        "retrait": "Retrait",
+        "remise": "Remise"
+      },
+      "recouvrement": "Taux de recouvrement",
+      "couverture": "Couverture trésorerie",
+      "mois": "mois",
+      "journal": {
+        "titre": "Journal des écritures",
+        "date": "Date",
+        "compte": "Compte",
+        "description": "Description",
+        "type": "Type",
+        "debit": "Débit",
+        "credit": "Crédit",
+        "piece": "Pièce",
+        "totalDebit": "Total débit",
+        "totalCredit": "Total crédit",
+        "types": {
+          "depense": "Dépense",
+          "encaissement": "Encaissement",
+          "virement": "Virement",
+          "cloture": "Clôture",
+          "report": "Report"
+        }
+      },
+      "grandLivre": {
+        "title": "Grand-Livre",
+        "selectCompte": "Sélectionner un compte...",
+        "soldeOuverture": "Solde d'ouverture",
+        "soldeFinal": "Solde final",
+        "hint": "Sélectionnez un compte PCG pour afficher le détail des écritures."
+      },
+      "depenses": {
+        "title": "Dépenses",
+        "add": "Nouvelle dépense",
+        "colDate": "Date",
+        "colTitre": "Titre",
+        "colCompte": "Compte",
+        "colPrestataire": "Prestataire",
+        "colMode": "Mode",
+        "colMontant": "Montant",
+        "modes": {
+          "virement": "Virement",
+          "cheque": "Chèque",
+          "especes": "Espèces",
+          "cb": "CB",
+          "prelevement": "Prélèvement",
+          "autre": "Autre"
+        },
+        "form": {
+          "titre": "Titre",
+          "montant": "Montant (MAD)",
+          "date": "Date",
+          "compte": "Compte de charge",
+          "mode": "Mode de paiement",
+          "prestataire": "Prestataire (optionnel)",
+          "justificatif": "Pièce justificative",
+          "importIa": "Import IA",
+          "analyser": "Analyser",
+          "utiliser": "Utiliser ces données",
+          "confiance": "Confiance"
+        }
+      },
+      "encaissement": {
+        "title": "Encaisser un paiement",
+        "recherche": "Rechercher copropriétaire ou N° lot",
+        "step1": "Sélectionner créance",
+        "step2": "Saisir paiement",
+        "soldeImpaye": "Solde impayé",
+        "montant": "Montant",
+        "date": "Date",
+        "mode": "Mode de paiement",
+        "compteDestination": "Compte destination",
+        "refCheque": "Référence chèque",
+        "comptes": {
+          "5121": "Banque principale (5121)",
+          "5122": "Compte chèques (5122)",
+          "5161": "Caisse (5161)"
+        }
+      },
+      "cloture": {
+        "title": "Clôture de l'exercice",
+        "checklist": "Checklist pré-clôture",
+        "equilibre": "Écritures équilibrées (Débit = Crédit)",
+        "classe6": "Comptes de charges (cl. 6) mouvementés",
+        "classe7": "Comptes de produits (cl. 7) mouvementés",
+        "hasEcritures": "Au moins une écriture enregistrée",
+        "totalDebit": "Total Débit",
+        "totalCredit": "Total Crédit",
+        "btn": "Clôturer l'exercice",
+        "confirmTitle": "Confirmer la clôture",
+        "confirmMsg": "Cette action est irréversible. Toutes les écritures seront verrouillées. Continuer ?",
+        "warning": "Attention — après clôture, aucune écriture ne peut être modifiée.",
+        "already_clos": "Exercice clôturé",
+        "clos_msg": "Cet exercice a été clôturé le"
+      },
+      "export": {
+        "title": "Exporter",
+        "excelJournal": "Excel — Journal complet",
+        "excelGrandLivre": "Excel — Grand-Livre",
+        "sageFec": "Sage FEC",
+        "pdfJournal": "PDF — Journal",
+        "pdfBalance": "PDF — Balance"
+      },
+      "seuil": {
+        "label": "Seuil comptable",
+        "moins200": "≤ 200 000 MAD — Régime simplifié (Annexes 10, 13)",
+        "entre200et500": "200–500 k MAD — Régime normal (Annexes 10-12)",
+        "plus500": "≥ 500 000 MAD — Régime complet (Annexes 3-10)"
       }
     }
   }
