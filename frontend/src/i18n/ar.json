@@ -222,15 +222,20 @@
   "gestionnaire": {
     "nav": {
       "dashboard": "لوحة التحكم",
+      "sectionCopropriete": "الملكية المشتركة",
       "residences": "الإقامات",
       "coproprietaires": "الملاك المشاركون",
+      "prestataires": "المزودون",
+      "sectionFinances": "المالية",
       "appelsFonds": "استدعاءات الأموال",
       "paiements": "المدفوعات",
+      "depenses": "المصاريف",
+      "budgets": "الميزانية",
+      "comptabilite": "المحاسبة",
+      "sectionOperations": "العمليات",
       "tickets": "التذاكر",
       "assemblees": "الجمعيات العامة",
       "annonces": "الإعلانات",
-      "prestataires": "المزودون",
-      "budgets": "الميزانية",
       "documents": "الوثائق"
     },
     "residences": {
@@ -650,6 +655,333 @@
         "ag": "دعوة جمعية عامة",
         "soon": "قريبًا"
       }
+    },
+    "comptabilite": {
+      "title": "المحاسبة",
+      "exercice": "الدورة",
+      "statut": {
+        "ouvert": "مفتوحة",
+        "clos": "مغلقة 🔒"
+      },
+      "tabs": {
+        "dashboard": "لوحة التحكم",
+        "journal": "اليومية",
+        "grandLivre": "الأستاذ العام",
+        "depenses": "المصاريف",
+        "cloture": "إقفال الدورة"
+      },
+      "kpi": {
+        "produits": "الإيرادات",
+        "charges": "المصاريف",
+        "resultat": "النتيجة الصافية",
+        "tresorerie": "الخزينة",
+        "creances": "الديون"
+      },
+      "tresorerie": {
+        "title": "تفاصيل الخزينة",
+        "banque": "البنك (5121)",
+        "cheque": "الشيكات (5122)",
+        "caisse": "الصندوق (5161)",
+        "depot": "إيداع",
+        "retrait": "سحب",
+        "remise": "تحويل"
+      },
+      "recouvrement": "نسبة التحصيل",
+      "couverture": "تغطية الخزينة",
+      "mois": "أشهر",
+      "journal": {
+        "titre": "يومية القيود",
+        "date": "التاريخ",
+        "compte": "الحساب",
+        "description": "البيان",
+        "type": "النوع",
+        "debit": "مدين",
+        "credit": "دائن",
+        "piece": "الوثيقة",
+        "totalDebit": "إجمالي المدين",
+        "totalCredit": "إجمالي الدائن",
+        "types": {
+          "depense": "مصروف",
+          "encaissement": "تحصيل",
+          "virement": "تحويل",
+          "cloture": "إقفال",
+          "report": "ترحيل"
+        }
+      },
+      "grandLivre": {
+        "title": "الأستاذ العام",
+        "selectCompte": "اختر حسابًا...",
+        "soldeOuverture": "رصيد الافتتاح",
+        "soldeFinal": "الرصيد النهائي",
+        "hint": "اختر حساب المخطط المحاسبي لعرض تفاصيل القيود."
+      },
+      "depenses": {
+        "title": "المصاريف",
+        "add": "مصروف جديد",
+        "colDate": "التاريخ",
+        "colTitre": "العنوان",
+        "colCompte": "الحساب",
+        "colPrestataire": "المورد",
+        "colMode": "طريقة الدفع",
+        "colMontant": "المبلغ",
+        "modes": {
+          "virement": "تحويل بنكي",
+          "cheque": "شيك",
+          "especes": "نقدًا",
+          "cb": "بطاقة بنكية",
+          "prelevement": "خصم تلقائي",
+          "autre": "أخرى"
+        },
+        "form": {
+          "titre": "العنوان",
+          "montant": "المبلغ (درهم)",
+          "date": "التاريخ",
+          "compte": "حساب الأعباء",
+          "mode": "طريقة الدفع",
+          "prestataire": "المورد (اختياري)",
+          "justificatif": "وثيقة مثبتة",
+          "importIa": "استيراد بالذكاء الاصطناعي",
+          "analyser": "تحليل",
+          "utiliser": "استخدام هذه البيانات",
+          "confiance": "الثقة"
+        }
+      },
+      "encaissement": {
+        "title": "تسجيل دفعة",
+        "recherche": "البحث عن مالك أو رقم القطعة",
+        "step1": "اختيار الدين",
+        "step2": "إدخال الدفعة",
+        "soldeImpaye": "الرصيد غير المدفوع",
+        "montant": "المبلغ",
+        "date": "التاريخ",
+        "mode": "طريقة الدفع",
+        "compteDestination": "الحساب المستهدف",
+        "refCheque": "مرجع الشيك",
+        "comptes": {
+          "5121": "الحساب البنكي (5121)",
+          "5122": "حساب الشيكات (5122)",
+          "5161": "الصندوق (5161)"
+        }
+      },
+      "cloture": {
+        "title": "إقفال الدورة",
+        "checklist": "قائمة التحقق قبل الإقفال",
+        "equilibre": "القيود متوازنة (مدين = دائن)",
+        "classe6": "تم تحريك حسابات الأعباء (ص. 6)",
+        "classe7": "تم تحريك حسابات الإيرادات (ص. 7)",
+        "hasEcritures": "يوجد قيد واحد على الأقل",
+        "totalDebit": "إجمالي المدين",
+        "totalCredit": "إجمالي الدائن",
+        "btn": "إقفال الدورة",
+        "confirmTitle": "تأكيد الإقفال",
+        "confirmMsg": "هذا الإجراء لا رجعة فيه. سيتم قفل جميع القيود. هل تريد المتابعة؟",
+        "warning": "تحذير — بعد الإقفال، لا يمكن تعديل أي قيد.",
+        "already_clos": "الدورة مغلقة",
+        "clos_msg": "تم إقفال هذه الدورة بتاريخ"
+      },
+      "export": {
+        "title": "تصدير",
+        "excelJournal": "Excel — اليومية الكاملة",
+        "excelGrandLivre": "Excel — الأستاذ العام",
+        "sageFec": "Sage FEC",
+        "pdfJournal": "PDF — اليومية",
+        "pdfBalance": "PDF — ميزان المراجعة"
+      },
+      "seuil": {
+        "label": "العتبة المحاسبية",
+        "moins200": "≤ 200,000 درهم — نظام مبسط",
+        "entre200et500": "200–500 ألف درهم — النظام العادي",
+        "plus500": "≥ 500,000 درهم — النظام الشامل"
+      }
+    },
+    "paiements": {
+      "title": "متابعة المدفوعات",
+      "tabs": {
+        "creances": "الديون",
+        "appels": "طلبات الاشتراك",
+        "historique": "السجل",
+        "decomptes": "البيانات الفردية",
+        "virements": "التحويلات"
+      },
+      "creances": {
+        "enRetard": "متأخر",
+        "aPayer": "للسداد",
+        "tauxRecouvrement": "نسبة التحصيل",
+        "relancerTout": "تذكير جميع المتأخرين",
+        "relanceSuccess": "تم إرسال التذكير",
+        "statuts": {
+          "a_payer": "للسداد",
+          "en_retard": "متأخر",
+          "paye": "مدفوع",
+          "partiellement_paye": "جزئي",
+          "annulee": "ملغى"
+        },
+        "colCreance": "المالك المشارك",
+        "colSolde": "الرصيد",
+        "colEcheance": "تاريخ الاستحقاق",
+        "colAnciennete": "قِدَم التأخر",
+        "colRelance": "آخر تذكير",
+        "jourRetard": "يوم تأخر"
+      },
+      "encaisser": {
+        "title": "تحصيل دفعة",
+        "step1": "اختيار دين",
+        "step2": "إدخال الدفعة",
+        "montant": "المبلغ (درهم)",
+        "date": "تاريخ الدفع",
+        "methode": "طريقة الدفع",
+        "compte": "الحساب المستهدف",
+        "refCheque": "مرجع الشيك",
+        "success": "تم تسجيل الدفعة",
+        "methodes": {
+          "especes": "نقداً",
+          "virement": "تحويل بنكي",
+          "cheque": "شيك",
+          "cb": "بطاقة بنكية",
+          "mobile_money": "موبايل موني"
+        },
+        "comptes": {
+          "5121": "البنك الرئيسي (5121)",
+          "5122": "حساب الشيكات (5122)",
+          "5161": "الصندوق (5161)"
+        }
+      },
+      "avance": {
+        "title": "دفعة مسبقة",
+        "info": "ستُخصَّص هذه الدفعة تلقائياً لطلبات الاشتراك القادمة",
+        "success": "تم تسجيل الدفعة المسبقة"
+      },
+      "virements": {
+        "title": "التحويلات المُصرَّح بها",
+        "valider": "التحقق",
+        "rejeter": "الرفض",
+        "motif": "سبب الرفض",
+        "valideSuccess": "تم التحقق من التحويل",
+        "rejeteSuccess": "تم رفض التحويل",
+        "statuts": {
+          "en_attente": "قيد الانتظار",
+          "valide": "مُتحقَّق",
+          "rejete": "مرفوض"
+        }
+      },
+      "decompte": {
+        "title": "الكشف الفردي",
+        "recherche": "البحث عن مالك مشارك",
+        "generer": "إنشاء",
+        "exporter": "تصدير PDF",
+        "totalAppele": "إجمالي المطلوب",
+        "totalPaye": "إجمالي المدفوع",
+        "solde": "الرصيد"
+      }
+    },
+    "depenses": {
+      "title": "المصاريف",
+      "subtitle": "متابعة تكاليف الملكية المشتركة",
+      "add": "إضافة مصروف",
+      "importIa": "استيراد بالذكاء الاصطناعي",
+      "recurrentes": "المتكررة",
+      "saveSuccess": "تم تسجيل المصروف",
+      "kpi": {
+        "total": "إجمالي الفترة",
+        "nb": "عدد المصاريف",
+        "moyen": "المتوسط",
+        "enAttente": "في انتظار الموافقة"
+      },
+      "cols": {
+        "date": "التاريخ",
+        "titre": "العنوان",
+        "prestataire": "المزود",
+        "compte": "حساب PCG",
+        "montant": "المبلغ",
+        "mode": "طريقة الدفع",
+        "approbation": "الموافقة"
+      },
+      "approbation": {
+        "approuve": "معتمد",
+        "en_attente": "قيد الانتظار",
+        "rejete": "مرفوض"
+      },
+      "form": {
+        "titre": "العنوان",
+        "montant": "المبلغ (درهم)",
+        "date": "التاريخ",
+        "compte": "حساب التكلفة",
+        "mode": "طريقة الدفع",
+        "prestataire": "المزود (اختياري)",
+        "justificatif": "المستند المبرر",
+        "scanner": "تحليل بالذكاء الاصطناعي",
+        "utiliser": "استخدام هذه البيانات",
+        "seuilWarning": "يستلزم هذا المصروف موافقة مجلس النقابة"
+      },
+      "recurrentModal": {
+        "title": "المصاريف المتكررة",
+        "nouveau": "نموذج جديد",
+        "frequences": {
+          "mensuelle": "شهري",
+          "trimestrielle": "ربع سنوي",
+          "semestrielle": "نصف سنوي",
+          "annuelle": "سنوي"
+        },
+        "jourEmission": "يوم الإصدار",
+        "prochaine": "الإصدار القادم"
+      }
+    },
+    "budget": {
+      "title": "الميزانية التقديرية",
+      "statuts": {
+        "brouillon": "مسودة",
+        "soumis_ag": "مُقدَّم للجمعية العامة",
+        "approuve": "معتمد",
+        "verrouille": "مُقفَل"
+      },
+      "kpi": {
+        "prevu": "الميزانية المخططة",
+        "engage": "الملتزم / المُصدَر",
+        "realise": "المُنجَز",
+        "reste": "المتبقي للصرف"
+      },
+      "annexe5": {
+        "title": "جدول الملحق 5",
+        "colCompte": "الحساب",
+        "colLibelle": "البيان",
+        "colRealiseN1": "المنجز ن-1",
+        "colBudgetN": "ميزانية ن",
+        "colEngage": "الملتزم",
+        "colRealise": "المنجز",
+        "colPct": "% الاستهلاك",
+        "sections": {
+          "chargesCourantes": "I — الأعباء الجارية",
+          "chargesTravaux": "II — أعباء الأشغال",
+          "totalCharges": "III — مجموع الأعباء",
+          "produitsCourants": "IV — المنتجات الجارية",
+          "produitsTravaux": "V — منتجات الأشغال",
+          "totalProduits": "VI — مجموع المنتجات",
+          "resultat": "VII — النتيجة"
+        },
+        "saved": "تم الحفظ"
+      },
+      "simulation": {
+        "title": "محاكاة الاشتراكات",
+        "budgetTotal": "إجمالي ميزانية الأعباء",
+        "tantiemesTotal": "مجموع الحصص",
+        "colLot": "الشقة",
+        "colCopro": "المالك المشارك",
+        "colTantieme": "الحصة",
+        "colPct": "النسبة",
+        "colAnnuelle": "الاشتراك السنوي",
+        "colMensuelle": "الاشتراك الشهري",
+        "colVariation": "التغيير مقارنة بن-1",
+        "exporter": "تصدير PDF"
+      },
+      "ia": {
+        "title": "اقتراحات الذكاء الاصطناعي",
+        "appliquer": "تطبيق الاقتراحات المحددة",
+        "justification": "المبرر"
+      },
+      "soumettre": "تقديم للجمعية العامة",
+      "verrouiller": "قفل الميزانية",
+      "exporter": "تصدير PDF الملحق 5",
+      "creer": "إنشاء الميزانية"
     }
   }
 }

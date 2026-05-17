@@ -15,7 +15,6 @@ import { DashboardPage as GestDashboardPage } from '@/pages/gestionnaire/Dashboa
 import { ResidencesPage } from '@/pages/gestionnaire/residences/ResidencesPage'
 import { ResidencePage } from '@/pages/gestionnaire/residences/ResidencePage'
 import { CoproprietairesPage } from '@/pages/gestionnaire/CoproprietairesPage'
-import { AppelsFondsPage } from '@/pages/gestionnaire/AppelsFondsPage'
 import { PaiementsPage } from '@/pages/gestionnaire/PaiementsPage'
 import { TicketsPage } from '@/pages/gestionnaire/TicketsPage'
 import { AssembleesPage } from '@/pages/gestionnaire/AssembleesPage'
@@ -23,6 +22,8 @@ import { AnnoncesPage } from '@/pages/gestionnaire/AnnoncesPage'
 import { PrestatairesPage } from '@/pages/gestionnaire/PrestatairesPage'
 import { BudgetsPage } from '@/pages/gestionnaire/BudgetsPage'
 import { DocumentsPage } from '@/pages/gestionnaire/DocumentsPage'
+import { ComptabilitePage } from '@/pages/gestionnaire/ComptabilitePage'
+import { DepensesPage } from '@/pages/gestionnaire/DepensesPage'
 
 export const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
@@ -63,7 +64,7 @@ export const router = createBrowserRouter([
       { path: 'residences', element: <ResidencesPage /> },
       { path: 'residences/:id', element: <ResidencePage /> },
       { path: 'coproprietaires', element: <CoproprietairesPage /> },
-      { path: 'appels-fonds', element: <AppelsFondsPage /> },
+      { path: 'appels-fonds', element: <Navigate to="/gestionnaire/paiements" replace /> },
       { path: 'paiements', element: <PaiementsPage /> },
       { path: 'tickets', element: <TicketsPage /> },
       { path: 'assemblees', element: <AssembleesPage /> },
@@ -71,6 +72,8 @@ export const router = createBrowserRouter([
       { path: 'prestataires', element: <PrestatairesPage /> },
       { path: 'budgets', element: <BudgetsPage /> },
       { path: 'documents', element: <DocumentsPage /> },
+      { path: 'comptabilite', element: <ComptabilitePage /> },
+      { path: 'depenses', element: <DepensesPage /> },
     ],
   },
 ])

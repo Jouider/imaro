@@ -206,13 +206,17 @@ export function DocumentsPage() {
       className: 'w-24 text-right',
       renderCell: (doc) => (
         <div className="flex items-center justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => window.open(doc.url, '_blank', 'noopener,noreferrer')}
-            title={t('gestionnaire.documents.download', { defaultValue: 'Télécharger' })}
+          <Button variant="ghost" size="sm" asChild
+            title={t('gestionnaire.documents.download', { defaultValue: 'Télécharger PDF' })}
           >
-            <Download className="size-4" />
+            <a
+              href={doc.url}
+              download={doc.nom.endsWith('.pdf') ? doc.nom : `${doc.nom}.pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Download className="size-4" />
+            </a>
           </Button>
           <Button
             variant="ghost"
