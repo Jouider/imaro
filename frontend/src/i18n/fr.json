@@ -226,6 +226,7 @@
       "coproprietaires": "Copropriétaires",
       "appelsFonds": "Appels de fonds",
       "paiements": "Paiements",
+      "depenses": "Dépenses",
       "tickets": "Tickets",
       "assemblees": "Assemblées",
       "annonces": "Annonces",
@@ -789,6 +790,195 @@
         "entre200et500": "200–500 k MAD — Régime normal (Annexes 10-12)",
         "plus500": "≥ 500 000 MAD — Régime complet (Annexes 3-10)"
       }
+    },
+    "paiements": {
+      "title": "Suivi des paiements",
+      "tabs": {
+        "creances": "Créances",
+        "appels": "Appels de fonds",
+        "historique": "Historique",
+        "decomptes": "Décomptes",
+        "virements": "Virements"
+      },
+      "creances": {
+        "enRetard": "en retard",
+        "aPayer": "à payer",
+        "tauxRecouvrement": "Taux recouvrement",
+        "relancerTout": "Relancer tous les impayés",
+        "relanceSuccess": "Relance envoyée",
+        "statuts": {
+          "a_payer": "À payer",
+          "en_retard": "En retard",
+          "paye": "Payé",
+          "partiellement_paye": "Partiel",
+          "annulee": "Annulée"
+        },
+        "colCreance": "Copropriétaire",
+        "colSolde": "Solde",
+        "colEcheance": "Échéance",
+        "colAnciennete": "Ancienneté",
+        "colRelance": "Dernière relance",
+        "jourRetard": "j de retard"
+      },
+      "encaisser": {
+        "title": "Encaisser un paiement",
+        "step1": "Sélectionner une créance",
+        "step2": "Saisir le paiement",
+        "montant": "Montant (MAD)",
+        "date": "Date de paiement",
+        "methode": "Méthode",
+        "compte": "Compte de destination",
+        "refCheque": "Référence chèque",
+        "success": "Paiement enregistré",
+        "methodes": {
+          "especes": "Espèces",
+          "virement": "Virement bancaire",
+          "cheque": "Chèque",
+          "cb": "Carte bancaire",
+          "mobile_money": "Mobile Money"
+        },
+        "comptes": {
+          "5121": "Banque principale (5121)",
+          "5122": "Compte chèques (5122)",
+          "5161": "Caisse (5161)"
+        }
+      },
+      "avance": {
+        "title": "Paiement en avance",
+        "info": "Ce paiement sera affecté automatiquement aux prochains appels de fonds",
+        "success": "Paiement en avance enregistré"
+      },
+      "virements": {
+        "title": "Virements déclarés",
+        "valider": "Valider",
+        "rejeter": "Rejeter",
+        "motif": "Motif du rejet",
+        "valideSuccess": "Virement validé",
+        "rejeteSuccess": "Virement rejeté",
+        "statuts": {
+          "en_attente": "En attente",
+          "valide": "Validé",
+          "rejete": "Rejeté"
+        }
+      },
+      "decompte": {
+        "title": "Décompte individuel",
+        "recherche": "Rechercher un copropriétaire",
+        "generer": "Générer",
+        "exporter": "Exporter PDF",
+        "totalAppele": "Total appelé",
+        "totalPaye": "Total payé",
+        "solde": "Solde"
+      }
+    },
+    "depenses": {
+      "title": "Dépenses",
+      "subtitle": "Suivi des charges de copropriété",
+      "add": "Ajouter une dépense",
+      "importIa": "Import IA",
+      "recurrentes": "Récurrentes",
+      "saveSuccess": "Dépense enregistrée",
+      "kpi": {
+        "total": "Total période",
+        "nb": "Nb dépenses",
+        "moyen": "Montant moyen",
+        "enAttente": "En attente approbation"
+      },
+      "cols": {
+        "date": "Date",
+        "titre": "Titre",
+        "prestataire": "Prestataire",
+        "compte": "Compte PCG",
+        "montant": "Montant",
+        "mode": "Mode",
+        "approbation": "Approbation"
+      },
+      "approbation": {
+        "approuve": "Approuvé",
+        "en_attente": "En attente",
+        "rejete": "Rejeté"
+      },
+      "form": {
+        "titre": "Titre",
+        "montant": "Montant (MAD)",
+        "date": "Date",
+        "compte": "Compte de charge",
+        "mode": "Mode de paiement",
+        "prestataire": "Prestataire (optionnel)",
+        "justificatif": "Pièce justificative",
+        "scanner": "Analyser avec l'IA",
+        "utiliser": "Utiliser ces données",
+        "seuilWarning": "Cette dépense nécessite une approbation du conseil syndical"
+      },
+      "recurrentModal": {
+        "title": "Dépenses récurrentes",
+        "nouveau": "Nouveau modèle",
+        "frequences": {
+          "mensuelle": "Mensuelle",
+          "trimestrielle": "Trimestrielle",
+          "semestrielle": "Semestrielle",
+          "annuelle": "Annuelle"
+        },
+        "jourEmission": "Jour d'émission",
+        "prochaine": "Prochaine émission"
+      }
+    },
+    "budget": {
+      "title": "Budget Prévisionnel",
+      "statuts": {
+        "brouillon": "Brouillon",
+        "soumis_ag": "Soumis à l'AG",
+        "approuve": "Approuvé",
+        "verrouille": "Verrouillé"
+      },
+      "kpi": {
+        "prevu": "Budget prévu",
+        "engage": "Engagé / Émis",
+        "realise": "Réalisé",
+        "reste": "Reste à dépenser"
+      },
+      "annexe5": {
+        "title": "Tableau Annexe 5",
+        "colCompte": "Compte",
+        "colLibelle": "Libellé",
+        "colRealiseN1": "Réal. N-1",
+        "colBudgetN": "Budget N",
+        "colEngage": "Engagé",
+        "colRealise": "Réalisé",
+        "colPct": "% Cons.",
+        "sections": {
+          "chargesCourantes": "I — Charges courantes",
+          "chargesTravaux": "II — Charges travaux",
+          "totalCharges": "III — Total charges",
+          "produitsCourants": "IV — Produits courants",
+          "produitsTravaux": "V — Produits travaux",
+          "totalProduits": "VI — Total produits",
+          "resultat": "VII — Résultat"
+        },
+        "saved": "Sauvegardé"
+      },
+      "simulation": {
+        "title": "Simulateur de cotisations",
+        "budgetTotal": "Budget charges total",
+        "tantiemesTotal": "Tantièmes totaux",
+        "colLot": "Lot",
+        "colCopro": "Copropriétaire",
+        "colTantieme": "Tantième",
+        "colPct": "Quote-part",
+        "colAnnuelle": "Cotis. annuelle",
+        "colMensuelle": "Cotis. mensuelle",
+        "colVariation": "Variation vs N-1",
+        "exporter": "Exporter PDF"
+      },
+      "ia": {
+        "title": "Suggestions IA",
+        "appliquer": "Appliquer les suggestions sélectionnées",
+        "justification": "Justification"
+      },
+      "soumettre": "Soumettre à l'AG",
+      "verrouiller": "Verrouiller le budget",
+      "exporter": "Export PDF Annexe 5",
+      "creer": "Créer le budget"
     }
   }
 }

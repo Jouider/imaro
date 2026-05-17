@@ -13,6 +13,7 @@ import {
   Hammer,
   PiggyBank,
   BookOpen,
+  Receipt,
   LogOut,
   Menu,
   X,
@@ -55,6 +56,11 @@ const NAV_ITEMS: NavItem[] = [
     to: '/gestionnaire/paiements',
     icon: <CreditCard className="size-5" aria-hidden="true" />,
     labelKey: 'gestionnaire.nav.paiements',
+  },
+  {
+    to: '/gestionnaire/depenses',
+    icon: <Receipt className="size-5" aria-hidden="true" />,
+    labelKey: 'gestionnaire.nav.depenses',
   },
   {
     to: '/gestionnaire/tickets',

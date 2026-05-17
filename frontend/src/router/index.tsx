@@ -24,6 +24,7 @@ import { PrestatairesPage } from '@/pages/gestionnaire/PrestatairesPage'
 import { BudgetsPage } from '@/pages/gestionnaire/BudgetsPage'
 import { DocumentsPage } from '@/pages/gestionnaire/DocumentsPage'
 import { ComptabilitePage } from '@/pages/gestionnaire/ComptabilitePage'
+import { DepensesPage } from '@/pages/gestionnaire/DepensesPage'
 
 export const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
@@ -73,6 +74,7 @@ export const router = createBrowserRouter([
       { path: 'budgets', element: <BudgetsPage /> },
       { path: 'documents', element: <DocumentsPage /> },
       { path: 'comptabilite', element: <ComptabilitePage /> },
+      { path: 'depenses', element: <DepensesPage /> },
     ],
   },
 ])
