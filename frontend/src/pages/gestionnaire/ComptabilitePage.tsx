@@ -18,6 +18,7 @@ import {
   XCircle,
   ChevronDown,
   Loader2,
+  Printer,
 } from 'lucide-react'
 import {
   BarChart,
@@ -51,6 +52,13 @@ import {
   type ImportIaResult,
 } from '@/services/comptabilite.service'
 import { getResidences } from '@/services/gestionnaire.service'
+import { useAuthStore } from '@/stores/authStore'
+import {
+  generateRapportFinancier,
+  generateJournalPdf,
+  generateBalancePdf,
+  generateGrandLivrePdf,
+} from '@/lib/pdf-reports'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { KpiCard } from '@/components/shared/KpiCard'
 import { DataTable, type Column } from '@/components/shared/DataTable'
@@ -105,7 +113,7 @@ const fmt = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFr
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type ActiveTab = 'dashboard' | 'journal' | 'grandLivre' | 'depenses' | 'cloture'
+type ActiveTab = 'dashboard' | 'journal' | 'grandLivre' | 'depenses' | 'rapports' | 'cloture'
 
 type DepenseFormState = {
   titre: string
@@ -1527,6 +1535,190 @@ function TabCloture({
   )
 }
 
+// ─── Tab: Rapports ────────────────────────────────────────────────────────────
+
+type TabRapportsProps = {
+  exerciceId: number
+  exerciceAnnee: number
+  residenceName: string
+  city: string
+  companyName: string
+}
+
+function TabRapports({
+  exerciceId,
+  exerciceAnnee,
+  residenceName,
+  city,
+  companyName,
+}: TabRapportsProps) {
+  const { data: dashboard } = useQuery({
+    queryKey: ['dashboard-compta', exerciceId],
+    queryFn: () => getComptaDashboard(exerciceId),
+  })
+
+  const { data: ecritures = [] } = useQuery({
+    queryKey: ['journal', exerciceId],
+    queryFn: () => getJournal(exerciceId),
+  })
+
+  const { data: balance = [] } = useQuery({
+    queryKey: ['balance', exerciceId],
+    queryFn: () => getBalance(exerciceId),
+  })
+
+  const [loadingRapport, setLoadingRapport] = useState(false)
+  const [loadingJournal, setLoadingJournal] = useState(false)
+  const [loadingBalance, setLoadingBalance] = useState(false)
+  const [loadingGrandLivre, setLoadingGrandLivre] = useState(false)
+
+  async function handleRapportFinancier() {
+    if (!dashboard) return
+    setLoadingRapport(true)
+    try {
+      await Promise.resolve()
+      generateRapportFinancier({
+        companyName,
+        residenceName,
+        city,
+        annee: exerciceAnnee,
+        dashboard,
+        nbLots: 0,
+      })
+    } finally {
+      setLoadingRapport(false)
+    }
+  }
+
+  async function handleJournal() {
+    setLoadingJournal(true)
+    try {
+      await Promise.resolve()
+      generateJournalPdf({ companyName, residenceName, city, annee: exerciceAnnee, ecritures })
+    } finally {
+      setLoadingJournal(false)
+    }
+  }
+
+  async function handleBalance() {
+    setLoadingBalance(true)
+    try {
+      await Promise.resolve()
+      generateBalancePdf({ companyName, residenceName, city, annee: exerciceAnnee, balance })
+    } finally {
+      setLoadingBalance(false)
+    }
+  }
+
+  async function handleGrandLivre() {
+    setLoadingGrandLivre(true)
+    try {
+      await Promise.resolve()
+      generateGrandLivrePdf({ companyName, residenceName, city, annee: exerciceAnnee, ecritures })
+    } finally {
+      setLoadingGrandLivre(false)
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-lg font-semibold text-foreground">Rapports financiers</h2>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Documents Légaux et Officiels</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Rapport financier */}
+          <div className="flex items-center justify-between rounded-lg bg-muted/40 px-4 py-3">
+            <div>
+              <p className="font-medium text-sm">Rapport Financier Annuel</p>
+              <p className="text-xs text-muted-foreground">
+                Synthèse financière, répartition des charges, analyse des impayés — 3 pages
+              </p>
+            </div>
+            <Button
+              size="sm"
+              className="bg-[#1B4F72] text-white hover:bg-[#154066]"
+              onClick={() => void handleRapportFinancier()}
+              disabled={loadingRapport || !dashboard}
+            >
+              {loadingRapport ? (
+                <Loader2 className="me-1.5 size-4 animate-spin" />
+              ) : (
+                <Printer className="me-1.5 size-4" />
+              )}
+              Rapport Financier
+            </Button>
+          </div>
+
+          {/* Séparateur + registres obligatoires */}
+          <div>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Registres obligatoires (Art. 8 &amp; 10)
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void handleJournal()}
+                disabled={loadingJournal}
+              >
+                {loadingJournal ? (
+                  <Loader2 className="me-1.5 size-4 animate-spin" />
+                ) : (
+                  <Printer className="me-1.5 size-4" />
+                )}
+                Journal
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void handleGrandLivre()}
+                disabled={loadingGrandLivre}
+              >
+                {loadingGrandLivre ? (
+                  <Loader2 className="me-1.5 size-4 animate-spin" />
+                ) : (
+                  <Printer className="me-1.5 size-4" />
+                )}
+                Grand Livre
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void handleBalance()}
+                disabled={loadingBalance}
+              >
+                {loadingBalance ? (
+                  <Loader2 className="me-1.5 size-4 animate-spin" />
+                ) : (
+                  <Printer className="me-1.5 size-4" />
+                )}
+                Balance
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Legal disclaimer */}
+      <Card className="border-blue-100 bg-blue-50/50 dark:border-blue-900 dark:bg-blue-950/20">
+        <CardContent className="pt-4">
+          <p className="text-xs leading-relaxed text-blue-800 dark:text-blue-300">
+            Ce rapport est établi conformément à la Loi 18-00 (Dahir n° 1-02-298 du 3 octobre 2002)
+            relative au statut de la copropriété des immeubles bâtis. Tout copropriétaire peut en
+            demander copie au syndic selon l&apos;article 8 de ladite loi. Les documents générés ont
+            valeur informative et sont certifiés par le gestionnaire de la copropriété.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
 // ─── ComptabilitePage ─────────────────────────────────────────────────────────
 
 export function ComptabilitePage() {
@@ -1534,6 +1726,9 @@ export function ComptabilitePage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard')
   const [depenseModalOpen, setDepenseModalOpen] = useState(false)
   const [encaisserModalOpen, setEncaisserModalOpen] = useState(false)
+
+  const user = useAuthStore((s) => s.user)
+  const companyName = user?.name ?? 'Imaro Syndic'
 
   // Residence: default to 1 (Atlas Casablanca)
   const { data: residences = [] } = useQuery({
@@ -1555,11 +1750,15 @@ export function ComptabilitePage() {
   const currentExercice = exercices.find((e) => e.id === exerciceId)
   const exerciceClos = currentExercice?.statut === 'clos'
 
+  const residenceName = residences[0]?.name ?? 'Résidence'
+  const city = residences[0]?.city ?? ''
+
   const TABS: { key: ActiveTab; label: string }[] = [
     { key: 'dashboard', label: t('gestionnaire.comptabilite.tabs.dashboard', { defaultValue: 'Tableau de bord' }) },
     { key: 'journal', label: t('gestionnaire.comptabilite.tabs.journal', { defaultValue: 'Journal' }) },
     { key: 'grandLivre', label: t('gestionnaire.comptabilite.tabs.grandLivre', { defaultValue: 'Grand-Livre' }) },
     { key: 'depenses', label: t('gestionnaire.comptabilite.tabs.depenses', { defaultValue: 'Dépenses' }) },
+    { key: 'rapports', label: t('gestionnaire.comptabilite.tabs.rapports', { defaultValue: 'Rapports' }) },
     { key: 'cloture', label: t('gestionnaire.comptabilite.tabs.cloture', { defaultValue: 'Clôture' }) },
   ]
 
@@ -1682,6 +1881,15 @@ export function ComptabilitePage() {
           exerciceId={exerciceId}
           exerciceClos={exerciceClos}
           onOpenDepenseModal={() => setDepenseModalOpen(true)}
+        />
+      )}
+      {activeTab === 'rapports' && (
+        <TabRapports
+          exerciceId={exerciceId}
+          exerciceAnnee={currentExercice?.annee ?? new Date().getFullYear()}
+          residenceName={residenceName}
+          city={city}
+          companyName={companyName}
         />
       )}
       {activeTab === 'cloture' && (
