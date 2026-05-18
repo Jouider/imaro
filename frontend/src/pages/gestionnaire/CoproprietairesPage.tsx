@@ -1,12 +1,16 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Users, UserPlus, Mail, Phone, Copy, CheckCircle2 } from 'lucide-react'
+import {
+  Users, UserPlus, Mail, Phone, Copy, CheckCircle2,
+  MessageCircle, Building2, TriangleAlert,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import {
   getResidences,
   getCoproprietaires,
   createCoproprietaire,
+  storeLot,
   type Coproprietaire,
   type CreateCoproprietaireInput,
   type CreateCoproprietaireResponse,
@@ -76,7 +80,7 @@ type CreateDialogProps = {
   onOpenChange: (open: boolean) => void
   residences: Array<{ id: number; name: string }>
   defaultResidenceId: string
-  onSuccess: (result: CreateCoproprietaireResponse) => void
+  onSuccess: (result: CreateCoproprietaireResponse, meta: { authMethod: 'email' | 'phone'; email: string }) => void
 }
 
 function CreateCoproprietaireDialog({
@@ -105,7 +109,7 @@ function CreateCoproprietaireDialog({
       return createCoproprietaire(input)
     },
     onSuccess: (result) => {
-      onSuccess(result)
+      onSuccess(result, { authMethod, email })
       // reset form
       setName('')
       setEmail('')
@@ -268,87 +272,317 @@ function CreateCoproprietaireDialog({
   )
 }
 
+// ─── Create lot dialog ────────────────────────────────────────────────────────
+
+type CreateLotDialogProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  residenceId: number
+  coproprietaireId: number
+  coproprietaireName: string
+}
+
+function CreateLotDialog({
+  open,
+  onOpenChange,
+  residenceId,
+  coproprietaireId,
+  coproprietaireName,
+}: CreateLotDialogProps) {
+  const queryClient = useQueryClient()
+  const [numero, setNumero] = useState('')
+  const [type, setType] = useState<'appartement' | 'commerce' | 'parking' | 'cave'>('appartement')
+  const [etage, setEtage] = useState('')
+  const [superficie, setSuperficie] = useState('')
+  const [tantieme, setTantieme] = useState('')
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      storeLot(residenceId, {
+        numero,
+        type,
+        etage: Number(etage),
+        superficie: Number(superficie),
+        tantieme: Number(tantieme),
+        // coproprietaire_id passed as extra field for backend assignment
+        ...({ coproprietaire_id: coproprietaireId } as object),
+      } as Parameters<typeof storeLot>[1]),
+    onSuccess: () => {
+      toast.success(`Lot ${numero} créé et assigné à ${coproprietaireName}`)
+      void queryClient.invalidateQueries({ queryKey: ['coproprietaires'] })
+      void queryClient.invalidateQueries({ queryKey: ['lots'] })
+      onOpenChange(false)
+    },
+    onError: () => toast.error('Erreur lors de la création du lot'),
+  })
+
+  const canSubmit =
+    !!numero.trim() && !!etage && !!superficie && !!tantieme && !mutation.isPending
+
+  const inputCls =
+    'w-full min-h-[44px] rounded-lg border border-border bg-white px-3 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all focus:border-[#1B4F72] focus:outline-none focus:ring-2 focus:ring-[#1B4F72]/10'
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Building2 className="size-5 text-[#1B4F72]" />
+            Créer un lot
+          </DialogTitle>
+          <DialogDescription>
+            Ce lot sera automatiquement assigné à{' '}
+            <span className="font-semibold text-foreground">{coproprietaireName}</span>.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form
+          className="space-y-4 pt-2"
+          onSubmit={(e) => { e.preventDefault(); mutation.mutate() }}
+        >
+          {/* Numéro + Type */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="lot-numero">Numéro *</Label>
+              <input
+                id="lot-numero"
+                placeholder="A-01"
+                value={numero}
+                onChange={(e) => setNumero(e.target.value)}
+                required
+                className={inputCls}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="lot-type">Type *</Label>
+              <Select value={type} onValueChange={(v) => setType(v as typeof type)}>
+                <SelectTrigger id="lot-type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="appartement">Appartement</SelectItem>
+                  <SelectItem value="commerce">Commerce</SelectItem>
+                  <SelectItem value="parking">Parking</SelectItem>
+                  <SelectItem value="cave">Cave</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Étage + Superficie + Tantième */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="lot-etage">Étage *</Label>
+              <input
+                id="lot-etage"
+                type="number"
+                placeholder="1"
+                value={etage}
+                onChange={(e) => setEtage(e.target.value)}
+                required
+                className={inputCls}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="lot-superficie">Superficie (m²) *</Label>
+              <input
+                id="lot-superficie"
+                type="number"
+                placeholder="85"
+                value={superficie}
+                onChange={(e) => setSuperficie(e.target.value)}
+                required
+                className={inputCls}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="lot-tantieme">Tantième *</Label>
+              <input
+                id="lot-tantieme"
+                type="number"
+                placeholder="45"
+                value={tantieme}
+                onChange={(e) => setTantieme(e.target.value)}
+                required
+                className={inputCls}
+              />
+            </div>
+          </div>
+
+          <Button
+            type="submit"
+            className="h-11 w-full bg-[#1B4F72] text-white hover:bg-[#153f5c]"
+            disabled={!canSubmit}
+          >
+            {mutation.isPending ? 'Création…' : 'Créer et assigner le lot'}
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // ─── Success dialog ───────────────────────────────────────────────────────────
 
 type SuccessDialogProps = {
   open: boolean
   onClose: () => void
   result: CreateCoproprietaireResponse | null
+  residenceId: number
+  authMethod: 'email' | 'phone'
+  email: string
 }
 
-function SuccessDialog({ open, onClose, result }: SuccessDialogProps) {
+function SuccessDialog({ open, onClose, result, residenceId, authMethod, email }: SuccessDialogProps) {
+  const [createLotOpen, setCreateLotOpen] = useState(false)
+
   if (!result) return null
 
-  function copyPassword() {
+  const isEmail = authMethod === 'email'
+  const phone = result.coproprietaire.phone
+  const phoneDigits = phone.replace(/^\+212/, '')
+
+  function copyCode() {
     if (result?.temp_password) {
       void navigator.clipboard.writeText(result.temp_password)
-      toast.success('Copié !')
+      toast.success('Code copié !')
     }
   }
 
+  function sendWhatsApp() {
+    const code = result?.temp_password ?? ''
+    const msg = encodeURIComponent(
+      `Bonjour ${result?.coproprietaire.name} 👋\n\nVotre code d'accès Imaro est : *${code}*\n\nConnectez-vous sur l'application et entrez ce code pour accéder à votre espace copropriétaire.`
+    )
+    window.open(`https://wa.me/${phone.replace('+', '')}?text=${msg}`, '_blank')
+  }
+
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Compte créé avec succès</DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Propriétaire créé !</DialogTitle>
+          </DialogHeader>
 
-        <div className="space-y-5 pt-2">
-          {/* Success banner */}
-          <div className="flex items-center gap-3 rounded-lg bg-green-50 px-4 py-3">
-            <CheckCircle2 className="size-5 shrink-0 text-green-600" />
-            <p className="text-sm text-green-800">
-              Le compte de <span className="font-semibold">{result.coproprietaire.name}</span> a été créé.
-            </p>
-          </div>
+          <div className="space-y-4 pt-1">
+            {/* ── Green credentials card ── */}
+            <div className="rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-950/30">
+              {/* Header row */}
+              <div className="flex items-center gap-2 mb-3">
+                <CheckCircle2 className="size-4 shrink-0 text-green-600" />
+                <p className="text-sm font-medium text-green-800 dark:text-green-300">
+                  Le copropriétaire a été créé avec succès.
+                </p>
+              </div>
 
-          {result.temp_password ? (
-            /* Email method — show temp password */
-            <div className="space-y-2">
-              <Label>Mot de passe temporaire</Label>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 rounded-lg border border-border bg-muted/40 px-4 py-2.5 font-mono text-base tracking-widest text-[#1B4F72]">
-                  {result.temp_password}
+              {/* Credentials */}
+              <div className="space-y-2 text-sm">
+                {isEmail ? (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-green-900 dark:text-green-200 min-w-[120px]">Email :</span>
+                      <span className="text-green-800 dark:text-green-300 font-mono">{email}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-green-900 dark:text-green-200 min-w-[120px]">Mot de passe :</span>
+                      <div className="flex items-center gap-2 flex-1">
+                        <span className="font-mono text-green-800 dark:text-green-300 tracking-wider">
+                          {result.temp_password}
+                        </span>
+                        <button
+                          onClick={copyCode}
+                          className="text-green-700 hover:text-green-900 dark:text-green-400"
+                          aria-label="Copier le mot de passe"
+                        >
+                          <Copy className="size-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-green-900 dark:text-green-200 min-w-[100px]">Téléphone :</span>
+                      <span className="text-green-800 dark:text-green-300 font-mono">{phoneDigits}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-green-900 dark:text-green-200 min-w-[100px]">Code d'accès :</span>
+                      <span className="rounded-md bg-green-200 dark:bg-green-800 px-3 py-1 font-mono text-base font-bold tracking-widest text-green-900 dark:text-green-100">
+                        {result.temp_password}
+                      </span>
+                      <button
+                        onClick={copyCode}
+                        className="text-green-700 hover:text-green-900 dark:text-green-400"
+                        aria-label="Copier le code"
+                      >
+                        <Copy className="size-3.5" />
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Warning or WhatsApp */}
+              {isEmail ? (
+                <div className="mt-3 flex items-center gap-1.5 text-xs text-green-700 dark:text-green-400 italic">
+                  <TriangleAlert className="size-3.5 shrink-0" />
+                  Notez ces informations, elles ne seront plus accessibles après.
                 </div>
+              ) : (
+                <div className="mt-3 space-y-2">
+                  <p className="text-xs text-green-700 dark:text-green-400">
+                    Partagez ce code avec le copropriétaire via WhatsApp.
+                  </p>
+                  <button
+                    onClick={sendWhatsApp}
+                    className="flex items-center gap-2 rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  >
+                    <MessageCircle className="size-4" />
+                    Envoyer par WhatsApp
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* ── Create lot prompt ── */}
+            <div className="rounded-xl border border-border bg-muted/30 p-4">
+              <p className="text-sm text-foreground mb-3">
+                Souhaitez-vous créer un lot pour ce nouveau propriétaire ?
+              </p>
+              <div className="flex gap-2">
                 <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={copyPassword}
-                  className="shrink-0 gap-1.5"
+                  className="flex-1 gap-2 bg-[#1B4F72] text-white hover:bg-[#153f5c]"
+                  onClick={() => {
+                    onClose()
+                    setCreateLotOpen(true)
+                  }}
                 >
-                  <Copy className="size-3.5" />
-                  Copier
+                  <Building2 className="size-4" />
+                  Oui, créer un lot
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={onClose}
+                >
+                  Non, terminer
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Partagez ce mot de passe avec le copropriétaire pour qu'il puisse se connecter via l'application.
-              </p>
             </div>
-          ) : (
-            /* Phone method — WhatsApp notice */
-            <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/20 px-4 py-3">
-              <Phone className="mt-0.5 size-4 shrink-0 text-[#1B4F72]" />
-              <p className="text-sm text-muted-foreground">
-                Un code WhatsApp sera envoyé au{' '}
-                <span className="font-semibold text-foreground">
-                  +212 {result.coproprietaire.phone.replace(/^\+212/, '')}
-                </span>{' '}
-                lors de sa première connexion.
-              </p>
-            </div>
-          )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
-          <Button
-            type="button"
-            className="h-11 w-full bg-[#1B4F72] text-white hover:bg-[#153f5c]"
-            onClick={onClose}
-          >
-            Terminer
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+      {/* Lot creation dialog — opens after success dialog closes */}
+      <CreateLotDialog
+        open={createLotOpen}
+        onOpenChange={setCreateLotOpen}
+        residenceId={residenceId}
+        coproprietaireId={result.coproprietaire.id}
+        coproprietaireName={result.coproprietaire.name}
+      />
+    </>
   )
 }
 
@@ -360,6 +594,10 @@ export function CoproprietairesPage() {
   const [selectedResidenceId, setSelectedResidenceId] = useState<string>('')
   const [createOpen, setCreateOpen] = useState(false)
   const [successResult, setSuccessResult] = useState<CreateCoproprietaireResponse | null>(null)
+  const [successMeta, setSuccessMeta] = useState<{ authMethod: 'email' | 'phone'; email: string }>({
+    authMethod: 'email',
+    email: '',
+  })
 
   const { data: residences = [], isLoading: loadingResidences } = useQuery({
     queryKey: ['residences'],
@@ -408,9 +646,13 @@ export function CoproprietairesPage() {
     },
   ]
 
-  function handleCreateSuccess(result: CreateCoproprietaireResponse) {
+  function handleCreateSuccess(
+    result: CreateCoproprietaireResponse,
+    meta: { authMethod: 'email' | 'phone'; email: string },
+  ) {
     setCreateOpen(false)
     setSuccessResult(result)
+    setSuccessMeta(meta)
     void queryClient.invalidateQueries({ queryKey: ['coproprietaires', residenceId] })
   }
 
@@ -481,6 +723,9 @@ export function CoproprietairesPage() {
         open={successResult !== null}
         onClose={handleSuccessClose}
         result={successResult}
+        residenceId={residenceId ?? 0}
+        authMethod={successMeta.authMethod}
+        email={successMeta.email}
       />
     </div>
   )

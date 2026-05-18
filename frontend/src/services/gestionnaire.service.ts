@@ -393,9 +393,10 @@ export async function createCoproprietaire(
       lot: { id: 0, numero: '—', tantieme: 0 },
       solde_actuel: 0,
     },
+    // email → 8-char alphanumeric password; phone → 6-digit access code
     temp_password: input.auth_method === 'email'
       ? Math.random().toString(36).slice(-8).toUpperCase()
-      : null,
+      : String(Math.floor(100000 + Math.random() * 900000)),
   }
   return withMock(
     async () => {
