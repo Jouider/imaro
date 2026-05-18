@@ -77,6 +77,7 @@ class AuthController extends Controller
                 'token_type' => 'Bearer',
                 'expires_in' => 30 * 24 * 60 * 60,
                 'user'       => new UserResource($user),
+                'tenant'     => $this->tenantData($user),
             ],
         ]);
     }
@@ -148,6 +149,7 @@ class AuthController extends Controller
                 'token_type' => 'Bearer',
                 'expires_in' => 30 * 24 * 60 * 60,
                 'user'       => new UserResource($user),
+                'tenant'     => $this->tenantData($user),
             ],
         ]);
     }
@@ -213,6 +215,7 @@ class AuthController extends Controller
                 'token_type' => 'Bearer',
                 'expires_in' => 30 * 24 * 60 * 60,
                 'user'       => new UserResource($user),
+                'tenant'     => $this->tenantData($user),
             ],
         ]);
     }
@@ -227,11 +230,24 @@ class AuthController extends Controller
         return response()->json([
             'status' => 'success',
             'data'   => [
-                'user'        => new UserResource($user),
-                'roles'       => $user->getRoleNames(),
-                'permissions' => $user->getAllPermissions()->pluck('name'),
+                'user'   => new UserResource($user),
+                'tenant' => $this->tenantData($user),
             ],
         ]);
+    }
+
+    private function tenantData(User $user): ?array
+    {
+        if (! $user->tenant) {
+            return null;
+        }
+
+        return [
+            'id'        => $user->tenant->id,
+            'name'      => $user->tenant->name,
+            'subdomain' => $user->tenant->subdomain,
+            'plan'      => $user->tenant->plan,
+        ];
     }
 
     /**
