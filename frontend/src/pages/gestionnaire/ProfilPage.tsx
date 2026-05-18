@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { Building2, Bell, Shield, LogOut, Pencil, Check, X } from 'lucide-react'
+import { Building2, Bell, Shield, LogOut, Pencil, Check, X, ImagePlus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { useAuthStore } from '@/stores/authStore'
+import { useSettingsStore } from '@/stores/settingsStore'
 import { setStoredToken } from '@/lib/axios'
 import { logout } from '@/services/auth.service'
 import { cn } from '@/lib/utils'
@@ -30,6 +31,8 @@ function getInitials(name: string): string {
 export function ProfilPage() {
   const navigate = useNavigate()
   const { user, tenant, clear } = useAuthStore()
+  const { logoUrl, setLogoUrl } = useSettingsStore()
+  const logoInputRef = useRef<HTMLInputElement>(null)
 
   // ── Edit mode ──
   const [editMode, setEditMode] = useState(false)
@@ -45,6 +48,27 @@ export function ProfilPage() {
     setEditName(user?.name ?? '')
     setEditPhone(user?.phone ?? '')
     setEditMode(false)
+  }
+
+  // ── Logo upload ──
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Le logo ne doit pas dépasser 2 Mo')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      setLogoUrl(reader.result as string)
+      toast.success('Logo mis à jour — visible dans la barre de navigation')
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleRemoveLogo = () => {
+    setLogoUrl(null)
+    toast.success('Logo supprimé')
   }
 
   // ── Notification toggles ──
@@ -156,7 +180,68 @@ export function ProfilPage() {
         )}
       </div>
 
-      {/* ── 3. Syndic & Abonnement ── */}
+      {/* ── 3. Logo du syndic ── */}
+      <div className="rounded-2xl bg-white shadow-sm p-6 dark:bg-card">
+        <div className="flex items-center gap-2 mb-1">
+          <ImagePlus className="size-4 shrink-0" style={{ color: '#1B4F72' }} />
+          <h2 className="text-base font-semibold text-foreground">Logo du Syndic</h2>
+        </div>
+        <p className="text-sm text-muted-foreground mb-5">
+          Affiché dans la barre de navigation. PNG ou JPG, 2 Mo max.
+        </p>
+
+        <div className="flex items-center gap-5">
+          {/* Preview */}
+          <div
+            className={cn(
+              'flex size-16 shrink-0 items-center justify-center rounded-xl border-2 border-dashed',
+              logoUrl ? 'border-transparent' : 'border-border bg-muted/30',
+            )}
+          >
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="Logo syndic"
+                className="size-full rounded-xl object-contain"
+              />
+            ) : (
+              <Building2 className="size-6 text-muted-foreground/40" />
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-col gap-2">
+            <input
+              ref={logoInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              className="hidden"
+              onChange={handleLogoChange}
+            />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => logoInputRef.current?.click()}
+            >
+              <ImagePlus className="me-1.5 size-3.5" />
+              {logoUrl ? 'Changer le logo' : 'Importer un logo'}
+            </Button>
+            {logoUrl && (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                onClick={handleRemoveLogo}
+              >
+                <Trash2 className="me-1.5 size-3.5" />
+                Supprimer
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── 4. Syndic & Abonnement (was 3) ── */}
       <div className="rounded-2xl bg-white shadow-sm p-6 dark:bg-card">
         <div className="flex items-center gap-2 mb-4">
           <Building2 className="size-4 shrink-0" style={{ color: '#1B4F72' }} />

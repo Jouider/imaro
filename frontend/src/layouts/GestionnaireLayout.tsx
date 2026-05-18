@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -21,11 +21,19 @@ import {
   Bell,
   UserCircle,
   CreditCard as AbonnementIcon,
+  BanknoteIcon,
+  TicketIcon,
+  CalendarCheck,
+  AlertCircle,
+  Info,
+  CheckCheck,
 } from 'lucide-react'
 import { Wordmark } from '@/components/Wordmark'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { useAuthStore } from '@/stores/authStore'
+import { useSettingsStore } from '@/stores/settingsStore'
+import { useNotifStore, type NotifType } from '@/stores/notifStore'
 import { setStoredToken } from '@/lib/axios'
 import { logout } from '@/services/auth.service'
 import { Button } from '@/components/ui/button'
@@ -149,11 +157,56 @@ function getInitials(name: string): string {
     .join('')
 }
 
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const mins = Math.floor(diff / 60_000)
+  if (mins < 1) return "À l'instant"
+  if (mins < 60) return `Il y a ${mins} min`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `Il y a ${hours}h`
+  const days = Math.floor(hours / 24)
+  return `Il y a ${days}j`
+}
+
+function notifIcon(type: NotifType) {
+  const base = 'size-8 rounded-full flex items-center justify-center shrink-0'
+  switch (type) {
+    case 'paiement':
+      return (
+        <div className={cn(base, 'bg-green-100 dark:bg-green-900/30')}>
+          <BanknoteIcon className="size-4 text-green-600 dark:text-green-400" />
+        </div>
+      )
+    case 'ticket':
+      return (
+        <div className={cn(base, 'bg-blue-100 dark:bg-blue-900/30')}>
+          <TicketIcon className="size-4 text-blue-600 dark:text-blue-400" />
+        </div>
+      )
+    case 'assemblee':
+      return (
+        <div className={cn(base, 'bg-purple-100 dark:bg-purple-900/30')}>
+          <CalendarCheck className="size-4 text-purple-600 dark:text-purple-400" />
+        </div>
+      )
+    case 'retard':
+      return (
+        <div className={cn(base, 'bg-red-100 dark:bg-red-900/30')}>
+          <AlertCircle className="size-4 text-red-500 dark:text-red-400" />
+        </div>
+      )
+    default:
+      return (
+        <div className={cn(base, 'bg-gray-100 dark:bg-muted')}>
+          <Info className="size-4 text-muted-foreground" />
+        </div>
+      )
+  }
+}
+
 // ─── SidebarNav ───────────────────────────────────────────────────────────────
 
-type SidebarNavProps = {
-  onNavClick?: () => void
-}
+type SidebarNavProps = { onNavClick?: () => void }
 
 function SidebarNav({ onNavClick }: SidebarNavProps) {
   const { t } = useTranslation()
@@ -163,12 +216,12 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
       className="flex h-full flex-col"
       style={{ background: 'linear-gradient(180deg, #1a4f72 0%, #153f5c 100%)' }}
     >
-      {/* ── Logo ── */}
+      {/* Logo */}
       <div className="flex h-16 shrink-0 items-center px-5 border-b border-white/8">
         <Wordmark inverted className="h-12 w-48" />
       </div>
 
-      {/* ── Navigation ── */}
+      {/* Navigation */}
       <nav className="no-scrollbar flex-1 overflow-y-auto px-3 py-4 space-y-5">
         {NAV_SECTIONS.map((section, si) => (
           <div key={si}>
@@ -228,6 +281,139 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
   )
 }
 
+// ─── NotificationCenter ───────────────────────────────────────────────────────
+
+function NotificationCenter() {
+  const { notifs, markRead, markAllRead, dismiss } = useNotifStore()
+  const unreadCount = notifs.filter((n) => !n.read).length
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} non lues)` : ''}`}
+          className="relative flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus:outline-none"
+        >
+          <Bell className="size-[18px]" />
+          {unreadCount > 0 && (
+            <span
+              className="absolute end-1.5 top-1.5 flex size-4 items-center justify-center rounded-full bg-[#E67E22] text-[10px] font-bold text-white"
+              aria-hidden="true"
+            >
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
+        </button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent
+        ref={panelRef}
+        align="end"
+        sideOffset={8}
+        className="w-[360px] p-0"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b px-4 py-3">
+          <div className="flex items-center gap-2">
+            <Bell className="size-4 text-[#1B4F72]" />
+            <span className="text-sm font-semibold text-foreground">Notifications</span>
+            {unreadCount > 0 && (
+              <span className="rounded-full bg-[#E67E22] px-1.5 py-0.5 text-[10px] font-bold text-white">
+                {unreadCount}
+              </span>
+            )}
+          </div>
+          {unreadCount > 0 && (
+            <button
+              onClick={markAllRead}
+              className="flex items-center gap-1 text-xs text-[#1B4F72] hover:underline"
+            >
+              <CheckCheck className="size-3.5" />
+              Tout lire
+            </button>
+          )}
+        </div>
+
+        {/* List */}
+        <div className="max-h-[400px] overflow-y-auto">
+          {notifs.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
+              <Bell className="size-8 text-muted-foreground/30" />
+              <p className="text-sm text-muted-foreground">Aucune notification</p>
+            </div>
+          ) : (
+            notifs.map((n) => (
+              <div
+                key={n.id}
+                className={cn(
+                  'group flex items-start gap-3 px-4 py-3 transition-colors',
+                  'border-b last:border-0',
+                  !n.read
+                    ? 'bg-[#1B4F72]/[0.03] dark:bg-[#1B4F72]/10'
+                    : 'hover:bg-muted/40',
+                )}
+                onClick={() => markRead(n.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && markRead(n.id)}
+              >
+                {/* Type icon */}
+                {notifIcon(n.type)}
+
+                {/* Content */}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <p
+                      className={cn(
+                        'text-sm leading-tight',
+                        !n.read ? 'font-semibold text-foreground' : 'font-medium text-foreground/80',
+                      )}
+                    >
+                      {n.title}
+                    </p>
+                    {/* Unread dot */}
+                    {!n.read && (
+                      <span className="mt-1 size-2 shrink-0 rounded-full bg-[#E67E22]" />
+                    )}
+                  </div>
+                  <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                    {n.message}
+                  </p>
+                  <p className="mt-1 text-[11px] text-muted-foreground/60">
+                    {timeAgo(n.time)}
+                  </p>
+                </div>
+
+                {/* Dismiss X — appears on hover */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    dismiss(n.id)
+                  }}
+                  aria-label="Supprimer cette notification"
+                  className="mt-0.5 hidden shrink-0 rounded p-0.5 text-muted-foreground/40 hover:bg-muted hover:text-muted-foreground group-hover:flex"
+                >
+                  <X className="size-3.5" />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Footer */}
+        {notifs.length > 0 && (
+          <div className="border-t px-4 py-2.5">
+            <p className="text-center text-xs text-muted-foreground">
+              {notifs.length} notification{notifs.length > 1 ? 's' : ''} au total
+            </p>
+          </div>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
 // ─── UserMenu (avatar dropdown) ───────────────────────────────────────────────
 
 function UserMenu() {
@@ -244,14 +430,13 @@ function UserMenu() {
   })
 
   const initials = user ? getInitials(user.name) : 'G'
-  const roleName = user?.role === 'manager' ? 'Manager' : 'Gestionnaire'
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
           aria-label="Menu utilisateur"
-          className="flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ring-2 ring-transparent transition-all hover:ring-[#1B4F72]/30 focus:outline-none focus-visible:ring-[#1B4F72]/40"
+          className="flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ring-2 ring-transparent transition-all hover:ring-[#1B4F72]/30 focus:outline-none"
           style={{ background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)' }}
         >
           {initials}
@@ -259,7 +444,6 @@ function UserMenu() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-60" sideOffset={8}>
-        {/* User info header */}
         <DropdownMenuLabel className="font-normal py-3">
           <div className="flex items-center gap-3">
             <div
@@ -273,10 +457,10 @@ function UserMenu() {
                 {user?.name ?? '—'}
               </p>
               <p className="truncate text-xs text-muted-foreground mt-0.5">
-                {user?.phone ?? roleName}
+                {user?.phone ?? '—'}
               </p>
               {tenant && (
-                <p className="truncate text-xs text-muted-foreground/70 mt-0.5">
+                <p className="truncate text-xs text-muted-foreground/60 mt-0.5">
                   {tenant.name}
                 </p>
               )}
@@ -318,28 +502,35 @@ function UserMenu() {
   )
 }
 
-// ─── TopBar context pill (left side) ─────────────────────────────────────────
+// ─── ContextPill (topbar left) ────────────────────────────────────────────────
 
 function ContextPill() {
   const { tenant } = useAuthStore()
+  const { logoUrl } = useSettingsStore()
 
   return (
     <div className="hidden sm:flex items-center gap-2.5">
-      {/* Icon */}
+      {/* Logo or fallback icon */}
       <div
-        className="flex size-8 shrink-0 items-center justify-center rounded-lg text-white"
-        style={{ background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)' }}
+        className={cn(
+          'flex size-8 shrink-0 items-center justify-center rounded-lg overflow-hidden',
+          !logoUrl && 'text-white',
+        )}
+        style={!logoUrl ? { background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)' } : undefined}
       >
-        <Building2 className="size-4" aria-hidden="true" />
+        {logoUrl ? (
+          <img src={logoUrl} alt="Logo syndic" className="size-full object-contain" />
+        ) : (
+          <Building2 className="size-4" aria-hidden="true" />
+        )}
       </div>
+
       {/* Name + subtitle */}
       <div className="min-w-0 leading-tight">
         <p className="truncate text-sm font-semibold text-foreground max-w-[160px]">
           {tenant?.name ?? 'Imaro'}
         </p>
-        <p className="text-[11px] text-muted-foreground">
-          Gestionnaire
-        </p>
+        <p className="text-[11px] text-muted-foreground">Gestionnaire</p>
       </div>
     </div>
   )
@@ -352,12 +543,12 @@ export function GestionnaireLayout() {
 
   return (
     <div className="flex min-h-svh">
-      {/* ── Desktop sidebar ── */}
+      {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 start-0 hidden w-[240px] lg:block shadow-xl shadow-black/10">
         <SidebarNav />
       </aside>
 
-      {/* ── Mobile overlay sidebar ── */}
+      {/* Mobile overlay sidebar */}
       {mobileOpen && (
         <>
           <div
@@ -380,7 +571,7 @@ export function GestionnaireLayout() {
         </>
       )}
 
-      {/* ── Main area ── */}
+      {/* Main area */}
       <div className="flex min-h-svh flex-1 flex-col lg:ms-[240px]">
 
         {/* ── Topbar ── */}
@@ -397,7 +588,7 @@ export function GestionnaireLayout() {
             <Menu className="size-5" />
           </Button>
 
-          {/* Left: context pill (residence / tenant) */}
+          {/* Left: logo + tenant name */}
           <ContextPill />
 
           {/* Spacer */}
@@ -405,27 +596,18 @@ export function GestionnaireLayout() {
 
           {/* Right: actions */}
           <div className="flex items-center gap-1">
-            {/* Notifications */}
-            <button
-              aria-label="Notifications"
-              className="relative flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            >
-              <Bell className="size-[18px]" />
-              {/* Unread dot */}
-              <span
-                className="absolute end-2 top-2 size-1.5 rounded-full bg-[#E67E22]"
-                aria-hidden="true"
-              />
-            </button>
+
+            {/* Notification center */}
+            <NotificationCenter />
 
             {/* Divider */}
-            <div className="mx-1 h-5 w-px bg-border" />
+            <div className="mx-1.5 h-5 w-px bg-border" />
 
             <ThemeToggle />
             <LanguageSwitcher />
 
             {/* Divider */}
-            <div className="mx-1 h-5 w-px bg-border" />
+            <div className="mx-1.5 h-5 w-px bg-border" />
 
             {/* User avatar dropdown */}
             <UserMenu />
