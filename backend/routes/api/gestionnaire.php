@@ -39,8 +39,9 @@ Route::prefix('residences/{residence}')->group(function () {
 Route::put('/lots/{lot}', [LotController::class, 'updateFlat']);
 Route::delete('/lots/{lot}', [LotController::class, 'destroyFlat']);
 
-// Copropriétaires — liste globale (toutes résidences du gestionnaire)
+// Copropriétaires — liste globale + création + code d'accès
 Route::get('/coproprietaires', [CoproprietaireController::class, 'indexGlobal']);
+Route::post('/coproprietaires', [CoproprietaireController::class, 'store']);
 Route::post('/coproprietaires/{coproprietaire}/generate-code', [CoproprietaireController::class, 'generateCode']);
 
 // Appels de fonds (KAN-14)

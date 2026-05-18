@@ -3,18 +3,62 @@
 namespace App\Http\Controllers\Api\Gestionnaire;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Gestionnaire\StoreCoproprietaireRequest;
 use App\Http\Resources\CoproprietaireResource;
 use App\Models\Coproprietaire;
+use App\Models\Lot;
 use App\Models\Residence;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class CoproprietaireController extends Controller
 {
+    /**
+     * POST /api/gestionnaire/coproprietaires
+     * Crée un user résident + un coproprietaire lié au lot.
+     */
+    public function store(StoreCoproprietaireRequest $request): JsonResponse
+    {
+        $lot = Lot::findOrFail($request->lot_id);
+
+        $isManager      = $request->user()->role === 'manager';
+        $isGestionnaire = $lot->residence->gestionnaire_id === $request->user()->id;
+
+        abort_if(! $isManager && ! $isGestionnaire, 403, 'Accès refusé.');
+
+        $coproprietaire = DB::transaction(function () use ($request, $lot) {
+            $user = User::create([
+                'tenant_id' => $request->user()->tenant_id,
+                'name'      => $request->name,
+                'phone'     => $request->phone,
+                'email'     => $request->email,
+                'role'      => 'resident',
+                'password'  => Hash::make(Str::random(16)),
+                'status'    => 'active',
+            ]);
+
+            return Coproprietaire::create([
+                'tenant_id'   => $request->user()->tenant_id,
+                'user_id'     => $user->id,
+                'lot_id'      => $lot->id,
+                'type'        => $request->type,
+                'date_entree' => $request->date_entree ?? now()->toDateString(),
+                'solde_actuel' => 0,
+            ]);
+        });
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Copropriétaire créé.',
+            'data'    => ['coproprietaire' => new CoproprietaireResource($coproprietaire->load(['user', 'lot']))],
+        ], 201);
+    }
+
     /**
      * POST /api/gestionnaire/coproprietaires/{coproprietaire}/generate-code
      * Génère un code d'accès temporaire pour un résident et le log (WhatsApp simulé).
