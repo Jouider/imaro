@@ -18,13 +18,27 @@ import {
   Menu,
   X,
   ChevronRight,
+  Bell,
   UserCircle,
+  CreditCard as AbonnementIcon,
 } from 'lucide-react'
 import { Wordmark } from '@/components/Wordmark'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { useAuthStore } from '@/stores/authStore'
+import { setStoredToken } from '@/lib/axios'
+import { logout } from '@/services/auth.service'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { useMutation } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -123,17 +137,17 @@ const NAV_SECTIONS: NavSection[] = [
       },
     ],
   },
-  {
-    labelKey: null,
-    items: [
-      {
-        to: '/gestionnaire/profil',
-        icon: <UserCircle className="size-[18px]" aria-hidden="true" />,
-        labelKey: 'gestionnaire.nav.profil',
-      },
-    ],
-  },
 ]
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map((p) => p.charAt(0).toUpperCase())
+    .slice(0, 2)
+    .join('')
+}
 
 // ─── SidebarNav ───────────────────────────────────────────────────────────────
 
@@ -143,13 +157,6 @@ type SidebarNavProps = {
 
 function SidebarNav({ onNavClick }: SidebarNavProps) {
   const { t } = useTranslation()
-  const { user, clear } = useAuthStore()
-  const navigate = useNavigate()
-
-  const handleLogout = () => {
-    clear()
-    void navigate('/login', { replace: true })
-  }
 
   return (
     <div
@@ -161,11 +168,10 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
         <Wordmark inverted className="h-12 w-48" />
       </div>
 
-      {/* ── Navigation (no scrollbar) ── */}
+      {/* ── Navigation ── */}
       <nav className="no-scrollbar flex-1 overflow-y-auto px-3 py-4 space-y-5">
         {NAV_SECTIONS.map((section, si) => (
           <div key={si}>
-            {/* Section label */}
             {section.labelKey && (
               <div className="flex items-center gap-2 px-2 mb-1.5">
                 <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/30 select-none">
@@ -174,8 +180,6 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
                 <div className="flex-1 h-px bg-white/8" />
               </div>
             )}
-
-            {/* Items */}
             <ul className="space-y-0.5">
               {section.items.map((item) => (
                 <li key={item.to}>
@@ -193,14 +197,12 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
                   >
                     {({ isActive }) => (
                       <>
-                        {/* Active left accent bar */}
                         {isActive && (
                           <span
                             className="absolute start-0 inset-y-1.5 w-[3px] rounded-full bg-[#e67e22]"
                             aria-hidden="true"
                           />
                         )}
-                        {/* Icon — brighter when active */}
                         <span
                           className={cn(
                             'transition-colors',
@@ -209,9 +211,7 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
                         >
                           {item.icon}
                         </span>
-                        {/* Label */}
                         <span className="flex-1 truncate">{t(item.labelKey)}</span>
-                        {/* Chevron hint on hover (inactive only) */}
                         {!isActive && (
                           <ChevronRight className="size-3.5 opacity-0 group-hover:opacity-40 transition-opacity shrink-0" />
                         )}
@@ -224,34 +224,122 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
           </div>
         ))}
       </nav>
+    </div>
+  )
+}
 
-      {/* ── User footer ── */}
-      <div className="shrink-0 border-t border-white/8 p-4">
-        <div className="flex items-center gap-3 mb-3">
-          {/* Avatar */}
-          <div
-            className="flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ring-2 ring-white/15"
-            style={{ background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)' }}
-          >
-            {user?.name?.charAt(0).toUpperCase() ?? 'G'}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-white leading-tight">
-              {user?.name ?? '—'}
-            </p>
-            <p className="truncate text-xs text-white/40 capitalize mt-0.5">
-              {user?.role ?? '—'}
-            </p>
-          </div>
-        </div>
+// ─── UserMenu (avatar dropdown) ───────────────────────────────────────────────
 
+function UserMenu() {
+  const navigate = useNavigate()
+  const { user, tenant, clear } = useAuthStore()
+
+  const logoutMutation = useMutation({
+    mutationFn: logout,
+    onSettled: () => {
+      setStoredToken(null)
+      clear()
+      void navigate('/login', { replace: true })
+    },
+  })
+
+  const initials = user ? getInitials(user.name) : 'G'
+  const roleName = user?.role === 'manager' ? 'Manager' : 'Gestionnaire'
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
         <button
-          onClick={handleLogout}
-          className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-white/45 transition-all hover:bg-white/6 hover:text-white/80"
+          aria-label="Menu utilisateur"
+          className="flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ring-2 ring-transparent transition-all hover:ring-[#1B4F72]/30 focus:outline-none focus-visible:ring-[#1B4F72]/40"
+          style={{ background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)' }}
         >
-          <LogOut className="size-3.5 shrink-0" aria-hidden="true" />
-          {t('nav.logout')}
+          {initials}
         </button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="w-60" sideOffset={8}>
+        {/* User info header */}
+        <DropdownMenuLabel className="font-normal py-3">
+          <div className="flex items-center gap-3">
+            <div
+              className="flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+              style={{ background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)' }}
+            >
+              {initials}
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-foreground leading-tight">
+                {user?.name ?? '—'}
+              </p>
+              <p className="truncate text-xs text-muted-foreground mt-0.5">
+                {user?.phone ?? roleName}
+              </p>
+              {tenant && (
+                <p className="truncate text-xs text-muted-foreground/70 mt-0.5">
+                  {tenant.name}
+                </p>
+              )}
+            </div>
+          </div>
+        </DropdownMenuLabel>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuGroup>
+          <DropdownMenuItem
+            className="gap-2.5 cursor-pointer"
+            onClick={() => void navigate('/gestionnaire/profil')}
+          >
+            <UserCircle className="size-4 shrink-0 text-muted-foreground" />
+            <span>Mon Profil</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="gap-2.5 cursor-pointer"
+            onClick={() => void navigate('/gestionnaire/profil')}
+          >
+            <AbonnementIcon className="size-4 shrink-0 text-muted-foreground" />
+            <span>Abonnement</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          className="gap-2.5 cursor-pointer text-red-500 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"
+          onClick={() => logoutMutation.mutate()}
+          disabled={logoutMutation.isPending}
+        >
+          <LogOut className="size-4 shrink-0" />
+          <span>{logoutMutation.isPending ? 'Déconnexion…' : 'Déconnexion'}</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+// ─── TopBar context pill (left side) ─────────────────────────────────────────
+
+function ContextPill() {
+  const { tenant } = useAuthStore()
+
+  return (
+    <div className="hidden sm:flex items-center gap-2.5">
+      {/* Icon */}
+      <div
+        className="flex size-8 shrink-0 items-center justify-center rounded-lg text-white"
+        style={{ background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)' }}
+      >
+        <Building2 className="size-4" aria-hidden="true" />
+      </div>
+      {/* Name + subtitle */}
+      <div className="min-w-0 leading-tight">
+        <p className="truncate text-sm font-semibold text-foreground max-w-[160px]">
+          {tenant?.name ?? 'Imaro'}
+        </p>
+        <p className="text-[11px] text-muted-foreground">
+          Gestionnaire
+        </p>
       </div>
     </div>
   )
@@ -294,21 +382,53 @@ export function GestionnaireLayout() {
 
       {/* ── Main area ── */}
       <div className="flex min-h-svh flex-1 flex-col lg:ms-[240px]">
-        {/* Topbar */}
-        <header className="sticky top-0 z-30 flex h-14 items-center border-b bg-white/95 backdrop-blur-sm px-4 dark:border-border dark:bg-card/95">
+
+        {/* ── Topbar ── */}
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-white/95 px-4 backdrop-blur-sm dark:border-border dark:bg-card/95">
+
+          {/* Mobile hamburger */}
           <Button
             variant="ghost"
             size="sm"
-            className="me-3 lg:hidden"
+            className="shrink-0 lg:hidden"
             onClick={() => setMobileOpen(true)}
             aria-label="Ouvrir le menu"
           >
             <Menu className="size-5" />
           </Button>
+
+          {/* Left: context pill (residence / tenant) */}
+          <ContextPill />
+
+          {/* Spacer */}
           <div className="flex-1" />
-          <div className="flex items-center gap-2">
-            <LanguageSwitcher />
+
+          {/* Right: actions */}
+          <div className="flex items-center gap-1">
+            {/* Notifications */}
+            <button
+              aria-label="Notifications"
+              className="relative flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              <Bell className="size-[18px]" />
+              {/* Unread dot */}
+              <span
+                className="absolute end-2 top-2 size-1.5 rounded-full bg-[#E67E22]"
+                aria-hidden="true"
+              />
+            </button>
+
+            {/* Divider */}
+            <div className="mx-1 h-5 w-px bg-border" />
+
             <ThemeToggle />
+            <LanguageSwitcher />
+
+            {/* Divider */}
+            <div className="mx-1 h-5 w-px bg-border" />
+
+            {/* User avatar dropdown */}
+            <UserMenu />
           </div>
         </header>
 
