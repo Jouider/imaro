@@ -952,4 +952,189 @@ Types valides : `ordinaire` | `extraordinaire`
 
 ---
 
-*Last updated: 2026-05-18 — nouveau système auth (email+password admins, code résident), Sprint 2 endpoints (annonces, contrats, budgets, documents, assemblées)*
+---
+
+## DevOps — Workflow de travail
+
+### Environnements
+
+| Environnement | Branch | URL Frontend | URL API | Base de données |
+|---|---|---|---|---|
+| **Production** | `main` | https://imaro.ma | https://api.imaro.ma | `imaro` |
+| **Staging** | `develop` | https://staging.imaro.ma | https://api-staging.imaro.ma | `imaro_staging` |
+| **Local** | feature branch | http://localhost:5173 | http://localhost:8000 | `imaro_local` |
+
+---
+
+### Règles Git — À respecter absolument
+
+```
+❌ JAMAIS push direct sur main ou develop
+✅ Toujours passer par une feature branch + Pull Request
+```
+
+**Naming des branches**
+```
+feat/backend-whatsapp        ← nouvelle fonctionnalité backend
+feat/frontend-dashboard      ← nouvelle fonctionnalité frontend
+fix/backend-tantieme-calc    ← correction bug backend
+fix/frontend-login-screen    ← correction bug frontend
+```
+
+**Format des commits (Conventional Commits)**
+```
+feat(auth): add resident first-login activation flow
+fix(dashboard): show all residences for manager role
+docs(api): update contract with sprint 2 endpoints
+refactor(lots): extract tantieme validation to service
+```
+
+---
+
+### Flow de développement quotidien
+
+```
+1. Chaque matin — se synchroniser avec develop
+   git checkout develop
+   git pull origin develop
+
+2. Créer une feature branch depuis develop
+   git checkout -b feat/backend-whatsapp
+
+3. Coder + commiter régulièrement
+   git add backend/...
+   git commit -m "feat(whatsapp): add Twilio service"
+
+4. Pousser la branch
+   git push origin feat/backend-whatsapp
+
+5. Ouvrir une Pull Request sur GitHub : feat/... → develop
+   - Reviewer : l'autre (Abdellah review frontend, Mouad review backend)
+   - PR mergée → déploiement auto sur staging via CI/CD
+
+6. Tester sur staging : https://staging.imaro.ma
+
+7. Quand staging est validé → PR develop → main
+   → déploiement auto en production via CI/CD
+```
+
+---
+
+### CI/CD — GitHub Actions (4 workflows)
+
+| Workflow | Déclenché sur | Action |
+|---|---|---|
+| `deploy-backend.yml` | push `main` · `backend/**` | Deploy prod + migrate + cache |
+| `deploy-frontend.yml` | push `main` · `frontend/**` | Build + deploy prod |
+| `deploy-staging-backend.yml` | push `develop` · `backend/**` | Deploy staging + migrate + cache |
+| `deploy-staging-frontend.yml` | push `develop` · `frontend/**` | Build + deploy staging |
+
+**Ce que fait chaque deploy backend automatiquement :**
+```bash
+git pull origin <branch>
+sed -i '/TelescopeServiceProvider/d' bootstrap/providers.php  # retire Telescope (dev only)
+composer install --no-dev --optimize-autoloader
+php artisan migrate --force
+php artisan config:cache && php artisan route:cache && php artisan view:cache
+supervisorctl restart horizon  # redémarre les workers de queue
+```
+
+---
+
+### Infrastructure VPS
+
+```
+Serveur : Hostinger KVM2 — Ubuntu 24.04 LTS
+IP      : 72.62.20.248
+SSH     : port 2222 (user: abdellah)
+
+Stack   : PHP 8.4 · Nginx 1.24 · MySQL 8 · Redis 7 · Node 22 · Supervisor
+
+/var/www/imaro/          ← Production (branch: main)
+/var/www/imaro-staging/  ← Staging (branch: develop)
+```
+
+**SSL** : Let's Encrypt via Certbot — expire 2026-08-15 (auto-renouvellement activé)
+
+---
+
+### Zones de responsabilité
+
+| Zone | Responsable | Ne pas toucher |
+|---|---|---|
+| `backend/` | Abdellah | ❌ frontend/ |
+| `frontend/` | Mouad | ❌ backend/ |
+| `docs/api.md` | Abdellah | Mettre à jour AVANT de coder un nouvel endpoint |
+| `.github/workflows/` | Abdellah | — |
+| `docker-compose.yml` | Abdellah | — |
+
+**Règle :** Si Abdellah trouve un bug frontend → ouvre une **GitHub Issue** au lieu de toucher le code. Idem pour Mouad côté backend.
+
+---
+
+### Commandes utiles sur le VPS
+
+```bash
+# Se connecter
+ssh -p 2222 abdellah@72.62.20.248
+
+# Voir les logs Laravel (prod)
+sudo tail -f /var/www/imaro/backend/storage/logs/laravel.log
+
+# Voir les logs Laravel (staging)
+sudo tail -f /var/www/imaro-staging/backend/storage/logs/laravel.log
+
+# Statut des workers Horizon
+sudo supervisorctl status
+
+# Redémarrer Horizon prod
+sudo supervisorctl restart horizon
+
+# Redémarrer Horizon staging
+sudo supervisorctl restart horizon-staging
+
+# Re-seeder la prod (⚠️ efface toutes les données)
+cd /var/www/imaro/backend
+sudo -u www-data php artisan migrate:fresh --seed --force
+
+# Vider le cache
+sudo -u www-data php artisan cache:clear
+sudo -u www-data php artisan config:cache && php artisan route:cache
+```
+
+---
+
+### Secrets GitHub configurés
+
+| Secret | Usage |
+|---|---|
+| `VPS_HOST` | IP du serveur (72.62.20.248) |
+| `VPS_USER` | Utilisateur SSH (abdellah) |
+| `VPS_SSH_KEY` | Clé privée RSA pour CI/CD |
+| `VPS_PORT` | Port SSH (2222) |
+| `VITE_API_URL` | URL API pour le build frontend prod |
+
+Deux environments GitHub configurés : `production` et `staging`.
+
+---
+
+### Gestion des hotfixes (bug critique en prod)
+
+```
+1. Créer une branch depuis main (pas develop)
+   git checkout main
+   git checkout -b fix/backend-critical-bug
+
+2. Corriger + commiter
+
+3. PR directement vers main (mention "HOTFIX" dans le titre)
+
+4. Après merge → merger aussi dans develop pour rester sync
+   git checkout develop
+   git merge main
+   git push origin develop
+```
+
+---
+
+*Last updated: 2026-05-18 — nouveau système auth (email+password admins, code résident), Sprint 2 endpoints (annonces, contrats, budgets, documents, assemblées), DevOps workflow*
