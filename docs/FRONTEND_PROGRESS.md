@@ -4,36 +4,168 @@
 
 ---
 
-## ⚡ Dernières modifications — 18 mai 2026
+## ⚡ Dernières modifications — 18 mai 2026 (soir)
 
-### Nouvelles pages & fonctionnalités
+### Nouveau système d'authentification — IMPORTANT à implémenter
+
+Le modèle auth a changé. Voici la logique complète :
+
+| Qui | Méthode | Endpoint |
+|---|---|---|
+| **Gestionnaire / Syndic** | Email + Mot de passe (fourni par Imaro) | `POST /api/auth/login` |
+| **Copropriétaire (email)** | Email + Mot de passe (généré auto) | `POST /api/auth/login` |
+| **Copropriétaire (WhatsApp)** | Téléphone + OTP WhatsApp | `POST /api/auth/otp/request` + `POST /api/auth/otp/verify` |
+
+> La page `/login` affiche d'abord un sélecteur de rôle. Si "Syndic / Gestionnaire" → formulaire email + password. Si "Copropriétaire" → numéro de téléphone + OTP WhatsApp (inchangé).
+
+### Création de copropriétaire par le gestionnaire — NOUVEAU
+
+Le gestionnaire peut maintenant créer des comptes copropriétaires depuis la page Copropriétaires. Dialog avec deux méthodes :
+
+**Méthode Email** → le système génère un mot de passe temporaire que le gestionnaire partage.
+**Méthode WhatsApp** → le copropriétaire reçoit un OTP lors de sa première connexion.
+
+### Autres fonctionnalités
 
 | Quoi | Fichier(s) | Impact backend |
 |---|---|---|
-| **Page de connexion unifiée** — une seule entrée `/login` avec sélection du rôle (Syndic / Copropriétaire) puis OTP WhatsApp | `pages/LoginPage.tsx` | Aucun — réutilise `/api/auth/otp/request` et `/api/auth/otp/verify` |
-| **Page Mon Profil (gestionnaire)** — infos perso, logo syndic, notifications WhatsApp, GDPR, déconnexion | `pages/gestionnaire/ProfilPage.tsx` | Nouveau endpoint `PATCH /api/gestionnaire/profil` (voir ci-dessous) |
-| **Topbar redesign** — logo syndic + nom société à gauche, cloche notifications, FR/AR pill, avatar dropdown à droite | `layouts/GestionnaireLayout.tsx` | Nouveau endpoint `GET /api/gestionnaire/notifications` (voir ci-dessous) |
-| **Système de notifications** — centre de notifications avec types paiement / ticket / assemblée / retard / info, mark-as-read, dismiss | `stores/notifStore.ts` | Nouveau endpoint `GET /api/gestionnaire/notifications` (voir ci-dessous) |
-| **Logo syndic** — upload base64 → stocké en localStorage (front uniquement pour l'instant) | `stores/settingsStore.ts` | Endpoint upload logo à prévoir (voir ci-dessous) |
-| **Language switcher** — pill compact FR \| AR sans dropdown | `components/LanguageSwitcher.tsx` | Rien |
+| **Page Mon Profil (gestionnaire)** — logo syndic, notifications, GDPR | `pages/gestionnaire/ProfilPage.tsx` | `PATCH /api/gestionnaire/profil` (voir section ci-dessous) |
+| **Topbar** — logo syndic, cloche, FR\|AR pill, avatar dropdown | `layouts/GestionnaireLayout.tsx` | `GET /api/gestionnaire/notifications` |
+| **Système de notifications** — 5 types, mark-as-read, dismiss | `stores/notifStore.ts` | `GET /api/gestionnaire/notifications` |
+| **Logo syndic** — upload PNG/JPG → localStorage | `stores/settingsStore.ts` | `POST /api/gestionnaire/profil/logo` |
+| **Language switcher** — pill FR \| AR | `components/LanguageSwitcher.tsx` | Rien |
 
-### Ce qui est 100% frontend (aucun backend requis maintenant)
+---
 
-- Logo syndic stocké en `localStorage` via `imaro.settings` — fonctionnel sans API, persisté côté navigateur. Le backend pourra stocker l'URL S3 plus tard.
-- Notifications : mock seed data dans `imaro.notifs` localStorage. Mark-as-read et dismiss fonctionnent localement.
-- Language switcher : bascule i18next FR ↔ AR, sans persistance serveur.
+## Endpoints attendus — Authentification (PRIORITÉ 1)
 
-### Notes critiques pour le backend
+### Login email (gestionnaire + copropriétaire email)
 
-1. **`user.name` dans la réponse OTP** — Ce champ alimente le nom en haut des PDFs et l'avatar dans la topbar. Il doit contenir le nom complet de la société de gestion (pas juste le prénom). S'assure que `POST /api/auth/otp/verify` retourne `user.name` = nom société pour les gestionnaires.
+```
+POST /api/auth/login
+```
 
-2. **`tenant.name`** — Affiché dans la topbar gauche à côté du logo. Doit correspondre au nom commercial du syndic.
+Corps :
+```json
+{ "email": "syndic@imaro.ma", "password": "monMotDePasse" }
+```
+
+Réponse succès :
+```json
+{
+  "status": "success",
+  "data": {
+    "token": "sanctum-token-abc123",
+    "user": {
+      "id": 2,
+      "name": "Ahmed Berrada",
+      "phone": "+212612000002",
+      "role": "gestionnaire"
+    },
+    "tenant": {
+      "id": 1,
+      "name": "Atlas Syndic",
+      "subdomain": "atlas",
+      "plan": "standard"
+    }
+  }
+}
+```
+
+Réponse erreur :
+```json
+{ "status": "error", "message": "Identifiants incorrects" }
+```
+→ HTTP 401
+
+> **Important** : Même format de réponse que `POST /api/auth/otp/verify`. Le frontend utilise exactement le même `setSession({ token, user, tenant })`.
+
+### OTP WhatsApp — inchangé
+
+```
+POST /api/auth/otp/request   { "phone": "+212612345678" }
+POST /api/auth/otp/verify    { "phone": "+212612345678", "otp": "123456" }
+```
+
+---
+
+## Endpoints attendus — Création de copropriétaire (PRIORITÉ 1)
+
+```
+POST /api/gestionnaire/residences/:id/coproprietaires
+```
+
+Corps (méthode email) :
+```json
+{
+  "auth_method": "email",
+  "name": "Youssef El Mansouri",
+  "email": "youssef@gmail.com",
+  "phone": "+212612345678",
+  "residence_id": 1
+}
+```
+
+Corps (méthode WhatsApp) :
+```json
+{
+  "auth_method": "phone",
+  "name": "Youssef El Mansouri",
+  "phone": "+212612345678",
+  "email": null,
+  "residence_id": 1
+}
+```
+
+Réponse (méthode email) :
+```json
+{
+  "status": "success",
+  "data": {
+    "coproprietaire": {
+      "id": 42,
+      "name": "Youssef El Mansouri",
+      "phone": "+212612345678",
+      "lot": { "id": 0, "numero": "—", "tantieme": 0 },
+      "solde_actuel": 0
+    },
+    "temp_password": "ABC12XY8"
+  }
+}
+```
+
+Réponse (méthode WhatsApp) :
+```json
+{
+  "status": "success",
+  "data": {
+    "coproprietaire": { ... },
+    "temp_password": null
+  }
+}
+```
+
+> **Logique backend** :
+> - Méthode email : crée un `User` avec `email`, génère un mot de passe aléatoire (8 chars alphanum), retourne `temp_password` en clair **une seule fois**.
+> - Méthode WhatsApp : crée un `User` avec `phone` uniquement, `temp_password = null`. Le copropriétaire se connectera via OTP WhatsApp.
+> - Dans les deux cas, assigner le copropriétaire à la résidence et créer sa relation `UserResidence`.
+> - L'assignment du lot se fait séparément via `PUT /api/gestionnaire/residences/:id/lots/:lotId` (qui existe déjà).
 
 ### Workflow Git — rappel
 
 - Notre branche `feat/gestionnaire-dashboard` → **PR vers `develop`** dès que tu es prêt à tester
 - 1 approbation → merge → staging auto-deploy
 - Fin de sprint : `develop → main` (2 approbations) → production
+
+---
+
+## ⚡ Modifications du 18 mai 2026 (matin)
+
+| Quoi | Impact backend |
+|---|---|
+| Logo syndic upload (localStorage) | Upload endpoint à prévoir |
+| Notification center (localStorage) | `GET /api/gestionnaire/notifications` |
+| FR\|AR pill | Rien |
 
 ---
 

@@ -18,13 +18,15 @@ import {
   ChevronRight,
   Shield,
   Globe,
+  Mail,
+  Lock,
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { Wordmark } from '@/components/Wordmark'
-import { requestOtp, verifyOtp } from '@/services/auth.service'
+import { requestOtp, verifyOtp, loginWithEmail } from '@/services/auth.service'
 import { setStoredToken } from '@/lib/axios'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
@@ -233,6 +235,8 @@ export function LoginPage() {
   const [step, setStep] = useState<Step>(validParamRole ? 'phone' : 'role')
   const [digits, setDigits] = useState('')
   const [otp, setOtp] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
   const fullPhone = `+212${digits}`
   const phoneValid = /^[67]\d{8}$/.test(digits)
@@ -263,6 +267,17 @@ export function LoginPage() {
       toast.error(extractError(err))
       setOtp('')
     },
+  })
+
+  // ── Email+password login (gestionnaire) ──
+  const loginEmailMutation = useMutation({
+    mutationFn: () => loginWithEmail(email, password),
+    onSuccess: ({ token, user, tenant }) => {
+      setStoredToken(token)
+      setSession({ token, user, tenant })
+      void navigate('/gestionnaire/dashboard', { replace: true })
+    },
+    onError: (err) => toast.error(extractError(err)),
   })
 
   // Auto-submit on complete OTP
@@ -303,7 +318,9 @@ export function LoginPage() {
     step === 'role'
       ? 'Choisissez votre espace pour continuer'
       : step === 'phone'
-        ? 'Entrez votre numéro de téléphone marocain'
+        ? role === 'gestionnaire'
+          ? 'Connectez-vous avec vos identifiants'
+          : 'Entrez votre numéro de téléphone marocain'
         : `Code envoyé via WhatsApp au +212 ${digits}`
 
   return (
@@ -397,8 +414,63 @@ export function LoginPage() {
               </div>
             )}
 
-            {/* ── Step: Phone ── */}
-            {step === 'phone' && (
+            {/* ── Step: Phone (resident) or Email+Password (gestionnaire) ── */}
+            {step === 'phone' && role === 'gestionnaire' && (
+              <form onSubmit={(e) => { e.preventDefault(); loginEmailMutation.mutate() }} className="space-y-5">
+                {/* Role badge */}
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border bg-[#1B4F72]/5 px-3 py-1 text-xs font-medium text-[#1B4F72]">
+                    <Building2 className="size-3.5" />
+                    Syndic / Gestionnaire
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Adresse email</Label>
+                  <div className="relative">
+                    <Mail className="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                    <input
+                      id="email"
+                      type="email"
+                      placeholder="votre@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="w-full min-h-[52px] rounded-xl border-2 border-border bg-white ps-10 pe-4 text-base text-[#1B4F72] placeholder:text-muted-foreground/50 transition-all focus:border-[#1B4F72] focus:outline-none focus:ring-4 focus:ring-[#1B4F72]/10 dark:bg-card"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password">Mot de passe</Label>
+                  <div className="relative">
+                    <Lock className="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                    <input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="w-full min-h-[52px] rounded-xl border-2 border-border bg-white ps-10 pe-4 text-base text-[#1B4F72] placeholder:text-muted-foreground/50 transition-all focus:border-[#1B4F72] focus:outline-none focus:ring-4 focus:ring-[#1B4F72]/10 dark:bg-card"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Identifiants fournis par l'équipe Imaro
+                  </p>
+                </div>
+
+                <Button
+                  type="submit"
+                  className="h-12 w-full bg-[#1B4F72] text-base text-white hover:bg-[#153f5c]"
+                  disabled={loginEmailMutation.isPending || !email || !password}
+                >
+                  {loginEmailMutation.isPending ? 'Connexion…' : 'Se connecter'}
+                </Button>
+              </form>
+            )}
+
+            {step === 'phone' && role === 'resident' && (
               <form
                 className="space-y-5"
                 onSubmit={(e) => {
@@ -409,12 +481,8 @@ export function LoginPage() {
                 {/* Role badge */}
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 rounded-full border bg-[#1B4F72]/5 px-3 py-1 text-xs font-medium text-[#1B4F72]">
-                    {role === 'gestionnaire' ? (
-                      <Building2 className="size-3.5" />
-                    ) : (
-                      <Users className="size-3.5" />
-                    )}
-                    {role === 'gestionnaire' ? 'Syndic / Gestionnaire' : 'Copropriétaire'}
+                    <Users className="size-3.5" />
+                    Copropriétaire
                   </span>
                 </div>
 
