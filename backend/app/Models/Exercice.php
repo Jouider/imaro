@@ -49,4 +49,9 @@ class Exercice extends Model
     {
         return $this->hasMany(Paiement::class);
     }
+
+    public function depenses(): HasMany
+    {
+        return $this->hasMany(Depense::class);
+    }
 }
