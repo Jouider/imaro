@@ -41,6 +41,7 @@ Route::delete('/lots/{lot}', [LotController::class, 'destroyFlat']);
 
 // Copropriétaires — liste globale (toutes résidences du gestionnaire)
 Route::get('/coproprietaires', [CoproprietaireController::class, 'indexGlobal']);
+Route::post('/coproprietaires/{coproprietaire}/generate-code', [CoproprietaireController::class, 'generateCode']);
 
 // Appels de fonds (KAN-14)
 Route::apiResource('appels-fonds', AppelFondsController::class)

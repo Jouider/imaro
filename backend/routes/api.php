@@ -10,11 +10,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('auth')->group(function () {
-    Route::post('/request-otp', [AuthController::class, 'requestOtp']);
-    Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
-    // Aliases attendus par le frontend (otp/request + otp/verify)
-    Route::post('/otp/request', [AuthController::class, 'requestOtp']);
-    Route::post('/otp/verify', [AuthController::class, 'verifyOtp']);
+    // Admin (manager, gestionnaire, conseil, super_admin) — email + password
+    Route::post('/login', [AuthController::class, 'login']);
+
+    // Résident (portail mobile) — téléphone + code
+    Route::post('/resident/login',    [AuthController::class, 'residentLogin']);
+    Route::post('/resident/activate', [AuthController::class, 'residentActivate']);
 });
 
 /*

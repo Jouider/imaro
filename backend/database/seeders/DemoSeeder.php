@@ -43,41 +43,45 @@ class DemoSeeder extends Seeder
         // ── 2. Users ───────────────────────────────────────────
         $manager = User::create([
             'tenant_id' => $t,
-            'name' => 'Mohammed Fikri',
-            'phone' => '+212600000001',
-            'email' => 'fikri@blancasyndic.ma',
-            'role' => 'manager',
-            'status' => 'active',
+            'name'      => 'Mohammed Fikri',
+            'phone'     => '+212600000001',
+            'email'     => 'fikri@blancasyndic.ma',
+            'password'  => bcrypt('imaro2026'),
+            'role'      => 'manager',
+            'status'    => 'active',
         ]);
         $manager->assignRole('manager');
 
         $gestionnaire1 = User::create([
             'tenant_id' => $t,
-            'name' => 'Karim Alaoui',
-            'phone' => '+212600000002',
-            'email' => 'alaoui@blancasyndic.ma',
-            'role' => 'gestionnaire',
-            'status' => 'active',
+            'name'      => 'Karim Alaoui',
+            'phone'     => '+212600000002',
+            'email'     => 'alaoui@blancasyndic.ma',
+            'password'  => bcrypt('imaro2026'),
+            'role'      => 'gestionnaire',
+            'status'    => 'active',
         ]);
         $gestionnaire1->assignRole('gestionnaire');
 
         $gestionnaire2 = User::create([
             'tenant_id' => $t,
-            'name' => 'Leila Mansouri',
-            'phone' => '+212600000003',
-            'email' => 'mansouri@blancasyndic.ma',
-            'role' => 'gestionnaire',
-            'status' => 'active',
+            'name'      => 'Leila Mansouri',
+            'phone'     => '+212600000003',
+            'email'     => 'mansouri@blancasyndic.ma',
+            'password'  => bcrypt('imaro2026'),
+            'role'      => 'gestionnaire',
+            'status'    => 'active',
         ]);
         $gestionnaire2->assignRole('gestionnaire');
 
         $conseil = User::create([
             'tenant_id' => $t,
-            'name' => 'Driss El Fassi',
-            'phone' => '+212600000004',
-            'email' => 'elfassi@email.ma',
-            'role' => 'conseil',
-            'status' => 'active',
+            'name'      => 'Driss El Fassi',
+            'phone'     => '+212600000004',
+            'email'     => 'elfassi@email.ma',
+            'password'  => bcrypt('imaro2026'),
+            'role'      => 'conseil',
+            'status'    => 'active',
         ]);
         $conseil->assignRole('conseil');
 
@@ -521,9 +525,11 @@ class DemoSeeder extends Seeder
         $this->command->info('✅ DemoSeeder terminé !');
         $this->command->info('');
         $this->command->info('   📋 Tenant       : Blanca Syndic (subdomain: blanca)');
-        $this->command->info('   👤 Manager      : Mohammed Fikri (+212600000001)');
-        $this->command->info('   👥 Gestionnaires: Karim Alaoui (+212600000002), Leila Mansouri (+212600000003)');
-        $this->command->info('   🏛️  Conseil      : Driss El Fassi (+212600000004)');
+        $this->command->info('   👤 Manager      : fikri@blancasyndic.ma / imaro2026');
+        $this->command->info('   👥 Gestionnaire1: alaoui@blancasyndic.ma / imaro2026');
+        $this->command->info('   👥 Gestionnaire2: mansouri@blancasyndic.ma / imaro2026');
+        $this->command->info('   🏛️  Conseil      : elfassi@email.ma / imaro2026');
+        $this->command->info('   📱 Résidents    : générer un code via POST /gestionnaire/coproprietaires/{id}/generate-code');
         $this->command->info('   🏠 Résidence    : Résidence Atlas · 20 lots · 1 000 tantièmes');
         $this->command->info('   📅 Exercice     : 2026 (actif)');
         $this->command->info('   🔧 Prestataires : 5 (ascenseur, nettoyage, plomberie, gardiennage, jardin)');
