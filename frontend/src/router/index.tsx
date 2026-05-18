@@ -1,7 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { HomePage } from '@/pages/HomePage'
 import { LoginPage } from '@/pages/LoginPage'
-import { PortailLoginPage } from '@/pages/portail/PortailLoginPage'
 import { PortailLayout } from '@/pages/portail/PortailLayout'
 import { PortailHomePage } from '@/pages/portail/PortailHomePage'
 import { PortailFinancesPage } from '@/pages/portail/PortailFinancesPage'
@@ -30,7 +29,8 @@ export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
 
   // ── Portail copropriétaire ──────────────────────────────
-  { path: '/portail/login', element: <PortailLoginPage /> },
+  // /portail/login now redirects to the unified /login page
+  { path: '/portail/login', element: <Navigate to="/login" replace /> },
   {
     path: '/portail',
     element: (

@@ -16,7 +16,7 @@ export function PortailGuard({ children }: Props) {
 
   useEffect(() => {
     if (!isAuthorised) {
-      void navigate('/portail/login', { replace: true })
+      void navigate('/login', { replace: true })
     }
   }, [isAuthorised, navigate])
 
