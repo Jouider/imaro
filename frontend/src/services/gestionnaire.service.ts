@@ -62,6 +62,20 @@ export type Coproprietaire = {
   solde_actuel: number
 }
 
+export type CreateCoproprietaireInput = {
+  auth_method: 'email' | 'phone'
+  name: string
+  email?: string
+  phone?: string
+  residence_id: number
+  lot_id?: number
+}
+
+export type CreateCoproprietaireResponse = {
+  coproprietaire: Coproprietaire
+  temp_password: string | null  // only set when auth_method === 'email'
+}
+
 export type Exercice = {
   id: number
   annee: number
@@ -365,6 +379,35 @@ export async function getCoproprietaires(residenceId: number, search?: string): 
     const res = await api.get<ApiEnvelope<{ coproprietaires: Coproprietaire[] }>>(`/gestionnaire/residences/${residenceId}/coproprietaires`, { params })
     return res.data.data.coproprietaires
   }, MOCK_COPROPRIETAIRES)
+}
+
+export async function createCoproprietaire(
+  input: CreateCoproprietaireInput
+): Promise<CreateCoproprietaireResponse> {
+  // Mock: simulate backend response
+  const mock: CreateCoproprietaireResponse = {
+    coproprietaire: {
+      id: Date.now(),
+      name: input.name,
+      phone: input.phone ?? '',
+      lot: { id: 0, numero: '—', tantieme: 0 },
+      solde_actuel: 0,
+    },
+    // email → 8-char alphanumeric password; phone → 6-digit access code
+    temp_password: input.auth_method === 'email'
+      ? Math.random().toString(36).slice(-8).toUpperCase()
+      : String(Math.floor(100000 + Math.random() * 900000)),
+  }
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<CreateCoproprietaireResponse>>(
+        `/gestionnaire/residences/${input.residence_id}/coproprietaires`,
+        input,
+      )
+      return res.data.data
+    },
+    mock,
+  )
 }
 
 // ─── Exercices ───────────────────────────────────────────────────────────────
