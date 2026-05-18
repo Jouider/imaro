@@ -58,22 +58,24 @@ export type Coproprietaire = {
   id: number
   name: string
   phone: string
-  lot: { id: number; numero: string; tantieme: number }
-  solde_actuel: number
+  email?: string
+  /** Backend returns `solde` (mapped from solde_actuel) */
+  solde: number
+  lot: { id: number; numero: string; tantieme: number } | null
 }
 
 export type CreateCoproprietaireInput = {
-  auth_method: 'email' | 'phone'
   name: string
+  phone: string
   email?: string
-  phone?: string
-  residence_id: number
-  lot_id?: number
+  lot_id: number
+  type?: 'proprietaire' | 'locataire'
 }
 
 export type CreateCoproprietaireResponse = {
   coproprietaire: Coproprietaire
-  temp_password: string | null  // only set when auth_method === 'email'
+  /** 8-char alphanumeric temp code, returned directly by the store endpoint, shown once to gestionnaire */
+  temp_password: string
 }
 
 export type Exercice = {
@@ -100,15 +102,24 @@ export type AppelFonds = {
 
 export type Paiement = {
   id: number
-  lot: { id: number; numero: string }
-  coproprietaire: { id: number; name: string }
-  appel_fonds: { id: number; titre: string }
-  montant_du: number
-  montant_paye: number
-  statut: string
-  date_paiement: string
-  mode_paiement: string
+  montant: number
+  mode: string
   reference?: string
+  note?: string
+  date_paiement: string
+  coproprietaire: {
+    id: number
+    name: string
+    phone: string
+    lot: { numero: string; tantieme: number }
+  }
+  ligne: {
+    id: number
+    montant_du: number
+    montant_paye: number
+    statut: string
+    libelle: string
+  }
 }
 
 export type Impaye = {
@@ -235,9 +246,9 @@ const MOCK_LOTS: Lot[] = [
 ]
 
 const MOCK_COPROPRIETAIRES: Coproprietaire[] = [
-  { id: 1, name: 'Hassan Benali', phone: '+212600000010', lot: { id: 1, numero: 'A-01', tantieme: 45 }, solde_actuel: 0 },
-  { id: 2, name: 'Fatima Chraibi', phone: '+212600000011', lot: { id: 2, numero: 'A-02', tantieme: 48 }, solde_actuel: -720 },
-  { id: 3, name: 'Karim El Fassi', phone: '+212600000012', lot: { id: 4, numero: 'P-01', tantieme: 8 }, solde_actuel: -144 },
+  { id: 1, name: 'Hassan Benali', phone: '+212600000010', solde: 0, lot: { id: 1, numero: 'A-01', tantieme: 45 } },
+  { id: 2, name: 'Fatima Chraibi', phone: '+212600000011', solde: -720, lot: { id: 2, numero: 'A-02', tantieme: 48 } },
+  { id: 3, name: 'Karim El Fassi', phone: '+212600000012', solde: -144, lot: { id: 4, numero: 'P-01', tantieme: 8 } },
 ]
 
 const MOCK_EXERCICES: Exercice[] = [
@@ -275,8 +286,23 @@ const MOCK_APPELS_FONDS: AppelFonds[] = [
 ]
 
 const MOCK_PAIEMENTS: Paiement[] = [
-  { id: 1, lot: { id: 1, numero: 'A-01' }, coproprietaire: { id: 1, name: 'Hassan Benali' }, appel_fonds: { id: 1, titre: 'Charges Q1 2026' }, montant_du: 810, montant_paye: 810, statut: 'payé', date_paiement: '2026-01-15', mode_paiement: 'virement', reference: 'VIR-2026-001' },
-  { id: 2, lot: { id: 2, numero: 'A-02' }, coproprietaire: { id: 2, name: 'Fatima Chraibi' }, appel_fonds: { id: 1, titre: 'Charges Q1 2026' }, montant_du: 864, montant_paye: 144, statut: 'partiel', date_paiement: '2026-01-20', mode_paiement: 'especes' },
+  {
+    id: 1,
+    montant: 810,
+    mode: 'virement',
+    reference: 'VIR-2026-001',
+    date_paiement: '2026-01-15',
+    coproprietaire: { id: 1, name: 'Hassan Benali', phone: '+212600000010', lot: { numero: 'A-01', tantieme: 100 } },
+    ligne: { id: 1, montant_du: 810, montant_paye: 810, statut: 'paye', libelle: 'Charges Q1 2026' },
+  },
+  {
+    id: 2,
+    montant: 144,
+    mode: 'especes',
+    date_paiement: '2026-01-20',
+    coproprietaire: { id: 2, name: 'Fatima Chraibi', phone: '+212600000011', lot: { numero: 'A-02', tantieme: 107 } },
+    ligne: { id: 2, montant_du: 864, montant_paye: 144, statut: 'partiellement_paye', libelle: 'Charges Q1 2026' },
+  },
 ]
 
 const MOCK_IMPAYES: Impaye[] = [
@@ -357,17 +383,32 @@ export async function getLots(residenceId: number): Promise<{ lots: Lot[]; total
 }
 
 export async function storeLot(residenceId: number, data: Pick<Lot, 'numero' | 'type' | 'etage' | 'superficie' | 'tantieme'>): Promise<Lot> {
-  const res = await api.post<ApiEnvelope<Lot>>(`/gestionnaire/residences/${residenceId}/lots`, data)
-  return res.data.data
+  const mockLot: Lot = {
+    id: Date.now(),
+    numero: data.numero,
+    type: data.type,
+    etage: data.etage,
+    superficie: data.superficie,
+    tantieme: data.tantieme,
+    coproprietaire: null,
+  }
+  return withMock(async () => {
+    const res = await api.post<ApiEnvelope<Lot>>(`/gestionnaire/residences/${residenceId}/lots`, data)
+    return res.data.data
+  }, mockLot)
 }
 
 export async function updateLot(residenceId: number, lotId: number, data: Partial<Pick<Lot, 'numero' | 'type' | 'etage' | 'superficie' | 'tantieme'>>): Promise<Lot> {
-  const res = await api.put<ApiEnvelope<Lot>>(`/gestionnaire/residences/${residenceId}/lots/${lotId}`, data)
-  return res.data.data
+  return withMock(async () => {
+    const res = await api.put<ApiEnvelope<Lot>>(`/gestionnaire/residences/${residenceId}/lots/${lotId}`, data)
+    return res.data.data
+  }, { ...MOCK_LOTS[0], ...data, id: lotId })
 }
 
 export async function deleteLot(residenceId: number, lotId: number): Promise<void> {
-  await api.delete(`/gestionnaire/residences/${residenceId}/lots/${lotId}`)
+  return withMock(async () => {
+    await api.delete(`/gestionnaire/residences/${residenceId}/lots/${lotId}`)
+  }, undefined)
 }
 
 // ─── Copropriétaires ─────────────────────────────────────────────────────────
@@ -384,30 +425,25 @@ export async function getCoproprietaires(residenceId: number, search?: string): 
 export async function createCoproprietaire(
   input: CreateCoproprietaireInput
 ): Promise<CreateCoproprietaireResponse> {
-  // Mock: simulate backend response
   const mock: CreateCoproprietaireResponse = {
     coproprietaire: {
       id: Date.now(),
       name: input.name,
-      phone: input.phone ?? '',
-      lot: { id: 0, numero: '—', tantieme: 0 },
-      solde_actuel: 0,
+      phone: input.phone,
+      email: input.email,
+      solde: 0,
+      lot: { id: input.lot_id, numero: '—', tantieme: 0 },
     },
-    // email → 8-char alphanumeric password; phone → 6-digit access code
-    temp_password: input.auth_method === 'email'
-      ? Math.random().toString(36).slice(-8).toUpperCase()
-      : String(Math.floor(100000 + Math.random() * 900000)),
+    temp_password: Math.random().toString(36).slice(-8).toUpperCase(),
   }
-  return withMock(
-    async () => {
-      const res = await api.post<ApiEnvelope<CreateCoproprietaireResponse>>(
-        `/gestionnaire/residences/${input.residence_id}/coproprietaires`,
-        input,
-      )
-      return res.data.data
-    },
-    mock,
-  )
+  return withMock(async () => {
+    // temp_password is returned directly in the store response — no separate generate-code call needed
+    const res = await api.post<ApiEnvelope<CreateCoproprietaireResponse>>(
+      '/gestionnaire/coproprietaires',
+      { ...input, type: input.type ?? 'proprietaire' },
+    )
+    return res.data.data
+  }, mock)
 }
 
 // ─── Exercices ───────────────────────────────────────────────────────────────
@@ -461,7 +497,7 @@ export async function getPaiements(params?: { residence_id?: number; statut?: st
   }, MOCK_PAIEMENTS)
 }
 
-export async function storePaiement(data: { appel_fonds_ligne_id: number; montant: number; date_paiement: string; mode_paiement: string; reference?: string; notes?: string }): Promise<Paiement> {
+export async function storePaiement(data: { appel_fonds_ligne_id: number; montant: number; date_paiement: string; mode: string; reference?: string; note?: string }): Promise<Paiement> {
   const res = await api.post<ApiEnvelope<Paiement>>('/gestionnaire/paiements', data)
   return res.data.data
 }
