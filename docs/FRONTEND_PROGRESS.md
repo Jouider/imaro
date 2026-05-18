@@ -1,6 +1,51 @@
-# Imaro — Frontend Progress (2026-05-16)
+# Imaro — Frontend Progress (2026-05-18)
 
 > **Pour Abdellah** — ce fichier récapitule ce qui est construit côté frontend, les endpoints API attendus pour chaque page, et le format exact des réponses. Mis à jour après chaque sprint.
+
+---
+
+## ⚡ Dernières modifications — 18 mai 2026
+
+### Nouvelles pages & fonctionnalités
+
+| Quoi | Fichier(s) | Impact backend |
+|---|---|---|
+| **Page de connexion unifiée** — une seule entrée `/login` avec sélection du rôle (Syndic / Copropriétaire) puis OTP WhatsApp | `pages/LoginPage.tsx` | Aucun — réutilise `/api/auth/otp/request` et `/api/auth/otp/verify` |
+| **Page Mon Profil (gestionnaire)** — infos perso, logo syndic, notifications WhatsApp, GDPR, déconnexion | `pages/gestionnaire/ProfilPage.tsx` | Nouveau endpoint `PATCH /api/gestionnaire/profil` (voir ci-dessous) |
+| **Topbar redesign** — logo syndic + nom société à gauche, cloche notifications, FR/AR pill, avatar dropdown à droite | `layouts/GestionnaireLayout.tsx` | Nouveau endpoint `GET /api/gestionnaire/notifications` (voir ci-dessous) |
+| **Système de notifications** — centre de notifications avec types paiement / ticket / assemblée / retard / info, mark-as-read, dismiss | `stores/notifStore.ts` | Nouveau endpoint `GET /api/gestionnaire/notifications` (voir ci-dessous) |
+| **Logo syndic** — upload base64 → stocké en localStorage (front uniquement pour l'instant) | `stores/settingsStore.ts` | Endpoint upload logo à prévoir (voir ci-dessous) |
+| **Language switcher** — pill compact FR \| AR sans dropdown | `components/LanguageSwitcher.tsx` | Rien |
+
+### Ce qui est 100% frontend (aucun backend requis maintenant)
+
+- Logo syndic stocké en `localStorage` via `imaro.settings` — fonctionnel sans API, persisté côté navigateur. Le backend pourra stocker l'URL S3 plus tard.
+- Notifications : mock seed data dans `imaro.notifs` localStorage. Mark-as-read et dismiss fonctionnent localement.
+- Language switcher : bascule i18next FR ↔ AR, sans persistance serveur.
+
+### Notes critiques pour le backend
+
+1. **`user.name` dans la réponse OTP** — Ce champ alimente le nom en haut des PDFs et l'avatar dans la topbar. Il doit contenir le nom complet de la société de gestion (pas juste le prénom). S'assure que `POST /api/auth/otp/verify` retourne `user.name` = nom société pour les gestionnaires.
+
+2. **`tenant.name`** — Affiché dans la topbar gauche à côté du logo. Doit correspondre au nom commercial du syndic.
+
+### Workflow Git — rappel
+
+- Notre branche `feat/gestionnaire-dashboard` → **PR vers `develop`** dès que tu es prêt à tester
+- 1 approbation → merge → staging auto-deploy
+- Fin de sprint : `develop → main` (2 approbations) → production
+
+---
+
+## ⚡ Modifications du 17 mai 2026
+
+### Ce qui était nouveau ce jour-là
+
+| Quoi | Impact backend |
+|---|---|
+| **Rapports PDF** — onglet Rapports dans Comptabilité avec génération de 4 PDFs (Rapport Financier, Journal, Balance, Grand Livre) | ✅ **Aucun nouveau endpoint** — tout est généré client-side avec jsPDF |
+| **Vercel déployé** — toutes les pages Sprint 2→5 + Rapports en ligne | Rien |
+| **Fix typage** — `ComptabilitePage.tsx` corrections lint/TS | Rien |
 
 ---
 
@@ -480,6 +525,397 @@ file        = <fichier>
 
 ---
 
+## Endpoints attendus — Profil gestionnaire & Notifications
+
+À implémenter dans `routes/api/gestionnaire.php`.
+
+### Profil gestionnaire
+
+```
+GET   /api/gestionnaire/profil
+PATCH /api/gestionnaire/profil
+POST  /api/gestionnaire/profil/logo    (multipart)
+```
+
+Réponse GET :
+```json
+{
+  "status": "success",
+  "data": {
+    "profil": {
+      "id": 2,
+      "name": "Ahmed Berrada",
+      "phone": "+212612000002",
+      "role": "gestionnaire",
+      "logo_url": "https://storage.../logo-syndic.png",
+      "notif_paiement": true,
+      "notif_ticket": true,
+      "notif_assemblee": true,
+      "notif_retard": true
+    }
+  }
+}
+```
+
+Corps PATCH (JSON) :
+```json
+{
+  "name": "Ahmed Berrada",
+  "notif_paiement": true,
+  "notif_ticket": false,
+  "notif_assemblee": true,
+  "notif_retard": true
+}
+```
+
+POST `/profil/logo` (multipart) :
+```
+file = <image PNG/JPG, max 2 Mo>
+```
+Réponse :
+```json
+{ "status": "success", "data": { "logo_url": "https://storage.../logo.png" } }
+```
+
+> **Important** : Pour l'instant le logo est stocké en base64 dans le localStorage du navigateur (`imaro.settings`). Quand tu implémentes l'endpoint, le frontend basculera automatiquement vers l'URL S3 retournée — aucun changement frontend nécessaire, juste brancher le service.
+
+---
+
+### Notifications gestionnaire
+
+```
+GET   /api/gestionnaire/notifications
+PATCH /api/gestionnaire/notifications/:id/read
+PATCH /api/gestionnaire/notifications/read-all
+DELETE /api/gestionnaire/notifications/:id
+```
+
+Réponse GET :
+```json
+{
+  "status": "success",
+  "data": {
+    "notifications": [
+      {
+        "id": "n1",
+        "type": "paiement",
+        "title": "Paiement reçu",
+        "message": "Youssef El Mansouri a réglé 1 500 MAD — Lot B3",
+        "time": "2026-05-18T10:22:00Z",
+        "read": false
+      }
+    ]
+  }
+}
+```
+
+`type` valides : `"paiement"` | `"ticket"` | `"assemblee"` | `"retard"` | `"info"`
+
+> **Pour l'instant** : Le frontend utilise un store Zustand persisté en localStorage (`imaro.notifs`) avec des données mock. Quand l'endpoint sera prêt, on branchera `GET /notifications` dans un `useQuery` et on remplacera les mutations locales par des `useMutation`. Aucun changement UI.
+>
+> **Push en temps réel** : Si vous voulez des notifications live (nouveau ticket soumis → cloche sonne), prévoir un endpoint WebSocket ou Server-Sent Events. À discuter en Sprint 4.
+
+---
+
+## Endpoints attendus — Comptabilité (gestionnaire)
+
+À implémenter dans `routes/api/gestionnaire.php` (middleware auth Sanctum + rôle `gestionnaire`).
+
+> **Aucun endpoint nouveau n'est nécessaire pour l'onglet Rapports** — les PDFs sont entièrement générés côté client (jsPDF) à partir des données déjà exposées par les endpoints dashboard, journal et balance ci-dessous.
+
+---
+
+### Exercices comptables
+
+```
+GET  /api/gestionnaire/residences/:id/exercices
+POST /api/gestionnaire/residences/:id/exercices
+```
+
+Réponse GET :
+```json
+{
+  "status": "success",
+  "data": {
+    "exercices": [
+      {
+        "id": 1,
+        "annee": 2025,
+        "statut": "ouvert",
+        "date_debut": "2025-01-01",
+        "date_fin": "2025-12-31",
+        "solde_initial": 5000.00,
+        "residence_id": 1
+      }
+    ]
+  }
+}
+```
+
+Corps POST :
+```json
+{ "annee": 2026, "date_debut": "2026-01-01", "date_fin": "2026-12-31", "solde_initial": 0 }
+```
+
+`statut` : `"ouvert"` | `"cloture"`
+
+---
+
+### Dashboard comptabilité
+
+```
+GET /api/gestionnaire/exercices/:id/dashboard
+```
+
+```json
+{
+  "status": "success",
+  "data": {
+    "dashboard": {
+      "total_charges": 48500.00,
+      "total_produits": 52000.00,
+      "solde": 3500.00,
+      "taux_recouvrement": 87.5,
+      "charges_par_categorie": [
+        { "categorie": "Entretien", "montant": 18000.00 },
+        { "categorie": "Gardiennage", "montant": 14400.00 },
+        { "categorie": "Assurance", "montant": 6000.00 },
+        { "categorie": "Eau/Électricité", "montant": 10100.00 }
+      ],
+      "evolution_mensuelle": [
+        { "mois": "Jan", "charges": 4200, "produits": 4500 },
+        { "mois": "Fév", "charges": 3800, "produits": 4200 }
+      ]
+    }
+  }
+}
+```
+
+> Ce endpoint alimente : les 4 KPI cards, le graphique barres "Évolution mensuelle" et le camembert "Répartition charges".
+
+---
+
+### Journal comptable
+
+```
+GET /api/gestionnaire/exercices/:id/journal
+```
+
+Paramètres optionnels : `?compte=401&type=debit&date_debut=2025-01-01&date_fin=2025-12-31`
+
+```json
+{
+  "status": "success",
+  "data": {
+    "ecritures": [
+      {
+        "id": 1,
+        "date": "2025-01-15",
+        "libelle": "Facture gardiennage janv.",
+        "compte_debit": "614",
+        "compte_credit": "401",
+        "montant": 1200.00,
+        "piece": "FAC-2025-001",
+        "exercice_id": 1
+      }
+    ]
+  }
+}
+```
+
+> Utilisé par l'onglet Journal et par `generateJournalPdf()` pour le PDF.
+
+---
+
+### Grand livre
+
+```
+GET /api/gestionnaire/exercices/:id/grand-livre
+```
+
+Paramètre optionnel : `?compte=614`
+
+```json
+{
+  "status": "success",
+  "data": {
+    "comptes": [
+      {
+        "numero": "614",
+        "intitule": "Charges de gardiennage",
+        "solde_initial": 0,
+        "total_debit": 14400.00,
+        "total_credit": 0,
+        "solde_final": 14400.00,
+        "ecritures": [
+          { "date": "2025-01-15", "libelle": "Gardiennage janv.", "debit": 1200.00, "credit": 0 }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+### Balance des comptes
+
+```
+GET /api/gestionnaire/exercices/:id/balance
+```
+
+```json
+{
+  "status": "success",
+  "data": {
+    "balance": [
+      {
+        "compte": "614",
+        "intitule": "Charges de gardiennage",
+        "debit": 14400.00,
+        "credit": 0,
+        "solde": 14400.00
+      }
+    ]
+  }
+}
+```
+
+> Utilisé par l'onglet Balance et par `generateBalancePdf()` + `generateGrandLivrePdf()`.
+
+---
+
+### Dépenses (charges)
+
+```
+GET    /api/gestionnaire/exercices/:id/depenses
+POST   /api/gestionnaire/exercices/:id/depenses
+DELETE /api/gestionnaire/exercices/:id/depenses/:depId
+```
+
+Réponse GET :
+```json
+{
+  "status": "success",
+  "data": {
+    "depenses": [
+      {
+        "id": 1,
+        "date": "2025-01-15",
+        "description": "Facture gardiennage",
+        "categorie": "Gardiennage",
+        "montant": 1200.00,
+        "prestataire": "Société Sécurité Atlas",
+        "statut": "paye",
+        "exercice_id": 1
+      }
+    ]
+  }
+}
+```
+
+Corps POST :
+```json
+{
+  "date": "2025-01-15",
+  "description": "Facture gardiennage",
+  "categorie": "Gardiennage",
+  "montant": 1200.00,
+  "prestataire": "Société Sécurité Atlas",
+  "statut": "paye"
+}
+```
+
+`statut` : `"paye"` | `"en_attente"` | `"annule"`
+
+---
+
+### Encaissements
+
+```
+POST /api/gestionnaire/exercices/:id/encaissements
+```
+
+Corps :
+```json
+{
+  "coproprietaire_id": 5,
+  "montant": 1500.00,
+  "date": "2025-02-10",
+  "reference": "VIR-2025-047",
+  "appel_fonds_id": 3
+}
+```
+
+Réponse :
+```json
+{
+  "status": "success",
+  "data": {
+    "encaissement": {
+      "id": 12,
+      "coproprietaire_id": 5,
+      "montant": 1500.00,
+      "date": "2025-02-10",
+      "reference": "VIR-2025-047"
+    }
+  }
+}
+```
+
+---
+
+### Comptes PCG (référentiel)
+
+```
+GET /api/gestionnaire/comptes-pcg
+```
+
+```json
+{
+  "status": "success",
+  "data": {
+    "comptes": [
+      { "numero": "401", "intitule": "Fournisseurs", "classe": 4 },
+      { "numero": "512", "intitule": "Banque", "classe": 5 },
+      { "numero": "614", "intitule": "Charges de gardiennage", "classe": 6 },
+      { "numero": "706", "intitule": "Cotisations copropriétaires", "classe": 7 }
+    ]
+  }
+}
+```
+
+> Ce endpoint est utilisé dans les selects du Journal (choix des comptes débit/crédit). Il peut retourner une liste statique — pas besoin de CRUD.
+
+---
+
+### Clôture d'exercice
+
+```
+POST /api/gestionnaire/exercices/:id/cloturer
+```
+
+Body : vide `{}`
+
+Réponse :
+```json
+{
+  "status": "success",
+  "data": {
+    "exercice": {
+      "id": 1,
+      "annee": 2025,
+      "statut": "cloture",
+      "date_cloture": "2026-01-31"
+    }
+  }
+}
+```
+
+> La clôture passe le statut de `"ouvert"` à `"cloture"`. Une fois clôturé, l'exercice est en lecture seule (le frontend désactive les boutons d'ajout/suppression). La vérification se fait côté backend : retourner `422` si des écritures sont en déséquilibre débit/crédit.
+
+---
+
 ## Endpoints attendus — Portail copropriétaire
 
 À implémenter dans `routes/api/portail.php` (middleware auth Sanctum + rôle `resident`).
@@ -690,7 +1126,9 @@ Erreur auth (401) : `{ "status": "error", "message": "Unauthenticated." }`
 | `services/prestataires.service.ts` | prestataires CRUD + contrats CRUD |
 | `services/budgets.service.ts` | budgets GET/POST + approuver + postes CRUD |
 | `services/documents.service.ts` | GET/POST/DELETE /gestionnaire/documents |
+| `services/comptabilite.service.ts` | exercices, dashboard, journal, grand livre, balance, dépenses CRUD, encaissements, comptes PCG, clôture |
 | `services/portail.service.ts` | portail dashboard, operations, annonces, assemblees, reclamations (GET + POST), documents, profil |
+| `lib/pdf-reports.ts` | ⚠️ **Aucun endpoint** — génération PDF pure navigateur (jsPDF) |
 
 ---
 
@@ -698,6 +1136,8 @@ Erreur auth (401) : `{ "status": "error", "message": "Unauthenticated." }`
 
 - **Stockage fichiers** : les documents et photos sont uploadés en multipart. Le backend doit retourner une `url` publique (S3/R2). Le frontend ne stocke pas de fichiers localement.
 - **Pagination** : aucune page ne pagine côté frontend pour l'instant — les listes sont complètes. À implémenter côté backend si les collections dépassent ~500 items.
-- **CORS** : le backend doit autoriser `http://localhost:5173` (dev) et `https://frontend-eta-indol-78.vercel.app` (preview).
+- **CORS** : le backend doit autoriser `http://localhost:5173` (dev) et `https://frontend-eta-indol-78.vercel.app` (Vercel preview).
 - **Tickets — champ `images` vs `photos`** : le frontend utilise `images: string[]` dans le type `Ticket`. Retourne bien ce champ (pas `photos`).
 - **Assemblées — `ordre_du_jour`** : le frontend attend un `string[]`. Si le backend stocke un texte brut, le split par `\n` en Laravel avant de retourner.
+- **Rapports PDF — `user.name`** : le nom affiché en en-tête des PDFs vient de `user.name` retourné par l'auth. Ce champ doit contenir le **nom de la société de gestion** (ex: "Atlas Syndic SARL"), pas juste le prénom du gestionnaire.
+- **Déploiement Vercel** : déployé manuellement via `vercel --prod` depuis `frontend/`. Pas de CI/CD GitHub → Vercel pour l'instant. À mettre en place quand on passe sur `develop`/`main`.
