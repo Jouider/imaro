@@ -24,38 +24,54 @@ class CoproprietaireController extends Controller
      */
     public function store(StoreCoproprietaireRequest $request): JsonResponse
     {
-        $lot = Lot::findOrFail($request->lot_id);
+        // Resolve lot — either directly or via residence_id (takes first available lot)
+        $lot = $request->lot_id
+            ? Lot::findOrFail($request->lot_id)
+            : Lot::where('residence_id', $request->residence_id)->firstOrFail();
 
         $isManager      = $request->user()->role === 'manager';
         $isGestionnaire = $lot->residence->gestionnaire_id === $request->user()->id;
 
         abort_if(! $isManager && ! $isGestionnaire, 403, 'Accès refusé.');
 
-        $coproprietaire = DB::transaction(function () use ($request, $lot) {
+        $tempCode = strtoupper(Str::random(8));
+
+        $coproprietaire = DB::transaction(function () use ($request, $lot, $tempCode) {
             $user = User::create([
-                'tenant_id' => $request->user()->tenant_id,
-                'name'      => $request->name,
-                'phone'     => $request->phone,
-                'email'     => $request->email,
-                'role'      => 'resident',
-                'password'  => Hash::make(Str::random(16)),
-                'status'    => 'active',
+                'tenant_id'        => $request->user()->tenant_id,
+                'name'             => $request->name,
+                'phone'            => $request->phone,
+                'email'            => $request->email,
+                'role'             => 'resident',
+                'password'         => Hash::make(Str::random(16)),
+                'access_code'      => Hash::make($tempCode),
+                'must_change_code' => true,
+                'status'           => 'active',
             ]);
 
             return Coproprietaire::create([
-                'tenant_id'   => $request->user()->tenant_id,
-                'user_id'     => $user->id,
-                'lot_id'      => $lot->id,
-                'type'        => $request->type,
-                'date_entree' => $request->date_entree ?? now()->toDateString(),
+                'tenant_id'    => $request->user()->tenant_id,
+                'user_id'      => $user->id,
+                'lot_id'       => $lot->id,
+                'type'         => $request->type ?? 'proprietaire',
+                'date_entree'  => $request->date_entree ?? now()->toDateString(),
                 'solde_actuel' => 0,
             ]);
         });
 
+        Log::info('[CODE ACCÈS RÉSIDENT - SIMULÉ]', [
+            'destinataire' => $request->name,
+            'phone'        => $request->phone,
+            'code'         => $tempCode,
+        ]);
+
         return response()->json([
             'status'  => 'success',
             'message' => 'Copropriétaire créé.',
-            'data'    => ['coproprietaire' => new CoproprietaireResource($coproprietaire->load(['user', 'lot']))],
+            'data'    => [
+                'coproprietaire' => new CoproprietaireResource($coproprietaire->load(['user', 'lot'])),
+                'temp_password'  => $tempCode,
+            ],
         ], 201);
     }
 
