@@ -355,6 +355,42 @@ export function PortailLoginPage() {
         </div>
       </div>
 
+      {/* Dev bypass — shown in DEV or when VITE_SHOW_DEV_BYPASS=true */}
+      {(import.meta.env.DEV || !!import.meta.env.VITE_SHOW_DEV_BYPASS) && (
+        <div className="border-t border-dashed border-amber-300 bg-amber-50 px-4 py-3 text-center">
+          <p className="mb-2 text-xs font-semibold text-amber-700">
+            ⚙️ Dev mode — WhatsApp non configuré
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-amber-400 text-amber-700 hover:bg-amber-100"
+            onClick={() => {
+              const mockSession = {
+                token: 'dev-mock-token',
+                user: {
+                  id: 1,
+                  name: 'Youssef El Mansouri',
+                  phone: '+212612345678',
+                  role: 'resident' as const,
+                },
+                tenant: {
+                  id: 1,
+                  name: 'Résidence Al Blanca',
+                  subdomain: 'blanca',
+                  plan: 'standard',
+                },
+              }
+              setStoredToken(mockSession.token)
+              setSession(mockSession)
+              void navigate('/portail', { replace: true })
+            }}
+          >
+            Accès direct (dev)
+          </Button>
+        </div>
+      )}
+
       {/* Footer */}
       <p className="py-4 text-center text-xs text-muted-foreground">
         © {new Date().getFullYear()} Imaro · {t('app.tagline')}

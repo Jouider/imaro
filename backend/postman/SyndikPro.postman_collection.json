@@ -1,0 +1,974 @@
+{
+  "info": {
+    "name": "SyndikPro — Backend API",
+    "description": "Collection complète pour tester le backend SyndikPro.\n\n**Workflow de test :**\n1. Exécuter «01 - Demander OTP» (manager ou gestionnaire)\n2. Récupérer l'OTP dans les logs : `grep \"OTP SIMULÉ\" backend/storage/logs/laravel.log | tail -1`\n3. Exécuter «02 - Vérifier OTP» → le token est sauvegardé automatiquement\n4. Tester les endpoints dans l'ordre des dossiers",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{gestionnaire_token}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000", "type": "string" },
+    { "key": "manager_token", "value": "", "type": "string" },
+    { "key": "gestionnaire_token", "value": "", "type": "string" },
+    { "key": "residence_id", "value": "1", "type": "string" },
+    { "key": "lot_id", "value": "1", "type": "string" },
+    { "key": "appel_fonds_id", "value": "1", "type": "string" },
+    { "key": "appel_fonds_ligne_id", "value": "1", "type": "string" },
+    { "key": "ticket_id", "value": "1", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "description": "Authentification OTP sans mot de passe. Après verify-otp, le token est sauvegardé automatiquement dans les variables de la collection.",
+      "item": [
+        {
+          "name": "01 - Demander OTP (Manager)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Status success', () => pm.expect(pm.response.json().status).to.eql('success'));",
+                  "console.log('⚠️  Récupérer OTP: grep \"OTP SIMULÉ\" backend/storage/logs/laravel.log | tail -1');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+212600000001\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/request-otp",
+            "description": "Demande un OTP pour le manager Mohammed Fikri (+212600000001).\nL'OTP apparaît dans les logs Laravel."
+          }
+        },
+        {
+          "name": "01 - Demander OTP (Gestionnaire)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "console.log('⚠️  Récupérer OTP: grep \"OTP SIMULÉ\" backend/storage/logs/laravel.log | tail -1');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+212600000002\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/request-otp",
+            "description": "Demande un OTP pour Karim Alaoui (gestionnaire, +212600000002)."
+          }
+        },
+        {
+          "name": "02 - Vérifier OTP → Token Manager",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.token) {",
+                  "  pm.collectionVariables.set('manager_token', json.data.token);",
+                  "  console.log('✅ manager_token sauvegardé:', json.data.token.substring(0, 20) + '...');",
+                  "  console.log('👤 Connecté en tant que:', json.data.user.name, '|', json.data.user.role);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+212600000001\",\n  \"otp\": \"REMPLACER_PAR_OTP\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/verify-otp",
+            "description": "Remplace REMPLACER_PAR_OTP par le code des logs.\nLe token manager est sauvegardé automatiquement."
+          }
+        },
+        {
+          "name": "02 - Vérifier OTP → Token Gestionnaire",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.token) {",
+                  "  pm.collectionVariables.set('gestionnaire_token', json.data.token);",
+                  "  console.log('✅ gestionnaire_token sauvegardé:', json.data.token.substring(0, 20) + '...');",
+                  "  console.log('👤 Connecté en tant que:', json.data.user.name, '|', json.data.user.role);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+212600000002\",\n  \"otp\": \"REMPLACER_PAR_OTP\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/verify-otp",
+            "description": "Remplace REMPLACER_PAR_OTP par le code des logs.\nLe token gestionnaire est sauvegardé automatiquement."
+          }
+        },
+        {
+          "name": "03 - Mon profil (/auth/me)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has user data', () => pm.expect(pm.response.json().data.user).to.exist);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/auth/me",
+            "description": "Retourne le profil de l'utilisateur connecté avec ses rôles et permissions."
+          }
+        },
+        {
+          "name": "04 - Déconnexion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('gestionnaire_token', '');",
+                  "console.log('✅ Token révoqué');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/logout",
+            "description": "Révoque le token Sanctum courant."
+          }
+        },
+        {
+          "name": "❌ OTP invalide (test 422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "pm.test('Format téléphone invalide', () => pm.expect(pm.response.json().status).to.eql('error'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"0612345678\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/request-otp",
+            "description": "Doit retourner 422 — format téléphone non +212."
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Dashboard",
+      "description": "KPIs gestionnaire — mis en cache Redis 5 minutes.",
+      "item": [
+        {
+          "name": "Dashboard KPIs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json().data;",
+                  "pm.test('Has all KPIs', () => {",
+                  "  pm.expect(data.residences_count).to.exist;",
+                  "  pm.expect(data.lots_count).to.exist;",
+                  "  pm.expect(data.taux_recouvrement).to.exist;",
+                  "  pm.expect(data.tickets_ouverts).to.exist;",
+                  "});",
+                  "console.log('📊 KPIs:', JSON.stringify(data, null, 2));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/gestionnaire/dashboard",
+            "description": "Retourne les KPIs des résidences assignées au gestionnaire connecté."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏢 Résidences",
+      "description": "Gestion des résidences assignées au gestionnaire.",
+      "item": [
+        {
+          "name": "Liste des résidences",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json().data;",
+                  "pm.test('Has residences array', () => pm.expect(data.residences).to.be.an('array'));",
+                  "if (data.residences.length > 0) {",
+                  "  const id = data.residences[0].id;",
+                  "  pm.collectionVariables.set('residence_id', id.toString());",
+                  "  console.log('✅ residence_id sauvegardé:', id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/gestionnaire/residences",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gestionnaire", "residences"],
+              "query": [
+                { "key": "per_page", "value": "15", "disabled": true },
+                { "key": "search", "value": "Atlas", "disabled": true }
+              ]
+            },
+            "description": "Retourne uniquement les résidences où gestionnaire_id = utilisateur connecté."
+          }
+        },
+        {
+          "name": "Détail résidence",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has lots', () => pm.expect(pm.response.json().data.residence.lots).to.exist);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/gestionnaire/residences/{{residence_id}}",
+            "description": "Retourne le détail avec tous les lots et copropriétaires."
+          }
+        },
+        {
+          "name": "Modifier résidence",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Updated', () => pm.expect(pm.response.json().status).to.eql('success'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"city\": \"Casablanca\"\n}"
+            },
+            "url": "{{base_url}}/api/gestionnaire/residences/{{residence_id}}"
+          }
+        },
+        {
+          "name": "❌ Résidence d'un autre gestionnaire (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403 ou 404', () => {",
+                  "  pm.expect([403, 404]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/gestionnaire/residences/9999",
+            "description": "Doit retourner 403 ou 404."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏠 Lots & Tantièmes",
+      "description": "Gestion des lots. Règle métier: somme tantièmes ≤ total_tantieme (1000).",
+      "item": [
+        {
+          "name": "Liste des lots",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json().data;",
+                  "console.log('🏠 Lots:', data.lots.length, '| Sum tantièmes:', data.sum_tantieme, '/ Total:', data.total_tantieme);",
+                  "if (data.lots.length > 0) {",
+                  "  pm.collectionVariables.set('lot_id', data.lots[0].id.toString());",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/gestionnaire/residences/{{residence_id}}/lots",
+            "description": "Retourne les lots avec la somme des tantièmes."
+          }
+        },
+        {
+          "name": "Créer un lot",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 ou 422', () => {",
+                  "  pm.expect([201, 422]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code === 422) {",
+                  "  console.log('⚠️  Budget tantième dépassé:', pm.response.json().message);",
+                  "} else {",
+                  "  const lot = pm.response.json().data.lot;",
+                  "  pm.collectionVariables.set('lot_id', lot.id.toString());",
+                  "  console.log('✅ Lot créé ID:', lot.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numero\": \"Z99\",\n  \"type\": \"parking\",\n  \"etage\": 0,\n  \"superficie\": 12.5,\n  \"tantieme\": 10\n}"
+            },
+            "url": "{{base_url}}/api/gestionnaire/residences/{{residence_id}}/lots",
+            "description": "⚠️ Si les 20 lots du seeder occupent déjà 1000/1000, retourne 422. Faire migrate:fresh --seed d'abord."
+          }
+        },
+        {
+          "name": "Modifier un lot",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"superficie\": 90.5\n}"
+            },
+            "url": "{{base_url}}/api/gestionnaire/residences/{{residence_id}}/lots/{{lot_id}}"
+          }
+        },
+        {
+          "name": "❌ Tantième dépassé (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "console.log('✅ Validation tantième OK:', pm.response.json().message);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numero\": \"OVER\",\n  \"type\": \"appartement\",\n  \"etage\": 1,\n  \"tantieme\": 9999\n}"
+            },
+            "url": "{{base_url}}/api/gestionnaire/residences/{{residence_id}}/lots",
+            "description": "Doit retourner 422 — tantième dépasserait le total."
+          }
+        },
+        {
+          "name": "Liste des copropriétaires",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "console.log('👥 Copropriétaires:', pm.response.json().data.meta.total);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/gestionnaire/residences/{{residence_id}}/coproprietaires",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gestionnaire", "residences", "{{residence_id}}", "coproprietaires"],
+              "query": [
+                { "key": "search", "value": "Hassan", "disabled": true },
+                { "key": "per_page", "value": "10", "disabled": true }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💰 Appels de Fonds",
+      "description": "KAN-14 — Création avec génération automatique des lignes par tantième.\nmontant_du = montant_total × (tantieme / 1000)",
+      "item": [
+        {
+          "name": "Liste des appels de fonds",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const afs = pm.response.json().data.appels_fonds;",
+                  "console.log('💰 Appels de fonds:', afs.length);",
+                  "if (afs.length > 0) {",
+                  "  pm.collectionVariables.set('appel_fonds_id', afs[0].id.toString());",
+                  "  console.log('✅ appel_fonds_id sauvegardé:', afs[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/gestionnaire/appels-fonds",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gestionnaire", "appels-fonds"],
+              "query": [
+                { "key": "residence_id", "value": "{{residence_id}}", "disabled": true },
+                { "key": "statut", "value": "brouillon", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer un appel de fonds",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const af = pm.response.json().data.appel_fonds;",
+                  "pm.collectionVariables.set('appel_fonds_id', af.id.toString());",
+                  "console.log('✅ Appel de fonds créé ID:', af.id);",
+                  "console.log('📋 Lignes générées:', af.lignes_count);",
+                  "console.log('💵 Montant total:', af.montant_total, 'DH');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"libelle\": \"Charges Q3 2026\",\n  \"description\": \"Charges trimestrielles de copropriété\",\n  \"residence_id\": {{residence_id}},\n  \"montant_total\": 18000,\n  \"date_echeance\": \"2026-09-30\"\n}"
+            },
+            "url": "{{base_url}}/api/gestionnaire/appels-fonds",
+            "description": "Génère automatiquement les lignes par tantième:\n- Lot A01 (65/1000) → 1170 DH\n- Lot A02 (55/1000) → 990 DH\n- etc."
+          }
+        },
+        {
+          "name": "Détail appel de fonds",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const af = pm.response.json().data.appel_fonds;",
+                  "console.log('📊 Taux recouvrement:', af.taux_recouvrement + '%');",
+                  "console.log('✅ Payé:', af.montant_recouvre, 'DH | Restant:', af.montant_restant, 'DH');",
+                  "if (af.lignes && af.lignes.length > 0) {",
+                  "  const firstImpaye = af.lignes.find(l => l.statut !== 'paye');",
+                  "  if (firstImpaye) {",
+                  "    pm.collectionVariables.set('appel_fonds_ligne_id', firstImpaye.id.toString());",
+                  "    console.log('✅ appel_fonds_ligne_id sauvegardé:', firstImpaye.id);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/gestionnaire/appels-fonds/{{appel_fonds_id}}",
+            "description": "Retourne le détail avec toutes les lignes, montant payé/restant par copropriétaire."
+          }
+        },
+        {
+          "name": "Modifier appel de fonds (brouillon)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const code = pm.response.code;",
+                  "pm.test('Status 200 ou 422', () => pm.expect([200, 422]).to.include(code));",
+                  "if (code === 422) console.log('⚠️', pm.response.json().message);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"libelle\": \"Charges Q3 2026 — Révisé\"\n}"
+            },
+            "url": "{{base_url}}/api/gestionnaire/appels-fonds/{{appel_fonds_id}}",
+            "description": "Modification uniquement si statut = brouillon. Retourne 422 si déjà envoyé."
+          }
+        },
+        {
+          "name": "Envoyer l'appel de fonds",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const code = pm.response.code;",
+                  "pm.test('Status 200 ou 422', () => pm.expect([200, 422]).to.include(code));",
+                  "if (code === 200) {",
+                  "  console.log('✅ Statut:', pm.response.json().data.appel_fonds.statut);",
+                  "  console.log('📅 Envoyé le:', pm.response.json().data.appel_fonds.sent_at);",
+                  "} else {",
+                  "  console.log('⚠️', pm.response.json().message);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": "{{base_url}}/api/gestionnaire/appels-fonds/{{appel_fonds_id}}/envoyer",
+            "description": "Passe le statut brouillon → envoye. sent_at est horodaté.\nTODO KAN-16: déclenchera les notifications WhatsApp."
+          }
+        }
+      ]
+    },
+    {
+      "name": "💳 Paiements",
+      "description": "KAN-15 — Enregistrement des paiements avec mise à jour automatique des statuts.",
+      "item": [
+        {
+          "name": "Liste des paiements",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "console.log('💳 Total paiements:', pm.response.json().data.meta.total);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/gestionnaire/paiements",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gestionnaire", "paiements"],
+              "query": [
+                { "key": "residence_id", "value": "{{residence_id}}", "disabled": true },
+                { "key": "appel_fonds_id", "value": "{{appel_fonds_id}}", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Enregistrer un paiement (partiel)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 ou 422', () => pm.expect([201, 422]).to.include(pm.response.code));",
+                  "if (pm.response.code === 201) {",
+                  "  const p = pm.response.json().data.paiement;",
+                  "  console.log('✅ Paiement enregistré:', p.montant, 'DH |', p.mode);",
+                  "  console.log('📊 Ligne statut:', p.ligne.statut);",
+                  "} else {",
+                  "  console.log('⚠️', pm.response.json().message);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appel_fonds_ligne_id\": {{appel_fonds_ligne_id}},\n  \"montant\": 500,\n  \"mode\": \"virement\",\n  \"date_paiement\": \"2026-05-13\",\n  \"reference\": \"VIR-2026-001\",\n  \"note\": \"Paiement partiel\"\n}"
+            },
+            "url": "{{base_url}}/api/gestionnaire/paiements",
+            "description": "Enregistre un paiement. Si montant < montant_du → statut ligne = 'partiel'.\nSi montant >= montant_du → statut ligne = 'paye'.\nRecalcule le solde_actuel du copropriétaire et le statut de l'appel de fonds."
+          }
+        },
+        {
+          "name": "Enregistrer un paiement (complet)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 ou 422', () => pm.expect([201, 422]).to.include(pm.response.code));",
+                  "if (pm.response.code === 201) {",
+                  "  const p = pm.response.json().data.paiement;",
+                  "  console.log('✅ Paiement complet:', p.montant, 'DH');",
+                  "  console.log('📊 Ligne statut:', p.ligne.statut, '(doit être paye)');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appel_fonds_ligne_id\": {{appel_fonds_ligne_id}},\n  \"montant\": 9999,\n  \"mode\": \"cheque\",\n  \"date_paiement\": \"2026-05-13\",\n  \"reference\": \"CHQ-2026-001\"\n}"
+            },
+            "url": "{{base_url}}/api/gestionnaire/paiements",
+            "description": "Montant élevé → statut ligne passe à 'paye'."
+          }
+        },
+        {
+          "name": "Liste des impayés",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json().data;",
+                  "console.log('⚠️  Impayés:', data.count, '| Total:', data.total_impaye, 'DH');",
+                  "if (data.impayes.length > 0) {",
+                  "  const first = data.impayes[0];",
+                  "  console.log('👤', first.coproprietaire.name, '| Lot:', first.coproprietaire.lot.numero);",
+                  "  console.log('💵 Reste:', first.montant_reste, 'DH | Retard:', first.jours_retard, 'jours');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/gestionnaire/impayes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gestionnaire", "impayes"],
+              "query": [
+                { "key": "residence_id", "value": "{{residence_id}}", "disabled": true },
+                { "key": "overdue_only", "value": "true", "disabled": true }
+              ]
+            },
+            "description": "Retourne toutes les lignes impayées/partielles avec le nombre de jours de retard."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔧 Tickets Maintenance",
+      "description": "KAN-21 — Système de tickets pour la maintenance des résidences.",
+      "item": [
+        {
+          "name": "Liste des tickets",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const data = pm.response.json().data;",
+                  "console.log('🔧 Total tickets:', data.meta.total);",
+                  "if (data.tickets.length > 0) {",
+                  "  pm.collectionVariables.set('ticket_id', data.tickets[0].id.toString());",
+                  "  console.log('✅ ticket_id sauvegardé:', data.tickets[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/gestionnaire/tickets",
+              "host": ["{{base_url}}"],
+              "path": ["api", "gestionnaire", "tickets"],
+              "query": [
+                { "key": "statut", "value": "ouvert", "disabled": true },
+                { "key": "priorite", "value": "urgent", "disabled": true },
+                { "key": "categorie", "value": "ascenseur", "disabled": true },
+                { "key": "residence_id", "value": "{{residence_id}}", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Créer un ticket",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const t = pm.response.json().data.ticket;",
+                  "pm.collectionVariables.set('ticket_id', t.id.toString());",
+                  "console.log('✅ Ticket créé ID:', t.id, '| Statut:', t.statut);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"residence_id\": {{residence_id}},\n  \"categorie\": \"ascenseur\",\n  \"description\": \"Ascenseur en panne bloc A depuis ce matin\",\n  \"priorite\": \"urgent\"\n}"
+            },
+            "url": "{{base_url}}/api/gestionnaire/tickets"
+          }
+        },
+        {
+          "name": "Détail ticket",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/gestionnaire/tickets/{{ticket_id}}"
+          }
+        },
+        {
+          "name": "Mettre en cours",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "console.log('✅ Statut:', pm.response.json().data.ticket.statut);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statut\": \"en_cours\",\n  \"cout_estime\": 1500\n}"
+            },
+            "url": "{{base_url}}/api/gestionnaire/tickets/{{ticket_id}}"
+          }
+        },
+        {
+          "name": "Clôturer un ticket",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 ou 422', () => pm.expect([200, 422]).to.include(pm.response.code));",
+                  "if (pm.response.code === 200) {",
+                  "  const t = pm.response.json().data.ticket;",
+                  "  console.log('✅ Ticket clos | closed_at:', t.closed_at);",
+                  "} else {",
+                  "  console.log('⚠️', pm.response.json().message);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": "{{base_url}}/api/gestionnaire/tickets/{{ticket_id}}/clos",
+            "description": "Passe le statut à 'clos' et horodate closed_at."
+          }
+        },
+        {
+          "name": "❌ Clôturer ticket déjà clos (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 422', () => pm.response.to.have.status(422));",
+                  "console.log('✅ Validation OK:', pm.response.json().message);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": "{{base_url}}/api/gestionnaire/tickets/{{ticket_id}}/clos",
+            "description": "Appeler après avoir clos le ticket — doit retourner 422."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚫 Tests de sécurité",
+      "description": "Vérifie que les guards d'autorisation fonctionnent correctement.",
+      "item": [
+        {
+          "name": "Sans token → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 401', () => pm.response.to.have.status(401));",
+                  "console.log('✅ Guard auth OK');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": "{{base_url}}/api/gestionnaire/dashboard",
+            "description": "Doit retourner 401 sans token."
+          }
+        },
+        {
+          "name": "Token manager sur route gestionnaire → 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 403', () => pm.response.to.have.status(403));",
+                  "console.log('✅ Guard rôle OK');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{manager_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "url": "{{base_url}}/api/gestionnaire/dashboard",
+            "description": "Token manager (role:manager) sur route protégée role:gestionnaire → 403."
+          }
+        }
+      ]
+    }
+  ]
+}

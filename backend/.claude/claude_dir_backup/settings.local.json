@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth:*)",
+      "Bash(git -C /Users/Abdellah/projects/syndikpro status)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(gh repo:*)",
+      "Bash(git remote:*)",
+      "Bash(git push:*)",
+      "Bash(git checkout:*)",
+      "Bash(gh api:*)",
+      "Bash(php --version)",
+      "Bash(composer --version)",
+      "Bash(mysql --version)",
+      "Bash(redis-cli ping:*)",
+      "Bash(brew services:*)",
+      "Bash(composer create-project:*)"
+    ]
+  }
+}

@@ -14,11 +14,14 @@ class StoreAppelFondsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'libelle' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:1000'],
+            // Le frontend envoie 'titre', le backend stocke sous 'libelle'
+            'titre'        => ['required_without:libelle', 'string', 'max:255'],
+            'libelle'      => ['required_without:titre', 'string', 'max:255'],
+            'description'  => ['nullable', 'string', 'max:1000'],
             'residence_id' => ['required', 'integer', 'exists:residences,id'],
-            'montant_total' => ['required', 'numeric', 'min:1'],
-            'date_echeance' => ['required', 'date', 'after:today'],
+            'exercice_id'  => ['nullable', 'integer', 'exists:exercices,id'],
+            'montant_total'=> ['required', 'numeric', 'min:1'],
+            'date_echeance'=> ['required', 'date'],
         ];
     }
 }

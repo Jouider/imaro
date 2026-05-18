@@ -10,22 +10,24 @@ class CoproprietaireResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'type' => $this->type,
-            'date_entree' => $this->date_entree?->toDateString(),
-            'solde_actuel' => $this->solde_actuel,
-            'user' => $this->when($this->relationLoaded('user'), fn () => [
-                'id' => $this->user->id,
-                'name' => $this->user->name,
-                'phone' => $this->user->phone,
-                'email' => $this->user->email,
+            'id'    => $this->id,
+            'name'  => $this->when($this->relationLoaded('user'), fn () => $this->user?->name),
+            'phone' => $this->when($this->relationLoaded('user'), fn () => $this->user?->phone),
+            'email' => $this->when($this->relationLoaded('user'), fn () => $this->user?->email),
+            'solde' => $this->solde_actuel,
+            'lot'   => $this->when($this->relationLoaded('lot') && $this->lot, fn () => [
+                'id'      => $this->lot->id,
+                'numero'  => $this->lot->numero,
+                'type'    => $this->lot->type,
+                'tantieme'=> $this->lot->tantieme,
             ]),
-            'lot' => $this->when($this->relationLoaded('lot'), fn () => [
-                'id' => $this->lot->id,
-                'numero' => $this->lot->numero,
-                'type' => $this->lot->type,
-                'tantieme' => $this->lot->tantieme,
-            ]),
+            'residence' => $this->when(
+                $this->relationLoaded('lot') && $this->lot?->relationLoaded('residence') && $this->lot->residence,
+                fn () => [
+                    'id'   => $this->lot->residence->id,
+                    'name' => $this->lot->residence->name,
+                ]
+            ),
         ];
     }
 }

@@ -12,6 +12,17 @@ export type MeResponse = ApiEnvelope<{
   tenant: AuthTenant
 }>
 
+export type LoginEmailResponse = ApiEnvelope<{
+  token: string
+  user: AuthUser
+  tenant: AuthTenant
+}>
+
+export async function loginWithEmail(email: string, password: string) {
+  const { data } = await api.post<LoginEmailResponse>('/auth/login', { email, password })
+  return data.data
+}
+
 export async function requestOtp(phone: string) {
   const { data } = await api.post<RequestOtpResponse>('/auth/request-otp', {
     phone,

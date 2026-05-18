@@ -1,0 +1,39 @@
+name: Deploy Frontend (Staging)
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'frontend/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            set -e
+            cd /var/www/imaro-staging
+
+            echo "📦 Pull latest code..."
+            git pull origin develop
+
+            echo "📚 Install dependencies..."
+            cd frontend
+            npm ci
+
+            echo "🔨 Build..."
+            VITE_API_URL=https://api-staging.imaro.ma npm run build
+
+            echo "✅ Staging frontend deployed!"
