@@ -18,6 +18,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  UserCircle,
 } from 'lucide-react'
 import { Wordmark } from '@/components/Wordmark'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
@@ -119,6 +120,16 @@ const NAV_SECTIONS: NavSection[] = [
         to: '/gestionnaire/documents',
         icon: <FileText className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.documents',
+      },
+    ],
+  },
+  {
+    labelKey: null,
+    items: [
+      {
+        to: '/gestionnaire/profil',
+        icon: <UserCircle className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.profil',
       },
     ],
   },
