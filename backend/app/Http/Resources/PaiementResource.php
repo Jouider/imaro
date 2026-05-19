@@ -15,16 +15,23 @@ class PaiementResource extends JsonResource
             'mode' => $this->mode,
             'reference' => $this->reference,
             'note' => $this->note,
+            'notes' => $this->note,
             'date_paiement' => $this->date_paiement?->toDateString(),
+            'date' => $this->date_paiement?->toDateString(),
             'created_at' => $this->created_at?->toIso8601String(),
             'coproprietaire' => $this->when($this->relationLoaded('coproprietaire'), fn () => [
                 'id' => $this->coproprietaire->id,
                 'name' => $this->coproprietaire->user?->name,
                 'phone' => $this->coproprietaire->user?->phone,
-                'lot' => [
-                    'numero' => $this->coproprietaire->lot?->numero,
-                    'tantieme' => $this->coproprietaire->lot?->tantieme,
-                ],
+            ]),
+            'lot' => $this->when($this->relationLoaded('coproprietaire'), fn () => [
+                'id' => $this->coproprietaire->lot?->id,
+                'numero' => $this->coproprietaire->lot?->numero,
+            ]),
+            'appel_fonds' => $this->when($this->relationLoaded('appelFondsLigne'), fn () => [
+                'id' => $this->appelFondsLigne->appelFonds?->id,
+                'reference' => $this->appelFondsLigne->appelFonds?->reference
+                    ?? 'AF-'.date('Y').'-'.str_pad($this->appelFondsLigne->appel_fonds_id, 3, '0', STR_PAD_LEFT),
             ]),
             'ligne' => $this->when($this->relationLoaded('appelFondsLigne'), fn () => [
                 'id' => $this->appelFondsLigne->id,

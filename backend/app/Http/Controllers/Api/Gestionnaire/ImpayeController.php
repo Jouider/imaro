@@ -66,6 +66,7 @@ class ImpayeController extends Controller
                 'montant_du' => $ligne->montant_du,
                 'montant_paye' => $ligne->montant_paye,
                 'montant_reste' => round($ligne->montant_du - $ligne->montant_paye, 2),
+                'montant_restant' => round($ligne->montant_du - $ligne->montant_paye, 2),
                 'statut' => $ligne->statut,
                 'jours_retard' => $joursRetard,
                 'appel_fonds' => [
