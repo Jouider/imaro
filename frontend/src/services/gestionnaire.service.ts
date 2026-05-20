@@ -68,8 +68,10 @@ export type CreateCoproprietaireInput = {
   name: string
   phone: string
   email?: string
+  residence_id: number
   lot_id: number
   type?: 'proprietaire' | 'locataire'
+  date_entree?: string
 }
 
 export type CreateCoproprietaireResponse = {

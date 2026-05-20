@@ -74,6 +74,7 @@ function CreateCoproprietaireDialog({
         name,
         phone: `+212${phoneDigits}`,
         ...(email ? { email } : {}),
+        residence_id: Number(residenceId),
         lot_id: Number(lotId),
       }),
     onSuccess: (result) => {
