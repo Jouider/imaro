@@ -28,15 +28,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { KpiCard, LoadingSkeleton, EmptyState } from '@/components/shared'
 import {
-  getDashboardKpis,
+  getDashboard,
   getRecouvrementMensuel,
   getResidences,
-  getTopImpayes,
-  getTicketsUrgents,
-  getAssembleesAvenir,
-  type Impaye,
-  type TicketUrgent,
-  type AG,
+  type DashboardTopImpaye,
+  type DashboardTicketUrgent,
+  type DashboardAssemblee,
 } from '@/services/gestionnaire.service'
 import { formatMontant } from '@/lib/utils'
 
@@ -78,16 +75,16 @@ function getCategorieIcon(categorie: string) {
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-type ImpayeRowProps = { impaye: Impaye }
+type ImpayeRowProps = { impaye: DashboardTopImpaye }
 
 function ImpayeRow({ impaye }: ImpayeRowProps) {
   const { t } = useTranslation()
-  const { jours_retard, coproprietaire, lot, montant_restant } = impaye
+  const { jours, coproprietaire, lot, montant } = impaye
 
   const badgeClass =
-    jours_retard > 60
+    jours > 60
       ? 'bg-[var(--color-imaro-danger)]/10 text-[var(--color-imaro-danger)]'
-      : jours_retard > 30
+      : jours > 30
         ? 'bg-[var(--color-imaro-warning)]/10 text-[var(--color-imaro-warning)]'
         : 'bg-muted text-muted-foreground'
 
@@ -100,23 +97,23 @@ function ImpayeRow({ impaye }: ImpayeRowProps) {
         <p className="truncate text-sm font-medium text-[var(--color-imaro-text)] dark:text-foreground">
           {coproprietaire.name}
         </p>
-        <p className="text-xs text-muted-foreground">Lot {lot.numero}</p>
+        <p className="text-xs text-muted-foreground">Lot {lot}</p>
       </div>
       <div className="flex flex-col items-end gap-1">
         <span className="text-sm font-semibold text-[var(--color-imaro-danger)]">
-          {formatMontant(montant_restant)}
+          {formatMontant(montant)}
         </span>
         <span
           className={`rounded-full px-1.5 py-0.5 text-xs font-medium ${badgeClass}`}
         >
-          {t('gestionnaire.dashboard.topImpayes.jours', { n: jours_retard })}
+          {t('gestionnaire.dashboard.topImpayes.jours', { n: jours })}
         </span>
       </div>
     </div>
   )
 }
 
-type TicketRowProps = { ticket: TicketUrgent }
+type TicketRowProps = { ticket: DashboardTicketUrgent }
 
 function TicketRow({ ticket }: TicketRowProps) {
   return (
@@ -124,13 +121,13 @@ function TicketRow({ ticket }: TicketRowProps) {
       <div className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-[var(--color-imaro-danger)]" />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          {getCategorieIcon(ticket.categorie)}
+          {getCategorieIcon(ticket.titre)}
           <p className="truncate text-sm font-medium text-[var(--color-imaro-text)] dark:text-foreground">
-            {ticket.description}
+            {ticket.titre}
           </p>
         </div>
         <p className="mt-0.5 text-xs text-muted-foreground">
-          {ticket.residence.name} · Lot {ticket.lot.numero}
+          {ticket.residence.name}
         </p>
       </div>
       <span className="shrink-0 text-xs text-muted-foreground">
@@ -140,7 +137,7 @@ function TicketRow({ ticket }: TicketRowProps) {
   )
 }
 
-type AgRowProps = { ag: AG }
+type AgRowProps = { ag: DashboardAssemblee }
 
 function AgRow({ ag }: AgRowProps) {
   return (
@@ -150,14 +147,11 @@ function AgRow({ ag }: AgRowProps) {
         <p className="truncate text-sm font-medium text-[var(--color-imaro-text)] dark:text-foreground">
           {ag.titre}
         </p>
-        <p className="text-xs text-muted-foreground">{ag.residence_name}</p>
+        <p className="text-xs text-muted-foreground">{ag.residence.name}</p>
       </div>
       <div className="flex flex-col items-end gap-0.5 shrink-0">
         <span className="text-xs font-medium text-[var(--color-imaro-primary)]">
           {formatDateShort(ag.date)}
-        </span>
-        <span className="text-xs text-muted-foreground">
-          {ag.lieu.split(',')[0]}
         </span>
       </div>
     </div>
@@ -290,9 +284,9 @@ export function DashboardPage() {
     queryFn: () => getResidences(),
   })
 
-  const kpiQuery = useQuery({
-    queryKey: ['gestionnaire', 'kpi', residenceId],
-    queryFn: () => getDashboardKpis(residenceId),
+  const dashboardQuery = useQuery({
+    queryKey: ['gestionnaire', 'dashboard', residenceId],
+    queryFn: () => getDashboard(residenceId),
   })
 
   const chartQuery = useQuery({
@@ -300,22 +294,7 @@ export function DashboardPage() {
     queryFn: () => getRecouvrementMensuel(),
   })
 
-  const impayesQuery = useQuery({
-    queryKey: ['gestionnaire', 'impayes', residenceId],
-    queryFn: () => getTopImpayes(residenceId, 10),
-  })
-
-  const ticketsQuery = useQuery({
-    queryKey: ['gestionnaire', 'tickets-urgents', residenceId],
-    queryFn: () => getTicketsUrgents(residenceId),
-  })
-
-  const agQuery = useQuery({
-    queryKey: ['gestionnaire', 'assemblees'],
-    queryFn: getAssembleesAvenir,
-  })
-
-  const kpi = kpiQuery.data
+  const dashboard = dashboardQuery.data
   const residences = residencesQuery.data ?? []
 
 
@@ -346,32 +325,28 @@ export function DashboardPage() {
       </div>
 
       {/* B — KPI cards */}
-      {kpiQuery.isLoading ? (
+      {dashboardQuery.isLoading ? (
         <LoadingSkeleton variant="kpi" count={4} />
       ) : (
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <KpiCard
             icon={<Building2 className="size-5" />}
-            value={kpi?.residences_count ?? 0}
+            value={dashboard?.kpi.nb_residences ?? 0}
             label={t('gestionnaire.dashboard.kpi.residences')}
           />
           <KpiCard
             icon={<Users className="size-5" />}
-            value={kpi?.lots_count ?? 0}
+            value={dashboard?.kpi.nb_coproprietaires ?? 0}
             label={t('gestionnaire.dashboard.kpi.coproprietaires')}
           />
           <KpiCard
             icon={<TrendingUp className="size-5" />}
-            value={formatMontant(kpi?.montant_recouvre ?? 0)}
+            value={formatMontant(dashboard?.kpi.ca_mensuel ?? 0)}
             label={t('gestionnaire.dashboard.kpi.caMensuel')}
-            trend={{
-              value: kpi?.taux_recouvrement ?? 0,
-              label: 'taux recouvrement',
-            }}
           />
           <KpiCard
             icon={<AlertCircle className="size-5" />}
-            value={formatMontant(kpi?.montant_restant ?? 0)}
+            value={formatMontant(dashboard?.kpi.total_impayes ?? 0)}
             label={t('gestionnaire.dashboard.kpi.impayes')}
           />
         </div>
@@ -384,14 +359,6 @@ export function DashboardPage() {
             <CardTitle className="text-base font-semibold text-[var(--color-imaro-primary)] dark:text-foreground">
               {t('gestionnaire.dashboard.chart.title')}
             </CardTitle>
-            {kpi && (
-              <Badge
-                variant="outline"
-                className="border-[var(--color-imaro-primary)] text-[var(--color-imaro-primary)]"
-              >
-                {kpi.taux_recouvrement}%
-              </Badge>
-            )}
           </div>
         </CardHeader>
         <CardContent>
@@ -416,11 +383,11 @@ export function DashboardPage() {
               <CardTitle className="text-base font-semibold text-[var(--color-imaro-primary)] dark:text-foreground">
                 {t('gestionnaire.dashboard.topImpayes.title')}
               </CardTitle>
-              {impayesQuery.data && impayesQuery.data.length > 0 && (
+              {dashboard?.top_impayes && dashboard.top_impayes.length > 0 && (
                 <Badge className="bg-[var(--color-imaro-danger)] text-white">
                   {formatMontant(
-                    impayesQuery.data.reduce(
-                      (acc, i) => acc + i.montant_restant,
+                    dashboard.top_impayes.reduce(
+                      (acc, i) => acc + i.montant,
                       0,
                     ),
                   )}
@@ -429,18 +396,18 @@ export function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent className="pt-0">
-            {impayesQuery.isLoading ? (
+            {dashboardQuery.isLoading ? (
               <LoadingSkeleton variant="table" count={5} />
-            ) : !impayesQuery.data?.length ? (
+            ) : !dashboard?.top_impayes?.length ? (
               <EmptyState
                 icon={<AlertCircle className="size-12" />}
                 title={t('gestionnaire.dashboard.topImpayes.title')}
               />
             ) : (
               <div>
-                {impayesQuery.data.map((impaye) => (
+                {dashboard.top_impayes.map((impaye) => (
                   <ImpayeRow
-                    key={`${impaye.coproprietaire.id}-${impaye.lot.numero}`}
+                    key={`${impaye.coproprietaire.id}-${impaye.lot}`}
                     impaye={impaye}
                   />
                 ))}
@@ -458,24 +425,24 @@ export function DashboardPage() {
                 <CardTitle className="text-base font-semibold text-[var(--color-imaro-primary)] dark:text-foreground">
                   {t('gestionnaire.dashboard.ticketsUrgents.title')}
                 </CardTitle>
-                {ticketsQuery.data && ticketsQuery.data.length > 0 && (
+                {dashboard?.tickets_urgents && dashboard.tickets_urgents.length > 0 && (
                   <Badge className="bg-[var(--color-imaro-danger)] text-white">
-                    {ticketsQuery.data.length}
+                    {dashboard.tickets_urgents.length}
                   </Badge>
                 )}
               </div>
             </CardHeader>
             <CardContent className="pt-0">
-              {ticketsQuery.isLoading ? (
+              {dashboardQuery.isLoading ? (
                 <LoadingSkeleton variant="table" count={3} />
-              ) : !ticketsQuery.data?.length ? (
+              ) : !dashboard?.tickets_urgents?.length ? (
                 <EmptyState
                   icon={<Wrench className="size-12" />}
                   title={t('gestionnaire.dashboard.ticketsUrgents.empty')}
                 />
               ) : (
                 <div>
-                  {ticketsQuery.data.map((ticket) => (
+                  {dashboard.tickets_urgents.map((ticket) => (
                     <TicketRow key={ticket.id} ticket={ticket} />
                   ))}
                 </div>
@@ -491,16 +458,16 @@ export function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              {agQuery.isLoading ? (
+              {dashboardQuery.isLoading ? (
                 <LoadingSkeleton variant="table" count={2} />
-              ) : !agQuery.data?.length ? (
+              ) : !dashboard?.assemblees_a_venir?.length ? (
                 <EmptyState
                   icon={<CalendarDays className="size-12" />}
                   title={t('gestionnaire.dashboard.assemblees.empty')}
                 />
               ) : (
                 <div>
-                  {agQuery.data.map((ag) => (
+                  {dashboard.assemblees_a_venir.map((ag) => (
                     <AgRow key={ag.id} ag={ag} />
                   ))}
                 </div>

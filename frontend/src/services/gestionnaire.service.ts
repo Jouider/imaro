@@ -15,6 +15,41 @@ async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
+export type DashboardTopImpaye = {
+  coproprietaire: { id: number; name: string }
+  lot: string          // "C209" — plain string
+  montant: number
+  jours: number
+}
+
+export type DashboardTicketUrgent = {
+  id: number
+  titre: string
+  priorite: string
+  statut: string
+  residence: { id: number; name: string }
+  created_at: string
+}
+
+export type DashboardAssemblee = {
+  id: number
+  titre: string
+  date: string
+  residence: { name: string }
+}
+
+export type DashboardData = {
+  kpi: {
+    nb_residences: number
+    nb_coproprietaires: number
+    ca_mensuel: number
+    total_impayes: number
+  }
+  top_impayes: DashboardTopImpaye[]
+  tickets_urgents: DashboardTicketUrgent[]
+  assemblees_a_venir: DashboardAssemblee[]
+}
+
 export type DashboardKpi = {
   residences_count: number
   lots_count: number
@@ -219,11 +254,6 @@ const MOCK_KPI_ALL: DashboardKpi = {
   appels_fonds_actifs: 1,
 }
 
-const MOCK_KPI_BY_RESIDENCE: Record<number, DashboardKpi> = {
-  1: { residences_count: 1, lots_count: 24, taux_recouvrement: 83, montant_recouvre: 9960, montant_restant: 2040, tickets_ouverts: 2, tickets_urgents: 1, appels_fonds_actifs: 1 },
-  2: { residences_count: 1, lots_count: 18, taux_recouvrement: 72, montant_recouvre: 7920, montant_restant: 3080, tickets_ouverts: 1, tickets_urgents: 1, appels_fonds_actifs: 0 },
-  3: { residences_count: 1, lots_count: 20, taux_recouvrement: 78, montant_recouvre: 6420, montant_restant: 1780, tickets_ouverts: 1, tickets_urgents: 0, appels_fonds_actifs: 0 },
-}
 
 const MOCK_RECOUVREMENT_MENSUEL: RecouvrementMois[] = [
   { mois: 'Jan', taux: 68, recouvre: 16320, restant: 7680 },
@@ -336,13 +366,38 @@ const MOCK_ASSEMBLEES_AG: AG[] = MOCK_ASSEMBLEES.map((a) => ({
 
 // ─── Dashboard ───────────────────────────────────────────────────────────────
 
-export async function getDashboardKpis(residenceId?: number): Promise<DashboardKpi> {
-  const mock = residenceId !== undefined
-    ? (MOCK_KPI_BY_RESIDENCE[residenceId] ?? MOCK_KPI_ALL)
-    : MOCK_KPI_ALL
+export async function getDashboard(residenceId?: number): Promise<DashboardData> {
+  const mock: DashboardData = {
+    kpi: {
+      nb_residences: MOCK_KPI_ALL.residences_count,
+      nb_coproprietaires: MOCK_KPI_ALL.lots_count,
+      ca_mensuel: MOCK_KPI_ALL.montant_recouvre,
+      total_impayes: MOCK_KPI_ALL.montant_restant,
+    },
+    top_impayes: MOCK_IMPAYES.slice(0, 5).map((i) => ({
+      coproprietaire: { id: i.coproprietaire.id, name: i.coproprietaire.name },
+      lot: i.lot.numero,
+      montant: i.montant_restant,
+      jours: i.jours_retard,
+    })),
+    tickets_urgents: MOCK_TICKETS.filter((t) => t.priorite === 'urgent').slice(0, 3).map((t) => ({
+      id: t.id,
+      titre: t.description,
+      priorite: t.priorite,
+      statut: t.statut,
+      residence: t.residence,
+      created_at: t.created_at,
+    })),
+    assemblees_a_venir: MOCK_ASSEMBLEES.slice(0, 3).map((a) => ({
+      id: a.id,
+      titre: a.titre,
+      date: a.date,
+      residence: { name: a.residence.name },
+    })),
+  }
   return withMock(async () => {
     const params = residenceId !== undefined ? { residence_id: residenceId } : {}
-    const res = await api.get<ApiEnvelope<DashboardKpi>>('/gestionnaire/dashboard', { params })
+    const res = await api.get<ApiEnvelope<DashboardData>>('/gestionnaire/dashboard', { params })
     return res.data.data
   }, mock)
 }
