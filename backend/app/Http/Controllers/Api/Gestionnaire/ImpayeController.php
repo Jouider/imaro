@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Gestionnaire;
 
+use App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
 use App\Http\Controllers\Controller;
 use App\Models\AppelFondsLigne;
 use Carbon\Carbon;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 
 class ImpayeController extends Controller
 {
+    use AuthorizesResidence;
     /**
      * GET /api/gestionnaire/impayes
      * Liste des lignes impayées ou partielles sur les résidences du gestionnaire.
@@ -28,7 +30,7 @@ class ImpayeController extends Controller
                     $q->where('appels_fonds.statut', '!=', 'brouillon')
                         ->whereHas(
                             'residence',
-                            fn ($r) => $r->where('gestionnaire_id', $request->user()->id)
+                            $this->residenceScope($request)
                         );
                 }
             );

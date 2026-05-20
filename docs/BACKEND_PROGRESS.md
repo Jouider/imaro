@@ -1,4 +1,4 @@
-# Imaro — Backend Progress (2026-05-16)
+# Imaro — Backend Progress (2026-05-21)
 
 > **Pour Mouad** — ce fichier récapitule l'état exact du backend : tous les endpoints disponibles, les formats de réponse réels, les champs à connaître, et ce qui n'est pas encore implémenté.
 
@@ -98,15 +98,69 @@ PUT  /api/gestionnaire/residences/:id
   "nb_lots": 20,
   "total_tantieme": 1000,
   "taux_recouvrement": 75.0,
-  "exercice_actif": { "id": 1, "annee": 2026, "statut": "actif" }
+  "mode_cotisation": "tantieme",
+  "cotisation_mensuelle": null,
+  "exercice_actif": { "id": 1, "annee": 2026, "statut": "actif" },
+  "groupes_habitations": [...],
+  "immeubles": [...]
 }
 ```
+
+> **`mode_cotisation`** : `"tantieme"` (prorata sur 1000) ou `"fixe"` (même montant pour tous les lots). Si `"fixe"`, `cotisation_mensuelle` contient le montant par lot (ex : 2500 DH).
+
+---
+
+### Groupes d'habitation (Tranches)
+> Optionnel — à utiliser uniquement pour les grandes résidences avec plusieurs tranches.
+
+```
+GET    /api/gestionnaire/residences/:id/groupes-habitations
+POST   /api/gestionnaire/residences/:id/groupes-habitations
+PUT    /api/gestionnaire/residences/:id/groupes-habitations/:gh_id
+DELETE /api/gestionnaire/residences/:id/groupes-habitations/:gh_id
+```
+```json
+{
+  "id": 1,
+  "nom": "Tranche A",
+  "description": "Bâtiment Nord",
+  "total_tantieme": 1000,
+  "immeubles": [...]
+}
+```
+Corps POST/PUT : `{ nom, description?, total_tantieme? }`
+
+> Si une résidence a des GH, les budgets/exercices/appels de fonds sont gérés **par GH** (pas au niveau résidence).
+
+---
+
+### Immeubles
+```
+GET    /api/gestionnaire/residences/:id/immeubles
+POST   /api/gestionnaire/residences/:id/immeubles
+PUT    /api/gestionnaire/residences/:id/immeubles/:immeuble_id
+DELETE /api/gestionnaire/residences/:id/immeubles/:immeuble_id
+GET    /api/gestionnaire/immeubles/:immeuble_id/lots
+```
+```json
+{
+  "id": 1,
+  "nom": "Immeuble A",
+  "adresse": null,
+  "nb_etages": 4,
+  "nb_lots": 16,
+  "groupe_habitation_id": 1,
+  "groupe_habitation": { "id": 1, "nom": "Tranche A" }
+}
+```
+Corps POST : `{ nom, groupe_habitation_id?, adresse?, nb_etages? }`
 
 ---
 
 ### Lots
 ```
 GET    /api/gestionnaire/residences/:id/lots   → { lots: [...], total_tantieme: 1000, sum_tantieme: 1000 }
+GET    /api/gestionnaire/immeubles/:id/lots    → { lots: [...] }
 POST   /api/gestionnaire/residences/:id/lots
 PUT    /api/gestionnaire/lots/:id
 DELETE /api/gestionnaire/lots/:id
@@ -119,10 +173,12 @@ DELETE /api/gestionnaire/lots/:id
   "etage": 1,
   "superficie": 85.5,
   "tantieme": 120,
+  "immeuble_id": 1,
+  "immeuble": { "id": 1, "nom": "Immeuble A" },
   "proprietaire": { "id": 1, "name": "Hassan Benali" }
 }
 ```
-Corps POST/PUT : `{ numero, type, etage, superficie, tantieme }`
+Corps POST : `{ numero, type, etage, superficie, tantieme, immeuble_id }` ← **`immeuble_id` maintenant obligatoire**
 
 ---
 
@@ -366,12 +422,49 @@ DELETE /api/gestionnaire/budgets/:id/postes/:poste_id
   "exercice": { "id": 1, "annee": 2026 },
   "residence": { "id": 1, "name": "Résidence Atlas" },
   "postes": [
-    { "id": 1, "categorie": "entretien", "description": "Maintenance ascenseurs", "montant_prevu": 18000, "montant_realise": 18000 }
+    {
+      "id": 1,
+      "categorie": "entretien",
+      "description": "Maintenance ascenseurs",
+      "montant_prevu": 18000,
+      "montant_realise": 18000,
+      "prestataire_id": 1,
+      "prestataire": { "id": 1, "nom": "Atlas Ascenseurs SARL" },
+      "contrat_id": 1,
+      "contrat": { "id": 1, "titre": "Contrat maintenance 2026" },
+      "nombre": 12,
+      "prix_unitaire": 1500.00,
+      "cout_mensuel": 1500.00,
+      "nb_mois": 12,
+      "date_debut": "2026-01-01",
+      "date_fin": "2026-12-31"
+    }
   ]
 }
 ```
 Corps POST budget : `{ residence_id, exercice_id }`
-Corps POST/PUT poste : `{ categorie, description, montant_prevu, montant_realise? }`
+
+Corps POST/PUT poste — **2 modes** :
+
+**Mode simple** (montant direct) :
+```json
+{ "categorie": "entretien", "description": "...", "montant_prevu": 18000, "montant_realise": 0 }
+```
+
+**Mode détaillé** (calcul automatique) :
+```json
+{
+  "categorie": "entretien",
+  "description": "Maintenance ascenseurs",
+  "prestataire_id": 1,
+  "contrat_id": 1,
+  "nombre": 1,
+  "prix_unitaire": 1500.00,
+  "date_debut": "2026-01-01",
+  "date_fin": "2026-12-31"
+}
+```
+> Le backend calcule automatiquement : `cout_mensuel = nombre × prix_unitaire`, `nb_mois` depuis les dates, `montant_prevu = cout_mensuel × nb_mois`.
 
 Catégories : `entretien` | `gardiennage` | `nettoyage` | `administratif` | `travaux` | `assurance` | `autre`
 
@@ -531,6 +624,15 @@ PUT /api/portail/profil    { name?, email? }
 
 ---
 
+### Appels de fonds — mise à jour
+Le champ `groupe_habitation_id` est maintenant accepté dans le POST. Si la résidence a des GH (tranches), passer `groupe_habitation_id` pour scoper l'appel à une tranche uniquement.
+
+**Calcul auto adaptatif** :
+- `mode_cotisation = "tantieme"` → `montant_du = montant_total × (lot.tantieme / total_tantieme_scope)`
+- `mode_cotisation = "fixe"` → `montant_du = montant_total / nb_lots_scope`
+
+---
+
 ## Ce qui n'est pas encore implémenté (sprint 3)
 
 | Fonctionnalité | Raison |
@@ -550,5 +652,7 @@ PUT /api/portail/profil    { name?, email? }
 - **Storage URL dev** : `http://localhost:8000/storage/...` (après `php artisan storage:link`)
 - **CORS** : `*` configuré — pas de blocage en dev ni sur Vercel preview
 - **Auth OTP dev** : OTP visible dans `backend/storage/logs/laravel.log`
-- **Données démo** : `php artisan migrate:fresh --seed` — 1 résidence, 20 lots, 1 exercice actif 2026
+- **Données démo** : `php artisan migrate:fresh --seed` — 2 résidences, 30 lots, 1 exercice actif 2026
+  - **Résidence Atlas** (Casablanca, 20 lots) : mode tantième — 2 tranches (Tranche A : 16 lots, Tranche B : 4 lots)
+  - **Résidence Anfa Gardens** (Casablanca, 10 lots) : mode fixe 2500 DH/lot — 1 immeuble, pas de tranche
 - **Rôles disponibles en démo** : `gestionnaire` (Mohammed Fikri, +212600000001) et `resident` (Hassan Benali, +212661000001)

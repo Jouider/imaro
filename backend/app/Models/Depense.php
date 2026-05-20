@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Depense extends Model
 {
     protected $fillable = [
-        'tenant_id', 'exercice_id', 'residence_id', 'prestataire_id',
+        'tenant_id', 'exercice_id', 'residence_id', 'groupe_habitation_id', 'prestataire_id',
         'created_by', 'description', 'categorie', 'montant', 'date',
         'statut', 'facture_path',
     ];
@@ -29,6 +29,11 @@ class Depense extends Model
     public function residence(): BelongsTo
     {
         return $this->belongsTo(Residence::class);
+    }
+
+    public function groupeHabitation(): BelongsTo
+    {
+        return $this->belongsTo(GroupeHabitation::class);
     }
 
     public function prestataire(): BelongsTo

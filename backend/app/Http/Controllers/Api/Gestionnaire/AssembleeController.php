@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Gestionnaire;
 
+use App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AssembleeResource;
 use App\Models\Assemblee;
@@ -12,11 +13,10 @@ use Illuminate\Validation\Rule;
 
 class AssembleeController extends Controller
 {
+    use AuthorizesResidence;
     public function index(Request $request): JsonResponse
     {
-        $residenceIds = Residence::where('gestionnaire_id', $request->user()->id)
-            ->where('tenant_id', config('app.tenant_id'))
-            ->pluck('id');
+        $residenceIds = $this->accessibleResidenceIds($request);
 
         $assemblees = Assemblee::with('residence')
             ->where('tenant_id', config('app.tenant_id'))

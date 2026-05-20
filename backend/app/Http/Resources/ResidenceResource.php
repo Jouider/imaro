@@ -29,8 +29,12 @@ class ResidenceResource extends JsonResource
                 'id'   => $this->gestionnaire->id,
                 'name' => $this->gestionnaire->name,
             ]),
-            'lots'             => LotResource::collection($this->whenLoaded('lots')),
-            'created_at'       => $this->created_at?->toIso8601String(),
+            'mode_cotisation'       => $this->mode_cotisation,
+            'cotisation_mensuelle'  => $this->cotisation_mensuelle,
+            'groupes_habitations'   => GroupeHabitationResource::collection($this->whenLoaded('groupesHabitations')),
+            'immeubles'             => ImmeubleResource::collection($this->whenLoaded('immeubles')),
+            'lots'                  => LotResource::collection($this->whenLoaded('lots')),
+            'created_at'            => $this->created_at?->toIso8601String(),
         ];
     }
 }

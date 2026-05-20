@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Residence extends Model
@@ -16,6 +17,7 @@ class Residence extends Model
     protected $fillable = [
         'tenant_id', 'gestionnaire_id', 'name', 'address',
         'city', 'photo', 'total_tantieme', 'nb_lots', 'status',
+        'mode_cotisation', 'cotisation_mensuelle',
     ];
 
     protected static function booted(): void
@@ -65,6 +67,26 @@ class Residence extends Model
     public function assemblees(): HasMany
     {
         return $this->hasMany(Assemblee::class);
+    }
+
+    public function groupesHabitations(): HasMany
+    {
+        return $this->hasMany(GroupeHabitation::class);
+    }
+
+    public function immeubles(): HasMany
+    {
+        return $this->hasMany(Immeuble::class);
+    }
+
+    public function lotsViaImmeubles(): HasManyThrough
+    {
+        return $this->hasManyThrough(Lot::class, Immeuble::class);
+    }
+
+    public function hasGroupesHabitations(): bool
+    {
+        return $this->groupesHabitations()->exists();
     }
 
     public function getTauxRecouvrementAttribute(): float
