@@ -21,7 +21,7 @@ class BudgetController extends Controller
             'exercice_id'  => 'required|exists:exercices,id',
         ]);
 
-        $budget = Budget::with(['residence', 'exercice', 'postes'])
+        $budget = Budget::with(['residence', 'exercice', 'postes.prestataire', 'postes.contrat'])
             ->where('tenant_id', config('app.tenant_id'))
             ->where('residence_id', $request->residence_id)
             ->where('exercice_id', $request->exercice_id)
@@ -72,7 +72,7 @@ class BudgetController extends Controller
             'approuve_at' => Carbon::now(),
         ]);
 
-        $budget->load(['residence', 'exercice', 'postes']);
+        $budget->load(['residence', 'exercice', 'postes.prestataire', 'postes.contrat']);
 
         return response()->json([
             'status'  => 'success',
@@ -88,16 +88,22 @@ class BudgetController extends Controller
         $data = $request->validate([
             'categorie'       => ['required', Rule::in(['entretien', 'gardiennage', 'nettoyage', 'administratif', 'travaux', 'assurance', 'autre'])],
             'description'     => 'required|string|max:255',
-            'montant_prevu'   => 'required|numeric|min:0',
+            'prestataire_id'  => 'nullable|exists:prestataires,id',
+            'contrat_id'      => 'nullable|exists:contrats,id',
+            'nombre'          => 'nullable|integer|min:1',
+            'prix_unitaire'   => 'nullable|numeric|min:0',
+            'cout_mensuel'    => 'nullable|numeric|min:0',
+            'date_debut'      => 'nullable|date',
+            'date_fin'        => 'nullable|date|after_or_equal:date_debut',
+            'nb_mois'         => 'nullable|integer|min:1|max:12',
+            'montant_prevu'   => 'nullable|numeric|min:0',
             'montant_realise' => 'nullable|numeric|min:0',
         ]);
 
-        $poste = $budget->postes()->create([
-            'categorie'       => $data['categorie'],
-            'description'     => $data['description'],
-            'montant_prevu'   => $data['montant_prevu'],
-            'montant_realise' => $data['montant_realise'] ?? 0,
-        ]);
+        $computed = $this->computePoste($data);
+
+        $poste = $budget->postes()->create($computed);
+        $poste->load(['prestataire', 'contrat']);
 
         return response()->json([
             'status'  => 'success',
@@ -114,11 +120,28 @@ class BudgetController extends Controller
         $data = $request->validate([
             'categorie'       => ['sometimes', Rule::in(['entretien', 'gardiennage', 'nettoyage', 'administratif', 'travaux', 'assurance', 'autre'])],
             'description'     => 'sometimes|string|max:255',
-            'montant_prevu'   => 'sometimes|numeric|min:0',
+            'prestataire_id'  => 'nullable|exists:prestataires,id',
+            'contrat_id'      => 'nullable|exists:contrats,id',
+            'nombre'          => 'nullable|integer|min:1',
+            'prix_unitaire'   => 'nullable|numeric|min:0',
+            'cout_mensuel'    => 'nullable|numeric|min:0',
+            'date_debut'      => 'nullable|date',
+            'date_fin'        => 'nullable|date|after_or_equal:date_debut',
+            'nb_mois'         => 'nullable|integer|min:1|max:12',
+            'montant_prevu'   => 'nullable|numeric|min:0',
             'montant_realise' => 'sometimes|numeric|min:0',
         ]);
 
-        $poste->update($data);
+        // Merge existing values with incoming for re-computation
+        $merged = array_merge($poste->only([
+            'nombre', 'prix_unitaire', 'cout_mensuel',
+            'date_debut', 'date_fin', 'nb_mois', 'montant_prevu',
+        ]), $data);
+
+        $computed = $this->computePoste($merged);
+
+        $poste->update($computed);
+        $poste->load(['prestataire', 'contrat']);
 
         return response()->json([
             'status'  => 'success',
@@ -135,5 +158,43 @@ class BudgetController extends Controller
         $poste->delete();
 
         return response()->json(['status' => 'success', 'message' => 'Poste supprimé']);
+    }
+
+    /**
+     * Auto-calcule cout_mensuel, nb_mois et montant_prevu à partir des champs saisis.
+     *
+     * Priorités :
+     *  1. cout_mensuel = nombre × prix_unitaire  (si les deux sont fournis)
+     *  2. nb_mois      = diff(date_debut, date_fin) en mois  (si les deux dates sont fournies)
+     *  3. montant_prevu = cout_mensuel × nb_mois
+     */
+    private function computePoste(array $data): array
+    {
+        // 1. cout_mensuel
+        if (isset($data['nombre'], $data['prix_unitaire'])) {
+            $data['cout_mensuel'] = round($data['nombre'] * $data['prix_unitaire'], 2);
+        }
+
+        // 2. nb_mois depuis les dates (si pas saisi manuellement)
+        if (empty($data['nb_mois']) && ! empty($data['date_debut']) && ! empty($data['date_fin'])) {
+            $debut = Carbon::parse($data['date_debut']);
+            $fin   = Carbon::parse($data['date_fin']);
+            // Inclure le mois de début et de fin
+            $data['nb_mois'] = (int) max(1, $debut->diffInMonths($fin) + 1);
+        }
+
+        // 3. montant_prevu (si pas saisi manuellement)
+        if (empty($data['montant_prevu']) && isset($data['cout_mensuel'], $data['nb_mois'])) {
+            $data['montant_prevu'] = round($data['cout_mensuel'] * $data['nb_mois'], 2);
+        }
+
+        // Fallback : montant_prevu = cout_mensuel si nb_mois absent
+        if (empty($data['montant_prevu']) && isset($data['cout_mensuel'])) {
+            $data['montant_prevu'] = $data['cout_mensuel'];
+        }
+
+        $data['montant_realise'] = $data['montant_realise'] ?? 0;
+
+        return $data;
     }
 }
