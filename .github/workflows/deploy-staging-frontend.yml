@@ -34,6 +34,6 @@ jobs:
             npm ci
 
             echo "🔨 Build..."
-            VITE_API_URL=https://api-staging.imaro.ma/api npm run build
+            VITE_API_URL=https://api.imaro.ma/api npm run build
 
             echo "✅ Staging frontend deployed!"
