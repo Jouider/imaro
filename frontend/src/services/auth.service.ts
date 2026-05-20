@@ -1,42 +1,50 @@
 import { api, type ApiEnvelope } from '@/lib/axios'
 import type { AuthTenant, AuthUser } from '@/stores/authStore'
 
-export type RequestOtpResponse = ApiEnvelope<{ expires_in: number }>
-export type VerifyOtpResponse = ApiEnvelope<{
-  token: string
-  user: AuthUser
-  tenant: AuthTenant
-}>
-export type MeResponse = ApiEnvelope<{
-  user: AuthUser
-  tenant: AuthTenant
-}>
+// ─── Shared session data ──────────────────────────────────────────────────────
 
-export type LoginEmailResponse = ApiEnvelope<{
-  token: string
-  user: AuthUser
-  tenant: AuthTenant
-}>
+type SessionData = { token: string; user: AuthUser; tenant: AuthTenant }
+
+// ─── Gestionnaire / Admin login (email + password) ────────────────────────────
+
+export type LoginEmailResponse = ApiEnvelope<SessionData>
 
 export async function loginWithEmail(email: string, password: string) {
   const { data } = await api.post<LoginEmailResponse>('/auth/login', { email, password })
   return data.data
 }
 
-export async function requestOtp(phone: string) {
-  const { data } = await api.post<RequestOtpResponse>('/auth/request-otp', {
+// ─── Resident login (phone + code) ───────────────────────────────────────────
+
+/** Backend returns either a session (success) or a first-login signal */
+export type ResidentLoginResponse =
+  | { status: 'success'; data: SessionData }
+  | { status: 'first_login'; data: { phone: string } }
+  | { status: 'error'; message: string }
+
+export async function residentLogin(phone: string, code: string): Promise<ResidentLoginResponse> {
+  const { data } = await api.post<ResidentLoginResponse>('/auth/resident/login', { phone, code })
+  return data
+}
+
+/** Called on first login — resident sets their own personal code */
+export async function residentActivate(
+  phone: string,
+  tempCode: string,
+  newCode: string,
+): Promise<SessionData> {
+  const { data } = await api.post<ApiEnvelope<SessionData>>('/auth/resident/activate', {
     phone,
+    temp_code: tempCode,
+    new_code: newCode,
+    new_code_confirmation: newCode,
   })
   return data.data
 }
 
-export async function verifyOtp(phone: string, otp: string) {
-  const { data } = await api.post<VerifyOtpResponse>('/auth/verify-otp', {
-    phone,
-    otp,
-  })
-  return data.data
-}
+// ─── Shared ───────────────────────────────────────────────────────────────────
+
+export type MeResponse = ApiEnvelope<{ user: AuthUser; tenant: AuthTenant }>
 
 export async function me() {
   const { data } = await api.get<MeResponse>('/auth/me')

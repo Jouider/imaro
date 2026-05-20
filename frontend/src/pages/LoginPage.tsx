@@ -1,11 +1,4 @@
-import {
-  useState,
-  useEffect,
-  useRef,
-  type ChangeEvent,
-  type KeyboardEvent,
-  type ClipboardEvent,
-} from 'react'
+import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -20,13 +13,14 @@ import {
   Globe,
   Mail,
   Lock,
+  KeyRound,
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { Wordmark } from '@/components/Wordmark'
-import { requestOtp, verifyOtp, loginWithEmail } from '@/services/auth.service'
+import { loginWithEmail, residentLogin, residentActivate } from '@/services/auth.service'
 import { setStoredToken } from '@/lib/axios'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
@@ -34,112 +28,7 @@ import { cn } from '@/lib/utils'
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Role = 'gestionnaire' | 'resident'
-type Step = 'role' | 'phone' | 'otp'
-
-// ─── OTP cooldown ─────────────────────────────────────────────────────────────
-
-const OTP_COOLDOWN = 60
-
-function useCooldown() {
-  const [seconds, setSeconds] = useState(0)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  const start = () => {
-    setSeconds(OTP_COOLDOWN)
-    if (intervalRef.current) clearInterval(intervalRef.current)
-    intervalRef.current = setInterval(() => {
-      setSeconds((prev) => {
-        if (prev <= 1) {
-          clearInterval(intervalRef.current!)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-  }
-
-  useEffect(
-    () => () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    },
-    [],
-  )
-
-  return { seconds, start, active: seconds > 0 }
-}
-
-// ─── OTP 6-box input ──────────────────────────────────────────────────────────
-
-type OtpBoxesProps = { value: string; onChange: (v: string) => void }
-
-function OtpBoxes({ value, onChange }: OtpBoxesProps) {
-  const refsEl = useRef<(HTMLInputElement | null)[]>([])
-
-  function focusBox(index: number) {
-    refsEl.current[Math.max(0, Math.min(5, index))]?.focus()
-  }
-
-  function handleChange(index: number, e: ChangeEvent<HTMLInputElement>) {
-    const digit = e.target.value.replace(/\D/g, '').slice(-1)
-    const chars = value.split('')
-    chars[index] = digit
-    const next = chars.join('').slice(0, 6)
-    onChange(next)
-    if (digit) focusBox(index + 1)
-  }
-
-  function handleKeyDown(index: number, e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Backspace') {
-      if (value[index]) {
-        const chars = value.split('')
-        chars[index] = ''
-        onChange(chars.join(''))
-      } else {
-        focusBox(index - 1)
-      }
-    } else if (e.key === 'ArrowLeft') {
-      focusBox(index - 1)
-    } else if (e.key === 'ArrowRight') {
-      focusBox(index + 1)
-    }
-  }
-
-  function handlePaste(e: ClipboardEvent<HTMLInputElement>) {
-    e.preventDefault()
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
-    onChange(pasted)
-    focusBox(Math.min(pasted.length, 5))
-  }
-
-  return (
-    <div className="flex justify-center gap-2.5" dir="ltr">
-      {Array.from({ length: 6 }, (_, i) => (
-        <input
-          key={i}
-          ref={(el) => {
-            refsEl.current[i] = el
-          }}
-          type="text"
-          inputMode="numeric"
-          maxLength={1}
-          value={value[i] ?? ''}
-          onChange={(e) => handleChange(i, e)}
-          onKeyDown={(e) => handleKeyDown(i, e)}
-          onPaste={handlePaste}
-          onFocus={(e) => e.target.select()}
-          aria-label={`Chiffre ${i + 1}`}
-          className={cn(
-            'h-12 w-12 rounded-xl border-2 bg-white text-center text-xl font-semibold',
-            'text-[#1B4F72] transition-all focus:outline-none',
-            value[i]
-              ? 'border-[#1B4F72] shadow-sm'
-              : 'border-border focus:border-[#1B4F72] focus:ring-2 focus:ring-[#1B4F72]/20',
-          )}
-        />
-      ))}
-    </div>
-  )
-}
+type Step = 'role' | 'phone' | 'code' | 'activate'
 
 // ─── Error helper ─────────────────────────────────────────────────────────────
 
@@ -218,58 +107,39 @@ const ROLE_CARDS: { id: Role; icon: typeof Building2; title: string; desc: strin
   },
 ]
 
+// ─── Shared input style ───────────────────────────────────────────────────────
+
+const inputCls =
+  'w-full min-h-[52px] rounded-xl border-2 border-border bg-white px-4 text-base text-[#1B4F72] placeholder:text-muted-foreground/50 transition-all focus:border-[#1B4F72] focus:outline-none focus:ring-4 focus:ring-[#1B4F72]/10 dark:bg-card'
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export function LoginPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const setSession = useAuthStore((s) => s.setSession)
-  const cooldown = useCooldown()
 
-  // Support ?role=gestionnaire or ?role=resident to skip role step
   const paramRole = searchParams.get('role') as Role | null
   const validParamRole =
     paramRole === 'gestionnaire' || paramRole === 'resident' ? paramRole : null
 
   const [role, setRole] = useState<Role | null>(validParamRole)
   const [step, setStep] = useState<Step>(validParamRole ? 'phone' : 'role')
-  const [digits, setDigits] = useState('')
-  const [otp, setOtp] = useState('')
+
+  // gestionnaire fields
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+
+  // resident fields
+  const [digits, setDigits] = useState('')
+  const [accessCode, setAccessCode] = useState('')   // temp code from gestionnaire
+  const [newCode, setNewCode] = useState('')          // personal code (activation)
+  const [newCodeConfirm, setNewCodeConfirm] = useState('')
 
   const fullPhone = `+212${digits}`
   const phoneValid = /^[67]\d{8}$/.test(digits)
 
-  // ── Request OTP ──
-  const requestMutation = useMutation({
-    mutationFn: () => requestOtp(fullPhone),
-    onSuccess: () => {
-      setStep('otp')
-      setOtp('')
-      cooldown.start()
-    },
-    onError: (err) => toast.error(extractError(err)),
-  })
-
-  // ── Verify OTP ──
-  const verifyMutation = useMutation({
-    mutationFn: () => verifyOtp(fullPhone, otp),
-    onSuccess: ({ token, user, tenant }) => {
-      setStoredToken(token)
-      setSession({ token, user, tenant })
-      void navigate(
-        role === 'gestionnaire' ? '/gestionnaire/dashboard' : '/portail',
-        { replace: true },
-      )
-    },
-    onError: (err) => {
-      toast.error(extractError(err))
-      setOtp('')
-    },
-  })
-
-  // ── Email+password login (gestionnaire) ──
+  // ── Gestionnaire — email + password ──
   const loginEmailMutation = useMutation({
     mutationFn: () => loginWithEmail(email, password),
     onSuccess: ({ token, user, tenant }) => {
@@ -280,13 +150,32 @@ export function LoginPage() {
     onError: (err) => toast.error(extractError(err)),
   })
 
-  // Auto-submit on complete OTP
-  useEffect(() => {
-    if (otp.length === 6 && !verifyMutation.isPending) {
-      verifyMutation.mutate()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [otp])
+  // ── Resident — phone + code ──
+  const residentLoginMutation = useMutation({
+    mutationFn: () => residentLogin(fullPhone, accessCode),
+    onSuccess: (res) => {
+      if (res.status === 'success') {
+        setStoredToken(res.data.token)
+        setSession(res.data)
+        void navigate('/portail', { replace: true })
+      } else if (res.status === 'first_login') {
+        // Resident must set their own personal code
+        setStep('activate')
+      }
+    },
+    onError: (err) => toast.error(extractError(err)),
+  })
+
+  // ── Resident — first-login activation ──
+  const activateMutation = useMutation({
+    mutationFn: () => residentActivate(fullPhone, accessCode, newCode),
+    onSuccess: ({ token, user, tenant }) => {
+      setStoredToken(token)
+      setSession({ token, user, tenant })
+      void navigate('/portail', { replace: true })
+    },
+    onError: (err) => toast.error(extractError(err)),
+  })
 
   function pickRole(r: Role) {
     setRole(r)
@@ -294,34 +183,25 @@ export function LoginPage() {
   }
 
   function goBack() {
-    if (step === 'otp') {
-      setStep('phone')
-      setOtp('')
-    } else {
-      setStep('role')
-      setRole(null)
-      setDigits('')
-    }
+    if (step === 'code') { setStep('phone'); setAccessCode('') }
+    else if (step === 'activate') { setStep('code'); setNewCode(''); setNewCodeConfirm('') }
+    else { setStep('role'); setRole(null); setDigits('') }
   }
 
   // ── Titles per step ──
   const title =
-    step === 'role'
-      ? 'Bienvenue sur Imaro'
-      : step === 'phone'
-        ? role === 'gestionnaire'
-          ? 'Espace Syndic'
-          : 'Espace Copropriétaire'
-        : 'Code de vérification'
+    step === 'role' ? 'Bienvenue sur Imaro'
+    : step === 'activate' ? 'Créez votre code personnel'
+    : step === 'code' ? 'Code d\'accès'
+    : role === 'gestionnaire' ? 'Espace Syndic'
+    : 'Espace Copropriétaire'
 
   const subtitle =
-    step === 'role'
-      ? 'Choisissez votre espace pour continuer'
-      : step === 'phone'
-        ? role === 'gestionnaire'
-          ? 'Connectez-vous avec vos identifiants'
-          : 'Entrez votre numéro de téléphone marocain'
-        : `Code envoyé via WhatsApp au +212 ${digits}`
+    step === 'role' ? 'Choisissez votre espace pour continuer'
+    : step === 'activate' ? 'Définissez un code personnel de 6 caractères minimum'
+    : step === 'code' ? `Entrez le code fourni par votre syndic pour +212 ${digits}`
+    : role === 'gestionnaire' ? 'Connectez-vous avec vos identifiants'
+    : 'Entrez votre numéro de téléphone marocain'
 
   return (
     <div className="flex min-h-svh bg-[#f4f7fa]">
@@ -409,15 +289,15 @@ export function LoginPage() {
                 ))}
 
                 <p className="pt-3 text-center text-xs text-muted-foreground">
-                  Connexion sécurisée par code WhatsApp — sans mot de passe
+                  Connexion sécurisée — syndics par email, copropriétaires par code d'accès
                 </p>
               </div>
             )}
 
             {/* ── Step: Phone (resident) or Email+Password (gestionnaire) ── */}
+            {/* ── Gestionnaire: email + password ── */}
             {step === 'phone' && role === 'gestionnaire' && (
               <form onSubmit={(e) => { e.preventDefault(); loginEmailMutation.mutate() }} className="space-y-5">
-                {/* Role badge */}
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 rounded-full border bg-[#1B4F72]/5 px-3 py-1 text-xs font-medium text-[#1B4F72]">
                     <Building2 className="size-3.5" />
@@ -436,7 +316,7 @@ export function LoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full min-h-[52px] rounded-xl border-2 border-border bg-white ps-10 pe-4 text-base text-[#1B4F72] placeholder:text-muted-foreground/50 transition-all focus:border-[#1B4F72] focus:outline-none focus:ring-4 focus:ring-[#1B4F72]/10 dark:bg-card"
+                      className={cn(inputCls, 'ps-10 pe-4')}
                     />
                   </div>
                 </div>
@@ -452,7 +332,7 @@ export function LoginPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full min-h-[52px] rounded-xl border-2 border-border bg-white ps-10 pe-4 text-base text-[#1B4F72] placeholder:text-muted-foreground/50 transition-all focus:border-[#1B4F72] focus:outline-none focus:ring-4 focus:ring-[#1B4F72]/10 dark:bg-card"
+                      className={cn(inputCls, 'ps-10 pe-4')}
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
@@ -470,15 +350,12 @@ export function LoginPage() {
               </form>
             )}
 
+            {/* ── Resident: enter phone ── */}
             {step === 'phone' && role === 'resident' && (
               <form
                 className="space-y-5"
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  requestMutation.mutate()
-                }}
+                onSubmit={(e) => { e.preventDefault(); setStep('code') }}
               >
-                {/* Role badge */}
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 rounded-full border bg-[#1B4F72]/5 px-3 py-1 text-xs font-medium text-[#1B4F72]">
                     <Users className="size-3.5" />
@@ -487,9 +364,7 @@ export function LoginPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="font-medium">
-                    Numéro de téléphone
-                  </Label>
+                  <Label htmlFor="phone">Numéro de téléphone</Label>
                   <div className="flex overflow-hidden rounded-xl border-2 border-border transition-all focus-within:border-[#1B4F72] focus-within:ring-4 focus-within:ring-[#1B4F72]/10">
                     <span className="flex items-center border-e bg-[#f4f7fa] px-4 text-sm font-bold text-[#1B4F72]">
                       +212
@@ -500,77 +375,125 @@ export function LoginPage() {
                       inputMode="numeric"
                       placeholder="6XX XX XX XX"
                       value={digits}
-                      onChange={(e) =>
-                        setDigits(e.target.value.replace(/\D/g, '').slice(0, 9))
-                      }
+                      onChange={(e) => setDigits(e.target.value.replace(/\D/g, '').slice(0, 9))}
                       required
                       dir="ltr"
                       className="min-h-[52px] flex-1 bg-white px-4 text-base text-[#1B4F72] placeholder:text-muted-foreground/50 focus:outline-none"
                     />
                   </div>
+                  <p className="text-xs text-muted-foreground">Ex : 6XX XX XX XX ou 7XX XX XX XX</p>
+                </div>
+
+                <Button
+                  type="submit"
+                  className="h-12 w-full bg-[#E67E22] text-base text-white hover:bg-[#d35400]"
+                  disabled={!phoneValid}
+                >
+                  Continuer
+                </Button>
+              </form>
+            )}
+
+            {/* ── Resident: enter access code (from gestionnaire) ── */}
+            {step === 'code' && (
+              <form
+                className="space-y-5"
+                onSubmit={(e) => { e.preventDefault(); residentLoginMutation.mutate() }}
+              >
+                <div className="rounded-xl bg-[#1B4F72]/5 px-4 py-3 text-sm text-[#1B4F72]">
+                  <span className="font-semibold">+212 {digits}</span>
+                  <span className="text-[#1B4F72]/60"> · Copropriétaire</span>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="access-code">Code d'accès</Label>
+                  <div className="relative">
+                    <KeyRound className="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                    <input
+                      id="access-code"
+                      type="text"
+                      placeholder="Code fourni par votre syndic"
+                      value={accessCode}
+                      onChange={(e) => setAccessCode(e.target.value.trim())}
+                      required
+                      autoComplete="off"
+                      className={cn(inputCls, 'ps-10 pe-4 font-mono tracking-wider')}
+                    />
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    Ex : 6XX XX XX XX ou 7XX XX XX XX
+                    Ce code vous a été communiqué par votre gestionnaire via WhatsApp.
                   </p>
                 </div>
 
                 <Button
                   type="submit"
                   className="h-12 w-full bg-[#E67E22] text-base text-white hover:bg-[#d35400]"
-                  disabled={requestMutation.isPending || !phoneValid}
+                  disabled={residentLoginMutation.isPending || accessCode.length < 6}
                 >
-                  {requestMutation.isPending ? (
-                    'Envoi en cours…'
-                  ) : (
-                    <span className="flex items-center justify-center gap-2">
-                      <MessageCircle className="size-5" />
-                      Recevoir le code WhatsApp
-                    </span>
-                  )}
+                  {residentLoginMutation.isPending ? 'Vérification…' : 'Accéder à mon espace'}
                 </Button>
               </form>
             )}
 
-            {/* ── Step: OTP ── */}
-            {step === 'otp' && (
-              <div className="space-y-6">
-                {/* WhatsApp icon hint */}
-                <div className="flex items-center justify-center gap-2 rounded-xl bg-green-50 py-3 text-sm text-green-700">
-                  <MessageCircle className="size-4 shrink-0" />
-                  <span>
-                    Code envoyé sur WhatsApp à <span className="font-semibold">+212 {digits}</span>
-                  </span>
+            {/* ── Resident: first-login — set personal code ── */}
+            {step === 'activate' && (
+              <form
+                className="space-y-5"
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  if (newCode !== newCodeConfirm) {
+                    toast.error('Les codes ne correspondent pas')
+                    return
+                  }
+                  if (newCode.length < 6) {
+                    toast.error('Code trop court (6 caractères minimum)')
+                    return
+                  }
+                  activateMutation.mutate()
+                }}
+              >
+                <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+                  <MessageCircle className="mb-1 size-4 inline-block me-1.5 text-amber-600" />
+                  Première connexion — choisissez un code personnel que vous utiliserez à chaque connexion.
                 </div>
 
-                <OtpBoxes value={otp} onChange={setOtp} />
+                <div className="space-y-2">
+                  <Label htmlFor="new-code">Nouveau code</Label>
+                  <input
+                    id="new-code"
+                    type="password"
+                    placeholder="6 caractères minimum"
+                    value={newCode}
+                    onChange={(e) => setNewCode(e.target.value)}
+                    required
+                    className={inputCls}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-code">Confirmer le code</Label>
+                  <input
+                    id="confirm-code"
+                    type="password"
+                    placeholder="Répétez votre code"
+                    value={newCodeConfirm}
+                    onChange={(e) => setNewCodeConfirm(e.target.value)}
+                    required
+                    className={cn(
+                      inputCls,
+                      newCodeConfirm && newCode !== newCodeConfirm && 'border-red-400 focus:border-red-400 focus:ring-red-100',
+                    )}
+                  />
+                </div>
 
                 <Button
-                  className="h-12 w-full bg-[#E67E22] text-base text-white hover:bg-[#d35400]"
-                  disabled={otp.length !== 6 || verifyMutation.isPending}
-                  onClick={() => verifyMutation.mutate()}
+                  type="submit"
+                  className="h-12 w-full bg-[#1B4F72] text-base text-white hover:bg-[#153f5c]"
+                  disabled={activateMutation.isPending || newCode.length < 6}
                 >
-                  {verifyMutation.isPending ? 'Vérification…' : 'Accéder à mon espace'}
+                  {activateMutation.isPending ? 'Activation…' : 'Confirmer et se connecter'}
                 </Button>
-
-                <div className="space-y-2 text-center">
-                  {cooldown.active ? (
-                    <p className="text-sm text-muted-foreground">
-                      Renvoyer dans{' '}
-                      <span className="font-semibold tabular-nums text-[#1B4F72]">
-                        {cooldown.seconds}s
-                      </span>
-                    </p>
-                  ) : (
-                    <button
-                      type="button"
-                      className="text-sm text-[#1B4F72] underline-offset-4 hover:underline"
-                      disabled={requestMutation.isPending}
-                      onClick={() => requestMutation.mutate()}
-                    >
-                      Renvoyer le code
-                    </button>
-                  )}
-                </div>
-              </div>
+              </form>
             )}
           </div>
         </div>
