@@ -10,8 +10,10 @@ import {
   getLots,
   storeAppelFonds,
   envoyerAppelFonds,
+  getGroupesHabitations,
   type AppelFonds,
   type Lot,
+  type GroupeHabitation,
 } from '@/services/gestionnaire.service'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
@@ -50,6 +52,7 @@ type AppelForm = {
   montant_total: string
   date_echeance: string
   description: string
+  groupe_habitation_id: string
 }
 
 const EMPTY_FORM: AppelForm = {
@@ -58,6 +61,7 @@ const EMPTY_FORM: AppelForm = {
   montant_total: '',
   date_echeance: '',
   description: '',
+  groupe_habitation_id: '',
 }
 
 // ---------------------------------------------------------------------------
@@ -69,14 +73,19 @@ interface RepartitionPreviewProps {
   lots: Lot[]
   totalTantieme: number
   montantTotal: number
+  mode?: 'tantieme' | 'fixe'
+  montantFixe?: number
 }
 
 function RepartitionPreview({
   lots,
   totalTantieme,
   montantTotal,
+  mode,
+  montantFixe,
 }: RepartitionPreviewProps) {
   const [open, setOpen] = useState(true)
+  const isFixe = mode === 'fixe'
 
   return (
     <div className="rounded-lg border bg-muted/30 p-3">
@@ -85,7 +94,7 @@ function RepartitionPreview({
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center justify-between text-sm font-medium"
       >
-        <span>Répartition par tantième</span>
+        <span>{isFixe ? 'Répartition par montant fixe' : 'Répartition par tantième'}</span>
         {open ? (
           <ChevronUp className="size-4 text-muted-foreground" />
         ) : (
@@ -99,13 +108,29 @@ function RepartitionPreview({
             <thead>
               <tr className="border-b text-muted-foreground">
                 <th className="py-1 text-left font-medium">Lot</th>
-                <th className="py-1 text-right font-medium">Tantième</th>
-                <th className="py-1 text-right font-medium">%</th>
-                <th className="py-1 text-right font-medium">Montant</th>
+                {isFixe ? (
+                  <th className="py-1 text-right font-medium">Montant</th>
+                ) : (
+                  <>
+                    <th className="py-1 text-right font-medium">Tantième</th>
+                    <th className="py-1 text-right font-medium">%</th>
+                    <th className="py-1 text-right font-medium">Montant</th>
+                  </>
+                )}
               </tr>
             </thead>
             <tbody>
               {lots.map((lot) => {
+                if (isFixe) {
+                  return (
+                    <tr key={lot.id} className="border-b border-muted last:border-0">
+                      <td className="py-1 font-mono">{lot.numero}</td>
+                      <td className="py-1 text-right tabular-nums">
+                        {fmt.format(montantFixe ?? 0)}
+                      </td>
+                    </tr>
+                  )
+                }
                 const pct =
                   totalTantieme > 0 ? (lot.tantieme / totalTantieme) * 100 : 0
                 const montantLot =
@@ -131,11 +156,19 @@ function RepartitionPreview({
             <tfoot>
               <tr className="border-t font-bold">
                 <td className="py-1">Total</td>
-                <td className="py-1 text-right tabular-nums">{totalTantieme}</td>
-                <td className="py-1 text-right tabular-nums">100 %</td>
-                <td className="py-1 text-right tabular-nums">
-                  {fmt.format(montantTotal)}
-                </td>
+                {isFixe ? (
+                  <td className="py-1 text-right tabular-nums">
+                    {fmt.format(lots.length * (montantFixe ?? 0))}
+                  </td>
+                ) : (
+                  <>
+                    <td className="py-1 text-right tabular-nums">{totalTantieme}</td>
+                    <td className="py-1 text-right tabular-nums">100 %</td>
+                    <td className="py-1 text-right tabular-nums">
+                      {fmt.format(montantTotal)}
+                    </td>
+                  </>
+                )}
               </tr>
             </tfoot>
           </table>
@@ -174,11 +207,21 @@ export function AppelsFondsPage() {
     enabled: !!form.residence_id,
   })
 
+  // Groupes habitations for the selected residence
+  const ghQuery = useQuery({
+    queryKey: ['gestionnaire', 'groupes-habitations', form.residence_id],
+    queryFn: () => getGroupesHabitations(Number(form.residence_id)),
+    enabled: !!form.residence_id && createOpen,
+  })
+  const groupesHabitations: GroupeHabitation[] = ghQuery.data ?? []
+
   const lots: Lot[] = lotsData?.lots ?? []
   const totalTantieme: number = lotsData?.total_tantieme ?? 0
   const montantTotal = Number(form.montant_total) || 0
   const showRepartition =
     !!form.residence_id && montantTotal > 0 && !lotsLoading && lots.length > 0
+
+  const selectedResidence = residences.find((r) => r.id === Number(form.residence_id))
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -188,6 +231,7 @@ export function AppelsFondsPage() {
         montant_total: Number(form.montant_total),
         date_echeance: form.date_echeance,
         description: form.description || undefined,
+        ...(form.groupe_habitation_id ? { groupe_habitation_id: Number(form.groupe_habitation_id) } : {}),
       }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['appels-fonds'] })
@@ -338,7 +382,7 @@ export function AppelsFondsPage() {
               <Select
                 value={form.residence_id}
                 onValueChange={(v) =>
-                  setForm((f) => ({ ...f, residence_id: v }))
+                  setForm((f) => ({ ...f, residence_id: v, groupe_habitation_id: '' }))
                 }
               >
                 <SelectTrigger className="w-full">
@@ -353,6 +397,28 @@ export function AppelsFondsPage() {
                 </SelectContent>
               </Select>
             </div>
+
+            {groupesHabitations.length > 0 && (
+              <div className="flex flex-col gap-1">
+                <Label>Tranche (optionnel)</Label>
+                <Select
+                  value={form.groupe_habitation_id}
+                  onValueChange={(v) => setForm((f) => ({ ...f, groupe_habitation_id: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Toutes les tranches" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Toutes les tranches</SelectItem>
+                    {groupesHabitations.map((gh) => (
+                      <SelectItem key={gh.id} value={String(gh.id)}>
+                        {gh.nom}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label>{t('gestionnaire.appelsFonds.form.montant')}</Label>
@@ -389,6 +455,8 @@ export function AppelsFondsPage() {
                   lots={lots}
                   totalTantieme={totalTantieme}
                   montantTotal={montantTotal}
+                  mode={selectedResidence?.mode_cotisation}
+                  montantFixe={selectedResidence?.montant_fixe}
                 />
               ) : null
             )}

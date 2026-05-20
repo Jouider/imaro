@@ -153,6 +153,13 @@ export type LigneBudget = {
   realise: number
   pct_consomme: number
   ordre: number
+  // Optional prestataire linking fields
+  prestataire_id?: number
+  contrat_id?: number
+  nombre?: number
+  prix_unitaire?: number
+  date_debut?: string
+  date_fin?: string
 }
 
 export type BudgetAnnexe5 = {
