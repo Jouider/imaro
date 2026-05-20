@@ -247,13 +247,13 @@ export function ResidencePage() {
     },
   ]
 
-  type CoproRow = { id: number; name: string; phone: string; lot_numero: string; solde_actuel: number }
+  type CoproRow = { id: number; name: string; phone: string; lot_numero: string; solde: number }
   const coproRows: CoproRow[] = coproprietaires.map((c) => ({
     id: c.id,
     name: c.name,
     phone: c.phone,
-    lot_numero: c.lot.numero,
-    solde_actuel: c.solde_actuel,
+    lot_numero: c.lot?.numero ?? '',
+    solde: c.solde,
   }))
 
   const coproColumns: Column<CoproRow>[] = [
@@ -261,11 +261,11 @@ export function ResidencePage() {
     { key: 'phone', header: t('gestionnaire.residence.colTelephone') },
     { key: 'lot_numero', header: 'Lot', sortable: true },
     {
-      key: 'solde_actuel',
+      key: 'solde',
       header: t('gestionnaire.residence.colSolde'),
       sortable: true,
       renderCell: (r) => (
-        <MontantDisplay value={r.solde_actuel} colorize />
+        <MontantDisplay value={r.solde} colorize />
       ),
     },
   ]

@@ -273,7 +273,7 @@ export async function getPortailDashboard(): Promise<DashboardData> {
 
 export async function getOperations(): Promise<Operation[]> {
   return withMock(async () => {
-    const res = await api.get<ApiEnvelope<{ operations: Operation[] }>>('/portail/paiements')
+    const res = await api.get<ApiEnvelope<{ operations: Operation[] }>>('/portail/operations')
     return res.data.data.operations
   }, MOCK_OPERATIONS)
 }
