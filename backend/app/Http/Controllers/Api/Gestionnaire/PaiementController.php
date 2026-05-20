@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Gestionnaire;
 
+use App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Gestionnaire\StorePaiementRequest;
 use App\Http\Resources\PaiementResource;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class PaiementController extends Controller
 {
+    use AuthorizesResidence;
     /**
      * GET /api/gestionnaire/paiements
      */
@@ -59,12 +61,7 @@ class PaiementController extends Controller
     {
         $ligne = AppelFondsLigne::with(['appelFonds.residence', 'coproprietaire'])->findOrFail($request->appel_fonds_ligne_id);
 
-        // Vérifier que la résidence appartient au gestionnaire
-        abort_if(
-            $ligne->appelFonds->residence->gestionnaire_id !== $request->user()->id,
-            403,
-            'Accès refusé.'
-        );
+        $this->authorizeResidence($request, $ligne->appelFonds->residence);
 
         if ($ligne->statut === 'paye') {
             return response()->json([

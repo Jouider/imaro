@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 
 class CoproprietaireController extends Controller
 {
+    use \App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
     /**
      * POST /api/gestionnaire/coproprietaires
      * Crée un user résident + un coproprietaire lié au lot.
@@ -123,9 +124,7 @@ class CoproprietaireController extends Controller
      */
     public function indexGlobal(Request $request): JsonResponse
     {
-        $residenceIds = Residence::where('gestionnaire_id', $request->user()->id)
-            ->where('tenant_id', config('app.tenant_id'))
-            ->pluck('id');
+        $residenceIds = $this->accessibleResidenceIds($request);
 
         $coproprietaires = Coproprietaire::whereHas('lot', fn ($q) => $q->whereIn('residence_id', $residenceIds))
             ->with(['user', 'lot.residence'])
@@ -142,11 +141,7 @@ class CoproprietaireController extends Controller
      */
     public function index(Request $request, Residence $residence): JsonResponse
     {
-        abort_if(
-            $residence->gestionnaire_id !== $request->user()->id,
-            403,
-            'Cette résidence ne vous est pas assignée.'
-        );
+        $this->authorizeResidence($request, $residence);
 
         $query = Coproprietaire::whereHas('lot', fn ($q) => $q->where('residence_id', $residence->id))
             ->with(['user', 'lot']);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Gestionnaire;
 
+use App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Gestionnaire\StoreTicketRequest;
 use App\Http\Requests\Gestionnaire\UpdateTicketRequest;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 
 class TicketController extends Controller
 {
+    use AuthorizesResidence;
     /**
      * GET /api/gestionnaire/tickets
      */
@@ -21,7 +23,7 @@ class TicketController extends Controller
     {
         $query = Ticket::with(['residence', 'lot', 'user', 'prestataire'])
             ->where('tenant_id', config('app.tenant_id'))
-            ->whereHas('residence', fn ($q) => $q->where('gestionnaire_id', $request->user()->id));
+            ->whereHas('residence', $this->residenceScope($request));
 
         if ($request->filled('residence_id')) {
             $query->where('residence_id', $request->residence_id);
@@ -185,10 +187,6 @@ class TicketController extends Controller
     private function authorizeTicket(Request $request, Ticket $ticket): void
     {
         $ticket->loadMissing('residence');
-        abort_if(
-            $ticket->residence->gestionnaire_id !== $request->user()->id,
-            403,
-            'Accès refusé.'
-        );
+        $this->authorizeResidence($request, $ticket->residence);
     }
 }

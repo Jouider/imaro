@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Gestionnaire;
 
+use App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Gestionnaire\StoreAppelFondsRequest;
 use App\Http\Requests\Gestionnaire\UpdateAppelFondsRequest;
@@ -14,13 +15,14 @@ use Illuminate\Http\Request;
 
 class AppelFondsController extends Controller
 {
+    use AuthorizesResidence;
     /**
      * GET /api/gestionnaire/appels-fonds
      */
     public function index(Request $request): JsonResponse
     {
         $query = AppelFonds::with(['residence', 'exercice', 'createdBy', 'lignes'])
-            ->whereHas('residence', fn ($q) => $q->where('gestionnaire_id', $request->user()->id));
+            ->whereHas('residence', $this->residenceScope($request));
 
         if ($request->filled('residence_id')) {
             $query->where('residence_id', $request->residence_id);
@@ -53,12 +55,7 @@ class AppelFondsController extends Controller
     public function store(StoreAppelFondsRequest $request): JsonResponse
     {
         $residence = Residence::findOrFail($request->residence_id);
-
-        abort_if(
-            $residence->gestionnaire_id !== $request->user()->id,
-            403,
-            'Cette résidence ne vous est pas assignée.'
-        );
+        $this->authorizeResidence($request, $residence);
 
         $appelFonds = AppelFonds::create([
             'tenant_id'    => config('app.tenant_id'),
@@ -173,10 +170,6 @@ class AppelFondsController extends Controller
     private function authorizeAppelFonds(Request $request, AppelFonds $appelFonds): void
     {
         $appelFonds->load('residence');
-        abort_if(
-            $appelFonds->residence->gestionnaire_id !== $request->user()->id,
-            403,
-            'Accès refusé.'
-        );
+        $this->authorizeResidence($request, $appelFonds->residence);
     }
 }

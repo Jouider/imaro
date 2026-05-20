@@ -7,22 +7,27 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Exercice extends Model
+class Immeuble extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'tenant_id', 'residence_id', 'groupe_habitation_id', 'annee',
-        'date_debut', 'date_fin', 'statut',
+        'tenant_id',
+        'residence_id',
+        'groupe_habitation_id',
+        'nom',
+        'adresse',
+        'nb_etages',
+        'nb_lots',
     ];
 
     protected function casts(): array
     {
         return [
-            'date_debut' => 'date',
-            'date_fin'   => 'date',
-            'annee'      => 'integer',
+            'nb_etages' => 'integer',
+            'nb_lots'   => 'integer',
         ];
     }
 
@@ -30,7 +35,7 @@ class Exercice extends Model
     {
         static::addGlobalScope('tenant', function (Builder $query) {
             if ($tenantId = config('app.tenant_id')) {
-                $query->where('exercices.tenant_id', $tenantId);
+                $query->where('immeubles.tenant_id', $tenantId);
             }
         });
     }
@@ -45,18 +50,8 @@ class Exercice extends Model
         return $this->belongsTo(GroupeHabitation::class);
     }
 
-    public function appelsFonds(): HasMany
+    public function lots(): HasMany
     {
-        return $this->hasMany(AppelFonds::class);
-    }
-
-    public function paiements(): HasMany
-    {
-        return $this->hasMany(Paiement::class);
-    }
-
-    public function depenses(): HasMany
-    {
-        return $this->hasMany(Depense::class);
+        return $this->hasMany(Lot::class);
     }
 }

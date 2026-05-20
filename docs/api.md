@@ -277,6 +277,8 @@ Liste les résidences assignées au gestionnaire (ou toutes pour le manager).
         "city": "Casablanca",
         "nb_lots": 20,
         "total_tantieme": 1000,
+        "mode_cotisation": "tantieme",
+        "cotisation_mensuelle": null,
         "status": "active",
         "gestionnaire": { "id": 2, "name": "Karim Alaoui" },
         "exercices": [ { "id": 1, "annee": 2026, "statut": "actif" } ]
@@ -290,7 +292,30 @@ Liste les résidences assignées au gestionnaire (ou toutes pour le manager).
 ---
 
 ### GET /api/gestionnaire/residences/{id}
-Détail avec lots et copropriétaires.
+Détail complet avec GH, immeubles, lots.
+
+**Response 200** (extrait)
+```json
+{
+  "id": 1,
+  "name": "Résidence Atlas",
+  "mode_cotisation": "tantieme",
+  "cotisation_mensuelle": null,
+  "groupes_habitations": [
+    {
+      "id": 1,
+      "nom": "Tranche A",
+      "total_tantieme": 1000,
+      "immeubles": [
+        { "id": 1, "nom": "Immeuble A", "nb_etages": 4, "nb_lots": 16 }
+      ]
+    }
+  ],
+  "immeubles": [
+    { "id": 1, "nom": "Immeuble A", "groupe_habitation_id": 1 }
+  ]
+}
+```
 
 ---
 
@@ -298,8 +323,128 @@ Détail avec lots et copropriétaires.
 
 **Body**
 ```json
-{ "name": "Résidence Atlas", "address": "12 Bd Zerktouni", "city": "Casablanca" }
+{
+  "name": "Résidence Atlas",
+  "address": "12 Bd Zerktouni",
+  "city": "Casablanca",
+  "mode_cotisation": "fixe",
+  "cotisation_mensuelle": 2500.00
+}
 ```
+
+---
+
+## 3b. Groupes d'Habitation (Tranches)
+
+`auth:sanctum` · `role:manager|gestionnaire`
+
+> Optionnel. À utiliser pour les résidences avec plusieurs bâtiments/tranches indépendants. Si présent, les budgets et appels de fonds sont gérés au niveau de la tranche.
+
+### GET /api/gestionnaire/residences/{id}/groupes-habitations
+
+**Response 200**
+```json
+{
+  "status": "success",
+  "data": {
+    "groupes_habitations": [
+      {
+        "id": 1,
+        "nom": "Tranche A",
+        "description": "Bâtiment Nord — 16 appartements",
+        "total_tantieme": 1000,
+        "immeubles": [ { "id": 1, "nom": "Immeuble A", "nb_lots": 16 } ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+### POST /api/gestionnaire/residences/{id}/groupes-habitations
+
+**Body**
+```json
+{ "nom": "Tranche A", "description": "Bâtiment Nord", "total_tantieme": 1000 }
+```
+
+**Response 201**
+
+---
+
+### PUT /api/gestionnaire/residences/{id}/groupes-habitations/{gh}
+
+**Body** (champs optionnels)
+```json
+{ "nom": "Tranche A - Révisé", "description": "...", "total_tantieme": 1000 }
+```
+
+---
+
+### DELETE /api/gestionnaire/residences/{id}/groupes-habitations/{gh}
+
+**Erreurs :**
+- `422` — impossible de supprimer si le GH contient des immeubles
+
+---
+
+## 3c. Immeubles
+
+`auth:sanctum` · `role:manager|gestionnaire`
+
+> Obligatoire entre résidence et lot. Chaque lot appartient à un immeuble.
+
+### GET /api/gestionnaire/residences/{id}/immeubles
+
+**Response 200**
+```json
+{
+  "status": "success",
+  "data": {
+    "immeubles": [
+      {
+        "id": 1,
+        "nom": "Immeuble A",
+        "adresse": null,
+        "nb_etages": 4,
+        "nb_lots": 16,
+        "groupe_habitation_id": 1,
+        "groupe_habitation": { "id": 1, "nom": "Tranche A" }
+      }
+    ]
+  }
+}
+```
+
+---
+
+### POST /api/gestionnaire/residences/{id}/immeubles
+
+**Body**
+```json
+{
+  "nom": "Immeuble A",
+  "groupe_habitation_id": 1,
+  "adresse": "Entrée principale",
+  "nb_etages": 4
+}
+```
+
+> `groupe_habitation_id` optionnel. Si fourni, doit appartenir à la résidence.
+
+---
+
+### PUT /api/gestionnaire/residences/{id}/immeubles/{immeuble}
+### DELETE /api/gestionnaire/residences/{id}/immeubles/{immeuble}
+
+**Erreurs :**
+- `422` — impossible de supprimer si l'immeuble contient des lots
+
+---
+
+### GET /api/gestionnaire/immeubles/{immeuble}/lots
+Liste les lots d'un immeuble spécifique.
 
 ---
 
@@ -357,7 +502,10 @@ Action irréversible.
 `auth:sanctum` · `role:manager|gestionnaire`
 
 **Règle :** La somme des tantièmes de tous les lots d'une résidence doit être exactement **1000**.
-**Calcul :** `montant_du = montant_total × (tantieme / 1000)`
+**Calcul tantième :** `montant_du = montant_total × (tantieme / 1000)`
+**Calcul fixe :** `montant_du = montant_total / nb_lots`
+
+> **Nouveau :** chaque lot appartient obligatoirement à un **immeuble** (`immeuble_id` requis au POST).
 
 ### GET /api/gestionnaire/residences/{id}/lots
 
@@ -369,11 +517,13 @@ Action irréversible.
     "lots": [
       {
         "id": 1,
-        "numero": "Apt 1",
+        "numero": "A101",
         "type": "appartement",
         "etage": 1,
         "superficie": 85.00,
         "tantieme": 65,
+        "immeuble_id": 1,
+        "immeuble": { "id": 1, "nom": "Immeuble A" },
         "coproprietaire": { "id": 1, "name": "Hassan Benali", "phone": "+212600000010" }
       }
     ],
@@ -385,16 +535,28 @@ Action irréversible.
 
 ---
 
+### GET /api/gestionnaire/immeubles/{immeuble}/lots
+Filtre les lots par immeuble directement.
+
+---
+
 ### POST /api/gestionnaire/residences/{id}/lots
 
 **Body**
 ```json
-{ "numero": "Apt 1", "type": "appartement", "etage": 1, "superficie": 85.00, "tantieme": 65 }
+{
+  "numero": "A101",
+  "type": "appartement",
+  "etage": 1,
+  "superficie": 85.00,
+  "tantieme": 65,
+  "immeuble_id": 1
+}
 ```
 
 Types valides : `appartement` | `local_commercial` | `parking` | `cave`
 
-**Validation :** La somme ne doit pas dépasser `total_tantieme`.
+**Validation :** `immeuble_id` obligatoire et doit appartenir à la résidence. La somme des tantièmes ne doit pas dépasser `total_tantieme`.
 
 **Response 201**
 
@@ -475,7 +637,7 @@ Le code est affiché **une seule fois** au gestionnaire — non récupérable en
 
 ### GET /api/gestionnaire/appels-fonds
 
-**Query params :** `residence_id`, `statut` (`brouillon`|`envoye`|`partiel`|`paye`), `per_page`
+**Query params :** `residence_id`, `groupe_habitation_id`, `statut` (`brouillon`|`envoye`|`partiel`|`paye`), `per_page`
 
 **Response 200**
 ```json
@@ -491,7 +653,7 @@ Le code est affiché **une seule fois** au gestionnaire — non récupérable en
         "montant_total": 18000.00,
         "statut": "partiel",
         "date_echeance": "2026-06-30",
-        "lignes_count": 20
+        "lignes_count": 16
       }
     ]
   }
@@ -501,7 +663,7 @@ Le code est affiché **une seule fois** au gestionnaire — non récupérable en
 ---
 
 ### POST /api/gestionnaire/appels-fonds
-Génère automatiquement une ligne par lot, calculée par tantième.
+Génère automatiquement une ligne par lot selon le mode de cotisation.
 
 **Body**
 ```json
@@ -509,13 +671,18 @@ Génère automatiquement une ligne par lot, calculée par tantième.
   "libelle": "Charges Q2 2026",
   "residence_id": 1,
   "exercice_id": 1,
+  "groupe_habitation_id": 1,
   "montant_total": 18000.00,
   "date_echeance": "2026-06-30",
   "description": "Charges de copropriété Q2 2026"
 }
 ```
 
-**Calcul :** Pour chaque lot : `montant_du = 18000 × (tantieme / 1000)`
+> `groupe_habitation_id` optionnel. Si fourni, seuls les lots de cette tranche sont inclus.
+
+**Calcul automatique selon `mode_cotisation` de la résidence :**
+- `"tantieme"` → `montant_du = montant_total × (lot.tantieme / total_tantieme_scope)`
+- `"fixe"` → `montant_du = montant_total / nb_lots_scope`
 
 **Response 201**
 
@@ -804,15 +971,53 @@ Types valides : `maintenance` | `nettoyage` | `gardiennage` | `ascenseur` | `aut
 ---
 
 ### POST /api/gestionnaire/budgets/{id}/postes
-Ajouter un poste budgétaire.
+Ajouter un poste budgétaire. Deux modes disponibles :
 
-**Body**
+**Mode simple** (montant saisi manuellement) :
 ```json
 {
   "categorie": "gardiennage",
   "description": "Salaire gardien + charges",
   "montant_prevu": 60000.00,
   "montant_realise": 25000.00
+}
+```
+
+**Mode détaillé avec prestataire** (montant calculé automatiquement) :
+```json
+{
+  "categorie": "entretien",
+  "description": "Maintenance ascenseurs",
+  "prestataire_id": 1,
+  "contrat_id": 1,
+  "nombre": 1,
+  "prix_unitaire": 1500.00,
+  "date_debut": "2026-01-01",
+  "date_fin": "2026-12-31"
+}
+```
+
+> Le backend calcule : `cout_mensuel = nombre × prix_unitaire`, `nb_mois` depuis les dates, `montant_prevu = cout_mensuel × nb_mois`.
+> `prestataire_id`, `contrat_id`, `nombre`, `prix_unitaire`, `date_debut`, `date_fin` sont tous optionnels — compatibles avec l'ancien format.
+
+**Response** (poste créé) :
+```json
+{
+  "id": 1,
+  "categorie": "entretien",
+  "description": "Maintenance ascenseurs",
+  "montant_prevu": 18000.00,
+  "montant_realise": 0,
+  "prestataire_id": 1,
+  "prestataire": { "id": 1, "nom": "Atlas Ascenseurs SARL" },
+  "contrat_id": 1,
+  "contrat": { "id": 1, "titre": "Contrat maintenance 2026" },
+  "nombre": 1,
+  "prix_unitaire": 1500.00,
+  "cout_mensuel": 1500.00,
+  "nb_mois": 12,
+  "date_debut": "2026-01-01",
+  "date_fin": "2026-12-31"
 }
 ```
 
@@ -958,4 +1163,4 @@ Types valides : `ordinaire` | `extraordinaire`
 
 ---
 
-*Last updated: 2026-05-18 — nouveau systeme auth (email+password admins, code resident), Sprint 2 endpoints (annonces, contrats, budgets, documents, assemblees)*
+*Last updated: 2026-05-21 — hiérarchie GH > Immeuble > Lot, mode cotisation fixe/tantième, postes budgétaires avec prestataire et calcul automatique*
