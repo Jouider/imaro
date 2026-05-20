@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\Gestionnaire\AnnonceController;
+use App\Http\Controllers\Api\Gestionnaire\GroupeHabitationController;
+use App\Http\Controllers\Api\Gestionnaire\ImmeubleController;
 use App\Http\Controllers\Api\Gestionnaire\AppelFondsController;
 use App\Http\Controllers\Api\Gestionnaire\AssembleeController;
 use App\Http\Controllers\Api\Gestionnaire\BudgetController;
@@ -36,7 +38,20 @@ Route::prefix('residences/{residence}')->group(function () {
     Route::get('/exercices', [ExerciceController::class, 'index']);
     Route::post('/exercices', [ExerciceController::class, 'store']);
     Route::post('/exercices/{exercice}/cloture', [ExerciceController::class, 'cloture']);
+    // Groupes d'habitation (GH / tranches) — optionnel
+    Route::get('/groupes-habitations', [GroupeHabitationController::class, 'index']);
+    Route::post('/groupes-habitations', [GroupeHabitationController::class, 'store']);
+    Route::put('/groupes-habitations/{groupeHabitation}', [GroupeHabitationController::class, 'update']);
+    Route::delete('/groupes-habitations/{groupeHabitation}', [GroupeHabitationController::class, 'destroy']);
+    // Immeubles
+    Route::get('/immeubles', [ImmeubleController::class, 'index']);
+    Route::post('/immeubles', [ImmeubleController::class, 'store']);
+    Route::put('/immeubles/{immeuble}', [ImmeubleController::class, 'update']);
+    Route::delete('/immeubles/{immeuble}', [ImmeubleController::class, 'destroy']);
 });
+
+// Lots par immeuble
+Route::get('/immeubles/{immeuble}/lots', [ImmeubleController::class, 'lots']);
 
 // Lots — routes plates pour PUT/DELETE (attendues par le frontend)
 Route::put('/lots/{lot}', [LotController::class, 'updateFlat']);

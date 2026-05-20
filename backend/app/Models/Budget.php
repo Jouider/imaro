@@ -7,12 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+
+
 class Budget extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'tenant_id', 'residence_id', 'exercice_id', 'statut', 'approuve_at',
+        'tenant_id', 'residence_id', 'groupe_habitation_id', 'exercice_id', 'statut', 'approuve_at',
     ];
 
     protected function casts(): array
@@ -25,6 +27,11 @@ class Budget extends Model
     public function residence(): BelongsTo
     {
         return $this->belongsTo(Residence::class);
+    }
+
+    public function groupeHabitation(): BelongsTo
+    {
+        return $this->belongsTo(GroupeHabitation::class);
     }
 
     public function exercice(): BelongsTo

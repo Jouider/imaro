@@ -11,6 +11,8 @@ use App\Models\Coproprietaire;
 use App\Models\Depense;
 use App\Models\Document;
 use App\Models\Exercice;
+use App\Models\GroupeHabitation;
+use App\Models\Immeuble;
 use App\Models\Lot;
 use App\Models\Notification;
 use App\Models\Paiement;
@@ -96,26 +98,74 @@ class DemoSeeder extends Seeder
         // ══════════════════════════════════════════════════════════
         // 3. RÉSIDENCES — 2 résidences à Casablanca
         // ══════════════════════════════════════════════════════════
+        // Atlas — mode tantième, 2 GH (tranches), 20 lots
         $residence1 = Residence::withoutGlobalScope('tenant')->create([
-            'tenant_id'       => $t,
-            'gestionnaire_id' => $gestionnaire1->id,
-            'name'            => 'Résidence Atlas',
-            'address'         => '12 Boulevard Zerktouni, Maârif',
-            'city'            => 'Casablanca',
-            'total_tantieme'  => 1000,
-            'nb_lots'         => 20,
-            'status'          => 'active',
+            'tenant_id'           => $t,
+            'gestionnaire_id'     => $gestionnaire1->id,
+            'name'                => 'Résidence Atlas',
+            'address'             => '12 Boulevard Zerktouni, Maârif',
+            'city'                => 'Casablanca',
+            'total_tantieme'      => 1000,
+            'mode_cotisation'     => 'tantieme',
+            'cotisation_mensuelle'=> null,
+            'nb_lots'             => 20,
+            'status'              => 'active',
         ]);
 
+        // GH Atlas
+        $ghAtlas1 = GroupeHabitation::withoutGlobalScope('tenant')->create([
+            'tenant_id'      => $t,
+            'residence_id'   => $residence1->id,
+            'nom'            => 'Tranche A',
+            'description'    => 'Bâtiment principal — 16 appartements',
+            'total_tantieme' => 780,
+        ]);
+        $ghAtlas2 = GroupeHabitation::withoutGlobalScope('tenant')->create([
+            'tenant_id'      => $t,
+            'residence_id'   => $residence1->id,
+            'nom'            => 'Tranche B',
+            'description'    => 'Aile secondaire — 4 lots',
+            'total_tantieme' => 220,
+        ]);
+
+        $immeubleAtlasA = Immeuble::withoutGlobalScope('tenant')->create([
+            'tenant_id'             => $t,
+            'residence_id'          => $residence1->id,
+            'groupe_habitation_id'  => $ghAtlas1->id,
+            'nom'                   => 'Immeuble A',
+            'nb_etages'             => 5,
+            'nb_lots'               => 16,
+        ]);
+        $immeubleAtlasB = Immeuble::withoutGlobalScope('tenant')->create([
+            'tenant_id'             => $t,
+            'residence_id'          => $residence1->id,
+            'groupe_habitation_id'  => $ghAtlas2->id,
+            'nom'                   => 'Immeuble B',
+            'nb_etages'             => 2,
+            'nb_lots'               => 4,
+        ]);
+
+        // Anfa — mode fixe, sans GH, 1 immeuble, cotisation 2500 DH/lot
         $residence2 = Residence::withoutGlobalScope('tenant')->create([
-            'tenant_id'       => $t,
-            'gestionnaire_id' => $gestionnaire2->id,
-            'name'            => 'Résidence Anfa Gardens',
-            'address'         => '45 Rue des Palmiers, Anfa',
-            'city'            => 'Casablanca',
-            'total_tantieme'  => 1000,
-            'nb_lots'         => 10,
-            'status'          => 'active',
+            'tenant_id'           => $t,
+            'gestionnaire_id'     => $gestionnaire2->id,
+            'name'                => 'Résidence Anfa Gardens',
+            'address'             => '45 Rue des Palmiers, Anfa',
+            'city'                => 'Casablanca',
+            'total_tantieme'      => 1000,
+            'mode_cotisation'     => 'fixe',
+            'cotisation_mensuelle'=> 2500,
+            'nb_lots'             => 10,
+            'status'              => 'active',
+        ]);
+
+        $immeubleAnfa = Immeuble::withoutGlobalScope('tenant')->create([
+            'tenant_id'             => $t,
+            'residence_id'          => $residence2->id,
+            'groupe_habitation_id'  => null,
+            'nom'                   => 'Immeuble Anfa',
+            'nb_etages'             => 4,
+            'nb_lots'               => 10,
         ]);
 
         // ══════════════════════════════════════════════════════════
@@ -178,9 +228,12 @@ class DemoSeeder extends Seeder
         $coproprietairesAtlas = [];
 
         foreach ($nomsAtlas as $i => $nom) {
-            $lot = Lot::create([
+            // Lots 0-15 → Immeuble A (Tranche A), Lots 16-19 → Immeuble B (Tranche B)
+            $immeuble = $i < 16 ? $immeubleAtlasA : $immeubleAtlasB;
+            $lot = Lot::withoutGlobalScope('tenant')->create([
                 'tenant_id'    => $t,
                 'residence_id' => $residence1->id,
+                'immeuble_id'  => $immeuble->id,
                 'numero'       => $i < 16 ? 'A'.($i + 101) : 'B'.($i - 15),
                 'etage'        => (int) floor($i / 4) + 1,
                 'type'         => $typesLot[$i % count($typesLot)],
@@ -223,9 +276,10 @@ class DemoSeeder extends Seeder
         $coproprietairesAnfa = [];
 
         foreach ($nomsAnfa as $i => $nom) {
-            $lot = Lot::create([
+            $lot = Lot::withoutGlobalScope('tenant')->create([
                 'tenant_id'    => $t,
                 'residence_id' => $residence2->id,
+                'immeuble_id'  => $immeubleAnfa->id,
                 'numero'       => 'C'.($i + 201),
                 'etage'        => (int) floor($i / 3) + 1,
                 'type'         => $i === 9 ? 'local_commercial' : 'appartement',
