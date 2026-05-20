@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Gestionnaire;
 
+use App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Gestionnaire\UpdateResidenceRequest;
 use App\Http\Resources\ResidenceResource;
@@ -11,13 +12,17 @@ use Illuminate\Http\Request;
 
 class ResidenceController extends Controller
 {
+    use AuthorizesResidence;
     /**
      * GET /api/gestionnaire/residences
      * Lists only residences assigned to the authenticated gestionnaire.
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Residence::where('gestionnaire_id', $request->user()->id)
+        $query = Residence::when(
+                ! $request->user()->hasRole('manager'),
+                fn ($q) => $q->where('gestionnaire_id', $request->user()->id)
+            )
             ->with(['gestionnaire', 'exercices'])
             ->withCount('lots');
 
@@ -75,12 +80,4 @@ class ResidenceController extends Controller
         ]);
     }
 
-    private function authorizeResidence(Request $request, Residence $residence): void
-    {
-        abort_if(
-            $residence->gestionnaire_id !== $request->user()->id,
-            403,
-            'Cette résidence ne vous est pas assignée.'
-        );
-    }
 }

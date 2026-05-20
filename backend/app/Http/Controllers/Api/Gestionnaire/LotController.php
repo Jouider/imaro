@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Gestionnaire;
 
+use App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Gestionnaire\StoreLotRequest;
 use App\Http\Requests\Gestionnaire\UpdateLotRequest;
@@ -14,6 +15,7 @@ use Illuminate\Http\Request;
 
 class LotController extends Controller
 {
+    use AuthorizesResidence;
     /**
      * GET /api/gestionnaire/residences/{residence}/lots
      */
@@ -173,14 +175,6 @@ class LotController extends Controller
         return $this->destroy($request, $residence, $lot);
     }
 
-    private function authorizeResidence(Request $request, Residence $residence): void
-    {
-        abort_if(
-            $residence->gestionnaire_id !== $request->user()->id,
-            403,
-            'Cette résidence ne vous est pas assignée.'
-        );
-    }
 
     private function getTotalTantiemeScope(Immeuble $immeuble, Residence $residence): float
     {
