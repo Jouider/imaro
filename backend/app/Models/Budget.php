@@ -14,7 +14,7 @@ class Budget extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tenant_id', 'residence_id', 'groupe_habitation_id', 'exercice_id', 'statut', 'approuve_at',
+        'tenant_id', 'residence_id', 'groupe_habitation_id', 'exercice_id', 'statut', 'version', 'approuve_at',
     ];
 
     protected function casts(): array
@@ -42,5 +42,10 @@ class Budget extends Model
     public function postes(): HasMany
     {
         return $this->hasMany(PosteBudgetaire::class);
+    }
+
+    public function lignes(): HasMany
+    {
+        return $this->hasMany(LigneBudget::class)->orderBy('ordre');
     }
 }

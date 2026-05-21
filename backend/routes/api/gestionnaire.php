@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Gestionnaire\AnnonceController;
+use App\Http\Controllers\Api\Gestionnaire\BudgetAnnexe5Controller;
 use App\Http\Controllers\Api\Gestionnaire\GroupeHabitationController;
 use App\Http\Controllers\Api\Gestionnaire\ImmeubleController;
 use App\Http\Controllers\Api\Gestionnaire\AppelFondsController;
@@ -38,6 +39,9 @@ Route::prefix('residences/{residence}')->group(function () {
     Route::get('/exercices', [ExerciceController::class, 'index']);
     Route::post('/exercices', [ExerciceController::class, 'store']);
     Route::post('/exercices/{exercice}/cloture', [ExerciceController::class, 'cloture']);
+    // Budget Annexe 5 (per exercice)
+    Route::get('/exercices/{exercice}/budget-annexe5', [BudgetAnnexe5Controller::class, 'show']);
+    Route::get('/exercices/{exercice}/budget', [BudgetAnnexe5Controller::class, 'showSimple']);
     // Groupes d'habitation (GH / tranches) — optionnel
     Route::get('/groupes-habitations', [GroupeHabitationController::class, 'index']);
     Route::post('/groupes-habitations', [GroupeHabitationController::class, 'store']);
@@ -104,6 +108,16 @@ Route::post('/budgets/{budget}/approuver', [BudgetController::class, 'approuver'
 Route::post('/budgets/{budget}/postes', [BudgetController::class, 'storePoste']);
 Route::put('/budgets/{budget}/postes/{poste}', [BudgetController::class, 'updatePoste']);
 Route::delete('/budgets/{budget}/postes/{poste}', [BudgetController::class, 'destroyPoste']);
+
+// Budget Annexe 5 — Lignes + actions
+Route::post('/budgets/{budget}/lignes', [BudgetAnnexe5Controller::class, 'storeLigne']);
+Route::put('/budgets/{budget}/lignes/bulk', [BudgetAnnexe5Controller::class, 'bulkUpdateLignes']);
+Route::put('/budgets/lignes/{ligne}', [BudgetAnnexe5Controller::class, 'updateLigne']);
+Route::delete('/budgets/lignes/{ligne}', [BudgetAnnexe5Controller::class, 'destroyLigne']);
+Route::post('/budgets/{budget}/soumettre-ag', [BudgetAnnexe5Controller::class, 'soumettreAg']);
+Route::post('/budgets/{budget}/verrouiller', [BudgetAnnexe5Controller::class, 'verrouiller']);
+Route::get('/budgets/{budget}/simulation', [BudgetAnnexe5Controller::class, 'simulation']);
+Route::get('/budgets/{budget}/suggestions-ia', [BudgetAnnexe5Controller::class, 'suggestionsIa']);
 
 // Documents (Sprint 2)
 Route::get('/documents', [DocumentController::class, 'index']);
