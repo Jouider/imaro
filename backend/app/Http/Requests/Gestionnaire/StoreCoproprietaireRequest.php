@@ -14,12 +14,25 @@ class StoreCoproprietaireRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'        => 'required|string|max:255',
-            'phone'       => 'required|string|max:20|unique:users,phone',
-            'email'       => 'nullable|email|max:255|unique:users,email',
-            'lot_id'      => 'required|integer|exists:lots,id',
-            'type'        => 'required|in:proprietaire,locataire',
-            'date_entree' => 'nullable|date',
+            'name'         => 'required|string|max:255',
+            'phone'        => 'nullable|string|max:20|unique:users,phone',
+            'email'        => 'nullable|email|max:255|unique:users,email',
+            'lot_id'       => 'nullable|integer|exists:lots,id',
+            'residence_id' => 'nullable|integer|exists:residences,id',
+            'type'         => 'nullable|in:proprietaire,locataire',
+            'date_entree'  => 'nullable|date',
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($v) {
+            if (! $this->lot_id && ! $this->residence_id) {
+                $v->errors()->add('lot_id', 'lot_id ou residence_id est requis.');
+            }
+            if (! $this->phone && ! $this->email) {
+                $v->errors()->add('phone', 'phone ou email est requis.');
+            }
+        });
     }
 }

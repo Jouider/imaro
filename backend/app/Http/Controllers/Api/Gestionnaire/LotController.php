@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api\Gestionnaire;
 
+use App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Gestionnaire\StoreLotRequest;
 use App\Http\Requests\Gestionnaire\UpdateLotRequest;
 use App\Http\Resources\LotResource;
+use App\Models\Immeuble;
 use App\Models\Lot;
 use App\Models\Residence;
 use Illuminate\Http\JsonResponse;
@@ -13,6 +15,7 @@ use Illuminate\Http\Request;
 
 class LotController extends Controller
 {
+    use AuthorizesResidence;
     /**
      * GET /api/gestionnaire/residences/{residence}/lots
      */
@@ -42,37 +45,48 @@ class LotController extends Controller
     {
         $this->authorizeResidence($request, $residence);
 
-        $currentSum = $residence->lots()->sum('tantieme');
-        $newTantieme = $request->tantieme;
+        // Résoudre l'immeuble cible
+        $immeubleId = $request->immeuble_id;
+        $immeuble = Immeuble::where('id', $immeubleId)
+            ->where('residence_id', $residence->id)
+            ->firstOrFail();
 
-        if ($currentSum + $newTantieme > $residence->total_tantieme) {
-            $remaining = $residence->total_tantieme - $currentSum;
+        // Validation tantième uniquement en mode tantieme
+        $newTantieme = $request->tantieme ?? 0;
+        if ($residence->mode_cotisation === 'tantieme' && $newTantieme > 0) {
+            $totalTantieme = $this->getTotalTantiemeScope($immeuble, $residence);
+            $currentSum = $this->getCurrentTantiemeSum($immeuble, $residence);
 
-            return response()->json([
-                'status' => 'error',
-                'message' => "Tantième invalide. Restant disponible : {$remaining}.",
-                'errors' => ['tantieme' => ["La somme dépasserait {$residence->total_tantieme}. Restant : {$remaining}."]],
-            ], 422);
+            if ($currentSum + $newTantieme > $totalTantieme) {
+                $remaining = $totalTantieme - $currentSum;
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => "Tantième invalide. Restant disponible : {$remaining}.",
+                    'errors'  => ['tantieme' => ["La somme dépasserait {$totalTantieme}. Restant : {$remaining}."]],
+                ], 422);
+            }
         }
 
-        $lot = $residence->lots()->create([
-            'tenant_id' => config('app.tenant_id'),
-            'numero' => $request->numero,
-            'type' => $request->type,
-            'etage' => $request->etage,
-            'superficie' => $request->superficie,
-            'tantieme' => $newTantieme,
+        $lot = Lot::create([
+            'tenant_id'    => config('app.tenant_id'),
+            'residence_id' => $residence->id,
+            'immeuble_id'  => $immeuble->id,
+            'numero'       => $request->numero,
+            'type'         => $request->type,
+            'etage'        => $request->etage ?? 0,
+            'superficie'   => $request->superficie,
+            'tantieme'     => $newTantieme,
         ]);
 
-        // Update nb_lots on residence
         $residence->increment('nb_lots');
+        $immeuble->increment('nb_lots');
 
-        $lot->load('coproprietairePrincipal.user');
+        $lot->load('coproprietairePrincipal.user', 'immeuble');
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Lot créé',
-            'data' => ['lot' => new LotResource($lot)],
+            'data'    => ['lot' => new LotResource($lot)],
         ], 201);
     }
 
@@ -128,11 +142,13 @@ class LotController extends Controller
             ], 422);
         }
 
+        $immeuble = $lot->immeuble;
         $lot->delete();
         $residence->decrement('nb_lots');
+        $immeuble?->decrement('nb_lots');
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Lot supprimé',
         ]);
     }
@@ -159,12 +175,22 @@ class LotController extends Controller
         return $this->destroy($request, $residence, $lot);
     }
 
-    private function authorizeResidence(Request $request, Residence $residence): void
+
+    private function getTotalTantiemeScope(Immeuble $immeuble, Residence $residence): float
     {
-        abort_if(
-            $residence->gestionnaire_id !== $request->user()->id,
-            403,
-            'Cette résidence ne vous est pas assignée.'
-        );
+        if ($immeuble->groupe_habitation_id && $immeuble->groupeHabitation) {
+            return (float) $immeuble->groupeHabitation->total_tantieme;
+        }
+        return (float) $residence->total_tantieme;
+    }
+
+    private function getCurrentTantiemeSum(Immeuble $immeuble, Residence $residence): float
+    {
+        if ($immeuble->groupe_habitation_id) {
+            return (float) Lot::whereHas('immeuble', function ($q) use ($immeuble) {
+                $q->where('groupe_habitation_id', $immeuble->groupe_habitation_id);
+            })->sum('tantieme');
+        }
+        return (float) $residence->lots()->sum('tantieme');
     }
 }

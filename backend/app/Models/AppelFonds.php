@@ -15,8 +15,8 @@ class AppelFonds extends Model
     protected $table = 'appels_fonds';
 
     protected $fillable = [
-        'tenant_id', 'residence_id', 'exercice_id', 'created_by', 'libelle',
-        'description', 'montant_total', 'date_echeance', 'statut', 'sent_at',
+        'tenant_id', 'residence_id', 'groupe_habitation_id', 'exercice_id', 'created_by',
+        'libelle', 'description', 'montant_total', 'date_echeance', 'statut', 'sent_at',
     ];
 
     protected function casts(): array
@@ -42,6 +42,11 @@ class AppelFonds extends Model
         return $this->belongsTo(Residence::class);
     }
 
+    public function groupeHabitation(): BelongsTo
+    {
+        return $this->belongsTo(GroupeHabitation::class);
+    }
+
     public function exercice(): BelongsTo
     {
         return $this->belongsTo(Exercice::class);
@@ -58,27 +63,67 @@ class AppelFonds extends Model
     }
 
     /**
-     * Génère les lignes automatiquement selon les tantièmes.
-     * Règle : montant_du = montant_total × (tantieme / total_tantieme)
+     * Génère les lignes automatiquement.
+     *
+     * Mode fixe  : montant_du = montant_total / nb_lots_scope
+     * Mode tantieme : montant_du = montant_total × (tantieme / total_tantieme_scope)
      */
     public function genererLignes(): void
     {
-        $residence = $this->residence()->with('lots.coproprietaires')->first();
+        $lots = $this->getLotsInScope();
+        $residence = $this->residence;
+        $modeCotisation = $residence->mode_cotisation ?? 'tantieme';
+        $nbLots = $lots->count();
 
-        foreach ($residence->lots as $lot) {
+        foreach ($lots as $lot) {
             foreach ($lot->coproprietaires as $copro) {
-                $montantDu = round(
-                    $this->montant_total * ($lot->tantieme / $residence->total_tantieme),
-                    2
-                );
+                if ($modeCotisation === 'fixe') {
+                    $montantDu = $nbLots > 0
+                        ? round($this->montant_total / $nbLots, 2)
+                        : 0;
+                } else {
+                    $totalTantieme = $this->getTotalTantiemeInScope();
+                    $montantDu = $totalTantieme > 0
+                        ? round($this->montant_total * ($lot->tantieme / $totalTantieme), 2)
+                        : 0;
+                }
 
                 $this->lignes()->create([
                     'coproprietaire_id' => $copro->id,
-                    'montant_du' => $montantDu,
-                    'montant_paye' => 0,
-                    'statut' => 'impaye',
+                    'lot_id'            => $lot->id,
+                    'montant_du'        => $montantDu,
+                    'montant_paye'      => 0,
+                    'statut'            => 'impaye',
                 ]);
             }
         }
+    }
+
+    /**
+     * Lots concernés : ceux du GH si défini, sinon tous les lots de la résidence.
+     */
+    private function getLotsInScope(): \Illuminate\Database\Eloquent\Collection
+    {
+        if ($this->groupe_habitation_id) {
+            return Lot::whereHas('immeuble', function ($q) {
+                $q->where('groupe_habitation_id', $this->groupe_habitation_id);
+            })->with('coproprietaires')->get();
+        }
+
+        return Lot::where('residence_id', $this->residence_id)
+            ->with('coproprietaires')
+            ->get();
+    }
+
+    /**
+     * Total tantième du scope (GH ou résidence).
+     */
+    private function getTotalTantiemeInScope(): float
+    {
+        if ($this->groupe_habitation_id && $this->groupeHabitation) {
+            return (float) $this->groupeHabitation->total_tantieme;
+        }
+
+        return (float) ($this->residence->total_tantieme ?? 1000);
     }
 }

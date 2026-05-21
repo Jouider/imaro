@@ -18,7 +18,7 @@ class User extends Authenticatable
         'tenant_id', 'name', 'phone', 'email', 'password',
         'access_code', 'must_change_code',
         'role', 'otp_code', 'otp_expires_at', 'lang',
-        'avatar', 'status', 'last_login_at',
+        'avatar', 'status', 'last_login_at', 'notification_prefs',
     ];
 
     protected $hidden = [
@@ -28,9 +28,10 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'otp_expires_at'   => 'datetime',
-            'last_login_at'    => 'datetime',
-            'must_change_code' => 'boolean',
+            'otp_expires_at'    => 'datetime',
+            'last_login_at'     => 'datetime',
+            'must_change_code'  => 'boolean',
+            'notification_prefs' => 'array',
         ];
     }
 
@@ -47,6 +48,11 @@ class User extends Authenticatable
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
     }
 
     public function notificationsLog(): HasMany

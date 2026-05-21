@@ -179,6 +179,30 @@ Resident (mobile app — sprint 3):
 - Invite by email with temporary token (passwords NEVER shown in plain text)
 - OTP email as 2FA option
 
+## Legal compliance (MANDATORY)
+Every new feature, endpoint, or module MUST comply with:
+- **Loi 18-00** (statut de la copropriété des immeubles bâtis, modifiée par Loi 106-12)
+- **Décret 2.23.700** (règles comptables des syndicats, effectif 1er janvier 2026)
+
+Before coding any new feature, check `docs/loi-18-00-conformite.md` for:
+1. Which articles of Loi 18-00 apply to this feature
+2. Which accounting rules of Décret 2.23.700 apply
+3. Required majorités for AG-related decisions (relative, 3/4, unanimité)
+4. Financial data must align with the 7-class chart of accounts (Classes 1,3,4,5,6,7)
+5. Any document retention obligations (5 years minimum)
+
+Key legal rules that MUST be enforced in code:
+- AG convocation: 15 days minimum notice (Art. 16quinquies)
+- AG quorum: 50% copropriétaires present (Art. 18)
+- Syndic election: 3/4 majority (Art. 19)
+- Impayés: mise en demeure + 30j = toutes provisions exigibles (Art. 25)
+- Prescription charges: 5 ans (Art. 43)
+- Compte bancaire séparé obligatoire par syndicat (Art. 26)
+- Budget voté obligatoire avant tout décaissement (Décret 2.23.700)
+- Comptabilité d'engagement, pas de caisse simple (Décret 2.23.700)
+- Audit expert-comptable obligatoire si recettes > 1 000 000 MAD (Décret 2.23.700)
+- Conservation documents 5 ans minimum (Décret 2.23.700)
+
 ## Business rules (critical)
 - Tantièmes: each lot has a share out of 1000 (e.g., lot A = 45/1000)
 - Appel de fonds calculation: montant_du = montant_total × (tantieme / total_tantieme)

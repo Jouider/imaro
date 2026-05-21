@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\Api\Gestionnaire\AnnonceController;
+use App\Http\Controllers\Api\Gestionnaire\GroupeHabitationController;
+use App\Http\Controllers\Api\Gestionnaire\ImmeubleController;
 use App\Http\Controllers\Api\Gestionnaire\AppelFondsController;
 use App\Http\Controllers\Api\Gestionnaire\AssembleeController;
 use App\Http\Controllers\Api\Gestionnaire\BudgetController;
+use App\Http\Controllers\Api\Gestionnaire\ComptabiliteController;
 use App\Http\Controllers\Api\Gestionnaire\ContratController;
 use App\Http\Controllers\Api\Gestionnaire\CoproprietaireController;
 use App\Http\Controllers\Api\Gestionnaire\DashboardController;
@@ -11,8 +14,10 @@ use App\Http\Controllers\Api\Gestionnaire\DocumentController;
 use App\Http\Controllers\Api\Gestionnaire\ExerciceController;
 use App\Http\Controllers\Api\Gestionnaire\ImpayeController;
 use App\Http\Controllers\Api\Gestionnaire\LotController;
+use App\Http\Controllers\Api\Gestionnaire\NotificationController;
 use App\Http\Controllers\Api\Gestionnaire\PaiementController;
 use App\Http\Controllers\Api\Gestionnaire\PrestataireController;
+use App\Http\Controllers\Api\Gestionnaire\ProfilController;
 use App\Http\Controllers\Api\Gestionnaire\ResidenceController;
 use App\Http\Controllers\Api\Gestionnaire\TicketController;
 use Illuminate\Support\Facades\Route;
@@ -33,7 +38,20 @@ Route::prefix('residences/{residence}')->group(function () {
     Route::get('/exercices', [ExerciceController::class, 'index']);
     Route::post('/exercices', [ExerciceController::class, 'store']);
     Route::post('/exercices/{exercice}/cloture', [ExerciceController::class, 'cloture']);
+    // Groupes d'habitation (GH / tranches) — optionnel
+    Route::get('/groupes-habitations', [GroupeHabitationController::class, 'index']);
+    Route::post('/groupes-habitations', [GroupeHabitationController::class, 'store']);
+    Route::put('/groupes-habitations/{groupeHabitation}', [GroupeHabitationController::class, 'update']);
+    Route::delete('/groupes-habitations/{groupeHabitation}', [GroupeHabitationController::class, 'destroy']);
+    // Immeubles
+    Route::get('/immeubles', [ImmeubleController::class, 'index']);
+    Route::post('/immeubles', [ImmeubleController::class, 'store']);
+    Route::put('/immeubles/{immeuble}', [ImmeubleController::class, 'update']);
+    Route::delete('/immeubles/{immeuble}', [ImmeubleController::class, 'destroy']);
 });
+
+// Lots par immeuble
+Route::get('/immeubles/{immeuble}/lots', [ImmeubleController::class, 'lots']);
 
 // Lots — routes plates pour PUT/DELETE (attendues par le frontend)
 Route::put('/lots/{lot}', [LotController::class, 'updateFlat']);
@@ -91,3 +109,30 @@ Route::delete('/budgets/{budget}/postes/{poste}', [BudgetController::class, 'des
 Route::get('/documents', [DocumentController::class, 'index']);
 Route::post('/documents', [DocumentController::class, 'store']);
 Route::delete('/documents/{document}', [DocumentController::class, 'destroy']);
+
+// Profil gestionnaire
+Route::get('/profil', [ProfilController::class, 'show']);
+Route::patch('/profil', [ProfilController::class, 'update']);
+Route::post('/profil/logo', [ProfilController::class, 'uploadLogo']);
+
+// Notifications
+Route::get('/notifications', [NotificationController::class, 'index']);
+Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
+
+// Comptabilité — exercice-scoped endpoints
+Route::prefix('exercices/{exercice}')->group(function () {
+    Route::get('/dashboard', [ComptabiliteController::class, 'dashboard']);
+    Route::get('/journal', [ComptabiliteController::class, 'journal']);
+    Route::get('/grand-livre', [ComptabiliteController::class, 'grandLivre']);
+    Route::get('/balance', [ComptabiliteController::class, 'balance']);
+    Route::get('/depenses', [ComptabiliteController::class, 'depensesIndex']);
+    Route::post('/depenses', [ComptabiliteController::class, 'depensesStore']);
+    Route::delete('/depenses/{depense}', [ComptabiliteController::class, 'depensesDestroy']);
+    Route::post('/encaissements', [ComptabiliteController::class, 'storeEncaissement']);
+    Route::post('/cloturer', [ComptabiliteController::class, 'cloturer']);
+});
+
+// Comptes PCG (référentiel statique)
+Route::get('/comptes-pcg', [ComptabiliteController::class, 'comptesPcg']);
