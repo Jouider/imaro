@@ -3,17 +3,19 @@
 namespace App\Http\Controllers\Api\Gestionnaire;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
 use App\Models\Exercice;
 use App\Models\Residence;
-use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ExerciceController extends Controller
 {
-    public function index(Residence $residence): JsonResponse
+    use AuthorizesResidence;
+
+    public function index(Request $request, Residence $residence): JsonResponse
     {
-        abort_if($residence->gestionnaire_id !== auth()->id(), 403);
+        $this->authorizeResidence($request, $residence);
 
         $exercices = $residence->exercices()
             ->orderByDesc('annee')
@@ -27,7 +29,7 @@ class ExerciceController extends Controller
 
     public function store(Request $request, Residence $residence): JsonResponse
     {
-        abort_if($residence->gestionnaire_id !== auth()->id(), 403);
+        $this->authorizeResidence($request, $residence);
 
         $data = $request->validate([
             'annee'      => 'required|integer|min:2000|max:2100',
@@ -57,9 +59,9 @@ class ExerciceController extends Controller
         ], 201);
     }
 
-    public function cloture(Residence $residence, Exercice $exercice): JsonResponse
+    public function cloture(Request $request, Residence $residence, Exercice $exercice): JsonResponse
     {
-        abort_if($residence->gestionnaire_id !== auth()->id(), 403);
+        $this->authorizeResidence($request, $residence);
         abort_if($exercice->residence_id !== $residence->id, 404);
 
         if ($exercice->statut !== 'actif') {
