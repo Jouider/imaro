@@ -3,7 +3,8 @@ import { useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Plus, Pencil, Trash2, Lock } from 'lucide-react'
+import { Plus, Pencil, Trash2, Lock, Zap, Building2 } from 'lucide-react'
+import { GenerateLotsModal } from '@/components/gestionnaire/GenerateLotsModal'
 import {
   getResidence,
   getLots,
@@ -97,6 +98,10 @@ export function ResidencePage() {
   const [editingImmeuble, setEditingImmeuble] = useState<Immeuble | null>(null)
   const [deletingImmeuble, setDeletingImmeuble] = useState<Immeuble | null>(null)
   const [immeubleForm, setImmeubleForm] = useState<ImmeubleForm>(EMPTY_IMMEUBLE_FORM)
+
+  // Generate lots modal state
+  const [generateOpen, setGenerateOpen] = useState(false)
+  const [generateImmeubleId, setGenerateImmeubleId] = useState<number | null>(null)
 
   // ── Queries ──────────────────────────────────────────────────────────────
 
@@ -485,10 +490,23 @@ export function ResidencePage() {
         }
         actions={
           activeTab === 'lots' ? (
-            <Button onClick={openCreate} size="sm">
-              <Plus className="me-1.5 size-4" />
-              {t('gestionnaire.residence.addLot')}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setGenerateImmeubleId(immeubles[0]?.id ?? null)
+                  setGenerateOpen(true)
+                }}
+              >
+                <Zap className="me-1.5 size-4" />
+                Générer des lots
+              </Button>
+              <Button onClick={openCreate} size="sm">
+                <Plus className="me-1.5 size-4" />
+                {t('gestionnaire.residence.addLot')}
+              </Button>
+            </div>
           ) : activeTab === 'immeubles' ? (
             <Button onClick={openCreateImmeuble} size="sm">
               <Plus className="me-1.5 size-4" />
@@ -526,13 +544,32 @@ export function ResidencePage() {
               })}
             </p>
           )}
-          <DataTable
-            data={lotsData?.lots ?? []}
-            columns={lotsColumns}
-            rowKey="id"
-            isLoading={loadingLots}
-            searchable
-          />
+          {!loadingLots && (lotsData?.lots ?? []).length === 0 ? (
+            <div className="flex flex-col items-center gap-4 py-16 text-center">
+              <Building2 className="size-12 text-muted-foreground/40" />
+              <div>
+                <p className="font-medium text-muted-foreground">Aucun lot dans cet immeuble</p>
+                <p className="text-sm text-muted-foreground/70">Ajoutez des lots un par un ou générez-en plusieurs</p>
+              </div>
+              <Button
+                onClick={() => {
+                  setGenerateImmeubleId(immeubles[0]?.id ?? null)
+                  setGenerateOpen(true)
+                }}
+              >
+                <Zap className="size-4 mr-2" />
+                Générer des lots
+              </Button>
+            </div>
+          ) : (
+            <DataTable
+              data={lotsData?.lots ?? []}
+              columns={lotsColumns}
+              rowKey="id"
+              isLoading={loadingLots}
+              searchable
+            />
+          )}
         </>
       )}
 
@@ -733,6 +770,21 @@ export function ResidencePage() {
         onConfirm={() => deletingImmeuble && deleteImmeubleMutation.mutate(deletingImmeuble.id)}
         isLoading={deleteImmeubleMutation.isPending}
       />
+
+      {/* Generate lots modal */}
+      {generateOpen && generateImmeubleId !== null && (
+        <GenerateLotsModal
+          open={generateOpen}
+          onOpenChange={setGenerateOpen}
+          residenceId={residenceId}
+          immeubleId={generateImmeubleId}
+          immeubleName={immeubles.find((i) => i.id === generateImmeubleId)?.nom ?? ''}
+          onSuccess={(count) => {
+            void qc.invalidateQueries({ queryKey: ['lots', residenceId] })
+            toast.success(`${count} lots créés avec succès`)
+          }}
+        />
+      )}
     </div>
   )
 }
