@@ -77,6 +77,24 @@ export type Residence = {
   total_tantieme: number
   status: string
   taux_recouvrement: number
+  mode_cotisation?: 'tantieme' | 'fixe'
+  montant_fixe?: number
+}
+
+export type GroupeHabitation = {
+  id: number
+  nom: string
+  code?: string
+  residence_id: number
+  nb_immeubles?: number
+}
+
+export type Immeuble = {
+  id: number
+  nom: string
+  groupe_habitation_id?: number | null
+  residence_id: number
+  nb_lots?: number
 }
 
 export type Lot = {
@@ -86,6 +104,8 @@ export type Lot = {
   etage: number
   superficie: number
   tantieme: number
+  immeuble_id?: number
+  immeuble?: { id: number; nom: string }
   coproprietaire: { id: number; name: string; phone: string } | null
 }
 
@@ -364,6 +384,19 @@ const MOCK_ASSEMBLEES_AG: AG[] = MOCK_ASSEMBLEES.map((a) => ({
   lieu: a.lieu,
 }))
 
+const MOCK_GROUPES_HABITATIONS: GroupeHabitation[] = [
+  { id: 1, nom: 'Tranche A', code: 'TA', residence_id: 1, nb_immeubles: 2 },
+  { id: 2, nom: 'Tranche B', code: 'TB', residence_id: 1, nb_immeubles: 1 },
+  { id: 3, nom: 'Tranche Nord', code: 'TN', residence_id: 2, nb_immeubles: 1 },
+]
+
+const MOCK_IMMEUBLES: Immeuble[] = [
+  { id: 1, nom: 'Bâtiment 1', groupe_habitation_id: 1, residence_id: 1, nb_lots: 12 },
+  { id: 2, nom: 'Bâtiment 2', groupe_habitation_id: 1, residence_id: 1, nb_lots: 8 },
+  { id: 3, nom: 'Bâtiment 3', groupe_habitation_id: 2, residence_id: 1, nb_lots: 4 },
+  { id: 4, nom: 'Tour Principale', groupe_habitation_id: 3, residence_id: 2, nb_lots: 18 },
+]
+
 // ─── Dashboard ───────────────────────────────────────────────────────────────
 
 export async function getDashboard(residenceId?: number): Promise<DashboardData> {
@@ -439,7 +472,7 @@ export async function getLots(residenceId: number): Promise<{ lots: Lot[]; total
   }, { lots: MOCK_LOTS, total_tantieme: MOCK_LOTS.reduce((s, l) => s + l.tantieme, 0) })
 }
 
-export async function storeLot(residenceId: number, data: Pick<Lot, 'numero' | 'type' | 'etage' | 'superficie' | 'tantieme'>): Promise<Lot> {
+export async function storeLot(residenceId: number, data: Pick<Lot, 'numero' | 'type' | 'etage' | 'superficie' | 'tantieme'> & { immeuble_id?: number }): Promise<Lot> {
   const mockLot: Lot = {
     id: Date.now(),
     numero: data.numero,
@@ -447,6 +480,7 @@ export async function storeLot(residenceId: number, data: Pick<Lot, 'numero' | '
     etage: data.etage,
     superficie: data.superficie,
     tantieme: data.tantieme,
+    immeuble_id: data.immeuble_id,
     coproprietaire: null,
   }
   return withMock(async () => {
@@ -455,7 +489,7 @@ export async function storeLot(residenceId: number, data: Pick<Lot, 'numero' | '
   }, mockLot)
 }
 
-export async function updateLot(residenceId: number, lotId: number, data: Partial<Pick<Lot, 'numero' | 'type' | 'etage' | 'superficie' | 'tantieme'>>): Promise<Lot> {
+export async function updateLot(residenceId: number, lotId: number, data: Partial<Pick<Lot, 'numero' | 'type' | 'etage' | 'superficie' | 'tantieme'>> & { immeuble_id?: number }): Promise<Lot> {
   return withMock(async () => {
     const res = await api.put<ApiEnvelope<Lot>>(`/gestionnaire/residences/${residenceId}/lots/${lotId}`, data)
     return res.data.data
@@ -531,7 +565,7 @@ export async function getAppelsFonds(params?: { residence_id?: number; statut?: 
   }, MOCK_APPELS_FONDS)
 }
 
-export async function storeAppelFonds(data: { titre: string; residence_id: number; montant_total: number; date_echeance: string; description?: string }): Promise<AppelFonds> {
+export async function storeAppelFonds(data: { titre: string; residence_id: number; montant_total: number; date_echeance: string; description?: string; groupe_habitation_id?: number }): Promise<AppelFonds> {
   const res = await api.post<ApiEnvelope<{ appel_fonds: AppelFonds }>>('/gestionnaire/appels-fonds', data)
   return res.data.data.appel_fonds
 }
@@ -639,4 +673,131 @@ export async function getAssembleesAvenir(): Promise<AG[]> {
     const res = await api.get<ApiEnvelope<{ assemblees: AG[] }>>('/gestionnaire/assemblees')
     return res.data.data.assemblees
   }, MOCK_ASSEMBLEES_AG.filter((a) => new Date(a.date) > new Date()))
+}
+
+// ─── Groupes d'habitation (Tranches) ─────────────────────────────────────────
+
+export async function getGroupesHabitations(residenceId: number): Promise<GroupeHabitation[]> {
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<{ groupes_habitations: GroupeHabitation[] }>>(`/gestionnaire/residences/${residenceId}/groupes-habitations`)
+    return res.data.data.groupes_habitations
+  }, MOCK_GROUPES_HABITATIONS.filter((gh) => gh.residence_id === residenceId))
+}
+
+export async function storeGroupeHabitation(residenceId: number, data: { nom: string; code?: string }): Promise<GroupeHabitation> {
+  const mockGH: GroupeHabitation = {
+    id: Date.now(),
+    nom: data.nom,
+    code: data.code,
+    residence_id: residenceId,
+    nb_immeubles: 0,
+  }
+  return withMock(async () => {
+    const res = await api.post<ApiEnvelope<GroupeHabitation>>(`/gestionnaire/residences/${residenceId}/groupes-habitations`, data)
+    return res.data.data
+  }, mockGH)
+}
+
+export async function updateGroupeHabitation(residenceId: number, ghId: number, data: { nom?: string; code?: string }): Promise<GroupeHabitation> {
+  const existing = MOCK_GROUPES_HABITATIONS.find((gh) => gh.id === ghId) ?? { id: ghId, nom: data.nom ?? '', residence_id: residenceId }
+  return withMock(async () => {
+    const res = await api.put<ApiEnvelope<GroupeHabitation>>(`/gestionnaire/residences/${residenceId}/groupes-habitations/${ghId}`, data)
+    return res.data.data
+  }, { ...existing, ...data } as GroupeHabitation)
+}
+
+export async function deleteGroupeHabitation(residenceId: number, ghId: number): Promise<void> {
+  return withMock(async () => {
+    await api.delete(`/gestionnaire/residences/${residenceId}/groupes-habitations/${ghId}`)
+  }, undefined)
+}
+
+// ─── Immeubles ───────────────────────────────────────────────────────────────
+
+export async function getImmeubles(residenceId: number): Promise<Immeuble[]> {
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<{ immeubles: Immeuble[] }>>(`/gestionnaire/residences/${residenceId}/immeubles`)
+    return res.data.data.immeubles
+  }, MOCK_IMMEUBLES.filter((im) => im.residence_id === residenceId))
+}
+
+export async function storeImmeuble(residenceId: number, data: { nom: string; groupe_habitation_id?: number }): Promise<Immeuble> {
+  const mockImmeuble: Immeuble = {
+    id: Date.now(),
+    nom: data.nom,
+    groupe_habitation_id: data.groupe_habitation_id ?? null,
+    residence_id: residenceId,
+    nb_lots: 0,
+  }
+  return withMock(async () => {
+    const res = await api.post<ApiEnvelope<Immeuble>>(`/gestionnaire/residences/${residenceId}/immeubles`, data)
+    return res.data.data
+  }, mockImmeuble)
+}
+
+export async function updateImmeuble(residenceId: number, immeubleId: number, data: { nom?: string; groupe_habitation_id?: number }): Promise<Immeuble> {
+  const existing = MOCK_IMMEUBLES.find((im) => im.id === immeubleId) ?? { id: immeubleId, nom: data.nom ?? '', residence_id: residenceId }
+  return withMock(async () => {
+    const res = await api.put<ApiEnvelope<Immeuble>>(`/gestionnaire/residences/${residenceId}/immeubles/${immeubleId}`, data)
+    return res.data.data
+  }, { ...existing, ...data } as Immeuble)
+}
+
+export async function deleteImmeuble(residenceId: number, immeubleId: number): Promise<void> {
+  return withMock(async () => {
+    await api.delete(`/gestionnaire/residences/${residenceId}/immeubles/${immeubleId}`)
+  }, undefined)
+}
+
+export async function getLotsByImmeuble(immeubleId: number): Promise<{ lots: Lot[]; total_tantieme: number }> {
+  const mockLots = MOCK_LOTS.filter((l) => l.immeuble_id === immeubleId)
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<{ lots: Lot[]; total_tantieme: number }>>(`/gestionnaire/immeubles/${immeubleId}/lots`)
+    return res.data.data
+  }, { lots: mockLots, total_tantieme: mockLots.reduce((s, l) => s + l.tantieme, 0) })
+}
+
+// ─── Prestataires ─────────────────────────────────────────────────────────────
+
+export type Prestataire = {
+  id: number
+  nom: string
+  secteur?: string
+}
+
+export type Contrat = {
+  id: number
+  prestataire_id: number
+  titre: string
+  date_debut?: string
+  date_fin?: string
+}
+
+const MOCK_PRESTATAIRES: Prestataire[] = [
+  { id: 1, nom: 'Kone Maroc', secteur: 'Ascenseurs' },
+  { id: 2, nom: 'CleanPro', secteur: 'Nettoyage' },
+  { id: 3, nom: 'Securitas', secteur: 'Gardiennage' },
+]
+
+const MOCK_CONTRATS: Contrat[] = [
+  { id: 1, prestataire_id: 1, titre: 'Maintenance ascenseurs 2026', date_debut: '2026-01-01', date_fin: '2026-12-31' },
+  { id: 2, prestataire_id: 2, titre: 'Nettoyage parties communes 2026', date_debut: '2026-01-01', date_fin: '2026-12-31' },
+  { id: 3, prestataire_id: 3, titre: 'Gardiennage 24h/24 2026', date_debut: '2026-01-01', date_fin: '2026-12-31' },
+]
+
+export async function getPrestataires(): Promise<Prestataire[]> {
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<{ prestataires: Prestataire[] }>>('/gestionnaire/prestataires')
+    return res.data.data.prestataires
+  }, MOCK_PRESTATAIRES)
+}
+
+export async function getContrats(prestataireId?: number): Promise<Contrat[]> {
+  return withMock(async () => {
+    const params = prestataireId !== undefined ? { prestataire_id: prestataireId } : {}
+    const res = await api.get<ApiEnvelope<{ contrats: Contrat[] }>>('/gestionnaire/contrats', { params })
+    return res.data.data.contrats
+  }, prestataireId !== undefined
+    ? MOCK_CONTRATS.filter((c) => c.prestataire_id === prestataireId)
+    : MOCK_CONTRATS)
 }

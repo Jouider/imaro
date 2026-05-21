@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { PiggyBank, Plus, Trash2, Lock, Send, Sparkles, TrendingDown, TrendingUp, CheckCircle2, Download, Loader2 } from 'lucide-react'
+import { PiggyBank, Plus, Trash2, Lock, Send, Sparkles, TrendingDown, TrendingUp, CheckCircle2, Download, Loader2, ChevronDown, ChevronUp } from 'lucide-react'
 import {
   BarChart,
   Bar,
@@ -29,6 +29,8 @@ import {
 import {
   getResidences,
   getExercices,
+  getPrestataires,
+  getContrats,
   type Exercice,
 } from '@/services/gestionnaire.service'
 import { getComptesPcg } from '@/services/comptabilite.service'
@@ -408,6 +410,15 @@ export function BudgetsPage() {
   const [addLigneDialog, setAddLigneDialog] = useState<{ type: LigneBudget['type'] } | null>(null)
   const [deleteLigneTarget, setDeleteLigneTarget] = useState<number | null>(null)
   const [addLigneForm, setAddLigneForm] = useState({ compte_pcg: '', libelle: '', budget_n: '' })
+  const [prestataireOpen, setPrestataireOpen] = useState(false)
+  const [prestataireForm, setPrestataireForm] = useState({
+    prestataire_id: '',
+    contrat_id: '',
+    nombre: '',
+    prix_unitaire: '',
+    date_debut: '',
+    date_fin: '',
+  })
 
   // ── Queries ────────────────────────────────────────────────────────────────
 
@@ -434,6 +445,20 @@ export function BudgetsPage() {
     enabled: !!addLigneDialog,
   })
 
+  const { data: prestataires = [] } = useQuery({
+    queryKey: ['prestataires'],
+    queryFn: () => getPrestataires(),
+    enabled: !!addLigneDialog && prestataireOpen,
+  })
+
+  const selectedPrestataireId = prestataireForm.prestataire_id ? Number(prestataireForm.prestataire_id) : undefined
+
+  const { data: contrats = [] } = useQuery({
+    queryKey: ['contrats', selectedPrestataireId],
+    queryFn: () => getContrats(selectedPrestataireId),
+    enabled: !!addLigneDialog && prestataireOpen,
+  })
+
   // ── Mutations ─────────────────────────────────────────────────────────────
 
   const createBudgetMutation = useMutation({
@@ -448,12 +473,18 @@ export function BudgetsPage() {
     onError: () => toast.error('Erreur lors de la sauvegarde'),
   })
 
+  const resetAddLigneDialog = () => {
+    setAddLigneDialog(null)
+    setAddLigneForm({ compte_pcg: '', libelle: '', budget_n: '' })
+    setPrestataireOpen(false)
+    setPrestataireForm({ prestataire_id: '', contrat_id: '', nombre: '', prix_unitaire: '', date_debut: '', date_fin: '' })
+  }
+
   const ajouterLigneMutation = useMutation({
     mutationFn: (data: Partial<LigneBudget>) => ajouterLigne(budget!.id, data),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['budget-annexe5', residenceId, exerciceId] })
-      setAddLigneDialog(null)
-      setAddLigneForm({ compte_pcg: '', libelle: '', budget_n: '' })
+      resetAddLigneDialog()
       toast.success('Ligne ajoutée')
     },
     onError: () => toast.error('Erreur'),
@@ -860,8 +891,8 @@ export function BudgetsPage() {
       />
 
       {/* Add ligne dialog */}
-      <Dialog open={!!addLigneDialog} onOpenChange={(o) => !o && setAddLigneDialog(null)}>
-        <DialogContent className="max-w-md">
+      <Dialog open={!!addLigneDialog} onOpenChange={(o) => !o && resetAddLigneDialog()}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Ajouter une ligne</DialogTitle>
           </DialogHeader>
@@ -900,21 +931,145 @@ export function BudgetsPage() {
                 onChange={(e) => setAddLigneForm((f) => ({ ...f, budget_n: e.target.value }))}
               />
             </div>
+
+            {/* Prestataire collapsible section */}
+            <div className="rounded-lg border">
+              <button
+                type="button"
+                className="flex w-full items-center justify-between px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setPrestataireOpen((o) => !o)}
+              >
+                <span>Lier un prestataire (optionnel)</span>
+                {prestataireOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+              </button>
+
+              {prestataireOpen && (
+                <div className="border-t px-3 pb-3 pt-3 space-y-3">
+                  <div className="space-y-1">
+                    <Label>Prestataire</Label>
+                    <Select
+                      value={prestataireForm.prestataire_id}
+                      onValueChange={(v) =>
+                        setPrestataireForm((f) => ({ ...f, prestataire_id: v, contrat_id: '' }))
+                      }
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Sélectionner un prestataire" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {prestataires.map((p) => (
+                          <SelectItem key={p.id} value={String(p.id)}>
+                            {p.nom}{p.secteur ? ` — ${p.secteur}` : ''}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label>Contrat</Label>
+                    <Select
+                      value={prestataireForm.contrat_id}
+                      onValueChange={(v) => setPrestataireForm((f) => ({ ...f, contrat_id: v }))}
+                      disabled={contrats.length === 0}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder={contrats.length === 0 ? 'Aucun contrat' : 'Sélectionner un contrat'} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {contrats.map((c) => (
+                          <SelectItem key={c.id} value={String(c.id)}>{c.titre}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label>Nombre (ex. 12 mois)</Label>
+                      <Input
+                        type="number"
+                        placeholder="12"
+                        value={prestataireForm.nombre}
+                        onChange={(e) => {
+                          const nombre = e.target.value
+                          setPrestataireForm((f) => ({ ...f, nombre }))
+                          if (nombre && prestataireForm.prix_unitaire) {
+                            const computed = Number(nombre) * Number(prestataireForm.prix_unitaire)
+                            setAddLigneForm((f) => ({ ...f, budget_n: String(computed) }))
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label>Prix unitaire (DH)</Label>
+                      <Input
+                        type="number"
+                        placeholder="5000"
+                        value={prestataireForm.prix_unitaire}
+                        onChange={(e) => {
+                          const prix_unitaire = e.target.value
+                          setPrestataireForm((f) => ({ ...f, prix_unitaire }))
+                          if (prestataireForm.nombre && prix_unitaire) {
+                            const computed = Number(prestataireForm.nombre) * Number(prix_unitaire)
+                            setAddLigneForm((f) => ({ ...f, budget_n: String(computed) }))
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {prestataireForm.nombre && prestataireForm.prix_unitaire && (
+                    <p className="text-xs text-muted-foreground">
+                      Montant auto-calculé : <strong className="text-foreground">{(Number(prestataireForm.nombre) * Number(prestataireForm.prix_unitaire)).toLocaleString('fr-MA')} DH</strong> — modifiable dans le champ Budget N ci-dessus.
+                    </p>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label>Date début</Label>
+                      <Input
+                        type="date"
+                        value={prestataireForm.date_debut}
+                        onChange={(e) => setPrestataireForm((f) => ({ ...f, date_debut: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label>Date fin</Label>
+                      <Input
+                        type="date"
+                        value={prestataireForm.date_fin}
+                        onChange={(e) => setPrestataireForm((f) => ({ ...f, date_fin: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAddLigneDialog(null)} disabled={ajouterLigneMutation.isPending}>
+            <Button variant="outline" onClick={resetAddLigneDialog} disabled={ajouterLigneMutation.isPending}>
               {t('actions.cancel')}
             </Button>
             <Button
-              onClick={() =>
-                addLigneDialog &&
-                ajouterLigneMutation.mutate({
+              onClick={() => {
+                if (!addLigneDialog) return
+                const payload: Partial<LigneBudget> = {
                   compte_pcg: addLigneForm.compte_pcg,
                   libelle: addLigneForm.libelle,
                   budget_n: Number(addLigneForm.budget_n),
                   type: addLigneDialog.type,
-                })
-              }
+                }
+                if (prestataireOpen) {
+                  if (prestataireForm.prestataire_id) payload.prestataire_id = Number(prestataireForm.prestataire_id)
+                  if (prestataireForm.contrat_id) payload.contrat_id = Number(prestataireForm.contrat_id)
+                  if (prestataireForm.nombre) payload.nombre = Number(prestataireForm.nombre)
+                  if (prestataireForm.prix_unitaire) payload.prix_unitaire = Number(prestataireForm.prix_unitaire)
+                  if (prestataireForm.date_debut) payload.date_debut = prestataireForm.date_debut
+                  if (prestataireForm.date_fin) payload.date_fin = prestataireForm.date_fin
+                }
+                ajouterLigneMutation.mutate(payload)
+              }}
               disabled={!addLigneForm.libelle || !addLigneForm.budget_n || ajouterLigneMutation.isPending}
             >
               {ajouterLigneMutation.isPending ? t('actions.loading') : t('actions.save')}
