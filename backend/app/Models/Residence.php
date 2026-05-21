@@ -37,6 +37,16 @@ class Residence extends Model
         return $this->belongsTo(User::class, 'gestionnaire_id');
     }
 
+    public function exercices(): HasMany
+    {
+        return $this->hasMany(Exercice::class);
+    }
+
+    public function exerciceActif(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Exercice::class)->where('statut', 'actif')->latestOfMany('annee');
+    }
+
     public function lots(): HasMany
     {
         return $this->hasMany(Lot::class);

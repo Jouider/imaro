@@ -12,8 +12,8 @@ class Assemblee extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tenant_id', 'residence_id', 'created_by', 'titre',
-        'date', 'lieu', 'ordre_du_jour', 'statut', 'quorum_atteint', 'pv_pdf_path',
+        'tenant_id', 'residence_id', 'created_by', 'titre', 'type',
+        'date', 'lieu', 'quorum_requis', 'ordre_du_jour', 'statut', 'quorum_atteint', 'pv_pdf_path',
     ];
 
     protected function casts(): array

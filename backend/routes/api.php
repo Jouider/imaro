@@ -10,8 +10,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('auth')->group(function () {
-    Route::post('/request-otp', [AuthController::class, 'requestOtp']);
-    Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
+    // Admin (manager, gestionnaire, conseil, super_admin) — email + password
+    Route::post('/login', [AuthController::class, 'login']);
+
+    // Résident (portail mobile) — téléphone + code
+    Route::post('/resident/login',    [AuthController::class, 'residentLogin']);
+    Route::post('/resident/activate', [AuthController::class, 'residentActivate']);
 });
 
 /*
@@ -35,8 +39,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->prefix('manager')
         ->group(base_path('routes/api/manager.php'));
 
-    // Gestionnaire
-    Route::middleware('role:gestionnaire')
+    // Gestionnaire (accessible par manager aussi)
+    Route::middleware('role:manager|gestionnaire')
         ->prefix('gestionnaire')
         ->group(base_path('routes/api/gestionnaire.php'));
 
@@ -50,8 +54,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->prefix('conseil')
         ->group(base_path('routes/api/conseil.php'));
 
-    // Résident (portail mobile)
+    // Résident (portail copropriétaire)
     Route::middleware('role:resident')
-        ->prefix('resident')
+        ->prefix('portail')
         ->group(base_path('routes/api/resident.php'));
 });

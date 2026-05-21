@@ -1,0 +1,988 @@
+{
+  "app": {
+    "name": "Imaro",
+    "tagline": "إدارة الملكية المشتركة — المغرب"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "dashboard": "لوحة التحكم"
+  },
+  "language": {
+    "fr": "Français",
+    "ar": "العربية",
+    "switch": "تغيير اللغة"
+  },
+  "auth": {
+    "title": "تسجيل الدخول إلى Imaro",
+    "subtitle": "تلقَّ رمزًا من 6 أرقام عبر واتساب",
+    "phone": "الهاتف",
+    "phonePlaceholder": "+212 6XX XX XX XX",
+    "requestOtp": "إرسال الرمز",
+    "otp": "رمز التحقق",
+    "otpPlaceholder": "123456",
+    "verifyOtp": "تحقق",
+    "back": "رجوع"
+  },
+  "statut": {
+    "paye": "مدفوع",
+    "impaye": "غير مدفوع",
+    "partiel": "جزئي",
+    "retard": "متأخر"
+  },
+  "actions": {
+    "confirm": "تأكيد",
+    "cancel": "إلغاء",
+    "loading": "جارٍ التحميل…",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "save": "حفظ"
+  },
+  "portail": {
+    "nav": {
+      "home": "الرئيسية",
+      "actualites": "الأخبار",
+      "finances": "المالية",
+      "reclamations": "الشكاوى",
+      "profil": "الملف الشخصي"
+    },
+    "home": {
+      "balance": "رصيدي",
+      "aJour": "محدَّث",
+      "enRetard": "متأخر",
+      "prochainAppel": "الاستدعاء القادم",
+      "le": "في",
+      "annonces": "الإعلانات",
+      "voirTout": "عرض الكل",
+      "noAnnonces": "لا توجد إعلانات",
+      "kpiPaidYear": "المدفوع هذا العام",
+      "kpiPending": "المبلغ المتبقي",
+      "assemblees": "الجمعيات القادمة",
+      "noAssemblees": "لا توجد جمعيات مبرمجة",
+      "prochainPaiement": "الدفعة القادمة",
+      "payer": "الدفع ←"
+    },
+    "actualites": {
+      "title": "الأخبار",
+      "tabAnnonces": "الإعلانات",
+      "tabAssemblees": "الجمعيات",
+      "tabCalendrier": "التقويم",
+      "noAnnonces": "لا توجد إعلانات لإقامتك",
+      "noAssemblees": "لا توجد جمعيات مبرمجة",
+      "urgente": "عاجل",
+      "lectures": "{{n}} قراءة",
+      "quorum": "النصاب: {{n}} %",
+      "participants": "{{n}} مشارك",
+      "agNonTenue": "لم تُعقد الجمعية بعد",
+      "ordreDuJour": "جدول الأعمال",
+      "convoquee": "مدعوة",
+      "tenue": "منعقدة",
+      "annulee": "ملغاة",
+      "ordinaire": "عادية",
+      "extraordinaire": "غير عادية",
+      "calendarHint": "انقر على يوم محدد لعرض الأحداث",
+      "calendarEmpty": "لا توجد أحداث هذا الشهر"
+    },
+    "finances": {
+      "title": "ماليتي",
+      "tabFinances": "الماليات",
+      "tabDocuments": "الوثائق",
+      "filter": {
+        "all": "الكل",
+        "appels": "استدعاءات الأموال",
+        "paiements": "المدفوعات"
+      },
+      "empty": "لا توجد عمليات",
+      "recu": "تحميل الإيصال",
+      "documents": {
+        "title": "وثائقي",
+        "empty": "لا توجد وثائق متاحة",
+        "download": "تحميل",
+        "groupReglement": "نظام الملكية المشتركة",
+        "groupPvAg": "محاضر الجمعيات",
+        "groupContratFacture": "العقود / الفواتير",
+        "groupAutre": "وثائق أخرى"
+      }
+    },
+    "reclamations": {
+      "title": "الإبلاغ عن مشكلة",
+      "categorie": "الفئة",
+      "sujet": "الموضوع",
+      "description": "الوصف",
+      "submit": "الإبلاغ عن المشكلة",
+      "success": "تم إرسال الشكوى",
+      "hint": "تتم معالجة شكاواكم في غضون 48 ساعة عمل.",
+      "addPhoto": "إضافة صورة",
+      "removePhoto": "حذف الصورة",
+      "photoHint": "JPEG أو PNG أو WebP · الحد الأقصى 5 صور · 5 ميغابايت/صورة",
+      "photoSizeError": "الملف كبير جدًا (الحد الأقصى 5 ميغابايت للصورة)"
+    },
+    "profil": {
+      "title": "ملفي الشخصي",
+      "apparence": "المظهر",
+      "darkMode": "الوضع الداكن",
+      "logout": "تسجيل الخروج"
+    },
+    "login": {
+      "title": "بوابة الملاك المشاركين",
+      "subtitle": "سيصلك رمز مكوّن من 6 أرقام عبر واتساب",
+      "phone": "رقم الهاتف",
+      "phonePlaceholder": "6XX XX XX XX",
+      "sendCode": "استلام رمز واتساب",
+      "sending": "جارٍ الإرسال…",
+      "otp": "رمز التحقق",
+      "otpHint": "أدخل الرمز المكوّن من 6 أرقام الذي وصلك عبر واتساب",
+      "verify": "الدخول إلى حسابي",
+      "verifying": "جارٍ التحقق…",
+      "resend": "إعادة إرسال الرمز",
+      "resendIn": "إعادة الإرسال خلال {{s}}ث",
+      "changePhone": "تغيير رقم الهاتف",
+      "noCode": "لم تستلم الرمز؟",
+      "smsFallback": "الاستلام عبر رسالة SMS"
+    },
+    "dashboard": {
+      "welcome": "مرحباً، {{name}} !",
+      "subtitle": "بوابة المالك المشارك"
+    }
+  },
+  "home": {
+    "title": "مرحبًا بكم في Imaro",
+    "subtitle": "منصة مغربية لإدارة الملكية المشتركة وفق القانون 18-00",
+    "ctaLogin": "تسجيل الدخول",
+    "stackHeading": "المكدس التقني",
+    "cards": {
+      "residences": {
+        "title": "الإقامات",
+        "desc": "الشقق، الحصص، الملاك المشاركون"
+      },
+      "appelsFonds": {
+        "title": "نداءات الأموال",
+        "desc": "حساب تلقائي حسب الحصص + التذكيرات"
+      },
+      "loi": {
+        "title": "القانون 18-00",
+        "desc": "ملفات PDF مطابقة + متعدد المستأجرين"
+      }
+    },
+    "nav": {
+      "gestionnaire": "المدير",
+      "coproprietaire": "المالك المشارك"
+    },
+    "hero": {
+      "headline1": "إدارة الملكية",
+      "headline2": "المشتركة بشكل مختلف",
+      "sub": "منصة متكاملة للمديرين والملاك المشاركين المغاربة — وفق القانون 18-00.",
+      "ctaGestionnaire": "دخول المدير",
+      "ctaCoproprietaire": "دخول المالك",
+      "badge": "القانون 18-00 ✓"
+    },
+    "stats": {
+      "residences": "مجمع سكني",
+      "coproprietaires": "مالك مشارك",
+      "dispo": "التوفر",
+      "loi": "مطابق للقانون 18-00"
+    },
+    "features": {
+      "title": "كل ما تحتاجه",
+      "sub": "حل متكامل لإدارة الملكية المشتركة الحديثة",
+      "residences": { "title": "إدارة المجمعات", "desc": "الشقق والحصص والملاك في مكان واحد" },
+      "appels": { "title": "استدعاءات الأموال التلقائية", "desc": "حساب حسب الحصص وإرسال واتساب فوري" },
+      "paiements": { "title": "متابعة المدفوعات", "desc": "سجل كامل والمتأخرات في الوقت الفعلي" },
+      "tickets": { "title": "التذاكر والشكاوى", "desc": "معالجة مع صور ومتابعة الحالة" },
+      "assemblees": { "title": "الجمعيات العامة", "desc": "الدعوات وجداول الأعمال ومحاضر الاجتماعات" },
+      "portail": { "title": "بوابة المالك", "desc": "تطبيق جوال لكل ساكن" }
+    },
+    "howItWorks": {
+      "title": "جاهز للعمل في 3 خطوات",
+      "sub": "ابدأ في دقائق، بدون تدريب تقني",
+      "step1": { "title": "أنشئ مجمعك السكني", "desc": "أضف شققك وحصصك وملاكك بضع نقرات" },
+      "step2": { "title": "ادعُ الملاك المشاركين", "desc": "يتلقون وصولاً عبر واتساب إلى بوابتهم الشخصية" },
+      "step3": { "title": "أدِر في الوقت الفعلي", "desc": "لوحة تحكم، تذكيرات تلقائية، تقارير فورية" }
+    },
+    "portals": {
+      "gestionnaire": {
+        "title": "فضاء المدير",
+        "desc": "أدِر محفظة مجمعاتك من لوحة تحكم موحدة.",
+        "cta": "دخول المدير ←"
+      },
+      "coproprietaire": {
+        "title": "فضاء المالك المشارك",
+        "desc": "اطلع على رسومك وادفع عبر الإنترنت وأبلغ عن مشاكل.",
+        "cta": "دخول المالك ←"
+      }
+    },
+    "footer": {
+      "tagline": "إدارة الملكية المشتركة مُبسَّطة للمغرب",
+      "legal": "مطابق للقانون 18-00 · المغرب",
+      "copyright": "© 2026 Imaro. جميع الحقوق محفوظة."
+    }
+  },
+  "gestionnaire": {
+    "nav": {
+      "dashboard": "لوحة التحكم",
+      "sectionCopropriete": "الملكية المشتركة",
+      "residences": "الإقامات",
+      "coproprietaires": "الملاك المشاركون",
+      "prestataires": "المزودون",
+      "sectionFinances": "المالية",
+      "appelsFonds": "استدعاءات الأموال",
+      "paiements": "المدفوعات",
+      "depenses": "المصاريف",
+      "budgets": "الميزانية",
+      "comptabilite": "المحاسبة",
+      "sectionOperations": "العمليات",
+      "tickets": "التذاكر",
+      "assemblees": "الجمعيات العامة",
+      "annonces": "الإعلانات",
+      "documents": "الوثائق",
+      "profil": "ملفي الشخصي"
+    },
+    "residences": {
+      "title": "الإقامات",
+      "subtitle": "جميع مجمعات الملكية المشتركة المُدارة",
+      "searchPlaceholder": "ابحث بالاسم أو المدينة…",
+      "colNom": "الاسم",
+      "colAdresse": "العنوان",
+      "colVille": "المدينة",
+      "colLots": "الشقق",
+      "colRecouvrement": "نسبة التحصيل",
+      "empty": "لا توجد إقامات",
+      "emptyDesc": "لا تدير حسابك أي إقامة حتى الآن."
+    },
+    "residence": {
+      "tabLots": "الشقق",
+      "tabCoproprietaires": "الملاك",
+      "tabExercices": "السنوات المالية",
+      "colNumero": "رقم",
+      "colType": "النوع",
+      "colEtage": "الطابق",
+      "colSuperficie": "المساحة",
+      "colTantieme": "الحصة",
+      "colProprietaire": "المالك",
+      "colNom": "الاسم",
+      "colTelephone": "الهاتف",
+      "colSolde": "الرصيد",
+      "colAnnee": "السنة",
+      "colStatut": "الحالة",
+      "addLot": "إضافة شقة",
+      "editLot": "تعديل الشقة",
+      "deleteLot": "حذف الشقة",
+      "deleteLotDesc": "ستُحذف الشقة {{numero}} نهائيًا.",
+      "addExercice": "سنة مالية جديدة",
+      "lotTypes": {
+        "appartement": "شقة",
+        "commerce": "محل تجاري",
+        "parking": "موقف سيارات",
+        "cave": "مخزن",
+        "bureau": "مكتب",
+        "autre": "أخرى"
+      },
+      "exerciceStatut": {
+        "actif": "نشط",
+        "cloture": "مغلق"
+      },
+      "totalTantieme": "إجمالي الحصص: {{val}} / 1000",
+      "backToList": "الإقامات"
+    },
+    "coproprietaires": {
+      "title": "الملاك المشاركون",
+      "subtitle": "اختر إقامة لعرض ملاكها",
+      "selectResidence": "اختر إقامة",
+      "allResidences": "جميع الإقامات",
+      "colNom": "الاسم",
+      "colTelephone": "الهاتف",
+      "colLot": "الشقة",
+      "colSolde": "الرصيد",
+      "colResidence": "الإقامة",
+      "empty": "لا يوجد ملاك",
+      "emptyDesc": "اختر إقامة أعلاه لعرض ملاكها."
+    },
+    "appelsFonds": {
+      "title": "استدعاءات الأموال",
+      "subtitle": "إدارة استدعاءات الأموال ومتابعة التحصيل",
+      "newAppel": "استدعاء جديد",
+      "colTitre": "العنوان",
+      "colResidence": "الإقامة",
+      "colMontant": "المبلغ الإجمالي",
+      "colRecouvre": "المحصَّل",
+      "colEcheance": "تاريخ الاستحقاق",
+      "colStatut": "الحالة",
+      "colActions": "إجراءات",
+      "statut": {
+        "brouillon": "مسودة",
+        "publie": "منشور",
+        "cloture": "مغلق"
+      },
+      "envoyer": "إرسال",
+      "envoyerConfirm": "إرسال استدعاء الأموال للملاك؟",
+      "envoyerDesc": "سيتم إرسال إشعار واتساب لجميع الملاك.",
+      "envoyerSuccess": "تم إرسال استدعاء الأموال",
+      "form": {
+        "titre": "العنوان",
+        "residence": "الإقامة",
+        "montant": "المبلغ الإجمالي (درهم)",
+        "echeance": "تاريخ الاستحقاق",
+        "description": "الوصف (اختياري)"
+      },
+      "empty": "لا توجد استدعاءات",
+      "emptyDesc": "أنشئ أول استدعاء للأموال."
+    },
+    "paiements": {
+      "title": "المدفوعات",
+      "tabHistorique": "السجل",
+      "tabImpayes": "المتأخرات",
+      "newPaiement": "تسجيل دفعة",
+      "colDate": "التاريخ",
+      "colReference": "المرجع",
+      "colCoproprietaire": "المالك",
+      "colLot": "الشقة",
+      "colAppel": "استدعاء الأموال",
+      "colMontant": "المبلغ",
+      "colMode": "طريقة الدفع",
+      "colStatut": "الحالة",
+      "colMontantDu": "المبلغ المستحق",
+      "colRestant": "المتبقي",
+      "colJoursRetard": "أيام التأخير",
+      "modes": {
+        "especes": "نقدًا",
+        "virement": "تحويل بنكي",
+        "cheque": "شيك",
+        "mobile": "دفع إلكتروني"
+      },
+      "form": {
+        "appelLigne": "الشقة / استدعاء الأموال",
+        "montant": "المبلغ (درهم)",
+        "date": "تاريخ الدفع",
+        "mode": "طريقة الدفع",
+        "reference": "المرجع (اختياري)",
+        "notes": "ملاحظات (اختياري)"
+      },
+      "emptyHistorique": "لا توجد مدفوعات مسجلة",
+      "emptyImpayes": "لا توجد متأخرات"
+    },
+    "tickets": {
+      "title": "التذاكر",
+      "subtitle": "متابعة الشكاوى والتدخلات",
+      "colRef": "المرجع",
+      "colTitre": "الوصف",
+      "colResidence": "الإقامة",
+      "colPriorite": "الأولوية",
+      "colStatut": "الحالة",
+      "colDate": "التاريخ",
+      "colActions": "إجراءات",
+      "filterAll": "الكل",
+      "filterStatut": "الحالة",
+      "filterPriorite": "الأولوية",
+      "statut": {
+        "ouvert": "مفتوح",
+        "en_cours": "قيد المعالجة",
+        "resolu": "تم الحل",
+        "clos": "مغلق"
+      },
+      "priorite": {
+        "urgent": "عاجل",
+        "normal": "عادي",
+        "faible": "منخفض"
+      },
+      "detail": "تفاصيل التذكرة",
+      "closeTicket": "إغلاق التذكرة",
+      "closeConfirm": "إغلاق هذه التذكرة نهائيًا؟",
+      "closeDesc": "هذا الإجراء لا يمكن التراجع عنه. ستنتقل التذكرة إلى حالة 'مغلق'.",
+      "closeSuccess": "تم إغلاق التذكرة",
+      "updateSuccess": "تم تحديث التذكرة",
+      "images": "الصور",
+      "noImages": "لا توجد صور",
+      "empty": "لا توجد تذاكر",
+      "emptyDesc": "لا توجد تذاكر تطابق الفلاتر المحددة.",
+      "viewKanban": "كانبان",
+      "viewTable": "جدول"
+    },
+    "documents": {
+      "title": "الوثائق",
+      "subtitle": "مركز وثائق مجمعاتك",
+      "add": "إضافة وثيقة",
+      "filterType": "النوع",
+      "filterResidence": "الإقامة",
+      "filterAll": "الكل",
+      "colNom": "الاسم",
+      "colType": "النوع",
+      "colResidence": "الإقامة",
+      "colDate": "التاريخ",
+      "colTaille": "الحجم",
+      "download": "تحميل",
+      "delete": "حذف",
+      "deleteConfirm": "حذف هذه الوثيقة؟",
+      "deleteDesc": "ستُحذف هذه الوثيقة نهائيًا.",
+      "toutes": "جميع الإقامات",
+      "empty": "لا توجد وثائق",
+      "emptyDesc": "أضف أول وثيقة لمشاركتها مع الملاك المشاركين.",
+      "addSuccess": "تمت إضافة الوثيقة",
+      "deleteSuccess": "تم حذف الوثيقة",
+      "form": {
+        "nom": "اسم الوثيقة",
+        "type": "النوع",
+        "residence": "الإقامة (اختياري)",
+        "date": "التاريخ",
+        "file": "الملف"
+      },
+      "types": {
+        "reglement": "النظام الداخلي",
+        "pv_ag": "محضر جمعية",
+        "contrat": "عقد",
+        "facture": "فاتورة",
+        "autre": "أخرى"
+      }
+    },
+    "assemblees": {
+      "title": "الجمعيات العامة",
+      "subtitle": "الدعوات ومحاضر الاجتماعات ومتابعة الجمعيات",
+      "newAG": "جمعية عامة جديدة",
+      "tabAVenir": "القادمة",
+      "tabPassees": "المنتهية",
+      "colTitre": "العنوان",
+      "colType": "النوع",
+      "colResidence": "الإقامة",
+      "colDate": "التاريخ والوقت",
+      "colLieu": "المكان",
+      "colStatut": "الحالة",
+      "type": {
+        "ordinaire": "عادية",
+        "extraordinaire": "غير عادية"
+      },
+      "statut": {
+        "convoquee": "مدعوة",
+        "tenue": "منعقدة",
+        "annulee": "ملغاة"
+      },
+      "form": {
+        "titre": "العنوان",
+        "type": "النوع",
+        "residence": "الإقامة",
+        "date": "التاريخ",
+        "heure": "الوقت",
+        "lieu": "المكان",
+        "quorum": "النصاب المطلوب",
+        "ordreDuJour": "جدول الأعمال"
+      },
+      "empty": "لا توجد جمعيات",
+      "emptyDesc": "لا توجد جمعيات عامة مجدولة حاليًا."
+    },
+    "annonces": {
+      "title": "الإعلانات",
+      "subtitle": "التواصل مع ملاك الإقامات",
+      "newAnnonce": "إعلان جديد",
+      "tabToutes": "الكل",
+      "tabPubliees": "منشورة",
+      "tabBrouillons": "مسودات",
+      "tabArchivees": "مؤرشفة",
+      "colTitre": "العنوان",
+      "colResidence": "الإقامة",
+      "colStatut": "الحالة",
+      "colPriorite": "الأولوية",
+      "colDate": "التاريخ",
+      "colLectures": "القراءات",
+      "statut": {
+        "brouillon": "مسودة",
+        "publiee": "منشور",
+        "archivee": "مؤرشف"
+      },
+      "priorite": {
+        "normale": "عادية",
+        "urgente": "عاجلة"
+      },
+      "toutes": "جميع الإقامات",
+      "publier": "نشر",
+      "archiver": "أرشفة",
+      "publishConfirm": "نشر هذا الإعلان؟",
+      "publishDesc": "سيتمكن الملاك من رؤية هذا الإعلان فور نشره.",
+      "publishSuccess": "تم نشر الإعلان",
+      "archiveConfirm": "أرشفة هذا الإعلان؟",
+      "archiveDesc": "لن يظهر الإعلان للملاك بعد الأرشفة.",
+      "archiveSuccess": "تم أرشفة الإعلان",
+      "deleteConfirm": "حذف هذا الإعلان؟",
+      "deleteDesc": "هذا الإجراء لا يمكن التراجع عنه.",
+      "deleteSuccess": "تم حذف الإعلان",
+      "form": {
+        "titre": "العنوان",
+        "contenu": "المحتوى",
+        "priorite": "الأولوية",
+        "residence": "الإقامة (اتركه فارغًا = جميع الإقامات)"
+      },
+      "empty": "لا توجد إعلانات",
+      "emptyDesc": "أنشئ أول إعلان لإعلام الملاك."
+    },
+    "prestataires": {
+      "title": "المزودون والعقود",
+      "subtitle": "إدارة الموردين وعقود الصيانة",
+      "tabPrestataires": "المزودون",
+      "tabContrats": "العقود",
+      "newPrestataire": "مزود جديد",
+      "newContrat": "عقد جديد",
+      "colNom": "الاسم",
+      "colSpecialite": "التخصص",
+      "colTelephone": "الهاتف",
+      "colNote": "التقييم",
+      "colInterventions": "التدخلات",
+      "colStatut": "الحالة",
+      "colTitre": "العنوان",
+      "colPrestataire": "المزود",
+      "colResidence": "الإقامة",
+      "colMontant": "المبلغ/السنة",
+      "colDebut": "البداية",
+      "colFin": "النهاية",
+      "colRenouvellement": "تلقائي",
+      "statut": {
+        "actif": "نشط",
+        "blackliste": "محظور",
+        "expire": "منتهي",
+        "resilie": "مُنهى"
+      },
+      "specialite": {
+        "ascenseurs": "المصاعد",
+        "electricite": "الكهرباء",
+        "proprete": "النظافة",
+        "plomberie": "السباكة",
+        "securite": "الأمن",
+        "autre": "أخرى"
+      },
+      "typeContrat": {
+        "maintenance": "صيانة",
+        "nettoyage": "تنظيف",
+        "gardiennage": "حراسة",
+        "autre": "أخرى"
+      },
+      "expiresIn": "ينتهي خلال {{n}} ي",
+      "expired": "منتهي",
+      "form": {
+        "nom": "الاسم",
+        "specialite": "التخصص",
+        "telephone": "الهاتف",
+        "email": "البريد الإلكتروني",
+        "adresse": "العنوان",
+        "titre": "عنوان العقد",
+        "prestataire": "المزود",
+        "residence": "الإقامة",
+        "typeContrat": "نوع العقد",
+        "montant": "المبلغ السنوي (درهم)",
+        "dateDebut": "تاريخ البداية",
+        "dateFin": "تاريخ النهاية",
+        "renouvellementAuto": "تجديد تلقائي"
+      },
+      "emptyPrestataires": "لا يوجد مزودون",
+      "emptyPrestatairesDesc": "أضف أول مزود.",
+      "emptyContrats": "لا توجد عقود",
+      "emptyContratsDesc": "أنشئ أول عقد صيانة."
+    },
+    "budgets": {
+      "title": "الميزانية",
+      "subtitle": "الميزانية التقديرية ومتابعة الإنفاق",
+      "selectResidence": "اختر إقامة",
+      "selectExercice": "اختر السنة المالية",
+      "newPoste": "إضافة بند",
+      "editPoste": "تعديل البند",
+      "deletePoste": "حذف البند",
+      "deletePosteDesc": "سيُحذف هذا البند نهائيًا.",
+      "colCategorie": "الفئة",
+      "colDescription": "الوصف",
+      "colPrevu": "المخطط (درهم)",
+      "colRealise": "المنجز (درهم)",
+      "colEcart": "الفارق",
+      "colExecution": "التنفيذ",
+      "totalPrevu": "إجمالي المخطط",
+      "totalRealise": "إجمالي المنجز",
+      "tauxExecution": "نسبة التنفيذ",
+      "categories": {
+        "maintenance": "صيانة",
+        "nettoyage": "تنظيف",
+        "gardiennage": "حراسة",
+        "electricite": "كهرباء",
+        "eau": "ماء",
+        "assurance": "تأمين",
+        "administratif": "إداري",
+        "travaux": "أشغال",
+        "autre": "أخرى"
+      },
+      "statut": {
+        "brouillon": "مسودة",
+        "approuve": "معتمد"
+      },
+      "approve": "اعتماد الميزانية",
+      "approveConfirm": "اعتماد هذه الميزانية؟",
+      "approveDesc": "بعد الاعتماد لن يمكن تعديل البنود.",
+      "approveSuccess": "تم اعتماد الميزانية",
+      "form": {
+        "categorie": "الفئة",
+        "description": "الوصف",
+        "montantPrevu": "المبلغ المخطط (درهم)",
+        "montantRealise": "المبلغ المنجز (درهم)"
+      },
+      "empty": "لم يتم إنشاء ميزانية بعد",
+      "emptyDesc": "اختر إقامة وسنة مالية لعرض الميزانية أو إنشائها.",
+      "noExercice": "لا توجد سنة مالية نشطة"
+    },
+    "dashboard": {
+      "title": "لوحة التحكم",
+      "filterAll": "جميع الإقامات",
+      "kpi": {
+        "residences": "الإقامات",
+        "coproprietaires": "الملاك المشاركون",
+        "caMensuel": "المحصّل هذا الشهر",
+        "impayes": "إجمالي المتأخرات"
+      },
+      "chart": {
+        "title": "التحصيل الشهري",
+        "recouvre": "محصَّل",
+        "restant": "متبقي"
+      },
+      "topImpayes": {
+        "title": "أكبر المتأخرات",
+        "jours": "{{n}}ي"
+      },
+      "ticketsUrgents": {
+        "title": "التذاكر العاجلة",
+        "empty": "لا توجد تذاكر عاجلة"
+      },
+      "assemblees": {
+        "title": "الجمعيات العامة القادمة",
+        "empty": "لا توجد جمعيات مبرمجة"
+      },
+      "actions": {
+        "title": "إجراءات سريعة",
+        "appelFonds": "إنشاء استدعاء أموال",
+        "paiement": "تسجيل دفعة",
+        "ticket": "تذكرة جديدة",
+        "ag": "دعوة جمعية عامة",
+        "soon": "قريبًا"
+      }
+    },
+    "comptabilite": {
+      "title": "المحاسبة",
+      "exercice": "الدورة",
+      "statut": {
+        "ouvert": "مفتوحة",
+        "clos": "مغلقة 🔒"
+      },
+      "tabs": {
+        "dashboard": "لوحة التحكم",
+        "journal": "اليومية",
+        "grandLivre": "الأستاذ العام",
+        "depenses": "المصاريف",
+        "cloture": "إقفال الدورة"
+      },
+      "kpi": {
+        "produits": "الإيرادات",
+        "charges": "المصاريف",
+        "resultat": "النتيجة الصافية",
+        "tresorerie": "الخزينة",
+        "creances": "الديون"
+      },
+      "tresorerie": {
+        "title": "تفاصيل الخزينة",
+        "banque": "البنك (5121)",
+        "cheque": "الشيكات (5122)",
+        "caisse": "الصندوق (5161)",
+        "depot": "إيداع",
+        "retrait": "سحب",
+        "remise": "تحويل"
+      },
+      "recouvrement": "نسبة التحصيل",
+      "couverture": "تغطية الخزينة",
+      "mois": "أشهر",
+      "journal": {
+        "titre": "يومية القيود",
+        "date": "التاريخ",
+        "compte": "الحساب",
+        "description": "البيان",
+        "type": "النوع",
+        "debit": "مدين",
+        "credit": "دائن",
+        "piece": "الوثيقة",
+        "totalDebit": "إجمالي المدين",
+        "totalCredit": "إجمالي الدائن",
+        "types": {
+          "depense": "مصروف",
+          "encaissement": "تحصيل",
+          "virement": "تحويل",
+          "cloture": "إقفال",
+          "report": "ترحيل"
+        }
+      },
+      "grandLivre": {
+        "title": "الأستاذ العام",
+        "selectCompte": "اختر حسابًا...",
+        "soldeOuverture": "رصيد الافتتاح",
+        "soldeFinal": "الرصيد النهائي",
+        "hint": "اختر حساب المخطط المحاسبي لعرض تفاصيل القيود."
+      },
+      "depenses": {
+        "title": "المصاريف",
+        "add": "مصروف جديد",
+        "colDate": "التاريخ",
+        "colTitre": "العنوان",
+        "colCompte": "الحساب",
+        "colPrestataire": "المورد",
+        "colMode": "طريقة الدفع",
+        "colMontant": "المبلغ",
+        "modes": {
+          "virement": "تحويل بنكي",
+          "cheque": "شيك",
+          "especes": "نقدًا",
+          "cb": "بطاقة بنكية",
+          "prelevement": "خصم تلقائي",
+          "autre": "أخرى"
+        },
+        "form": {
+          "titre": "العنوان",
+          "montant": "المبلغ (درهم)",
+          "date": "التاريخ",
+          "compte": "حساب الأعباء",
+          "mode": "طريقة الدفع",
+          "prestataire": "المورد (اختياري)",
+          "justificatif": "وثيقة مثبتة",
+          "importIa": "استيراد بالذكاء الاصطناعي",
+          "analyser": "تحليل",
+          "utiliser": "استخدام هذه البيانات",
+          "confiance": "الثقة"
+        }
+      },
+      "encaissement": {
+        "title": "تسجيل دفعة",
+        "recherche": "البحث عن مالك أو رقم القطعة",
+        "step1": "اختيار الدين",
+        "step2": "إدخال الدفعة",
+        "soldeImpaye": "الرصيد غير المدفوع",
+        "montant": "المبلغ",
+        "date": "التاريخ",
+        "mode": "طريقة الدفع",
+        "compteDestination": "الحساب المستهدف",
+        "refCheque": "مرجع الشيك",
+        "comptes": {
+          "5121": "الحساب البنكي (5121)",
+          "5122": "حساب الشيكات (5122)",
+          "5161": "الصندوق (5161)"
+        }
+      },
+      "cloture": {
+        "title": "إقفال الدورة",
+        "checklist": "قائمة التحقق قبل الإقفال",
+        "equilibre": "القيود متوازنة (مدين = دائن)",
+        "classe6": "تم تحريك حسابات الأعباء (ص. 6)",
+        "classe7": "تم تحريك حسابات الإيرادات (ص. 7)",
+        "hasEcritures": "يوجد قيد واحد على الأقل",
+        "totalDebit": "إجمالي المدين",
+        "totalCredit": "إجمالي الدائن",
+        "btn": "إقفال الدورة",
+        "confirmTitle": "تأكيد الإقفال",
+        "confirmMsg": "هذا الإجراء لا رجعة فيه. سيتم قفل جميع القيود. هل تريد المتابعة؟",
+        "warning": "تحذير — بعد الإقفال، لا يمكن تعديل أي قيد.",
+        "already_clos": "الدورة مغلقة",
+        "clos_msg": "تم إقفال هذه الدورة بتاريخ"
+      },
+      "export": {
+        "title": "تصدير",
+        "excelJournal": "Excel — اليومية الكاملة",
+        "excelGrandLivre": "Excel — الأستاذ العام",
+        "sageFec": "Sage FEC",
+        "pdfJournal": "PDF — اليومية",
+        "pdfBalance": "PDF — ميزان المراجعة"
+      },
+      "seuil": {
+        "label": "العتبة المحاسبية",
+        "moins200": "≤ 200,000 درهم — نظام مبسط",
+        "entre200et500": "200–500 ألف درهم — النظام العادي",
+        "plus500": "≥ 500,000 درهم — النظام الشامل"
+      }
+    },
+    "paiements": {
+      "title": "متابعة المدفوعات",
+      "tabs": {
+        "creances": "الديون",
+        "appels": "طلبات الاشتراك",
+        "historique": "السجل",
+        "decomptes": "البيانات الفردية",
+        "virements": "التحويلات"
+      },
+      "creances": {
+        "enRetard": "متأخر",
+        "aPayer": "للسداد",
+        "tauxRecouvrement": "نسبة التحصيل",
+        "relancerTout": "تذكير جميع المتأخرين",
+        "relanceSuccess": "تم إرسال التذكير",
+        "statuts": {
+          "a_payer": "للسداد",
+          "en_retard": "متأخر",
+          "paye": "مدفوع",
+          "partiellement_paye": "جزئي",
+          "annulee": "ملغى"
+        },
+        "colCreance": "المالك المشارك",
+        "colSolde": "الرصيد",
+        "colEcheance": "تاريخ الاستحقاق",
+        "colAnciennete": "قِدَم التأخر",
+        "colRelance": "آخر تذكير",
+        "jourRetard": "يوم تأخر"
+      },
+      "encaisser": {
+        "title": "تحصيل دفعة",
+        "step1": "اختيار دين",
+        "step2": "إدخال الدفعة",
+        "montant": "المبلغ (درهم)",
+        "date": "تاريخ الدفع",
+        "methode": "طريقة الدفع",
+        "compte": "الحساب المستهدف",
+        "refCheque": "مرجع الشيك",
+        "success": "تم تسجيل الدفعة",
+        "methodes": {
+          "especes": "نقداً",
+          "virement": "تحويل بنكي",
+          "cheque": "شيك",
+          "cb": "بطاقة بنكية",
+          "mobile_money": "موبايل موني"
+        },
+        "comptes": {
+          "5121": "البنك الرئيسي (5121)",
+          "5122": "حساب الشيكات (5122)",
+          "5161": "الصندوق (5161)"
+        }
+      },
+      "avance": {
+        "title": "دفعة مسبقة",
+        "info": "ستُخصَّص هذه الدفعة تلقائياً لطلبات الاشتراك القادمة",
+        "success": "تم تسجيل الدفعة المسبقة"
+      },
+      "virements": {
+        "title": "التحويلات المُصرَّح بها",
+        "valider": "التحقق",
+        "rejeter": "الرفض",
+        "motif": "سبب الرفض",
+        "valideSuccess": "تم التحقق من التحويل",
+        "rejeteSuccess": "تم رفض التحويل",
+        "statuts": {
+          "en_attente": "قيد الانتظار",
+          "valide": "مُتحقَّق",
+          "rejete": "مرفوض"
+        }
+      },
+      "decompte": {
+        "title": "الكشف الفردي",
+        "recherche": "البحث عن مالك مشارك",
+        "generer": "إنشاء",
+        "exporter": "تصدير PDF",
+        "totalAppele": "إجمالي المطلوب",
+        "totalPaye": "إجمالي المدفوع",
+        "solde": "الرصيد"
+      }
+    },
+    "depenses": {
+      "title": "المصاريف",
+      "subtitle": "متابعة تكاليف الملكية المشتركة",
+      "add": "إضافة مصروف",
+      "importIa": "استيراد بالذكاء الاصطناعي",
+      "recurrentes": "المتكررة",
+      "saveSuccess": "تم تسجيل المصروف",
+      "kpi": {
+        "total": "إجمالي الفترة",
+        "nb": "عدد المصاريف",
+        "moyen": "المتوسط",
+        "enAttente": "في انتظار الموافقة"
+      },
+      "cols": {
+        "date": "التاريخ",
+        "titre": "العنوان",
+        "prestataire": "المزود",
+        "compte": "حساب PCG",
+        "montant": "المبلغ",
+        "mode": "طريقة الدفع",
+        "approbation": "الموافقة"
+      },
+      "approbation": {
+        "approuve": "معتمد",
+        "en_attente": "قيد الانتظار",
+        "rejete": "مرفوض"
+      },
+      "form": {
+        "titre": "العنوان",
+        "montant": "المبلغ (درهم)",
+        "date": "التاريخ",
+        "compte": "حساب التكلفة",
+        "mode": "طريقة الدفع",
+        "prestataire": "المزود (اختياري)",
+        "justificatif": "المستند المبرر",
+        "scanner": "تحليل بالذكاء الاصطناعي",
+        "utiliser": "استخدام هذه البيانات",
+        "seuilWarning": "يستلزم هذا المصروف موافقة مجلس النقابة"
+      },
+      "recurrentModal": {
+        "title": "المصاريف المتكررة",
+        "nouveau": "نموذج جديد",
+        "frequences": {
+          "mensuelle": "شهري",
+          "trimestrielle": "ربع سنوي",
+          "semestrielle": "نصف سنوي",
+          "annuelle": "سنوي"
+        },
+        "jourEmission": "يوم الإصدار",
+        "prochaine": "الإصدار القادم"
+      }
+    },
+    "budget": {
+      "title": "الميزانية التقديرية",
+      "statuts": {
+        "brouillon": "مسودة",
+        "soumis_ag": "مُقدَّم للجمعية العامة",
+        "approuve": "معتمد",
+        "verrouille": "مُقفَل"
+      },
+      "kpi": {
+        "prevu": "الميزانية المخططة",
+        "engage": "الملتزم / المُصدَر",
+        "realise": "المُنجَز",
+        "reste": "المتبقي للصرف"
+      },
+      "annexe5": {
+        "title": "جدول الملحق 5",
+        "colCompte": "الحساب",
+        "colLibelle": "البيان",
+        "colRealiseN1": "المنجز ن-1",
+        "colBudgetN": "ميزانية ن",
+        "colEngage": "الملتزم",
+        "colRealise": "المنجز",
+        "colPct": "% الاستهلاك",
+        "sections": {
+          "chargesCourantes": "I — الأعباء الجارية",
+          "chargesTravaux": "II — أعباء الأشغال",
+          "totalCharges": "III — مجموع الأعباء",
+          "produitsCourants": "IV — المنتجات الجارية",
+          "produitsTravaux": "V — منتجات الأشغال",
+          "totalProduits": "VI — مجموع المنتجات",
+          "resultat": "VII — النتيجة"
+        },
+        "saved": "تم الحفظ"
+      },
+      "simulation": {
+        "title": "محاكاة الاشتراكات",
+        "budgetTotal": "إجمالي ميزانية الأعباء",
+        "tantiemesTotal": "مجموع الحصص",
+        "colLot": "الشقة",
+        "colCopro": "المالك المشارك",
+        "colTantieme": "الحصة",
+        "colPct": "النسبة",
+        "colAnnuelle": "الاشتراك السنوي",
+        "colMensuelle": "الاشتراك الشهري",
+        "colVariation": "التغيير مقارنة بن-1",
+        "exporter": "تصدير PDF"
+      },
+      "ia": {
+        "title": "اقتراحات الذكاء الاصطناعي",
+        "appliquer": "تطبيق الاقتراحات المحددة",
+        "justification": "المبرر"
+      },
+      "soumettre": "تقديم للجمعية العامة",
+      "verrouiller": "قفل الميزانية",
+      "exporter": "تصدير PDF الملحق 5",
+      "creer": "إنشاء الميزانية"
+    }
+  }
+}

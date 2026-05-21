@@ -11,7 +11,7 @@ class Paiement extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tenant_id', 'coproprietaire_id', 'appel_fonds_ligne_id',
+        'tenant_id', 'exercice_id', 'coproprietaire_id', 'appel_fonds_ligne_id',
         'saisi_par', 'montant', 'mode', 'reference',
         'note', 'recu_pdf_path', 'date_paiement',
     ];
@@ -22,6 +22,11 @@ class Paiement extends Model
             'montant' => 'float',
             'date_paiement' => 'date',
         ];
+    }
+
+    public function exercice(): BelongsTo
+    {
+        return $this->belongsTo(Exercice::class);
     }
 
     public function coproprietaire(): BelongsTo

@@ -1,11 +1,12 @@
-# SyndikPro — API Contract
+# imaro — API Contract
 
-**Base URL:** `https://{subdomain}.syndikpro.ma/api`
-**Local dev:** `http://localhost:8000/api`
-**Auth:** `Authorization: Bearer {sanctum_token}`
-**Content-Type:** `application/json`
-**Currency:** MAD (DH) — always
-**Languages:** FR (primary), AR (secondary, RTL)
+**Base URL prod :** `https://api.imaro.ma/api`
+**Base URL staging :** `https://api-staging.imaro.ma/api`
+**Local dev :** `http://localhost:8000/api`
+**Auth :** `Authorization: Bearer {sanctum_token}`
+**Content-Type :** `application/json` (sauf upload fichiers → `multipart/form-data`)
+**Currency :** MAD (DH) — toujours
+**Languages :** FR (primary), AR (secondary, RTL)
 
 ---
 
@@ -33,88 +34,145 @@
 
 ## Multi-Tenant
 
-Tenant is resolved from the subdomain: `blanca.syndikpro.ma` → tenant `blanca`.
-`SetTenant` middleware auto-injects `tenant_id` on every request. All resources are scoped to the current tenant.
+Tenant résolu depuis le sous-domaine : `blanca.imaro.ma` → tenant `blanca`.
+Le middleware `SetTenant` injecte automatiquement le `tenant_id` sur chaque requête. Toutes les ressources sont isolées par tenant.
 
 ---
 
 ## Roles
 
-| Role | Description |
-|---|---|
-| `super_admin` | SyndikPro team — full platform access |
-| `manager` | Syndic company owner |
-| `gestionnaire` | Employee managing N residences |
-| `agent_recouvrement` | Collections specialist |
-| `conseil` | Elected copropriétaire — read-only |
-| `resident` | End copropriétaire — own data only |
+| Role | Description | Prefix |
+|---|---|---|
+| `super_admin` | Équipe imaro (Digitoyou) — accès total | `/api/admin/` |
+| `manager` | Propriétaire du cabinet syndic | `/api/manager/` + `/api/gestionnaire/` |
+| `gestionnaire` | Employé du cabinet, N résidences assignées | `/api/gestionnaire/` |
+| `conseil` | Copropriétaire élu — lecture + réclamations | `/api/conseil/` |
+| `resident` | Copropriétaire — portail mobile, ses données uniquement | `/api/portail/` |
 
 ---
 
-## 1. Auth (OTP — no password)
+## 1. Auth
 
-### POST /api/auth/request-otp
-Request a 6-digit OTP via WhatsApp (fallback: SMS).
+### POST /api/auth/login
+Login email + mot de passe pour : **manager, gestionnaire, conseil, super_admin**.
 
 **Body**
 ```json
-{ "phone": "+212600000001" }
+{ "email": "fikri@blancasyndic.ma", "password": "imaro2026" }
 ```
 
 **Response 200**
 ```json
 {
   "status": "success",
-  "message": "OTP envoyé via WhatsApp",
-  "data": { "expires_in": 300 }
-}
-```
-
-**Notes**
-- OTP stored hashed in Redis, TTL 5 min
-- WhatsApp = priority 1, SMS = fallback
-
----
-
-### POST /api/auth/verify-otp
-Verify OTP and get Sanctum token.
-
-**Body**
-```json
-{ "phone": "+212600000001", "otp": "482719" }
-```
-
-**Response 200**
-```json
-{
-  "status": "success",
-  "message": "Authentifié",
+  "message": "Connexion réussie",
   "data": {
     "token": "1|abc...",
+    "token_type": "Bearer",
+    "expires_in": 2592000,
     "user": {
       "id": 1,
       "name": "Mohammed Fikri",
       "phone": "+212600000001",
-      "role": "manager"
-    },
-    "tenant": {
-      "id": 1,
-      "name": "Blanca Syndic",
-      "subdomain": "blanca",
-      "plan": "business"
+      "email": "fikri@blancasyndic.ma",
+      "role": "manager",
+      "lang": "fr",
+      "status": "active",
+      "last_login_at": "2026-05-18T16:39:09+00:00",
+      "tenant": {
+        "id": 1,
+        "name": "Blanca Syndic",
+        "subdomain": "blanca",
+        "plan": "business"
+      }
     }
   }
 }
 ```
 
-**Response 422** — invalid or expired OTP
+**Erreurs**
+- `401` — email ou mot de passe incorrect
+- `403` — compte désactivé, ou rôle `resident` (utiliser le portail)
+- `429` — trop de tentatives (5 max / 10 min)
+
+---
+
+### POST /api/auth/resident/login
+Login téléphone + code d'accès pour les **résidents**.
+
+**Body**
+```json
+{ "phone": "+212600000010", "code": "AT3K9M2P" }
+```
+
+**Response 200 — connexion normale**
+```json
+{
+  "status": "success",
+  "message": "Connexion réussie",
+  "data": {
+    "token": "2|xyz...",
+    "token_type": "Bearer",
+    "expires_in": 2592000,
+    "user": { ... }
+  }
+}
+```
+
+**Response 200 — première connexion** *(pas de token — frontend doit afficher l'écran d'activation)*
+```json
+{
+  "status": "first_login",
+  "message": "Première connexion. Veuillez créer votre code d'accès personnel.",
+  "data": { "phone": "+212600000010" }
+}
+```
+
+**Erreurs**
+- `401` — numéro ou code incorrect
+- `403` — compte désactivé
+- `429` — trop de tentatives (5 max / 10 min)
+
+---
+
+### POST /api/auth/resident/activate
+Première connexion résident — crée le code personnel et retourne le token directement.
+
+**Body**
+```json
+{
+  "phone": "+212600000010",
+  "temp_code": "AT3K9M2P",
+  "new_code": "hassan123",
+  "new_code_confirmation": "hassan123"
+}
+```
+
+**Response 200**
+```json
+{
+  "status": "success",
+  "message": "Code créé. Bienvenue sur imaro !",
+  "data": {
+    "token": "3|abc...",
+    "token_type": "Bearer",
+    "expires_in": 2592000,
+    "user": { ... }
+  }
+}
+```
+
+**Erreurs**
+- `401` — numéro ou code temporaire incorrect
+- `422` — compte déjà activé (must_change_code = false)
+- `429` — trop de tentatives
 
 ---
 
 ### GET /api/auth/me
 `auth:sanctum`
 
-Returns current user, permissions, and tenant info.
+Retourne l'utilisateur courant, ses rôles et permissions.
 
 **Response 200**
 ```json
@@ -124,16 +182,11 @@ Returns current user, permissions, and tenant info.
     "user": {
       "id": 1,
       "name": "Mohammed Fikri",
-      "phone": "+212600000001",
       "role": "manager",
-      "permissions": ["manage-residences", "manage-users", "view-reports"]
+      "tenant": { "id": 1, "name": "Blanca Syndic", "subdomain": "blanca" }
     },
-    "tenant": {
-      "id": 1,
-      "name": "Blanca Syndic",
-      "subdomain": "blanca",
-      "plan": "business"
-    }
+    "roles": ["manager"],
+    "permissions": []
   }
 }
 ```
@@ -143,27 +196,73 @@ Returns current user, permissions, and tenant info.
 ### POST /api/auth/logout
 `auth:sanctum`
 
-Revokes current Sanctum token.
+Révoque le token Sanctum courant.
 
 **Response 200**
 ```json
-{ "status": "success", "message": "Déconnecté" }
+{ "status": "success", "message": "Déconnecté avec succès." }
 ```
 
 ---
 
-## 2. Residences (KAN-13)
+## 2. Dashboard
 
-`auth:sanctum` · roles: `manager`, `gestionnaire`
+`auth:sanctum` · `role:manager|gestionnaire`
 
-### GET /api/residences
-List all residences for the current tenant.
+### GET /api/gestionnaire/dashboard
+KPIs scopés aux résidences du gestionnaire (ou toutes pour le manager). Mis en cache Redis 5 min.
 
-**Query params**
-| Param | Type | Description |
-|---|---|---|
-| `per_page` | int | Default 15 |
-| `search` | string | Filter by name or city |
+**Response 200**
+```json
+{
+  "status": "success",
+  "data": {
+    "kpi": {
+      "nb_residences": 1,
+      "nb_coproprietaires": 20,
+      "ca_mensuel": 13860.00,
+      "total_impayes": 4140.00
+    },
+    "top_impayes": [
+      {
+        "coproprietaire": { "id": 16, "name": "Meriem Ouazzani" },
+        "lot": "Apt 16",
+        "montant": 900.00,
+        "jours": 0
+      }
+    ],
+    "tickets_urgents": [
+      {
+        "id": 1,
+        "titre": "L'ascenseur est en panne...",
+        "priorite": "urgent",
+        "statut": "ouvert",
+        "residence": { "id": 1, "name": "Résidence Atlas" },
+        "created_at": "2026-05-17T14:45:10+00:00"
+      }
+    ],
+    "assemblees_a_venir": [
+      {
+        "id": 1,
+        "titre": "AG Ordinaire 2026",
+        "date": "2026-06-14T15:00:00+00:00",
+        "residence": { "name": "Résidence Atlas" }
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 3. Résidences
+
+`auth:sanctum` · `role:manager|gestionnaire`
+
+### GET /api/gestionnaire/residences
+Liste les résidences assignées au gestionnaire (ou toutes pour le manager).
+
+**Query params :** `search`, `per_page` (défaut 15)
 
 **Response 200**
 ```json
@@ -174,61 +273,93 @@ List all residences for the current tenant.
       {
         "id": 1,
         "name": "Résidence Atlas",
-        "address": "Bd Mohammed V, Casablanca",
+        "address": "12 Boulevard Zerktouni",
         "city": "Casablanca",
-        "lots_count": 20,
-        "total_tantiemes": 1000,
-        "gestionnaire": { "id": 2, "name": "Youssef Benali" }
+        "nb_lots": 20,
+        "total_tantieme": 1000,
+        "status": "active",
+        "gestionnaire": { "id": 2, "name": "Karim Alaoui" },
+        "exercices": [ { "id": 1, "annee": 2026, "statut": "actif" } ]
       }
     ],
-    "meta": { "total": 1, "per_page": 15, "current_page": 1 }
+    "meta": { "total": 1, "per_page": 15, "current_page": 1, "last_page": 1 }
   }
 }
 ```
 
 ---
 
-### POST /api/residences
-`role:manager`
+### GET /api/gestionnaire/residences/{id}
+Détail avec lots et copropriétaires.
+
+---
+
+### PUT /api/gestionnaire/residences/{id}
 
 **Body**
 ```json
+{ "name": "Résidence Atlas", "address": "12 Bd Zerktouni", "city": "Casablanca" }
+```
+
+---
+
+## 4. Exercices
+
+`auth:sanctum` · `role:manager|gestionnaire`
+
+Chaque résidence fonctionne par exercices annuels. Toutes les opérations financières (appels de fonds, paiements, dépenses, budgets) sont rattachées à un exercice.
+
+### GET /api/gestionnaire/residences/{id}/exercices
+
+**Response 200**
+```json
 {
-  "name": "Résidence Atlas",
-  "address": "Bd Mohammed V",
-  "city": "Casablanca",
-  "gestionnaire_id": 2
+  "status": "success",
+  "data": [
+    { "id": 1, "annee": 2026, "date_debut": "2026-01-01", "date_fin": "2026-12-31", "statut": "actif" },
+    { "id": 2, "annee": 2025, "date_debut": "2025-01-01", "date_fin": "2025-12-31", "statut": "cloture" }
+  ]
 }
 ```
 
+---
+
+### POST /api/gestionnaire/residences/{id}/exercices
+
+**Body**
+```json
+{ "annee": 2027, "date_debut": "2027-01-01", "date_fin": "2027-12-31" }
+```
+
+**Validation :** Un seul exercice par année par résidence.
+
 **Response 201**
+```json
+{ "status": "success", "message": "Exercice 2027 créé.", "data": { "id": 3, "annee": 2027, "statut": "actif" } }
+```
 
 ---
 
-### GET /api/residences/{id}
+### POST /api/gestionnaire/residences/{id}/exercices/{exercice}/cloture
+Action irréversible.
 
-**Response 200** — includes lots list
+**Response 200**
+```json
+{ "status": "success", "message": "Exercice 2026 clôturé.", "data": { "statut": "cloture" } }
+```
 
----
-
-### PUT /api/residences/{id}
-`role:manager`
-
----
-
-### DELETE /api/residences/{id}
-`role:manager` — soft delete only
+**Erreurs :** `422` — exercice déjà clôturé
 
 ---
 
-## 3. Lots & Tantièmes (KAN-13)
+## 5. Lots & Tantièmes
 
-`auth:sanctum` · roles: `manager`, `gestionnaire`
+`auth:sanctum` · `role:manager|gestionnaire`
 
-**Business rule:** Sum of all `tantieme` values in a résidence MUST equal exactly **1000**.
-**Calculation:** `montant_du = montant_total × (tantieme / 1000)`
+**Règle :** La somme des tantièmes de tous les lots d'une résidence doit être exactement **1000**.
+**Calcul :** `montant_du = montant_total × (tantieme / 1000)`
 
-### GET /api/residences/{residence_id}/lots
+### GET /api/gestionnaire/residences/{id}/lots
 
 **Response 200**
 ```json
@@ -238,61 +369,53 @@ List all residences for the current tenant.
     "lots": [
       {
         "id": 1,
-        "numero": "A01",
+        "numero": "Apt 1",
         "type": "appartement",
         "etage": 1,
-        "surface_m2": 85,
-        "tantieme": 45,
-        "coproprietaire": {
-          "id": 1,
-          "name": "Hassan Benali",
-          "phone": "+212600000010"
-        }
+        "superficie": 85.00,
+        "tantieme": 65,
+        "coproprietaire": { "id": 1, "name": "Hassan Benali", "phone": "+212600000010" }
       }
     ],
-    "total_tantiemes": 1000
+    "total_tantieme": 1000,
+    "sum_tantieme": 1000
   }
 }
 ```
 
 ---
 
-### POST /api/residences/{residence_id}/lots
+### POST /api/gestionnaire/residences/{id}/lots
 
 **Body**
 ```json
-{
-  "numero": "A01",
-  "type": "appartement",
-  "etage": 1,
-  "surface_m2": 85,
-  "tantieme": 45,
-  "coproprietaire_id": 1
-}
+{ "numero": "Apt 1", "type": "appartement", "etage": 1, "superficie": 85.00, "tantieme": 65 }
 ```
 
-**Validation:** After insert, sum of tantièmes in the résidence must not exceed 1000.
+Types valides : `appartement` | `local_commercial` | `parking` | `cave`
+
+**Validation :** La somme ne doit pas dépasser `total_tantieme`.
 
 **Response 201**
 
 ---
 
-### PUT /api/residences/{residence_id}/lots/{id}
+### PUT /api/gestionnaire/residences/{id}/lots/{lot}
+### PUT /api/gestionnaire/lots/{lot} *(route plate)*
+### DELETE /api/gestionnaire/residences/{id}/lots/{lot}
+### DELETE /api/gestionnaire/lots/{lot} *(route plate)*
+
+Soft delete. Bloqué si le lot a des appels de fonds impayés.
 
 ---
 
-### DELETE /api/residences/{residence_id}/lots/{id}
-Soft delete. Blocked if lot has unpaid appels de fonds.
+## 6. Copropriétaires
 
----
+`auth:sanctum` · `role:manager|gestionnaire`
 
-## 4. Copropriétaires
+### GET /api/gestionnaire/residences/{id}/coproprietaires
 
-`auth:sanctum` · roles: `manager`, `gestionnaire`
-
-### GET /api/coproprietaires
-
-**Query params:** `residence_id`, `search`, `per_page`
+**Query params :** `search`, `per_page`
 
 **Response 200**
 ```json
@@ -304,49 +427,55 @@ Soft delete. Blocked if lot has unpaid appels de fonds.
         "id": 1,
         "name": "Hassan Benali",
         "phone": "+212600000010",
-        "email": "h.benali@example.com",
-        "lots": [{ "id": 1, "numero": "A01", "tantieme": 45 }],
-        "solde_du": 850.00
+        "email": "hassan.benali@email.ma",
+        "type": "proprietaire",
+        "date_entree": "2024-01-01",
+        "solde_actuel": -900.00,
+        "lot": { "id": 1, "numero": "Apt 1", "tantieme": 65 },
+        "residence": { "id": 1, "name": "Résidence Atlas" }
       }
-    ]
+    ],
+    "meta": { "total": 20, "per_page": 15, "current_page": 1, "last_page": 2 }
   }
 }
 ```
 
 ---
 
-### POST /api/coproprietaires
+### GET /api/gestionnaire/coproprietaires
+Liste globale — toutes les résidences du gestionnaire.
 
-**Body**
+---
+
+### POST /api/gestionnaire/coproprietaires/{id}/generate-code
+Génère un code d'accès temporaire pour un résident et l'envoie par WhatsApp (simulé par log en attendant Twilio).
+
+Le code est affiché **une seule fois** au gestionnaire — non récupérable ensuite.
+
+**Response 200**
 ```json
 {
-  "name": "Hassan Benali",
-  "phone": "+212600000010",
-  "email": "h.benali@example.com",
-  "cin": "BE123456",
-  "lot_ids": [1]
+  "status": "success",
+  "message": "Code d'accès généré pour Hassan Benali.",
+  "data": {
+    "code": "AT3K9M2P",
+    "phone": "+212600000010",
+    "name": "Hassan Benali"
+  }
 }
 ```
 
----
-
-### GET /api/coproprietaires/{id}
-
-Includes lots, paiements, and impayés.
+**Erreurs :** `403` — résidence non assignée à ce gestionnaire
 
 ---
 
-### PUT /api/coproprietaires/{id}
+## 7. Appels de Fonds
 
----
+`auth:sanctum` · `role:manager|gestionnaire`
 
-## 5. Appels de Fonds (KAN-14)
+### GET /api/gestionnaire/appels-fonds
 
-`auth:sanctum` · roles: `manager`, `gestionnaire`
-
-### GET /api/appels-fonds
-
-**Query params:** `residence_id`, `statut` (`brouillon`|`publié`|`clôturé`), `per_page`
+**Query params :** `residence_id`, `statut` (`brouillon`|`envoye`|`partiel`|`paye`), `per_page`
 
 **Response 200**
 ```json
@@ -356,14 +485,12 @@ Includes lots, paiements, and impayés.
     "appels_fonds": [
       {
         "id": 1,
-        "titre": "Charges Q2 2026",
+        "libelle": "Charges Q2 2026",
         "residence": { "id": 1, "name": "Résidence Atlas" },
+        "exercice": { "id": 1, "annee": 2026 },
         "montant_total": 18000.00,
-        "statut": "publié",
+        "statut": "partiel",
         "date_echeance": "2026-06-30",
-        "taux_recouvrement": 75,
-        "montant_recouvre": 13500.00,
-        "montant_restant": 4500.00,
         "lignes_count": 20
       }
     ]
@@ -373,88 +500,49 @@ Includes lots, paiements, and impayés.
 
 ---
 
-### POST /api/appels-fonds
-Auto-generates one line per lot, calculated by tantième.
+### POST /api/gestionnaire/appels-fonds
+Génère automatiquement une ligne par lot, calculée par tantième.
 
 **Body**
 ```json
 {
-  "titre": "Charges Q2 2026",
+  "libelle": "Charges Q2 2026",
   "residence_id": 1,
+  "exercice_id": 1,
   "montant_total": 18000.00,
   "date_echeance": "2026-06-30",
   "description": "Charges de copropriété Q2 2026"
 }
 ```
 
-**Logic:** For each lot in the résidence:
-`montant_du = 18000 × (tantieme / 1000)`
+**Calcul :** Pour chaque lot : `montant_du = 18000 × (tantieme / 1000)`
 
 **Response 201**
-```json
-{
-  "status": "success",
-  "message": "Appel de fonds créé",
-  "data": {
-    "appel_fonds": { ... },
-    "lignes": [
-      {
-        "lot_id": 1,
-        "lot_numero": "A01",
-        "coproprietaire": "Hassan Benali",
-        "tantieme": 45,
-        "montant_du": 810.00
-      }
-    ]
-  }
-}
-```
 
 ---
 
-### GET /api/appels-fonds/{id}
-
-Full detail with all lignes and paiement status per lot.
-
----
-
-### PUT /api/appels-fonds/{id}
-Only allowed when `statut = brouillon`.
+### GET /api/gestionnaire/appels-fonds/{id}
+Détail avec toutes les lignes et statut de paiement par lot.
 
 ---
 
-### POST /api/appels-fonds/{id}/publier
-`role:manager`
-
-Changes status from `brouillon` → `publié`. Triggers WhatsApp notifications to all copropriétaires.
-
-**Response 200**
+### PUT /api/gestionnaire/appels-fonds/{id}
+Modifiable uniquement si `statut = brouillon`.
 
 ---
 
-### POST /api/appels-fonds/{id}/cloture
-`role:manager`
-
-Changes status to `clôturé`.
+### POST /api/gestionnaire/appels-fonds/{id}/envoyer
+Publie l'appel de fonds. Déclenche notifications WhatsApp à tous les copropriétaires.
 
 ---
 
-### GET /api/appels-fonds/{id}/pdf
-Returns PDF (generated async via Job, referenced by Loi 18-00).
-Returns a signed URL if already generated, or queues generation and returns 202.
+## 8. Paiements & Impayés
 
-**Response 202** — generation queued
-**Response 200** — `{ "url": "..." }`
+`auth:sanctum` · `role:manager|gestionnaire`
 
----
+### GET /api/gestionnaire/paiements
 
-## 6. Paiements (KAN-15)
-
-`auth:sanctum` · roles: `manager`, `gestionnaire`, `agent_recouvrement`
-
-### GET /api/paiements
-
-**Query params:** `residence_id`, `appel_fonds_id`, `statut` (`payé`|`partiel`|`impayé`), `per_page`
+**Query params :** `residence_id`, `appel_fonds_id`, `statut`, `per_page`
 
 **Response 200**
 ```json
@@ -464,14 +552,13 @@ Returns a signed URL if already generated, or queues generation and returns 202.
     "paiements": [
       {
         "id": 1,
-        "lot": { "id": 1, "numero": "A01" },
         "coproprietaire": { "id": 1, "name": "Hassan Benali" },
-        "appel_fonds": { "id": 1, "titre": "Charges Q2 2026" },
-        "montant_du": 810.00,
-        "montant_paye": 810.00,
-        "statut": "payé",
-        "date_paiement": "2026-04-15",
-        "mode_paiement": "virement"
+        "lot": { "id": 1, "numero": "Apt 1" },
+        "appel_fonds": { "id": 1, "libelle": "Charges Q2 2026" },
+        "montant": 810.00,
+        "mode": "virement",
+        "reference": "VIR-2026-001",
+        "date_paiement": "2026-04-15"
       }
     ]
   }
@@ -480,31 +567,29 @@ Returns a signed URL if already generated, or queues generation and returns 202.
 
 ---
 
-### POST /api/paiements
-Enregistrer un paiement.
+### POST /api/gestionnaire/paiements
 
 **Body**
 ```json
 {
   "appel_fonds_ligne_id": 1,
   "montant": 810.00,
-  "date_paiement": "2026-04-15",
-  "mode_paiement": "virement",
+  "mode": "virement",
   "reference": "VIR-2026-001",
+  "date_paiement": "2026-04-15",
   "notes": ""
 }
 ```
 
-**Logic:** If `montant < montant_du` → statut = `partiel`. If `montant >= montant_du` → statut = `payé`.
+Modes valides : `especes` | `cheque` | `virement` | `mobile`
 
-**Response 201**
+**Logic :** `montant < montant_du` → statut `partiel`. `montant >= montant_du` → statut `paye`.
 
 ---
 
-### GET /api/impayés
-Liste des copropriétaires avec solde impayé.
+### GET /api/gestionnaire/impayes
 
-**Query params:** `residence_id`, `appel_fonds_id`, `overdue_only` (bool)
+**Query params :** `residence_id`, `appel_fonds_id`
 
 **Response 200**
 ```json
@@ -514,41 +599,30 @@ Liste des copropriétaires avec solde impayé.
     "impayes": [
       {
         "coproprietaire": { "id": 3, "name": "Fatima Chraibi", "phone": "+212600000012" },
-        "lot": { "numero": "B03" },
-        "montant_du": 720.00,
+        "lot": { "numero": "Apt 2" },
+        "montant_du": 990.00,
         "montant_paye": 0,
-        "montant_restant": 720.00,
-        "jours_retard": 15,
-        "appel_fonds": { "id": 1, "titre": "Charges Q2 2026" }
+        "montant_restant": 990.00,
+        "jours_retard": 15
       }
     ],
-    "total_impaye": 4500.00
+    "total_impaye": 4140.00
   }
 }
 ```
 
 ---
 
-### POST /api/impayés/{ligne_id}/relance
-Envoyer une relance manuelle via WhatsApp/SMS.
-
-**Body**
-```json
-{ "canal": "whatsapp" }
-```
-
-**Response 200** — job queued async
-
----
-
-## 7. Tickets Maintenance (KAN-21)
+## 9. Tickets / Réclamations
 
 `auth:sanctum`
 
-### GET /api/tickets
-`roles: manager, gestionnaire`
+> Upload de photos : `Content-Type: multipart/form-data`
 
-**Query params:** `residence_id`, `statut` (`ouvert`|`en_cours`|`résolu`|`fermé`), `priorite` (`urgent`|`normal`|`faible`), `per_page`
+### GET /api/gestionnaire/tickets
+`role:manager|gestionnaire`
+
+**Query params :** `residence_id`, `statut` (`ouvert`|`en_cours`|`resolu`|`clos`), `priorite` (`urgent`|`normal`|`faible`), `categorie`, `per_page`
 
 **Response 200**
 ```json
@@ -558,67 +632,88 @@ Envoyer une relance manuelle via WhatsApp/SMS.
     "tickets": [
       {
         "id": 1,
-        "titre": "Ascenseur en panne",
-        "description": "Ascenseur bloc A bloqué au 3ème étage",
+        "categorie": "ascenseur",
+        "description": "L'ascenseur est en panne depuis ce matin.",
         "priorite": "urgent",
         "statut": "ouvert",
+        "images": ["https://api.imaro.ma/storage/tickets/1/photo1.jpg"],
+        "closed_at": null,
+        "created_at": "2026-05-17T14:45:10+00:00",
         "residence": { "id": 1, "name": "Résidence Atlas" },
-        "coproprietaire": { "id": 1, "name": "Hassan Benali" },
-        "created_at": "2026-05-10T09:00:00Z"
+        "lot": { "id": 1, "numero": "Apt 1" },
+        "user": { "id": 5, "name": "Hassan Benali", "phone": "+212600000010" }
       }
-    ]
+    ],
+    "meta": { "total": 3, "per_page": 15, "current_page": 1, "last_page": 1 }
   }
 }
 ```
 
 ---
 
-### POST /api/tickets
-`roles: resident, conseil, gestionnaire, manager`
+### POST /api/gestionnaire/tickets
+`Content-Type: multipart/form-data`
 
-**Body**
-```json
-{
-  "titre": "Ascenseur en panne",
-  "description": "Ascenseur bloc A bloqué au 3ème étage",
-  "priorite": "urgent",
-  "residence_id": 1,
-  "lot_id": 1
-}
-```
+| Champ | Type | Requis | Description |
+|---|---|---|---|
+| `residence_id` | integer | ✅ | |
+| `lot_id` | integer | — | |
+| `categorie` | string | ✅ | `plomberie` \| `electricite` \| `ascenseur` \| `proprete` \| `securite` \| `autre` |
+| `description` | string | ✅ | Min 10, max 2000 chars |
+| `priorite` | string | ✅ | `urgent` \| `normal` \| `faible` |
+| `images[]` | file | — | Max 5 · jpeg/png/webp · max 5 MB/photo |
 
 **Response 201**
 
 ---
 
-### GET /api/tickets/{id}
+### GET /api/gestionnaire/tickets/{id}
+### PUT /api/gestionnaire/tickets/{id}
+### POST /api/gestionnaire/tickets/{id}/clos
+Action irréversible.
 
 ---
 
-### PUT /api/tickets/{id}
-`roles: gestionnaire, manager` — update statut, assign prestataire
+## 10. Annonces
+
+`auth:sanctum` · `role:manager|gestionnaire`
+
+### GET /api/gestionnaire/annonces
+
+**Query params :** `residence_id`, `statut` (`brouillon`|`publiee`|`archivee`)
+
+---
+
+### POST /api/gestionnaire/annonces
 
 **Body**
 ```json
 {
-  "statut": "en_cours",
-  "prestataire_id": 1,
-  "notes_internes": "Technicien contacté"
+  "titre": "Coupure d'eau prévue le 20 mai",
+  "contenu": "La LYDEC effectuera des travaux...",
+  "residence_id": 1,
+  "priorite": "urgente"
 }
 ```
 
----
-
-### POST /api/tickets/{id}/close
-`roles: gestionnaire, manager`
+Priorités valides : `normale` | `urgente`
 
 ---
 
-## 8. Prestataires
+### PUT /api/gestionnaire/annonces/{id}
+### POST /api/gestionnaire/annonces/{id}/publier
+### POST /api/gestionnaire/annonces/{id}/archiver
+### DELETE /api/gestionnaire/annonces/{id}
 
-`auth:sanctum` · roles: `manager`, `gestionnaire`
+---
 
-### GET /api/prestataires
+## 11. Prestataires & Contrats
+
+`auth:sanctum` · `role:manager|gestionnaire`
+
+### GET /api/gestionnaire/prestataires
+
+**Query params :** `statut` (`actif`|`inactif`), `specialite`
 
 **Response 200**
 ```json
@@ -628,10 +723,11 @@ Envoyer une relance manuelle via WhatsApp/SMS.
     "prestataires": [
       {
         "id": 1,
-        "name": "Ascenseurs Maroc SARL",
-        "specialite": "ascenseurs",
-        "phone": "+212522000001",
-        "email": "contact@asc-maroc.ma"
+        "nom": "Atlas Ascenseurs SARL",
+        "telephone": "+212522334455",
+        "specialite": "Maintenance ascenseurs",
+        "email": "contact@atlasasc.ma",
+        "statut": "actif"
       }
     ]
   }
@@ -640,96 +736,158 @@ Envoyer une relance manuelle via WhatsApp/SMS.
 
 ---
 
-### POST /api/prestataires
+### POST /api/gestionnaire/prestataires
 
 **Body**
 ```json
-{
-  "name": "Ascenseurs Maroc SARL",
-  "specialite": "ascenseurs",
-  "phone": "+212522000001",
-  "email": "contact@asc-maroc.ma",
-  "adresse": "Casablanca"
-}
+{ "nom": "Atlas Ascenseurs SARL", "telephone": "+212522334455", "specialite": "Maintenance ascenseurs", "email": "contact@atlasasc.ma" }
 ```
 
 ---
 
-## 9. Assemblées Générales
+### PUT /api/gestionnaire/prestataires/{id}
 
-`auth:sanctum` · roles: `manager`, `gestionnaire`
-
-### GET /api/assemblees
+**Body** (tous champs optionnels)
+```json
+{ "nom": "...", "telephone": "...", "statut": "inactif" }
+```
 
 ---
 
-### POST /api/assemblees
+### GET /api/gestionnaire/contrats
+
+**Query params :** `residence_id`, `statut` (`actif`|`expire`|`resilie`)
+
+---
+
+### POST /api/gestionnaire/contrats
+
+**Body**
+```json
+{
+  "titre": "Maintenance ascenseur 2026",
+  "type": "ascenseur",
+  "residence_id": 1,
+  "prestataire_id": 1,
+  "montant": 24000.00,
+  "date_debut": "2026-03-01",
+  "date_fin": "2027-02-28",
+  "renouvellement_auto": false
+}
+```
+
+Types valides : `maintenance` | `nettoyage` | `gardiennage` | `ascenseur` | `autre`
+
+---
+
+## 12. Budgets
+
+`auth:sanctum` · `role:manager|gestionnaire`
+
+### GET /api/gestionnaire/budgets
+
+**Query params :** `residence_id`, `exercice_id`
+
+---
+
+### POST /api/gestionnaire/budgets
+
+**Body**
+```json
+{ "residence_id": 1, "exercice_id": 1 }
+```
+
+---
+
+### POST /api/gestionnaire/budgets/{id}/approuver
+
+---
+
+### POST /api/gestionnaire/budgets/{id}/postes
+Ajouter un poste budgétaire.
+
+**Body**
+```json
+{
+  "categorie": "gardiennage",
+  "description": "Salaire gardien + charges",
+  "montant_prevu": 60000.00,
+  "montant_realise": 25000.00
+}
+```
+
+Catégories valides : `entretien` | `gardiennage` | `nettoyage` | `administratif` | `travaux` | `assurance` | `autre`
+
+---
+
+### PUT /api/gestionnaire/budgets/{id}/postes/{poste}
+### DELETE /api/gestionnaire/budgets/{id}/postes/{poste}
+
+---
+
+## 13. Documents
+
+`auth:sanctum` · `role:manager|gestionnaire`
+
+> Upload : `Content-Type: multipart/form-data`
+
+### GET /api/gestionnaire/documents
+
+**Query params :** `residence_id`, `type`
+
+---
+
+### POST /api/gestionnaire/documents
+
+| Champ | Type | Requis | Description |
+|---|---|---|---|
+| `nom` | string | ✅ | Nom du document |
+| `type` | string | ✅ | `reglement` \| `pv_ag` \| `contrat` \| `facture` \| `autre` |
+| `residence_id` | integer | — | Null = document global cabinet |
+| `file` | file | ✅ | PDF · max 10 MB |
+| `date` | date | — | Date du document |
+
+---
+
+### DELETE /api/gestionnaire/documents/{id}
+
+---
+
+## 14. Assemblées Générales
+
+`auth:sanctum` · `role:manager|gestionnaire`
+
+### GET /api/gestionnaire/assemblees
+
+**Query params :** `residence_id`, `statut` (`planifiee`|`tenue`|`annulee`)
+
+---
+
+### POST /api/gestionnaire/assemblees
 
 **Body**
 ```json
 {
   "titre": "AG Ordinaire 2026",
+  "type": "ordinaire",
   "residence_id": 1,
-  "date": "2026-06-15",
-  "lieu": "Salle de réunion, Résidence Atlas",
-  "ordre_du_jour": ["Approbation des comptes 2025", "Budget 2026", "Élection syndic"]
+  "date": "2026-06-14T15:00:00",
+  "lieu": "Salle de réunion RDC",
+  "quorum_requis": 50,
+  "ordre_du_jour": "Approbation comptes 2025\nBudget 2026\nQuestions diverses"
 }
 ```
 
----
-
-### POST /api/assemblees/{id}/votes
-Enregistrer un vote.
-
-**Body**
-```json
-{
-  "resolution": "Approbation des comptes 2025",
-  "coproprietaire_id": 1,
-  "vote": "pour"
-}
-```
+Types valides : `ordinaire` | `extraordinaire`
 
 ---
 
-## 10. Notifications Log
-
-`auth:sanctum` · roles: `manager`, `gestionnaire`
-
-### GET /api/notifications
-Historique des notifications envoyées (WhatsApp / SMS / email).
-
-**Query params:** `coproprietaire_id`, `canal`, `statut` (`envoyé`|`échoué`|`en_attente`), `per_page`
-
-**Response 200**
-```json
-{
-  "status": "success",
-  "data": {
-    "notifications": [
-      {
-        "id": 1,
-        "destinataire": "Hassan Benali",
-        "phone": "+212600000010",
-        "canal": "whatsapp",
-        "type": "relance_impaye",
-        "statut": "envoyé",
-        "sent_at": "2026-05-11T08:30:00Z"
-      }
-    ]
-  }
-}
-```
-
----
-
-## 11. Super Admin (KAN-13 setup)
+## 15. Super Admin
 
 `auth:sanctum` · `role:super_admin`
 
-### GET /api/super-admin/tenants
-
-### POST /api/super-admin/tenants
+### GET /api/admin/tenants
+### POST /api/admin/tenants
 
 **Body**
 ```json
@@ -738,43 +896,13 @@ Historique des notifications envoyées (WhatsApp / SMS / email).
   "subdomain": "blanca",
   "plan": "business",
   "manager_name": "Mohammed Fikri",
+  "manager_email": "fikri@blancasyndic.ma",
   "manager_phone": "+212600000001"
 }
 ```
 
-### PUT /api/super-admin/tenants/{id}
-### DELETE /api/super-admin/tenants/{id}
-
-### GET /api/super-admin/stats
-Platform-wide stats: tenants count, MRR, active users.
-
----
-
-## 12. Dashboard KPIs
-
-`auth:sanctum` · roles: `manager`, `gestionnaire`
-
-### GET /api/dashboard
-
-Cached in Redis (TTL 5 min).
-
-**Response 200**
-```json
-{
-  "status": "success",
-  "data": {
-    "residences_count": 3,
-    "lots_count": 60,
-    "taux_recouvrement": 75,
-    "montant_recouvre": 13500.00,
-    "montant_restant": 4500.00,
-    "tickets_ouverts": 3,
-    "tickets_urgents": 1,
-    "appels_fonds_actifs": 1,
-    "paiements_ce_mois": 8
-  }
-}
-```
+### PUT /api/admin/tenants/{id}
+### DELETE /api/admin/tenants/{id}
 
 ---
 
@@ -784,27 +912,50 @@ Cached in Redis (TTL 5 min).
 |---|---|
 | 200 | OK |
 | 201 | Created |
-| 202 | Accepted (async job queued) |
+| 202 | Accepted (job async en file) |
 | 204 | No Content (delete) |
-| 401 | Unauthenticated |
-| 403 | Unauthorized (wrong role) |
-| 404 | Not found |
-| 422 | Validation error |
-| 500 | Server error |
+| 401 | Non authentifié |
+| 403 | Rôle insuffisant ou compte désactivé |
+| 404 | Ressource non trouvée |
+| 422 | Erreur de validation |
+| 429 | Trop de tentatives (rate limit) |
+| 500 | Erreur serveur |
 
 ---
 
-## Notifications (async, always via Job)
+## Notifications (async, toujours via Job)
 
-| Event | Canal | Destinataire |
+| Événement | Canal | Destinataire |
 |---|---|---|
-| OTP request | WhatsApp → SMS | Copropriétaire |
-| Appel de fonds publié | WhatsApp → SMS → email | Tous copropriétaires de la résidence |
-| Relance impayé (auto J+7, J+15, J+30) | WhatsApp → SMS | Copropriétaire impayé |
-| Relance impayé (manuelle) | WhatsApp | Copropriétaire impayé |
+| Code d'accès résident généré | WhatsApp (simulé log) | Résident |
+| Appel de fonds envoyé | WhatsApp → SMS | Tous copropriétaires de la résidence |
+| Relance impayé auto (J+7, J+15, J+30) | WhatsApp → SMS | Copropriétaire impayé |
+| Relance impayé manuelle | WhatsApp | Copropriétaire impayé |
 | Ticket créé | WhatsApp | Gestionnaire assigné |
 | Ticket résolu | WhatsApp | Copropriétaire concerné |
+| Annonce publiée | WhatsApp push | Résidents de la résidence |
+
+> WhatsApp = priorité 1. SMS = fallback. Les envois sont toujours asynchrones via Laravel Horizon.
+> Twilio BSP — en attente d'approbation Meta. Actuellement simulé via `Log::info`.
 
 ---
 
-*Last updated: 2026-05-12 — sprint 1 (KAN-13, KAN-14, KAN-15, KAN-21)*
+## Comptes de démo
+
+| Rôle | Email | Mot de passe |
+|---|---|---|
+| Manager | fikri@blancasyndic.ma | imaro2026 |
+| Gestionnaire 1 | alaoui@blancasyndic.ma | imaro2026 |
+| Gestionnaire 2 | mansouri@blancasyndic.ma | imaro2026 |
+| Conseil | elfassi@email.ma | imaro2026 |
+| Résident | +212600000010 | Générer via `POST /gestionnaire/coproprietaires/1/generate-code` |
+
+---
+
+---
+
+> DevOps flow complet : voir [docs/devops.md](./devops.md)
+
+---
+
+*Last updated: 2026-05-18 — nouveau systeme auth (email+password admins, code resident), Sprint 2 endpoints (annonces, contrats, budgets, documents, assemblees)*

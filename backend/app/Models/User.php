@@ -16,19 +16,21 @@ class User extends Authenticatable
 
     protected $fillable = [
         'tenant_id', 'name', 'phone', 'email', 'password',
+        'access_code', 'must_change_code',
         'role', 'otp_code', 'otp_expires_at', 'lang',
         'avatar', 'status', 'last_login_at',
     ];
 
     protected $hidden = [
-        'password', 'remember_token', 'otp_code',
+        'password', 'access_code', 'remember_token', 'otp_code',
     ];
 
     protected function casts(): array
     {
         return [
-            'otp_expires_at' => 'datetime',
-            'last_login_at' => 'datetime',
+            'otp_expires_at'   => 'datetime',
+            'last_login_at'    => 'datetime',
+            'must_change_code' => 'boolean',
         ];
     }
 

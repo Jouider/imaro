@@ -15,7 +15,7 @@ class AppelFonds extends Model
     protected $table = 'appels_fonds';
 
     protected $fillable = [
-        'tenant_id', 'residence_id', 'created_by', 'libelle',
+        'tenant_id', 'residence_id', 'exercice_id', 'created_by', 'libelle',
         'description', 'montant_total', 'date_echeance', 'statut', 'sent_at',
     ];
 
@@ -40,6 +40,11 @@ class AppelFonds extends Model
     public function residence(): BelongsTo
     {
         return $this->belongsTo(Residence::class);
+    }
+
+    public function exercice(): BelongsTo
+    {
+        return $this->belongsTo(Exercice::class);
     }
 
     public function createdBy(): BelongsTo

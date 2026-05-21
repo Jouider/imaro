@@ -1,0 +1,194 @@
+<?php
+
+namespace App\Http\Controllers\Api\Gestionnaire;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Gestionnaire\StoreTicketRequest;
+use App\Http\Requests\Gestionnaire\UpdateTicketRequest;
+use App\Http\Resources\TicketResource;
+use App\Models\Ticket;
+use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+class TicketController extends Controller
+{
+    /**
+     * GET /api/gestionnaire/tickets
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $query = Ticket::with(['residence', 'lot', 'user', 'prestataire'])
+            ->where('tenant_id', config('app.tenant_id'))
+            ->whereHas('residence', fn ($q) => $q->where('gestionnaire_id', $request->user()->id));
+
+        if ($request->filled('residence_id')) {
+            $query->where('residence_id', $request->residence_id);
+        }
+
+        if ($request->filled('statut')) {
+            $query->where('statut', $request->statut);
+        }
+
+        if ($request->filled('priorite')) {
+            $query->where('priorite', $request->priorite);
+        }
+
+        if ($request->filled('categorie')) {
+            $query->where('categorie', $request->categorie);
+        }
+
+        $tickets = $query->latest()->paginate($request->integer('per_page', 15));
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'tickets' => TicketResource::collection($tickets),
+                'meta' => [
+                    'total' => $tickets->total(),
+                    'per_page' => $tickets->perPage(),
+                    'current_page' => $tickets->currentPage(),
+                    'last_page' => $tickets->lastPage(),
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * POST /api/gestionnaire/tickets
+     */
+    public function store(StoreTicketRequest $request): JsonResponse
+    {
+        $ticket = Ticket::create([
+            'tenant_id'   => config('app.tenant_id'),
+            'residence_id'=> $request->residence_id,
+            'lot_id'      => $request->lot_id,
+            'user_id'     => $request->user()->id,
+            'categorie'   => $request->categorie,
+            'description' => $request->description,
+            'priorite'    => $request->priorite,
+            'statut'      => 'ouvert',
+        ]);
+
+        if ($request->hasFile('images')) {
+            $ticket->update(['images' => $this->uploadImages($request->file('images'), $ticket->id)]);
+        }
+
+        $ticket->load(['residence', 'lot', 'user']);
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Ticket créé',
+            'data'    => ['ticket' => new TicketResource($ticket)],
+        ], 201);
+    }
+
+    /**
+     * GET /api/gestionnaire/tickets/{ticket}
+     */
+    public function show(Request $request, Ticket $ticket): JsonResponse
+    {
+        $this->authorizeTicket($request, $ticket);
+
+        $ticket->load(['residence', 'lot', 'user', 'prestataire']);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => ['ticket' => new TicketResource($ticket)],
+        ]);
+    }
+
+    /**
+     * PUT /api/gestionnaire/tickets/{ticket}
+     */
+    public function update(UpdateTicketRequest $request, Ticket $ticket): JsonResponse
+    {
+        $this->authorizeTicket($request, $ticket);
+
+        $data = $request->validated();
+
+        if (($data['statut'] ?? null) === 'clos' && $ticket->statut !== 'clos') {
+            $data['closed_at'] = Carbon::now();
+        }
+
+        // Supprimer des photos existantes
+        if (!empty($data['supprimer_images'])) {
+            $remaining = collect($ticket->images ?? [])
+                ->reject(fn ($path) => in_array($path, $data['supprimer_images']))
+                ->values()
+                ->all();
+
+            foreach ($data['supprimer_images'] as $path) {
+                Storage::disk('public')->delete($path);
+            }
+
+            $data['images'] = $remaining;
+        }
+
+        // Ajouter de nouvelles photos (cumul avec existantes)
+        if ($request->hasFile('images')) {
+            $nouvelles = $this->uploadImages($request->file('images'), $ticket->id);
+            $data['images'] = array_merge($ticket->images ?? [], $nouvelles);
+        }
+
+        unset($data['supprimer_images']);
+        $ticket->update($data);
+        $ticket->load(['residence', 'lot', 'user', 'prestataire']);
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Ticket mis à jour',
+            'data'    => ['ticket' => new TicketResource($ticket)],
+        ]);
+    }
+
+    /**
+     * POST /api/gestionnaire/tickets/{ticket}/clos
+     */
+    public function clos(Request $request, Ticket $ticket): JsonResponse
+    {
+        $this->authorizeTicket($request, $ticket);
+
+        if ($ticket->statut === 'clos') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ce ticket est déjà clos.',
+            ], 422);
+        }
+
+        $ticket->update([
+            'statut' => 'clos',
+            'closed_at' => Carbon::now(),
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Ticket clos',
+            'data' => ['ticket' => new TicketResource($ticket->load(['residence', 'lot', 'user']))],
+        ]);
+    }
+
+    /**
+     * Upload les fichiers images et retourne un tableau de chemins relatifs.
+     * Stocké dans public/tickets/{ticket_id}/
+     */
+    private function uploadImages(array $files, int $ticketId): array
+    {
+        $paths = [];
+        foreach ($files as $file) {
+            $paths[] = $file->store("tickets/{$ticketId}", 'public');
+        }
+        return $paths;
+    }
+
+    private function authorizeTicket(Request $request, Ticket $ticket): void
+    {
+        $ticket->loadMissing('residence');
+        abort_if(
+            $ticket->residence->gestionnaire_id !== $request->user()->id,
+            403,
+            'Accès refusé.'
+        );
+    }
+}

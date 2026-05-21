@@ -18,7 +18,7 @@ class ResidenceController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = Residence::where('gestionnaire_id', $request->user()->id)
-            ->with('gestionnaire')
+            ->with(['gestionnaire', 'exercices'])
             ->withCount('lots');
 
         if ($search = $request->search) {
@@ -51,7 +51,7 @@ class ResidenceController extends Controller
     {
         $this->authorizeResidence($request, $residence);
 
-        $residence->load(['gestionnaire', 'lots.coproprietairePrincipal.user']);
+        $residence->load(['gestionnaire', 'exercices', 'lots.coproprietairePrincipal.user']);
 
         return response()->json([
             'status' => 'success',
