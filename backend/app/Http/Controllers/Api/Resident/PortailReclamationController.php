@@ -19,6 +19,7 @@ class PortailReclamationController extends Controller
             ->get()
             ->map(fn ($t) => [
                 'id'          => $t->id,
+                'reference'   => 'REC-'.($t->created_at?->format('Y') ?? date('Y')).'-'.str_pad($t->id, 3, '0', STR_PAD_LEFT),
                 'titre'       => $t->description,
                 'categorie'   => $t->categorie,
                 'description' => $t->description,
@@ -72,6 +73,7 @@ class PortailReclamationController extends Controller
             'data'    => [
                 'reclamation' => [
                     'id'          => $ticket->id,
+                    'reference'   => 'REC-'.date('Y').'-'.str_pad($ticket->id, 3, '0', STR_PAD_LEFT),
                     'categorie'   => $ticket->categorie,
                     'description' => $ticket->description,
                     'statut'      => $ticket->statut,

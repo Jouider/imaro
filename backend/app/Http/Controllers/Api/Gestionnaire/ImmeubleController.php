@@ -12,9 +12,11 @@ use Illuminate\Http\Request;
 
 class ImmeubleController extends Controller
 {
-    public function index(Residence $residence): JsonResponse
+    use Concerns\AuthorizesResidence;
+
+    public function index(Request $request, Residence $residence): JsonResponse
     {
-        abort_if($residence->gestionnaire_id !== auth()->id(), 403);
+        $this->authorizeResidence($request, $residence);
 
         $immeubles = $residence->immeubles()
             ->with('groupeHabitation')
@@ -29,7 +31,7 @@ class ImmeubleController extends Controller
 
     public function store(Request $request, Residence $residence): JsonResponse
     {
-        abort_if($residence->gestionnaire_id !== auth()->id(), 403);
+        $this->authorizeResidence(request(), $residence);
 
         $data = $request->validate([
             'nom'                   => 'required|string|max:255',
@@ -80,7 +82,7 @@ class ImmeubleController extends Controller
 
     public function update(Request $request, Residence $residence, Immeuble $immeuble): JsonResponse
     {
-        abort_if($residence->gestionnaire_id !== auth()->id(), 403);
+        $this->authorizeResidence(request(), $residence);
         abort_if($immeuble->residence_id !== $residence->id, 404);
 
         $data = $request->validate([
@@ -115,7 +117,7 @@ class ImmeubleController extends Controller
 
     public function destroy(Residence $residence, Immeuble $immeuble): JsonResponse
     {
-        abort_if($residence->gestionnaire_id !== auth()->id(), 403);
+        $this->authorizeResidence(request(), $residence);
         abort_if($immeuble->residence_id !== $residence->id, 404);
 
         if ($immeuble->lots()->exists()) {
@@ -132,10 +134,7 @@ class ImmeubleController extends Controller
 
     public function lots(Immeuble $immeuble): JsonResponse
     {
-        abort_if(
-            $immeuble->residence->gestionnaire_id !== auth()->id(),
-            403
-        );
+        $this->authorizeResidence(request(), $immeuble->residence);
 
         $lots = $immeuble->lots()->with('coproprietairePrincipal.user')->get();
 

@@ -11,9 +11,11 @@ use Illuminate\Http\Request;
 
 class GroupeHabitationController extends Controller
 {
-    public function index(Residence $residence): JsonResponse
+    use Concerns\AuthorizesResidence;
+
+    public function index(Request $request, Residence $residence): JsonResponse
     {
-        abort_if($residence->gestionnaire_id !== auth()->id(), 403);
+        $this->authorizeResidence($request, $residence);
 
         $groupes = $residence->groupesHabitations()->with('immeubles')->get();
 
@@ -25,7 +27,7 @@ class GroupeHabitationController extends Controller
 
     public function store(Request $request, Residence $residence): JsonResponse
     {
-        abort_if($residence->gestionnaire_id !== auth()->id(), 403);
+        $this->authorizeResidence(request(), $residence);
 
         $data = $request->validate([
             'nom'            => 'required|string|max:255',
@@ -57,7 +59,7 @@ class GroupeHabitationController extends Controller
 
     public function update(Request $request, Residence $residence, GroupeHabitation $groupeHabitation): JsonResponse
     {
-        abort_if($residence->gestionnaire_id !== auth()->id(), 403);
+        $this->authorizeResidence(request(), $residence);
         abort_if($groupeHabitation->residence_id !== $residence->id, 404);
 
         $data = $request->validate([
@@ -77,7 +79,7 @@ class GroupeHabitationController extends Controller
 
     public function destroy(Residence $residence, GroupeHabitation $groupeHabitation): JsonResponse
     {
-        abort_if($residence->gestionnaire_id !== auth()->id(), 403);
+        $this->authorizeResidence(request(), $residence);
         abort_if($groupeHabitation->residence_id !== $residence->id, 404);
 
         if ($groupeHabitation->immeubles()->exists()) {
