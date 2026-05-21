@@ -33,16 +33,21 @@ class PrestataireController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $data = $request->validate([
-            'nom'        => 'required|string|max:255',
-            'telephone'  => 'required|string|max:20',
+        $request->validate([
+            'nom'        => 'required_without:name|string|max:255',
+            'name'       => 'required_without:nom|string|max:255',
+            'telephone'  => 'required_without:phone|string|max:20',
+            'phone'      => 'required_without:telephone|string|max:20',
             'specialite' => 'required|string|max:100',
             'email'      => 'nullable|email|max:255',
         ]);
 
         $prestataire = Prestataire::create([
-            'tenant_id' => config('app.tenant_id'),
-            ...$data,
+            'tenant_id'  => config('app.tenant_id'),
+            'nom'        => $request->input('nom') ?? $request->input('name'),
+            'telephone'  => $request->input('telephone') ?? $request->input('phone'),
+            'specialite' => $request->input('specialite'),
+            'email'      => $request->input('email'),
         ]);
 
         return response()->json([
@@ -56,15 +61,23 @@ class PrestataireController extends Controller
     {
         abort_if($prestataire->tenant_id !== config('app.tenant_id'), 403);
 
-        $data = $request->validate([
+        $request->validate([
             'nom'        => 'sometimes|string|max:255',
+            'name'       => 'sometimes|string|max:255',
             'telephone'  => 'sometimes|string|max:20',
+            'phone'      => 'sometimes|string|max:20',
             'specialite' => 'sometimes|string|max:100',
             'email'      => 'nullable|email|max:255',
             'statut'     => ['sometimes', Rule::in(['actif', 'inactif'])],
         ]);
 
-        $prestataire->update($data);
+        $prestataire->update(array_filter([
+            'nom'        => $request->input('nom') ?? $request->input('name'),
+            'telephone'  => $request->input('telephone') ?? $request->input('phone'),
+            'specialite' => $request->input('specialite'),
+            'email'      => $request->input('email'),
+            'statut'     => $request->input('statut'),
+        ], fn($v) => $v !== null));
 
         return response()->json([
             'status'  => 'success',
