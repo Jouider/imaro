@@ -35,10 +35,24 @@ class BudgetController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $tenantId = config('app.tenant_id');
+
         $data = $request->validate([
-            'residence_id' => 'required|exists:residences,id',
+            'residence_id' => "required|exists:residences,id,tenant_id,{$tenantId}",
             'exercice_id'  => 'required|exists:exercices,id',
         ]);
+
+        // Ensure exercice belongs to this residence
+        $exerciceBelongsToResidence = \App\Models\Exercice::where('id', $data['exercice_id'])
+            ->where('residence_id', $data['residence_id'])
+            ->exists();
+
+        if (! $exerciceBelongsToResidence) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Cet exercice n\'appartient pas à cette résidence.',
+            ], 422);
+        }
 
         if (Budget::where('residence_id', $data['residence_id'])->where('exercice_id', $data['exercice_id'])->exists()) {
             return response()->json([

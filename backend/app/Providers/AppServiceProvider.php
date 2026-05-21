@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\LigneBudget;
 use App\Services\OtpService;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -12,5 +14,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(OtpService::class);
     }
 
-    public function boot(): void {}
+    public function boot(): void
+    {
+        Route::model('ligne', LigneBudget::class);
+    }
 }
