@@ -32,8 +32,11 @@ Route::apiResource('residences', ResidenceController::class)->only(['index', 'sh
 Route::prefix('residences/{residence}')->group(function () {
     Route::get('/lots', [LotController::class, 'index']);
     Route::post('/lots', [LotController::class, 'store']);
+    Route::post('/lots/bulk', [LotController::class, 'bulkStore']);
     Route::put('/lots/{lot}', [LotController::class, 'update']);
     Route::delete('/lots/{lot}', [LotController::class, 'destroy']);
+    Route::post('/import-soldes', [LotController::class, 'importSoldes']);
+    Route::post('/import-paiements', [LotController::class, 'importPaiements']);
     Route::get('/coproprietaires', [CoproprietaireController::class, 'index']);
     // Exercices
     Route::get('/exercices', [ExerciceController::class, 'index']);
@@ -61,8 +64,9 @@ Route::get('/immeubles/{immeuble}/lots', [ImmeubleController::class, 'lots']);
 Route::put('/lots/{lot}', [LotController::class, 'updateFlat']);
 Route::delete('/lots/{lot}', [LotController::class, 'destroyFlat']);
 
-// Copropriétaires — liste globale + création + code d'accès
+// Copropriétaires — liste globale + création + import bulk + code d'accès
 Route::get('/coproprietaires', [CoproprietaireController::class, 'indexGlobal']);
+Route::post('/coproprietaires/bulk', [CoproprietaireController::class, 'bulkStore']);
 Route::post('/coproprietaires', [CoproprietaireController::class, 'store']);
 Route::post('/coproprietaires/{coproprietaire}/generate-code', [CoproprietaireController::class, 'generateCode']);
 
@@ -95,6 +99,7 @@ Route::delete('/annonces/{annonce}', [AnnonceController::class, 'destroy']);
 
 // Prestataires + Contrats (Sprint 2)
 Route::get('/prestataires', [PrestataireController::class, 'index']);
+Route::post('/prestataires/bulk', [PrestataireController::class, 'bulkStore']);
 Route::post('/prestataires', [PrestataireController::class, 'store']);
 Route::put('/prestataires/{prestataire}', [PrestataireController::class, 'update']);
 
