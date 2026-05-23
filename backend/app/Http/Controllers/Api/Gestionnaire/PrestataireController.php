@@ -57,6 +57,55 @@ class PrestataireController extends Controller
         ], 201);
     }
 
+    /**
+     * POST /api/gestionnaire/prestataires/bulk
+     * Crée plusieurs prestataires en une seule requête (chunks de 50 max).
+     * Idempotent : ignore si un prestataire avec le même téléphone existe déjà.
+     */
+    public function bulkStore(Request $request): JsonResponse
+    {
+        $request->validate([
+            'prestataires'              => ['required', 'array', 'min:1', 'max:50'],
+            'prestataires.*.nom'        => ['required', 'string', 'max:255'],
+            'prestataires.*.metier'     => ['required', 'string', 'max:100'],
+            'prestataires.*.telephone'  => ['required', 'string', 'max:20'],
+            'prestataires.*.email'      => ['nullable', 'email', 'max:255'],
+            'prestataires.*.ville'      => ['nullable', 'string', 'max:100'],
+        ]);
+
+        $tenantId = config('app.tenant_id');
+        $created  = 0;
+        $errors   = [];
+
+        foreach ($request->prestataires as $index => $data) {
+            $line = 'Ligne ' . ($index + 1);
+            try {
+                // Idempotence : même téléphone dans le même tenant
+                if (Prestataire::where('tenant_id', $tenantId)->where('telephone', $data['telephone'])->exists()) {
+                    $errors[] = "{$line}: prestataire avec le téléphone '{$data['telephone']}' existe déjà (ignoré).";
+                    continue;
+                }
+
+                Prestataire::create([
+                    'tenant_id'  => $tenantId,
+                    'nom'        => $data['nom'],
+                    'specialite' => $data['metier'],
+                    'telephone'  => $data['telephone'],
+                    'email'      => $data['email'] ?? null,
+                ]);
+
+                $created++;
+            } catch (\Throwable $e) {
+                $errors[] = "{$line}: " . $e->getMessage();
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => ['created' => $created, 'errors' => $errors],
+        ]);
+    }
+
     public function update(Request $request, Prestataire $prestataire): JsonResponse
     {
         abort_if($prestataire->tenant_id !== config('app.tenant_id'), 403);
