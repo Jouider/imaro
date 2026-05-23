@@ -672,9 +672,10 @@
       },
       "tabs": {
         "dashboard": "Tableau de bord",
-        "journal": "Journal",
+        "journal": "Journal comptable",
         "grandLivre": "Grand-Livre",
         "depenses": "Dépenses",
+        "rapports": "Rapports financiers",
         "cloture": "Clôture"
       },
       "kpi": {

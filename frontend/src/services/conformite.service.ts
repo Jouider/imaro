@@ -114,9 +114,26 @@ const MOCK_AUDIT_LOGS: AuditLog[] = [
   },
 ]
 
+function filterMockLogs(filters: AuditFilters): AuditLog[] {
+  let logs = MOCK_AUDIT_LOGS
+  if (filters.category) logs = logs.filter((l) => l.category === filters.category)
+  if (filters.severity) logs = logs.filter((l) => l.severity === filters.severity)
+  if (filters.search) {
+    const q = filters.search.toLowerCase()
+    logs = logs.filter(
+      (l) =>
+        l.action.toLowerCase().includes(q) ||
+        (l.user_email ?? '').toLowerCase().includes(q) ||
+        (l.target_label ?? '').toLowerCase().includes(q),
+    )
+  }
+  return logs
+}
+
 export async function getAuditLogs(
   filters: AuditFilters = {},
 ): Promise<{ logs: AuditLog[]; stats: AuditStats }> {
+  const mockLogs = filterMockLogs(filters)
   return withMock(
     async () => {
       const res = await api.get<ApiEnvelope<{ logs: AuditLog[]; stats: AuditStats }>>(
@@ -126,7 +143,7 @@ export async function getAuditLogs(
       return res.data.data
     },
     {
-      logs: MOCK_AUDIT_LOGS,
+      logs: mockLogs,
       stats: {
         total: MOCK_AUDIT_LOGS.length,
         errors: MOCK_AUDIT_LOGS.filter((l) => l.severity === 'error').length,
@@ -178,7 +195,7 @@ export async function getAnnexes(residenceId: number, exercice: number): Promise
       )
       return res.data.data
     },
-    MOCK_ANNEXES,
+    { ...MOCK_ANNEXES, exercice },
   )
 }
 
@@ -292,7 +309,7 @@ export async function getComplianceCalendar(
       )
       return res.data.data
     },
-    MOCK_COMPLIANCE_CALENDAR,
+    { ...MOCK_COMPLIANCE_CALENDAR, exercice },
   )
 }
 
