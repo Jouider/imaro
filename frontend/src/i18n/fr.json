@@ -237,7 +237,8 @@
       "assemblees": "Assemblées",
       "annonces": "Annonces",
       "documents": "Documents",
-      "profil": "Mon Profil"
+      "profil": "Mon Profil",
+      "imports": "Import données"
     },
     "residences": {
       "title": "Résidences",
@@ -983,6 +984,51 @@
       "verrouiller": "Verrouiller le budget",
       "exporter": "Export PDF Annexe 5",
       "creer": "Créer le budget"
+    },
+    "imports": {
+      "title": "Import de données",
+      "description": "Importez vos données existantes pour démarrer rapidement",
+      "selectResidence": "Sélectionnez une résidence",
+      "tabs": {
+        "lots": "Lots",
+        "coproprietaires": "Copropriétaires",
+        "soldes": "Soldes initiaux",
+        "paiements": "Historique paiements",
+        "prestataires": "Prestataires"
+      },
+      "steps": {
+        "upload": "Téléverser",
+        "mapping": "Mapper les colonnes",
+        "preview": "Aperçu",
+        "execute": "Importer"
+      },
+      "upload": {
+        "dropzone": "Glissez votre fichier Excel ici",
+        "or": "ou cliquer pour sélectionner",
+        "accepted": "Formats acceptés : .xlsx, .csv",
+        "downloadTemplate": "Télécharger le modèle"
+      },
+      "mapping": {
+        "source": "Colonne source",
+        "target": "Champ cible",
+        "confidence": "Confiance",
+        "auto": "Auto",
+        "manual": "Manuel",
+        "unmapped": "Non mappé",
+        "requiredMissing": "Champs requis non mappés"
+      },
+      "preview": {
+        "summary": "{valid} lignes valides · {errors} erreurs",
+        "skipErrors": "Ignorer les lignes en erreur",
+        "importButton": "Importer {count} lignes"
+      },
+      "execute": {
+        "inProgress": "Importation en cours... {done}/{total} lignes",
+        "success": "{count} lignes importées avec succès",
+        "failed": "{count} lignes échouées",
+        "done": "Terminé"
+      },
+      "order": "Ordre recommandé : Lots → Copropriétaires → Soldes → Paiements → Prestataires"
     }
   }
 }
