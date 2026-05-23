@@ -237,7 +237,13 @@
       "assemblees": "الجمعيات العامة",
       "annonces": "الإعلانات",
       "documents": "الوثائق",
-      "profil": "ملفي الشخصي"
+      "profil": "ملفي الشخصي",
+      "imports": "استيراد البيانات",
+      "recouvrement": "التحصيل",
+      "sectionConformite": "الامتثال",
+      "conformite": "تقويم الامتثال",
+      "annexes": "الملاحق المحاسبية",
+      "audit": "سجل التدقيق"
     },
     "residences": {
       "title": "الإقامات",
@@ -983,6 +989,51 @@
       "verrouiller": "قفل الميزانية",
       "exporter": "تصدير PDF الملحق 5",
       "creer": "إنشاء الميزانية"
+    },
+    "imports": {
+      "title": "استيراد البيانات",
+      "description": "استوردوا بياناتكم الحالية للبدء بسرعة",
+      "selectResidence": "اختر إقامة",
+      "tabs": {
+        "lots": "الشقق",
+        "coproprietaires": "الملاك المشاركون",
+        "soldes": "الأرصدة الأولية",
+        "paiements": "سجل المدفوعات",
+        "prestataires": "المزودون"
+      },
+      "steps": {
+        "upload": "تحميل",
+        "mapping": "ربط الأعمدة",
+        "preview": "معاينة",
+        "execute": "استيراد"
+      },
+      "upload": {
+        "dropzone": "اسحب ملف Excel هنا",
+        "or": "أو انقر للاختيار",
+        "accepted": "الصيغ المقبولة: xlsx. ،csv.",
+        "downloadTemplate": "تحميل النموذج"
+      },
+      "mapping": {
+        "source": "العمود المصدر",
+        "target": "الحقل المستهدف",
+        "confidence": "الثقة",
+        "auto": "تلقائي",
+        "manual": "يدوي",
+        "unmapped": "غير مربوط",
+        "requiredMissing": "حقول مطلوبة غير مربوطة"
+      },
+      "preview": {
+        "summary": "{valid} سطر صالح · {errors} أخطاء",
+        "skipErrors": "تجاهل الأسطر الخاطئة",
+        "importButton": "استيراد {count} سطر"
+      },
+      "execute": {
+        "inProgress": "جاري الاستيراد... {done}/{total} سطر",
+        "success": "تم استيراد {count} سطر بنجاح",
+        "failed": "فشل {count} سطر",
+        "done": "تم"
+      },
+      "order": "الترتيب الموصى: الشقق ← الملاك ← الأرصدة ← المدفوعات ← المزودون"
     }
   }
 }
