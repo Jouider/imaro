@@ -238,7 +238,12 @@
       "annonces": "Annonces",
       "documents": "Documents",
       "profil": "Mon Profil",
-      "imports": "Import données"
+      "imports": "Import données",
+      "recouvrement": "Recouvrement",
+      "sectionConformite": "Conformité",
+      "conformite": "Calendrier conformité",
+      "annexes": "Annexes comptables",
+      "audit": "Journal d'audit"
     },
     "residences": {
       "title": "Résidences",

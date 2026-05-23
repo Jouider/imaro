@@ -238,7 +238,12 @@
       "annonces": "الإعلانات",
       "documents": "الوثائق",
       "profil": "ملفي الشخصي",
-      "imports": "استيراد البيانات"
+      "imports": "استيراد البيانات",
+      "recouvrement": "التحصيل",
+      "sectionConformite": "الامتثال",
+      "conformite": "تقويم الامتثال",
+      "annexes": "الملاحق المحاسبية",
+      "audit": "سجل التدقيق"
     },
     "residences": {
       "title": "الإقامات",

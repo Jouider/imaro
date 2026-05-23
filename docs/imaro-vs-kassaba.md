@@ -66,19 +66,21 @@ Légende : ✅ Présent · 🟡 Partiel · ❌ Absent · ⭐ Avantage Imaro
 | **Pénalités de retard** | ✅ | ❌ | Calcul auto selon règlement copro |
 | **Risque de prescription** (alerte 3/5 ans) | ✅ | ❌ | KPI critique pour le marché MA |
 
-### 2.3 Comptabilité (le gros manque)
+### 2.3 Comptabilité
+
+**Découverte importante** : Imaro a déjà beaucoup de comptabilité dans `/gestionnaire/comptabilite` (ComptabilitePage 1913 lignes avec 6 tabs : Dashboard, Journal, Grand Livre, Dépenses, Rapports, Clôture).
 
 | Fonction | Kassaba | Imaro | Note |
 |---|---|---|---|
-| **Bilan d'ouverture** | ✅ | ❌ | Import des soldes initiaux par compte |
-| **Journal comptable (écritures partie double)** | ✅ | ❌ | **Bloquant pour les gros syndics** |
-| **Balance des comptes** | ✅ | ❌ | Soldes débiteurs/créditeurs par compte |
-| **Grand livre** | ✅ | ❌ | Détail des mouvements par compte |
-| **Livre de compte** (par copropriétaire) | ✅ | 🟡 | On a une vue paiements, pas de relevé comptable |
+| **Bilan d'ouverture** | ✅ | ❌ | Import des soldes initiaux par compte (pas encore) |
+| **Journal comptable (écritures partie double)** | ✅ | ✅ | **DÉJÀ FAIT** dans ComptabilitePage → Tab Journal |
+| **Balance des comptes** | ✅ | 🟡 | À ajouter comme tab dans ComptabilitePage |
+| **Grand livre** | ✅ | ✅ | **DÉJÀ FAIT** dans ComptabilitePage → Tab Grand Livre |
+| **Livre de compte** (par copropriétaire) | ✅ | 🟡 | Page paiements existe, formaliser comme relevé comptable |
 | **État de la situation financière (bilan)** | ✅ | ❌ | Annexe 13-1 du décret |
 | **Compte de gestion général** | ✅ | ❌ | Annexe 13-2 du décret |
 | **Pointage bancaire** (rapprochement relevé bancaire) | ✅ 10 banques | ❌ | **Killer feature, économise 80% du temps de gestion** |
-| **Clôture annuelle** (wizard 4 étapes) | ✅ | ❌ | Affectation résultat + verrouillage exercice |
+| **Clôture annuelle** (wizard 4 étapes) | ✅ | ✅ | **DÉJÀ FAIT** dans ComptabilitePage → Tab Clôture |
 | **Provisions pour créances douteuses** | ✅ | ❌ | Art. 2 du Décret 2.23.700, approbation AG |
 
 ### 2.4 Conformité légale (Décret 2.23.700 + Loi 18-00)
@@ -162,17 +164,19 @@ Découpée en 4 sprints de 2 semaines chacun. **Priorité = volume client perdu 
 | 4.5 | **Risque de prescription** : KPI sur `RecouvrementPage` (alerte créances proches 3 ans / 5 ans) | Haut | S | Oui |
 | 4.6 | **Occupants** : modèle `Occupant` séparé de `Coproprietaire` (un lot peut avoir 1 owner + N tenants) | Moyen | M | Oui (schéma) |
 
-### Sprint 5 — Comptabilité partie double (sem 26 → 27)
-**Objectif : remplacer Excel pour les gros syndics. Le module qui débloque les clients à >10 résidences.**
+### Sprint 5 — Comptabilité partie double — **réduit grâce à l'existant** (sem 26 → 27)
 
-| # | Feature | Impact | Effort |
-|---|---|---|---|
-| 5.1 | **Plan comptable** marocain syndic : classes 1-7 seedées en base (immobilisations, charges, produits, etc.) | Très haut | M |
-| 5.2 | **Bilan d'ouverture** : page d'import des soldes initiaux par compte (formulaire + import xlsx — réutiliser notre wizard !) | Très haut | M |
-| 5.3 | **Journal comptable** : page liste écritures partie double + formulaire création + journal d'écriture auto sur chaque paiement/dépense | Très haut | L |
-| 5.4 | **Grand livre** : page consultation détaillée par compte avec filtres période | Haut | M |
-| 5.5 | **Balance des comptes** : tableau D/C par compte + total avec contrôle équilibre | Haut | S |
-| 5.6 | **Livre de compte copropriétaire** : relevé individuel exportable PDF | Haut | M |
+**Bonne nouvelle : on a déjà Journal + Grand livre + Clôture dans `ComptabilitePage`.** Sprint allégé :
+
+| # | Feature | Impact | Effort | Status |
+|---|---|---|---|---|
+| 5.1 | **Plan comptable** marocain syndic : classes 1-7 seedées en base | Très haut | M | À faire (backend) |
+| 5.2 | **Bilan d'ouverture** : page d'import des soldes initiaux par compte (réutiliser notre wizard d'import !) | Très haut | M | À faire |
+| 5.3 | ~~Journal comptable~~ | — | — | **✅ Déjà fait** |
+| 5.4 | ~~Grand livre~~ | — | — | **✅ Déjà fait** |
+| 5.5 | **Balance des comptes** : tableau D/C par compte + total avec contrôle équilibre — ajouter tab dans ComptabilitePage | Haut | S | À faire |
+| 5.6 | **Livre de compte copropriétaire** : relevé individuel exportable PDF | Haut | M | À faire |
+| 5.7 | ~~Clôture annuelle~~ | — | — | **✅ Déjà fait** |
 
 ### Sprint 6 — Pointage bancaire + Clôture (sem 28 → 29)
 **Objectif : automatisation. C'est l'argument de vente N°1 pour le syndic occupé.**

@@ -25,6 +25,10 @@ import { ComptabilitePage } from '@/pages/gestionnaire/ComptabilitePage'
 import { DepensesPage } from '@/pages/gestionnaire/DepensesPage'
 import { ProfilPage } from '@/pages/gestionnaire/ProfilPage'
 import { ImportsPage } from '@/pages/gestionnaire/ImportsPage'
+import { AuditTrailPage } from '@/pages/gestionnaire/AuditTrailPage'
+import { AnnexesPage } from '@/pages/gestionnaire/AnnexesPage'
+import { ConformitePage } from '@/pages/gestionnaire/ConformitePage'
+import { RecouvrementPage } from '@/pages/gestionnaire/RecouvrementPage'
 
 export const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
@@ -77,6 +81,10 @@ export const router = createBrowserRouter([
       { path: 'comptabilite', element: <ComptabilitePage /> },
       { path: 'depenses', element: <DepensesPage /> },
       { path: 'imports', element: <ImportsPage /> },
+      { path: 'recouvrement', element: <RecouvrementPage /> },
+      { path: 'conformite', element: <ConformitePage /> },
+      { path: 'annexes', element: <AnnexesPage /> },
+      { path: 'audit', element: <AuditTrailPage /> },
       { path: 'profil', element: <ProfilPage /> },
     ],
   },
