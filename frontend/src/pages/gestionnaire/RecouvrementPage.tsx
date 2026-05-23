@@ -41,7 +41,7 @@ export function RecouvrementPage() {
 
   const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(null)
 
-  const residencesQ = useQuery({ queryKey: ['residences'], queryFn: getResidences })
+  const residencesQ = useQuery({ queryKey: ['residences'], queryFn: () => getResidences() })
 
   const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
 

@@ -54,7 +54,7 @@ export function ImportsPage() {
 
   const residencesQ = useQuery({
     queryKey: ['residences'],
-    queryFn: getResidences,
+    queryFn: () => getResidences(),
   })
 
   const lotsQ = useQuery({
