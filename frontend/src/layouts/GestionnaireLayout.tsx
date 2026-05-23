@@ -14,6 +14,11 @@ import {
   Megaphone,
   FileText,
   Hammer,
+  Upload,
+  Scale,
+  CalendarCheck,
+  ClipboardCheck,
+  Activity,
   LogOut,
   Menu,
   X,
@@ -23,7 +28,6 @@ import {
   CreditCard as AbonnementIcon,
   BanknoteIcon,
   TicketIcon,
-  CalendarCheck,
   AlertCircle,
   Info,
   CheckCheck,
@@ -93,6 +97,11 @@ const NAV_SECTIONS: NavSection[] = [
         icon: <Hammer className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.prestataires',
       },
+      {
+        to: '/gestionnaire/imports',
+        icon: <Upload className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.imports',
+      },
     ],
   },
   {
@@ -117,6 +126,31 @@ const NAV_SECTIONS: NavSection[] = [
         to: '/gestionnaire/comptabilite',
         icon: <BookOpen className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.comptabilite',
+      },
+      {
+        to: '/gestionnaire/recouvrement',
+        icon: <Scale className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.recouvrement',
+      },
+    ],
+  },
+  {
+    labelKey: 'gestionnaire.nav.sectionConformite',
+    items: [
+      {
+        to: '/gestionnaire/conformite',
+        icon: <CalendarCheck className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.conformite',
+      },
+      {
+        to: '/gestionnaire/annexes',
+        icon: <ClipboardCheck className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.annexes',
+      },
+      {
+        to: '/gestionnaire/audit',
+        icon: <Activity className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.audit',
       },
     ],
   },

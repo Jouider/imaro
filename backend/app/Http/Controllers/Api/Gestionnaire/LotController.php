@@ -9,9 +9,11 @@ use App\Http\Requests\Gestionnaire\UpdateLotRequest;
 use App\Http\Resources\LotResource;
 use App\Models\Immeuble;
 use App\Models\Lot;
+use App\Models\Paiement;
 use App\Models\Residence;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LotController extends Controller
 {
@@ -175,6 +177,197 @@ class LotController extends Controller
         return $this->destroy($request, $residence, $lot);
     }
 
+
+    /**
+     * POST /api/gestionnaire/residences/{residence}/lots/bulk
+     */
+    public function bulkStore(Request $request, Residence $residence): JsonResponse
+    {
+        $this->authorizeResidence($request, $residence);
+
+        $request->validate([
+            'lots'              => ['required', 'array', 'min:1', 'max:50'],
+            'lots.*.numero'     => ['required', 'string', 'max:20'],
+            'lots.*.type'       => ['required', 'in:appartement,local_commercial,parking,cave'],
+            'lots.*.etage'      => ['nullable', 'integer', 'min:0', 'max:50'],
+            'lots.*.superficie' => ['nullable', 'numeric', 'min:1'],
+            'lots.*.tantieme'   => ['required', 'numeric', 'min:0.01', 'max:1000'],
+            'lots.*.immeuble_id'=> ['nullable', 'integer'],
+        ]);
+
+        $defaultImmeuble = $residence->immeubles()->first();
+        $created = 0;
+        $errors  = [];
+
+        foreach ($request->lots as $index => $data) {
+            $line = 'Ligne ' . ($index + 1);
+            try {
+                if (Lot::where('residence_id', $residence->id)->where('numero', $data['numero'])->exists()) {
+                    $errors[] = "{$line}: lot '{$data['numero']}' existe déjà (ignoré).";
+                    continue;
+                }
+
+                $immeuble = isset($data['immeuble_id'])
+                    ? Immeuble::where('id', $data['immeuble_id'])->where('residence_id', $residence->id)->first()
+                    : $defaultImmeuble;
+
+                if (! $immeuble) {
+                    $errors[] = "{$line}: immeuble introuvable.";
+                    continue;
+                }
+
+                if ($residence->mode_cotisation === 'tantieme') {
+                    $currentSum = $residence->lots()->sum('tantieme');
+                    if ($currentSum + $data['tantieme'] > $residence->total_tantieme) {
+                        $remaining = round($residence->total_tantieme - $currentSum, 2);
+                        $errors[] = "{$line}: tantième invalide. Restant disponible : {$remaining}.";
+                        continue;
+                    }
+                }
+
+                Lot::create([
+                    'tenant_id'    => config('app.tenant_id'),
+                    'residence_id' => $residence->id,
+                    'immeuble_id'  => $immeuble->id,
+                    'numero'       => $data['numero'],
+                    'type'         => $data['type'],
+                    'etage'        => $data['etage'] ?? 0,
+                    'superficie'   => $data['superficie'] ?? null,
+                    'tantieme'     => $data['tantieme'],
+                ]);
+
+                $residence->increment('nb_lots');
+                $immeuble->increment('nb_lots');
+                $created++;
+            } catch (\Throwable $e) {
+                $errors[] = "{$line}: " . $e->getMessage();
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => ['created' => $created, 'errors' => $errors],
+        ]);
+    }
+
+    /**
+     * POST /api/gestionnaire/residences/{residence}/import-soldes
+     * Importe les soldes initiaux des copropriétaires (par numéro de lot).
+     */
+    public function importSoldes(Request $request, Residence $residence): JsonResponse
+    {
+        $this->authorizeResidence($request, $residence);
+
+        $request->validate([
+            'soldes'             => ['required', 'array', 'min:1', 'max:50'],
+            'soldes.*.lot_numero'=> ['required', 'string'],
+            'soldes.*.montant'   => ['required', 'numeric'],
+            'soldes.*.date'      => ['nullable', 'date'],
+        ]);
+
+        $imported = 0;
+        $errors   = [];
+
+        foreach ($request->soldes as $index => $data) {
+            $line = 'Ligne ' . ($index + 1);
+
+            $lot = Lot::where('residence_id', $residence->id)->where('numero', $data['lot_numero'])->first();
+            if (! $lot) {
+                $errors[] = "{$line}: lot '{$data['lot_numero']}' introuvable.";
+                continue;
+            }
+
+            $copro = $lot->coproprietairePrincipal;
+            if (! $copro) {
+                $errors[] = "{$line}: aucun copropriétaire principal pour le lot '{$data['lot_numero']}'.";
+                continue;
+            }
+
+            $copro->update(['solde_actuel' => (float) $data['montant']]);
+            $imported++;
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => ['imported' => $imported, 'errors' => $errors],
+        ]);
+    }
+
+    /**
+     * POST /api/gestionnaire/residences/{residence}/import-paiements
+     * Importe des paiements historiques (par numéro de lot).
+     */
+    public function importPaiements(Request $request, Residence $residence): JsonResponse
+    {
+        $this->authorizeResidence($request, $residence);
+
+        $request->validate([
+            'paiements'               => ['required', 'array', 'min:1', 'max:50'],
+            'paiements.*.lot_numero'  => ['required', 'string'],
+            'paiements.*.montant'     => ['required', 'numeric', 'min:0.01'],
+            'paiements.*.date'        => ['required', 'date'],
+            'paiements.*.mode'        => ['required', 'in:virement,cheque,especes,mobile'],
+            'paiements.*.reference'   => ['nullable', 'string', 'max:100'],
+            'paiements.*.trimestre'   => ['nullable', 'string', 'max:50'],
+        ]);
+
+        $imported = 0;
+        $errors   = [];
+
+        foreach ($request->paiements as $index => $data) {
+            $line = 'Ligne ' . ($index + 1);
+            try {
+                $lot = Lot::where('residence_id', $residence->id)->where('numero', $data['lot_numero'])->first();
+                if (! $lot) {
+                    $errors[] = "{$line}: lot '{$data['lot_numero']}' introuvable.";
+                    continue;
+                }
+
+                $copro = $lot->coproprietairePrincipal;
+                if (! $copro) {
+                    $errors[] = "{$line}: aucun copropriétaire principal pour le lot '{$data['lot_numero']}'.";
+                    continue;
+                }
+
+                DB::transaction(function () use ($request, $data, $copro, $residence) {
+                    $note = 'Import';
+                    if (! empty($data['trimestre'])) {
+                        $note .= ' - ' . $data['trimestre'];
+                    }
+
+                    // Retrouver l'exercice actif de la résidence pour le lier (best-effort)
+                    $exerciceId = $residence->exercices()
+                        ->where('statut', 'actif')
+                        ->value('id');
+
+                    Paiement::create([
+                        'tenant_id'           => config('app.tenant_id'),
+                        'exercice_id'         => $exerciceId,
+                        'coproprietaire_id'   => $copro->id,
+                        'appel_fonds_ligne_id'=> null,
+                        'saisi_par'           => $request->user()->id,
+                        'montant'             => $data['montant'],
+                        'mode'                => $data['mode'],
+                        'reference'           => $data['reference'] ?? null,
+                        'note'                => $note,
+                        'date_paiement'       => $data['date'],
+                    ]);
+
+                    // Solde = paiements standalone ajoutés manuellement au solde actuel
+                    $copro->update(['solde_actuel' => $copro->solde_actuel + $data['montant']]);
+                });
+
+                $imported++;
+            } catch (\Throwable $e) {
+                $errors[] = "{$line}: " . $e->getMessage();
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => ['imported' => $imported, 'errors' => $errors],
+        ]);
+    }
 
     private function getTotalTantiemeScope(Immeuble $immeuble, Residence $residence): float
     {

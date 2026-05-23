@@ -120,6 +120,80 @@ class CoproprietaireController extends Controller
     }
 
     /**
+     * POST /api/gestionnaire/coproprietaires/bulk
+     * Crée plusieurs copropriétaires en une seule requête (chunks de 50 max).
+     * Idempotent : ignore les lots qui ont déjà un copropriétaire principal.
+     */
+    public function bulkStore(Request $request): JsonResponse
+    {
+        $request->validate([
+            'coproprietaires'              => ['required', 'array', 'min:1', 'max:50'],
+            'coproprietaires.*.name'       => ['required', 'string', 'max:255'],
+            'coproprietaires.*.phone'      => ['required', 'string', 'max:20'],
+            'coproprietaires.*.email'      => ['nullable', 'email', 'max:255'],
+            'coproprietaires.*.lot_id'     => ['required', 'integer', 'exists:lots,id'],
+            'coproprietaires.*.residence_id'=> ['required', 'integer', 'exists:residences,id'],
+        ]);
+
+        $created = 0;
+        $errors  = [];
+
+        foreach ($request->coproprietaires as $index => $data) {
+            $line = 'Ligne ' . ($index + 1);
+            try {
+                $lot = Lot::with('residence')->findOrFail($data['lot_id']);
+
+                $isManager      = $request->user()->role === 'manager';
+                $isGestionnaire = $lot->residence->gestionnaire_id === $request->user()->id;
+                if (! $isManager && ! $isGestionnaire) {
+                    $errors[] = "{$line}: accès refusé pour la résidence du lot {$data['lot_id']}.";
+                    continue;
+                }
+
+                // Idempotence : lot déjà occupé par un propriétaire ?
+                if ($lot->coproprietairePrincipal()->exists()) {
+                    $errors[] = "{$line}: le lot '{$lot->numero}' a déjà un copropriétaire principal (ignoré).";
+                    continue;
+                }
+
+                $tempCode = strtoupper(\Illuminate\Support\Str::random(8));
+
+                DB::transaction(function () use ($data, $lot, $tempCode, $request) {
+                    $user = \App\Models\User::create([
+                        'tenant_id'        => $request->user()->tenant_id,
+                        'name'             => $data['name'],
+                        'phone'            => $data['phone'],
+                        'email'            => $data['email'] ?? null,
+                        'role'             => 'resident',
+                        'password'         => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(16)),
+                        'access_code'      => \Illuminate\Support\Facades\Hash::make($tempCode),
+                        'must_change_code' => true,
+                        'status'           => 'active',
+                    ]);
+
+                    \App\Models\Coproprietaire::create([
+                        'tenant_id'   => $request->user()->tenant_id,
+                        'user_id'     => $user->id,
+                        'lot_id'      => $lot->id,
+                        'type'        => 'proprietaire',
+                        'date_entree' => now()->toDateString(),
+                        'solde_actuel'=> 0,
+                    ]);
+                });
+
+                $created++;
+            } catch (\Throwable $e) {
+                $errors[] = "{$line}: " . $e->getMessage();
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => ['created' => $created, 'errors' => $errors],
+        ]);
+    }
+
+    /**
      * GET /api/gestionnaire/coproprietaires — liste globale de toutes les résidences du gestionnaire
      */
     public function indexGlobal(Request $request): JsonResponse

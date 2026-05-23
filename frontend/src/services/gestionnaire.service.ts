@@ -801,3 +801,86 @@ export async function getContrats(prestataireId?: number): Promise<Contrat[]> {
     ? MOCK_CONTRATS.filter((c) => c.prestataire_id === prestataireId)
     : MOCK_CONTRATS)
 }
+
+// ─── Bulk import functions ──────────────────────────────────────────────────
+
+type BulkResult = { created: number; errors: string[] }
+type ImportResult = { imported: number; errors: string[] }
+
+export async function bulkStoreLots(
+  residenceId: number,
+  lots: Record<string, unknown>[],
+): Promise<BulkResult> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<BulkResult>>(
+        `/gestionnaire/residences/${residenceId}/lots/bulk`,
+        { lots },
+      )
+      return res.data.data
+    },
+    { created: lots.length, errors: [] },
+  )
+}
+
+export async function bulkStoreCoproprietaires(
+  coproprietaires: Record<string, unknown>[],
+): Promise<BulkResult> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<BulkResult>>(
+        '/gestionnaire/coproprietaires/bulk',
+        { coproprietaires },
+      )
+      return res.data.data
+    },
+    { created: coproprietaires.length, errors: [] },
+  )
+}
+
+export async function importSoldes(
+  residenceId: number,
+  soldes: Record<string, unknown>[],
+): Promise<ImportResult> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<ImportResult>>(
+        `/gestionnaire/residences/${residenceId}/import-soldes`,
+        { soldes },
+      )
+      return res.data.data
+    },
+    { imported: soldes.length, errors: [] },
+  )
+}
+
+export async function importPaiements(
+  residenceId: number,
+  paiements: Record<string, unknown>[],
+): Promise<ImportResult> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<ImportResult>>(
+        `/gestionnaire/residences/${residenceId}/import-paiements`,
+        { paiements },
+      )
+      return res.data.data
+    },
+    { imported: paiements.length, errors: [] },
+  )
+}
+
+export async function bulkStorePrestataires(
+  prestataires: Record<string, unknown>[],
+): Promise<BulkResult> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<BulkResult>>(
+        '/gestionnaire/prestataires/bulk',
+        { prestataires },
+      )
+      return res.data.data
+    },
+    { created: prestataires.length, errors: [] },
+  )
+}
