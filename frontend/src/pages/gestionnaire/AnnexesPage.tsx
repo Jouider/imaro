@@ -7,9 +7,17 @@ import { Badge } from '@/components/ui/badge'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { getResidences } from '@/services/gestionnaire.service'
+import {
+  getResidences, getCoproprietaires, getImpayes,
+  type Coproprietaire, type Impaye,
+} from '@/services/gestionnaire.service'
 import { getAnnexes, regenerateAnnexe } from '@/services/conformite.service'
+import {
+  generateAnnexe10Pdf, generateAnnexe131Pdf, generateAnnexe132Pdf,
+  type Annexe10Row,
+} from '@/lib/annexes-pdf'
 
 const ANNEXE_LABELS: Record<string, string> = {
   '10':   'Annexe 10 — État des Contributions des Copropriétaires',
@@ -46,6 +54,109 @@ export function AnnexesPage() {
       regenerateAnnexe(residenceId!, annexeNum, exercice),
     onSuccess: () => annexesQ.refetch(),
   })
+
+  // Real data sources — populate the Annexe 10 table from existing services.
+  // 13-1 / 13-2 stay at zero until backend exposes per-account aggregates
+  // (see docs/sprint-4-conformite-legale.md).
+  const copropQ = useQuery({
+    queryKey: ['coproprietaires', residenceId],
+    queryFn: () => getCoproprietaires(residenceId!),
+    enabled: !!residenceId,
+  })
+
+  const impayesQ = useQuery({
+    queryKey: ['impayes', residenceId],
+    queryFn: () => getImpayes({ residence_id: residenceId! }),
+    enabled: !!residenceId,
+  })
+
+  const residence = residencesQ.data?.find((r) => r.id === residenceId)
+  const residenceName = residence?.name ?? 'Résidence'
+
+  const commonCtx = {
+    residenceName,
+    exerciceLabel: `Exercice clos le 31 décembre ${exercice}`,
+    exercice,
+    generatedAtIso: new Date().toISOString(),
+  }
+
+  /** Aggregate impayés per coproprietaire to compute appelé/payé. */
+  function buildAnnexe10Rows(): { rows: Annexe10Row[]; totals: { soldeInitial: number; appele: number; paye: number; soldeFinal: number } } {
+    const coprops: Coproprietaire[] = copropQ.data ?? []
+    const impayes: Impaye[] = impayesQ.data ?? []
+
+    const impayesByCopro = new Map<number, { appele: number; paye: number }>()
+    impayes.forEach((imp) => {
+      const cur = impayesByCopro.get(imp.coproprietaire.id) ?? { appele: 0, paye: 0 }
+      cur.appele += imp.montant_du
+      cur.paye   += imp.montant_paye
+      impayesByCopro.set(imp.coproprietaire.id, cur)
+    })
+
+    const rows: Annexe10Row[] = coprops
+      .filter((c) => c.lot)
+      .map((c) => {
+        const agg = impayesByCopro.get(c.id) ?? { appele: 0, paye: 0 }
+        return {
+          lotNumero: c.lot?.numero ?? '—',
+          coproprietaireNom: c.name,
+          soldeInitial: 0,           // requires bilan d'ouverture endpoint
+          appele: agg.appele,
+          paye: agg.paye,
+          soldeFinal: c.solde,
+        }
+      })
+
+    const totals = rows.reduce(
+      (acc, r) => ({
+        soldeInitial: acc.soldeInitial + r.soldeInitial,
+        appele:       acc.appele + r.appele,
+        paye:         acc.paye + r.paye,
+        soldeFinal:   acc.soldeFinal + r.soldeFinal,
+      }),
+      { soldeInitial: 0, appele: 0, paye: 0, soldeFinal: 0 },
+    )
+
+    return { rows, totals }
+  }
+
+  const handleDownload = async (annexeNum: string) => {
+    try {
+      if (annexeNum === '10') {
+        const { rows, totals } = buildAnnexe10Rows()
+        await generateAnnexe10Pdf({ ...commonCtx, rows, totals })
+      } else if (annexeNum === '13-1') {
+        await generateAnnexe131Pdf({
+          ...commonCtx,
+          current:  { fondsReserve: 0, creances: 0, dettes: 0, tresorerie: 0 },
+          previous: { fondsReserve: 0, creances: 0, dettes: 0, tresorerie: 0 },
+        })
+      } else if (annexeNum === '13-2') {
+        const zero4 = { n1: 0, n: 0, n0: 0, nMinus1: 0 }
+        await generateAnnexe132Pdf({
+          ...commonCtx,
+          excedent: 0,
+          recettes: {
+            cotisations: zero4, fondsReserve: zero4, autresAg: zero4, autresProduits: zero4,
+          },
+          depenses: {
+            matieres: zero4, servicesExterieurs: zero4, impotsTaxes: zero4,
+            personnel: zero4, autresCharges: zero4,
+          },
+        })
+      } else {
+        toast.info(`Annexe ${annexeNum} : génération à venir`)
+        return
+      }
+      toast.success(`Annexe ${annexeNum} téléchargée`)
+    } catch (err) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : `Impossible de générer l'annexe ${annexeNum}`,
+      )
+    }
+  }
 
   const annexes = annexesQ.data?.annexes ?? []
   const regime = annexesQ.data?.regime ?? 'simplifie'
@@ -126,6 +237,7 @@ export function AnnexesPage() {
               lastGenerated={a.last_generated}
               required
               onRegenerate={() => regenMut.mutate(a.num)}
+              onDownload={() => handleDownload(a.num)}
               loading={regenMut.isPending && regenMut.variables === a.num}
             />
           ))}
@@ -146,6 +258,7 @@ export function AnnexesPage() {
               available={a.available}
               lastGenerated={a.last_generated}
               onRegenerate={() => regenMut.mutate(a.num)}
+              onDownload={() => handleDownload(a.num)}
               loading={regenMut.isPending && regenMut.variables === a.num}
             />
           ))}
@@ -156,7 +269,7 @@ export function AnnexesPage() {
 }
 
 function AnnexeCard({
-  label, available, lastGenerated, required, onRegenerate, loading,
+  label, available, lastGenerated, required, onRegenerate, onDownload, loading,
 }: {
   num: string
   label: string
@@ -164,6 +277,7 @@ function AnnexeCard({
   lastGenerated?: string
   required?: boolean
   onRegenerate: () => void
+  onDownload: () => void
   loading: boolean
 }) {
   return (
@@ -212,6 +326,7 @@ function AnnexeCard({
           size="sm"
           className="gap-1.5"
           disabled={!available}
+          onClick={onDownload}
         >
           <Download className="size-3.5" />
           PDF
