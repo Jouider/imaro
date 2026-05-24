@@ -127,12 +127,14 @@ class CoproprietaireController extends Controller
     public function bulkStore(Request $request): JsonResponse
     {
         $request->validate([
-            'coproprietaires'              => ['required', 'array', 'min:1', 'max:50'],
-            'coproprietaires.*.name'       => ['required', 'string', 'max:255'],
-            'coproprietaires.*.phone'      => ['required', 'string', 'max:20'],
-            'coproprietaires.*.email'      => ['nullable', 'email', 'max:255'],
-            'coproprietaires.*.lot_id'     => ['required', 'integer', 'exists:lots,id'],
-            'coproprietaires.*.residence_id'=> ['required', 'integer', 'exists:residences,id'],
+            'coproprietaires'                  => ['required', 'array', 'min:1', 'max:50'],
+            'coproprietaires.*.name'           => ['required', 'string', 'max:255'],
+            'coproprietaires.*.phone'          => ['required', 'string', 'max:20'],
+            'coproprietaires.*.email'          => ['nullable', 'email', 'max:255'],
+            'coproprietaires.*.lot_id'         => ['nullable', 'integer'],
+            'coproprietaires.*.lot_numero'     => ['nullable', 'string', 'max:20'],
+            'coproprietaires.*.residence_id'   => ['nullable', 'integer'],
+            'coproprietaires.*.cin'            => ['nullable', 'string', 'max:20'],
         ]);
 
         $created = 0;
@@ -141,12 +143,32 @@ class CoproprietaireController extends Controller
         foreach ($request->coproprietaires as $index => $data) {
             $line = 'Ligne ' . ($index + 1);
             try {
-                $lot = Lot::with('residence')->findOrFail($data['lot_id']);
+                // Résoudre le lot par ID ou par numéro
+                if (! empty($data['lot_id'])) {
+                    $lot = Lot::with('residence')->find($data['lot_id']);
+                    if (! $lot) {
+                        $errors[] = "{$line}: Lot ID {$data['lot_id']} introuvable.";
+                        continue;
+                    }
+                } elseif (! empty($data['lot_numero']) && ! empty($data['residence_id'])) {
+                    $lot = Lot::with('residence')
+                        ->where('residence_id', $data['residence_id'])
+                        ->where('numero', $data['lot_numero'])
+                        ->first();
+
+                    if (! $lot) {
+                        $errors[] = "{$line}: Lot \"{$data['lot_numero']}\" introuvable dans cette résidence.";
+                        continue;
+                    }
+                } else {
+                    $errors[] = "{$line}: lot_id ou (lot_numero + residence_id) requis.";
+                    continue;
+                }
 
                 $isManager      = $request->user()->role === 'manager';
                 $isGestionnaire = $lot->residence->gestionnaire_id === $request->user()->id;
                 if (! $isManager && ! $isGestionnaire) {
-                    $errors[] = "{$line}: accès refusé pour la résidence du lot {$data['lot_id']}.";
+                    $errors[] = "{$line}: accès refusé pour la résidence du lot.";
                     continue;
                 }
 
