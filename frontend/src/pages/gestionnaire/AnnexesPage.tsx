@@ -7,9 +7,11 @@ import { Badge } from '@/components/ui/badge'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { getResidences } from '@/services/gestionnaire.service'
 import { getAnnexes, regenerateAnnexe } from '@/services/conformite.service'
+import { generateAnnexePdf } from '@/lib/annexes-pdf'
 
 const ANNEXE_LABELS: Record<string, string> = {
   '10':   'Annexe 10 — État des Contributions des Copropriétaires',
@@ -46,6 +48,27 @@ export function AnnexesPage() {
       regenerateAnnexe(residenceId!, annexeNum, exercice),
     onSuccess: () => annexesQ.refetch(),
   })
+
+  const residence = residencesQ.data?.find((r) => r.id === residenceId)
+  const residenceName = residence?.name ?? 'Résidence'
+
+  const handleDownload = async (annexeNum: string) => {
+    try {
+      await generateAnnexePdf(annexeNum, {
+        residenceName,
+        exerciceLabel: `Exercice clos le 31 décembre ${exercice}`,
+        exercice,
+        generatedAtIso: new Date().toISOString(),
+      })
+      toast.success(`Annexe ${annexeNum} téléchargée`)
+    } catch (err) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : `Impossible de générer l'annexe ${annexeNum}`,
+      )
+    }
+  }
 
   const annexes = annexesQ.data?.annexes ?? []
   const regime = annexesQ.data?.regime ?? 'simplifie'
@@ -126,6 +149,7 @@ export function AnnexesPage() {
               lastGenerated={a.last_generated}
               required
               onRegenerate={() => regenMut.mutate(a.num)}
+              onDownload={() => handleDownload(a.num)}
               loading={regenMut.isPending && regenMut.variables === a.num}
             />
           ))}
@@ -146,6 +170,7 @@ export function AnnexesPage() {
               available={a.available}
               lastGenerated={a.last_generated}
               onRegenerate={() => regenMut.mutate(a.num)}
+              onDownload={() => handleDownload(a.num)}
               loading={regenMut.isPending && regenMut.variables === a.num}
             />
           ))}
@@ -156,7 +181,7 @@ export function AnnexesPage() {
 }
 
 function AnnexeCard({
-  label, available, lastGenerated, required, onRegenerate, loading,
+  label, available, lastGenerated, required, onRegenerate, onDownload, loading,
 }: {
   num: string
   label: string
@@ -164,6 +189,7 @@ function AnnexeCard({
   lastGenerated?: string
   required?: boolean
   onRegenerate: () => void
+  onDownload: () => void
   loading: boolean
 }) {
   return (
@@ -212,6 +238,7 @@ function AnnexeCard({
           size="sm"
           className="gap-1.5"
           disabled={!available}
+          onClick={onDownload}
         >
           <Download className="size-3.5" />
           PDF
