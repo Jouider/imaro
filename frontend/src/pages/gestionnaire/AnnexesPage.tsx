@@ -30,7 +30,7 @@ export function AnnexesPage() {
   const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(null)
   const [exercice, setExercice] = useState(2026)
 
-  const residencesQ = useQuery({ queryKey: ['residences'], queryFn: getResidences })
+  const residencesQ = useQuery({ queryKey: ['residences'], queryFn: () => getResidences() })
 
   // Derive effective residence id (picked or auto first)
   const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null

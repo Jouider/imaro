@@ -19,6 +19,8 @@ import {
   ChevronDown,
   Loader2,
   Printer,
+  ClipboardCheck,
+  ChevronRight,
 } from 'lucide-react'
 import {
   BarChart,
@@ -1701,6 +1703,27 @@ function TabRapports({
               </Button>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Cross-link to Annexes (legal regulatory) */}
+      <Card className="border-[#1B4F72]/20 bg-[#1B4F72]/5">
+        <CardContent className="flex items-center gap-3 pt-4">
+          <ClipboardCheck className="size-5 text-[#1B4F72]" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-foreground">
+              Annexes réglementaires (Décret 2.23.700)
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Annexes 10, 13-1, 13-2 et autres documents légaux obligatoires
+            </p>
+          </div>
+          <a href="/gestionnaire/annexes">
+            <Button variant="outline" size="sm" className="gap-1.5">
+              Voir les annexes
+              <ChevronRight className="size-3.5" />
+            </Button>
+          </a>
         </CardContent>
       </Card>
 

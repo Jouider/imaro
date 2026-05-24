@@ -189,7 +189,7 @@ class LotController extends Controller
             'lots'              => ['required', 'array', 'min:1', 'max:50'],
             'lots.*.numero'     => ['required', 'string', 'max:20'],
             'lots.*.type'       => ['required', 'in:appartement,local_commercial,parking,cave'],
-            'lots.*.etage'      => ['nullable', 'integer', 'min:0', 'max:50'],
+            'lots.*.etage'      => ['nullable', 'integer', 'min:-5', 'max:50'],
             'lots.*.superficie' => ['nullable', 'numeric', 'min:1'],
             'lots.*.tantieme'   => ['required', 'numeric', 'min:0.01', 'max:1000'],
             'lots.*.immeuble_id'=> ['nullable', 'integer'],
