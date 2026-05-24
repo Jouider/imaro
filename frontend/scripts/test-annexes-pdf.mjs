@@ -14,8 +14,14 @@ jsPDF.prototype.save = function (filename) {
   return this
 }
 
-const { generateAnnexe10Pdf, generateAnnexe131Pdf, generateAnnexe132Pdf } =
-  await import('../src/lib/annexes-pdf.ts')
+const annexesMod = await import('../src/lib/annexes-pdf.ts')
+const {
+  generateAnnexe3Pdf, generateAnnexe4Pdf, generateAnnexe5Pdf,
+  generateAnnexe6Pdf, generateAnnexe7Pdf, generateAnnexe8Pdf,
+  generateAnnexe9Pdf, generateAnnexe10Pdf, generateAnnexe11Pdf,
+  generateAnnexe12Pdf, generateAnnexe131Pdf, generateAnnexe132Pdf,
+  generateAnnexePdf,
+} = annexesMod
 
 const ctx = {
   residenceName: 'Atlas Casablanca',
@@ -63,4 +69,20 @@ await generateAnnexe132Pdf({
   },
 })
 
-console.log('\nDone — open /tmp/imaro-annexe10_2026.pdf etc.')
+// All other annexes — generate with zero defaults via the dispatcher
+// (real data flows in from backend; here we just verify rendering).
+for (const num of ['3', '4', '5', '6', '7', '8', '9', '11', '12']) {
+  await generateAnnexePdf(num, ctx)
+}
+
+console.log('\nDone — 12 annexe PDFs generated.')
+// Suppress unused-import warnings when running the script
+void generateAnnexe3Pdf
+void generateAnnexe4Pdf
+void generateAnnexe5Pdf
+void generateAnnexe6Pdf
+void generateAnnexe7Pdf
+void generateAnnexe8Pdf
+void generateAnnexe9Pdf
+void generateAnnexe11Pdf
+void generateAnnexe12Pdf
