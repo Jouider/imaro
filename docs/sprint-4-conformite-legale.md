@@ -491,3 +491,191 @@ Ce qu'on s'attend à voir en PR :
 - **Mise en demeure** : génération PDF côté backend ou côté frontend (jsPDF) ? Backend est plus solide juridiquement.
 - **Annexes pour résidence multi-immeubles** : agrégat par résidence ou par immeuble ? Convention Décret = par résidence (= par syndic), pas par immeuble.
 - **Audit logs rétention** : combien de temps on garde ? Je propose 7 ans (durée légale comptable MA).
+
+---
+
+## 9. ⭐ MAJ — PDFs des 11 annexes générés côté frontend (mai 2026)
+
+Toutes les annexes du **Décret 2.23.700** sont maintenant générées par le frontend
+en jsPDF dans `src/lib/annexes-pdf.ts`. Le bouton **PDF** sur `/gestionnaire/annexes`
+télécharge un document signé Imaro avec :
+- En-tête navy/orange + logo Imaro inverted + badge "DOCUMENT OFFICIEL"
+- QR code scannable navy-sur-blanc encodant `https://imaro.ma/verify/{doc-code}`
+- Footer "Conforme au décret n° 2.23.700"
+
+### 9.1 Ce que le frontend a **déjà**
+
+| Annexe | Frontend | Source de données actuelle |
+|---|---|---|
+| **3 — Bilan complet** | ✅ généré (2 pages) avec sections ACTIF/PASSIF par groupe (Plan Comptable Marocain) | Zéros par défaut |
+| **4 — Compte de résultat complet** | ✅ généré (multi-pages, 30+ comptes 6xxx/7xxx) | Zéros par défaut |
+| **5 — Suivi du budget** | ✅ généré (Prévu vs Réalisé vs Écart) | Zéros par défaut |
+| **6 — Travaux non courants** | ✅ généré (KPIs + table) | Zéros par défaut |
+| **7 — Mouvements de trésorerie** | ✅ généré (Encaissements + Décaissements) | Zéros par défaut |
+| **8 — Suivi des emprunts** | ✅ généré (KPIs + table tableau d'amortissement) | Zéros par défaut |
+| **9 — Suivi des équipements** | ✅ généré (KPIs + inventaire) | Zéros par défaut |
+| **10 — Contributions copropriétaires** | ✅ généré | **Données réelles** depuis `getCoproprietaires` + `getImpayes` |
+| **11 — Bilan simplifié** | ✅ généré | Zéros par défaut |
+| **12 — Compte de résultat simplifié** | ✅ généré (avec hero "Résultat Final") | Zéros par défaut |
+| **13-1 — Bilan très simplifié** | ✅ généré | Zéros par défaut |
+| **13-2 — Compte de gestion + budget** | ✅ généré | Zéros par défaut |
+
+### 9.2 Ce dont j'ai besoin de toi (par ordre de priorité)
+
+#### 🥇 Priorité 1 — Endpoint de **vérification QR**
+
+```
+GET /api/verify/:docCode
+→ Page HTML publique (pas de auth) qui affiche :
+  - "Document authentique ✓" ou "Document non trouvé"
+  - Métadonnées : résidence, exercice, type d'annexe, date génération, gestionnaire
+  - Hash SHA-256 du contenu pour preuve d'intégrité
+```
+
+Quand un copropriétaire / auditor scanne le QR, c'est ce qui s'affiche. Il faut
+stocker un enregistrement par PDF généré :
+
+```sql
+CREATE TABLE annexes_generated (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  tenant_id BIGINT UNSIGNED NOT NULL,
+  residence_id BIGINT UNSIGNED NOT NULL,
+  exercice INT UNSIGNED NOT NULL,
+  annexe_num VARCHAR(10) NOT NULL,       -- '3', '4', ..., '13-2'
+  doc_code VARCHAR(64) UNIQUE NOT NULL,  -- 'IMA-ATLA-2026-A10-D336'
+  content_hash CHAR(64) NOT NULL,        -- SHA-256
+  generated_by BIGINT UNSIGNED NOT NULL,
+  generated_at TIMESTAMP NOT NULL,
+  payload_json JSON NOT NULL,            -- l'agrégat utilisé pour la génération
+  pdf_url VARCHAR(500) NULL,             -- optionnel : si on stocke aussi le PDF
+  INDEX idx_doc_code (doc_code),
+  INDEX idx_residence_exercice (residence_id, exercice)
+);
+```
+
+À chaque génération côté frontend, le frontend POSTe les métadonnées :
+```
+POST /api/annexes/register
+{ doc_code, residence_id, exercice, annexe_num, content_hash, payload }
+→ { id, verify_url }
+```
+
+#### 🥈 Priorité 2 — Endpoints **données par annexe**
+
+Pour que les PDFs aient des chiffres réels (pas des zéros), j'ai besoin des
+agrégats déjà calculés côté backend. Le frontend les passe ensuite directement
+aux générateurs.
+
+```
+GET /api/residences/:id/annexes/3?exercice=YYYY
+→ Annexe3Input (cf. types frontend src/lib/annexes-pdf.ts)
+   {
+     actif: { sections: [{ title, rows: [{code,libelle,currentValue,previousValue}], total }], total },
+     passif: { sections: [...], total },
+   }
+
+GET /api/residences/:id/annexes/4?exercice=YYYY
+→ Annexe4Input
+   {
+     totals: { charges, produits, resultat },
+     chargesSections: [{ title, rows: [{code,libelle,q:{n1,n,n0,nMinus1}}], total }],
+     produitsSections: [...],
+     totalCharges, totalProduits, resultatNet,  // tous Quad
+   }
+
+GET /api/residences/:id/annexes/5?exercice=YYYY
+→ Annexe5Input { totals: {prevu,realise,ecart}, rows: [{libelle,prevu,realise,ecart}] }
+
+GET /api/residences/:id/annexes/6?exercice=YYYY
+→ Annexe6Input { totals: {vote,engage,regle,reste}, rows: [{libelle,date,montantVote,montantEngage,montantRegle}] }
+
+GET /api/residences/:id/annexes/7?exercice=YYYY
+→ Annexe7Input { totals: {soldeOuverture,encaissements,decaissements,soldeCloture}, encaissements: [...], decaissements: [...] }
+
+GET /api/residences/:id/annexes/8?exercice=YYYY
+→ Annexe8Input { totals: {emprunte,paye,reste}, rows: [{libelle,organisme,dateDebut,montantInitial,paye,reste}] }
+
+GET /api/residences/:id/annexes/9?exercice=YYYY
+→ Annexe9Input { totals: {nbArticles,valeurTotale,valeurNetteTotale}, rows: [{designation,categorie,dateAcquisition,valeurAcquisition,valeurNette}] }
+
+GET /api/residences/:id/annexes/10?exercice=YYYY
+→ Annexe10Input { totals: {soldeInitial,appele,paye,soldeFinal}, rows: [{lotNumero,coproprietaireNom,...}] }
+   (côté frontend déjà calculé partiellement depuis `Coproprietaire.solde` et `Impaye`)
+
+GET /api/residences/:id/annexes/11?exercice=YYYY
+→ Annexe11Input { totals: {actif,passif}, actifRows: [...], passifRows: [...] }
+
+GET /api/residences/:id/annexes/12?exercice=YYYY
+→ Annexe12Input { resultatFinal, chargesCourantes: [...], totalChargesCourantes, ..., resultatCourant, resultatNonCourant, resultatFinalQuad }
+
+GET /api/residences/:id/annexes/13-1?exercice=YYYY
+→ Annexe13_1Input { current: {fondsReserve,creances,dettes,tresorerie}, previous: {...} }
+
+GET /api/residences/:id/annexes/13-2?exercice=YYYY
+→ Annexe13_2Input { excedent, recettes: {cotisations,fondsReserve,autresAg,autresProduits}, depenses: {matieres,servicesExterieurs,impotsTaxes,personnel,autresCharges} }
+```
+
+**Source des données dans la base** (où tu les calcules) :
+- Annexes 3, 4, 11, 12 : agrégats du **journal comptable** (`ecritures_comptables.ecriture_lignes`)
+  groupés par classe (6xxx pour charges, 7xxx pour produits, 1xxx/2xxx/3xxx/5xxx pour bilan).
+  Filtre par `exercice` (la table `exercices` qui existe déjà).
+- Annexe 5 : `budgets` (qu'on a) vs réalisé du compte de résultat.
+- Annexe 6 : nouvelle table `travaux_exceptionnels` (déjà documentée plus haut).
+- Annexe 7 : agrégats `paiements` + `depenses` groupés par mois ou par catégorie.
+- Annexe 8 : nouvelle table `emprunts` (déjà documentée plus haut).
+- Annexe 9 : nouvelle table `equipements` (déjà documentée plus haut).
+- Annexe 10 : `coproprietaires` + agrégats `paiements` + `appels_fonds_lignes`.
+- Annexes 13-1 / 13-2 : versions simplifiées des données des Annexes 3 et 4.
+
+#### 🥉 Priorité 3 — **Liste annexes par résidence/exercice**
+
+L'endpoint actuel mocké `GET /api/residences/:id/compliance/annexes?exercice=YYYY`
+doit retourner :
+
+```json
+{
+  "exercice": 2026,
+  "regime": "simplifie" | "normal",  // calculé sur recettes annuelles ≤ 200000 MAD
+  "annexes": [
+    { "num": "10",   "required": true,  "available": true,  "last_generated": "2026-..." },
+    { "num": "13-1", "required": true,  "available": true,  "last_generated": null },
+    { "num": "13-2", "required": true,  "available": true,  "last_generated": null },
+    { "num": "3",    "required": false, "available": true,  "last_generated": null },
+    ...
+    { "num": "12",   "required": false, "available": true,  "last_generated": null }
+  ]
+}
+```
+
+`required` est dérivé du régime :
+- **Régime simplifié** (≤ 200 000 MAD/an) : 10, 13-1, 13-2 obligatoires
+- **Régime normal** : 3, 4, 10 obligatoires (et les autres restent disponibles si données présentes)
+
+`available: true` = on a assez de données pour générer un PDF significatif.
+
+---
+
+## 10. ⚠ Important — message à Abdellah
+
+**Statut actuel** : tu peux merger la PR `feat/frontend-sprint4-conformite` dès
+maintenant, tout fonctionne avec des données nulles. Les PDFs sont déjà beaux,
+ils manquent juste les chiffres.
+
+**Quand tu auras un peu de temps**, attaque dans cet ordre :
+
+1. **Verify endpoint** (1-2 jours) — débloque la fonctionnalité QR
+2. **Annexe 10** (2 jours) — agrégats à partir des paiements + appels de fonds existants
+3. **Annexes 13-1 + 13-2** (3 jours) — les autres requises ; demandent plan comptable
+4. **Annexes 3, 4** (3 jours) — bilan + compte de résultat complets ; le plus gros morceau
+5. **Annexes 11, 12** (1 jour) — versions simplifiées des 3+4, presque gratuit une fois 3+4 faits
+6. **Annexes 5, 6, 7, 8, 9** (2 jours) — modules dédiés
+
+**Total estimé** : ~12-14 jours pour avoir tous les PDFs avec données réelles.
+
+Tu peux livrer **incrementalement** — chaque endpoint qui arrive remplit son
+annexe sans casser le reste. Le frontend bascule automatiquement de "données
+zéro" à "données réelles" dès qu'on remplace le ctx par les vraies données.
+
+Si tu as la moindre question sur les formats JSON attendus, ping-moi et je te
+donne un exemple complet. Tous les types TypeScript sont dans
+`frontend/src/lib/annexes-pdf.ts` (exportés en haut de chaque section).
