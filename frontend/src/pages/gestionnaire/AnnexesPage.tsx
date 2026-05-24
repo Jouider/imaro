@@ -14,22 +14,21 @@ import {
   type Coproprietaire, type Impaye,
 } from '@/services/gestionnaire.service'
 import { getAnnexes, regenerateAnnexe } from '@/services/conformite.service'
-import {
-  generateAnnexe10Pdf, generateAnnexe131Pdf, generateAnnexe132Pdf,
-  type Annexe10Row,
-} from '@/lib/annexes-pdf'
+import { generateAnnexe10Pdf, generateAnnexePdf, type Annexe10Row } from '@/lib/annexes-pdf'
 
 const ANNEXE_LABELS: Record<string, string> = {
-  '10':   'Annexe 10 — État des Contributions des Copropriétaires',
-  '13-1': 'Annexe 13-1 — État de la situation financière (Bilan)',
-  '13-2': 'Annexe 13-2 — Compte de gestion général',
-  '3':    'Annexe 3 — Informations générales',
-  '4':    'Annexe 4 — Composition du fonds de copropriété',
-  '5':    'Annexe 5 — Budget prévisionnel',
-  '6':    'Annexe 6 — Engagements',
+  '3':    'Annexe 3 — Bilan (État de la situation financière)',
+  '4':    'Annexe 4 — Compte de gestion général',
+  '5':    'Annexe 5 — Suivi du budget prévisionnel',
+  '6':    'Annexe 6 — Travaux et opérations non courantes',
   '7':    'Annexe 7 — Mouvements de trésorerie',
-  '8':    'Annexe 8 — État des liquidités',
-  '9':    'Annexe 9 — Équipements / Immobilisations',
+  '8':    'Annexe 8 — Suivi des emprunts',
+  '9':    'Annexe 9 — Suivi des équipements',
+  '10':   'Annexe 10 — État des contributions des copropriétaires',
+  '11':   'Annexe 11 — État simplifié de la situation financière',
+  '12':   'Annexe 12 — Compte de résultat simplifié',
+  '13-1': 'Annexe 13-1 — État de la situation financière (très simplifié)',
+  '13-2': 'Annexe 13-2 — Compte des produits et charges et budget',
 }
 
 export function AnnexesPage() {
@@ -122,31 +121,14 @@ export function AnnexesPage() {
 
   const handleDownload = async (annexeNum: string) => {
     try {
+      // Annexe 10 is special — we have client-side data (copropriétaires + impayés)
+      // to populate the contributions table. All other annexes use zero defaults
+      // until the backend exposes per-account aggregates.
       if (annexeNum === '10') {
         const { rows, totals } = buildAnnexe10Rows()
         await generateAnnexe10Pdf({ ...commonCtx, rows, totals })
-      } else if (annexeNum === '13-1') {
-        await generateAnnexe131Pdf({
-          ...commonCtx,
-          current:  { fondsReserve: 0, creances: 0, dettes: 0, tresorerie: 0 },
-          previous: { fondsReserve: 0, creances: 0, dettes: 0, tresorerie: 0 },
-        })
-      } else if (annexeNum === '13-2') {
-        const zero4 = { n1: 0, n: 0, n0: 0, nMinus1: 0 }
-        await generateAnnexe132Pdf({
-          ...commonCtx,
-          excedent: 0,
-          recettes: {
-            cotisations: zero4, fondsReserve: zero4, autresAg: zero4, autresProduits: zero4,
-          },
-          depenses: {
-            matieres: zero4, servicesExterieurs: zero4, impotsTaxes: zero4,
-            personnel: zero4, autresCharges: zero4,
-          },
-        })
       } else {
-        toast.info(`Annexe ${annexeNum} : génération à venir`)
-        return
+        await generateAnnexePdf(annexeNum, commonCtx)
       }
       toast.success(`Annexe ${annexeNum} téléchargée`)
     } catch (err) {
