@@ -14,7 +14,8 @@ jsPDF.prototype.save = function (filename) {
   return this
 }
 
-const { generateAnnexePdf } = await import('../src/lib/annexes-pdf.ts')
+const { generateAnnexe10Pdf, generateAnnexe131Pdf, generateAnnexe132Pdf } =
+  await import('../src/lib/annexes-pdf.ts')
 
 const ctx = {
   residenceName: 'Atlas Casablanca',
@@ -23,8 +24,43 @@ const ctx = {
   generatedAtIso: '2026-05-24T13:30:00Z',
 }
 
-generateAnnexePdf('10', ctx)
-generateAnnexePdf('13-1', ctx)
-generateAnnexePdf('13-2', ctx)
+// Annexe 10 — realistic test data (4 copropriétaires)
+await generateAnnexe10Pdf({
+  ...ctx,
+  rows: [
+    { lotNumero: 'A-01', coproprietaireNom: 'Hassan Benali',  soldeInitial: 0, appele: 4800, paye: 4800, soldeFinal:    0 },
+    { lotNumero: 'A-02', coproprietaireNom: 'Fatima Chraibi', soldeInitial: 0, appele: 5200, paye: 3500, soldeFinal: -1700 },
+    { lotNumero: 'B-01', coproprietaireNom: 'Karim El Fassi', soldeInitial: 0, appele: 3600, paye:    0, soldeFinal: -3600 },
+    { lotNumero: 'P-01', coproprietaireNom: 'Saïd Bennani',   soldeInitial: 0, appele:  900, paye:  900, soldeFinal:    0 },
+  ],
+  totals: { soldeInitial: 0, appele: 14500, paye: 9200, soldeFinal: -5300 },
+})
+
+// Annexe 13-1 — basic balance with some non-zero values
+await generateAnnexe131Pdf({
+  ...ctx,
+  current:  { fondsReserve: 25000, creances: 5300, dettes: 1200, tresorerie: 18500 },
+  previous: { fondsReserve: 22000, creances: 3100, dettes:  800, tresorerie: 21000 },
+})
+
+// Annexe 13-2 — sample P&L with budget vs realized
+const q = (n1, n, n0, nMinus1) => ({ n1, n, n0, nMinus1 })
+await generateAnnexe132Pdf({
+  ...ctx,
+  excedent: 3000,
+  recettes: {
+    cotisations:    q(18000, 14500, 14000, 13200),
+    fondsReserve:   q( 3000,  3000,  3000,  2500),
+    autresAg:       q(    0,     0,     0,     0),
+    autresProduits: q(  500,   300,   500,   200),
+  },
+  depenses: {
+    matieres:           q( 4500,  4200,  4500,  4100),
+    servicesExterieurs: q( 8000,  7800,  7500,  7100),
+    impotsTaxes:        q(  800,   800,   800,   800),
+    personnel:          q( 2400,  1900,  2400,  2400),
+    autresCharges:      q( 1500,   100,  1500,    50),
+  },
+})
 
 console.log('\nDone — open /tmp/imaro-annexe10_2026.pdf etc.')

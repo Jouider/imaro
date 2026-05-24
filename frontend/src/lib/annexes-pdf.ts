@@ -9,7 +9,17 @@
  *  - Annexe 13-2 → Compte des produits et charges et budget
  */
 import { jsPDF } from 'jspdf'
+import QRCode from 'qrcode'
 import { loadLogo } from './annexes-pdf-assets'
+
+/**
+ * Base URL where annexe PDFs link to for verification.
+ * Override via VITE_VERIFY_BASE_URL in production.
+ */
+const VERIFY_BASE_URL: string =
+  (typeof import.meta !== 'undefined' &&
+    (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_VERIFY_BASE_URL) ||
+  'https://imaro.ma/verify'
 
 // ─── Imaro brand tokens ──────────────────────────────────────────────────────
 
@@ -251,7 +261,28 @@ function drawSignatureBox(doc: jsPDF, y: number): number {
 }
 
 /** Footer separator + disclaimer + QR placeholder + page number. */
-function drawFooter(doc: jsPDF, pageNum: number, totalPages: number): void {
+/** Generate a verification URL that the QR encodes. */
+function buildVerifyUrl(docCode: string): string {
+  return `${VERIFY_BASE_URL}/${docCode}`
+}
+
+/** Generate a real scannable QR data URI for the verification URL. */
+async function generateVerifyQr(docCode: string): Promise<string> {
+  return QRCode.toDataURL(buildVerifyUrl(docCode), {
+    errorCorrectionLevel: 'M',
+    margin: 1,
+    width: 220,
+    color: { dark: '#1B4F72', light: '#FFFFFF' }, // Imaro navy on white
+  })
+}
+
+function drawFooter(
+  doc: jsPDF,
+  pageNum: number,
+  totalPages: number,
+  qrDataUri: string,
+  verifyUrl: string,
+): void {
   const sepY = 262
   doc.setDrawColor(...BORDER)
   doc.setLineWidth(0.3)
@@ -265,30 +296,31 @@ function drawFooter(doc: jsPDF, pageNum: number, totalPages: number): void {
     PAGE_W / 2, sepY + 5, { align: 'center' },
   )
 
-  // QR placeholder (small)
-  const qrSize = 14
+  // Real scannable QR (navy on white, ~16mm square)
+  const qrSize = 16
   const qrX = MARGIN
-  const qrY = PAGE_H - 22
+  const qrY = PAGE_H - 24
 
-  doc.setFillColor(20, 20, 20)
-  doc.rect(qrX, qrY, qrSize, qrSize, 'F')
-  doc.setFillColor(255, 255, 255)
-  doc.rect(qrX + 1.5, qrY + 1.5, 3.5, 3.5, 'F')
-  doc.rect(qrX + qrSize - 5, qrY + 1.5, 3.5, 3.5, 'F')
-  doc.rect(qrX + 1.5, qrY + qrSize - 5, 3.5, 3.5, 'F')
-  doc.setFillColor(20, 20, 20)
-  doc.rect(qrX + 2.5, qrY + 2.5, 1.5, 1.5, 'F')
-  doc.rect(qrX + qrSize - 4, qrY + 2.5, 1.5, 1.5, 'F')
-  doc.rect(qrX + 2.5, qrY + qrSize - 4, 1.5, 1.5, 'F')
-  doc.setFillColor(20, 20, 20)
-  doc.rect(qrX + 7, qrY + 6, 1.2, 1.2, 'F')
-  doc.rect(qrX + 9, qrY + 8, 1.2, 1.2, 'F')
-  doc.rect(qrX + 6, qrY + 10, 1.2, 1.2, 'F')
+  try {
+    doc.addImage(qrDataUri, 'PNG', qrX, qrY, qrSize, qrSize, undefined, 'FAST')
+  } catch {
+    // fallback (should not happen)
+    doc.setFillColor(20, 20, 20)
+    doc.rect(qrX, qrY, qrSize, qrSize, 'F')
+  }
 
+  // "SCAN TO VERIFY" caption + short URL hint under it
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(6.5)
   doc.setTextColor(...NAVY)
-  doc.text('SCAN TO VERIFY', qrX + qrSize + 2, qrY + qrSize - 1)
+  doc.text('SCAN TO VERIFY', qrX + qrSize + 2, qrY + 6)
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(5.5)
+  doc.setTextColor(...TEXT_MUTED)
+  // Show the host part of the URL so the user knows it's safe
+  const hostHint = verifyUrl.replace(/^https?:\/\//, '').split('/')[0]
+  doc.text(hostHint, qrX + qrSize + 2, qrY + 9.5)
+  doc.text('Document authentique', qrX + qrSize + 2, qrY + 13)
 
   // Centered tagline
   doc.setFont('helvetica', 'normal')
@@ -368,6 +400,8 @@ export async function generateAnnexe10Pdf(data: Annexe10Input): Promise<void> {
   const logo = data.logoInvertedDataUri ?? (await loadLogo('horizontal-inverted'))
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
   const docCode = data.documentCode ?? genDocCode('10', data.residenceName, data.exercice)
+  const verifyUrl = buildVerifyUrl(docCode)
+  const qrDataUri = await generateVerifyQr(docCode)
   const totalPages = 1
 
   drawTopAccent(doc)
@@ -395,7 +429,8 @@ export async function generateAnnexe10Pdf(data: Annexe10Input): Promise<void> {
     doc.text('Aucun copropriétaire enregistré', PAGE_W / 2, y + 12, { align: 'center' })
     y += 20 + 6
   } else {
-    const colW = [22, 65, 30, 28, 28, 31]
+    // Total must equal CONTENT_W (182mm): 17 + 53 + 28 + 24 + 24 + 36 = 182
+    const colW = [17, 53, 28, 24, 24, 36]
     const headers = ['Lot', 'Copropriétaire', 'Solde initial', 'Appelé', 'Payé', 'Solde final']
 
     // Header row — navy with white text
@@ -462,7 +497,7 @@ export async function generateAnnexe10Pdf(data: Annexe10Input): Promise<void> {
   }
 
   drawSignatureBox(doc, Math.max(y, 215))
-  drawFooter(doc, 1, totalPages)
+  drawFooter(doc, 1, totalPages, qrDataUri, verifyUrl)
 
   doc.save(`annexe10_${data.exercice}.pdf`)
 }
@@ -478,6 +513,8 @@ export async function generateAnnexe131Pdf(data: Annexe13_1Input): Promise<void>
   const logo = data.logoInvertedDataUri ?? (await loadLogo('horizontal-inverted'))
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
   const docCode = data.documentCode ?? genDocCode('13-1', data.residenceName, data.exercice)
+  const verifyUrl = buildVerifyUrl(docCode)
+  const qrDataUri = await generateVerifyQr(docCode)
 
   drawTopAccent(doc)
   drawTopBar(doc, docCode, 1, 1)
@@ -527,7 +564,7 @@ export async function generateAnnexe131Pdf(data: Annexe13_1Input): Promise<void>
   })
 
   drawSignatureBox(doc, 195)
-  drawFooter(doc, 1, 1)
+  drawFooter(doc, 1, 1, qrDataUri, verifyUrl)
 
   doc.save(`annexe13-1_${data.exercice}.pdf`)
 }
@@ -566,6 +603,8 @@ export async function generateAnnexe132Pdf(data: Annexe13_2Input): Promise<void>
   const logo = data.logoInvertedDataUri ?? (await loadLogo('horizontal-inverted'))
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
   const docCode = data.documentCode ?? genDocCode('13-2', data.residenceName, data.exercice)
+  const verifyUrl = buildVerifyUrl(docCode)
+  const qrDataUri = await generateVerifyQr(docCode)
 
   drawTopAccent(doc)
   drawTopBar(doc, docCode, 1, 1)
@@ -725,7 +764,7 @@ export async function generateAnnexe132Pdf(data: Annexe13_2Input): Promise<void>
   y += excRowH + 6
 
   drawSignatureBox(doc, Math.max(y, 215))
-  drawFooter(doc, 1, 1)
+  drawFooter(doc, 1, 1, qrDataUri, verifyUrl)
 
   doc.save(`annexe13-2_${data.exercice}.pdf`)
 }
