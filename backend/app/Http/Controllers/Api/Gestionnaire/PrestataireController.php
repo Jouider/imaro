@@ -67,10 +67,12 @@ class PrestataireController extends Controller
         $request->validate([
             'prestataires'              => ['required', 'array', 'min:1', 'max:50'],
             'prestataires.*.nom'        => ['required', 'string', 'max:255'],
-            'prestataires.*.metier'     => ['required', 'string', 'max:100'],
-            'prestataires.*.telephone'  => ['required', 'string', 'max:20'],
+            'prestataires.*.metier'     => ['nullable', 'string', 'max:100'],
+            'prestataires.*.specialite' => ['nullable', 'string', 'max:100'],
+            'prestataires.*.telephone'  => ['nullable', 'string', 'max:20'],
             'prestataires.*.email'      => ['nullable', 'email', 'max:255'],
             'prestataires.*.ville'      => ['nullable', 'string', 'max:100'],
+            'prestataires.*.adresse'    => ['nullable', 'string', 'max:255'],
         ]);
 
         $tenantId = config('app.tenant_id');
@@ -80,17 +82,19 @@ class PrestataireController extends Controller
         foreach ($request->prestataires as $index => $data) {
             $line = 'Ligne ' . ($index + 1);
             try {
+                $telephone = $data['telephone'] ?? null;
+
                 // Idempotence : même téléphone dans le même tenant
-                if (Prestataire::where('tenant_id', $tenantId)->where('telephone', $data['telephone'])->exists()) {
-                    $errors[] = "{$line}: prestataire avec le téléphone '{$data['telephone']}' existe déjà (ignoré).";
+                if ($telephone && Prestataire::where('tenant_id', $tenantId)->where('telephone', $telephone)->exists()) {
+                    $errors[] = "{$line}: prestataire avec le téléphone '{$telephone}' existe déjà (ignoré).";
                     continue;
                 }
 
                 Prestataire::create([
                     'tenant_id'  => $tenantId,
                     'nom'        => $data['nom'],
-                    'specialite' => $data['metier'],
-                    'telephone'  => $data['telephone'],
+                    'specialite' => $data['specialite'] ?? $data['metier'] ?? null,
+                    'telephone'  => $telephone,
                     'email'      => $data['email'] ?? null,
                 ]);
 

@@ -184,11 +184,11 @@ class LotController extends Controller
     public function bulkStore(Request $request, Residence $residence): JsonResponse
     {
         $this->authorizeResidence($request, $residence);
-
+    
         $request->validate([
             'lots'              => ['required', 'array', 'min:1', 'max:50'],
             'lots.*.numero'     => ['required', 'string', 'max:20'],
-            'lots.*.type'       => ['required', 'in:appartement,local_commercial,parking,cave'],
+            'lots.*.type'       => ['required', 'in:appartement,local_commercial,commerce,parking,cave,bureau,autre'],
             'lots.*.etage'      => ['nullable', 'integer', 'min:-5', 'max:50'],
             'lots.*.superficie' => ['nullable', 'numeric', 'min:1'],
             'lots.*.tantieme'   => ['required', 'numeric', 'min:0.01', 'max:1000'],
@@ -259,10 +259,12 @@ class LotController extends Controller
         $this->authorizeResidence($request, $residence);
 
         $request->validate([
-            'soldes'             => ['required', 'array', 'min:1', 'max:50'],
-            'soldes.*.lot_numero'=> ['required', 'string'],
-            'soldes.*.montant'   => ['required', 'numeric'],
-            'soldes.*.date'      => ['nullable', 'date'],
+            'soldes'              => ['required', 'array', 'min:1', 'max:50'],
+            'soldes.*.lot_numero' => ['nullable', 'string'],
+            'soldes.*.lot_id'     => ['nullable', 'integer'],
+            'soldes.*.montant'    => ['required', 'numeric'],
+            'soldes.*.date'       => ['nullable', 'date'],
+            'soldes.*.date_arrete'=> ['nullable', 'date'],
         ]);
 
         $imported = 0;
@@ -271,9 +273,16 @@ class LotController extends Controller
         foreach ($request->soldes as $index => $data) {
             $line = 'Ligne ' . ($index + 1);
 
-            $lot = Lot::where('residence_id', $residence->id)->where('numero', $data['lot_numero'])->first();
+            // Résoudre le lot par ID ou par numéro
+            $lot = null;
+            if (! empty($data['lot_id'])) {
+                $lot = Lot::where('residence_id', $residence->id)->where('id', $data['lot_id'])->first();
+            } elseif (! empty($data['lot_numero'])) {
+                $lot = Lot::where('residence_id', $residence->id)->where('numero', $data['lot_numero'])->first();
+            }
+            $lotLabel = $data['lot_numero'] ?? $data['lot_id'] ?? '?';
             if (! $lot) {
-                $errors[] = "{$line}: lot '{$data['lot_numero']}' introuvable.";
+                $errors[] = "{$line}: lot '{$lotLabel}' introuvable.";
                 continue;
             }
 
@@ -302,13 +311,17 @@ class LotController extends Controller
         $this->authorizeResidence($request, $residence);
 
         $request->validate([
-            'paiements'               => ['required', 'array', 'min:1', 'max:50'],
-            'paiements.*.lot_numero'  => ['required', 'string'],
-            'paiements.*.montant'     => ['required', 'numeric', 'min:0.01'],
-            'paiements.*.date'        => ['required', 'date'],
-            'paiements.*.mode'        => ['required', 'in:virement,cheque,especes,mobile'],
-            'paiements.*.reference'   => ['nullable', 'string', 'max:100'],
-            'paiements.*.trimestre'   => ['nullable', 'string', 'max:50'],
+            'paiements'                    => ['required', 'array', 'min:1', 'max:50'],
+            'paiements.*.lot_numero'       => ['nullable', 'string'],
+            'paiements.*.lot_id'           => ['nullable', 'integer'],
+            'paiements.*.coproprietaire_id'=> ['nullable', 'integer'],
+            'paiements.*.montant'          => ['required', 'numeric', 'min:0.01'],
+            'paiements.*.date'             => ['nullable', 'date'],
+            'paiements.*.date_paiement'    => ['nullable', 'date'],
+            'paiements.*.mode'             => ['nullable', 'in:virement,cheque,especes,mobile,cb'],
+            'paiements.*.reference'        => ['nullable', 'string', 'max:100'],
+            'paiements.*.note'             => ['nullable', 'string', 'max:255'],
+            'paiements.*.trimestre'        => ['nullable', 'string', 'max:50'],
         ]);
 
         $imported = 0;
@@ -317,9 +330,16 @@ class LotController extends Controller
         foreach ($request->paiements as $index => $data) {
             $line = 'Ligne ' . ($index + 1);
             try {
-                $lot = Lot::where('residence_id', $residence->id)->where('numero', $data['lot_numero'])->first();
+                // Résoudre le lot par ID ou par numéro
+                $lot = null;
+                if (! empty($data['lot_id'])) {
+                    $lot = Lot::where('residence_id', $residence->id)->where('id', $data['lot_id'])->first();
+                } elseif (! empty($data['lot_numero'])) {
+                    $lot = Lot::where('residence_id', $residence->id)->where('numero', $data['lot_numero'])->first();
+                }
+                $lotLabel = $data['lot_numero'] ?? $data['lot_id'] ?? '?';
                 if (! $lot) {
-                    $errors[] = "{$line}: lot '{$data['lot_numero']}' introuvable.";
+                    $errors[] = "{$line}: lot '{$lotLabel}' introuvable.";
                     continue;
                 }
 
@@ -330,10 +350,12 @@ class LotController extends Controller
                 }
 
                 DB::transaction(function () use ($request, $data, $copro, $residence) {
-                    $note = 'Import';
+                    $note = $data['note'] ?? 'Import';
                     if (! empty($data['trimestre'])) {
                         $note .= ' - ' . $data['trimestre'];
                     }
+
+                    $datePaiement = $data['date_paiement'] ?? $data['date'] ?? now()->toDateString();
 
                     // Retrouver l'exercice actif de la résidence pour le lier (best-effort)
                     $exerciceId = $residence->exercices()
@@ -347,10 +369,10 @@ class LotController extends Controller
                         'appel_fonds_ligne_id'=> null,
                         'saisi_par'           => $request->user()->id,
                         'montant'             => $data['montant'],
-                        'mode'                => $data['mode'],
+                        'mode'                => $data['mode'] ?? 'especes',
                         'reference'           => $data['reference'] ?? null,
                         'note'                => $note,
-                        'date_paiement'       => $data['date'],
+                        'date_paiement'       => $datePaiement,
                     ]);
 
                     // Solde = paiements standalone ajoutés manuellement au solde actuel

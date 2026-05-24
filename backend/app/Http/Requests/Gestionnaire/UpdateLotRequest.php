@@ -15,7 +15,7 @@ class UpdateLotRequest extends FormRequest
     {
         return [
             'numero' => ['sometimes', 'string', 'max:20'],
-            'type' => ['sometimes', 'in:appartement,local_commercial,parking,cave'],
+            'type' => ['sometimes', 'in:appartement,local_commercial,commerce,parking,cave,bureau,autre'],
             'etage' => ['sometimes', 'integer', 'min:-5', 'max:50'],
             'superficie' => ['sometimes', 'nullable', 'numeric', 'min:1', 'max:9999'],
             'tantieme' => ['sometimes', 'numeric', 'min:0.01', 'max:1000'],
