@@ -44,6 +44,29 @@ Route::middleware('auth:sanctum')->group(function () {
         ->prefix('gestionnaire')
         ->group(base_path('routes/api/gestionnaire.php'));
 
+    // Alias routes — conformite.service.ts calls without /gestionnaire/ prefix
+    Route::middleware('role:manager|gestionnaire')->group(function () {
+        $ns = 'App\\Http\\Controllers\\Api\\Gestionnaire';
+        Route::get('/audit-logs', [$ns.'\\AuditLogController', 'index']);
+        Route::get('/audit-logs/export', [$ns.'\\AuditLogController', 'export']);
+        Route::get('/lots/{lot}/occupants', [$ns.'\\OccupantController', 'index']);
+        Route::post('/lots/{lot}/occupants', [$ns.'\\OccupantController', 'store']);
+        Route::prefix('residences/{residence}')->group(function () use ($ns) {
+            Route::get('/annexes', [$ns.'\\AnnexeController', 'index']);
+            Route::get('/annexes/{annexeNum}', [$ns.'\\AnnexeController', 'show']);
+            Route::post('/annexes/{annexeNum}/regenerate', [$ns.'\\AnnexeController', 'regenerate']);
+            Route::get('/compliance-calendar', [$ns.'\\ComplianceCalendarController', 'index']);
+            Route::get('/penalty-config', [$ns.'\\PenaltyController', 'show']);
+            Route::put('/penalty-config', [$ns.'\\PenaltyController', 'update']);
+            Route::post('/penalties/recalculate', [$ns.'\\PenaltyController', 'recalculate']);
+            Route::get('/recouvrement', [$ns.'\\RecouvrementController', 'index']);
+            Route::get('/occupants', [$ns.'\\OccupantController', 'indexByResidence']);
+        });
+        Route::post('/compliance-tasks/{task}/complete', [$ns.'\\ComplianceCalendarController', 'complete']);
+        Route::post('/compliance-tasks/{task}/skip', [$ns.'\\ComplianceCalendarController', 'skip']);
+        Route::post('/paiements/{paiement}/mise-en-demeure', [$ns.'\\PenaltyController', 'miseEnDemeure']);
+    });
+
     // Agent recouvrement
     Route::middleware('role:agent_recouvrement')
         ->prefix('agent')
