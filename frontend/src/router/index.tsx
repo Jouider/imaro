@@ -30,6 +30,7 @@ import { AnnexesPage } from '@/pages/gestionnaire/AnnexesPage'
 import { ConformitePage } from '@/pages/gestionnaire/ConformitePage'
 import { RecouvrementPage } from '@/pages/gestionnaire/RecouvrementPage'
 import { PointagePage } from '@/pages/gestionnaire/PointagePage'
+import { OccupantsPage } from '@/pages/gestionnaire/OccupantsPage'
 
 export const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
@@ -84,6 +85,7 @@ export const router = createBrowserRouter([
       { path: 'imports', element: <ImportsPage /> },
       { path: 'recouvrement', element: <RecouvrementPage /> },
       { path: 'pointage', element: <PointagePage /> },
+      { path: 'occupants', element: <OccupantsPage /> },
       { path: 'conformite', element: <ConformitePage /> },
       { path: 'annexes', element: <AnnexesPage /> },
       { path: 'audit', element: <AuditTrailPage /> },

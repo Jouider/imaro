@@ -1,11 +1,16 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Scale, AlertTriangle, ShieldAlert, FileWarning, TrendingUp, Mail,
+  Settings, Sparkles, RefreshCw,
 } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
@@ -16,7 +21,8 @@ import { cn } from '@/lib/utils'
 import { getResidences } from '@/services/gestionnaire.service'
 import {
   getRecouvrement, sendMiseEnDemeure,
-  type PrescriptionSeverity,
+  getPenaltyConfig, updatePenaltyConfig, recalculatePenalties,
+  type PrescriptionSeverity, type PenaltyConfig,
 } from '@/services/conformite.service'
 
 const fmt = new Intl.NumberFormat('fr-MA', {
@@ -56,6 +62,58 @@ export function RecouvrementPage() {
     onSuccess: () => recQ.refetch(),
   })
 
+  const queryClient = useQueryClient()
+
+  // ── Penalty config ────────────────────────────────────────────────────────
+  const [showConfig, setShowConfig] = useState(false)
+  /**
+   * Local edits patch — applied on top of the server config when the user
+   * tweaks the form. Reset to `null` on cancel/save → derived value falls
+   * back to the server response. Avoids setState-in-effect.
+   */
+  const [configEdits, setConfigEdits] = useState<Partial<PenaltyConfig>>({})
+
+  const configQ = useQuery({
+    queryKey: ['penalty-config', residenceId],
+    queryFn: () => getPenaltyConfig(residenceId!),
+    enabled: !!residenceId,
+  })
+
+  const draftConfig: PenaltyConfig | null = configQ.data
+    ? { ...configQ.data, ...configEdits }
+    : null
+
+  const setDraftConfig = (next: PenaltyConfig) => {
+    if (!configQ.data) return
+    const patch: Partial<PenaltyConfig> = {}
+    ;(Object.keys(next) as (keyof PenaltyConfig)[]).forEach((k) => {
+      if (next[k] !== configQ.data![k]) {
+        // assigning via index — k is a key of PenaltyConfig
+        ;(patch as Record<string, unknown>)[k] = next[k]
+      }
+    })
+    setConfigEdits(patch)
+  }
+
+  const saveConfigMut = useMutation({
+    mutationFn: (cfg: PenaltyConfig) => updatePenaltyConfig(residenceId!, cfg),
+    onSuccess: () => {
+      toast.success('Configuration enregistrée')
+      setConfigEdits({})
+      void queryClient.invalidateQueries({ queryKey: ['penalty-config', residenceId] })
+    },
+    onError: () => toast.error('Échec de l\'enregistrement'),
+  })
+
+  const recalcMut = useMutation({
+    mutationFn: () => recalculatePenalties(residenceId!),
+    onSuccess: (r) => {
+      toast.success(`${r.recalculated} pénalités recalculées (${r.total_penalty_amount.toFixed(2)} DH)`)
+      void queryClient.invalidateQueries({ queryKey: ['recouvrement', residenceId] })
+    },
+    onError: () => toast.error('Échec du recalcul'),
+  })
+
   const data = recQ.data
   const criticalCount = data?.prescription_risks.filter((r) => r.severite === 'critical').length ?? 0
   const highCount = data?.prescription_risks.filter((r) => r.severite === 'high').length ?? 0
@@ -79,8 +137,8 @@ export function RecouvrementPage() {
         </div>
       </div>
 
-      {/* Residence selector */}
-      <div className="flex items-center gap-3">
+      {/* Residence selector + action buttons */}
+      <div className="flex flex-wrap items-center gap-3">
         <label className="text-sm font-medium">Résidence</label>
         <Select value={residenceId ? String(residenceId) : ''} onValueChange={(v) => setPickedResidenceId(Number(v))}>
           <SelectTrigger className="w-72"><SelectValue placeholder="Sélectionner" /></SelectTrigger>
@@ -90,7 +148,177 @@ export function RecouvrementPage() {
             ))}
           </SelectContent>
         </Select>
+
+        <div className="ml-auto flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            onClick={() => recalcMut.mutate()}
+            disabled={!residenceId || recalcMut.isPending || !configQ.data?.enabled}
+            title={!configQ.data?.enabled ? 'Activer les pénalités d\'abord' : 'Recalculer les pénalités sur les impayés'}
+          >
+            <Sparkles className={cn('size-3.5', recalcMut.isPending && 'animate-pulse')} />
+            Recalculer pénalités
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            onClick={() => setShowConfig((v) => !v)}
+          >
+            <Settings className="size-3.5" />
+            {showConfig ? 'Masquer la configuration' : 'Configuration pénalités'}
+          </Button>
+        </div>
       </div>
+
+      {/* Penalty configuration form */}
+      {showConfig && draftConfig && (
+        <div className="rounded-xl border-2 border-[#1B4F72]/20 bg-[#1B4F72]/5 p-5">
+          <div className="mb-4 flex items-center gap-2">
+            <Settings className="size-4 text-[#1B4F72]" />
+            <h2 className="text-sm font-bold text-[#1B4F72]">
+              Configuration des pénalités de retard
+            </h2>
+            <Badge variant="outline" className="ml-2 border-blue-200 bg-blue-50 text-[10px] text-blue-700">
+              Loi 18-00 · Art. 25
+            </Badge>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* Enabled toggle */}
+            <div className="flex items-center justify-between rounded-lg border bg-card p-3">
+              <div>
+                <Label htmlFor="penalty-enabled" className="text-sm font-medium">Pénalités activées</Label>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Calcul automatique sur tout impayé après période de grâce
+                </p>
+              </div>
+              <Switch
+                id="penalty-enabled"
+                checked={draftConfig.enabled}
+                onCheckedChange={(checked) => setDraftConfig({ ...draftConfig, enabled: checked })}
+              />
+            </div>
+
+            {/* Grace period */}
+            <div className="rounded-lg border bg-card p-3">
+              <Label htmlFor="grace-days" className="text-sm font-medium">Période de grâce (jours)</Label>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Délai avant application des pénalités
+              </p>
+              <Input
+                id="grace-days"
+                type="number"
+                min="0"
+                value={draftConfig.grace_period_days}
+                onChange={(e) => setDraftConfig({ ...draftConfig, grace_period_days: Number(e.target.value) })}
+                className="mt-2"
+                disabled={!draftConfig.enabled}
+              />
+            </div>
+
+            {/* Rate type */}
+            <div className="rounded-lg border bg-card p-3">
+              <Label className="text-sm font-medium">Type de pénalité</Label>
+              <div className="mt-2 grid grid-cols-3 gap-1.5">
+                {(['fixed', 'percentage', 'daily'] as const).map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    disabled={!draftConfig.enabled}
+                    onClick={() => setDraftConfig({ ...draftConfig, rate_type: type })}
+                    className={cn(
+                      'rounded-md border px-2 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
+                      draftConfig.rate_type === type
+                        ? 'border-[#1B4F72] bg-[#1B4F72] text-white'
+                        : 'border-border bg-card text-muted-foreground hover:border-[#1B4F72]/40',
+                    )}
+                  >
+                    {type === 'fixed' ? 'Fixe (DH)' : type === 'percentage' ? 'Pourcentage' : 'Journalier'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Rate value */}
+            <div className="rounded-lg border bg-card p-3">
+              <Label htmlFor="rate-value" className="text-sm font-medium">
+                Valeur ({draftConfig.rate_type === 'fixed' ? 'DH' : draftConfig.rate_type === 'percentage' ? '%' : 'DH/jour'})
+              </Label>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {draftConfig.rate_type === 'fixed' && 'Montant forfaitaire ajouté à chaque impayé'}
+                {draftConfig.rate_type === 'percentage' && 'Pourcentage du montant impayé'}
+                {draftConfig.rate_type === 'daily' && 'Pénalité ajoutée par jour de retard'}
+              </p>
+              <Input
+                id="rate-value"
+                type="number"
+                step="0.01"
+                min="0"
+                value={draftConfig.rate_value}
+                onChange={(e) => setDraftConfig({ ...draftConfig, rate_value: Number(e.target.value) })}
+                className="mt-2"
+                disabled={!draftConfig.enabled}
+              />
+            </div>
+
+            {/* Cap max (optional) */}
+            <div className="rounded-lg border bg-card p-3 md:col-span-2">
+              <Label htmlFor="cap-max" className="text-sm font-medium">Plafond maximum (DH, optionnel)</Label>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Pénalité plafonnée. Laisser vide pour aucun plafond.
+              </p>
+              <Input
+                id="cap-max"
+                type="number"
+                step="0.01"
+                min="0"
+                value={draftConfig.cap_max_montant ?? ''}
+                onChange={(e) => setDraftConfig({
+                  ...draftConfig,
+                  cap_max_montant: e.target.value === '' ? undefined : Number(e.target.value),
+                })}
+                className="mt-2 max-w-xs"
+                disabled={!draftConfig.enabled}
+              />
+            </div>
+          </div>
+
+          {/* AG approval reminder */}
+          {draftConfig.enabled && !draftConfig.ag_approved_at && (
+            <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-900/30 dark:bg-amber-950/20">
+              <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-600" />
+              <p className="text-xs text-amber-700 dark:text-amber-300">
+                <strong>Décision d&apos;AG requise</strong> — Les pénalités doivent être votées en assemblée générale
+                avant d&apos;être légalement applicables (Loi 18-00 art. 25).
+              </p>
+            </div>
+          )}
+
+          {/* Save button */}
+          <div className="mt-4 flex justify-end gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setConfigEdits({})}
+              disabled={saveConfigMut.isPending || Object.keys(configEdits).length === 0}
+            >
+              Annuler
+            </Button>
+            <Button
+              size="sm"
+              className="gap-1.5"
+              onClick={() => draftConfig && saveConfigMut.mutate(draftConfig)}
+              disabled={saveConfigMut.isPending}
+            >
+              <RefreshCw className={cn('size-3.5', saveConfigMut.isPending && 'animate-spin')} />
+              Enregistrer
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">

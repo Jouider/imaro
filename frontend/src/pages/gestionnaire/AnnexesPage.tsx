@@ -13,8 +13,11 @@ import {
   getResidences, getCoproprietaires, getImpayes,
   type Coproprietaire, type Impaye,
 } from '@/services/gestionnaire.service'
-import { getAnnexes, regenerateAnnexe } from '@/services/conformite.service'
-import { generateAnnexe10Pdf, generateAnnexePdf, type Annexe10Row } from '@/lib/annexes-pdf'
+import { getAnnexes, regenerateAnnexe, getAnnexeData } from '@/services/conformite.service'
+import {
+  generateAnnexe10Pdf, generateAnnexe131Pdf, generateAnnexe132Pdf,
+  generateAnnexePdf, type Annexe10Row,
+} from '@/lib/annexes-pdf'
 
 const ANNEXE_LABELS: Record<string, string> = {
   '3':    'Annexe 3 — Bilan (État de la situation financière)',
@@ -119,15 +122,67 @@ export function AnnexesPage() {
     return { rows, totals }
   }
 
+  // Backend payload shapes (match Abdellah's API responses for annexes 10/13-1/13-2).
+  // Source : docs/sprint-4-conformite-legale.md §9.2 + his PR #63.
+  type Annexe10Payload = {
+    totals: { soldeInitial: number; appele: number; paye: number; soldeFinal: number }
+    rows: Annexe10Row[]
+  }
+  type Annexe131Payload = {
+    current:  { fondsReserve: number; creances: number; dettes: number; tresorerie: number }
+    previous: { fondsReserve: number; creances: number; dettes: number; tresorerie: number }
+  }
+  type Quad4 = { n1: number; n: number; n0: number; nMinus1: number }
+  type Annexe132Payload = {
+    excedent: number
+    recettes: {
+      cotisations: Quad4; fondsReserve: Quad4; autresAg: Quad4; autresProduits: Quad4
+    }
+    depenses: {
+      matieres: Quad4; servicesExterieurs: Quad4; impotsTaxes: Quad4;
+      personnel: Quad4; autresCharges: Quad4
+    }
+  }
+
   const handleDownload = async (annexeNum: string) => {
+    if (!residenceId) return
     try {
-      // Annexe 10 is special — we have client-side data (copropriétaires + impayés)
-      // to populate the contributions table. All other annexes use zero defaults
-      // until the backend exposes per-account aggregates.
+      // For the 3 required annexes, fetch real data from Abdellah's backend.
+      // Fall back to client-aggregates / zero defaults on error.
       if (annexeNum === '10') {
-        const { rows, totals } = buildAnnexe10Rows()
-        await generateAnnexe10Pdf({ ...commonCtx, rows, totals })
+        let data: { totals: Annexe10Payload['totals']; rows: Annexe10Row[] }
+        try {
+          const payload = await getAnnexeData<Annexe10Payload>(residenceId, '10', exercice)
+          data = { totals: payload.totals, rows: payload.rows }
+        } catch {
+          // backend unavailable → use client-computed data
+          data = buildAnnexe10Rows()
+        }
+        await generateAnnexe10Pdf({ ...commonCtx, ...data })
+      } else if (annexeNum === '13-1') {
+        let payload: Annexe131Payload
+        try {
+          payload = await getAnnexeData<Annexe131Payload>(residenceId, '13-1', exercice)
+        } catch {
+          const zero = { fondsReserve: 0, creances: 0, dettes: 0, tresorerie: 0 }
+          payload = { current: zero, previous: zero }
+        }
+        await generateAnnexe131Pdf({ ...commonCtx, ...payload })
+      } else if (annexeNum === '13-2') {
+        let payload: Annexe132Payload
+        try {
+          payload = await getAnnexeData<Annexe132Payload>(residenceId, '13-2', exercice)
+        } catch {
+          const z: Quad4 = { n1: 0, n: 0, n0: 0, nMinus1: 0 }
+          payload = {
+            excedent: 0,
+            recettes: { cotisations: z, fondsReserve: z, autresAg: z, autresProduits: z },
+            depenses: { matieres: z, servicesExterieurs: z, impotsTaxes: z, personnel: z, autresCharges: z },
+          }
+        }
+        await generateAnnexe132Pdf({ ...commonCtx, ...payload })
       } else {
+        // Annexes 3, 4, 5, 6, 7, 8, 9, 11, 12 — backend not ready yet
         await generateAnnexePdf(annexeNum, commonCtx)
       }
       toast.success(`Annexe ${annexeNum} téléchargée`)
