@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Lot extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'tenant_id', 'residence_id', 'immeuble_id', 'numero', 'etage',
@@ -44,5 +45,10 @@ class Lot extends Model
     public function coproprietairePrincipal(): HasOne
     {
         return $this->hasOne(Coproprietaire::class)->where('type', 'proprietaire');
+    }
+
+    public function occupants(): HasMany
+    {
+        return $this->hasMany(Occupant::class);
     }
 }

@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\Api\Gestionnaire\AnnonceController;
+use App\Http\Controllers\Api\Gestionnaire\AnnexeController;
+use App\Http\Controllers\Api\Gestionnaire\AuditLogController;
 use App\Http\Controllers\Api\Gestionnaire\BudgetAnnexe5Controller;
+use App\Http\Controllers\Api\Gestionnaire\ComplianceCalendarController;
 use App\Http\Controllers\Api\Gestionnaire\GroupeHabitationController;
 use App\Http\Controllers\Api\Gestionnaire\ImmeubleController;
 use App\Http\Controllers\Api\Gestionnaire\AppelFondsController;
@@ -16,9 +19,12 @@ use App\Http\Controllers\Api\Gestionnaire\ExerciceController;
 use App\Http\Controllers\Api\Gestionnaire\ImpayeController;
 use App\Http\Controllers\Api\Gestionnaire\LotController;
 use App\Http\Controllers\Api\Gestionnaire\NotificationController;
+use App\Http\Controllers\Api\Gestionnaire\OccupantController;
 use App\Http\Controllers\Api\Gestionnaire\PaiementController;
+use App\Http\Controllers\Api\Gestionnaire\PenaltyController;
 use App\Http\Controllers\Api\Gestionnaire\PrestataireController;
 use App\Http\Controllers\Api\Gestionnaire\ProfilController;
+use App\Http\Controllers\Api\Gestionnaire\RecouvrementController;
 use App\Http\Controllers\Api\Gestionnaire\ResidenceController;
 use App\Http\Controllers\Api\Gestionnaire\TicketController;
 use Illuminate\Support\Facades\Route;
@@ -155,3 +161,46 @@ Route::prefix('exercices/{exercice}')->group(function () {
 
 // Comptes PCG (référentiel statique)
 Route::get('/comptes-pcg', [ComptabiliteController::class, 'comptesPcg']);
+
+// ========================================
+// Sprint 4 — Conformité légale
+// ========================================
+
+// Audit trail
+Route::get('/audit-logs', [AuditLogController::class, 'index']);
+Route::get('/audit-logs/export', [AuditLogController::class, 'export']);
+
+// Occupants (per lot)
+Route::get('/lots/{lot}/occupants', [OccupantController::class, 'index']);
+Route::post('/lots/{lot}/occupants', [OccupantController::class, 'store']);
+Route::put('/occupants/{occupant}', [OccupantController::class, 'update']);
+Route::delete('/occupants/{occupant}', [OccupantController::class, 'destroy']);
+
+// Résidence-scoped Sprint 4 routes
+Route::prefix('residences/{residence}')->group(function () {
+    // Occupants agrégés par résidence
+    Route::get('/occupants', [OccupantController::class, 'indexByResidence']);
+
+    // Penalty config
+    Route::get('/penalty-config', [PenaltyController::class, 'show']);
+    Route::put('/penalty-config', [PenaltyController::class, 'update']);
+    Route::post('/penalties/recalculate', [PenaltyController::class, 'recalculate']);
+
+    // Recouvrement (prescription risks)
+    Route::get('/recouvrement', [RecouvrementController::class, 'index']);
+
+    // Compliance calendar
+    Route::get('/compliance-calendar', [ComplianceCalendarController::class, 'index']);
+
+    // Annexes
+    Route::get('/annexes', [AnnexeController::class, 'index']);
+    Route::get('/annexes/{annexeNum}', [AnnexeController::class, 'show']);
+    Route::post('/annexes/{annexeNum}/regenerate', [AnnexeController::class, 'regenerate']);
+});
+
+// Compliance tasks actions
+Route::post('/compliance-tasks/{task}/complete', [ComplianceCalendarController::class, 'complete']);
+Route::post('/compliance-tasks/{task}/skip', [ComplianceCalendarController::class, 'skip']);
+
+// Mise en demeure (per paiement)
+Route::post('/paiements/{paiement}/mise-en-demeure', [PenaltyController::class, 'miseEnDemeure']);
