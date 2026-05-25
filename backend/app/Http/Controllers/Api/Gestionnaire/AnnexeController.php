@@ -25,20 +25,41 @@ class AnnexeController extends Controller
             ->get()
             ->keyBy('annexe_num');
 
-        // Required annexes depend on regime
-        $requises = ['10', '13-1', '13-2'];
-        $disponibles = $cached->keys()->toArray();
+        // Determine regime based on annual revenue (Décret 2.23.700)
+        $totalRecettes = \App\Models\Paiement::whereHas('appelFondsLigne.appelFonds', function ($q) use ($residence, $exercice) {
+            $q->where('residence_id', $residence->id)
+              ->whereYear('date_appel', $exercice);
+        })->sum('montant');
+
+        $regime = $totalRecettes <= 200000 ? 'simplifie' : 'normal';
+
+        // Simplifié: 10, 13-1, 13-2 required. Normal: all required.
+        $requiredNums = $regime === 'simplifie'
+            ? ['10', '13-1', '13-2']
+            : ['3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13-1', '13-2'];
+
+        // All 12 annexes
+        $allNums = ['3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13-1', '13-2'];
+
+        // Supported annexes that can generate real data
+        $supported = ['10', '13-1', '13-2'];
+
+        $annexes = collect($allNums)->map(function ($num) use ($cached, $requiredNums, $supported) {
+            $c = $cached->get($num);
+            return [
+                'num' => $num,
+                'required' => in_array($num, $requiredNums),
+                'available' => in_array($num, $supported),
+                'last_generated' => $c?->generated_at?->toISOString(),
+            ];
+        })->values();
 
         return response()->json([
             'status' => 'success',
             'data' => [
-                'requises' => $requises,
-                'disponibles' => $disponibles,
-                'annexes' => $cached->map(fn ($c) => [
-                    'num' => $c->annexe_num,
-                    'generated_at' => $c->generated_at?->toISOString(),
-                    'pdf_url' => $c->pdf_path,
-                ]),
+                'exercice' => $exercice,
+                'regime' => $regime,
+                'annexes' => $annexes,
             ],
         ]);
     }
