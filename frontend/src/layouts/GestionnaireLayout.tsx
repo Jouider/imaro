@@ -18,6 +18,10 @@ import {
   Scale,
   Landmark,
   UserCheck,
+  Banknote,
+  HardHat,
+  Undo2,
+  TrendingUp,
   CalendarCheck,
   ClipboardCheck,
   Activity,
@@ -143,6 +147,36 @@ const NAV_SECTIONS: NavSection[] = [
         to: '/gestionnaire/pointage',
         icon: <Landmark className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.pointage',
+      },
+      {
+        to: '/gestionnaire/autres-recettes',
+        icon: <TrendingUp className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.autresRecettes',
+      },
+      {
+        to: '/gestionnaire/remboursements',
+        icon: <Undo2 className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.remboursements',
+      },
+    ],
+  },
+  {
+    labelKey: 'gestionnaire.nav.sectionPatrimoine',
+    items: [
+      {
+        to: '/gestionnaire/equipements',
+        icon: <Wrench className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.equipements',
+      },
+      {
+        to: '/gestionnaire/emprunts',
+        icon: <Banknote className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.emprunts',
+      },
+      {
+        to: '/gestionnaire/travaux-exceptionnels',
+        icon: <HardHat className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.travauxExceptionnels',
       },
     ],
   },
