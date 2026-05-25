@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\ComplianceCalendarTask;
 use App\Models\LigneBudget;
 use App\Services\OtpService;
 use Illuminate\Support\Facades\Route;
@@ -17,5 +18,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Route::model('ligne', LigneBudget::class);
+        Route::model('task', ComplianceCalendarTask::class);
     }
 }
