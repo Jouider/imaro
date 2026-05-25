@@ -676,6 +676,7 @@
         "dashboard": "Tableau de bord",
         "journal": "Journal comptable",
         "grandLivre": "Grand-Livre",
+        "balance": "Balance des comptes",
         "depenses": "Dépenses",
         "rapports": "Rapports financiers",
         "cloture": "Clôture"
@@ -1002,7 +1003,8 @@
         "coproprietaires": "Copropriétaires",
         "soldes": "Soldes initiaux",
         "paiements": "Historique paiements",
-        "prestataires": "Prestataires"
+        "prestataires": "Prestataires",
+        "bilanOuverture": "Bilan d'ouverture"
       },
       "steps": {
         "upload": "Téléverser",

@@ -8,6 +8,7 @@ import {
   Scale,
   CreditCard,
   Hammer,
+  BookOpen,
   CheckCircle2,
   Info,
 } from 'lucide-react'
@@ -28,6 +29,7 @@ import { coproprietairesConfig } from '@/lib/import/configs/coproprietaires.conf
 import { soldesConfig } from '@/lib/import/configs/soldes.config'
 import { paiementsConfig } from '@/lib/import/configs/paiements.config'
 import { prestatairesConfig } from '@/lib/import/configs/prestataires.config'
+import { bilanOuvertureConfig } from '@/lib/import/configs/bilan-ouverture.config'
 import type { ImportContext } from '@/lib/import/types'
 
 // ─── Tab definitions ────────────────────────────────────────────────────────
@@ -38,6 +40,7 @@ const IMPORT_TABS = [
   { id: 'soldes', config: soldesConfig, icon: Scale, deps: ['lots'] },
   { id: 'paiements', config: paiementsConfig, icon: CreditCard, deps: ['lots', 'coproprietaires'] },
   { id: 'prestataires', config: prestatairesConfig, icon: Hammer, deps: [] },
+  { id: 'bilan-ouverture', config: bilanOuvertureConfig, icon: BookOpen, deps: [] as string[] },
 ] as const
 
 // ─── ImportsPage ────────────────────────────────────────────────────────────
