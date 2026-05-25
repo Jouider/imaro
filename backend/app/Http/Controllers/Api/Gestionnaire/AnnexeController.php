@@ -26,10 +26,12 @@ class AnnexeController extends Controller
             ->keyBy('annexe_num');
 
         // Determine regime based on annual revenue (Décret 2.23.700)
-        $totalRecettes = \App\Models\Paiement::whereHas('appelFondsLigne.appelFonds', function ($q) use ($residence, $exercice) {
-            $q->where('residence_id', $residence->id)
-              ->whereYear('date_appel', $exercice);
-        })->sum('montant');
+        $exerciceIds = \App\Models\Exercice::where('residence_id', $residence->id)
+            ->where('annee', $exercice)
+            ->pluck('id');
+
+        $totalRecettes = \App\Models\Paiement::whereIn('exercice_id', $exerciceIds)
+            ->sum('montant');
 
         $regime = $totalRecettes <= 200000 ? 'simplifie' : 'normal';
 
