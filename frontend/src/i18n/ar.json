@@ -676,6 +676,7 @@
         "dashboard": "لوحة التحكم",
         "journal": "اليومية المحاسبية",
         "grandLivre": "الأستاذ العام",
+        "balance": "ميزان المراجعة",
         "depenses": "المصاريف",
         "rapports": "التقارير المالية",
         "cloture": "إقفال الدورة"
@@ -1002,7 +1003,8 @@
         "coproprietaires": "الملاك المشاركون",
         "soldes": "الأرصدة الأولية",
         "paiements": "سجل المدفوعات",
-        "prestataires": "المزودون"
+        "prestataires": "المزودون",
+        "bilanOuverture": "الميزانية الافتتاحية"
       },
       "steps": {
         "upload": "تحميل",

@@ -21,6 +21,8 @@ import {
   Printer,
   ClipboardCheck,
   ChevronRight,
+  ArrowDownToLine,
+  ArrowUpFromLine,
 } from 'lucide-react'
 import {
   BarChart,
@@ -52,6 +54,7 @@ import {
   type Depense,
   type GrandLivreCompte,
   type ImportIaResult,
+  type BalanceLigne,
 } from '@/services/comptabilite.service'
 import { getResidences } from '@/services/gestionnaire.service'
 import { useAuthStore } from '@/stores/authStore'
@@ -66,6 +69,8 @@ import { KpiCard } from '@/components/shared/KpiCard'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { MontantDisplay } from '@/components/shared/MontantDisplay'
 import { ConfirmModal } from '@/components/shared/ConfirmModal'
+import { EmptyState } from '@/components/shared/EmptyState'
+import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -115,7 +120,7 @@ const fmt = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFr
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type ActiveTab = 'dashboard' | 'journal' | 'grandLivre' | 'depenses' | 'rapports' | 'cloture'
+type ActiveTab = 'dashboard' | 'journal' | 'grandLivre' | 'balance' | 'depenses' | 'rapports' | 'cloture'
 
 type DepenseFormState = {
   titre: string
@@ -1240,6 +1245,214 @@ function TabGrandLivre({ exerciceId }: { exerciceId: number }) {
   )
 }
 
+// ─── Tab: Balance des comptes ─────────────────────────────────────────────────
+
+function TabBalance({
+  exerciceId,
+  exerciceAnnee,
+  residenceName,
+  city,
+  companyName,
+}: {
+  exerciceId: number
+  exerciceAnnee: number
+  residenceName: string
+  city: string
+  companyName: string
+}) {
+  const { t } = useTranslation()
+
+  const { data: balance = [], isLoading } = useQuery({
+    queryKey: ['balance', exerciceId],
+    queryFn: () => getBalance(exerciceId),
+  })
+
+  const [exporting, setExporting] = useState(false)
+
+  // Group by classe (1-7 in plan comptable marocain syndic)
+  const byClasse = useMemo(() => {
+    const groups: Record<number, BalanceLigne[]> = {}
+    balance.forEach((b) => {
+      if (!groups[b.classe]) groups[b.classe] = []
+      groups[b.classe].push(b)
+    })
+    // Sort each class by numero
+    Object.values(groups).forEach((rows) =>
+      rows.sort((a, b) => a.numero.localeCompare(b.numero)),
+    )
+    return groups
+  }, [balance])
+
+  const totals = useMemo(() => {
+    return balance.reduce(
+      (acc, b) => ({
+        debit: acc.debit + b.total_debit,
+        credit: acc.credit + b.total_credit,
+        soldeDebiteur: acc.soldeDebiteur + b.solde_debiteur,
+        soldeCrediteur: acc.soldeCrediteur + b.solde_crediteur,
+      }),
+      { debit: 0, credit: 0, soldeDebiteur: 0, soldeCrediteur: 0 },
+    )
+  }, [balance])
+
+  const equilibre = Math.abs(totals.debit - totals.credit) < 0.01
+  const ecartSolde = Math.abs(totals.soldeDebiteur - totals.soldeCrediteur)
+
+  const CLASSE_LABELS: Record<number, { label: string; color: string }> = {
+    1: { label: 'Classe 1 — Capitaux propres',                      color: 'bg-purple-50 text-purple-700 border-purple-200' },
+    2: { label: 'Classe 2 — Immobilisations',                       color: 'bg-blue-50 text-blue-700 border-blue-200' },
+    3: { label: 'Classe 3 — Créances actif circulant',              color: 'bg-cyan-50 text-cyan-700 border-cyan-200' },
+    4: { label: 'Classe 4 — Dettes passif circulant',               color: 'bg-amber-50 text-amber-700 border-amber-200' },
+    5: { label: 'Classe 5 — Trésorerie',                            color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+    6: { label: 'Classe 6 — Charges',                               color: 'bg-orange-50 text-orange-700 border-orange-200' },
+    7: { label: 'Classe 7 — Produits',                              color: 'bg-green-50 text-green-700 border-green-200' },
+  }
+
+  async function handleExportPdf() {
+    setExporting(true)
+    try {
+      await Promise.resolve()
+      generateBalancePdf({ companyName, residenceName, city, annee: exerciceAnnee, balance })
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  if (isLoading) return <LoadingSkeleton variant="table" />
+
+  return (
+    <div className="space-y-6">
+      {/* KPIs */}
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <KpiCard
+          icon={<ArrowDownToLine className="size-4" />}
+          label={t('gestionnaire.comptabilite.balance.totalDebit', { defaultValue: 'Total Débit' })}
+          value={fmt.format(totals.debit) + ' DH'}
+        />
+        <KpiCard
+          icon={<ArrowUpFromLine className="size-4" />}
+          label={t('gestionnaire.comptabilite.balance.totalCredit', { defaultValue: 'Total Crédit' })}
+          value={fmt.format(totals.credit) + ' DH'}
+        />
+        <KpiCard
+          icon={<TrendingUp className="size-4" />}
+          label={t('gestionnaire.comptabilite.balance.soldeDebiteur', { defaultValue: 'Soldes débiteurs' })}
+          value={fmt.format(totals.soldeDebiteur) + ' DH'}
+        />
+        <KpiCard
+          icon={<TrendingDown className="size-4" />}
+          label={t('gestionnaire.comptabilite.balance.soldeCrediteur', { defaultValue: 'Soldes créditeurs' })}
+          value={fmt.format(totals.soldeCrediteur) + ' DH'}
+        />
+      </div>
+
+      {/* Équilibre banner */}
+      <div
+        className={cn(
+          'flex items-center gap-3 rounded-xl border-2 p-4',
+          equilibre
+            ? 'border-green-200 bg-green-50 dark:border-green-900/30 dark:bg-green-950/20'
+            : 'border-red-200 bg-red-50 dark:border-red-900/30 dark:bg-red-950/20',
+        )}
+      >
+        {equilibre ? (
+          <CheckCircle2 className="size-5 shrink-0 text-green-600" />
+        ) : (
+          <AlertCircle className="size-5 shrink-0 text-red-600" />
+        )}
+        <div className="flex-1">
+          <p className={cn('text-sm font-semibold', equilibre ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200')}>
+            {equilibre ? 'Balance équilibrée' : 'Balance déséquilibrée'}
+          </p>
+          <p className={cn('text-xs', equilibre ? 'text-green-700/80 dark:text-green-400/80' : 'text-red-700/80 dark:text-red-400/80')}>
+            {equilibre
+              ? `Total Débit = Total Crédit = ${fmt.format(totals.debit)} DH · Écart soldes : ${fmt.format(ecartSolde)} DH`
+              : `Écart débits/crédits : ${fmt.format(Math.abs(totals.debit - totals.credit))} DH — vérifier les écritures`}
+          </p>
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          className="gap-1.5"
+          onClick={() => void handleExportPdf()}
+          disabled={exporting || balance.length === 0}
+        >
+          {exporting ? <Loader2 className="size-3.5 animate-spin" /> : <Printer className="size-3.5" />}
+          Export PDF
+        </Button>
+      </div>
+
+      {/* Comptes table */}
+      {balance.length === 0 ? (
+        <EmptyState
+          icon={<BookOpen className="size-12" />}
+          title="Aucune écriture comptable"
+          description="La balance se construira automatiquement à partir des écritures de l'exercice."
+        />
+      ) : (
+        Object.keys(byClasse)
+          .map(Number)
+          .sort((a, b) => a - b)
+          .map((classe) => {
+            const meta = CLASSE_LABELS[classe] ?? { label: `Classe ${classe}`, color: 'bg-muted text-muted-foreground border-border' }
+            const rows = byClasse[classe]
+            const classTotals = rows.reduce(
+              (acc, r) => ({
+                debit: acc.debit + r.total_debit,
+                credit: acc.credit + r.total_credit,
+                soldeD: acc.soldeD + r.solde_debiteur,
+                soldeC: acc.soldeC + r.solde_crediteur,
+              }),
+              { debit: 0, credit: 0, soldeD: 0, soldeC: 0 },
+            )
+            return (
+              <div key={classe} className="overflow-hidden rounded-xl border bg-card">
+                <div className={cn('flex items-center gap-2 border-b px-4 py-2.5', meta.color)}>
+                  <span className="text-xs font-bold">{meta.label}</span>
+                  <span className="ml-auto text-xs tabular-nums opacity-70">{rows.length} compte{rows.length > 1 ? 's' : ''}</span>
+                </div>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/30">
+                      <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">Compte</th>
+                      <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">Libellé</th>
+                      <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">Débit</th>
+                      <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">Crédit</th>
+                      <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">Solde D</th>
+                      <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">Solde C</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((r) => (
+                      <tr key={r.numero} className="border-b last:border-b-0 hover:bg-muted/20">
+                        <td className="px-4 py-2 font-mono text-xs">{r.numero}</td>
+                        <td className="px-4 py-2">{r.libelle}</td>
+                        <td className="px-4 py-2 text-right tabular-nums text-xs">{r.total_debit > 0 ? fmt.format(r.total_debit) : '—'}</td>
+                        <td className="px-4 py-2 text-right tabular-nums text-xs">{r.total_credit > 0 ? fmt.format(r.total_credit) : '—'}</td>
+                        <td className="px-4 py-2 text-right tabular-nums text-xs font-medium">{r.solde_debiteur > 0 ? fmt.format(r.solde_debiteur) : '—'}</td>
+                        <td className="px-4 py-2 text-right tabular-nums text-xs font-medium">{r.solde_crediteur > 0 ? fmt.format(r.solde_crediteur) : '—'}</td>
+                      </tr>
+                    ))}
+                    {/* Class totals */}
+                    <tr className="bg-muted/40 font-semibold">
+                      <td className="px-4 py-2 text-xs uppercase tracking-wide text-muted-foreground" colSpan={2}>
+                        Total Classe {classe}
+                      </td>
+                      <td className="px-4 py-2 text-right tabular-nums text-xs">{fmt.format(classTotals.debit)}</td>
+                      <td className="px-4 py-2 text-right tabular-nums text-xs">{fmt.format(classTotals.credit)}</td>
+                      <td className="px-4 py-2 text-right tabular-nums text-xs">{fmt.format(classTotals.soldeD)}</td>
+                      <td className="px-4 py-2 text-right tabular-nums text-xs">{fmt.format(classTotals.soldeC)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )
+          })
+      )}
+    </div>
+  )
+}
+
 // ─── Tab: Dépenses ────────────────────────────────────────────────────────────
 
 function TabDepenses({
@@ -1780,6 +1993,7 @@ export function ComptabilitePage() {
     { key: 'dashboard', label: t('gestionnaire.comptabilite.tabs.dashboard', { defaultValue: 'Tableau de bord' }) },
     { key: 'journal', label: t('gestionnaire.comptabilite.tabs.journal', { defaultValue: 'Journal' }) },
     { key: 'grandLivre', label: t('gestionnaire.comptabilite.tabs.grandLivre', { defaultValue: 'Grand-Livre' }) },
+    { key: 'balance', label: t('gestionnaire.comptabilite.tabs.balance', { defaultValue: 'Balance des comptes' }) },
     { key: 'depenses', label: t('gestionnaire.comptabilite.tabs.depenses', { defaultValue: 'Dépenses' }) },
     { key: 'rapports', label: t('gestionnaire.comptabilite.tabs.rapports', { defaultValue: 'Rapports' }) },
     { key: 'cloture', label: t('gestionnaire.comptabilite.tabs.cloture', { defaultValue: 'Clôture' }) },
@@ -1899,6 +2113,15 @@ export function ComptabilitePage() {
       {activeTab === 'dashboard' && <TabDashboard exerciceId={exerciceId} />}
       {activeTab === 'journal' && <TabJournal exerciceId={exerciceId} />}
       {activeTab === 'grandLivre' && <TabGrandLivre exerciceId={exerciceId} />}
+      {activeTab === 'balance' && (
+        <TabBalance
+          exerciceId={exerciceId}
+          exerciceAnnee={currentExercice?.annee ?? 0}
+          residenceName={residenceName}
+          city={city}
+          companyName="Imaro"
+        />
+      )}
       {activeTab === 'depenses' && (
         <TabDepenses
           exerciceId={exerciceId}
