@@ -27,10 +27,13 @@ jobs:
             cd /var/www/imaro
 
             echo "📦 Pull latest code..."
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
 
             echo "📚 Install dependencies..."
             cd frontend
+            rm -rf node_modules
             npm ci
 
             echo "🔨 Build..."
