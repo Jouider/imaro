@@ -28,7 +28,10 @@ jobs:
           command_timeout: 10m
           script: |
             set -e
-            cd /var/www/imaro/backend
+            cd /var/www/imaro
+
+            echo "🧹 Clean stale locks..."
+            rm -f .git/index.lock
 
             echo "📦 Pull latest code..."
             git fetch origin main
@@ -36,6 +39,7 @@ jobs:
             git clean -fd
 
             echo "📚 Install dependencies..."
+            cd backend
             composer install --no-dev --optimize-autoloader
 
             echo "🗄️ Run migrations..."

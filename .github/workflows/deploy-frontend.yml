@@ -26,6 +26,9 @@ jobs:
             set -e
             cd /var/www/imaro
 
+            echo "🧹 Clean stale locks..."
+            rm -f .git/index.lock
+
             echo "📦 Pull latest code..."
             git fetch origin main
             git reset --hard origin/main

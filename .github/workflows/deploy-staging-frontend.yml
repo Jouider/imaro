@@ -26,6 +26,9 @@ jobs:
             set -e
             cd /var/www/imaro-staging
 
+            echo "🧹 Clean stale locks..."
+            rm -f .git/index.lock
+
             echo "📦 Pull latest code..."
             git fetch origin develop
             git reset --hard origin/develop
