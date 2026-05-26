@@ -13,7 +13,12 @@ type Props = {
 
 const ACCEPTED = '.xlsx,.csv,.xls'
 
-export function FileDropZone({ onFileSelected, onDownloadTemplate, accept = ACCEPTED, loading }: Props) {
+export function FileDropZone({
+  onFileSelected,
+  onDownloadTemplate,
+  accept = ACCEPTED,
+  loading,
+}: Props) {
   const { t } = useTranslation()
   const [dragOver, setDragOver] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -54,7 +59,10 @@ export function FileDropZone({ onFileSelected, onDownloadTemplate, accept = ACCE
     <div className="space-y-4">
       {/* Drop zone */}
       <div
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+        onDragOver={(e) => {
+          e.preventDefault()
+          setDragOver(true)
+        }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
@@ -79,9 +87,14 @@ export function FileDropZone({ onFileSelected, onDownloadTemplate, accept = ACCE
           <>
             <FileSpreadsheet className="size-10 text-green-600" />
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-foreground">{selectedFile.name}</span>
+              <span className="text-sm font-medium text-foreground">
+                {selectedFile.name}
+              </span>
               <button
-                onClick={(e) => { e.stopPropagation(); clearFile() }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  clearFile()
+                }}
                 className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
                 aria-label="Retirer le fichier"
               >
@@ -121,7 +134,10 @@ export function FileDropZone({ onFileSelected, onDownloadTemplate, accept = ACCE
         <Button
           variant="outline"
           size="sm"
-          onClick={(e) => { e.stopPropagation(); onDownloadTemplate() }}
+          onClick={(e) => {
+            e.stopPropagation()
+            onDownloadTemplate()
+          }}
           className="gap-2 text-xs"
         >
           <Download className="size-3.5" />

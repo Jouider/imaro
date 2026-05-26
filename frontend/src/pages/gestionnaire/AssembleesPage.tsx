@@ -67,7 +67,9 @@ export function AssembleesPage() {
   const qc = useQueryClient()
   const [searchParams] = useSearchParams()
   const [activeTab, setActiveTab] = useState<Tab>('a_venir')
-  const [createOpen, setCreateOpen] = useState(() => searchParams.get('create') === '1')
+  const [createOpen, setCreateOpen] = useState(
+    () => searchParams.get('create') === '1',
+  )
   const [detailAG, setDetailAG] = useState<Assemblee | null>(null)
   const [form, setForm] = useState<AGForm>(EMPTY_FORM)
 
@@ -119,9 +121,15 @@ export function AssembleesPage() {
       renderCell: (r) => (
         <Badge
           variant="outline"
-          className={r.type === 'extraordinaire' ? 'border-orange-400 text-orange-700' : ''}
+          className={
+            r.type === 'extraordinaire'
+              ? 'border-orange-400 text-orange-700'
+              : ''
+          }
         >
-          {t(`gestionnaire.assemblees.type.${r.type}`, { defaultValue: r.type })}
+          {t(`gestionnaire.assemblees.type.${r.type}`, {
+            defaultValue: r.type,
+          })}
         </Badge>
       ),
     },
@@ -138,9 +146,16 @@ export function AssembleesPage() {
         const d = new Date(r.date)
         return (
           <span className="tabular-nums text-sm">
-            {d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+            {d.toLocaleDateString('fr-FR', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+            })}
             {' · '}
-            {d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+            {d.toLocaleTimeString('fr-FR', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
           </span>
         )
       },
@@ -156,7 +171,9 @@ export function AssembleesPage() {
         const cls = STATUT_STYLES[r.statut] ?? 'bg-gray-100 text-gray-600'
         return (
           <Badge className={`${cls} hover:${cls} border-0`}>
-            {t(`gestionnaire.assemblees.statut.${r.statut}`, { defaultValue: r.statut })}
+            {t(`gestionnaire.assemblees.statut.${r.statut}`, {
+              defaultValue: r.statut,
+            })}
           </Badge>
         )
       },
@@ -244,14 +261,19 @@ export function AssembleesPage() {
               <Label>{t('gestionnaire.assemblees.form.titre')}</Label>
               <Input
                 value={form.titre}
-                onChange={(e) => setForm((f) => ({ ...f, titre: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, titre: e.target.value }))
+                }
                 placeholder="AG Ordinaire 2026"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label>{t('gestionnaire.assemblees.form.type')}</Label>
-                <Select value={form.type} onValueChange={(v) => setForm((f) => ({ ...f, type: v }))}>
+                <Select
+                  value={form.type}
+                  onValueChange={(v) => setForm((f) => ({ ...f, type: v }))}
+                >
                   <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
@@ -267,7 +289,12 @@ export function AssembleesPage() {
               </div>
               <div className="space-y-1">
                 <Label>{t('gestionnaire.assemblees.form.residence')}</Label>
-                <Select value={form.residence_id} onValueChange={(v) => setForm((f) => ({ ...f, residence_id: v }))}>
+                <Select
+                  value={form.residence_id}
+                  onValueChange={(v) =>
+                    setForm((f) => ({ ...f, residence_id: v }))
+                  }
+                >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Choisir" />
                   </SelectTrigger>
@@ -287,7 +314,9 @@ export function AssembleesPage() {
                 <Input
                   type="date"
                   value={form.date}
-                  onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, date: e.target.value }))
+                  }
                 />
               </div>
               <div className="space-y-1">
@@ -295,7 +324,9 @@ export function AssembleesPage() {
                 <Input
                   type="time"
                   value={form.heure}
-                  onChange={(e) => setForm((f) => ({ ...f, heure: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, heure: e.target.value }))
+                  }
                 />
               </div>
             </div>
@@ -304,7 +335,9 @@ export function AssembleesPage() {
                 <Label>{t('gestionnaire.assemblees.form.lieu')}</Label>
                 <Input
                   value={form.lieu}
-                  onChange={(e) => setForm((f) => ({ ...f, lieu: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, lieu: e.target.value }))
+                  }
                   placeholder="Salle de réunion, RDC"
                 />
               </div>
@@ -316,9 +349,13 @@ export function AssembleesPage() {
                     min={1}
                     max={100}
                     value={form.quorum_requis}
-                    onChange={(e) => setForm((f) => ({ ...f, quorum_requis: e.target.value }))}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, quorum_requis: e.target.value }))
+                    }
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                    %
+                  </span>
                 </div>
               </div>
             </div>
@@ -326,7 +363,9 @@ export function AssembleesPage() {
               <Label>{t('gestionnaire.assemblees.form.ordreDuJour')}</Label>
               <textarea
                 value={form.ordre_du_jour}
-                onChange={(e) => setForm((f) => ({ ...f, ordre_du_jour: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, ordre_du_jour: e.target.value }))
+                }
                 placeholder="1. Approbation des comptes&#10;2. Budget prévisionnel&#10;3. Questions diverses"
                 className="w-full min-h-[100px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
@@ -334,21 +373,30 @@ export function AssembleesPage() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateOpen(false)} disabled={createMutation.isPending}>
+            <Button
+              variant="outline"
+              onClick={() => setCreateOpen(false)}
+              disabled={createMutation.isPending}
+            >
               {t('actions.cancel')}
             </Button>
             <Button
               onClick={() => createMutation.mutate()}
               disabled={!isFormValid || createMutation.isPending}
             >
-              {createMutation.isPending ? t('actions.loading') : t('actions.save')}
+              {createMutation.isPending
+                ? t('actions.loading')
+                : t('actions.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* AG detail dialog */}
-      <Dialog open={!!detailAG} onOpenChange={(open) => !open && setDetailAG(null)}>
+      <Dialog
+        open={!!detailAG}
+        onOpenChange={(open) => !open && setDetailAG(null)}
+      >
         {detailAG && (
           <DialogContent className="max-w-lg">
             <DialogHeader>
@@ -378,7 +426,10 @@ export function AssembleesPage() {
                       year: 'numeric',
                     })}
                     {' à '}
-                    {new Date(detailAG.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(detailAG.date).toLocaleTimeString('fr-FR', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                   </p>
                 </div>
                 <div>
@@ -391,20 +442,27 @@ export function AssembleesPage() {
               <div className="flex items-center gap-3 rounded-lg border p-3">
                 <Users className="size-5 shrink-0 text-muted-foreground" />
                 <div className="flex-1 text-sm">
-                  <p className="font-medium">Quorum requis : {detailAG.quorum_requis} %</p>
+                  <p className="font-medium">
+                    Quorum requis : {detailAG.quorum_requis} %
+                  </p>
                   {detailAG.participants_count !== null ? (
-                    <p className="text-muted-foreground">{detailAG.participants_count} participants présents</p>
+                    <p className="text-muted-foreground">
+                      {detailAG.participants_count} participants présents
+                    </p>
                   ) : (
                     <p className="text-muted-foreground">AG non encore tenue</p>
                   )}
                 </div>
                 <Badge
                   className={cn(
-                    STATUT_STYLES[detailAG.statut] ?? 'bg-gray-100 text-gray-600',
+                    STATUT_STYLES[detailAG.statut] ??
+                      'bg-gray-100 text-gray-600',
                     'border-0 shrink-0',
                   )}
                 >
-                  {t(`gestionnaire.assemblees.statut.${detailAG.statut}`, { defaultValue: detailAG.statut })}
+                  {t(`gestionnaire.assemblees.statut.${detailAG.statut}`, {
+                    defaultValue: detailAG.statut,
+                  })}
                 </Badge>
               </div>
 
@@ -415,7 +473,9 @@ export function AssembleesPage() {
                 </p>
                 <div className="rounded-md border bg-muted/30 p-3">
                   {detailAG.ordre_du_jour.split('\n').map((line, i) => (
-                    <p key={i} className="text-sm">{line}</p>
+                    <p key={i} className="text-sm">
+                      {line}
+                    </p>
                   ))}
                 </div>
               </div>

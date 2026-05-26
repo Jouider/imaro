@@ -1,0 +1,97 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Imaro/Design Tokens" />
+
+# Imaro — Design tokens
+
+Palette, typographie et règles d'usage du design system Imaro.
+Tokens définis dans `src/index.css` (Tailwind v4 `@theme`).
+
+---
+
+## Couleurs de marque
+
+<div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+  <div className="rounded-xl border bg-card p-4">
+    <div className="h-16 rounded-lg" style={{ background: '#1B4F72' }} />
+    <p className="mt-3 text-sm font-semibold">Primary navy</p>
+    <code className="text-xs text-muted-foreground">#1B4F72</code>
+    <p className="mt-1 text-xs text-muted-foreground">
+      Sidebar, titres, primary buttons
+    </p>
+  </div>
+  <div className="rounded-xl border bg-card p-4">
+    <div className="h-16 rounded-lg" style={{ background: '#2980b9' }} />
+    <p className="mt-3 text-sm font-semibold">Primary light</p>
+    <code className="text-xs text-muted-foreground">#2980b9</code>
+    <p className="mt-1 text-xs text-muted-foreground">Hover, focus rings</p>
+  </div>
+  <div className="rounded-xl border bg-card p-4">
+    <div className="h-16 rounded-lg" style={{ background: '#E67E22' }} />
+    <p className="mt-3 text-sm font-semibold">Accent orange</p>
+    <code className="text-xs text-muted-foreground">#E67E22</code>
+    <p className="mt-1 text-xs text-muted-foreground">CTA principal</p>
+  </div>
+  <div className="rounded-xl border bg-card p-4">
+    <div className="h-16 rounded-lg" style={{ background: '#F8F9FA' }} />
+    <p className="mt-3 text-sm font-semibold">Surface</p>
+    <code className="text-xs text-muted-foreground">#F8F9FA</code>
+    <p className="mt-1 text-xs text-muted-foreground">Fond app</p>
+  </div>
+</div>
+
+## Couleurs d'état
+
+<div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3">
+  <div className="rounded-xl border bg-card p-4">
+    <div className="h-12 rounded-lg" style={{ background: '#27AE60' }} />
+    <p className="mt-3 text-sm font-semibold">Success</p>
+    <code className="text-xs text-muted-foreground">#27AE60</code>
+  </div>
+  <div className="rounded-xl border bg-card p-4">
+    <div className="h-12 rounded-lg" style={{ background: '#F39C12' }} />
+    <p className="mt-3 text-sm font-semibold">Warning</p>
+    <code className="text-xs text-muted-foreground">#F39C12</code>
+  </div>
+  <div className="rounded-xl border bg-card p-4">
+    <div className="h-12 rounded-lg" style={{ background: '#E74C3C' }} />
+    <p className="mt-3 text-sm font-semibold">Danger</p>
+    <code className="text-xs text-muted-foreground">#E74C3C</code>
+  </div>
+</div>
+
+---
+
+## Typographie
+
+- **Body** — `Nunito Sans` (`font-sans`)
+- **Headings** — `DM Serif Display` (`font-display`) sur les H1 de page
+- **Numérique** — toujours `tabular-nums` pour les montants et stats
+
+> Jamais d'`Inter`, `Roboto` ou `Arial` — la marque s'écrit en Nunito Sans + DM Serif.
+
+<div className="mt-3 space-y-3">
+  <h1 className="font-display text-3xl text-[var(--primary)]">
+    DM Serif Display — Heading
+  </h1>
+  <p className="font-sans text-base">
+    Nunito Sans — corps de texte standard 16 px.
+  </p>
+  <p className="font-sans text-sm text-muted-foreground">
+    Nunito Sans — texte secondaire 14 px.
+  </p>
+  <p className="font-sans tabular-nums text-base">
+    1 500,00 DH — chiffres tabulaires alignés
+  </p>
+</div>
+
+---
+
+## Règles d'usage
+
+- **Montants** — toujours `<MontantDisplay value={...} />` (locale fr-FR + `DH`, jamais MAD/€/$).
+- **Statuts** — toujours `<StatutBadge statut="..." />` (i18n géré).
+- **Suppression** — toujours via `<ConfirmModal>` avant la mutation.
+- **Loading** — `<LoadingSkeleton variant="..." />`, jamais de spinner nu.
+- **CTA orange** — `bg-[var(--accent)] text-white hover:bg-[var(--color-imaro-accent-dark)]`.
+- **Pas de texte UI en dur** — toujours i18n (`useTranslation`), FR + AR (RTL via `<html dir>`).

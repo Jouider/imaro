@@ -1,31 +1,58 @@
 import { useState, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Landmark, Upload, Sparkles, CheckCircle2, AlertTriangle, XCircle,
-  ArrowDownToLine, ArrowUpFromLine, Calendar, RefreshCw,
+  Landmark,
+  Upload,
+  Sparkles,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  Calendar,
+  RefreshCw,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select'
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 import {
-  BANQUES, parseBankStatement, autoMatchAll, getMockParseResult,
-  getMockTargets, computeStats,
-  type Banque, type ParseResult, type Match, type MatchableTarget,
+  BANQUES,
+  parseBankStatement,
+  autoMatchAll,
+  getMockParseResult,
+  getMockTargets,
+  computeStats,
+  type Banque,
+  type ParseResult,
+  type Match,
+  type MatchableTarget,
 } from '@/services/pointage.service'
 
 const fmt = new Intl.NumberFormat('fr-MA', {
-  minimumFractionDigits: 2, maximumFractionDigits: 2,
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
 })
 
 const dt = new Intl.DateTimeFormat('fr-MA', {
-  day: '2-digit', month: '2-digit', year: 'numeric',
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
 })
 
 export function PointagePage() {
@@ -33,7 +60,9 @@ export function PointagePage() {
 
   const [parsed, setParsed] = useState<ParseResult | null>(null)
   const [matches, setMatches] = useState<Record<string, Match | null>>({})
-  const [filter, setFilter] = useState<'all' | 'auto' | 'suggested' | 'unmatched'>('all')
+  const [filter, setFilter] = useState<
+    'all' | 'auto' | 'suggested' | 'unmatched'
+  >('all')
   const [banque, setBanque] = useState<Banque>('attijariwafa')
   const [parsing, setParsing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -48,7 +77,9 @@ export function PointagePage() {
 
   // ── Handlers ───────────────────────────────────────────────────────────────
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0]
     if (!file) return
     setParsing(true)
@@ -60,7 +91,7 @@ export function PointagePage() {
       setMatches(newMatches)
       toast.success(
         `${result.totalLines} lignes importées. ` +
-        `${Object.values(newMatches).filter((m) => m?.confidence === 'auto').length} auto-matchées.`,
+          `${Object.values(newMatches).filter((m) => m?.confidence === 'auto').length} auto-matchées.`,
       )
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Erreur de parsing')
@@ -105,7 +136,7 @@ export function PointagePage() {
     return parsed.lines.filter((l) => {
       const m = matches[l.id]
       if (filter === 'all') return true
-      if (filter === 'auto')      return m?.confidence === 'auto'
+      if (filter === 'auto') return m?.confidence === 'auto'
       if (filter === 'suggested') return m?.confidence === 'suggested'
       if (filter === 'unmatched') return !m
       return true
@@ -123,16 +154,24 @@ export function PointagePage() {
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-foreground">
-            {t('gestionnaire.pointage.title', { defaultValue: 'Pointage bancaire' })}
+            {t('gestionnaire.pointage.title', {
+              defaultValue: 'Pointage bancaire',
+            })}
           </h1>
           <p className="text-sm text-muted-foreground">
             {t('gestionnaire.pointage.subtitle', {
-              defaultValue: 'Rapprochement automatique du relevé bancaire avec vos paiements et dépenses',
+              defaultValue:
+                'Rapprochement automatique du relevé bancaire avec vos paiements et dépenses',
             })}
           </p>
         </div>
         {parsed && (
-          <Button variant="outline" size="sm" className="gap-2" onClick={handleReset}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={handleReset}
+          >
             <RefreshCw className="size-4" />
             Nouveau pointage
           </Button>
@@ -149,18 +188,26 @@ export function PointagePage() {
                 <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   Banque source
                 </label>
-                <Select value={banque} onValueChange={(v) => setBanque(v as Banque)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Select
+                  value={banque}
+                  onValueChange={(v) => setBanque(v as Banque)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     {BANQUES.map((b) => (
-                      <SelectItem key={b.code} value={b.code}>{b.label}</SelectItem>
+                      <SelectItem key={b.code} value={b.code}>
+                        {b.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <p className="text-xs text-muted-foreground max-w-md">
-                Importez le relevé bancaire au format CSV ou Excel exporté depuis votre espace bancaire en ligne.
-                Imaro détecte automatiquement les colonnes (date, libellé, débit, crédit).
+                Importez le relevé bancaire au format CSV ou Excel exporté
+                depuis votre espace bancaire en ligne. Imaro détecte
+                automatiquement les colonnes (date, libellé, débit, crédit).
               </p>
             </div>
 
@@ -210,8 +257,8 @@ export function PointagePage() {
             <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-900/30 dark:bg-amber-950/20">
               <Sparkles className="size-4 text-amber-600" />
               <p className="flex-1 text-xs text-amber-700 dark:text-amber-300">
-                Pas de fichier sous la main ? Chargez le jeu de démo
-                (relevé Attijariwafa avec 10 lignes pour résidence Atlas).
+                Pas de fichier sous la main ? Chargez le jeu de démo (relevé
+                Attijariwafa avec 10 lignes pour résidence Atlas).
               </p>
               <Button variant="outline" size="sm" onClick={handleLoadDemo}>
                 Démo
@@ -226,7 +273,11 @@ export function PointagePage() {
             </p>
             <div className="flex flex-wrap gap-2">
               {BANQUES.filter((b) => b.code !== 'autre').map((b) => (
-                <Badge key={b.code} variant="outline" className="border-[#1B4F72]/20 bg-[#1B4F72]/5 text-[#1B4F72]">
+                <Badge
+                  key={b.code}
+                  variant="outline"
+                  className="border-[#1B4F72]/20 bg-[#1B4F72]/5 text-[#1B4F72]"
+                >
                   {b.label}
                 </Badge>
               ))}
@@ -246,11 +297,18 @@ export function PointagePage() {
               <span className="ml-2 text-muted-foreground">
                 · {BANQUES.find((b) => b.code === parsed.banque)?.label}
                 {parsed.periode.from && (
-                  <> · {dt.format(new Date(parsed.periode.from))} → {dt.format(new Date(parsed.periode.to))}</>
+                  <>
+                    {' '}
+                    · {dt.format(new Date(parsed.periode.from))} →{' '}
+                    {dt.format(new Date(parsed.periode.to))}
+                  </>
                 )}
               </span>
             </div>
-            <Badge variant="outline" className="border-[#1B4F72]/30 bg-[#1B4F72]/5 text-[#1B4F72] text-xs">
+            <Badge
+              variant="outline"
+              className="border-[#1B4F72]/30 bg-[#1B4F72]/5 text-[#1B4F72] text-xs"
+            >
               {parsed.totalLines} lignes
             </Badge>
           </div>
@@ -280,25 +338,37 @@ export function PointagePage() {
               label="À vérifier"
               value={`${stats.suggested + stats.unmatched}`}
               icon={<AlertTriangle className="size-4" />}
-              tone={(stats.suggested + stats.unmatched) > 0 ? 'warning' : 'muted'}
+              tone={stats.suggested + stats.unmatched > 0 ? 'warning' : 'muted'}
               subtitle={`${stats.suggested} suggérées · ${stats.unmatched} sans match`}
             />
           </div>
 
           {/* Filters */}
           <div className="flex flex-wrap items-center gap-2">
-            <FilterChip active={filter === 'all'}        onClick={() => setFilter('all')}>
+            <FilterChip
+              active={filter === 'all'}
+              onClick={() => setFilter('all')}
+            >
               Toutes ({stats.total_lines})
             </FilterChip>
-            <FilterChip active={filter === 'auto'}       onClick={() => setFilter('auto')}>
+            <FilterChip
+              active={filter === 'auto'}
+              onClick={() => setFilter('auto')}
+            >
               <CheckCircle2 className="me-1.5 size-3.5" />
               Auto-matchées ({stats.auto_matched})
             </FilterChip>
-            <FilterChip active={filter === 'suggested'}  onClick={() => setFilter('suggested')}>
+            <FilterChip
+              active={filter === 'suggested'}
+              onClick={() => setFilter('suggested')}
+            >
               <AlertTriangle className="me-1.5 size-3.5" />
               Suggérées ({stats.suggested})
             </FilterChip>
-            <FilterChip active={filter === 'unmatched'}  onClick={() => setFilter('unmatched')}>
+            <FilterChip
+              active={filter === 'unmatched'}
+              onClick={() => setFilter('unmatched')}
+            >
               <XCircle className="me-1.5 size-3.5" />
               Non rapprochées ({stats.unmatched})
             </FilterChip>
@@ -320,7 +390,10 @@ export function PointagePage() {
               <TableBody>
                 {filteredLines.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-10">
+                    <TableCell
+                      colSpan={6}
+                      className="text-center text-sm text-muted-foreground py-10"
+                    >
                       Aucune ligne pour ce filtre.
                     </TableCell>
                   </TableRow>
@@ -328,27 +401,42 @@ export function PointagePage() {
                   filteredLines.map((line) => {
                     const m = matches[line.id]
                     return (
-                      <TableRow key={line.id} className={cn(
-                        m?.status === 'confirmed' && 'bg-green-50/50 dark:bg-green-950/10',
-                      )}>
+                      <TableRow
+                        key={line.id}
+                        className={cn(
+                          m?.status === 'confirmed' &&
+                            'bg-green-50/50 dark:bg-green-950/10',
+                        )}
+                      >
                         <TableCell className="text-xs font-mono text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <Calendar className="size-3" />
                             {dt.format(new Date(line.date))}
                           </div>
                         </TableCell>
-                        <TableCell className="text-sm max-w-[280px] truncate" title={line.libelle}>
+                        <TableCell
+                          className="text-sm max-w-[280px] truncate"
+                          title={line.libelle}
+                        >
                           {line.libelle}
                         </TableCell>
                         <TableCell className="text-right tabular-nums text-sm">
                           {line.debit > 0 ? (
-                            <span className="text-orange-600">{fmt.format(line.debit)}</span>
-                          ) : '—'}
+                            <span className="text-orange-600">
+                              {fmt.format(line.debit)}
+                            </span>
+                          ) : (
+                            '—'
+                          )}
                         </TableCell>
                         <TableCell className="text-right tabular-nums text-sm">
                           {line.credit > 0 ? (
-                            <span className="text-green-600 font-medium">{fmt.format(line.credit)}</span>
-                          ) : '—'}
+                            <span className="text-green-600 font-medium">
+                              {fmt.format(line.credit)}
+                            </span>
+                          ) : (
+                            '—'
+                          )}
                         </TableCell>
                         <TableCell className="text-sm">
                           <MatchCell match={m} />
@@ -357,14 +445,18 @@ export function PointagePage() {
                           {m && m.status !== 'confirmed' && (
                             <div className="flex justify-end gap-1">
                               <Button
-                                size="icon" variant="ghost" className="size-7"
+                                size="icon"
+                                variant="ghost"
+                                className="size-7"
                                 onClick={() => handleConfirm(line.id)}
                                 title="Confirmer le match"
                               >
                                 <CheckCircle2 className="size-4 text-green-600" />
                               </Button>
                               <Button
-                                size="icon" variant="ghost" className="size-7"
+                                size="icon"
+                                variant="ghost"
+                                className="size-7"
                                 onClick={() => handleReject(line.id)}
                                 title="Rejeter le match"
                               >
@@ -373,12 +465,19 @@ export function PointagePage() {
                             </div>
                           )}
                           {m?.status === 'confirmed' && (
-                            <Badge variant="outline" className="border-green-300 bg-green-50 text-[10px] text-green-700">
+                            <Badge
+                              variant="outline"
+                              className="border-green-300 bg-green-50 text-[10px] text-green-700"
+                            >
                               Confirmé
                             </Badge>
                           )}
                           {!m && (
-                            <Button size="sm" variant="ghost" className="h-7 text-xs">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 text-xs"
+                            >
                               Lier...
                             </Button>
                           )}
@@ -398,10 +497,12 @@ export function PointagePage() {
                 <Sparkles className="size-5 text-[#1B4F72]" />
                 <div>
                   <p className="text-sm font-medium text-foreground">
-                    {stats.auto_matched} rapprochements automatiques prêts à confirmer
+                    {stats.auto_matched} rapprochements automatiques prêts à
+                    confirmer
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Les paiements seront marqués comme reçus dans Imaro et liés à ces lignes bancaires.
+                    Les paiements seront marqués comme reçus dans Imaro et liés
+                    à ces lignes bancaires.
                   </p>
                 </div>
               </div>
@@ -418,7 +519,9 @@ export function PointagePage() {
                     })
                     return next
                   })
-                  toast.success(`${stats.auto_matched} rapprochements confirmés`)
+                  toast.success(
+                    `${stats.auto_matched} rapprochements confirmés`,
+                  )
                 }}
               >
                 <CheckCircle2 className="size-4" />
@@ -435,36 +538,55 @@ export function PointagePage() {
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 function Kpi({
-  label, value, icon, tone, subtitle,
+  label,
+  value,
+  icon,
+  tone,
+  subtitle,
 }: {
-  label: string; value: string; icon: React.ReactNode
+  label: string
+  value: string
+  icon: React.ReactNode
   tone: 'primary' | 'success' | 'warning' | 'muted'
   subtitle?: string
 }) {
   const toneClasses = {
     primary: 'bg-[#1B4F72]/10 text-[#1B4F72]',
-    success: 'bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-400',
-    warning: 'bg-amber-100 text-amber-600 dark:bg-amber-950/20 dark:text-amber-400',
-    muted:   'bg-muted text-muted-foreground',
+    success:
+      'bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-400',
+    warning:
+      'bg-amber-100 text-amber-600 dark:bg-amber-950/20 dark:text-amber-400',
+    muted: 'bg-muted text-muted-foreground',
   }[tone]
   return (
     <div className="rounded-xl border bg-card p-4">
       <div className="mb-2 flex items-center gap-2">
-        <div className={cn('flex size-7 items-center justify-center rounded-lg', toneClasses)}>
+        <div
+          className={cn(
+            'flex size-7 items-center justify-center rounded-lg',
+            toneClasses,
+          )}
+        >
           {icon}
         </div>
         <p className="text-xs text-muted-foreground">{label}</p>
       </div>
       <p className="text-xl font-bold tracking-tight">{value}</p>
-      {subtitle && <p className="mt-0.5 text-[10px] text-muted-foreground">{subtitle}</p>}
+      {subtitle && (
+        <p className="mt-0.5 text-[10px] text-muted-foreground">{subtitle}</p>
+      )}
     </div>
   )
 }
 
 function FilterChip({
-  active, onClick, children,
+  active,
+  onClick,
+  children,
 }: {
-  active: boolean; onClick: () => void; children: React.ReactNode
+  active: boolean
+  onClick: () => void
+  children: React.ReactNode
 }) {
   return (
     <button
@@ -495,20 +617,31 @@ function MatchCell({ match }: { match: Match | null | undefined }) {
       ? 'border-green-300 bg-green-50 text-green-700'
       : 'border-amber-300 bg-amber-50 text-amber-700'
   const icon =
-    match.confidence === 'auto'
-      ? <CheckCircle2 className="size-3.5" />
-      : <AlertTriangle className="size-3.5" />
+    match.confidence === 'auto' ? (
+      <CheckCircle2 className="size-3.5" />
+    ) : (
+      <AlertTriangle className="size-3.5" />
+    )
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-1.5">
-        <span className={cn('inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium', accent)}>
+        <span
+          className={cn(
+            'inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium',
+            accent,
+          )}
+        >
           {icon}
           {match.confidence === 'auto' ? 'Auto' : 'Suggéré'}
-          <span className="ml-1 opacity-60">({Math.round(match.score * 100)}%)</span>
+          <span className="ml-1 opacity-60">
+            ({Math.round(match.score * 100)}%)
+          </span>
         </span>
         <span className="text-sm font-medium">{match.targetLabel}</span>
       </div>
-      <p className="text-[10px] text-muted-foreground">{match.reasons.join(' · ')}</p>
+      <p className="text-[10px] text-muted-foreground">
+        {match.reasons.join(' · ')}
+      </p>
     </div>
   )
 }

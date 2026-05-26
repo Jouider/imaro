@@ -22,7 +22,12 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { getResidences, getLots, getImmeubles, getCoproprietaires } from '@/services/gestionnaire.service'
+import {
+  getResidences,
+  getLots,
+  getImmeubles,
+  getCoproprietaires,
+} from '@/services/gestionnaire.service'
 import { ImportStepper } from '@/components/gestionnaire/import/ImportStepper'
 import { lotsConfig } from '@/lib/import/configs/lots.config'
 import { coproprietairesConfig } from '@/lib/import/configs/coproprietaires.config'
@@ -36,11 +41,26 @@ import type { ImportContext } from '@/lib/import/types'
 
 const IMPORT_TABS = [
   { id: 'lots', config: lotsConfig, icon: Building2, deps: [] as string[] },
-  { id: 'coproprietaires', config: coproprietairesConfig, icon: Users, deps: ['lots'] },
+  {
+    id: 'coproprietaires',
+    config: coproprietairesConfig,
+    icon: Users,
+    deps: ['lots'],
+  },
   { id: 'soldes', config: soldesConfig, icon: Scale, deps: ['lots'] },
-  { id: 'paiements', config: paiementsConfig, icon: CreditCard, deps: ['lots', 'coproprietaires'] },
+  {
+    id: 'paiements',
+    config: paiementsConfig,
+    icon: CreditCard,
+    deps: ['lots', 'coproprietaires'],
+  },
   { id: 'prestataires', config: prestatairesConfig, icon: Hammer, deps: [] },
-  { id: 'bilan-ouverture', config: bilanOuvertureConfig, icon: BookOpen, deps: [] as string[] },
+  {
+    id: 'bilan-ouverture',
+    config: bilanOuvertureConfig,
+    icon: BookOpen,
+    deps: [] as string[],
+  },
 ] as const
 
 // ─── ImportsPage ────────────────────────────────────────────────────────────
@@ -113,7 +133,9 @@ export function ImportsPage() {
       void queryClient.invalidateQueries({ queryKey: ['lots', residenceId] })
     }
     if (tabId === 'coproprietaires') {
-      void queryClient.invalidateQueries({ queryKey: ['coproprietaires', residenceId] })
+      void queryClient.invalidateQueries({
+        queryKey: ['coproprietaires', residenceId],
+      })
     }
     // Auto-advance to next tab
     const idx = IMPORT_TABS.findIndex((t) => t.id === tabId)
@@ -157,7 +179,9 @@ export function ImportsPage() {
           }}
         >
           <SelectTrigger className="w-72">
-            <SelectValue placeholder={t('gestionnaire.imports.selectResidence')} />
+            <SelectValue
+              placeholder={t('gestionnaire.imports.selectResidence')}
+            />
           </SelectTrigger>
           <SelectContent>
             {(residencesQ.data ?? []).map((r) => (
@@ -205,8 +229,12 @@ export function ImportsPage() {
                       'gap-2 rounded-lg border px-4 py-2.5 transition-all',
                       'data-[state=active]:bg-[#1B4F72] data-[state=active]:text-white data-[state=active]:border-[#1B4F72]',
                       'data-[state=inactive]:hover:border-[#1B4F72]/40 data-[state=inactive]:hover:bg-[#1B4F72]/5',
-                      isCompleted && 'border-green-300 bg-green-50 dark:border-green-800 dark:bg-green-950/20',
-                      hasMissingDeps && !isCompleted && !( activeTab === tab.id) && 'opacity-60',
+                      isCompleted &&
+                        'border-green-300 bg-green-50 dark:border-green-800 dark:bg-green-950/20',
+                      hasMissingDeps &&
+                        !isCompleted &&
+                        !(activeTab === tab.id) &&
+                        'opacity-60',
                     )}
                   >
                     {isCompleted ? (
@@ -241,7 +269,11 @@ export function ImportsPage() {
               const isCompleted = completed.has(tab.id)
               const missingDeps = tab.deps.filter((d) => !completed.has(d))
               return (
-                <TabsContent key={tab.id} value={tab.id} className="mt-6 space-y-4">
+                <TabsContent
+                  key={tab.id}
+                  value={tab.id}
+                  className="mt-6 space-y-4"
+                >
                   {/* Dep warning — shown but doesn't block */}
                   {!isCompleted && missingDeps.length > 0 && (
                     <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-900/30 dark:bg-amber-950/20">
@@ -267,11 +299,13 @@ export function ImportsPage() {
                         Import terminé
                       </p>
                       <button
-                        onClick={() => setCompleted((prev) => {
-                          const next = new Set(prev)
-                          next.delete(tab.id)
-                          return next
-                        })}
+                        onClick={() =>
+                          setCompleted((prev) => {
+                            const next = new Set(prev)
+                            next.delete(tab.id)
+                            return next
+                          })
+                        }
                         className="text-xs text-muted-foreground underline hover:text-foreground"
                       >
                         Ré-importer

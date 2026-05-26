@@ -187,19 +187,46 @@
     "features": {
       "title": "Tout ce dont vous avez besoin",
       "sub": "Une solution complète pour la gestion moderne de copropriété",
-      "residences": { "title": "Gestion des résidences", "desc": "Lots, tantièmes et copropriétaires centralisés" },
-      "appels": { "title": "Appels de fonds automatisés", "desc": "Calcul par tantième, envoi WhatsApp instantané" },
-      "paiements": { "title": "Suivi des paiements", "desc": "Historique complet et impayés en temps réel" },
-      "tickets": { "title": "Tickets & réclamations", "desc": "Traitement avec photos et suivi de statut" },
-      "assemblees": { "title": "Assemblées générales", "desc": "Convocations, ordres du jour et procès-verbaux" },
-      "portail": { "title": "Portail copropriétaire", "desc": "Application mobile pour chaque résident" }
+      "residences": {
+        "title": "Gestion des résidences",
+        "desc": "Lots, tantièmes et copropriétaires centralisés"
+      },
+      "appels": {
+        "title": "Appels de fonds automatisés",
+        "desc": "Calcul par tantième, envoi WhatsApp instantané"
+      },
+      "paiements": {
+        "title": "Suivi des paiements",
+        "desc": "Historique complet et impayés en temps réel"
+      },
+      "tickets": {
+        "title": "Tickets & réclamations",
+        "desc": "Traitement avec photos et suivi de statut"
+      },
+      "assemblees": {
+        "title": "Assemblées générales",
+        "desc": "Convocations, ordres du jour et procès-verbaux"
+      },
+      "portail": {
+        "title": "Portail copropriétaire",
+        "desc": "Application mobile pour chaque résident"
+      }
     },
     "howItWorks": {
       "title": "Opérationnel en 3 étapes",
       "sub": "Démarrez en quelques minutes, sans formation technique",
-      "step1": { "title": "Créez votre résidence", "desc": "Ajoutez vos lots, tantièmes et copropriétaires en quelques clics" },
-      "step2": { "title": "Invitez vos copropriétaires", "desc": "Ils reçoivent un accès WhatsApp à leur portail personnel" },
-      "step3": { "title": "Gérez en temps réel", "desc": "Tableau de bord, relances automatiques, rapports instantanés" }
+      "step1": {
+        "title": "Créez votre résidence",
+        "desc": "Ajoutez vos lots, tantièmes et copropriétaires en quelques clics"
+      },
+      "step2": {
+        "title": "Invitez vos copropriétaires",
+        "desc": "Ils reçoivent un accès WhatsApp à leur portail personnel"
+      },
+      "step3": {
+        "title": "Gérez en temps réel",
+        "desc": "Tableau de bord, relances automatiques, rapports instantanés"
+      }
     },
     "portals": {
       "gestionnaire": {

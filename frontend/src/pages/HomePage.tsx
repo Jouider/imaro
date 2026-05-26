@@ -279,10 +279,7 @@ export function HomePage() {
         {/* ══════════════════════════════════════
             3. STATS BAR
         ══════════════════════════════════════ */}
-        <section
-          className="relative -mt-8 bg-[#F8F9FA]"
-          style={{ zIndex: 10 }}
-        >
+        <section className="relative -mt-8 bg-[#F8F9FA]" style={{ zIndex: 10 }}>
           <div className="mx-auto max-w-5xl px-6 py-10">
             <div className="flex flex-col items-center justify-around gap-6 sm:flex-row">
               {STATS.map((stat, i) => (
@@ -383,7 +380,10 @@ export function HomePage() {
               {STEPS.map((step, i) => {
                 const Icon = step.icon
                 return (
-                  <div key={step.key} className="flex flex-1 flex-col items-center text-center">
+                  <div
+                    key={step.key}
+                    className="flex flex-1 flex-col items-center text-center"
+                  >
                     {/* Step number + icon */}
                     <div className="relative mb-5 flex size-20 items-center justify-center rounded-full bg-[#1B4F72] shadow-lg">
                       {/* Large background number */}

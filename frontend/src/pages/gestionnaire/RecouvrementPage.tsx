@@ -2,8 +2,15 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
-  Scale, AlertTriangle, ShieldAlert, FileWarning, TrendingUp, Mail,
-  Settings, Sparkles, RefreshCw,
+  Scale,
+  AlertTriangle,
+  ShieldAlert,
+  FileWarning,
+  TrendingUp,
+  Mail,
+  Settings,
+  Sparkles,
+  RefreshCw,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -12,42 +19,79 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select'
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 import { getResidences } from '@/services/gestionnaire.service'
 import {
-  getRecouvrement, sendMiseEnDemeure,
-  getPenaltyConfig, updatePenaltyConfig, recalculatePenalties,
-  type PrescriptionSeverity, type PenaltyConfig,
+  getRecouvrement,
+  sendMiseEnDemeure,
+  getPenaltyConfig,
+  updatePenaltyConfig,
+  recalculatePenalties,
+  type PrescriptionSeverity,
+  type PenaltyConfig,
 } from '@/services/conformite.service'
 
 const fmt = new Intl.NumberFormat('fr-MA', {
-  minimumFractionDigits: 2, maximumFractionDigits: 2,
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
 })
 
-const SEVERITY_META: Record<PrescriptionSeverity, { label: string; cls: string }> = {
-  low:      { label: 'Faible',    cls: 'border-green-200 bg-green-50 text-green-700' },
-  medium:   { label: 'Modéré',    cls: 'border-amber-200 bg-amber-50 text-amber-700' },
-  high:     { label: 'Élevé',     cls: 'border-orange-200 bg-orange-50 text-orange-700' },
-  critical: { label: 'Critique',  cls: 'border-red-200 bg-red-50 text-red-700' },
+const SEVERITY_META: Record<
+  PrescriptionSeverity,
+  { label: string; cls: string }
+> = {
+  low: { label: 'Faible', cls: 'border-green-200 bg-green-50 text-green-700' },
+  medium: {
+    label: 'Modéré',
+    cls: 'border-amber-200 bg-amber-50 text-amber-700',
+  },
+  high: {
+    label: 'Élevé',
+    cls: 'border-orange-200 bg-orange-50 text-orange-700',
+  },
+  critical: { label: 'Critique', cls: 'border-red-200 bg-red-50 text-red-700' },
 }
 
 const STATUS_BADGES: Record<string, { label: string; cls: string }> = {
-  en_retard:        { label: 'En retard',         cls: 'border-amber-200 bg-amber-50 text-amber-700' },
-  mise_en_demeure:  { label: 'Mise en demeure',   cls: 'border-orange-200 bg-orange-50 text-orange-700' },
-  contentieux:      { label: 'Contentieux',       cls: 'border-red-200 bg-red-50 text-red-700' },
+  en_retard: {
+    label: 'En retard',
+    cls: 'border-amber-200 bg-amber-50 text-amber-700',
+  },
+  mise_en_demeure: {
+    label: 'Mise en demeure',
+    cls: 'border-orange-200 bg-orange-50 text-orange-700',
+  },
+  contentieux: {
+    label: 'Contentieux',
+    cls: 'border-red-200 bg-red-50 text-red-700',
+  },
 }
 
 export function RecouvrementPage() {
   const { t } = useTranslation()
 
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(null)
+  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
+    null,
+  )
 
-  const residencesQ = useQuery({ queryKey: ['residences'], queryFn: () => getResidences() })
+  const residencesQ = useQuery({
+    queryKey: ['residences'],
+    queryFn: () => getResidences(),
+  })
 
   const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
 
@@ -100,23 +144,32 @@ export function RecouvrementPage() {
     onSuccess: () => {
       toast.success('Configuration enregistrée')
       setConfigEdits({})
-      void queryClient.invalidateQueries({ queryKey: ['penalty-config', residenceId] })
+      void queryClient.invalidateQueries({
+        queryKey: ['penalty-config', residenceId],
+      })
     },
-    onError: () => toast.error('Échec de l\'enregistrement'),
+    onError: () => toast.error("Échec de l'enregistrement"),
   })
 
   const recalcMut = useMutation({
     mutationFn: () => recalculatePenalties(residenceId!),
     onSuccess: (r) => {
-      toast.success(`${r.recalculated} pénalités recalculées (${r.total_penalty_amount.toFixed(2)} DH)`)
-      void queryClient.invalidateQueries({ queryKey: ['recouvrement', residenceId] })
+      toast.success(
+        `${r.recalculated} pénalités recalculées (${r.total_penalty_amount.toFixed(2)} DH)`,
+      )
+      void queryClient.invalidateQueries({
+        queryKey: ['recouvrement', residenceId],
+      })
     },
     onError: () => toast.error('Échec du recalcul'),
   })
 
   const data = recQ.data
-  const criticalCount = data?.prescription_risks.filter((r) => r.severite === 'critical').length ?? 0
-  const highCount = data?.prescription_risks.filter((r) => r.severite === 'high').length ?? 0
+  const criticalCount =
+    data?.prescription_risks.filter((r) => r.severite === 'critical').length ??
+    0
+  const highCount =
+    data?.prescription_risks.filter((r) => r.severite === 'high').length ?? 0
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-6">
@@ -127,7 +180,9 @@ export function RecouvrementPage() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-foreground">
-            {t('gestionnaire.recouvrement.title', { defaultValue: 'Recouvrement' })}
+            {t('gestionnaire.recouvrement.title', {
+              defaultValue: 'Recouvrement',
+            })}
           </h1>
           <p className="text-sm text-muted-foreground">
             {t('gestionnaire.recouvrement.subtitle', {
@@ -140,11 +195,18 @@ export function RecouvrementPage() {
       {/* Residence selector + action buttons */}
       <div className="flex flex-wrap items-center gap-3">
         <label className="text-sm font-medium">Résidence</label>
-        <Select value={residenceId ? String(residenceId) : ''} onValueChange={(v) => setPickedResidenceId(Number(v))}>
-          <SelectTrigger className="w-72"><SelectValue placeholder="Sélectionner" /></SelectTrigger>
+        <Select
+          value={residenceId ? String(residenceId) : ''}
+          onValueChange={(v) => setPickedResidenceId(Number(v))}
+        >
+          <SelectTrigger className="w-72">
+            <SelectValue placeholder="Sélectionner" />
+          </SelectTrigger>
           <SelectContent>
             {(residencesQ.data ?? []).map((r) => (
-              <SelectItem key={r.id} value={String(r.id)}>{r.name}</SelectItem>
+              <SelectItem key={r.id} value={String(r.id)}>
+                {r.name}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -155,10 +217,18 @@ export function RecouvrementPage() {
             size="sm"
             className="gap-1.5"
             onClick={() => recalcMut.mutate()}
-            disabled={!residenceId || recalcMut.isPending || !configQ.data?.enabled}
-            title={!configQ.data?.enabled ? 'Activer les pénalités d\'abord' : 'Recalculer les pénalités sur les impayés'}
+            disabled={
+              !residenceId || recalcMut.isPending || !configQ.data?.enabled
+            }
+            title={
+              !configQ.data?.enabled
+                ? "Activer les pénalités d'abord"
+                : 'Recalculer les pénalités sur les impayés'
+            }
           >
-            <Sparkles className={cn('size-3.5', recalcMut.isPending && 'animate-pulse')} />
+            <Sparkles
+              className={cn('size-3.5', recalcMut.isPending && 'animate-pulse')}
+            />
             Recalculer pénalités
           </Button>
           <Button
@@ -168,7 +238,9 @@ export function RecouvrementPage() {
             onClick={() => setShowConfig((v) => !v)}
           >
             <Settings className="size-3.5" />
-            {showConfig ? 'Masquer la configuration' : 'Configuration pénalités'}
+            {showConfig
+              ? 'Masquer la configuration'
+              : 'Configuration pénalités'}
           </Button>
         </div>
       </div>
@@ -181,7 +253,10 @@ export function RecouvrementPage() {
             <h2 className="text-sm font-bold text-[#1B4F72]">
               Configuration des pénalités de retard
             </h2>
-            <Badge variant="outline" className="ml-2 border-blue-200 bg-blue-50 text-[10px] text-blue-700">
+            <Badge
+              variant="outline"
+              className="ml-2 border-blue-200 bg-blue-50 text-[10px] text-blue-700"
+            >
               Loi 18-00 · Art. 25
             </Badge>
           </div>
@@ -190,7 +265,12 @@ export function RecouvrementPage() {
             {/* Enabled toggle */}
             <div className="flex items-center justify-between rounded-lg border bg-card p-3">
               <div>
-                <Label htmlFor="penalty-enabled" className="text-sm font-medium">Pénalités activées</Label>
+                <Label
+                  htmlFor="penalty-enabled"
+                  className="text-sm font-medium"
+                >
+                  Pénalités activées
+                </Label>
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   Calcul automatique sur tout impayé après période de grâce
                 </p>
@@ -198,13 +278,17 @@ export function RecouvrementPage() {
               <Switch
                 id="penalty-enabled"
                 checked={draftConfig.enabled}
-                onCheckedChange={(checked) => setDraftConfig({ ...draftConfig, enabled: checked })}
+                onCheckedChange={(checked) =>
+                  setDraftConfig({ ...draftConfig, enabled: checked })
+                }
               />
             </div>
 
             {/* Grace period */}
             <div className="rounded-lg border bg-card p-3">
-              <Label htmlFor="grace-days" className="text-sm font-medium">Période de grâce (jours)</Label>
+              <Label htmlFor="grace-days" className="text-sm font-medium">
+                Période de grâce (jours)
+              </Label>
               <p className="mt-0.5 text-xs text-muted-foreground">
                 Délai avant application des pénalités
               </p>
@@ -213,7 +297,12 @@ export function RecouvrementPage() {
                 type="number"
                 min="0"
                 value={draftConfig.grace_period_days}
-                onChange={(e) => setDraftConfig({ ...draftConfig, grace_period_days: Number(e.target.value) })}
+                onChange={(e) =>
+                  setDraftConfig({
+                    ...draftConfig,
+                    grace_period_days: Number(e.target.value),
+                  })
+                }
                 className="mt-2"
                 disabled={!draftConfig.enabled}
               />
@@ -228,7 +317,9 @@ export function RecouvrementPage() {
                     key={type}
                     type="button"
                     disabled={!draftConfig.enabled}
-                    onClick={() => setDraftConfig({ ...draftConfig, rate_type: type })}
+                    onClick={() =>
+                      setDraftConfig({ ...draftConfig, rate_type: type })
+                    }
                     className={cn(
                       'rounded-md border px-2 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
                       draftConfig.rate_type === type
@@ -236,7 +327,11 @@ export function RecouvrementPage() {
                         : 'border-border bg-card text-muted-foreground hover:border-[#1B4F72]/40',
                     )}
                   >
-                    {type === 'fixed' ? 'Fixe (DH)' : type === 'percentage' ? 'Pourcentage' : 'Journalier'}
+                    {type === 'fixed'
+                      ? 'Fixe (DH)'
+                      : type === 'percentage'
+                        ? 'Pourcentage'
+                        : 'Journalier'}
                   </button>
                 ))}
               </div>
@@ -245,12 +340,21 @@ export function RecouvrementPage() {
             {/* Rate value */}
             <div className="rounded-lg border bg-card p-3">
               <Label htmlFor="rate-value" className="text-sm font-medium">
-                Valeur ({draftConfig.rate_type === 'fixed' ? 'DH' : draftConfig.rate_type === 'percentage' ? '%' : 'DH/jour'})
+                Valeur (
+                {draftConfig.rate_type === 'fixed'
+                  ? 'DH'
+                  : draftConfig.rate_type === 'percentage'
+                    ? '%'
+                    : 'DH/jour'}
+                )
               </Label>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                {draftConfig.rate_type === 'fixed' && 'Montant forfaitaire ajouté à chaque impayé'}
-                {draftConfig.rate_type === 'percentage' && 'Pourcentage du montant impayé'}
-                {draftConfig.rate_type === 'daily' && 'Pénalité ajoutée par jour de retard'}
+                {draftConfig.rate_type === 'fixed' &&
+                  'Montant forfaitaire ajouté à chaque impayé'}
+                {draftConfig.rate_type === 'percentage' &&
+                  'Pourcentage du montant impayé'}
+                {draftConfig.rate_type === 'daily' &&
+                  'Pénalité ajoutée par jour de retard'}
               </p>
               <Input
                 id="rate-value"
@@ -258,7 +362,12 @@ export function RecouvrementPage() {
                 step="0.01"
                 min="0"
                 value={draftConfig.rate_value}
-                onChange={(e) => setDraftConfig({ ...draftConfig, rate_value: Number(e.target.value) })}
+                onChange={(e) =>
+                  setDraftConfig({
+                    ...draftConfig,
+                    rate_value: Number(e.target.value),
+                  })
+                }
                 className="mt-2"
                 disabled={!draftConfig.enabled}
               />
@@ -266,7 +375,9 @@ export function RecouvrementPage() {
 
             {/* Cap max (optional) */}
             <div className="rounded-lg border bg-card p-3 md:col-span-2">
-              <Label htmlFor="cap-max" className="text-sm font-medium">Plafond maximum (DH, optionnel)</Label>
+              <Label htmlFor="cap-max" className="text-sm font-medium">
+                Plafond maximum (DH, optionnel)
+              </Label>
               <p className="mt-0.5 text-xs text-muted-foreground">
                 Pénalité plafonnée. Laisser vide pour aucun plafond.
               </p>
@@ -276,10 +387,15 @@ export function RecouvrementPage() {
                 step="0.01"
                 min="0"
                 value={draftConfig.cap_max_montant ?? ''}
-                onChange={(e) => setDraftConfig({
-                  ...draftConfig,
-                  cap_max_montant: e.target.value === '' ? undefined : Number(e.target.value),
-                })}
+                onChange={(e) =>
+                  setDraftConfig({
+                    ...draftConfig,
+                    cap_max_montant:
+                      e.target.value === ''
+                        ? undefined
+                        : Number(e.target.value),
+                  })
+                }
                 className="mt-2 max-w-xs"
                 disabled={!draftConfig.enabled}
               />
@@ -291,8 +407,9 @@ export function RecouvrementPage() {
             <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-900/30 dark:bg-amber-950/20">
               <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-600" />
               <p className="text-xs text-amber-700 dark:text-amber-300">
-                <strong>Décision d&apos;AG requise</strong> — Les pénalités doivent être votées en assemblée générale
-                avant d&apos;être légalement applicables (Loi 18-00 art. 25).
+                <strong>Décision d&apos;AG requise</strong> — Les pénalités
+                doivent être votées en assemblée générale avant d&apos;être
+                légalement applicables (Loi 18-00 art. 25).
               </p>
             </div>
           )}
@@ -303,7 +420,9 @@ export function RecouvrementPage() {
               variant="outline"
               size="sm"
               onClick={() => setConfigEdits({})}
-              disabled={saveConfigMut.isPending || Object.keys(configEdits).length === 0}
+              disabled={
+                saveConfigMut.isPending || Object.keys(configEdits).length === 0
+              }
             >
               Annuler
             </Button>
@@ -313,7 +432,12 @@ export function RecouvrementPage() {
               onClick={() => draftConfig && saveConfigMut.mutate(draftConfig)}
               disabled={saveConfigMut.isPending}
             >
-              <RefreshCw className={cn('size-3.5', saveConfigMut.isPending && 'animate-spin')} />
+              <RefreshCw
+                className={cn(
+                  'size-3.5',
+                  saveConfigMut.isPending && 'animate-spin',
+                )}
+              />
               Enregistrer
             </Button>
           </div>
@@ -345,7 +469,11 @@ export function RecouvrementPage() {
           value={`${criticalCount + highCount}`}
           icon={<ShieldAlert className="size-4" />}
           tone="danger"
-          subtitle={criticalCount > 0 ? `${criticalCount} critique${criticalCount > 1 ? 's' : ''}` : 'aucun risque'}
+          subtitle={
+            criticalCount > 0
+              ? `${criticalCount} critique${criticalCount > 1 ? 's' : ''}`
+              : 'aucun risque'
+          }
         />
       </div>
 
@@ -356,13 +484,17 @@ export function RecouvrementPage() {
           <h2 className="text-base font-bold text-red-800 dark:text-red-200">
             Risque de prescription
           </h2>
-          <Badge variant="outline" className="ml-2 border-red-300 bg-white text-[10px] text-red-700">
+          <Badge
+            variant="outline"
+            className="ml-2 border-red-300 bg-white text-[10px] text-red-700"
+          >
             Loi 18-00 · Prescription quinquennale
           </Badge>
         </div>
         <p className="mb-4 text-xs text-red-700/80 dark:text-red-300/80">
-          Les créances de charges de copropriété sont prescrites après 5 ans sans interruption.
-          Une action légale immédiate est requise pour les créances à statut critique.
+          Les créances de charges de copropriété sont prescrites après 5 ans
+          sans interruption. Une action légale immédiate est requise pour les
+          créances à statut critique.
         </p>
 
         {data?.prescription_risks.length === 0 ? (
@@ -385,23 +517,41 @@ export function RecouvrementPage() {
               <TableBody>
                 {data?.prescription_risks.map((r) => (
                   <TableRow key={r.coproprietaire_id}>
-                    <TableCell className="font-medium text-sm">{r.coproprietaire_nom}</TableCell>
-                    <TableCell className="font-mono text-sm">{r.lot_numero}</TableCell>
-                    <TableCell className="text-right font-medium tabular-nums">{fmt.format(r.montant)} DH</TableCell>
+                    <TableCell className="font-medium text-sm">
+                      {r.coproprietaire_nom}
+                    </TableCell>
+                    <TableCell className="font-mono text-sm">
+                      {r.lot_numero}
+                    </TableCell>
+                    <TableCell className="text-right font-medium tabular-nums">
+                      {fmt.format(r.montant)} DH
+                    </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {new Intl.DateTimeFormat('fr-MA', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(r.date_origine))}
+                      {new Intl.DateTimeFormat('fr-MA', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                      }).format(new Date(r.date_origine))}
                     </TableCell>
                     <TableCell className="text-right tabular-nums">
-                      <span className={cn(
-                        'text-sm font-medium',
-                        r.severite === 'critical' && 'text-red-600',
-                        r.severite === 'high' && 'text-orange-600',
-                      )}>
+                      <span
+                        className={cn(
+                          'text-sm font-medium',
+                          r.severite === 'critical' && 'text-red-600',
+                          r.severite === 'high' && 'text-orange-600',
+                        )}
+                      >
                         {r.jours_restants}
                       </span>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={cn('text-[10px]', SEVERITY_META[r.severite].cls)}>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          'text-[10px]',
+                          SEVERITY_META[r.severite].cls,
+                        )}
+                      >
                         {SEVERITY_META[r.severite].label}
                       </Badge>
                     </TableCell>
@@ -434,9 +584,15 @@ export function RecouvrementPage() {
             <TableBody>
               {(data?.lots ?? []).map((l) => (
                 <TableRow key={l.lot_id}>
-                  <TableCell className="font-mono text-sm">{l.lot_numero}</TableCell>
-                  <TableCell className="text-sm font-medium">{l.coproprietaire_nom}</TableCell>
-                  <TableCell className="text-right tabular-nums">{fmt.format(l.montant_du)} DH</TableCell>
+                  <TableCell className="font-mono text-sm">
+                    {l.lot_numero}
+                  </TableCell>
+                  <TableCell className="text-sm font-medium">
+                    {l.coproprietaire_nom}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {fmt.format(l.montant_du)} DH
+                  </TableCell>
                   <TableCell className="text-right text-sm tabular-nums text-amber-600">
                     {fmt.format(l.montant_penalites)} DH
                   </TableCell>
@@ -444,7 +600,13 @@ export function RecouvrementPage() {
                     {l.anciennete_jours} j
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={cn('text-[10px]', STATUS_BADGES[l.statut]?.cls)}>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        'text-[10px]',
+                        STATUS_BADGES[l.statut]?.cls,
+                      )}
+                    >
                       {STATUS_BADGES[l.statut]?.label}
                     </Badge>
                   </TableCell>
@@ -471,7 +633,11 @@ export function RecouvrementPage() {
 }
 
 function Kpi({
-  label, value, icon, tone, subtitle,
+  label,
+  value,
+  icon,
+  tone,
+  subtitle,
 }: {
   label: string
   value: string | number
@@ -481,21 +647,29 @@ function Kpi({
 }) {
   const toneClasses = {
     primary: 'bg-[#1B4F72]/10 text-[#1B4F72]',
-    danger:  'bg-red-100 text-red-600 dark:bg-red-950/20 dark:text-red-400',
-    warning: 'bg-amber-100 text-amber-600 dark:bg-amber-950/20 dark:text-amber-400',
-    muted:   'bg-muted text-muted-foreground',
+    danger: 'bg-red-100 text-red-600 dark:bg-red-950/20 dark:text-red-400',
+    warning:
+      'bg-amber-100 text-amber-600 dark:bg-amber-950/20 dark:text-amber-400',
+    muted: 'bg-muted text-muted-foreground',
   }[tone]
 
   return (
     <div className="rounded-xl border bg-card p-4">
       <div className="mb-2 flex items-center gap-2">
-        <div className={cn('flex size-7 items-center justify-center rounded-lg', toneClasses)}>
+        <div
+          className={cn(
+            'flex size-7 items-center justify-center rounded-lg',
+            toneClasses,
+          )}
+        >
           {icon}
         </div>
         <p className="text-xs text-muted-foreground">{label}</p>
       </div>
       <p className="text-2xl font-bold tracking-tight">{value}</p>
-      {subtitle && <p className="mt-1 text-[10px] text-muted-foreground">{subtitle}</p>}
+      {subtitle && (
+        <p className="mt-1 text-[10px] text-muted-foreground">{subtitle}</p>
+      )}
     </div>
   )
 }

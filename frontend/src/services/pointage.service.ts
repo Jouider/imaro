@@ -16,30 +16,39 @@ import * as XLSX from 'xlsx'
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type Banque =
-  | 'attijariwafa' | 'bp' | 'boa' | 'cih' | 'sg' | 'bmci'
-  | 'cdm' | 'ca' | 'cfg' | 'albarid' | 'autre'
+  | 'attijariwafa'
+  | 'bp'
+  | 'boa'
+  | 'cih'
+  | 'sg'
+  | 'bmci'
+  | 'cdm'
+  | 'ca'
+  | 'cfg'
+  | 'albarid'
+  | 'autre'
 
 export const BANQUES: { code: Banque; label: string }[] = [
   { code: 'attijariwafa', label: 'Attijariwafa Bank' },
-  { code: 'bp',           label: 'Banque Populaire' },
-  { code: 'boa',          label: 'Bank of Africa' },
-  { code: 'cih',          label: 'CIH Bank' },
-  { code: 'sg',           label: 'Société Générale' },
-  { code: 'bmci',         label: 'BMCI' },
-  { code: 'cdm',          label: 'Crédit du Maroc' },
-  { code: 'ca',           label: 'Crédit Agricole' },
-  { code: 'cfg',          label: 'CFG Bank' },
-  { code: 'albarid',      label: 'Al Barid Bank' },
-  { code: 'autre',        label: 'Autre (format générique)' },
+  { code: 'bp', label: 'Banque Populaire' },
+  { code: 'boa', label: 'Bank of Africa' },
+  { code: 'cih', label: 'CIH Bank' },
+  { code: 'sg', label: 'Société Générale' },
+  { code: 'bmci', label: 'BMCI' },
+  { code: 'cdm', label: 'Crédit du Maroc' },
+  { code: 'ca', label: 'Crédit Agricole' },
+  { code: 'cfg', label: 'CFG Bank' },
+  { code: 'albarid', label: 'Al Barid Bank' },
+  { code: 'autre', label: 'Autre (format générique)' },
 ]
 
 export type BankLine = {
-  id: string           // hash unique de date+libelle+montant
-  date: string         // ISO YYYY-MM-DD
+  id: string // hash unique de date+libelle+montant
+  date: string // ISO YYYY-MM-DD
   libelle: string
-  debit: number        // > 0 si sortie d'argent (dépense)
-  credit: number       // > 0 si entrée d'argent (paiement reçu)
-  balance?: number     // solde après opération (optionnel)
+  debit: number // > 0 si sortie d'argent (dépense)
+  credit: number // > 0 si entrée d'argent (paiement reçu)
+  balance?: number // solde après opération (optionnel)
   banque: Banque
 }
 
@@ -47,10 +56,10 @@ export type Match = {
   bankLineId: string
   targetType: 'paiement' | 'depense'
   targetId: number
-  targetLabel: string      // ex: "Karim Benali — Lot A-01" ou "Facture nettoyage avril"
+  targetLabel: string // ex: "Karim Benali — Lot A-01" ou "Facture nettoyage avril"
   confidence: 'auto' | 'suggested' | 'manual'
-  score: number            // 0-1, plus c'est élevé plus le match est sûr
-  reasons: string[]        // ex: ["Montant exact", "+/- 2j", "Nom détecté"]
+  score: number // 0-1, plus c'est élevé plus le match est sûr
+  reasons: string[] // ex: ["Montant exact", "+/- 2j", "Nom détecté"]
   status: 'pending' | 'confirmed' | 'rejected'
 }
 
@@ -117,10 +126,10 @@ function parseAmount(raw: string | number | undefined): number {
   if (raw === undefined || raw === null || raw === '') return 0
   if (typeof raw === 'number') return raw
   const s = String(raw)
-    .replace(/\s/g, '')          // remove spaces (FR thousand separators)
-    .replace(/[^\d,.-]/g, '')    // remove currency symbols
-    .replace(/\./g, '')          // remove dot thousand sep (FR uses .)
-    .replace(',', '.')           // FR decimal → JS
+    .replace(/\s/g, '') // remove spaces (FR thousand separators)
+    .replace(/[^\d,.-]/g, '') // remove currency symbols
+    .replace(/\./g, '') // remove dot thousand sep (FR uses .)
+    .replace(',', '.') // FR decimal → JS
   const n = parseFloat(s)
   return isNaN(n) ? 0 : n
 }
@@ -137,20 +146,64 @@ async function readWorkbook(file: File): Promise<Record<string, unknown>[]> {
 }
 
 const COLUMN_ALIASES = {
-  date:    ['date', 'date opération', 'date operation', 'date valeur', 'date d\'opération', 'dt op'],
-  libelle: ['libellé', 'libelle', 'description', 'designation', 'opération', 'operation', 'détail', 'detail', 'motif'],
-  debit:   ['débit', 'debit', 'montant débit', 'montant debit', 'sortie', 'retrait', 'dr'],
-  credit:  ['crédit', 'credit', 'montant crédit', 'montant credit', 'entrée', 'entree', 'versement', 'cr'],
-  amount:  ['montant', 'amount', 'mt', 'somme'],
-  sens:    ['sens', 'type', 'd/c', 'nature'],
-  balance: ['solde', 'balance', 'solde après opération', 'solde apres operation'],
+  date: [
+    'date',
+    'date opération',
+    'date operation',
+    'date valeur',
+    "date d'opération",
+    'dt op',
+  ],
+  libelle: [
+    'libellé',
+    'libelle',
+    'description',
+    'designation',
+    'opération',
+    'operation',
+    'détail',
+    'detail',
+    'motif',
+  ],
+  debit: [
+    'débit',
+    'debit',
+    'montant débit',
+    'montant debit',
+    'sortie',
+    'retrait',
+    'dr',
+  ],
+  credit: [
+    'crédit',
+    'credit',
+    'montant crédit',
+    'montant credit',
+    'entrée',
+    'entree',
+    'versement',
+    'cr',
+  ],
+  amount: ['montant', 'amount', 'mt', 'somme'],
+  sens: ['sens', 'type', 'd/c', 'nature'],
+  balance: [
+    'solde',
+    'balance',
+    'solde après opération',
+    'solde apres operation',
+  ],
 } as const
 
-function findColumn(headers: string[], aliases: readonly string[]): string | null {
+function findColumn(
+  headers: string[],
+  aliases: readonly string[],
+): string | null {
   const norm = (s: string) => s.toLowerCase().replace(/[^a-zéèàâêîôûç]/g, '')
   for (const alias of aliases) {
     const target = norm(alias)
-    const found = headers.find((h) => norm(h).includes(target) || target.includes(norm(h)))
+    const found = headers.find(
+      (h) => norm(h).includes(target) || target.includes(norm(h)),
+    )
     if (found) return found
   }
   return null
@@ -162,24 +215,31 @@ export async function parseBankStatement(
 ): Promise<ParseResult> {
   const rows = await readWorkbook(file)
   if (rows.length === 0) {
-    return { banque, fileName: file.name, totalLines: 0, totalDebit: 0, totalCredit: 0,
-             periode: { from: '', to: '' }, lines: [] }
+    return {
+      banque,
+      fileName: file.name,
+      totalLines: 0,
+      totalDebit: 0,
+      totalCredit: 0,
+      periode: { from: '', to: '' },
+      lines: [],
+    }
   }
 
   const headers = Object.keys(rows[0])
 
-  const dateCol    = findColumn(headers, COLUMN_ALIASES.date)
+  const dateCol = findColumn(headers, COLUMN_ALIASES.date)
   const libelleCol = findColumn(headers, COLUMN_ALIASES.libelle)
-  const debitCol   = findColumn(headers, COLUMN_ALIASES.debit)
-  const creditCol  = findColumn(headers, COLUMN_ALIASES.credit)
-  const amountCol  = findColumn(headers, COLUMN_ALIASES.amount)
-  const sensCol    = findColumn(headers, COLUMN_ALIASES.sens)
+  const debitCol = findColumn(headers, COLUMN_ALIASES.debit)
+  const creditCol = findColumn(headers, COLUMN_ALIASES.credit)
+  const amountCol = findColumn(headers, COLUMN_ALIASES.amount)
+  const sensCol = findColumn(headers, COLUMN_ALIASES.sens)
   const balanceCol = findColumn(headers, COLUMN_ALIASES.balance)
 
   if (!dateCol || !libelleCol) {
     throw new Error(
       `Colonnes manquantes dans le relevé. Colonnes détectées : ${headers.join(', ')}\n` +
-      'Imaro a besoin au minimum d\'une colonne "Date" et "Libellé".',
+        'Imaro a besoin au minimum d\'une colonne "Date" et "Libellé".',
     )
   }
 
@@ -189,11 +249,11 @@ export async function parseBankStatement(
       const libelle = String(r[libelleCol] ?? '').trim()
       if (!libelle) return null
 
-      let debit  = 0
+      let debit = 0
       let credit = 0
 
       if (debitCol && creditCol) {
-        debit  = parseAmount(r[debitCol] as string)
+        debit = parseAmount(r[debitCol] as string)
         credit = parseAmount(r[creditCol] as string)
       } else if (amountCol) {
         const amt = parseAmount(r[amountCol] as string)
@@ -210,16 +270,23 @@ export async function parseBankStatement(
 
       if (debit === 0 && credit === 0) return null
 
-      const balance = balanceCol ? parseAmount(r[balanceCol] as string) : undefined
+      const balance = balanceCol
+        ? parseAmount(r[balanceCol] as string)
+        : undefined
       const total = debit > 0 ? -debit : credit
       return {
         id: hashLine(date, libelle, total),
-        date, libelle, debit, credit, balance, banque,
+        date,
+        libelle,
+        debit,
+        credit,
+        balance,
+        banque,
       }
     })
     .filter((l): l is BankLine => l !== null)
 
-  const totalDebit  = lines.reduce((s, l) => s + l.debit, 0)
+  const totalDebit = lines.reduce((s, l) => s + l.debit, 0)
   const totalCredit = lines.reduce((s, l) => s + l.credit, 0)
   const dates = lines.map((l) => l.date).sort()
   return {
@@ -236,8 +303,22 @@ export async function parseBankStatement(
 // ─── Auto-matching algorithm ──────────────────────────────────────────────────
 
 export type MatchableTarget =
-  | { type: 'paiement'; id: number; montant: number; date: string; label: string; tags: string[] }
-  | { type: 'depense';  id: number; montant: number; date: string; label: string; tags: string[] }
+  | {
+      type: 'paiement'
+      id: number
+      montant: number
+      date: string
+      label: string
+      tags: string[]
+    }
+  | {
+      type: 'depense'
+      id: number
+      montant: number
+      date: string
+      label: string
+      tags: string[]
+    }
 
 function daysBetween(a: string, b: string): number {
   const da = new Date(a).getTime()
@@ -276,52 +357,54 @@ export function findBestMatch(
   let bestTarget: MatchableTarget | null = null
   let bestReasons: string[] = []
 
-  candidates.filter((c) => c.type === want).forEach((c) => {
-    let score = 0
-    const reasons: string[] = []
+  candidates
+    .filter((c) => c.type === want)
+    .forEach((c) => {
+      let score = 0
+      const reasons: string[] = []
 
-    // Amount: required match within 0.01
-    const amountDiff = Math.abs(c.montant - amount)
-    if (amountDiff < 0.01) {
-      score += 0.55
-      reasons.push('Montant exact')
-    } else if (amountDiff / amount < 0.02) {
-      score += 0.4
-      reasons.push('Montant proche')
-    } else {
-      return // amount mismatch → no point continuing
-    }
-
-    // Date proximity (within 14 days)
-    const dayDiff = daysBetween(c.date, line.date)
-    if (dayDiff <= 1) {
-      score += 0.25
-      reasons.push('Même jour')
-    } else if (dayDiff <= 7) {
-      score += 0.2 - (dayDiff / 7) * 0.05
-      reasons.push(`+/- ${Math.round(dayDiff)} j`)
-    } else if (dayDiff <= 14) {
-      score += 0.05
-      reasons.push(`+/- ${Math.round(dayDiff)} j`)
-    }
-
-    // Tag fuzzy match (libelle ou nom dans la ligne bancaire)
-    let nameMatch = false
-    for (const tag of c.tags) {
-      if (fuzzyContains(line.libelle, tag)) {
-        nameMatch = true
-        reasons.push(`«${tag}» détecté`)
-        break
+      // Amount: required match within 0.01
+      const amountDiff = Math.abs(c.montant - amount)
+      if (amountDiff < 0.01) {
+        score += 0.55
+        reasons.push('Montant exact')
+      } else if (amountDiff / amount < 0.02) {
+        score += 0.4
+        reasons.push('Montant proche')
+      } else {
+        return // amount mismatch → no point continuing
       }
-    }
-    if (nameMatch) score += 0.2
 
-    if (score > bestScore) {
-      bestScore = score
-      bestTarget = c
-      bestReasons = reasons
-    }
-  })
+      // Date proximity (within 14 days)
+      const dayDiff = daysBetween(c.date, line.date)
+      if (dayDiff <= 1) {
+        score += 0.25
+        reasons.push('Même jour')
+      } else if (dayDiff <= 7) {
+        score += 0.2 - (dayDiff / 7) * 0.05
+        reasons.push(`+/- ${Math.round(dayDiff)} j`)
+      } else if (dayDiff <= 14) {
+        score += 0.05
+        reasons.push(`+/- ${Math.round(dayDiff)} j`)
+      }
+
+      // Tag fuzzy match (libelle ou nom dans la ligne bancaire)
+      let nameMatch = false
+      for (const tag of c.tags) {
+        if (fuzzyContains(line.libelle, tag)) {
+          nameMatch = true
+          reasons.push(`«${tag}» détecté`)
+          break
+        }
+      }
+      if (nameMatch) score += 0.2
+
+      if (score > bestScore) {
+        bestScore = score
+        bestTarget = c
+        bestReasons = reasons
+      }
+    })
 
   if (!bestTarget || bestScore < 0.4) return null
 
@@ -348,7 +431,9 @@ export function autoMatchAll(
   // Sort candidates by recency (newer first) for deterministic preference
   const sortedLines = [...lines].sort((a, b) => b.date.localeCompare(a.date))
   for (const line of sortedLines) {
-    const available = candidates.filter((c) => !usedTargetIds.has(`${c.type}:${c.id}`))
+    const available = candidates.filter(
+      (c) => !usedTargetIds.has(`${c.type}:${c.id}`),
+    )
     const m = findBestMatch(line, available)
     result[line.id] = m
     if (m && m.confidence === 'auto') {
@@ -361,27 +446,163 @@ export function autoMatchAll(
 // ─── Mock data for the page (until backend ready) ─────────────────────────────
 
 const MOCK_BANK_LINES: BankLine[] = [
-  { id: 'a1', date: '2026-04-22', libelle: 'VIRT KARIM BENALI RESIDENCE ATLAS',  debit:    0, credit: 850.00, banque: 'attijariwafa', balance: 25850 },
-  { id: 'a2', date: '2026-04-22', libelle: 'VIRT FATIMA Z IDRISSI',              debit:    0, credit:1700.00, banque: 'attijariwafa', balance: 27550 },
-  { id: 'a3', date: '2026-04-23', libelle: 'CHEQUE 0042 HASSAN BENALI',          debit:    0, credit: 850.00, banque: 'attijariwafa', balance: 28400 },
-  { id: 'a4', date: '2026-04-25', libelle: 'PRLV ATTIJARIWAFA FRAIS BANQUE',     debit:   25, credit:    0,    banque: 'attijariwafa', balance: 28375 },
-  { id: 'a5', date: '2026-04-28', libelle: 'VIRT NETTOYAGE COMMUNS AVRIL CLEAN PRO MAROC', debit: 1200, credit: 0, banque: 'attijariwafa', balance: 27175 },
-  { id: 'a6', date: '2026-04-30', libelle: 'PRLV TECHELEV MAINTENANCE ASCENSEUR', debit:  800, credit:    0,    banque: 'attijariwafa', balance: 26375 },
-  { id: 'a7', date: '2026-05-02', libelle: 'VIRT INCONNU REF XK-292',            debit:    0, credit:1200.00, banque: 'attijariwafa', balance: 27575 },
-  { id: 'a8', date: '2026-05-03', libelle: 'VIRT YASSINE TAZI',                  debit:    0, credit: 850.00, banque: 'attijariwafa', balance: 28425 },
-  { id: 'a9', date: '2026-05-05', libelle: 'CHEQUE 0091 LEILA CHERKAOUI',        debit:    0, credit: 950.00, banque: 'attijariwafa', balance: 29375 },
-  { id: 'aA', date: '2026-05-08', libelle: 'PRLV LYDEC EAU AVRIL',                debit:  340, credit:    0,    banque: 'attijariwafa', balance: 29035 },
+  {
+    id: 'a1',
+    date: '2026-04-22',
+    libelle: 'VIRT KARIM BENALI RESIDENCE ATLAS',
+    debit: 0,
+    credit: 850.0,
+    banque: 'attijariwafa',
+    balance: 25850,
+  },
+  {
+    id: 'a2',
+    date: '2026-04-22',
+    libelle: 'VIRT FATIMA Z IDRISSI',
+    debit: 0,
+    credit: 1700.0,
+    banque: 'attijariwafa',
+    balance: 27550,
+  },
+  {
+    id: 'a3',
+    date: '2026-04-23',
+    libelle: 'CHEQUE 0042 HASSAN BENALI',
+    debit: 0,
+    credit: 850.0,
+    banque: 'attijariwafa',
+    balance: 28400,
+  },
+  {
+    id: 'a4',
+    date: '2026-04-25',
+    libelle: 'PRLV ATTIJARIWAFA FRAIS BANQUE',
+    debit: 25,
+    credit: 0,
+    banque: 'attijariwafa',
+    balance: 28375,
+  },
+  {
+    id: 'a5',
+    date: '2026-04-28',
+    libelle: 'VIRT NETTOYAGE COMMUNS AVRIL CLEAN PRO MAROC',
+    debit: 1200,
+    credit: 0,
+    banque: 'attijariwafa',
+    balance: 27175,
+  },
+  {
+    id: 'a6',
+    date: '2026-04-30',
+    libelle: 'PRLV TECHELEV MAINTENANCE ASCENSEUR',
+    debit: 800,
+    credit: 0,
+    banque: 'attijariwafa',
+    balance: 26375,
+  },
+  {
+    id: 'a7',
+    date: '2026-05-02',
+    libelle: 'VIRT INCONNU REF XK-292',
+    debit: 0,
+    credit: 1200.0,
+    banque: 'attijariwafa',
+    balance: 27575,
+  },
+  {
+    id: 'a8',
+    date: '2026-05-03',
+    libelle: 'VIRT YASSINE TAZI',
+    debit: 0,
+    credit: 850.0,
+    banque: 'attijariwafa',
+    balance: 28425,
+  },
+  {
+    id: 'a9',
+    date: '2026-05-05',
+    libelle: 'CHEQUE 0091 LEILA CHERKAOUI',
+    debit: 0,
+    credit: 950.0,
+    banque: 'attijariwafa',
+    balance: 29375,
+  },
+  {
+    id: 'aA',
+    date: '2026-05-08',
+    libelle: 'PRLV LYDEC EAU AVRIL',
+    debit: 340,
+    credit: 0,
+    banque: 'attijariwafa',
+    balance: 29035,
+  },
 ]
 
 const MOCK_TARGETS: MatchableTarget[] = [
-  { type: 'paiement', id: 101, montant:  850, date: '2026-04-22', label: 'Karim Benali — Lot A-01',     tags: ['Karim Benali', 'Karim', 'Benali'] },
-  { type: 'paiement', id: 102, montant: 1700, date: '2026-04-21', label: 'Fatima Idrissi — Lot A-02',   tags: ['Fatima Idrissi', 'Fatima', 'Idrissi'] },
-  { type: 'paiement', id: 103, montant:  850, date: '2026-04-24', label: 'Hassan Benali — Lot A-03',    tags: ['Hassan Benali', 'Hassan'] },
-  { type: 'paiement', id: 104, montant:  850, date: '2026-05-03', label: 'Yassine Tazi — Lot B-01',     tags: ['Yassine Tazi', 'Yassine', 'Tazi'] },
-  { type: 'paiement', id: 105, montant:  950, date: '2026-05-05', label: 'Leila Cherkaoui — Lot C-01',  tags: ['Leila Cherkaoui', 'Leila', 'Cherkaoui'] },
-  { type: 'depense',  id: 201, montant: 1200, date: '2026-04-28', label: 'Nettoyage parties communes — avril', tags: ['Clean Pro Maroc', 'nettoyage', 'CleanPro'] },
-  { type: 'depense',  id: 202, montant:  800, date: '2026-04-30', label: 'Maintenance ascenseur',       tags: ['TechElev', 'ascenseur', 'maintenance'] },
-  { type: 'depense',  id: 203, montant:  340, date: '2026-05-08', label: 'Eau Lydec — avril',           tags: ['Lydec', 'eau'] },
+  {
+    type: 'paiement',
+    id: 101,
+    montant: 850,
+    date: '2026-04-22',
+    label: 'Karim Benali — Lot A-01',
+    tags: ['Karim Benali', 'Karim', 'Benali'],
+  },
+  {
+    type: 'paiement',
+    id: 102,
+    montant: 1700,
+    date: '2026-04-21',
+    label: 'Fatima Idrissi — Lot A-02',
+    tags: ['Fatima Idrissi', 'Fatima', 'Idrissi'],
+  },
+  {
+    type: 'paiement',
+    id: 103,
+    montant: 850,
+    date: '2026-04-24',
+    label: 'Hassan Benali — Lot A-03',
+    tags: ['Hassan Benali', 'Hassan'],
+  },
+  {
+    type: 'paiement',
+    id: 104,
+    montant: 850,
+    date: '2026-05-03',
+    label: 'Yassine Tazi — Lot B-01',
+    tags: ['Yassine Tazi', 'Yassine', 'Tazi'],
+  },
+  {
+    type: 'paiement',
+    id: 105,
+    montant: 950,
+    date: '2026-05-05',
+    label: 'Leila Cherkaoui — Lot C-01',
+    tags: ['Leila Cherkaoui', 'Leila', 'Cherkaoui'],
+  },
+  {
+    type: 'depense',
+    id: 201,
+    montant: 1200,
+    date: '2026-04-28',
+    label: 'Nettoyage parties communes — avril',
+    tags: ['Clean Pro Maroc', 'nettoyage', 'CleanPro'],
+  },
+  {
+    type: 'depense',
+    id: 202,
+    montant: 800,
+    date: '2026-04-30',
+    label: 'Maintenance ascenseur',
+    tags: ['TechElev', 'ascenseur', 'maintenance'],
+  },
+  {
+    type: 'depense',
+    id: 203,
+    montant: 340,
+    date: '2026-05-08',
+    label: 'Eau Lydec — avril',
+    tags: ['Lydec', 'eau'],
+  },
   // Note: pas de match pour ligne a4 (frais bancaires 25 DH) ni a7 (virt inconnu 1200)
 ]
 
@@ -395,8 +616,12 @@ const MOCK_PARSE_RESULT: ParseResult = {
   lines: MOCK_BANK_LINES,
 }
 
-export function getMockParseResult(): ParseResult { return MOCK_PARSE_RESULT }
-export function getMockTargets(): MatchableTarget[] { return MOCK_TARGETS }
+export function getMockParseResult(): ParseResult {
+  return MOCK_PARSE_RESULT
+}
+export function getMockTargets(): MatchableTarget[] {
+  return MOCK_TARGETS
+}
 
 /** Compute aggregate stats from matches for the KPI row. */
 export function computeStats(
@@ -404,7 +629,9 @@ export function computeStats(
   matches: Record<string, Match | null>,
 ): PointageStats {
   const totalLines = parsed.totalLines
-  let auto = 0, suggested = 0, unmatched = 0
+  let auto = 0,
+    suggested = 0,
+    unmatched = 0
   parsed.lines.forEach((l) => {
     const m = matches[l.id]
     if (!m) unmatched++
@@ -416,7 +643,7 @@ export function computeStats(
     auto_matched: auto,
     suggested,
     unmatched,
-    total_debit:  parsed.totalDebit,
+    total_debit: parsed.totalDebit,
     total_credit: parsed.totalCredit,
   }
 }

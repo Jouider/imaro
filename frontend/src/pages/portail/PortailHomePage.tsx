@@ -251,7 +251,9 @@ function ProchainPaiementCard({
       <div
         className={cn(
           'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
-          isOverdue ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600',
+          isOverdue
+            ? 'bg-orange-100 text-orange-600'
+            : 'bg-blue-100 text-blue-600',
         )}
       >
         <Bell className="size-5" aria-hidden="true" />
@@ -260,7 +262,9 @@ function ProchainPaiementCard({
       {/* Label + amount + date */}
       <div className="flex-1 min-w-0">
         <p className="text-xs text-muted-foreground">
-          {t('portail.home.prochainPaiement', { defaultValue: 'Prochain paiement' })}
+          {t('portail.home.prochainPaiement', {
+            defaultValue: 'Prochain paiement',
+          })}
         </p>
         <div className="flex items-baseline gap-1.5 flex-wrap">
           <MontantDisplay
@@ -268,7 +272,8 @@ function ProchainPaiementCard({
             className="font-semibold text-base"
           />
           <span className="text-xs text-muted-foreground">
-            {t('portail.home.le', { defaultValue: 'le' })} {formatDate(prochain_appel.date)}
+            {t('portail.home.le', { defaultValue: 'le' })}{' '}
+            {formatDate(prochain_appel.date)}
           </span>
         </div>
       </div>
@@ -295,30 +300,43 @@ function AssembleePreviewCard({ ag }: { ag: AssembleePortail }) {
   const dateObj = new Date(ag.date)
   const day = dateObj.toLocaleDateString('fr-FR', { day: '2-digit' })
   const month = dateObj.toLocaleDateString('fr-FR', { month: 'short' })
-  const time = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+  const time = dateObj.toLocaleTimeString('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
   const isExtraordinaire = ag.type === 'extraordinaire'
 
   return (
     <Link to="/portail/actualites" className="block">
-      <div className={cn(
-        'flex items-center gap-3 rounded-xl border bg-card p-3',
-        isExtraordinaire && 'border-orange-200 bg-orange-50/50 dark:bg-orange-950/10',
-      )}>
+      <div
+        className={cn(
+          'flex items-center gap-3 rounded-xl border bg-card p-3',
+          isExtraordinaire &&
+            'border-orange-200 bg-orange-50/50 dark:bg-orange-950/10',
+        )}
+      >
         {/* Date badge */}
-        <div className={cn(
-          'flex h-12 w-10 shrink-0 flex-col items-center justify-center rounded-lg text-white',
-          isExtraordinaire ? 'bg-orange-500' : 'bg-[var(--color-imaro-primary)]',
-        )}>
+        <div
+          className={cn(
+            'flex h-12 w-10 shrink-0 flex-col items-center justify-center rounded-lg text-white',
+            isExtraordinaire
+              ? 'bg-orange-500'
+              : 'bg-[var(--color-imaro-primary)]',
+          )}
+        >
           <span className="text-lg font-bold leading-none">{day}</span>
           <span className="text-xs uppercase leading-none mt-0.5">{month}</span>
         </div>
 
         {/* Info */}
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold leading-snug truncate">{ag.titre}</p>
+          <p className="text-sm font-semibold leading-snug truncate">
+            {ag.titre}
+          </p>
           <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <MapPin className="size-3" />{ag.lieu.split(',')[0]}
+              <MapPin className="size-3" />
+              {ag.lieu.split(',')[0]}
             </span>
             <span>{time}</span>
           </div>

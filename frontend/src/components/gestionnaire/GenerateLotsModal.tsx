@@ -1,13 +1,6 @@
 import { useState, useMemo } from 'react'
 import { toast } from 'sonner'
-import {
-  Zap,
-  Home,
-  Plus,
-  X,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react'
+import { Zap, Home, Plus, X, ChevronDown, ChevronUp } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -68,7 +61,8 @@ const TEMPLATE_CARDS: TemplateCard[] = [
   {
     template: 'residence_ensemble',
     title: 'Résidence / Ensemble immobilier',
-    subtitle: 'Définir des entrées avec des comptages différents (Ex: E1=12, Bloc B=8)',
+    subtitle:
+      'Définir des entrées avec des comptages différents (Ex: E1=12, Bloc B=8)',
   },
   {
     template: 'simple_sequential',
@@ -136,12 +130,38 @@ interface CommercialMixedState {
 
 // ─── Default states ───────────────────────────────────────────────────────────
 
-const DEFAULT_SIMPLE: SimpleSequentialState = { totalLots: 10, startingNumber: 1 }
-const DEFAULT_WINGS: WingsFloorsState = { wings: ['A'], floors: 4, startingFloor: 1, unitsPerFloor: 3, startingNumber: 1 }
-const DEFAULT_FLOOR: FloorBasedState = { floors: 4, startingFloor: 1, unitsPerFloor: 3, startingNumber: 1 }
-const DEFAULT_VILLA: VillaTownhouseState = { totalVillas: 5, prefix: 'Villa', phase: '', startingNumber: 1 }
-const DEFAULT_ENSEMBLE: ResidenceEnsembleState = { entrances: [{ name: 'E1', count: 0 }] }
-const DEFAULT_COMMERCIAL: CommercialMixedState = { unitTypes: [{ label: 'Boutique', count: 0 }, { label: 'Bureau', count: 0 }] }
+const DEFAULT_SIMPLE: SimpleSequentialState = {
+  totalLots: 10,
+  startingNumber: 1,
+}
+const DEFAULT_WINGS: WingsFloorsState = {
+  wings: ['A'],
+  floors: 4,
+  startingFloor: 1,
+  unitsPerFloor: 3,
+  startingNumber: 1,
+}
+const DEFAULT_FLOOR: FloorBasedState = {
+  floors: 4,
+  startingFloor: 1,
+  unitsPerFloor: 3,
+  startingNumber: 1,
+}
+const DEFAULT_VILLA: VillaTownhouseState = {
+  totalVillas: 5,
+  prefix: 'Villa',
+  phase: '',
+  startingNumber: 1,
+}
+const DEFAULT_ENSEMBLE: ResidenceEnsembleState = {
+  entrances: [{ name: 'E1', count: 0 }],
+}
+const DEFAULT_COMMERCIAL: CommercialMixedState = {
+  unitTypes: [
+    { label: 'Boutique', count: 0 },
+    { label: 'Bureau', count: 0 },
+  ],
+}
 
 // ─── Helper: build the next wing letter ──────────────────────────────────────
 
@@ -172,12 +192,16 @@ export function GenerateLotsModal({
   const [tantieme, setTantieme] = useState<number>(1)
 
   // Per-template state
-  const [simpleState, setSimpleState] = useState<SimpleSequentialState>(DEFAULT_SIMPLE)
+  const [simpleState, setSimpleState] =
+    useState<SimpleSequentialState>(DEFAULT_SIMPLE)
   const [wingsState, setWingsState] = useState<WingsFloorsState>(DEFAULT_WINGS)
   const [floorState, setFloorState] = useState<FloorBasedState>(DEFAULT_FLOOR)
-  const [villaState, setVillaState] = useState<VillaTownhouseState>(DEFAULT_VILLA)
-  const [ensembleState, setEnsembleState] = useState<ResidenceEnsembleState>(DEFAULT_ENSEMBLE)
-  const [commercialState, setCommercialState] = useState<CommercialMixedState>(DEFAULT_COMMERCIAL)
+  const [villaState, setVillaState] =
+    useState<VillaTownhouseState>(DEFAULT_VILLA)
+  const [ensembleState, setEnsembleState] =
+    useState<ResidenceEnsembleState>(DEFAULT_ENSEMBLE)
+  const [commercialState, setCommercialState] =
+    useState<CommercialMixedState>(DEFAULT_COMMERCIAL)
 
   // UI state
   const [previewOpen, setPreviewOpen] = useState(true)
@@ -200,7 +224,17 @@ export function GenerateLotsModal({
       case 'commercial_mixed':
         return { template, ...commercialState, tantieme }
     }
-  }, [template, simpleState, wingsState, floorState, villaState, ensembleState, commercialState, type, tantieme])
+  }, [
+    template,
+    simpleState,
+    wingsState,
+    floorState,
+    villaState,
+    ensembleState,
+    commercialState,
+    type,
+    tantieme,
+  ])
 
   const totalCount = useMemo(() => countLots(config), [config])
 
@@ -237,8 +271,8 @@ export function GenerateLotsModal({
             superficie: 0,
             tantieme: lot.tantieme,
             immeuble_id: immeubleId,
-          })
-        )
+          }),
+        ),
       )
       onSuccess(lots.length)
       onOpenChange(false)
@@ -264,38 +298,56 @@ export function GenerateLotsModal({
   // ── Entrance helpers ────────────────────────────────────────────────────────
 
   function addEntrance() {
-    setEnsembleState((s) => ({ entrances: [...s.entrances, { name: '', count: 0 }] }))
+    setEnsembleState((s) => ({
+      entrances: [...s.entrances, { name: '', count: 0 }],
+    }))
   }
 
   function removeEntrance(idx: number) {
-    setEnsembleState((s) => ({ entrances: s.entrances.filter((_, i) => i !== idx) }))
+    setEnsembleState((s) => ({
+      entrances: s.entrances.filter((_, i) => i !== idx),
+    }))
   }
 
   function updateEntrance(idx: number, patch: Partial<EntranceItem>) {
     setEnsembleState((s) => ({
-      entrances: s.entrances.map((e, i) => (i === idx ? { ...e, ...patch } : e)),
+      entrances: s.entrances.map((e, i) =>
+        i === idx ? { ...e, ...patch } : e,
+      ),
     }))
   }
 
   // ── UnitType helpers ────────────────────────────────────────────────────────
 
   function addUnitType() {
-    setCommercialState((s) => ({ unitTypes: [...s.unitTypes, { label: '', count: 0 }] }))
+    setCommercialState((s) => ({
+      unitTypes: [...s.unitTypes, { label: '', count: 0 }],
+    }))
   }
 
   function removeUnitType(idx: number) {
-    setCommercialState((s) => ({ unitTypes: s.unitTypes.filter((_, i) => i !== idx) }))
+    setCommercialState((s) => ({
+      unitTypes: s.unitTypes.filter((_, i) => i !== idx),
+    }))
   }
 
   function updateUnitType(idx: number, patch: Partial<UnitTypeItem>) {
     setCommercialState((s) => ({
-      unitTypes: s.unitTypes.map((u, i) => (i === idx ? { ...u, ...patch } : u)),
+      unitTypes: s.unitTypes.map((u, i) =>
+        i === idx ? { ...u, ...patch } : u,
+      ),
     }))
   }
 
   // ── Shared field renderers ──────────────────────────────────────────────────
 
-  function TypeSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  function TypeSelect({
+    value,
+    onChange,
+  }: {
+    value: string
+    onChange: (v: string) => void
+  }) {
     return (
       <div className="flex flex-col gap-1">
         <Label>Type de lot</Label>
@@ -315,7 +367,13 @@ export function GenerateLotsModal({
     )
   }
 
-  function TantiemeInput({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  function TantiemeInput({
+    value,
+    onChange,
+  }: {
+    value: number
+    onChange: (v: number) => void
+  }) {
     return (
       <div className="flex flex-col gap-1">
         <Label>Tantième par lot</Label>
@@ -342,7 +400,12 @@ export function GenerateLotsModal({
                 type="number"
                 min={1}
                 value={simpleState.totalLots}
-                onChange={(e) => setSimpleState((s) => ({ ...s, totalLots: Number(e.target.value) }))}
+                onChange={(e) =>
+                  setSimpleState((s) => ({
+                    ...s,
+                    totalLots: Number(e.target.value),
+                  }))
+                }
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -350,7 +413,12 @@ export function GenerateLotsModal({
               <Input
                 type="number"
                 value={simpleState.startingNumber}
-                onChange={(e) => setSimpleState((s) => ({ ...s, startingNumber: Number(e.target.value) }))}
+                onChange={(e) =>
+                  setSimpleState((s) => ({
+                    ...s,
+                    startingNumber: Number(e.target.value),
+                  }))
+                }
               />
             </div>
             <TypeSelect value={type} onChange={setType} />
@@ -365,7 +433,11 @@ export function GenerateLotsModal({
               <Label>Ailes / Blocs</Label>
               <div className="flex flex-wrap gap-2">
                 {wingsState.wings.map((wing, idx) => (
-                  <Badge key={idx} variant="secondary" className="flex items-center gap-1 px-2 py-1">
+                  <Badge
+                    key={idx}
+                    variant="secondary"
+                    className="flex items-center gap-1 px-2 py-1"
+                  >
                     {wing}
                     <button
                       type="button"
@@ -378,7 +450,12 @@ export function GenerateLotsModal({
                   </Badge>
                 ))}
                 {wingsState.wings.length < 10 && (
-                  <Button type="button" variant="outline" size="sm" onClick={addWing}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addWing}
+                  >
                     <Plus className="size-3.5 mr-1" />
                     Ajouter une aile
                   </Button>
@@ -392,18 +469,30 @@ export function GenerateLotsModal({
                   type="number"
                   min={1}
                   value={wingsState.floors}
-                  onChange={(e) => setWingsState((s) => ({ ...s, floors: Number(e.target.value) }))}
+                  onChange={(e) =>
+                    setWingsState((s) => ({
+                      ...s,
+                      floors: Number(e.target.value),
+                    }))
+                  }
                 />
               </div>
               <div className="flex flex-col gap-1">
                 <Label>
                   Étage de départ
-                  <span className="ml-1 text-xs text-muted-foreground">(négatif pour sous-sols)</span>
+                  <span className="ml-1 text-xs text-muted-foreground">
+                    (négatif pour sous-sols)
+                  </span>
                 </Label>
                 <Input
                   type="number"
                   value={wingsState.startingFloor}
-                  onChange={(e) => setWingsState((s) => ({ ...s, startingFloor: Number(e.target.value) }))}
+                  onChange={(e) =>
+                    setWingsState((s) => ({
+                      ...s,
+                      startingFloor: Number(e.target.value),
+                    }))
+                  }
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -412,7 +501,12 @@ export function GenerateLotsModal({
                   type="number"
                   min={1}
                   value={wingsState.unitsPerFloor}
-                  onChange={(e) => setWingsState((s) => ({ ...s, unitsPerFloor: Number(e.target.value) }))}
+                  onChange={(e) =>
+                    setWingsState((s) => ({
+                      ...s,
+                      unitsPerFloor: Number(e.target.value),
+                    }))
+                  }
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -420,7 +514,12 @@ export function GenerateLotsModal({
                 <Input
                   type="number"
                   value={wingsState.startingNumber}
-                  onChange={(e) => setWingsState((s) => ({ ...s, startingNumber: Number(e.target.value) }))}
+                  onChange={(e) =>
+                    setWingsState((s) => ({
+                      ...s,
+                      startingNumber: Number(e.target.value),
+                    }))
+                  }
                 />
               </div>
               <TypeSelect value={type} onChange={setType} />
@@ -438,18 +537,30 @@ export function GenerateLotsModal({
                 type="number"
                 min={1}
                 value={floorState.floors}
-                onChange={(e) => setFloorState((s) => ({ ...s, floors: Number(e.target.value) }))}
+                onChange={(e) =>
+                  setFloorState((s) => ({
+                    ...s,
+                    floors: Number(e.target.value),
+                  }))
+                }
               />
             </div>
             <div className="flex flex-col gap-1">
               <Label>
                 Étage de départ
-                <span className="ml-1 text-xs text-muted-foreground">(négatif pour sous-sols)</span>
+                <span className="ml-1 text-xs text-muted-foreground">
+                  (négatif pour sous-sols)
+                </span>
               </Label>
               <Input
                 type="number"
                 value={floorState.startingFloor}
-                onChange={(e) => setFloorState((s) => ({ ...s, startingFloor: Number(e.target.value) }))}
+                onChange={(e) =>
+                  setFloorState((s) => ({
+                    ...s,
+                    startingFloor: Number(e.target.value),
+                  }))
+                }
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -458,7 +569,12 @@ export function GenerateLotsModal({
                 type="number"
                 min={1}
                 value={floorState.unitsPerFloor}
-                onChange={(e) => setFloorState((s) => ({ ...s, unitsPerFloor: Number(e.target.value) }))}
+                onChange={(e) =>
+                  setFloorState((s) => ({
+                    ...s,
+                    unitsPerFloor: Number(e.target.value),
+                  }))
+                }
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -466,7 +582,12 @@ export function GenerateLotsModal({
               <Input
                 type="number"
                 value={floorState.startingNumber}
-                onChange={(e) => setFloorState((s) => ({ ...s, startingNumber: Number(e.target.value) }))}
+                onChange={(e) =>
+                  setFloorState((s) => ({
+                    ...s,
+                    startingNumber: Number(e.target.value),
+                  }))
+                }
               />
             </div>
             <TypeSelect value={type} onChange={setType} />
@@ -483,7 +604,12 @@ export function GenerateLotsModal({
                 type="number"
                 min={1}
                 value={villaState.totalVillas}
-                onChange={(e) => setVillaState((s) => ({ ...s, totalVillas: Number(e.target.value) }))}
+                onChange={(e) =>
+                  setVillaState((s) => ({
+                    ...s,
+                    totalVillas: Number(e.target.value),
+                  }))
+                }
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -491,14 +617,21 @@ export function GenerateLotsModal({
               <Input
                 type="number"
                 value={villaState.startingNumber}
-                onChange={(e) => setVillaState((s) => ({ ...s, startingNumber: Number(e.target.value) }))}
+                onChange={(e) =>
+                  setVillaState((s) => ({
+                    ...s,
+                    startingNumber: Number(e.target.value),
+                  }))
+                }
               />
             </div>
             <div className="flex flex-col gap-1">
               <Label>Préfixe</Label>
               <Input
                 value={villaState.prefix}
-                onChange={(e) => setVillaState((s) => ({ ...s, prefix: e.target.value }))}
+                onChange={(e) =>
+                  setVillaState((s) => ({ ...s, prefix: e.target.value }))
+                }
                 placeholder="Villa"
               />
             </div>
@@ -506,7 +639,9 @@ export function GenerateLotsModal({
               <Label>Phase</Label>
               <Input
                 value={villaState.phase}
-                onChange={(e) => setVillaState((s) => ({ ...s, phase: e.target.value }))}
+                onChange={(e) =>
+                  setVillaState((s) => ({ ...s, phase: e.target.value }))
+                }
                 placeholder="Phase 1 (optionnel)"
               />
             </div>
@@ -527,7 +662,9 @@ export function GenerateLotsModal({
                       className="w-28"
                       placeholder="E1"
                       value={entrance.name}
-                      onChange={(e) => updateEntrance(idx, { name: e.target.value })}
+                      onChange={(e) =>
+                        updateEntrance(idx, { name: e.target.value })
+                      }
                     />
                     <span className="text-muted-foreground">=</span>
                     <Input
@@ -536,7 +673,9 @@ export function GenerateLotsModal({
                       min={0}
                       placeholder="Nb lots"
                       value={entrance.count === 0 ? '' : entrance.count}
-                      onChange={(e) => updateEntrance(idx, { count: Number(e.target.value) })}
+                      onChange={(e) =>
+                        updateEntrance(idx, { count: Number(e.target.value) })
+                      }
                     />
                     <Button
                       type="button"
@@ -551,7 +690,13 @@ export function GenerateLotsModal({
                   </div>
                 ))}
               </div>
-              <Button type="button" variant="outline" size="sm" className="w-fit" onClick={addEntrance}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-fit"
+                onClick={addEntrance}
+              >
                 <Plus className="size-3.5 mr-1" />
                 Ajouter une entrée
               </Button>
@@ -575,7 +720,9 @@ export function GenerateLotsModal({
                       className="flex-1"
                       placeholder="Boutique"
                       value={unitType.label}
-                      onChange={(e) => updateUnitType(idx, { label: e.target.value })}
+                      onChange={(e) =>
+                        updateUnitType(idx, { label: e.target.value })
+                      }
                     />
                     <Input
                       type="number"
@@ -583,7 +730,9 @@ export function GenerateLotsModal({
                       min={0}
                       placeholder="Quantité"
                       value={unitType.count === 0 ? '' : unitType.count}
-                      onChange={(e) => updateUnitType(idx, { count: Number(e.target.value) })}
+                      onChange={(e) =>
+                        updateUnitType(idx, { count: Number(e.target.value) })
+                      }
                     />
                     <Button
                       type="button"
@@ -598,7 +747,13 @@ export function GenerateLotsModal({
                   </div>
                 ))}
               </div>
-              <Button type="button" variant="outline" size="sm" className="w-fit" onClick={addUnitType}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-fit"
+                onClick={addUnitType}
+              >
                 <Plus className="size-3.5 mr-1" />
                 Ajouter un type
               </Button>
@@ -627,10 +782,11 @@ export function GenerateLotsModal({
 
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
-
           {/* Template cards */}
           <section>
-            <h3 className="text-sm font-semibold mb-3 text-foreground">Modèles rapides</h3>
+            <h3 className="text-sm font-semibold mb-3 text-foreground">
+              Modèles rapides
+            </h3>
             <div className="grid grid-cols-2 gap-2">
               {TEMPLATE_CARDS.map((card) => (
                 <button
@@ -657,8 +813,12 @@ export function GenerateLotsModal({
                     )}
                   </span>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium leading-snug">{card.title}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground leading-snug">{card.subtitle}</p>
+                    <p className="text-sm font-medium leading-snug">
+                      {card.title}
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground leading-snug">
+                      {card.subtitle}
+                    </p>
                   </div>
                 </button>
               ))}
@@ -667,7 +827,9 @@ export function GenerateLotsModal({
 
           {/* Configuration */}
           <section>
-            <h3 className="text-sm font-semibold mb-3 text-foreground">Configuration</h3>
+            <h3 className="text-sm font-semibold mb-3 text-foreground">
+              Configuration
+            </h3>
             {renderConfigFields()}
           </section>
 
@@ -680,9 +842,10 @@ export function GenerateLotsModal({
             >
               <span>
                 Aperçu — premiers{' '}
-                <span className="font-semibold">{Math.min(10, totalCount)}</span>
-                {' '}lots sur{' '}
-                <span className="font-semibold">{totalCount}</span>
+                <span className="font-semibold">
+                  {Math.min(10, totalCount)}
+                </span>{' '}
+                lots sur <span className="font-semibold">{totalCount}</span>
               </span>
               {previewOpen ? (
                 <ChevronUp className="size-4 text-muted-foreground" />
@@ -699,10 +862,15 @@ export function GenerateLotsModal({
                   </p>
                 ) : (
                   previewLots.map((lot, idx) => (
-                    <div key={idx} className="flex items-center gap-2 px-4 py-2 text-sm">
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 px-4 py-2 text-sm"
+                    >
                       <Home className="size-3.5 shrink-0 text-muted-foreground" />
                       <span className="font-medium">{lot.numero}</span>
-                      <span className="text-muted-foreground">• Tantième : {lot.tantieme}</span>
+                      <span className="text-muted-foreground">
+                        • Tantième : {lot.tantieme}
+                      </span>
                     </div>
                   ))
                 )}
@@ -728,7 +896,9 @@ export function GenerateLotsModal({
           </Button>
           <Button
             type="button"
-            onClick={() => { void handleGenerate() }}
+            onClick={() => {
+              void handleGenerate()
+            }}
             disabled={totalCount === 0 || isGenerating}
           >
             {isGenerating ? (

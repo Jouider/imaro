@@ -15,6 +15,15 @@ import {
   Droplets,
   ShieldAlert,
   Zap,
+  // Sprint 4-8 modules
+  Sparkles,
+  Scale,
+  Landmark,
+  CalendarCheck,
+  ClipboardCheck,
+  ArrowRight,
+  UserCheck,
+  HardHat,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -172,7 +181,73 @@ type RecouvrementChartProps = {
   labelRestant: string
 }
 
-function RecouvrementChart({ data, labelRecouvre, labelRestant }: RecouvrementChartProps) {
+// ─── ModuleCard — Sprint 4-8 module quick access ───────────────────────────
+
+type ModuleCardProps = {
+  onClick: () => void
+  icon: React.ReactNode
+  iconBg: string
+  label: string
+  value: string
+  sublabel: string
+  tone?: 'default' | 'info' | 'success' | 'warning' | 'danger'
+}
+
+function ModuleCard({
+  onClick,
+  icon,
+  iconBg,
+  label,
+  value,
+  sublabel,
+  tone = 'default',
+}: ModuleCardProps) {
+  const toneAccent = {
+    default: 'border-border bg-card hover:border-[#1B4F72]/40',
+    info: 'border-blue-200 bg-blue-50/30 hover:border-blue-300 dark:border-blue-900/40 dark:bg-blue-950/10',
+    success:
+      'border-green-200 bg-green-50/30 hover:border-green-300 dark:border-green-900/40 dark:bg-green-950/10',
+    warning:
+      'border-amber-200 bg-amber-50/30 hover:border-amber-300 dark:border-amber-900/40 dark:bg-amber-950/10',
+    danger:
+      'border-red-200 bg-red-50/30 hover:border-red-300 dark:border-red-900/40 dark:bg-red-950/10',
+  }[tone]
+
+  const valueTone = {
+    default: 'text-foreground',
+    info: 'text-blue-700 dark:text-blue-300',
+    success: 'text-green-700 dark:text-green-300',
+    warning: 'text-amber-700 dark:text-amber-300',
+    danger: 'text-red-700 dark:text-red-300',
+  }[tone]
+
+  return (
+    <button
+      onClick={onClick}
+      className={`group relative overflow-hidden rounded-xl border-2 ${toneAccent} p-4 text-left transition-all hover:shadow-md`}
+    >
+      <div
+        className={`flex size-9 items-center justify-center rounded-lg ${iconBg}`}
+      >
+        {icon}
+      </div>
+      <p className="mt-3 text-xs text-muted-foreground">{label}</p>
+      <p className={`mt-0.5 text-lg font-bold tracking-tight ${valueTone}`}>
+        {value}
+      </p>
+      <p className="mt-1 text-[11px] text-muted-foreground line-clamp-2">
+        {sublabel}
+      </p>
+      <ArrowRight className="absolute right-3 top-3 size-3.5 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5 group-hover:text-foreground" />
+    </button>
+  )
+}
+
+function RecouvrementChart({
+  data,
+  labelRecouvre,
+  labelRestant,
+}: RecouvrementChartProps) {
   const maxVal = useMemo(() => {
     if (!data.length) return 25000
     const m = Math.max(...data.flatMap((d) => [d.recouvre, d.restant]))
@@ -226,11 +301,19 @@ function RecouvrementChart({ data, labelRecouvre, labelRestant }: RecouvrementCh
                 <div className="flex w-full flex-1 items-end gap-px">
                   <div
                     className="rounded-t-[3px] bg-[var(--color-imaro-primary)] transition-all duration-500"
-                    style={{ height: barPct(d.recouvre), flex: 1, minHeight: d.recouvre > 0 ? 2 : 0 }}
+                    style={{
+                      height: barPct(d.recouvre),
+                      flex: 1,
+                      minHeight: d.recouvre > 0 ? 2 : 0,
+                    }}
                   />
                   <div
                     className="rounded-t-[3px] bg-[var(--color-imaro-danger)] transition-all duration-500"
-                    style={{ height: barPct(d.restant), flex: 1, minHeight: d.restant > 0 ? 2 : 0 }}
+                    style={{
+                      height: barPct(d.restant),
+                      flex: 1,
+                      minHeight: d.restant > 0 ? 2 : 0,
+                    }}
                   />
                 </div>
               </div>
@@ -255,11 +338,15 @@ function RecouvrementChart({ data, labelRecouvre, labelRestant }: RecouvrementCh
       <div className="mt-3 flex justify-center gap-6">
         <div className="flex items-center gap-1.5">
           <span className="inline-block h-3 w-3 rounded-sm bg-[var(--color-imaro-primary)]" />
-          <span className="text-xs text-[var(--color-imaro-text-muted)]">{labelRecouvre}</span>
+          <span className="text-xs text-[var(--color-imaro-text-muted)]">
+            {labelRecouvre}
+          </span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="inline-block h-3 w-3 rounded-sm bg-[var(--color-imaro-danger)]" />
-          <span className="text-xs text-[var(--color-imaro-text-muted)]">{labelRestant}</span>
+          <span className="text-xs text-[var(--color-imaro-text-muted)]">
+            {labelRestant}
+          </span>
         </div>
       </div>
     </div>
@@ -296,7 +383,6 @@ export function DashboardPage() {
 
   const dashboard = dashboardQuery.data
   const residences = residencesQuery.data ?? []
-
 
   return (
     <div className="p-6 space-y-6">
@@ -351,6 +437,93 @@ export function DashboardPage() {
           />
         </div>
       )}
+
+      {/* B-bis — Module overview (Sprint 4-8 modules) */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            {t('gestionnaire.dashboard.modules.title', {
+              defaultValue: 'Aperçu modules',
+            })}
+          </h2>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Assistant IA — featured top-left, gradient */}
+          <button
+            onClick={() => void navigate('/gestionnaire/ia')}
+            className="group relative overflow-hidden rounded-xl border-2 border-purple-300 bg-gradient-to-br from-[#1B4F72] via-[#1B4F72]/90 to-purple-600 p-4 text-left text-white shadow-md transition-all hover:shadow-lg dark:border-purple-900/40"
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex size-9 items-center justify-center rounded-lg bg-white/20 backdrop-blur">
+                <Sparkles className="size-4" />
+              </div>
+              <Badge className="border-0 bg-white/20 text-[10px] text-white backdrop-blur">
+                BETA
+              </Badge>
+            </div>
+            <p className="mt-3 text-sm font-bold">Assistant IA</p>
+            <p className="mt-0.5 text-xs text-white/80">
+              Audit conformité · OCR factures · Suggestions budget
+            </p>
+            <ArrowRight className="absolute bottom-3 right-3 size-4 text-white/60 transition-transform group-hover:translate-x-1" />
+          </button>
+
+          {/* Conformité — progress */}
+          <ModuleCard
+            onClick={() => void navigate('/gestionnaire/conformite')}
+            icon={<CalendarCheck className="size-4" />}
+            iconBg="bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
+            label="Conformité"
+            value="14%"
+            sublabel="Cycle Décret 2.23.700 · Régime simplifié"
+            tone="info"
+          />
+
+          {/* Recouvrement — prescription risk */}
+          <ModuleCard
+            onClick={() => void navigate('/gestionnaire/recouvrement')}
+            icon={<Scale className="size-4" />}
+            iconBg="bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400"
+            label="Recouvrement"
+            value="1 critique"
+            sublabel="Risque prescription · 2 lots en retard"
+            tone="danger"
+          />
+
+          {/* Pointage bancaire */}
+          <ModuleCard
+            onClick={() => void navigate('/gestionnaire/pointage')}
+            icon={<Landmark className="size-4" />}
+            iconBg="bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+            label="Pointage bancaire"
+            value="À faire"
+            sublabel="Dernier import il y a 47 jours"
+            tone="warning"
+          />
+
+          {/* Patrimoine */}
+          <ModuleCard
+            onClick={() => void navigate('/gestionnaire/equipements')}
+            icon={<HardHat className="size-4" />}
+            iconBg="bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300"
+            label="Patrimoine"
+            value="157.500 DH"
+            sublabel="4 équipements · 1 emprunt actif"
+          />
+
+          {/* Annexes prêtes */}
+          <ModuleCard
+            onClick={() => void navigate('/gestionnaire/annexes')}
+            icon={<ClipboardCheck className="size-4" />}
+            iconBg="bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300"
+            label="Annexes comptables"
+            value="12 prêtes"
+            sublabel="3 requises · 9 complémentaires · Décret 2.23.700"
+            tone="success"
+          />
+        </div>
+      </section>
 
       {/* C — Recouvrement chart */}
       <Card className="dark:bg-card dark:border-border">
@@ -425,11 +598,12 @@ export function DashboardPage() {
                 <CardTitle className="text-base font-semibold text-[var(--color-imaro-primary)] dark:text-foreground">
                   {t('gestionnaire.dashboard.ticketsUrgents.title')}
                 </CardTitle>
-                {dashboard?.tickets_urgents && dashboard.tickets_urgents.length > 0 && (
-                  <Badge className="bg-[var(--color-imaro-danger)] text-white">
-                    {dashboard.tickets_urgents.length}
-                  </Badge>
-                )}
+                {dashboard?.tickets_urgents &&
+                  dashboard.tickets_urgents.length > 0 && (
+                    <Badge className="bg-[var(--color-imaro-danger)] text-white">
+                      {dashboard.tickets_urgents.length}
+                    </Badge>
+                  )}
               </div>
             </CardHeader>
             <CardContent className="pt-0">
@@ -488,7 +662,9 @@ export function DashboardPage() {
           <div className="flex flex-wrap gap-3">
             <Button
               className="bg-[var(--color-imaro-accent)] text-white hover:opacity-90"
-              onClick={() => void navigate('/gestionnaire/appels-fonds?create=1')}
+              onClick={() =>
+                void navigate('/gestionnaire/appels-fonds?create=1')
+              }
             >
               <FilePlus className="me-2 size-4" />
               {t('gestionnaire.dashboard.actions.appelFonds')}
@@ -516,6 +692,51 @@ export function DashboardPage() {
             >
               <CalendarPlus className="me-2 size-4" />
               {t('gestionnaire.dashboard.actions.ag')}
+            </Button>
+
+            {/* Separator */}
+            <div className="mx-1 hidden h-9 w-px bg-border md:block" />
+
+            {/* New shortcuts to Sprint 4-8 modules */}
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => void navigate('/gestionnaire/ia')}
+            >
+              <Sparkles className="size-4 text-purple-600" />
+              {t('gestionnaire.dashboard.actions.iaAudit', {
+                defaultValue: 'Audit IA',
+              })}
+            </Button>
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => void navigate('/gestionnaire/pointage')}
+            >
+              <Landmark className="size-4 text-amber-600" />
+              {t('gestionnaire.dashboard.actions.pointage', {
+                defaultValue: 'Pointage relevé',
+              })}
+            </Button>
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => void navigate('/gestionnaire/annexes')}
+            >
+              <ClipboardCheck className="size-4 text-blue-600" />
+              {t('gestionnaire.dashboard.actions.annexes', {
+                defaultValue: 'Générer annexe',
+              })}
+            </Button>
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => void navigate('/gestionnaire/occupants')}
+            >
+              <UserCheck className="size-4 text-[#1B4F72]" />
+              {t('gestionnaire.dashboard.actions.occupants', {
+                defaultValue: 'Occupants',
+              })}
             </Button>
           </div>
         </CardContent>

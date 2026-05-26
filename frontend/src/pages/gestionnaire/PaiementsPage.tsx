@@ -110,7 +110,11 @@ const MOCK_COPROS = [
 
 const fmt = new Intl.NumberFormat('fr-MA', { minimumFractionDigits: 2 })
 
-function RepartitionPreview({ lots, totalTantieme, montantTotal }: {
+function RepartitionPreview({
+  lots,
+  totalTantieme,
+  montantTotal,
+}: {
   lots: Lot[]
   totalTantieme: number
   montantTotal: number
@@ -124,7 +128,11 @@ function RepartitionPreview({ lots, totalTantieme, montantTotal }: {
         className="flex w-full items-center justify-between text-sm font-medium"
       >
         <span>Répartition par tantième</span>
-        {open ? <ChevronUp className="size-4 text-muted-foreground" /> : <ChevronDown className="size-4 text-muted-foreground" />}
+        {open ? (
+          <ChevronUp className="size-4 text-muted-foreground" />
+        ) : (
+          <ChevronDown className="size-4 text-muted-foreground" />
+        )}
       </button>
       {open && (
         <div className="mt-2 max-h-40 overflow-y-auto">
@@ -139,14 +147,27 @@ function RepartitionPreview({ lots, totalTantieme, montantTotal }: {
             </thead>
             <tbody>
               {lots.map((lot) => {
-                const pct = totalTantieme > 0 ? (lot.tantieme / totalTantieme) * 100 : 0
-                const montantLot = totalTantieme > 0 ? (lot.tantieme / totalTantieme) * montantTotal : 0
+                const pct =
+                  totalTantieme > 0 ? (lot.tantieme / totalTantieme) * 100 : 0
+                const montantLot =
+                  totalTantieme > 0
+                    ? (lot.tantieme / totalTantieme) * montantTotal
+                    : 0
                 return (
-                  <tr key={lot.id} className="border-b border-muted last:border-0">
+                  <tr
+                    key={lot.id}
+                    className="border-b border-muted last:border-0"
+                  >
                     <td className="py-1 font-mono">{lot.numero}</td>
-                    <td className="py-1 text-right tabular-nums">{lot.tantieme}</td>
-                    <td className="py-1 text-right tabular-nums">{pct.toFixed(2)} %</td>
-                    <td className="py-1 text-right tabular-nums">{fmt.format(montantLot)}</td>
+                    <td className="py-1 text-right tabular-nums">
+                      {lot.tantieme}
+                    </td>
+                    <td className="py-1 text-right tabular-nums">
+                      {pct.toFixed(2)} %
+                    </td>
+                    <td className="py-1 text-right tabular-nums">
+                      {fmt.format(montantLot)}
+                    </td>
                   </tr>
                 )
               })}
@@ -154,9 +175,13 @@ function RepartitionPreview({ lots, totalTantieme, montantTotal }: {
             <tfoot>
               <tr className="border-t font-bold">
                 <td className="py-1">Total</td>
-                <td className="py-1 text-right tabular-nums">{totalTantieme}</td>
+                <td className="py-1 text-right tabular-nums">
+                  {totalTantieme}
+                </td>
                 <td className="py-1 text-right tabular-nums">100 %</td>
-                <td className="py-1 text-right tabular-nums">{fmt.format(montantTotal)}</td>
+                <td className="py-1 text-right tabular-nums">
+                  {fmt.format(montantTotal)}
+                </td>
               </tr>
             </tfoot>
           </table>
@@ -174,12 +199,20 @@ type EncaisserModalProps = {
   preselectedCreance?: Creance
 }
 
-function EncaisserModal({ open, onOpenChange, preselectedCreance }: EncaisserModalProps) {
+function EncaisserModal({
+  open,
+  onOpenChange,
+  preselectedCreance,
+}: EncaisserModalProps) {
   const { t } = useTranslation()
   const qc = useQueryClient()
   const [step, setStep] = useState<1 | 2>(preselectedCreance ? 2 : 1)
-  const [selectedCreance, setSelectedCreance] = useState<Creance | null>(preselectedCreance ?? null)
-  const [montant, setMontant] = useState(String(preselectedCreance?.solde_restant ?? ''))
+  const [selectedCreance, setSelectedCreance] = useState<Creance | null>(
+    preselectedCreance ?? null,
+  )
+  const [montant, setMontant] = useState(
+    String(preselectedCreance?.solde_restant ?? ''),
+  )
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [methode, setMethode] = useState('virement')
   const [compte, setCompte] = useState('5121')
@@ -208,10 +241,14 @@ function EncaisserModal({ open, onOpenChange, preselectedCreance }: EncaisserMod
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['creances'] })
       void qc.invalidateQueries({ queryKey: ['encaissements'] })
-      toast.success(t('gestionnaire.paiements.encaisser.success', { defaultValue: 'Paiement enregistré' }))
+      toast.success(
+        t('gestionnaire.paiements.encaisser.success', {
+          defaultValue: 'Paiement enregistré',
+        }),
+      )
       onOpenChange(false)
     },
-    onError: () => toast.error('Erreur lors de l\'enregistrement'),
+    onError: () => toast.error("Erreur lors de l'enregistrement"),
   })
 
   const handleSelectCreance = (c: Creance) => {
@@ -233,14 +270,18 @@ function EncaisserModal({ open, onOpenChange, preselectedCreance }: EncaisserMod
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {t('gestionnaire.paiements.encaisser.title', { defaultValue: 'Encaisser un paiement' })}
+            {t('gestionnaire.paiements.encaisser.title', {
+              defaultValue: 'Encaisser un paiement',
+            })}
           </DialogTitle>
         </DialogHeader>
 
         {step === 1 && (
           <div className="space-y-3 py-2">
             <p className="text-sm text-muted-foreground">
-              {t('gestionnaire.paiements.encaisser.step1', { defaultValue: 'Sélectionner une créance' })}
+              {t('gestionnaire.paiements.encaisser.step1', {
+                defaultValue: 'Sélectionner une créance',
+              })}
             </p>
             {isLoading ? (
               <div className="flex justify-center py-8">
@@ -255,19 +296,33 @@ function EncaisserModal({ open, onOpenChange, preselectedCreance }: EncaisserMod
                     className="flex w-full items-center justify-between px-4 py-3 text-left text-sm hover:bg-muted/50 transition-colors"
                   >
                     <div>
-                      <span className="font-medium">{c.coproprietaire_nom}</span>
-                      <span className="ml-2 font-mono text-xs text-muted-foreground">{c.lot_numero}</span>
+                      <span className="font-medium">
+                        {c.coproprietaire_nom}
+                      </span>
+                      <span className="ml-2 font-mono text-xs text-muted-foreground">
+                        {c.lot_numero}
+                      </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <MontantDisplay value={c.solde_restant} />
-                      <Badge className={cn(CREANCE_STATUT_CLS[c.statut], 'border-0 text-xs')}>
-                        {t(`gestionnaire.paiements.creances.statuts.${c.statut}`, { defaultValue: c.statut })}
+                      <Badge
+                        className={cn(
+                          CREANCE_STATUT_CLS[c.statut],
+                          'border-0 text-xs',
+                        )}
+                      >
+                        {t(
+                          `gestionnaire.paiements.creances.statuts.${c.statut}`,
+                          { defaultValue: c.statut },
+                        )}
                       </Badge>
                     </div>
                   </button>
                 ))}
                 {payables.length === 0 && (
-                  <p className="p-6 text-center text-sm text-muted-foreground">Aucune créance à encaisser</p>
+                  <p className="p-6 text-center text-sm text-muted-foreground">
+                    Aucune créance à encaisser
+                  </p>
                 )}
               </div>
             )}
@@ -277,11 +332,15 @@ function EncaisserModal({ open, onOpenChange, preselectedCreance }: EncaisserMod
         {step === 2 && selectedCreance && (
           <div className="space-y-4 py-2">
             <div className="rounded-lg bg-muted/40 px-4 py-3 text-sm">
-              <span className="font-medium">{selectedCreance.coproprietaire_nom}</span>
+              <span className="font-medium">
+                {selectedCreance.coproprietaire_nom}
+              </span>
               <span className="mx-2 text-muted-foreground">·</span>
               <span className="font-mono">{selectedCreance.lot_numero}</span>
               <span className="mx-2 text-muted-foreground">·</span>
-              <span className="text-muted-foreground">{selectedCreance.appel_fonds_titre}</span>
+              <span className="text-muted-foreground">
+                {selectedCreance.appel_fonds_titre}
+              </span>
               {!preselectedCreance && (
                 <button
                   onClick={() => setStep(1)}
@@ -294,7 +353,11 @@ function EncaisserModal({ open, onOpenChange, preselectedCreance }: EncaisserMod
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label>{t('gestionnaire.paiements.encaisser.montant', { defaultValue: 'Montant (MAD)' })}</Label>
+                <Label>
+                  {t('gestionnaire.paiements.encaisser.montant', {
+                    defaultValue: 'Montant (MAD)',
+                  })}
+                </Label>
                 <Input
                   type="number"
                   value={montant}
@@ -303,21 +366,43 @@ function EncaisserModal({ open, onOpenChange, preselectedCreance }: EncaisserMod
                 />
               </div>
               <div className="space-y-1">
-                <Label>{t('gestionnaire.paiements.encaisser.date', { defaultValue: 'Date de paiement' })}</Label>
-                <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+                <Label>
+                  {t('gestionnaire.paiements.encaisser.date', {
+                    defaultValue: 'Date de paiement',
+                  })}
+                </Label>
+                <Input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
               </div>
             </div>
 
             <div className="space-y-1">
-              <Label>{t('gestionnaire.paiements.encaisser.methode', { defaultValue: 'Méthode' })}</Label>
+              <Label>
+                {t('gestionnaire.paiements.encaisser.methode', {
+                  defaultValue: 'Méthode',
+                })}
+              </Label>
               <Select value={methode} onValueChange={setMethode}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {(['especes', 'virement', 'cheque', 'cb', 'mobile_money'] as const).map((m) => (
+                  {(
+                    [
+                      'especes',
+                      'virement',
+                      'cheque',
+                      'cb',
+                      'mobile_money',
+                    ] as const
+                  ).map((m) => (
                     <SelectItem key={m} value={m}>
-                      {t(`gestionnaire.paiements.encaisser.methodes.${m}`, { defaultValue: m })}
+                      {t(`gestionnaire.paiements.encaisser.methodes.${m}`, {
+                        defaultValue: m,
+                      })}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -325,7 +410,11 @@ function EncaisserModal({ open, onOpenChange, preselectedCreance }: EncaisserMod
             </div>
 
             <div className="space-y-1">
-              <Label>{t('gestionnaire.paiements.encaisser.compte', { defaultValue: 'Compte de destination' })}</Label>
+              <Label>
+                {t('gestionnaire.paiements.encaisser.compte', {
+                  defaultValue: 'Compte de destination',
+                })}
+              </Label>
               <Select value={compte} onValueChange={setCompte}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
@@ -333,7 +422,9 @@ function EncaisserModal({ open, onOpenChange, preselectedCreance }: EncaisserMod
                 <SelectContent>
                   {(['5121', '5122', '5161'] as const).map((c) => (
                     <SelectItem key={c} value={c}>
-                      {t(`gestionnaire.paiements.encaisser.comptes.${c}`, { defaultValue: c })}
+                      {t(`gestionnaire.paiements.encaisser.comptes.${c}`, {
+                        defaultValue: c,
+                      })}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -342,15 +433,27 @@ function EncaisserModal({ open, onOpenChange, preselectedCreance }: EncaisserMod
 
             {methode === 'cheque' && (
               <div className="space-y-1">
-                <Label>{t('gestionnaire.paiements.encaisser.refCheque', { defaultValue: 'Référence chèque' })}</Label>
-                <Input value={refCheque} onChange={(e) => setRefCheque(e.target.value)} placeholder="CHQ-XXXX" />
+                <Label>
+                  {t('gestionnaire.paiements.encaisser.refCheque', {
+                    defaultValue: 'Référence chèque',
+                  })}
+                </Label>
+                <Input
+                  value={refCheque}
+                  onChange={(e) => setRefCheque(e.target.value)}
+                  placeholder="CHQ-XXXX"
+                />
               </div>
             )}
           </div>
         )}
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={storeMutation.isPending}>
+          <Button
+            variant="outline"
+            onClick={handleClose}
+            disabled={storeMutation.isPending}
+          >
             {t('actions.cancel')}
           </Button>
           {step === 2 && (
@@ -358,7 +461,9 @@ function EncaisserModal({ open, onOpenChange, preselectedCreance }: EncaisserMod
               onClick={() => storeMutation.mutate()}
               disabled={!montant || !selectedCreance || storeMutation.isPending}
             >
-              {storeMutation.isPending ? t('actions.loading') : t('actions.save')}
+              {storeMutation.isPending
+                ? t('actions.loading')
+                : t('actions.save')}
             </Button>
           )}
         </DialogFooter>
@@ -369,10 +474,18 @@ function EncaisserModal({ open, onOpenChange, preselectedCreance }: EncaisserMod
 
 // ─── PaiementAvanceModal ──────────────────────────────────────────────────────
 
-function PaiementAvanceModal({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+function PaiementAvanceModal({
+  open,
+  onOpenChange,
+}: {
+  open: boolean
+  onOpenChange: (o: boolean) => void
+}) {
   const { t } = useTranslation()
   const [search, setSearch] = useState('')
-  const [selectedCopro, setSelectedCopro] = useState<(typeof MOCK_COPROS)[0] | null>(null)
+  const [selectedCopro, setSelectedCopro] = useState<
+    (typeof MOCK_COPROS)[0] | null
+  >(null)
   const [montant, setMontant] = useState('')
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [methode, setMethode] = useState('virement')
@@ -382,7 +495,11 @@ function PaiementAvanceModal({ open, onOpenChange }: { open: boolean; onOpenChan
   )
 
   const handleSubmit = () => {
-    toast.success(t('gestionnaire.paiements.avance.success', { defaultValue: 'Paiement en avance enregistré' }))
+    toast.success(
+      t('gestionnaire.paiements.avance.success', {
+        defaultValue: 'Paiement en avance enregistré',
+      }),
+    )
     onOpenChange(false)
   }
 
@@ -391,12 +508,17 @@ function PaiementAvanceModal({ open, onOpenChange }: { open: boolean; onOpenChan
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {t('gestionnaire.paiements.avance.title', { defaultValue: 'Paiement en avance' })}
+            {t('gestionnaire.paiements.avance.title', {
+              defaultValue: 'Paiement en avance',
+            })}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="rounded-md border bg-blue-50 px-4 py-3 text-sm text-blue-800">
-            {t('gestionnaire.paiements.avance.info', { defaultValue: 'Ce paiement sera affecté automatiquement aux prochains appels de fonds' })}
+            {t('gestionnaire.paiements.avance.info', {
+              defaultValue:
+                'Ce paiement sera affecté automatiquement aux prochains appels de fonds',
+            })}
           </div>
 
           <div className="space-y-1">
@@ -411,47 +533,70 @@ function PaiementAvanceModal({ open, onOpenChange }: { open: boolean; onOpenChan
                 {filtered.map((c) => (
                   <button
                     key={c.id}
-                    onClick={() => { setSelectedCopro(c); setSearch(c.nom) }}
+                    onClick={() => {
+                      setSelectedCopro(c)
+                      setSearch(c.nom)
+                    }}
                     className="flex w-full items-center justify-between px-3 py-2 text-sm hover:bg-muted/50"
                   >
                     <span>{c.nom}</span>
-                    <span className="font-mono text-xs text-muted-foreground">{c.lot}</span>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {c.lot}
+                    </span>
                   </button>
                 ))}
               </div>
             )}
             {selectedCopro && (
-              <p className="text-xs text-muted-foreground">Lot : {selectedCopro.lot}</p>
+              <p className="text-xs text-muted-foreground">
+                Lot : {selectedCopro.lot}
+              </p>
             )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label>Montant (MAD)</Label>
-              <Input type="number" value={montant} onChange={(e) => setMontant(e.target.value)} />
+              <Input
+                type="number"
+                value={montant}
+                onChange={(e) => setMontant(e.target.value)}
+              />
             </div>
             <div className="space-y-1">
               <Label>Date</Label>
-              <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+              <Input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
             </div>
           </div>
 
           <div className="space-y-1">
             <Label>Méthode</Label>
             <Select value={methode} onValueChange={setMethode}>
-              <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {['especes', 'virement', 'cheque', 'cb', 'mobile_money'].map((m) => (
-                  <SelectItem key={m} value={m}>
-                    {t(`gestionnaire.paiements.encaisser.methodes.${m}`, { defaultValue: m })}
-                  </SelectItem>
-                ))}
+                {['especes', 'virement', 'cheque', 'cb', 'mobile_money'].map(
+                  (m) => (
+                    <SelectItem key={m} value={m}>
+                      {t(`gestionnaire.paiements.encaisser.methodes.${m}`, {
+                        defaultValue: m,
+                      })}
+                    </SelectItem>
+                  ),
+                )}
               </SelectContent>
             </Select>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>{t('actions.cancel')}</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            {t('actions.cancel')}
+          </Button>
           <Button onClick={handleSubmit} disabled={!selectedCopro || !montant}>
             {t('actions.save')}
           </Button>
@@ -482,11 +627,17 @@ function RejeterVirementModal({
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>
-            {t('gestionnaire.paiements.virements.rejeter', { defaultValue: 'Rejeter le virement' })}
+            {t('gestionnaire.paiements.virements.rejeter', {
+              defaultValue: 'Rejeter le virement',
+            })}
           </DialogTitle>
         </DialogHeader>
         <div className="py-2">
-          <Label>{t('gestionnaire.paiements.virements.motif', { defaultValue: 'Motif du rejet' })}</Label>
+          <Label>
+            {t('gestionnaire.paiements.virements.motif', {
+              defaultValue: 'Motif du rejet',
+            })}
+          </Label>
           <Input
             className="mt-1"
             value={motif}
@@ -495,13 +646,19 @@ function RejeterVirementModal({
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isLoading}>{t('actions.cancel')}</Button>
+          <Button variant="outline" onClick={onClose} disabled={isLoading}>
+            {t('actions.cancel')}
+          </Button>
           <Button
             variant="destructive"
             onClick={() => onConfirm(motif)}
             disabled={!motif.trim() || isLoading}
           >
-            {isLoading ? t('actions.loading') : t('gestionnaire.paiements.virements.rejeter', { defaultValue: 'Rejeter' })}
+            {isLoading
+              ? t('actions.loading')
+              : t('gestionnaire.paiements.virements.rejeter', {
+                  defaultValue: 'Rejeter',
+                })}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -518,9 +675,12 @@ export function PaiementsPage() {
 
   // Modals
   const [encaisserOpen, setEncaisserOpen] = useState(false)
-  const [encaisserCreance, setEncaisserCreance] = useState<Creance | undefined>(undefined)
+  const [encaisserCreance, setEncaisserCreance] = useState<Creance | undefined>(
+    undefined,
+  )
   const [avanceOpen, setAvanceOpen] = useState(false)
-  const [rejeterVirementTarget, setRejeterVirementTarget] = useState<VirementDeclare | null>(null)
+  const [rejeterVirementTarget, setRejeterVirementTarget] =
+    useState<VirementDeclare | null>(null)
   const [relancerAllOpen, setRelancerAllOpen] = useState(false)
 
   // Créances tab filters
@@ -541,7 +701,12 @@ export function PaiementsPage() {
 
   // Appels tab
   const [createAppelOpen, setCreateAppelOpen] = useState(false)
-  const [appelForm, setAppelForm] = useState({ titre: '', residence_id: '', montant_total: '', date_echeance: '' })
+  const [appelForm, setAppelForm] = useState({
+    titre: '',
+    residence_id: '',
+    montant_total: '',
+    date_echeance: '',
+  })
   const [envoyerTarget, setEnvoyerTarget] = useState<AppelFonds | null>(null)
 
   // ── Queries ────────────────────────────────────────────────────────────────
@@ -593,7 +758,11 @@ export function PaiementsPage() {
     mutationFn: (id: number) => relancerCreance(id),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['creances'] })
-      toast.success(t('gestionnaire.paiements.creances.relanceSuccess', { defaultValue: 'Relance envoyée' }))
+      toast.success(
+        t('gestionnaire.paiements.creances.relanceSuccess', {
+          defaultValue: 'Relance envoyée',
+        }),
+      )
     },
     onError: () => toast.error('Erreur'),
   })
@@ -612,17 +781,26 @@ export function PaiementsPage() {
     mutationFn: (id: number) => validerVirement(id),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['virements-declares'] })
-      toast.success(t('gestionnaire.paiements.virements.valideSuccess', { defaultValue: 'Virement validé' }))
+      toast.success(
+        t('gestionnaire.paiements.virements.valideSuccess', {
+          defaultValue: 'Virement validé',
+        }),
+      )
     },
     onError: () => toast.error('Erreur'),
   })
 
   const rejeterVirementMutation = useMutation({
-    mutationFn: ({ id, motif }: { id: number; motif: string }) => rejeterVirement(id, motif),
+    mutationFn: ({ id, motif }: { id: number; motif: string }) =>
+      rejeterVirement(id, motif),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['virements-declares'] })
       setRejeterVirementTarget(null)
-      toast.success(t('gestionnaire.paiements.virements.rejeteSuccess', { defaultValue: 'Virement rejeté' }))
+      toast.success(
+        t('gestionnaire.paiements.virements.rejeteSuccess', {
+          defaultValue: 'Virement rejeté',
+        }),
+      )
     },
     onError: () => toast.error('Erreur'),
   })
@@ -638,7 +816,12 @@ export function PaiementsPage() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['appels-fonds'] })
       setCreateAppelOpen(false)
-      setAppelForm({ titre: '', residence_id: '', montant_total: '', date_echeance: '' })
+      setAppelForm({
+        titre: '',
+        residence_id: '',
+        montant_total: '',
+        date_echeance: '',
+      })
       toast.success('Appel de fonds créé')
     },
     onError: () => toast.error('Erreur lors de la création'),
@@ -658,11 +841,14 @@ export function PaiementsPage() {
 
   const nbEnRetard = creances.filter((c) => c.statut === 'en_retard').length
   const nbAPayer = creances.filter((c) => c.statut === 'a_payer').length
-  const nbPartiel = creances.filter((c) => c.statut === 'partiellement_paye').length
+  const nbPartiel = creances.filter(
+    (c) => c.statut === 'partiellement_paye',
+  ).length
   const nbImpayes = nbEnRetard + nbAPayer + nbPartiel
   const totalDu = creances.reduce((s, c) => s + c.montant_initial, 0)
   const totalRegle = creances.reduce((s, c) => s + c.montant_regle, 0)
-  const tauxRecouvrement = totalDu > 0 ? Math.round((totalRegle / totalDu) * 100) : 0
+  const tauxRecouvrement =
+    totalDu > 0 ? Math.round((totalRegle / totalDu) * 100) : 0
 
   // ── Créances filter ────────────────────────────────────────────────────────
 
@@ -670,7 +856,11 @@ export function PaiementsPage() {
     if (creanceStatut !== 'tous' && c.statut !== creanceStatut) return false
     if (creanceSearch) {
       const q = creanceSearch.toLowerCase()
-      if (!c.coproprietaire_nom.toLowerCase().includes(q) && !c.lot_numero.toLowerCase().includes(q)) return false
+      if (
+        !c.coproprietaire_nom.toLowerCase().includes(q) &&
+        !c.lot_numero.toLowerCase().includes(q)
+      )
+        return false
     }
     if (creanceFrom && c.date_echeance < creanceFrom) return false
     if (creanceTo && c.date_echeance > creanceTo) return false
@@ -685,7 +875,11 @@ export function PaiementsPage() {
     if (histTo && e.date_paiement > histTo) return false
     if (histSearch) {
       const q = histSearch.toLowerCase()
-      if (!e.coproprietaire_nom.toLowerCase().includes(q) && !e.lot_numero.toLowerCase().includes(q)) return false
+      if (
+        !e.coproprietaire_nom.toLowerCase().includes(q) &&
+        !e.lot_numero.toLowerCase().includes(q)
+      )
+        return false
     }
     return true
   })
@@ -697,34 +891,48 @@ export function PaiementsPage() {
   const creancesColumns: Column<Creance>[] = [
     {
       key: 'coproprietaire_nom',
-      header: t('gestionnaire.paiements.creances.colCreance', { defaultValue: 'Copropriétaire' }),
+      header: t('gestionnaire.paiements.creances.colCreance', {
+        defaultValue: 'Copropriétaire',
+      }),
       sortable: true,
     },
     {
       key: 'lot_numero',
       header: t('gestionnaire.paiements.colLot', { defaultValue: 'Lot' }),
-      renderCell: (r) => <span className="font-mono text-sm">{r.lot_numero}</span>,
+      renderCell: (r) => (
+        <span className="font-mono text-sm">{r.lot_numero}</span>
+      ),
     },
     {
       key: 'appel_fonds_titre',
       header: 'Appel de fonds',
-      renderCell: (r) => <span className="text-sm text-muted-foreground">{r.appel_fonds_titre}</span>,
+      renderCell: (r) => (
+        <span className="text-sm text-muted-foreground">
+          {r.appel_fonds_titre}
+        </span>
+      ),
     },
     {
       key: 'solde_restant',
-      header: t('gestionnaire.paiements.creances.colSolde', { defaultValue: 'Solde' }),
+      header: t('gestionnaire.paiements.creances.colSolde', {
+        defaultValue: 'Solde',
+      }),
       sortable: true,
       renderCell: (r) => <MontantDisplay value={r.solde_restant} colorize />,
     },
     {
       key: 'date_echeance',
-      header: t('gestionnaire.paiements.creances.colEcheance', { defaultValue: 'Échéance' }),
+      header: t('gestionnaire.paiements.creances.colEcheance', {
+        defaultValue: 'Échéance',
+      }),
       sortable: true,
       renderCell: (r) => r.date_echeance.slice(0, 10),
     },
     {
       key: 'jours_retard',
-      header: t('gestionnaire.paiements.creances.colAnciennete', { defaultValue: 'Ancienneté' }),
+      header: t('gestionnaire.paiements.creances.colAnciennete', {
+        defaultValue: 'Ancienneté',
+      }),
       sortable: true,
       renderCell: (r) =>
         r.statut === 'en_retard' && r.jours_retard > 0 ? (
@@ -737,17 +945,26 @@ export function PaiementsPage() {
     },
     {
       key: 'date_derniere_relance',
-      header: t('gestionnaire.paiements.creances.colRelance', { defaultValue: 'Dernière relance' }),
-      renderCell: (r) => r.date_derniere_relance
-        ? <span className="text-xs text-muted-foreground">{r.date_derniere_relance.slice(0, 10)}</span>
-        : <span className="text-muted-foreground">—</span>,
+      header: t('gestionnaire.paiements.creances.colRelance', {
+        defaultValue: 'Dernière relance',
+      }),
+      renderCell: (r) =>
+        r.date_derniere_relance ? (
+          <span className="text-xs text-muted-foreground">
+            {r.date_derniere_relance.slice(0, 10)}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
     {
       key: 'statut',
       header: 'Statut',
       renderCell: (r) => (
         <Badge className={cn(CREANCE_STATUT_CLS[r.statut], 'border-0 text-xs')}>
-          {t(`gestionnaire.paiements.creances.statuts.${r.statut}`, { defaultValue: r.statut })}
+          {t(`gestionnaire.paiements.creances.statuts.${r.statut}`, {
+            defaultValue: r.statut,
+          })}
         </Badge>
       ),
     },
@@ -762,7 +979,10 @@ export function PaiementsPage() {
               variant="outline"
               size="sm"
               className="h-7 text-xs"
-              onClick={() => { setEncaisserCreance(r); setEncaisserOpen(true) }}
+              onClick={() => {
+                setEncaisserCreance(r)
+                setEncaisserOpen(true)
+              }}
             >
               <CreditCard className="me-1 size-3" />
               Encaisser
@@ -786,17 +1006,31 @@ export function PaiementsPage() {
 
   const appelsColumns: Column<AppelFonds>[] = [
     { key: 'titre', header: 'Titre', sortable: true },
-    { key: 'residence', header: 'Résidence', renderCell: (r) => r.residence.name },
-    { key: 'montant_total', header: 'Montant total', sortable: true, renderCell: (r) => <MontantDisplay value={r.montant_total} /> },
+    {
+      key: 'residence',
+      header: 'Résidence',
+      renderCell: (r) => r.residence.name,
+    },
+    {
+      key: 'montant_total',
+      header: 'Montant total',
+      sortable: true,
+      renderCell: (r) => <MontantDisplay value={r.montant_total} />,
+    },
     {
       key: 'montant_recouvre',
       header: 'Recouvré',
       renderCell: (r) => (
         <div className="flex items-center gap-2">
           <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
-            <div className="h-full rounded-full bg-[var(--color-imaro-accent)]" style={{ width: `${Math.min(r.taux_recouvrement ?? 0, 100)}%` }} />
+            <div
+              className="h-full rounded-full bg-[var(--color-imaro-accent)]"
+              style={{ width: `${Math.min(r.taux_recouvrement ?? 0, 100)}%` }}
+            />
           </div>
-          <span className="tabular-nums text-sm">{(r.taux_recouvrement ?? 0).toFixed(0)} %</span>
+          <span className="tabular-nums text-sm">
+            {(r.taux_recouvrement ?? 0).toFixed(0)} %
+          </span>
         </div>
       ),
     },
@@ -825,7 +1059,11 @@ export function PaiementsPage() {
       className: 'w-24 text-right',
       renderCell: (r) =>
         r.statut === 'brouillon' ? (
-          <Button variant="outline" size="sm" onClick={() => setEnvoyerTarget(r)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setEnvoyerTarget(r)}
+          >
             <Send className="me-1.5 size-3.5" />
             Envoyer
           </Button>
@@ -834,55 +1072,123 @@ export function PaiementsPage() {
   ]
 
   const historiqueColumns: Column<Encaissement>[] = [
-    { key: 'date_paiement', header: 'Date', sortable: true, renderCell: (r) => r.date_paiement.slice(0, 10) },
+    {
+      key: 'date_paiement',
+      header: 'Date',
+      sortable: true,
+      renderCell: (r) => r.date_paiement.slice(0, 10),
+    },
     { key: 'coproprietaire_nom', header: 'Copropriétaire', sortable: true },
-    { key: 'lot_numero', header: 'Lot', renderCell: (r) => <span className="font-mono text-sm">{r.lot_numero}</span> },
-    { key: 'montant', header: 'Montant', sortable: true, renderCell: (r) => <MontantDisplay value={r.montant} /> },
+    {
+      key: 'lot_numero',
+      header: 'Lot',
+      renderCell: (r) => (
+        <span className="font-mono text-sm">{r.lot_numero}</span>
+      ),
+    },
+    {
+      key: 'montant',
+      header: 'Montant',
+      sortable: true,
+      renderCell: (r) => <MontantDisplay value={r.montant} />,
+    },
     {
       key: 'methode',
       header: 'Méthode',
       renderCell: (r) => (
-        <Badge className={cn(ENCAISSEMENT_METHODE_CLS[r.methode], 'border-0 text-xs')}>
-          {t(`gestionnaire.paiements.encaisser.methodes.${r.methode}`, { defaultValue: r.methode })}
+        <Badge
+          className={cn(
+            ENCAISSEMENT_METHODE_CLS[r.methode],
+            'border-0 text-xs',
+          )}
+        >
+          {t(`gestionnaire.paiements.encaisser.methodes.${r.methode}`, {
+            defaultValue: r.methode,
+          })}
         </Badge>
       ),
     },
-    { key: 'compte_destination', header: 'Compte', renderCell: (r) => <span className="font-mono text-xs">{r.compte_destination}</span> },
+    {
+      key: 'compte_destination',
+      header: 'Compte',
+      renderCell: (r) => (
+        <span className="font-mono text-xs">{r.compte_destination}</span>
+      ),
+    },
     {
       key: 'est_rapproche',
       header: 'Rapproché',
-      renderCell: (r) => r.est_rapproche
-        ? <CheckCircle className="size-4 text-green-500" />
-        : <span className="text-muted-foreground">—</span>,
+      renderCell: (r) =>
+        r.est_rapproche ? (
+          <CheckCircle className="size-4 text-green-500" />
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
     {
       key: 'recu_path',
       header: 'Reçu',
-      renderCell: (r) => r.recu_path
-        ? <Button variant="ghost" size="sm" className="h-6 px-2"><Download className="size-3.5" /></Button>
-        : <span className="text-muted-foreground">—</span>,
+      renderCell: (r) =>
+        r.recu_path ? (
+          <Button variant="ghost" size="sm" className="h-6 px-2">
+            <Download className="size-3.5" />
+          </Button>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
   ]
 
   const virementsColumns: Column<VirementDeclare>[] = [
-    { key: 'date_declaration', header: 'Date déclaration', sortable: true, renderCell: (r) => r.date_declaration.slice(0, 10) },
+    {
+      key: 'date_declaration',
+      header: 'Date déclaration',
+      sortable: true,
+      renderCell: (r) => r.date_declaration.slice(0, 10),
+    },
     { key: 'coproprietaire_nom', header: 'Copropriétaire', sortable: true },
-    { key: 'lot_numero', header: 'Lot', renderCell: (r) => <span className="font-mono text-sm">{r.lot_numero}</span> },
-    { key: 'montant', header: 'Montant', sortable: true, renderCell: (r) => <MontantDisplay value={r.montant} /> },
-    { key: 'reference', header: 'Référence', renderCell: (r) => <span className="font-mono text-xs">{r.reference}</span> },
+    {
+      key: 'lot_numero',
+      header: 'Lot',
+      renderCell: (r) => (
+        <span className="font-mono text-sm">{r.lot_numero}</span>
+      ),
+    },
+    {
+      key: 'montant',
+      header: 'Montant',
+      sortable: true,
+      renderCell: (r) => <MontantDisplay value={r.montant} />,
+    },
+    {
+      key: 'reference',
+      header: 'Référence',
+      renderCell: (r) => (
+        <span className="font-mono text-xs">{r.reference}</span>
+      ),
+    },
     {
       key: 'justificatif_path',
       header: 'Justificatif',
-      renderCell: (r) => r.justificatif_path
-        ? <Button variant="ghost" size="sm" className="h-6 px-2"><FileText className="size-3.5" /></Button>
-        : <span className="text-muted-foreground">—</span>,
+      renderCell: (r) =>
+        r.justificatif_path ? (
+          <Button variant="ghost" size="sm" className="h-6 px-2">
+            <FileText className="size-3.5" />
+          </Button>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
     {
       key: 'statut',
       header: 'Statut',
       renderCell: (r) => (
-        <Badge className={cn(VIREMENT_STATUT_CLS[r.statut], 'border-0 text-xs')}>
-          {t(`gestionnaire.paiements.virements.statuts.${r.statut}`, { defaultValue: r.statut })}
+        <Badge
+          className={cn(VIREMENT_STATUT_CLS[r.statut], 'border-0 text-xs')}
+        >
+          {t(`gestionnaire.paiements.virements.statuts.${r.statut}`, {
+            defaultValue: r.statut,
+          })}
         </Badge>
       ),
     },
@@ -900,7 +1206,9 @@ export function PaiementsPage() {
               onClick={() => validerVirementMutation.mutate(r.id)}
             >
               <CheckCircle className="me-1 size-3" />
-              {t('gestionnaire.paiements.virements.valider', { defaultValue: 'Valider' })}
+              {t('gestionnaire.paiements.virements.valider', {
+                defaultValue: 'Valider',
+              })}
             </Button>
             <Button
               size="sm"
@@ -909,7 +1217,9 @@ export function PaiementsPage() {
               onClick={() => setRejeterVirementTarget(r)}
             >
               <X className="me-1 size-3" />
-              {t('gestionnaire.paiements.virements.rejeter', { defaultValue: 'Rejeter' })}
+              {t('gestionnaire.paiements.virements.rejeter', {
+                defaultValue: 'Rejeter',
+              })}
             </Button>
           </div>
         ) : null,
@@ -919,11 +1229,36 @@ export function PaiementsPage() {
   // ── Tabs definition ────────────────────────────────────────────────────────
 
   const TABS: { key: Tab; label: string }[] = [
-    { key: 'creances', label: t('gestionnaire.paiements.tabs.creances', { defaultValue: 'Créances' }) },
-    { key: 'appels', label: t('gestionnaire.paiements.tabs.appels', { defaultValue: 'Appels de fonds' }) },
-    { key: 'historique', label: t('gestionnaire.paiements.tabs.historique', { defaultValue: 'Historique' }) },
-    { key: 'decomptes', label: t('gestionnaire.paiements.tabs.decomptes', { defaultValue: 'Décomptes' }) },
-    { key: 'virements', label: t('gestionnaire.paiements.tabs.virements', { defaultValue: 'Virements' }) },
+    {
+      key: 'creances',
+      label: t('gestionnaire.paiements.tabs.creances', {
+        defaultValue: 'Créances',
+      }),
+    },
+    {
+      key: 'appels',
+      label: t('gestionnaire.paiements.tabs.appels', {
+        defaultValue: 'Appels de fonds',
+      }),
+    },
+    {
+      key: 'historique',
+      label: t('gestionnaire.paiements.tabs.historique', {
+        defaultValue: 'Historique',
+      }),
+    },
+    {
+      key: 'decomptes',
+      label: t('gestionnaire.paiements.tabs.decomptes', {
+        defaultValue: 'Décomptes',
+      }),
+    },
+    {
+      key: 'virements',
+      label: t('gestionnaire.paiements.tabs.virements', {
+        defaultValue: 'Virements',
+      }),
+    },
   ]
 
   const lotsArr: Lot[] = lotsData?.lots ?? []
@@ -933,18 +1268,36 @@ export function PaiementsPage() {
   return (
     <div className="p-6">
       <PageHeader
-        title={t('gestionnaire.paiements.title', { defaultValue: 'Suivi des paiements' })}
+        title={t('gestionnaire.paiements.title', {
+          defaultValue: 'Suivi des paiements',
+        })}
         actions={
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setAvanceOpen(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setAvanceOpen(true)}
+            >
               <CreditCard className="me-1.5 size-4" />
-              {t('gestionnaire.paiements.avance.title', { defaultValue: 'Paiement en avance' })}
+              {t('gestionnaire.paiements.avance.title', {
+                defaultValue: 'Paiement en avance',
+              })}
             </Button>
-            <Button size="sm" onClick={() => { setEncaisserCreance(undefined); setEncaisserOpen(true) }}>
+            <Button
+              size="sm"
+              onClick={() => {
+                setEncaisserCreance(undefined)
+                setEncaisserOpen(true)
+              }}
+            >
               <CreditCard className="me-1.5 size-4" />
               Encaisser
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setRelancerAllOpen(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setRelancerAllOpen(true)}
+            >
               <Bell className="me-1.5 size-4" />
               Envoyer rappels
               {nbImpayes > 0 && (
@@ -982,21 +1335,33 @@ export function PaiementsPage() {
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
             <span>
               <span className="font-semibold text-red-600">{nbEnRetard}</span>{' '}
-              {t('gestionnaire.paiements.creances.enRetard', { defaultValue: 'en retard' })}
+              {t('gestionnaire.paiements.creances.enRetard', {
+                defaultValue: 'en retard',
+              })}
             </span>
             <span>·</span>
             <span>
               <span className="font-semibold text-blue-600">{nbAPayer}</span>{' '}
-              {t('gestionnaire.paiements.creances.aPayer', { defaultValue: 'à payer' })}
+              {t('gestionnaire.paiements.creances.aPayer', {
+                defaultValue: 'à payer',
+              })}
             </span>
             <span>·</span>
             <span>
-              <span className="font-semibold text-orange-600">{nbPartiel}</span> partiellement payées
+              <span className="font-semibold text-orange-600">{nbPartiel}</span>{' '}
+              partiellement payées
             </span>
             <span>·</span>
             <span>
-              {t('gestionnaire.paiements.creances.tauxRecouvrement', { defaultValue: 'Taux recouvrement' })}{' '}
-              <span className={cn('font-semibold', tauxRecouvrement < 70 ? 'text-red-600' : 'text-green-600')}>
+              {t('gestionnaire.paiements.creances.tauxRecouvrement', {
+                defaultValue: 'Taux recouvrement',
+              })}{' '}
+              <span
+                className={cn(
+                  'font-semibold',
+                  tauxRecouvrement < 70 ? 'text-red-600' : 'text-green-600',
+                )}
+              >
                 {tauxRecouvrement} %
               </span>
             </span>
@@ -1016,15 +1381,35 @@ export function PaiementsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="tous">Tous les statuts</SelectItem>
-                {(['a_payer', 'en_retard', 'paye', 'partiellement_paye', 'annulee'] as const).map((s) => (
+                {(
+                  [
+                    'a_payer',
+                    'en_retard',
+                    'paye',
+                    'partiellement_paye',
+                    'annulee',
+                  ] as const
+                ).map((s) => (
                   <SelectItem key={s} value={s}>
-                    {t(`gestionnaire.paiements.creances.statuts.${s}`, { defaultValue: s })}
+                    {t(`gestionnaire.paiements.creances.statuts.${s}`, {
+                      defaultValue: s,
+                    })}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Input type="date" value={creanceFrom} onChange={(e) => setCreanceFrom(e.target.value)} className="w-40" />
-            <Input type="date" value={creanceTo} onChange={(e) => setCreanceTo(e.target.value)} className="w-40" />
+            <Input
+              type="date"
+              value={creanceFrom}
+              onChange={(e) => setCreanceFrom(e.target.value)}
+              className="w-40"
+            />
+            <Input
+              type="date"
+              value={creanceTo}
+              onChange={(e) => setCreanceTo(e.target.value)}
+              className="w-40"
+            />
           </div>
 
           <DataTable
@@ -1045,9 +1430,13 @@ export function PaiementsPage() {
               disabled={nbImpayes === 0}
             >
               <Bell className="me-1.5 size-4" />
-              {t('gestionnaire.paiements.creances.relancerTout', { defaultValue: 'Relancer tous les impayés' })}
+              {t('gestionnaire.paiements.creances.relancerTout', {
+                defaultValue: 'Relancer tous les impayés',
+              })}
               {nbImpayes > 0 && (
-                <Badge className="ms-1.5 border-0 bg-red-100 text-red-800 text-xs px-1.5">{nbImpayes}</Badge>
+                <Badge className="ms-1.5 border-0 bg-red-100 text-red-800 text-xs px-1.5">
+                  {nbImpayes}
+                </Badge>
               )}
             </Button>
           </div>
@@ -1085,18 +1474,40 @@ export function PaiementsPage() {
               className="max-w-xs"
             />
             <Select value={histMethode} onValueChange={setHistMethode}>
-              <SelectTrigger className="w-44"><SelectValue placeholder="Toutes méthodes" /></SelectTrigger>
+              <SelectTrigger className="w-44">
+                <SelectValue placeholder="Toutes méthodes" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="tous">Toutes méthodes</SelectItem>
-                {(['especes', 'virement', 'cheque', 'cb', 'mobile_money'] as const).map((m) => (
+                {(
+                  [
+                    'especes',
+                    'virement',
+                    'cheque',
+                    'cb',
+                    'mobile_money',
+                  ] as const
+                ).map((m) => (
                   <SelectItem key={m} value={m}>
-                    {t(`gestionnaire.paiements.encaisser.methodes.${m}`, { defaultValue: m })}
+                    {t(`gestionnaire.paiements.encaisser.methodes.${m}`, {
+                      defaultValue: m,
+                    })}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Input type="date" value={histFrom} onChange={(e) => setHistFrom(e.target.value)} className="w-40" />
-            <Input type="date" value={histTo} onChange={(e) => setHistTo(e.target.value)} className="w-40" />
+            <Input
+              type="date"
+              value={histFrom}
+              onChange={(e) => setHistFrom(e.target.value)}
+              className="w-40"
+            />
+            <Input
+              type="date"
+              value={histTo}
+              onChange={(e) => setHistTo(e.target.value)}
+              className="w-40"
+            />
           </div>
 
           <DataTable
@@ -1111,7 +1522,8 @@ export function PaiementsPage() {
 
           {filteredEnc.length > 0 && (
             <div className="flex justify-end text-sm font-medium">
-              Total : <MontantDisplay value={totalEncFiltered} className="ml-2" />
+              Total :{' '}
+              <MontantDisplay value={totalEncFiltered} className="ml-2" />
             </div>
           )}
         </div>
@@ -1122,7 +1534,9 @@ export function PaiementsPage() {
         <div className="space-y-4">
           <div className="flex gap-3">
             <Input
-              placeholder={t('gestionnaire.paiements.decompte.recherche', { defaultValue: 'Rechercher un copropriétaire' })}
+              placeholder={t('gestionnaire.paiements.decompte.recherche', {
+                defaultValue: 'Rechercher un copropriétaire',
+              })}
               value={decompteSearch}
               onChange={(e) => setDecompteSearch(e.target.value)}
               className="max-w-xs"
@@ -1133,14 +1547,19 @@ export function PaiementsPage() {
                 if (decompteSearch) setSelectedCoproId(found ?? 1)
               }}
             >
-              {t('gestionnaire.paiements.decompte.generer', { defaultValue: 'Générer' })}
+              {t('gestionnaire.paiements.decompte.generer', {
+                defaultValue: 'Générer',
+              })}
             </Button>
           </div>
 
           {selectedCoproId === null && (
             <div className="flex flex-col items-center gap-3 py-20 text-center text-muted-foreground">
               <FileText className="size-12" />
-              <p>Saisissez un nom et cliquez sur Générer pour afficher le décompte individuel</p>
+              <p>
+                Saisissez un nom et cliquez sur Générer pour afficher le
+                décompte individuel
+              </p>
             </div>
           )}
 
@@ -1155,12 +1574,18 @@ export function PaiementsPage() {
               <div className="rounded-lg border bg-card p-5">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                   <div>
-                    <p className="text-xs text-muted-foreground">Copropriétaire</p>
-                    <p className="font-semibold">{decompte.coproprietaire_nom}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Copropriétaire
+                    </p>
+                    <p className="font-semibold">
+                      {decompte.coproprietaire_nom}
+                    </p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Lot</p>
-                    <p className="font-mono font-semibold">{decompte.lot_numero}</p>
+                    <p className="font-mono font-semibold">
+                      {decompte.lot_numero}
+                    </p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Tantième</p>
@@ -1173,19 +1598,40 @@ export function PaiementsPage() {
                 </div>
                 <div className="mt-4 grid grid-cols-3 gap-4 border-t pt-4">
                   <div>
-                    <p className="text-xs text-muted-foreground">{t('gestionnaire.paiements.decompte.totalAppele', { defaultValue: 'Total appelé' })}</p>
-                    <MontantDisplay value={decompte.total_appele} className="text-lg font-semibold" />
+                    <p className="text-xs text-muted-foreground">
+                      {t('gestionnaire.paiements.decompte.totalAppele', {
+                        defaultValue: 'Total appelé',
+                      })}
+                    </p>
+                    <MontantDisplay
+                      value={decompte.total_appele}
+                      className="text-lg font-semibold"
+                    />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">{t('gestionnaire.paiements.decompte.totalPaye', { defaultValue: 'Total payé' })}</p>
-                    <MontantDisplay value={decompte.total_paye} className="text-lg font-semibold text-green-600" />
+                    <p className="text-xs text-muted-foreground">
+                      {t('gestionnaire.paiements.decompte.totalPaye', {
+                        defaultValue: 'Total payé',
+                      })}
+                    </p>
+                    <MontantDisplay
+                      value={decompte.total_paye}
+                      className="text-lg font-semibold text-green-600"
+                    />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">{t('gestionnaire.paiements.decompte.solde', { defaultValue: 'Solde' })}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t('gestionnaire.paiements.decompte.solde', {
+                        defaultValue: 'Solde',
+                      })}
+                    </p>
                     <MontantDisplay
                       value={decompte.solde}
                       colorize
-                      className={cn('text-lg font-semibold', decompte.solde < 0 ? 'text-red-600' : 'text-green-600')}
+                      className={cn(
+                        'text-lg font-semibold',
+                        decompte.solde < 0 ? 'text-red-600' : 'text-green-600',
+                      )}
                     />
                   </div>
                 </div>
@@ -1195,8 +1641,12 @@ export function PaiementsPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b bg-muted/40 text-xs text-muted-foreground">
-                      <th className="px-4 py-3 text-left font-medium">Appel de fonds</th>
-                      <th className="px-4 py-3 text-left font-medium">Échéance</th>
+                      <th className="px-4 py-3 text-left font-medium">
+                        Appel de fonds
+                      </th>
+                      <th className="px-4 py-3 text-left font-medium">
+                        Échéance
+                      </th>
                       <th className="px-4 py-3 text-right font-medium">Dû</th>
                       <th className="px-4 py-3 text-right font-medium">Payé</th>
                       <th className="px-4 py-3 font-medium">Statut</th>
@@ -1206,7 +1656,9 @@ export function PaiementsPage() {
                     {decompte.detail.map((d, i) => (
                       <tr key={i} className="hover:bg-muted/20">
                         <td className="px-4 py-3">{d.appel_fonds_titre}</td>
-                        <td className="px-4 py-3">{d.date_echeance.slice(0, 10)}</td>
+                        <td className="px-4 py-3">
+                          {d.date_echeance.slice(0, 10)}
+                        </td>
                         <td className="px-4 py-3 text-right tabular-nums">
                           <MontantDisplay value={d.montant_du} />
                         </td>
@@ -1214,7 +1666,13 @@ export function PaiementsPage() {
                           <MontantDisplay value={d.montant_paye} />
                         </td>
                         <td className="px-4 py-3">
-                          <Badge className={cn(CREANCE_STATUT_CLS[d.statut] ?? 'bg-gray-100 text-gray-700', 'border-0 text-xs')}>
+                          <Badge
+                            className={cn(
+                              CREANCE_STATUT_CLS[d.statut] ??
+                                'bg-gray-100 text-gray-700',
+                              'border-0 text-xs',
+                            )}
+                          >
                             {d.statut}
                           </Badge>
                         </td>
@@ -1231,7 +1689,9 @@ export function PaiementsPage() {
                   onClick={() => toast.info('Export en cours...')}
                 >
                   <Download className="me-1.5 size-4" />
-                  {t('gestionnaire.paiements.decompte.exporter', { defaultValue: 'Exporter PDF' })}
+                  {t('gestionnaire.paiements.decompte.exporter', {
+                    defaultValue: 'Exporter PDF',
+                  })}
                 </Button>
               </div>
             </div>
@@ -1249,14 +1709,19 @@ export function PaiementsPage() {
           searchable
           pageSize={10}
           emptyIcon={<FileText className="size-12 text-muted-foreground" />}
-          emptyTitle={t('gestionnaire.paiements.virements.title', { defaultValue: 'Aucun virement déclaré' })}
+          emptyTitle={t('gestionnaire.paiements.virements.title', {
+            defaultValue: 'Aucun virement déclaré',
+          })}
         />
       )}
 
       {/* ── Modals ── */}
       <EncaisserModal
         open={encaisserOpen}
-        onOpenChange={(o) => { setEncaisserOpen(o); if (!o) setEncaisserCreance(undefined) }}
+        onOpenChange={(o) => {
+          setEncaisserOpen(o)
+          if (!o) setEncaisserCreance(undefined)
+        }}
         preselectedCreance={encaisserCreance}
       />
 
@@ -1265,7 +1730,13 @@ export function PaiementsPage() {
       <RejeterVirementModal
         virement={rejeterVirementTarget}
         onClose={() => setRejeterVirementTarget(null)}
-        onConfirm={(motif) => rejeterVirementTarget && rejeterVirementMutation.mutate({ id: rejeterVirementTarget.id, motif })}
+        onConfirm={(motif) =>
+          rejeterVirementTarget &&
+          rejeterVirementMutation.mutate({
+            id: rejeterVirementTarget.id,
+            motif,
+          })
+        }
         isLoading={rejeterVirementMutation.isPending}
       />
 
@@ -1291,7 +1762,9 @@ export function PaiementsPage() {
               <Label>Titre</Label>
               <Input
                 value={appelForm.titre}
-                onChange={(e) => setAppelForm((f) => ({ ...f, titre: e.target.value }))}
+                onChange={(e) =>
+                  setAppelForm((f) => ({ ...f, titre: e.target.value }))
+                }
                 placeholder="Charges Q2 2026"
               />
             </div>
@@ -1299,12 +1772,18 @@ export function PaiementsPage() {
               <Label>Résidence</Label>
               <Select
                 value={appelForm.residence_id}
-                onValueChange={(v) => setAppelForm((f) => ({ ...f, residence_id: v }))}
+                onValueChange={(v) =>
+                  setAppelForm((f) => ({ ...f, residence_id: v }))
+                }
               >
-                <SelectTrigger className="w-full"><SelectValue placeholder="Choisir une résidence" /></SelectTrigger>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Choisir une résidence" />
+                </SelectTrigger>
                 <SelectContent>
                   {residences.map((r) => (
-                    <SelectItem key={r.id} value={String(r.id)}>{r.name}</SelectItem>
+                    <SelectItem key={r.id} value={String(r.id)}>
+                      {r.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -1315,7 +1794,12 @@ export function PaiementsPage() {
                 <Input
                   type="number"
                   value={appelForm.montant_total}
-                  onChange={(e) => setAppelForm((f) => ({ ...f, montant_total: e.target.value }))}
+                  onChange={(e) =>
+                    setAppelForm((f) => ({
+                      ...f,
+                      montant_total: e.target.value,
+                    }))
+                  }
                 />
               </div>
               <div className="space-y-1">
@@ -1323,30 +1807,51 @@ export function PaiementsPage() {
                 <Input
                   type="date"
                   value={appelForm.date_echeance}
-                  onChange={(e) => setAppelForm((f) => ({ ...f, date_echeance: e.target.value }))}
+                  onChange={(e) =>
+                    setAppelForm((f) => ({
+                      ...f,
+                      date_echeance: e.target.value,
+                    }))
+                  }
                 />
               </div>
             </div>
-            {!!appelForm.residence_id && montantTotal > 0 && (
-              lotsLoading ? (
+            {!!appelForm.residence_id &&
+              montantTotal > 0 &&
+              (lotsLoading ? (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Loader2 className="size-3.5 animate-spin" />
                   Calcul de la répartition…
                 </div>
               ) : lotsArr.length > 0 ? (
-                <RepartitionPreview lots={lotsArr} totalTantieme={totalTantieme} montantTotal={montantTotal} />
-              ) : null
-            )}
+                <RepartitionPreview
+                  lots={lotsArr}
+                  totalTantieme={totalTantieme}
+                  montantTotal={montantTotal}
+                />
+              ) : null)}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateAppelOpen(false)} disabled={createAppelMutation.isPending}>
+            <Button
+              variant="outline"
+              onClick={() => setCreateAppelOpen(false)}
+              disabled={createAppelMutation.isPending}
+            >
               {t('actions.cancel')}
             </Button>
             <Button
               onClick={() => createAppelMutation.mutate()}
-              disabled={!appelForm.titre || !appelForm.residence_id || !appelForm.montant_total || !appelForm.date_echeance || createAppelMutation.isPending}
+              disabled={
+                !appelForm.titre ||
+                !appelForm.residence_id ||
+                !appelForm.montant_total ||
+                !appelForm.date_echeance ||
+                createAppelMutation.isPending
+              }
             >
-              {createAppelMutation.isPending ? t('actions.loading') : t('actions.save')}
+              {createAppelMutation.isPending
+                ? t('actions.loading')
+                : t('actions.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1359,7 +1864,9 @@ export function PaiementsPage() {
         description="Cette action enverra une notification WhatsApp à tous les copropriétaires."
         confirmLabel="Envoyer"
         variant="default"
-        onConfirm={() => envoyerTarget && envoyerMutation.mutate(envoyerTarget.id)}
+        onConfirm={() =>
+          envoyerTarget && envoyerMutation.mutate(envoyerTarget.id)
+        }
         isLoading={envoyerMutation.isPending}
       />
     </div>

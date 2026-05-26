@@ -19,17 +19,28 @@ type Props = {
   onNext: () => void
 }
 
-export function ColumnMapper({ mappings, columns, onMappingChange, onNext }: Props) {
+export function ColumnMapper({
+  mappings,
+  columns,
+  onMappingChange,
+  onNext,
+}: Props) {
   const { t } = useTranslation()
 
   // Check if all required fields are mapped
-  const requiredKeys = new Set(columns.filter((c) => c.required).map((c) => c.key))
-  const mappedKeys = new Set(mappings.filter((m) => m.targetKey).map((m) => m.targetKey!))
+  const requiredKeys = new Set(
+    columns.filter((c) => c.required).map((c) => c.key),
+  )
+  const mappedKeys = new Set(
+    mappings.filter((m) => m.targetKey).map((m) => m.targetKey!),
+  )
   const missingRequired = [...requiredKeys].filter((k) => !mappedKeys.has(k))
   const allRequiredMapped = missingRequired.length === 0
 
   // Get already-used target keys to prevent duplicates
-  const usedTargets = new Set(mappings.filter((m) => m.targetKey).map((m) => m.targetKey!))
+  const usedTargets = new Set(
+    mappings.filter((m) => m.targetKey).map((m) => m.targetKey!),
+  )
 
   return (
     <div className="space-y-4">
@@ -87,7 +98,9 @@ export function ColumnMapper({ mappings, columns, onMappingChange, onNext }: Pro
                   }
                 >
                   <SelectTrigger className="h-8 text-xs">
-                    <SelectValue placeholder={t('gestionnaire.imports.mapping.unmapped')} />
+                    <SelectValue
+                      placeholder={t('gestionnaire.imports.mapping.unmapped')}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="__none__">
@@ -99,7 +112,10 @@ export function ColumnMapper({ mappings, columns, onMappingChange, onNext }: Pro
                       <SelectItem
                         key={col.key}
                         value={col.key}
-                        disabled={usedTargets.has(col.key) && mapping.targetKey !== col.key}
+                        disabled={
+                          usedTargets.has(col.key) &&
+                          mapping.targetKey !== col.key
+                        }
                       >
                         <span className="flex items-center gap-1.5">
                           {col.label}

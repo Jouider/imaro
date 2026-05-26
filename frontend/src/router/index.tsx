@@ -78,7 +78,10 @@ export const router = createBrowserRouter([
       { path: 'residences', element: <ResidencesPage /> },
       { path: 'residences/:id', element: <ResidencePage /> },
       { path: 'coproprietaires', element: <CoproprietairesPage /> },
-      { path: 'appels-fonds', element: <Navigate to="/gestionnaire/paiements" replace /> },
+      {
+        path: 'appels-fonds',
+        element: <Navigate to="/gestionnaire/paiements" replace />,
+      },
       { path: 'paiements', element: <PaiementsPage /> },
       { path: 'tickets', element: <TicketsPage /> },
       { path: 'assemblees', element: <AssembleesPage /> },

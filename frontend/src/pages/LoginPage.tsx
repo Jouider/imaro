@@ -20,7 +20,11 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { Wordmark } from '@/components/Wordmark'
-import { loginWithEmail, residentLogin, residentActivate } from '@/services/auth.service'
+import {
+  loginWithEmail,
+  residentLogin,
+  residentActivate,
+} from '@/services/auth.service'
 import { setStoredToken } from '@/lib/axios'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
@@ -54,7 +58,9 @@ function BrandPanel() {
   return (
     <div
       className="hidden lg:flex flex-col justify-between p-10 h-full"
-      style={{ background: 'linear-gradient(160deg, #1a4f72 0%, #0f3550 100%)' }}
+      style={{
+        background: 'linear-gradient(160deg, #1a4f72 0%, #0f3550 100%)',
+      }}
     >
       {/* Logo */}
       <Wordmark inverted className="h-11 w-auto" />
@@ -63,7 +69,11 @@ function BrandPanel() {
       <div className="space-y-8">
         <div>
           <h2 className="text-[2rem] font-bold leading-tight text-white">
-            La gestion de<br />copropriété<br />simplifiée.
+            La gestion de
+            <br />
+            copropriété
+            <br />
+            simplifiée.
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-white/55">
             Syndics, charges, assemblées et documents —<br />
@@ -92,7 +102,12 @@ function BrandPanel() {
 
 // ─── Role cards ───────────────────────────────────────────────────────────────
 
-const ROLE_CARDS: { id: Role; icon: typeof Building2; title: string; desc: string }[] = [
+const ROLE_CARDS: {
+  id: Role
+  icon: typeof Building2
+  title: string
+  desc: string
+}[] = [
   {
     id: 'gestionnaire',
     icon: Building2,
@@ -132,8 +147,8 @@ export function LoginPage() {
 
   // resident fields
   const [digits, setDigits] = useState('')
-  const [accessCode, setAccessCode] = useState('')   // temp code from gestionnaire
-  const [newCode, setNewCode] = useState('')          // personal code (activation)
+  const [accessCode, setAccessCode] = useState('') // temp code from gestionnaire
+  const [newCode, setNewCode] = useState('') // personal code (activation)
   const [newCodeConfirm, setNewCodeConfirm] = useState('')
 
   const fullPhone = `+212${digits}`
@@ -183,25 +198,42 @@ export function LoginPage() {
   }
 
   function goBack() {
-    if (step === 'code') { setStep('phone'); setAccessCode('') }
-    else if (step === 'activate') { setStep('code'); setNewCode(''); setNewCodeConfirm('') }
-    else { setStep('role'); setRole(null); setDigits('') }
+    if (step === 'code') {
+      setStep('phone')
+      setAccessCode('')
+    } else if (step === 'activate') {
+      setStep('code')
+      setNewCode('')
+      setNewCodeConfirm('')
+    } else {
+      setStep('role')
+      setRole(null)
+      setDigits('')
+    }
   }
 
   // ── Titles per step ──
   const title =
-    step === 'role' ? 'Bienvenue sur Imaro'
-    : step === 'activate' ? 'Créez votre code personnel'
-    : step === 'code' ? 'Code d\'accès'
-    : role === 'gestionnaire' ? 'Espace Syndic'
-    : 'Espace Copropriétaire'
+    step === 'role'
+      ? 'Bienvenue sur Imaro'
+      : step === 'activate'
+        ? 'Créez votre code personnel'
+        : step === 'code'
+          ? "Code d'accès"
+          : role === 'gestionnaire'
+            ? 'Espace Syndic'
+            : 'Espace Copropriétaire'
 
   const subtitle =
-    step === 'role' ? 'Choisissez votre espace pour continuer'
-    : step === 'activate' ? 'Définissez un code personnel de 6 caractères minimum'
-    : step === 'code' ? `Entrez le code fourni par votre syndic pour +212 ${digits}`
-    : role === 'gestionnaire' ? 'Connectez-vous avec vos identifiants'
-    : 'Entrez votre numéro de téléphone marocain'
+    step === 'role'
+      ? 'Choisissez votre espace pour continuer'
+      : step === 'activate'
+        ? 'Définissez un code personnel de 6 caractères minimum'
+        : step === 'code'
+          ? `Entrez le code fourni par votre syndic pour +212 ${digits}`
+          : role === 'gestionnaire'
+            ? 'Connectez-vous avec vos identifiants'
+            : 'Entrez votre numéro de téléphone marocain'
 
   return (
     <div className="flex min-h-svh bg-[#f4f7fa]">
@@ -275,8 +307,12 @@ export function LoginPage() {
                         />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-foreground">{card.title}</p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">{card.desc}</p>
+                        <p className="font-semibold text-foreground">
+                          {card.title}
+                        </p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          {card.desc}
+                        </p>
                       </div>
                       <ChevronRight
                         className={cn(
@@ -289,7 +325,8 @@ export function LoginPage() {
                 ))}
 
                 <p className="pt-3 text-center text-xs text-muted-foreground">
-                  Connexion sécurisée — syndics par email, copropriétaires par code d'accès
+                  Connexion sécurisée — syndics par email, copropriétaires par
+                  code d'accès
                 </p>
               </div>
             )}
@@ -297,7 +334,13 @@ export function LoginPage() {
             {/* ── Step: Phone (resident) or Email+Password (gestionnaire) ── */}
             {/* ── Gestionnaire: email + password ── */}
             {step === 'phone' && role === 'gestionnaire' && (
-              <form onSubmit={(e) => { e.preventDefault(); loginEmailMutation.mutate() }} className="space-y-5">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  loginEmailMutation.mutate()
+                }}
+                className="space-y-5"
+              >
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 rounded-full border bg-[#1B4F72]/5 px-3 py-1 text-xs font-medium text-[#1B4F72]">
                     <Building2 className="size-3.5" />
@@ -354,7 +397,10 @@ export function LoginPage() {
             {step === 'phone' && role === 'resident' && (
               <form
                 className="space-y-5"
-                onSubmit={(e) => { e.preventDefault(); setStep('code') }}
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  setStep('code')
+                }}
               >
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 rounded-full border bg-[#1B4F72]/5 px-3 py-1 text-xs font-medium text-[#1B4F72]">
@@ -375,13 +421,17 @@ export function LoginPage() {
                       inputMode="numeric"
                       placeholder="6XX XX XX XX"
                       value={digits}
-                      onChange={(e) => setDigits(e.target.value.replace(/\D/g, '').slice(0, 9))}
+                      onChange={(e) =>
+                        setDigits(e.target.value.replace(/\D/g, '').slice(0, 9))
+                      }
                       required
                       dir="ltr"
                       className="min-h-[52px] flex-1 bg-white px-4 text-base text-[#1B4F72] placeholder:text-muted-foreground/50 focus:outline-none"
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground">Ex : 6XX XX XX XX ou 7XX XX XX XX</p>
+                  <p className="text-xs text-muted-foreground">
+                    Ex : 6XX XX XX XX ou 7XX XX XX XX
+                  </p>
                 </div>
 
                 <Button
@@ -398,7 +448,10 @@ export function LoginPage() {
             {step === 'code' && (
               <form
                 className="space-y-5"
-                onSubmit={(e) => { e.preventDefault(); residentLoginMutation.mutate() }}
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  residentLoginMutation.mutate()
+                }}
               >
                 <div className="rounded-xl bg-[#1B4F72]/5 px-4 py-3 text-sm text-[#1B4F72]">
                   <span className="font-semibold">+212 {digits}</span>
@@ -417,20 +470,28 @@ export function LoginPage() {
                       onChange={(e) => setAccessCode(e.target.value.trim())}
                       required
                       autoComplete="off"
-                      className={cn(inputCls, 'ps-10 pe-4 font-mono tracking-wider')}
+                      className={cn(
+                        inputCls,
+                        'ps-10 pe-4 font-mono tracking-wider',
+                      )}
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Ce code vous a été communiqué par votre gestionnaire via WhatsApp.
+                    Ce code vous a été communiqué par votre gestionnaire via
+                    WhatsApp.
                   </p>
                 </div>
 
                 <Button
                   type="submit"
                   className="h-12 w-full bg-[#E67E22] text-base text-white hover:bg-[#d35400]"
-                  disabled={residentLoginMutation.isPending || accessCode.length < 6}
+                  disabled={
+                    residentLoginMutation.isPending || accessCode.length < 6
+                  }
                 >
-                  {residentLoginMutation.isPending ? 'Vérification…' : 'Accéder à mon espace'}
+                  {residentLoginMutation.isPending
+                    ? 'Vérification…'
+                    : 'Accéder à mon espace'}
                 </Button>
               </form>
             )}
@@ -454,7 +515,8 @@ export function LoginPage() {
               >
                 <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
                   <MessageCircle className="mb-1 size-4 inline-block me-1.5 text-amber-600" />
-                  Première connexion — choisissez un code personnel que vous utiliserez à chaque connexion.
+                  Première connexion — choisissez un code personnel que vous
+                  utiliserez à chaque connexion.
                 </div>
 
                 <div className="space-y-2">
@@ -481,7 +543,9 @@ export function LoginPage() {
                     required
                     className={cn(
                       inputCls,
-                      newCodeConfirm && newCode !== newCodeConfirm && 'border-red-400 focus:border-red-400 focus:ring-red-100',
+                      newCodeConfirm &&
+                        newCode !== newCodeConfirm &&
+                        'border-red-400 focus:border-red-400 focus:ring-red-100',
                     )}
                   />
                 </div>
@@ -491,7 +555,9 @@ export function LoginPage() {
                   className="h-12 w-full bg-[#1B4F72] text-base text-white hover:bg-[#153f5c]"
                   disabled={activateMutation.isPending || newCode.length < 6}
                 >
-                  {activateMutation.isPending ? 'Activation…' : 'Confirmer et se connecter'}
+                  {activateMutation.isPending
+                    ? 'Activation…'
+                    : 'Confirmer et se connecter'}
                 </Button>
               </form>
             )}

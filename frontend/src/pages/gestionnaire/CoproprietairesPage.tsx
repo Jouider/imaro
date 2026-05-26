@@ -2,8 +2,12 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
-  Users, UserPlus, Copy, CheckCircle2,
-  MessageCircle, Building2,
+  Users,
+  UserPlus,
+  Copy,
+  CheckCircle2,
+  MessageCircle,
+  Building2,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import {
@@ -45,7 +49,10 @@ type CreateDialogProps = {
   onOpenChange: (open: boolean) => void
   residences: Array<{ id: number; name: string }>
   defaultResidenceId: string
-  onSuccess: (result: CreateCoproprietaireResponse, meta: { phone: string }) => void
+  onSuccess: (
+    result: CreateCoproprietaireResponse,
+    meta: { phone: string },
+  ) => void
 }
 
 function CreateCoproprietaireDialog({
@@ -66,7 +73,9 @@ function CreateCoproprietaireDialog({
     queryFn: () => getLots(Number(residenceId)),
     enabled: !!residenceId,
   })
-  const availableLots = (lotsData?.lots ?? []).filter((l: Lot) => !l.coproprietaire)
+  const availableLots = (lotsData?.lots ?? []).filter(
+    (l: Lot) => !l.coproprietaire,
+  )
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -93,7 +102,11 @@ function CreateCoproprietaireDialog({
   }
 
   const canSubmit =
-    !!residenceId && !!lotId && !!name.trim() && !!phoneDigits.trim() && !mutation.isPending
+    !!residenceId &&
+    !!lotId &&
+    !!name.trim() &&
+    !!phoneDigits.trim() &&
+    !mutation.isPending
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -101,7 +114,8 @@ function CreateCoproprietaireDialog({
         <DialogHeader>
           <DialogTitle>Ajouter un copropriétaire</DialogTitle>
           <DialogDescription>
-            Ceci créera un nouveau copropriétaire et lui générera un compte pour accéder à son espace.
+            Ceci créera un nouveau copropriétaire et lui générera un compte pour
+            accéder à son espace.
           </DialogDescription>
         </DialogHeader>
 
@@ -109,7 +123,13 @@ function CreateCoproprietaireDialog({
           {/* Residence */}
           <div className="space-y-2">
             <Label htmlFor="dialog-residence">Résidence *</Label>
-            <Select value={residenceId} onValueChange={(v) => { setResidenceId(v); setLotId('') }}>
+            <Select
+              value={residenceId}
+              onValueChange={(v) => {
+                setResidenceId(v)
+                setLotId('')
+              }}
+            >
               <SelectTrigger id="dialog-residence">
                 <SelectValue placeholder="Sélectionner une résidence..." />
               </SelectTrigger>
@@ -181,7 +201,9 @@ function CreateCoproprietaireDialog({
                 inputMode="numeric"
                 placeholder="6XX XX XX XX"
                 value={phoneDigits}
-                onChange={(e) => setPhoneDigits(e.target.value.replace(/\D/g, '').slice(0, 9))}
+                onChange={(e) =>
+                  setPhoneDigits(e.target.value.replace(/\D/g, '').slice(0, 9))
+                }
                 required
                 dir="ltr"
                 className="min-h-[44px] flex-1 bg-white px-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
@@ -207,7 +229,9 @@ function CreateCoproprietaireDialog({
             className="h-11 w-full bg-[#1B4F72] text-white hover:bg-[#153f5c]"
             disabled={!canSubmit}
           >
-            {mutation.isPending ? 'Création en cours…' : 'Créer le copropriétaire'}
+            {mutation.isPending
+              ? 'Création en cours…'
+              : 'Créer le copropriétaire'}
           </Button>
         </form>
       </DialogContent>
@@ -234,7 +258,9 @@ function CreateLotDialog({
 }: CreateLotDialogProps) {
   const queryClient = useQueryClient()
   const [numero, setNumero] = useState('')
-  const [type, setType] = useState<'appartement' | 'commerce' | 'parking' | 'cave'>('appartement')
+  const [type, setType] = useState<
+    'appartement' | 'commerce' | 'parking' | 'cave'
+  >('appartement')
   const [etage, setEtage] = useState('')
   const [superficie, setSuperficie] = useState('')
   const [tantieme, setTantieme] = useState('')
@@ -260,7 +286,11 @@ function CreateLotDialog({
   })
 
   const canSubmit =
-    !!numero.trim() && !!etage && !!superficie && !!tantieme && !mutation.isPending
+    !!numero.trim() &&
+    !!etage &&
+    !!superficie &&
+    !!tantieme &&
+    !mutation.isPending
 
   const inputCls =
     'w-full min-h-[44px] rounded-lg border border-border bg-white px-3 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all focus:border-[#1B4F72] focus:outline-none focus:ring-2 focus:ring-[#1B4F72]/10'
@@ -275,13 +305,19 @@ function CreateLotDialog({
           </DialogTitle>
           <DialogDescription>
             Ce lot sera automatiquement assigné à{' '}
-            <span className="font-semibold text-foreground">{coproprietaireName}</span>.
+            <span className="font-semibold text-foreground">
+              {coproprietaireName}
+            </span>
+            .
           </DialogDescription>
         </DialogHeader>
 
         <form
           className="space-y-4 pt-2"
-          onSubmit={(e) => { e.preventDefault(); mutation.mutate() }}
+          onSubmit={(e) => {
+            e.preventDefault()
+            mutation.mutate()
+          }}
         >
           {/* Numéro + Type */}
           <div className="grid grid-cols-2 gap-3">
@@ -298,7 +334,10 @@ function CreateLotDialog({
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="lot-type">Type *</Label>
-              <Select value={type} onValueChange={(v) => setType(v as typeof type)}>
+              <Select
+                value={type}
+                onValueChange={(v) => setType(v as typeof type)}
+              >
                 <SelectTrigger id="lot-type">
                   <SelectValue />
                 </SelectTrigger>
@@ -375,7 +414,13 @@ type SuccessDialogProps = {
   phone: string
 }
 
-function SuccessDialog({ open, onClose, onCreateLot, result, phone }: SuccessDialogProps) {
+function SuccessDialog({
+  open,
+  onClose,
+  onCreateLot,
+  result,
+  phone,
+}: SuccessDialogProps) {
   if (!result) return null
 
   const phoneDigits = phone.replace(/^\+212/, '')
@@ -390,13 +435,18 @@ function SuccessDialog({ open, onClose, onCreateLot, result, phone }: SuccessDia
   function sendWhatsApp() {
     const code = result?.temp_password ?? ''
     const msg = encodeURIComponent(
-      `Bonjour ${result?.coproprietaire.name} 👋\n\nVotre code d'accès Imaro est : *${code}*\n\nConnectez-vous sur l'application et entrez ce code pour accéder à votre espace copropriétaire.`
+      `Bonjour ${result?.coproprietaire.name} 👋\n\nVotre code d'accès Imaro est : *${code}*\n\nConnectez-vous sur l'application et entrez ce code pour accéder à votre espace copropriétaire.`,
     )
     window.open(`https://wa.me/${phone.replace('+', '')}?text=${msg}`, '_blank')
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) onClose()
+      }}
+    >
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl">Propriétaire créé !</DialogTitle>
@@ -416,11 +466,17 @@ function SuccessDialog({ open, onClose, onCreateLot, result, phone }: SuccessDia
             {/* Credentials */}
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-green-900 dark:text-green-200 min-w-[100px]">Téléphone :</span>
-                <span className="text-green-800 dark:text-green-300 font-mono">{phoneDigits}</span>
+                <span className="font-semibold text-green-900 dark:text-green-200 min-w-[100px]">
+                  Téléphone :
+                </span>
+                <span className="text-green-800 dark:text-green-300 font-mono">
+                  {phoneDigits}
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-green-900 dark:text-green-200 min-w-[100px]">Code d'accès :</span>
+                <span className="font-semibold text-green-900 dark:text-green-200 min-w-[100px]">
+                  Code d'accès :
+                </span>
                 <span className="rounded-md bg-green-200 dark:bg-green-800 px-3 py-1 font-mono text-base font-bold tracking-widest text-green-900 dark:text-green-100">
                   {result.temp_password}
                 </span>
@@ -462,11 +518,7 @@ function SuccessDialog({ open, onClose, onCreateLot, result, phone }: SuccessDia
                 <Building2 className="size-4" />
                 Oui, créer un lot
               </Button>
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={onClose}
-              >
+              <Button variant="outline" className="flex-1" onClick={onClose}>
                 Non, terminer
               </Button>
             </div>
@@ -484,8 +536,11 @@ export function CoproprietairesPage() {
   const queryClient = useQueryClient()
   const [selectedResidenceId, setSelectedResidenceId] = useState<string>('')
   const [createOpen, setCreateOpen] = useState(false)
-  const [successResult, setSuccessResult] = useState<CreateCoproprietaireResponse | null>(null)
-  const [successMeta, setSuccessMeta] = useState<{ phone: string }>({ phone: '' })
+  const [successResult, setSuccessResult] =
+    useState<CreateCoproprietaireResponse | null>(null)
+  const [successMeta, setSuccessMeta] = useState<{ phone: string }>({
+    phone: '',
+  })
   const [createLotOpen, setCreateLotOpen] = useState(false)
   const [lotTarget, setLotTarget] = useState<{
     coproprietaireId: number
@@ -534,9 +589,7 @@ export function CoproprietairesPage() {
       key: 'solde',
       header: t('gestionnaire.coproprietaires.colSolde'),
       sortable: true,
-      renderCell: (r) => (
-        <MontantDisplay value={r.solde} colorize />
-      ),
+      renderCell: (r) => <MontantDisplay value={r.solde} colorize />,
     },
   ]
 
@@ -547,7 +600,9 @@ export function CoproprietairesPage() {
     setCreateOpen(false)
     setSuccessResult(result)
     setSuccessMeta({ phone: meta.phone })
-    void queryClient.invalidateQueries({ queryKey: ['coproprietaires', residenceId] })
+    void queryClient.invalidateQueries({
+      queryKey: ['coproprietaires', residenceId],
+    })
   }
 
   function handleSuccessClose() {

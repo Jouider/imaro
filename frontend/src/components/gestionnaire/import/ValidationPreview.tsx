@@ -17,8 +17,14 @@ export function ValidationPreview({ rows, columns, onImport, loading }: Props) {
   const { t } = useTranslation()
   const [skipErrors, setSkipErrors] = useState(true)
 
-  const validRows = useMemo(() => rows.filter((r) => r._status === 'valid'), [rows])
-  const errorRows = useMemo(() => rows.filter((r) => r._status === 'error'), [rows])
+  const validRows = useMemo(
+    () => rows.filter((r) => r._status === 'valid'),
+    [rows],
+  )
+  const errorRows = useMemo(
+    () => rows.filter((r) => r._status === 'error'),
+    [rows],
+  )
 
   const rowsToImport = skipErrors ? validRows : rows
 
@@ -57,7 +63,10 @@ export function ValidationPreview({ rows, columns, onImport, loading }: Props) {
               checked={skipErrors}
               onCheckedChange={(v) => setSkipErrors(!!v)}
             />
-            <label htmlFor="skip-errors" className="text-xs text-muted-foreground cursor-pointer">
+            <label
+              htmlFor="skip-errors"
+              className="text-xs text-muted-foreground cursor-pointer"
+            >
               {t('gestionnaire.imports.preview.skipErrors')}
             </label>
           </div>
@@ -69,15 +78,24 @@ export function ValidationPreview({ rows, columns, onImport, loading }: Props) {
         <table className="w-full text-xs">
           <thead className="sticky top-0 z-10 bg-muted/80 backdrop-blur-sm">
             <tr>
-              <th className="px-3 py-2 text-start font-semibold text-muted-foreground w-10">#</th>
+              <th className="px-3 py-2 text-start font-semibold text-muted-foreground w-10">
+                #
+              </th>
               <th className="px-3 py-2 text-start font-semibold text-muted-foreground w-10" />
               {mappedKeys.map((col) => (
-                <th key={col.key} className="px-3 py-2 text-start font-semibold text-muted-foreground whitespace-nowrap">
+                <th
+                  key={col.key}
+                  className="px-3 py-2 text-start font-semibold text-muted-foreground whitespace-nowrap"
+                >
                   {col.label}
-                  {col.required && <span className="text-red-500 ms-0.5">*</span>}
+                  {col.required && (
+                    <span className="text-red-500 ms-0.5">*</span>
+                  )}
                 </th>
               ))}
-              <th className="px-3 py-2 text-start font-semibold text-muted-foreground">Erreurs</th>
+              <th className="px-3 py-2 text-start font-semibold text-muted-foreground">
+                Erreurs
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -88,7 +106,9 @@ export function ValidationPreview({ rows, columns, onImport, loading }: Props) {
                   row._status === 'error' && 'bg-red-50/50 dark:bg-red-950/10',
                 )}
               >
-                <td className="px-3 py-2 text-muted-foreground">{row._index + 1}</td>
+                <td className="px-3 py-2 text-muted-foreground">
+                  {row._index + 1}
+                </td>
                 <td className="px-3 py-2">
                   {row._status === 'valid' ? (
                     <CheckCircle2 className="size-3.5 text-green-500" />
@@ -97,7 +117,10 @@ export function ValidationPreview({ rows, columns, onImport, loading }: Props) {
                   )}
                 </td>
                 {mappedKeys.map((col) => (
-                  <td key={col.key} className="px-3 py-2 max-w-[200px] truncate">
+                  <td
+                    key={col.key}
+                    className="px-3 py-2 max-w-[200px] truncate"
+                  >
                     {String(row[col.key] ?? '—')}
                   </td>
                 ))}
@@ -120,15 +143,19 @@ export function ValidationPreview({ rows, columns, onImport, loading }: Props) {
       {/* Import button */}
       <div className="flex justify-end">
         <Button
-          onClick={() => onImport(rowsToImport.filter((r) => r._status === 'valid'))}
+          onClick={() =>
+            onImport(rowsToImport.filter((r) => r._status === 'valid'))
+          }
           disabled={validRows.length === 0 || loading}
           className="gap-2"
         >
           {loading ? (
             <div className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
           ) : null}
-          {t('gestionnaire.imports.preview.importButton')
-            .replace('{count}', String(skipErrors ? validRows.length : rowsToImport.length))}
+          {t('gestionnaire.imports.preview.importButton').replace(
+            '{count}',
+            String(skipErrors ? validRows.length : rowsToImport.length),
+          )}
         </Button>
       </div>
     </div>

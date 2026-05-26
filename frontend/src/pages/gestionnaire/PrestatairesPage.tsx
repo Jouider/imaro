@@ -91,8 +91,10 @@ export function PrestatairesPage() {
   const [activeTab, setActiveTab] = useState<Tab>('prestataires')
   const [createPrestaOpen, setCreatePrestaOpen] = useState(false)
   const [createContratOpen, setCreateContratOpen] = useState(false)
-  const [prestaForm, setPrestaForm] = useState<PrestataireForm>(EMPTY_PRESTA_FORM)
-  const [contratForm, setContratForm] = useState<ContratForm>(EMPTY_CONTRAT_FORM)
+  const [prestaForm, setPrestaForm] =
+    useState<PrestataireForm>(EMPTY_PRESTA_FORM)
+  const [contratForm, setContratForm] =
+    useState<ContratForm>(EMPTY_CONTRAT_FORM)
 
   const { data: prestataires = [], isLoading: loadingPresta } = useQuery({
     queryKey: ['prestataires'],
@@ -157,7 +159,14 @@ export function PrestatairesPage() {
     contratForm.date_debut &&
     contratForm.date_fin
 
-  const SPECIALITES = ['ascenseurs', 'electricite', 'proprete', 'plomberie', 'securite', 'autre']
+  const SPECIALITES = [
+    'ascenseurs',
+    'electricite',
+    'proprete',
+    'plomberie',
+    'securite',
+    'autre',
+  ]
   const TYPE_CONTRATS = ['maintenance', 'nettoyage', 'gardiennage', 'autre']
 
   const prestaColumns: Column<Prestataire>[] = [
@@ -171,14 +180,18 @@ export function PrestatairesPage() {
       header: t('gestionnaire.prestataires.colSpecialite'),
       renderCell: (r) => (
         <span className="capitalize">
-          {t(`gestionnaire.prestataires.specialite.${r.specialite}`, { defaultValue: r.specialite })}
+          {t(`gestionnaire.prestataires.specialite.${r.specialite}`, {
+            defaultValue: r.specialite,
+          })}
         </span>
       ),
     },
     {
       key: 'phone',
       header: t('gestionnaire.prestataires.colTelephone'),
-      renderCell: (r) => <span className="tabular-nums text-sm">{r.phone}</span>,
+      renderCell: (r) => (
+        <span className="tabular-nums text-sm">{r.phone}</span>
+      ),
     },
     {
       key: 'note_satisfaction',
@@ -188,7 +201,9 @@ export function PrestatairesPage() {
     {
       key: 'nb_interventions',
       header: t('gestionnaire.prestataires.colInterventions'),
-      renderCell: (r) => <span className="tabular-nums">{r.nb_interventions}</span>,
+      renderCell: (r) => (
+        <span className="tabular-nums">{r.nb_interventions}</span>
+      ),
     },
     {
       key: 'statut',
@@ -197,7 +212,9 @@ export function PrestatairesPage() {
         const cls = STATUT_PRESTATAIRE[r.statut] ?? 'bg-gray-100 text-gray-600'
         return (
           <Badge className={cn(cls, 'hover:opacity-80 border-0')}>
-            {t(`gestionnaire.prestataires.statut.${r.statut}`, { defaultValue: r.statut })}
+            {t(`gestionnaire.prestataires.statut.${r.statut}`, {
+              defaultValue: r.statut,
+            })}
           </Badge>
         )
       },
@@ -217,9 +234,12 @@ export function PrestatairesPage() {
         <div>
           <p className="text-sm font-medium">{r.prestataire.name}</p>
           <p className="text-xs text-muted-foreground capitalize">
-            {t(`gestionnaire.prestataires.specialite.${r.prestataire.specialite}`, {
-              defaultValue: r.prestataire.specialite,
-            })}
+            {t(
+              `gestionnaire.prestataires.specialite.${r.prestataire.specialite}`,
+              {
+                defaultValue: r.prestataire.specialite,
+              },
+            )}
           </p>
         </div>
       ),
@@ -247,7 +267,12 @@ export function PrestatairesPage() {
       key: 'renouvellement_auto',
       header: t('gestionnaire.prestataires.colRenouvellement'),
       renderCell: (r) => (
-        <span className={cn('text-sm', r.renouvellement_auto ? 'text-green-700' : 'text-muted-foreground')}>
+        <span
+          className={cn(
+            'text-sm',
+            r.renouvellement_auto ? 'text-green-700' : 'text-muted-foreground',
+          )}
+        >
           {r.renouvellement_auto ? 'Oui' : 'Non'}
         </span>
       ),
@@ -259,7 +284,9 @@ export function PrestatairesPage() {
         const cls = STATUT_CONTRAT[r.statut] ?? 'bg-gray-100 text-gray-600'
         return (
           <Badge className={cn(cls, 'hover:opacity-80 border-0')}>
-            {t(`gestionnaire.prestataires.statut.${r.statut}`, { defaultValue: r.statut })}
+            {t(`gestionnaire.prestataires.statut.${r.statut}`, {
+              defaultValue: r.statut,
+            })}
           </Badge>
         )
       },
@@ -267,7 +294,10 @@ export function PrestatairesPage() {
   ]
 
   const TABS: { key: Tab; labelKey: string }[] = [
-    { key: 'prestataires', labelKey: 'gestionnaire.prestataires.tabPrestataires' },
+    {
+      key: 'prestataires',
+      labelKey: 'gestionnaire.prestataires.tabPrestataires',
+    },
     { key: 'contrats', labelKey: 'gestionnaire.prestataires.tabContrats' },
   ]
 
@@ -318,7 +348,9 @@ export function PrestatairesPage() {
           searchable
           emptyIcon={<Hammer className="size-12 text-muted-foreground" />}
           emptyTitle={t('gestionnaire.prestataires.emptyPrestataires')}
-          emptyDescription={t('gestionnaire.prestataires.emptyPrestatairesDesc')}
+          emptyDescription={t(
+            'gestionnaire.prestataires.emptyPrestatairesDesc',
+          )}
         />
       ) : (
         <DataTable
@@ -337,7 +369,9 @@ export function PrestatairesPage() {
       <Dialog open={createPrestaOpen} onOpenChange={setCreatePrestaOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{t('gestionnaire.prestataires.newPrestataire')}</DialogTitle>
+            <DialogTitle>
+              {t('gestionnaire.prestataires.newPrestataire')}
+            </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
@@ -346,7 +380,9 @@ export function PrestatairesPage() {
                 <Label>{t('gestionnaire.prestataires.form.nom')}</Label>
                 <Input
                   value={prestaForm.name}
-                  onChange={(e) => setPrestaForm((f) => ({ ...f, name: e.target.value }))}
+                  onChange={(e) =>
+                    setPrestaForm((f) => ({ ...f, name: e.target.value }))
+                  }
                   placeholder="Ascenseurs Maroc SARL"
                 />
               </div>
@@ -354,7 +390,9 @@ export function PrestatairesPage() {
                 <Label>{t('gestionnaire.prestataires.form.specialite')}</Label>
                 <Select
                   value={prestaForm.specialite}
-                  onValueChange={(v) => setPrestaForm((f) => ({ ...f, specialite: v }))}
+                  onValueChange={(v) =>
+                    setPrestaForm((f) => ({ ...f, specialite: v }))
+                  }
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue />
@@ -362,7 +400,9 @@ export function PrestatairesPage() {
                   <SelectContent>
                     {SPECIALITES.map((s) => (
                       <SelectItem key={s} value={s}>
-                        {t(`gestionnaire.prestataires.specialite.${s}`, { defaultValue: s })}
+                        {t(`gestionnaire.prestataires.specialite.${s}`, {
+                          defaultValue: s,
+                        })}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -372,7 +412,9 @@ export function PrestatairesPage() {
                 <Label>{t('gestionnaire.prestataires.form.telephone')}</Label>
                 <Input
                   value={prestaForm.phone}
-                  onChange={(e) => setPrestaForm((f) => ({ ...f, phone: e.target.value }))}
+                  onChange={(e) =>
+                    setPrestaForm((f) => ({ ...f, phone: e.target.value }))
+                  }
                   placeholder="+212522000000"
                 />
               </div>
@@ -381,7 +423,9 @@ export function PrestatairesPage() {
                 <Input
                   type="email"
                   value={prestaForm.email}
-                  onChange={(e) => setPrestaForm((f) => ({ ...f, email: e.target.value }))}
+                  onChange={(e) =>
+                    setPrestaForm((f) => ({ ...f, email: e.target.value }))
+                  }
                   placeholder="contact@prestataire.ma"
                 />
               </div>
@@ -389,7 +433,9 @@ export function PrestatairesPage() {
                 <Label>{t('gestionnaire.prestataires.form.adresse')}</Label>
                 <Input
                   value={prestaForm.adresse}
-                  onChange={(e) => setPrestaForm((f) => ({ ...f, adresse: e.target.value }))}
+                  onChange={(e) =>
+                    setPrestaForm((f) => ({ ...f, adresse: e.target.value }))
+                  }
                   placeholder="15 Bd Anfa, Casablanca"
                 />
               </div>
@@ -408,7 +454,9 @@ export function PrestatairesPage() {
               onClick={() => createPrestaMutation.mutate()}
               disabled={!isPrestaFormValid || createPrestaMutation.isPending}
             >
-              {createPrestaMutation.isPending ? t('actions.loading') : t('actions.save')}
+              {createPrestaMutation.isPending
+                ? t('actions.loading')
+                : t('actions.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -418,7 +466,9 @@ export function PrestatairesPage() {
       <Dialog open={createContratOpen} onOpenChange={setCreateContratOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{t('gestionnaire.prestataires.newContrat')}</DialogTitle>
+            <DialogTitle>
+              {t('gestionnaire.prestataires.newContrat')}
+            </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
@@ -426,7 +476,9 @@ export function PrestatairesPage() {
               <Label>{t('gestionnaire.prestataires.form.titre')}</Label>
               <Input
                 value={contratForm.titre}
-                onChange={(e) => setContratForm((f) => ({ ...f, titre: e.target.value }))}
+                onChange={(e) =>
+                  setContratForm((f) => ({ ...f, titre: e.target.value }))
+                }
                 placeholder="Contrat maintenance ascenseurs 2026"
               />
             </div>
@@ -436,7 +488,9 @@ export function PrestatairesPage() {
                 <Label>{t('gestionnaire.prestataires.form.prestataire')}</Label>
                 <Select
                   value={contratForm.prestataire_id}
-                  onValueChange={(v) => setContratForm((f) => ({ ...f, prestataire_id: v }))}
+                  onValueChange={(v) =>
+                    setContratForm((f) => ({ ...f, prestataire_id: v }))
+                  }
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Choisir" />
@@ -454,7 +508,9 @@ export function PrestatairesPage() {
                 <Label>{t('gestionnaire.prestataires.form.residence')}</Label>
                 <Select
                   value={contratForm.residence_id}
-                  onValueChange={(v) => setContratForm((f) => ({ ...f, residence_id: v }))}
+                  onValueChange={(v) =>
+                    setContratForm((f) => ({ ...f, residence_id: v }))
+                  }
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Choisir" />
@@ -472,7 +528,9 @@ export function PrestatairesPage() {
                 <Label>{t('gestionnaire.prestataires.form.typeContrat')}</Label>
                 <Select
                   value={contratForm.type_contrat}
-                  onValueChange={(v) => setContratForm((f) => ({ ...f, type_contrat: v }))}
+                  onValueChange={(v) =>
+                    setContratForm((f) => ({ ...f, type_contrat: v }))
+                  }
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue />
@@ -480,7 +538,9 @@ export function PrestatairesPage() {
                   <SelectContent>
                     {TYPE_CONTRATS.map((tc) => (
                       <SelectItem key={tc} value={tc}>
-                        {t(`gestionnaire.prestataires.typeContrat.${tc}`, { defaultValue: tc })}
+                        {t(`gestionnaire.prestataires.typeContrat.${tc}`, {
+                          defaultValue: tc,
+                        })}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -492,7 +552,12 @@ export function PrestatairesPage() {
                   type="number"
                   min={0}
                   value={contratForm.montant_annuel}
-                  onChange={(e) => setContratForm((f) => ({ ...f, montant_annuel: e.target.value }))}
+                  onChange={(e) =>
+                    setContratForm((f) => ({
+                      ...f,
+                      montant_annuel: e.target.value,
+                    }))
+                  }
                   placeholder="18000"
                 />
               </div>
@@ -501,7 +566,12 @@ export function PrestatairesPage() {
                 <Input
                   type="date"
                   value={contratForm.date_debut}
-                  onChange={(e) => setContratForm((f) => ({ ...f, date_debut: e.target.value }))}
+                  onChange={(e) =>
+                    setContratForm((f) => ({
+                      ...f,
+                      date_debut: e.target.value,
+                    }))
+                  }
                 />
               </div>
               <div className="space-y-1">
@@ -509,7 +579,9 @@ export function PrestatairesPage() {
                 <Input
                   type="date"
                   value={contratForm.date_fin}
-                  onChange={(e) => setContratForm((f) => ({ ...f, date_fin: e.target.value }))}
+                  onChange={(e) =>
+                    setContratForm((f) => ({ ...f, date_fin: e.target.value }))
+                  }
                 />
               </div>
             </div>
@@ -520,7 +592,10 @@ export function PrestatairesPage() {
                 type="checkbox"
                 checked={contratForm.renouvellement_auto}
                 onChange={(e) =>
-                  setContratForm((f) => ({ ...f, renouvellement_auto: e.target.checked }))
+                  setContratForm((f) => ({
+                    ...f,
+                    renouvellement_auto: e.target.checked,
+                  }))
                 }
                 className="size-4 accent-[var(--color-imaro-primary)]"
               />
@@ -542,7 +617,9 @@ export function PrestatairesPage() {
               onClick={() => createContratMutation.mutate()}
               disabled={!isContratFormValid || createContratMutation.isPending}
             >
-              {createContratMutation.isPending ? t('actions.loading') : t('actions.save')}
+              {createContratMutation.isPending
+                ? t('actions.loading')
+                : t('actions.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -554,7 +631,8 @@ export function PrestatairesPage() {
 // ─── StarRating ───────────────────────────────────────────────────────────────
 
 function StarRating({ value }: { value: number | null }) {
-  if (value === null) return <span className="text-xs text-muted-foreground">—</span>
+  if (value === null)
+    return <span className="text-xs text-muted-foreground">—</span>
   return (
     <div className="flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((i) => (
@@ -562,7 +640,9 @@ function StarRating({ value }: { value: number | null }) {
           key={i}
           className={cn(
             'size-3.5',
-            i <= value ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/30',
+            i <= value
+              ? 'fill-amber-400 text-amber-400'
+              : 'text-muted-foreground/30',
           )}
         />
       ))}
@@ -586,12 +666,26 @@ function ExpiryCell({
   })
 
   if (contrat.statut !== 'actif') {
-    return <span className="text-sm tabular-nums text-muted-foreground">{dateStr}</span>
+    return (
+      <span className="text-sm tabular-nums text-muted-foreground">
+        {dateStr}
+      </span>
+    )
   }
 
   const days = contrat.jours_avant_expiration
-  const urgentCls = days <= 0 ? 'text-red-600' : days <= 30 ? 'text-red-600' : days <= 60 ? 'text-orange-600' : 'text-muted-foreground'
-  const label = days <= 0 ? t('gestionnaire.prestataires.expired') : t('gestionnaire.prestataires.expiresIn', { n: days })
+  const urgentCls =
+    days <= 0
+      ? 'text-red-600'
+      : days <= 30
+        ? 'text-red-600'
+        : days <= 60
+          ? 'text-orange-600'
+          : 'text-muted-foreground'
+  const label =
+    days <= 0
+      ? t('gestionnaire.prestataires.expired')
+      : t('gestionnaire.prestataires.expiresIn', { n: days })
 
   return (
     <div>

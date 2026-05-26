@@ -2,50 +2,94 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import {
-  CalendarCheck, Calendar, Lock, Users, Archive,
-  CheckCircle2, Circle, AlertTriangle, Clock,
+  CalendarCheck,
+  Calendar,
+  Lock,
+  Users,
+  Archive,
+  CheckCircle2,
+  Circle,
+  AlertTriangle,
+  Clock,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { getResidences } from '@/services/gestionnaire.service'
 import {
   getComplianceCalendar,
-  type CompliancePhase, type ComplianceTask,
+  type CompliancePhase,
+  type ComplianceTask,
 } from '@/services/conformite.service'
 
-const PHASE_META: Record<CompliancePhase, { label: string; icon: typeof Calendar; color: string }> = {
-  operations_mensuelles: { label: 'Opérations mensuelles', icon: Calendar,      color: '#2980b9' },
-  cloture_exercice:      { label: "Clôture d'exercice",     icon: Lock,          color: '#E67E22' },
-  preparation_ag:        { label: "Préparation de l'AG",   icon: Users,          color: '#8E44AD' },
-  archivage:             { label: 'Archivage',              icon: Archive,        color: '#27AE60' },
+const PHASE_META: Record<
+  CompliancePhase,
+  { label: string; icon: typeof Calendar; color: string }
+> = {
+  operations_mensuelles: {
+    label: 'Opérations mensuelles',
+    icon: Calendar,
+    color: '#2980b9',
+  },
+  cloture_exercice: {
+    label: "Clôture d'exercice",
+    icon: Lock,
+    color: '#E67E22',
+  },
+  preparation_ag: {
+    label: "Préparation de l'AG",
+    icon: Users,
+    color: '#8E44AD',
+  },
+  archivage: { label: 'Archivage', icon: Archive, color: '#27AE60' },
 }
 
 const STATUS_STYLES: Record<ComplianceTask['status'], string> = {
-  pending:     'text-muted-foreground',
+  pending: 'text-muted-foreground',
   in_progress: 'text-blue-600 dark:text-blue-400',
-  done:        'text-green-600 dark:text-green-400',
-  skipped:     'text-muted-foreground line-through',
-  overdue:     'text-red-600 dark:text-red-400',
+  done: 'text-green-600 dark:text-green-400',
+  skipped: 'text-muted-foreground line-through',
+  overdue: 'text-red-600 dark:text-red-400',
 }
 
-const STATUS_BADGES: Record<ComplianceTask['status'], { label: string; cls: string }> = {
-  pending:     { label: 'À faire',     cls: 'border-gray-200 bg-gray-50 text-gray-600' },
-  in_progress: { label: 'En cours',    cls: 'border-blue-200 bg-blue-50 text-blue-700' },
-  done:        { label: 'Terminé',     cls: 'border-green-200 bg-green-50 text-green-700' },
-  skipped:     { label: 'Ignoré',      cls: 'border-gray-200 bg-gray-50 text-gray-400' },
-  overdue:     { label: 'En retard',   cls: 'border-red-200 bg-red-50 text-red-700' },
+const STATUS_BADGES: Record<
+  ComplianceTask['status'],
+  { label: string; cls: string }
+> = {
+  pending: {
+    label: 'À faire',
+    cls: 'border-gray-200 bg-gray-50 text-gray-600',
+  },
+  in_progress: {
+    label: 'En cours',
+    cls: 'border-blue-200 bg-blue-50 text-blue-700',
+  },
+  done: {
+    label: 'Terminé',
+    cls: 'border-green-200 bg-green-50 text-green-700',
+  },
+  skipped: { label: 'Ignoré', cls: 'border-gray-200 bg-gray-50 text-gray-400' },
+  overdue: { label: 'En retard', cls: 'border-red-200 bg-red-50 text-red-700' },
 }
 
 export function ConformitePage() {
   const { t } = useTranslation()
 
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(null)
+  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
+    null,
+  )
   const [exercice, setExercice] = useState(2026)
 
-  const residencesQ = useQuery({ queryKey: ['residences'], queryFn: () => getResidences() })
+  const residencesQ = useQuery({
+    queryKey: ['residences'],
+    queryFn: () => getResidences(),
+  })
 
   const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
 
@@ -67,7 +111,9 @@ export function ConformitePage() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-foreground">
-            {t('gestionnaire.conformite.title', { defaultValue: 'Calendrier de conformité' })}
+            {t('gestionnaire.conformite.title', {
+              defaultValue: 'Calendrier de conformité',
+            })}
           </h1>
           <p className="text-sm text-muted-foreground">
             {t('gestionnaire.conformite.subtitle', {
@@ -80,21 +126,35 @@ export function ConformitePage() {
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <label className="text-sm font-medium">Résidence</label>
-        <Select value={residenceId ? String(residenceId) : ''} onValueChange={(v) => setPickedResidenceId(Number(v))}>
-          <SelectTrigger className="w-64"><SelectValue placeholder="Sélectionner" /></SelectTrigger>
+        <Select
+          value={residenceId ? String(residenceId) : ''}
+          onValueChange={(v) => setPickedResidenceId(Number(v))}
+        >
+          <SelectTrigger className="w-64">
+            <SelectValue placeholder="Sélectionner" />
+          </SelectTrigger>
           <SelectContent>
             {(residencesQ.data ?? []).map((r) => (
-              <SelectItem key={r.id} value={String(r.id)}>{r.name}</SelectItem>
+              <SelectItem key={r.id} value={String(r.id)}>
+                {r.name}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <label className="text-sm font-medium">Exercice</label>
-        <Select value={String(exercice)} onValueChange={(v) => setExercice(Number(v))}>
-          <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
+        <Select
+          value={String(exercice)}
+          onValueChange={(v) => setExercice(Number(v))}
+        >
+          <SelectTrigger className="w-28">
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             {[2024, 2025, 2026, 2027].map((y) => (
-              <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+              <SelectItem key={y} value={String(y)}>
+                {y}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -106,7 +166,9 @@ export function ConformitePage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold">Exercice {calendar.exercice}</h2>
+                <h2 className="text-lg font-bold">
+                  Exercice {calendar.exercice}
+                </h2>
                 <Badge
                   variant="outline"
                   className={cn(
@@ -129,15 +191,33 @@ export function ConformitePage() {
             {/* Progress ring */}
             <div className="relative size-20">
               <svg className="size-20 -rotate-90" viewBox="0 0 80 80">
-                <circle cx="40" cy="40" r="34" stroke="currentColor" strokeWidth="6"
-                        fill="none" className="text-muted-foreground/15" />
-                <circle cx="40" cy="40" r="34" stroke="#1B4F72" strokeWidth="6" fill="none"
-                        strokeDasharray={`${calendar.progression_pct * 2.13} 213`}
-                        strokeLinecap="round" />
+                <circle
+                  cx="40"
+                  cy="40"
+                  r="34"
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  fill="none"
+                  className="text-muted-foreground/15"
+                />
+                <circle
+                  cx="40"
+                  cy="40"
+                  r="34"
+                  stroke="#1B4F72"
+                  strokeWidth="6"
+                  fill="none"
+                  strokeDasharray={`${calendar.progression_pct * 2.13} 213`}
+                  strokeLinecap="round"
+                />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-xl font-bold text-[#1B4F72]">{calendar.progression_pct}%</span>
-                <span className="text-[10px] uppercase text-muted-foreground">Avancement</span>
+                <span className="text-xl font-bold text-[#1B4F72]">
+                  {calendar.progression_pct}%
+                </span>
+                <span className="text-[10px] uppercase text-muted-foreground">
+                  Avancement
+                </span>
               </div>
             </div>
           </div>
@@ -163,14 +243,27 @@ export function ConformitePage() {
                     <div
                       className={cn(
                         'flex size-12 items-center justify-center rounded-full transition-all',
-                        isDone && 'bg-green-100 text-green-600 dark:bg-green-950/30',
-                        isCurrent && 'bg-[#1B4F72] text-white shadow-md ring-4 ring-[#1B4F72]/15',
-                        !isDone && !isCurrent && 'bg-muted text-muted-foreground/40',
+                        isDone &&
+                          'bg-green-100 text-green-600 dark:bg-green-950/30',
+                        isCurrent &&
+                          'bg-[#1B4F72] text-white shadow-md ring-4 ring-[#1B4F72]/15',
+                        !isDone &&
+                          !isCurrent &&
+                          'bg-muted text-muted-foreground/40',
                       )}
                     >
-                      {isDone ? <CheckCircle2 className="size-5" /> : <Icon className="size-5" />}
+                      {isDone ? (
+                        <CheckCircle2 className="size-5" />
+                      ) : (
+                        <Icon className="size-5" />
+                      )}
                     </div>
-                    <span className={cn('max-w-[110px] text-center text-xs font-medium', isCurrent && 'text-[#1B4F72]')}>
+                    <span
+                      className={cn(
+                        'max-w-[110px] text-center text-xs font-medium',
+                        isCurrent && 'text-[#1B4F72]',
+                      )}
+                    >
                       {meta.label}
                     </span>
                   </div>
@@ -199,39 +292,66 @@ export function ConformitePage() {
               <div className="mb-4 flex items-center gap-3">
                 <div
                   className="flex size-9 items-center justify-center rounded-lg"
-                  style={{ backgroundColor: `${meta.color}1a`, color: meta.color }}
+                  style={{
+                    backgroundColor: `${meta.color}1a`,
+                    color: meta.color,
+                  }}
                 >
                   <Icon className="size-4" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-sm font-semibold">{meta.label}</h3>
                   <p className="text-xs text-muted-foreground">
-                    {p.tasks.filter((t) => t.status === 'done').length}/{p.tasks.length} tâches terminées
+                    {p.tasks.filter((t) => t.status === 'done').length}/
+                    {p.tasks.length} tâches terminées
                   </p>
                 </div>
-                <span className="text-xs font-medium text-muted-foreground">{p.progress_pct}%</span>
+                <span className="text-xs font-medium text-muted-foreground">
+                  {p.progress_pct}%
+                </span>
               </div>
 
               <ul className="space-y-2">
                 {p.tasks.map((task) => (
                   <li key={task.id} className="flex items-center gap-2 text-sm">
-                    {task.status === 'done' && <CheckCircle2 className="size-4 text-green-500 shrink-0" />}
-                    {task.status === 'in_progress' && <Clock className="size-4 text-blue-500 shrink-0 animate-pulse" />}
-                    {task.status === 'overdue' && <AlertTriangle className="size-4 text-red-500 shrink-0" />}
-                    {(task.status === 'pending' || task.status === 'skipped') && (
+                    {task.status === 'done' && (
+                      <CheckCircle2 className="size-4 text-green-500 shrink-0" />
+                    )}
+                    {task.status === 'in_progress' && (
+                      <Clock className="size-4 text-blue-500 shrink-0 animate-pulse" />
+                    )}
+                    {task.status === 'overdue' && (
+                      <AlertTriangle className="size-4 text-red-500 shrink-0" />
+                    )}
+                    {(task.status === 'pending' ||
+                      task.status === 'skipped') && (
                       <Circle className="size-4 text-muted-foreground/40 shrink-0" />
                     )}
 
-                    <span className={cn('flex-1 text-xs', STATUS_STYLES[task.status])}>
+                    <span
+                      className={cn(
+                        'flex-1 text-xs',
+                        STATUS_STYLES[task.status],
+                      )}
+                    >
                       {task.task_label}
                     </span>
 
                     {task.due_date && (
                       <span className="text-[10px] text-muted-foreground">
-                        {new Intl.DateTimeFormat('fr-MA', { day: '2-digit', month: 'short' }).format(new Date(task.due_date))}
+                        {new Intl.DateTimeFormat('fr-MA', {
+                          day: '2-digit',
+                          month: 'short',
+                        }).format(new Date(task.due_date))}
                       </span>
                     )}
-                    <Badge variant="outline" className={cn('h-4 text-[9px] px-1.5', STATUS_BADGES[task.status].cls)}>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        'h-4 text-[9px] px-1.5',
+                        STATUS_BADGES[task.status].cls,
+                      )}
+                    >
                       {STATUS_BADGES[task.status].label}
                     </Badge>
                   </li>

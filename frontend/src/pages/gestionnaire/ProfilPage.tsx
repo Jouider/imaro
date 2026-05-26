@@ -2,7 +2,17 @@ import { useState, useRef } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { Building2, Bell, Shield, LogOut, Pencil, Check, X, ImagePlus, Trash2 } from 'lucide-react'
+import {
+  Building2,
+  Bell,
+  Shield,
+  LogOut,
+  Pencil,
+  Check,
+  X,
+  ImagePlus,
+  Trash2,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
@@ -107,7 +117,9 @@ export function ProfilPage() {
           <div className="relative shrink-0">
             <div
               className="flex size-20 items-center justify-center rounded-full text-2xl font-bold text-white"
-              style={{ background: 'linear-gradient(135deg, #2980b9, #1b4f72)' }}
+              style={{
+                background: 'linear-gradient(135deg, #2980b9, #1b4f72)',
+              }}
             >
               {initials}
             </div>
@@ -136,7 +148,9 @@ export function ProfilPage() {
                 {user?.role === 'manager' ? 'Manager' : 'Gestionnaire'}
               </Badge>
             </div>
-            <p className="mt-1.5 text-sm text-muted-foreground">{user?.phone ?? '—'}</p>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              {user?.phone ?? '—'}
+            </p>
             {tenant && (
               <p className="text-sm text-muted-foreground">{tenant.name}</p>
             )}
@@ -184,7 +198,9 @@ export function ProfilPage() {
       <div className="rounded-2xl bg-white shadow-sm p-6 dark:bg-card">
         <div className="flex items-center gap-2 mb-1">
           <ImagePlus className="size-4 shrink-0" style={{ color: '#1B4F72' }} />
-          <h2 className="text-base font-semibold text-foreground">Logo du Syndic</h2>
+          <h2 className="text-base font-semibold text-foreground">
+            Logo du Syndic
+          </h2>
         </div>
         <p className="text-sm text-muted-foreground mb-5">
           Affiché dans la barre de navigation. PNG ou JPG, 2 Mo max.
@@ -245,7 +261,9 @@ export function ProfilPage() {
       <div className="rounded-2xl bg-white shadow-sm p-6 dark:bg-card">
         <div className="flex items-center gap-2 mb-4">
           <Building2 className="size-4 shrink-0" style={{ color: '#1B4F72' }} />
-          <h2 className="text-base font-semibold text-foreground">Syndic & Abonnement</h2>
+          <h2 className="text-base font-semibold text-foreground">
+            Syndic & Abonnement
+          </h2>
         </div>
 
         <div className="space-y-3">
@@ -258,7 +276,9 @@ export function ProfilPage() {
           <Separator />
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Société</span>
-            <span className="text-sm font-medium text-foreground">{tenant?.name ?? '—'}</span>
+            <span className="text-sm font-medium text-foreground">
+              {tenant?.name ?? '—'}
+            </span>
           </div>
         </div>
 
@@ -335,7 +355,10 @@ export function ProfilPage() {
               onChange: setNotifRetard,
             },
           ].map((item) => (
-            <div key={item.id} className="flex items-start justify-between gap-3">
+            <div
+              key={item.id}
+              className="flex items-start justify-between gap-3"
+            >
               <div className="flex-1 min-w-0">
                 <Label
                   htmlFor={item.id}
@@ -369,7 +392,9 @@ export function ProfilPage() {
 
       {/* ── 5. Apparence ── */}
       <div className="rounded-2xl bg-white shadow-sm p-6 dark:bg-card">
-        <h2 className="text-base font-semibold text-foreground mb-4">Apparence</h2>
+        <h2 className="text-base font-semibold text-foreground mb-4">
+          Apparence
+        </h2>
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">Mode sombre</span>
           <ThemeToggle />
@@ -380,7 +405,9 @@ export function ProfilPage() {
       <div className="rounded-2xl bg-white shadow-sm p-6 dark:bg-card">
         <div className="flex items-center gap-2 mb-1">
           <Shield className="size-4 shrink-0" style={{ color: '#1B4F72' }} />
-          <h2 className="text-base font-semibold text-foreground">Mes Données Personnelles</h2>
+          <h2 className="text-base font-semibold text-foreground">
+            Mes Données Personnelles
+          </h2>
         </div>
         <p className="text-sm text-muted-foreground mb-5">
           Vos droits conformément à la{' '}
@@ -396,12 +423,17 @@ export function ProfilPage() {
               Droit d'accès (Article 7)
             </p>
             <p className="text-xs text-muted-foreground mb-3">
-              Demandez une copie de toutes vos données. L'export sera disponible sous 48h.
+              Demandez une copie de toutes vos données. L'export sera disponible
+              sous 48h.
             </p>
             <Button
               size="sm"
               variant="outline"
-              onClick={() => toast.info('Demande enregistrée. Vous recevrez votre export sous 48h.')}
+              onClick={() =>
+                toast.info(
+                  'Demande enregistrée. Vous recevrez votre export sous 48h.',
+                )
+              }
             >
               Demander l'export
             </Button>
@@ -415,7 +447,8 @@ export function ProfilPage() {
                   Droit de rectification (Article 8)
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Modifiez vos informations personnelles dans la section ci-dessus.
+                  Modifiez vos informations personnelles dans la section
+                  ci-dessus.
                 </p>
               </div>
               <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
@@ -430,7 +463,8 @@ export function ProfilPage() {
               Droit de suppression (Article 8)
             </p>
             <p className="text-xs text-muted-foreground mb-3">
-              Demandez la suppression de votre compte. Un administrateur examinera votre demande.
+              Demandez la suppression de votre compte. Un administrateur
+              examinera votre demande.
             </p>
             <Button
               size="sm"
@@ -447,8 +481,8 @@ export function ProfilPage() {
         </div>
 
         <p className="mt-4 text-xs text-muted-foreground border-t pt-4 dark:border-border">
-          Certaines données comptables peuvent être conservées 10 ans conformément aux obligations
-          légales marocaines.
+          Certaines données comptables peuvent être conservées 10 ans
+          conformément aux obligations légales marocaines.
         </p>
       </div>
 

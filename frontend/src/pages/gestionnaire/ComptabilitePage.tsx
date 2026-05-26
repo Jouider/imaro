@@ -114,13 +114,30 @@ const MODE_BADGE_STYLES: Record<Depense['mode_paiement'], string> = {
   autre: 'bg-gray-100 text-gray-600',
 }
 
-const PIE_COLORS = [IMARO_PRIMARY, IMARO_ACCENT, '#27AE60', '#8E44AD', '#95A5A6', '#E74C3C']
+const PIE_COLORS = [
+  IMARO_PRIMARY,
+  IMARO_ACCENT,
+  '#27AE60',
+  '#8E44AD',
+  '#95A5A6',
+  '#E74C3C',
+]
 
-const fmt = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+const fmt = new Intl.NumberFormat('fr-FR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type ActiveTab = 'dashboard' | 'journal' | 'grandLivre' | 'balance' | 'depenses' | 'rapports' | 'cloture'
+type ActiveTab =
+  | 'dashboard'
+  | 'journal'
+  | 'grandLivre'
+  | 'balance'
+  | 'depenses'
+  | 'rapports'
+  | 'cloture'
 
 type DepenseFormState = {
   titre: string
@@ -209,7 +226,9 @@ function NouvelleDepenseModal({
   })
 
   const compteClasse6 = comptes.filter(
-    (c) => c.classe === 6 && c.libelle.toLowerCase().includes(compteSearch.toLowerCase()),
+    (c) =>
+      c.classe === 6 &&
+      c.libelle.toLowerCase().includes(compteSearch.toLowerCase()),
   )
 
   const mutation = useMutation({
@@ -232,7 +251,11 @@ function NouvelleDepenseModal({
       setForm(EMPTY_DEPENSE_FORM)
       setIaResult(null)
       setShowIa(false)
-      toast.success(t('gestionnaire.comptabilite.depenses.add', { defaultValue: 'Dépense ajoutée' }))
+      toast.success(
+        t('gestionnaire.comptabilite.depenses.add', {
+          defaultValue: 'Dépense ajoutée',
+        }),
+      )
     },
     onError: () => toast.error('Erreur lors de la création'),
   })
@@ -263,7 +286,8 @@ function NouvelleDepenseModal({
     setShowIa(false)
   }
 
-  const isValid = form.titre.trim() && form.montant && form.date && form.compte_charge
+  const isValid =
+    form.titre.trim() && form.montant && form.date && form.compte_charge
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -271,7 +295,9 @@ function NouvelleDepenseModal({
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle>
-              {t('gestionnaire.comptabilite.depenses.add', { defaultValue: 'Nouvelle dépense' })}
+              {t('gestionnaire.comptabilite.depenses.add', {
+                defaultValue: 'Nouvelle dépense',
+              })}
             </DialogTitle>
             <Button
               type="button"
@@ -281,7 +307,9 @@ function NouvelleDepenseModal({
               className="flex items-center gap-1.5 text-xs"
             >
               <Sparkles className="size-3.5 text-purple-500" />
-              {t('gestionnaire.comptabilite.depenses.form.importIa', { defaultValue: 'Import IA' })}
+              {t('gestionnaire.comptabilite.depenses.form.importIa', {
+                defaultValue: 'Import IA',
+              })}
             </Button>
           </div>
         </DialogHeader>
@@ -291,7 +319,10 @@ function NouvelleDepenseModal({
           {showIa && (
             <div className="rounded-lg border border-purple-200 bg-purple-50 p-3 dark:border-purple-800 dark:bg-purple-950/30">
               <p className="mb-2 text-xs font-medium text-purple-700 dark:text-purple-300">
-                {t('gestionnaire.comptabilite.depenses.form.importIa', { defaultValue: 'Import IA' })} — Analysez une facture automatiquement
+                {t('gestionnaire.comptabilite.depenses.form.importIa', {
+                  defaultValue: 'Import IA',
+                })}{' '}
+                — Analysez une facture automatiquement
               </p>
               <div className="flex items-center gap-2">
                 <Input
@@ -309,23 +340,37 @@ function NouvelleDepenseModal({
                   {iaLoading ? (
                     <Loader2 className="size-3.5 animate-spin" />
                   ) : (
-                    t('gestionnaire.comptabilite.depenses.form.analyser', { defaultValue: 'Analyser' })
+                    t('gestionnaire.comptabilite.depenses.form.analyser', {
+                      defaultValue: 'Analyser',
+                    })
                   )}
                 </Button>
               </div>
               {iaResult && (
                 <div className="mt-2 space-y-1 rounded border bg-white p-2 text-xs dark:bg-card">
                   <p>
-                    <strong>{t('gestionnaire.comptabilite.depenses.form.titre', { defaultValue: 'Titre' })}:</strong> {iaResult.titre}
+                    <strong>
+                      {t('gestionnaire.comptabilite.depenses.form.titre', {
+                        defaultValue: 'Titre',
+                      })}
+                      :
+                    </strong>{' '}
+                    {iaResult.titre}
                   </p>
                   <p>
                     <strong>Montant:</strong> {fmt.format(iaResult.montant)} DH
                   </p>
                   <p>
-                    <strong>Compte suggéré:</strong> {iaResult.compte_charge_suggere}
+                    <strong>Compte suggéré:</strong>{' '}
+                    {iaResult.compte_charge_suggere}
                   </p>
                   <p>
-                    <strong>{t('gestionnaire.comptabilite.depenses.form.confiance', { defaultValue: 'Confiance' })}:</strong>{' '}
+                    <strong>
+                      {t('gestionnaire.comptabilite.depenses.form.confiance', {
+                        defaultValue: 'Confiance',
+                      })}
+                      :
+                    </strong>{' '}
                     <span
                       className={cn(
                         'font-medium',
@@ -346,7 +391,9 @@ function NouvelleDepenseModal({
                     onClick={handleUtiliserIa}
                     className="mt-1"
                   >
-                    {t('gestionnaire.comptabilite.depenses.form.utiliser', { defaultValue: 'Utiliser ces données' })}
+                    {t('gestionnaire.comptabilite.depenses.form.utiliser', {
+                      defaultValue: 'Utiliser ces données',
+                    })}
                   </Button>
                 </div>
               )}
@@ -354,36 +401,58 @@ function NouvelleDepenseModal({
           )}
 
           <div className="space-y-1">
-            <Label>{t('gestionnaire.comptabilite.depenses.form.titre', { defaultValue: 'Titre' })}</Label>
+            <Label>
+              {t('gestionnaire.comptabilite.depenses.form.titre', {
+                defaultValue: 'Titre',
+              })}
+            </Label>
             <Input
               value={form.titre}
-              onChange={(e) => setForm((f) => ({ ...f, titre: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, titre: e.target.value }))
+              }
               placeholder="Gardiennage Juin 2026"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label>{t('gestionnaire.comptabilite.depenses.form.montant', { defaultValue: 'Montant (MAD)' })}</Label>
+              <Label>
+                {t('gestionnaire.comptabilite.depenses.form.montant', {
+                  defaultValue: 'Montant (MAD)',
+                })}
+              </Label>
               <Input
                 type="number"
                 value={form.montant}
-                onChange={(e) => setForm((f) => ({ ...f, montant: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, montant: e.target.value }))
+                }
                 placeholder="3500"
               />
             </div>
             <div className="space-y-1">
-              <Label>{t('gestionnaire.comptabilite.depenses.form.date', { defaultValue: 'Date' })}</Label>
+              <Label>
+                {t('gestionnaire.comptabilite.depenses.form.date', {
+                  defaultValue: 'Date',
+                })}
+              </Label>
               <Input
                 type="date"
                 value={form.date}
-                onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, date: e.target.value }))
+                }
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <Label>{t('gestionnaire.comptabilite.depenses.form.compte', { defaultValue: 'Compte de charge' })}</Label>
+            <Label>
+              {t('gestionnaire.comptabilite.depenses.form.compte', {
+                defaultValue: 'Compte de charge',
+              })}
+            </Label>
             <Input
               value={compteSearch}
               onChange={(e) => setCompteSearch(e.target.value)}
@@ -392,7 +461,9 @@ function NouvelleDepenseModal({
             />
             <Select
               value={form.compte_charge}
-              onValueChange={(v) => setForm((f) => ({ ...f, compte_charge: v }))}
+              onValueChange={(v) =>
+                setForm((f) => ({ ...f, compte_charge: v }))
+              }
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Sélectionner un compte..." />
@@ -408,18 +479,35 @@ function NouvelleDepenseModal({
           </div>
 
           <div className="space-y-1">
-            <Label>{t('gestionnaire.comptabilite.depenses.form.mode', { defaultValue: 'Mode de paiement' })}</Label>
+            <Label>
+              {t('gestionnaire.comptabilite.depenses.form.mode', {
+                defaultValue: 'Mode de paiement',
+              })}
+            </Label>
             <Select
               value={form.mode_paiement}
-              onValueChange={(v) => setForm((f) => ({ ...f, mode_paiement: v }))}
+              onValueChange={(v) =>
+                setForm((f) => ({ ...f, mode_paiement: v }))
+              }
             >
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {(['virement', 'cheque', 'especes', 'cb', 'prelevement', 'autre'] as const).map((m) => (
+                {(
+                  [
+                    'virement',
+                    'cheque',
+                    'especes',
+                    'cb',
+                    'prelevement',
+                    'autre',
+                  ] as const
+                ).map((m) => (
                   <SelectItem key={m} value={m}>
-                    {t(`gestionnaire.comptabilite.depenses.modes.${m}`, { defaultValue: m })}
+                    {t(`gestionnaire.comptabilite.depenses.modes.${m}`, {
+                      defaultValue: m,
+                    })}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -427,21 +515,34 @@ function NouvelleDepenseModal({
           </div>
 
           <div className="space-y-1">
-            <Label>{t('gestionnaire.comptabilite.depenses.form.prestataire', { defaultValue: 'Prestataire (optionnel)' })}</Label>
+            <Label>
+              {t('gestionnaire.comptabilite.depenses.form.prestataire', {
+                defaultValue: 'Prestataire (optionnel)',
+              })}
+            </Label>
             <Input
               value={form.prestataire}
-              onChange={(e) => setForm((f) => ({ ...f, prestataire: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, prestataire: e.target.value }))
+              }
               placeholder="Nom du prestataire"
             />
           </div>
 
           <div className="space-y-1">
-            <Label>{t('gestionnaire.comptabilite.depenses.form.justificatif', { defaultValue: 'Pièce justificative' })}</Label>
+            <Label>
+              {t('gestionnaire.comptabilite.depenses.form.justificatif', {
+                defaultValue: 'Pièce justificative',
+              })}
+            </Label>
             <Input
               type="file"
               accept=".pdf,.jpg,.jpeg,.png"
               onChange={(e) =>
-                setForm((f) => ({ ...f, justificatif: e.target.files?.[0] ?? null }))
+                setForm((f) => ({
+                  ...f,
+                  justificatif: e.target.files?.[0] ?? null,
+                }))
               }
             />
           </div>
@@ -475,7 +576,11 @@ type EncaisserModalProps = {
   exerciceId: number
 }
 
-function EncaisserModal({ open, onOpenChange, exerciceId }: EncaisserModalProps) {
+function EncaisserModal({
+  open,
+  onOpenChange,
+  exerciceId,
+}: EncaisserModalProps) {
   const { t } = useTranslation()
   const qc = useQueryClient()
   const [form, setForm] = useState<EncaisserFormState>(EMPTY_ENCAISSER_FORM)
@@ -494,7 +599,8 @@ function EncaisserModal({ open, onOpenChange, exerciceId }: EncaisserModalProps)
         date: form.date,
         mode_paiement: form.mode_paiement,
         compte_destination: form.compte_destination,
-        reference_cheque: form.mode_paiement === 'cheque' ? form.reference_cheque : undefined,
+        reference_cheque:
+          form.mode_paiement === 'cheque' ? form.reference_cheque : undefined,
       }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['encaissements', exerciceId] })
@@ -502,9 +608,13 @@ function EncaisserModal({ open, onOpenChange, exerciceId }: EncaisserModalProps)
       void qc.invalidateQueries({ queryKey: ['dashboard-compta', exerciceId] })
       onOpenChange(false)
       setForm(EMPTY_ENCAISSER_FORM)
-      toast.success(t('gestionnaire.comptabilite.encaissement.title', { defaultValue: 'Encaissement enregistré' }))
+      toast.success(
+        t('gestionnaire.comptabilite.encaissement.title', {
+          defaultValue: 'Encaissement enregistré',
+        }),
+      )
     },
-    onError: () => toast.error('Erreur lors de l\'enregistrement'),
+    onError: () => toast.error("Erreur lors de l'enregistrement"),
   })
 
   function selectCreance(c: (typeof MOCK_CREANCES)[number]) {
@@ -524,25 +634,36 @@ function EncaisserModal({ open, onOpenChange, exerciceId }: EncaisserModalProps)
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {t('gestionnaire.comptabilite.encaissement.title', { defaultValue: 'Encaisser un paiement' })}
+            {t('gestionnaire.comptabilite.encaissement.title', {
+              defaultValue: 'Encaisser un paiement',
+            })}
           </DialogTitle>
         </DialogHeader>
 
         {form.step === 1 ? (
           <div className="space-y-3">
             <p className="text-sm font-medium text-muted-foreground">
-              {t('gestionnaire.comptabilite.encaissement.step1', { defaultValue: 'Sélectionner créance' })}
+              {t('gestionnaire.comptabilite.encaissement.step1', {
+                defaultValue: 'Sélectionner créance',
+              })}
             </p>
             <Input
               value={form.search}
-              onChange={(e) => setForm((f) => ({ ...f, search: e.target.value }))}
-              placeholder={t('gestionnaire.comptabilite.encaissement.recherche', {
-                defaultValue: 'Rechercher copropriétaire ou N° lot',
-              })}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, search: e.target.value }))
+              }
+              placeholder={t(
+                'gestionnaire.comptabilite.encaissement.recherche',
+                {
+                  defaultValue: 'Rechercher copropriétaire ou N° lot',
+                },
+              )}
             />
             <div className="max-h-60 overflow-y-auto rounded-lg border">
               {filteredCreances.length === 0 ? (
-                <p className="p-4 text-center text-sm text-muted-foreground">Aucune créance</p>
+                <p className="p-4 text-center text-sm text-muted-foreground">
+                  Aucune créance
+                </p>
               ) : (
                 filteredCreances.map((c) => (
                   <button
@@ -553,9 +674,13 @@ function EncaisserModal({ open, onOpenChange, exerciceId }: EncaisserModalProps)
                   >
                     <div className="text-left">
                       <p className="font-medium">{c.nom}</p>
-                      <p className="text-xs text-muted-foreground">Lot {c.lot}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Lot {c.lot}
+                      </p>
                     </div>
-                    <span className="font-semibold text-red-600">{fmt.format(c.solde)} DH</span>
+                    <span className="font-semibold text-red-600">
+                      {fmt.format(c.solde)} DH
+                    </span>
                   </button>
                 ))
               )}
@@ -565,38 +690,64 @@ function EncaisserModal({ open, onOpenChange, exerciceId }: EncaisserModalProps)
           <div className="space-y-4">
             <div className="rounded-lg bg-muted/40 p-3">
               <p className="font-medium">{form.selectedNom}</p>
-              <p className="text-sm text-muted-foreground">Lot {form.selectedLot}</p>
+              <p className="text-sm text-muted-foreground">
+                Lot {form.selectedLot}
+              </p>
               <p className="mt-1 text-sm">
-                {t('gestionnaire.comptabilite.encaissement.soldeImpaye', { defaultValue: 'Solde impayé' })}:{' '}
-                <span className="font-semibold text-red-600">{fmt.format(form.selectedSolde)} DH</span>
+                {t('gestionnaire.comptabilite.encaissement.soldeImpaye', {
+                  defaultValue: 'Solde impayé',
+                })}
+                :{' '}
+                <span className="font-semibold text-red-600">
+                  {fmt.format(form.selectedSolde)} DH
+                </span>
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label>{t('gestionnaire.comptabilite.encaissement.montant', { defaultValue: 'Montant' })}</Label>
+                <Label>
+                  {t('gestionnaire.comptabilite.encaissement.montant', {
+                    defaultValue: 'Montant',
+                  })}
+                </Label>
                 <Input
                   type="number"
                   value={form.montant}
-                  onChange={(e) => setForm((f) => ({ ...f, montant: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, montant: e.target.value }))
+                  }
                 />
               </div>
               <div className="space-y-1">
-                <Label>{t('gestionnaire.comptabilite.encaissement.date', { defaultValue: 'Date' })}</Label>
+                <Label>
+                  {t('gestionnaire.comptabilite.encaissement.date', {
+                    defaultValue: 'Date',
+                  })}
+                </Label>
                 <Input
                   type="date"
                   value={form.date}
-                  onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, date: e.target.value }))
+                  }
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <Label>{t('gestionnaire.comptabilite.encaissement.mode', { defaultValue: 'Mode de paiement' })}</Label>
+              <Label>
+                {t('gestionnaire.comptabilite.encaissement.mode', {
+                  defaultValue: 'Mode de paiement',
+                })}
+              </Label>
               <Select
                 value={form.mode_paiement}
                 onValueChange={(v) =>
-                  setForm((f) => ({ ...f, mode_paiement: v as EncaisserFormState['mode_paiement'] }))
+                  setForm((f) => ({
+                    ...f,
+                    mode_paiement: v as EncaisserFormState['mode_paiement'],
+                  }))
                 }
               >
                 <SelectTrigger className="w-full">
@@ -604,24 +755,38 @@ function EncaisserModal({ open, onOpenChange, exerciceId }: EncaisserModalProps)
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="virement">
-                    {t('gestionnaire.comptabilite.depenses.modes.virement', { defaultValue: 'Virement' })}
+                    {t('gestionnaire.comptabilite.depenses.modes.virement', {
+                      defaultValue: 'Virement',
+                    })}
                   </SelectItem>
                   <SelectItem value="cheque">
-                    {t('gestionnaire.comptabilite.depenses.modes.cheque', { defaultValue: 'Chèque' })}
+                    {t('gestionnaire.comptabilite.depenses.modes.cheque', {
+                      defaultValue: 'Chèque',
+                    })}
                   </SelectItem>
                   <SelectItem value="especes">
-                    {t('gestionnaire.comptabilite.depenses.modes.especes', { defaultValue: 'Espèces' })}
+                    {t('gestionnaire.comptabilite.depenses.modes.especes', {
+                      defaultValue: 'Espèces',
+                    })}
                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-1">
-              <Label>{t('gestionnaire.comptabilite.encaissement.compteDestination', { defaultValue: 'Compte destination' })}</Label>
+              <Label>
+                {t('gestionnaire.comptabilite.encaissement.compteDestination', {
+                  defaultValue: 'Compte destination',
+                })}
+              </Label>
               <Select
                 value={form.compte_destination}
                 onValueChange={(v) =>
-                  setForm((f) => ({ ...f, compte_destination: v as EncaisserFormState['compte_destination'] }))
+                  setForm((f) => ({
+                    ...f,
+                    compte_destination:
+                      v as EncaisserFormState['compte_destination'],
+                  }))
                 }
               >
                 <SelectTrigger className="w-full">
@@ -629,13 +794,19 @@ function EncaisserModal({ open, onOpenChange, exerciceId }: EncaisserModalProps)
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="5121">
-                    {t('gestionnaire.comptabilite.encaissement.comptes.5121', { defaultValue: 'Banque principale (5121)' })}
+                    {t('gestionnaire.comptabilite.encaissement.comptes.5121', {
+                      defaultValue: 'Banque principale (5121)',
+                    })}
                   </SelectItem>
                   <SelectItem value="5122">
-                    {t('gestionnaire.comptabilite.encaissement.comptes.5122', { defaultValue: 'Compte chèques (5122)' })}
+                    {t('gestionnaire.comptabilite.encaissement.comptes.5122', {
+                      defaultValue: 'Compte chèques (5122)',
+                    })}
                   </SelectItem>
                   <SelectItem value="5161">
-                    {t('gestionnaire.comptabilite.encaissement.comptes.5161', { defaultValue: 'Caisse (5161)' })}
+                    {t('gestionnaire.comptabilite.encaissement.comptes.5161', {
+                      defaultValue: 'Caisse (5161)',
+                    })}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -643,10 +814,16 @@ function EncaisserModal({ open, onOpenChange, exerciceId }: EncaisserModalProps)
 
             {form.mode_paiement === 'cheque' && (
               <div className="space-y-1">
-                <Label>{t('gestionnaire.comptabilite.encaissement.refCheque', { defaultValue: 'Référence chèque' })}</Label>
+                <Label>
+                  {t('gestionnaire.comptabilite.encaissement.refCheque', {
+                    defaultValue: 'Référence chèque',
+                  })}
+                </Label>
                 <Input
                   value={form.reference_cheque}
-                  onChange={(e) => setForm((f) => ({ ...f, reference_cheque: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, reference_cheque: e.target.value }))
+                  }
                   placeholder="CHQ-XXXXX"
                 />
               </div>
@@ -666,7 +843,11 @@ function EncaisserModal({ open, onOpenChange, exerciceId }: EncaisserModalProps)
 
         {form.step === 2 && (
           <DialogFooter>
-            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={mutation.isPending}>
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={mutation.isPending}
+            >
               {t('actions.cancel')}
             </Button>
             <Button
@@ -689,18 +870,45 @@ function ExportDropdown() {
   const [open, setOpen] = useState(false)
 
   const items = [
-    { icon: '📊', label: t('gestionnaire.comptabilite.export.excelJournal', { defaultValue: 'Excel — Journal complet' }) },
-    { icon: '📊', label: t('gestionnaire.comptabilite.export.excelGrandLivre', { defaultValue: 'Excel — Grand-Livre' }) },
-    { icon: '📋', label: t('gestionnaire.comptabilite.export.sageFec', { defaultValue: 'Sage FEC' }) },
-    { icon: '📄', label: t('gestionnaire.comptabilite.export.pdfJournal', { defaultValue: 'PDF — Journal' }) },
-    { icon: '📄', label: t('gestionnaire.comptabilite.export.pdfBalance', { defaultValue: 'PDF — Balance' }) },
+    {
+      icon: '📊',
+      label: t('gestionnaire.comptabilite.export.excelJournal', {
+        defaultValue: 'Excel — Journal complet',
+      }),
+    },
+    {
+      icon: '📊',
+      label: t('gestionnaire.comptabilite.export.excelGrandLivre', {
+        defaultValue: 'Excel — Grand-Livre',
+      }),
+    },
+    {
+      icon: '📋',
+      label: t('gestionnaire.comptabilite.export.sageFec', {
+        defaultValue: 'Sage FEC',
+      }),
+    },
+    {
+      icon: '📄',
+      label: t('gestionnaire.comptabilite.export.pdfJournal', {
+        defaultValue: 'PDF — Journal',
+      }),
+    },
+    {
+      icon: '📄',
+      label: t('gestionnaire.comptabilite.export.pdfBalance', {
+        defaultValue: 'PDF — Balance',
+      }),
+    },
   ]
 
   return (
     <div className="relative">
       <Button variant="outline" size="sm" onClick={() => setOpen((v) => !v)}>
         <Download className="me-1.5 size-4" />
-        {t('gestionnaire.comptabilite.export.title', { defaultValue: 'Exporter' })}
+        {t('gestionnaire.comptabilite.export.title', {
+          defaultValue: 'Exporter',
+        })}
         <ChevronDown className="ms-1 size-3.5" />
       </Button>
       {open && (
@@ -762,31 +970,41 @@ function TabDashboard({ exerciceId }: { exerciceId: number }) {
         <KpiCard
           icon={<TrendingUp className="size-5" />}
           value={kpiFmt(dash.produits)}
-          label={t('gestionnaire.comptabilite.kpi.produits', { defaultValue: 'Produits' })}
+          label={t('gestionnaire.comptabilite.kpi.produits', {
+            defaultValue: 'Produits',
+          })}
           className="border-green-200"
         />
         <KpiCard
           icon={<TrendingDown className="size-5" />}
           value={kpiFmt(dash.charges)}
-          label={t('gestionnaire.comptabilite.kpi.charges', { defaultValue: 'Charges' })}
+          label={t('gestionnaire.comptabilite.kpi.charges', {
+            defaultValue: 'Charges',
+          })}
           className="border-red-200"
         />
         <KpiCard
           icon={<BarChart2 className="size-5" />}
           value={kpiFmt(dash.resultat)}
-          label={t('gestionnaire.comptabilite.kpi.resultat', { defaultValue: 'Résultat net' })}
+          label={t('gestionnaire.comptabilite.kpi.resultat', {
+            defaultValue: 'Résultat net',
+          })}
           className={dash.resultat >= 0 ? 'border-blue-200' : 'border-red-300'}
         />
         <KpiCard
           icon={<Wallet className="size-5" />}
           value={kpiFmt(dash.tresorerie)}
-          label={t('gestionnaire.comptabilite.kpi.tresorerie', { defaultValue: 'Trésorerie' })}
+          label={t('gestionnaire.comptabilite.kpi.tresorerie', {
+            defaultValue: 'Trésorerie',
+          })}
           className="border-sky-200"
         />
         <KpiCard
           icon={<AlertCircle className="size-5" />}
           value={kpiFmt(dash.creances)}
-          label={t('gestionnaire.comptabilite.kpi.creances', { defaultValue: 'Créances' })}
+          label={t('gestionnaire.comptabilite.kpi.creances', {
+            defaultValue: 'Créances',
+          })}
           className="border-orange-200"
         />
       </div>
@@ -797,14 +1015,23 @@ function TabDashboard({ exerciceId }: { exerciceId: number }) {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
-              {t('gestionnaire.comptabilite.tabs.dashboard', { defaultValue: 'Produits vs Charges' })} — 2026
+              {t('gestionnaire.comptabilite.tabs.dashboard', {
+                defaultValue: 'Produits vs Charges',
+              })}{' '}
+              — 2026
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={dash.evolution} margin={{ top: 0, right: 8, bottom: 0, left: 0 }}>
+              <BarChart
+                data={dash.evolution}
+                margin={{ top: 0, right: 8, bottom: 0, left: 0 }}
+              >
                 <XAxis dataKey="mois" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`} />
+                <YAxis
+                  tick={{ fontSize: 11 }}
+                  tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`}
+                />
                 <Tooltip
                   formatter={(v) => {
                     const n = typeof v === 'number' ? v : 0
@@ -815,13 +1042,17 @@ function TabDashboard({ exerciceId }: { exerciceId: number }) {
                 <Bar
                   dataKey="produits"
                   fill={IMARO_PRIMARY}
-                  name={t('gestionnaire.comptabilite.kpi.produits', { defaultValue: 'Produits' })}
+                  name={t('gestionnaire.comptabilite.kpi.produits', {
+                    defaultValue: 'Produits',
+                  })}
                   radius={[3, 3, 0, 0]}
                 />
                 <Bar
                   dataKey="charges"
                   fill={IMARO_ACCENT}
-                  name={t('gestionnaire.comptabilite.kpi.charges', { defaultValue: 'Charges' })}
+                  name={t('gestionnaire.comptabilite.kpi.charges', {
+                    defaultValue: 'Charges',
+                  })}
                   radius={[3, 3, 0, 0]}
                 />
               </BarChart>
@@ -833,7 +1064,9 @@ function TabDashboard({ exerciceId }: { exerciceId: number }) {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
-              {t('gestionnaire.comptabilite.kpi.charges', { defaultValue: 'Répartition des charges' })}
+              {t('gestionnaire.comptabilite.kpi.charges', {
+                defaultValue: 'Répartition des charges',
+              })}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -849,7 +1082,10 @@ function TabDashboard({ exerciceId }: { exerciceId: number }) {
                   label={false}
                 >
                   {dash.charges_par_categorie.map((entry, i) => (
-                    <Cell key={entry.categorie} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                    <Cell
+                      key={entry.categorie}
+                      fill={PIE_COLORS[i % PIE_COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip
@@ -869,7 +1105,9 @@ function TabDashboard({ exerciceId }: { exerciceId: number }) {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
-              {t('gestionnaire.comptabilite.tresorerie.title', { defaultValue: 'Détail trésorerie' })}
+              {t('gestionnaire.comptabilite.tresorerie.title', {
+                defaultValue: 'Détail trésorerie',
+              })}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -877,16 +1115,25 @@ function TabDashboard({ exerciceId }: { exerciceId: number }) {
             <div className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
               <div>
                 <p className="text-sm font-medium">
-                  🏦 {t('gestionnaire.comptabilite.tresorerie.banque', { defaultValue: 'Banques (5121)' })}
+                  🏦{' '}
+                  {t('gestionnaire.comptabilite.tresorerie.banque', {
+                    defaultValue: 'Banques (5121)',
+                  })}
                 </p>
-                <p className="text-xs text-muted-foreground">{fmt.format(dash.banque_5121)} DH</p>
+                <p className="text-xs text-muted-foreground">
+                  {fmt.format(dash.banque_5121)} DH
+                </p>
               </div>
               <div className="flex gap-1">
                 <Button variant="outline" size="sm" className="text-xs">
-                  {t('gestionnaire.comptabilite.tresorerie.depot', { defaultValue: 'Dépôt' })}
+                  {t('gestionnaire.comptabilite.tresorerie.depot', {
+                    defaultValue: 'Dépôt',
+                  })}
                 </Button>
                 <Button variant="outline" size="sm" className="text-xs">
-                  {t('gestionnaire.comptabilite.tresorerie.retrait', { defaultValue: 'Retrait' })}
+                  {t('gestionnaire.comptabilite.tresorerie.retrait', {
+                    defaultValue: 'Retrait',
+                  })}
                 </Button>
               </div>
             </div>
@@ -894,25 +1141,41 @@ function TabDashboard({ exerciceId }: { exerciceId: number }) {
             <div className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
               <div>
                 <p className="text-sm font-medium">
-                  📄 {t('gestionnaire.comptabilite.tresorerie.cheque', { defaultValue: 'Chèques (5122)' })}
+                  📄{' '}
+                  {t('gestionnaire.comptabilite.tresorerie.cheque', {
+                    defaultValue: 'Chèques (5122)',
+                  })}
                 </p>
-                <p className="text-xs text-muted-foreground">{fmt.format(dash.cheque_5122)} DH</p>
+                <p className="text-xs text-muted-foreground">
+                  {fmt.format(dash.cheque_5122)} DH
+                </p>
               </div>
               <Button variant="outline" size="sm" className="text-xs">
-                {t('gestionnaire.comptabilite.tresorerie.remise', { defaultValue: 'Remise' })}
+                {t('gestionnaire.comptabilite.tresorerie.remise', {
+                  defaultValue: 'Remise',
+                })}
               </Button>
             </div>
             {/* Caisse 5161 */}
             <div className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
               <div>
                 <p className="text-sm font-medium">
-                  💵 {t('gestionnaire.comptabilite.tresorerie.caisse', { defaultValue: 'Caisse (5161)' })}
+                  💵{' '}
+                  {t('gestionnaire.comptabilite.tresorerie.caisse', {
+                    defaultValue: 'Caisse (5161)',
+                  })}
                 </p>
-                <p className="text-xs text-muted-foreground">{fmt.format(dash.caisse_5161)} DH</p>
+                <p className="text-xs text-muted-foreground">
+                  {fmt.format(dash.caisse_5161)} DH
+                </p>
               </div>
               <div className="flex gap-1">
-                <Button variant="outline" size="sm" className="text-xs">Entrée</Button>
-                <Button variant="outline" size="sm" className="text-xs">Sortie</Button>
+                <Button variant="outline" size="sm" className="text-xs">
+                  Entrée
+                </Button>
+                <Button variant="outline" size="sm" className="text-xs">
+                  Sortie
+                </Button>
               </div>
             </div>
           </CardContent>
@@ -926,7 +1189,11 @@ function TabDashboard({ exerciceId }: { exerciceId: number }) {
             {/* Taux recouvrement */}
             <div>
               <div className="mb-1 flex justify-between text-sm">
-                <span>{t('gestionnaire.comptabilite.recouvrement', { defaultValue: 'Taux de recouvrement' })}</span>
+                <span>
+                  {t('gestionnaire.comptabilite.recouvrement', {
+                    defaultValue: 'Taux de recouvrement',
+                  })}
+                </span>
                 <span className="font-semibold">{dash.taux_recouvrement}%</span>
               </div>
               <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
@@ -935,18 +1202,24 @@ function TabDashboard({ exerciceId }: { exerciceId: number }) {
                   style={{ width: `${dash.taux_recouvrement}%` }}
                 />
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">{dash.taux_recouvrement}% des charges recouvrées</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {dash.taux_recouvrement}% des charges recouvrées
+              </p>
             </div>
 
             {/* Couverture trésorerie */}
             <div className="rounded-lg bg-muted/40 px-3 py-2">
               <p className="text-sm text-muted-foreground">
-                {t('gestionnaire.comptabilite.couverture', { defaultValue: 'Couverture trésorerie' })}
+                {t('gestionnaire.comptabilite.couverture', {
+                  defaultValue: 'Couverture trésorerie',
+                })}
               </p>
               <p className="text-2xl font-bold text-[var(--color-imaro-primary)]">
                 {dash.couverture_tresorerie.toFixed(1)}{' '}
                 <span className="text-base font-normal text-muted-foreground">
-                  {t('gestionnaire.comptabilite.mois', { defaultValue: 'mois' })}
+                  {t('gestionnaire.comptabilite.mois', {
+                    defaultValue: 'mois',
+                  })}
                 </span>
               </p>
             </div>
@@ -981,22 +1254,31 @@ function TabJournal({ exerciceId }: { exerciceId: number }) {
   const columns: Column<EcritureComptable>[] = [
     {
       key: 'date',
-      header: t('gestionnaire.comptabilite.journal.date', { defaultValue: 'Date' }),
+      header: t('gestionnaire.comptabilite.journal.date', {
+        defaultValue: 'Date',
+      }),
       sortable: true,
       renderCell: (r) => r.date.slice(0, 10),
     },
     {
       key: 'numero_compte',
-      header: t('gestionnaire.comptabilite.journal.compte', { defaultValue: 'Compte' }),
+      header: t('gestionnaire.comptabilite.journal.compte', {
+        defaultValue: 'Compte',
+      }),
       renderCell: (r) => (
         <span className="font-mono text-sm">
-          {r.numero_compte} <span className="font-sans text-muted-foreground">— {r.libelle_compte}</span>
+          {r.numero_compte}{' '}
+          <span className="font-sans text-muted-foreground">
+            — {r.libelle_compte}
+          </span>
         </span>
       ),
     },
     {
       key: 'description',
-      header: t('gestionnaire.comptabilite.journal.description', { defaultValue: 'Description' }),
+      header: t('gestionnaire.comptabilite.journal.description', {
+        defaultValue: 'Description',
+      }),
       renderCell: (r) => (
         <span className="max-w-[220px] truncate text-sm" title={r.description}>
           {r.description}
@@ -1005,23 +1287,35 @@ function TabJournal({ exerciceId }: { exerciceId: number }) {
     },
     {
       key: 'type',
-      header: t('gestionnaire.comptabilite.journal.type', { defaultValue: 'Type' }),
+      header: t('gestionnaire.comptabilite.journal.type', {
+        defaultValue: 'Type',
+      }),
       renderCell: (r) => {
         const cls = TYPE_BADGE_STYLES[r.type]
-        const label = t(`gestionnaire.comptabilite.journal.types.${r.type}`, { defaultValue: r.type })
+        const label = t(`gestionnaire.comptabilite.journal.types.${r.type}`, {
+          defaultValue: r.type,
+        })
         return <Badge className={`${cls} border-0`}>{label}</Badge>
       },
     },
     {
       key: 'debit',
-      header: t('gestionnaire.comptabilite.journal.debit', { defaultValue: 'Débit' }),
+      header: t('gestionnaire.comptabilite.journal.debit', {
+        defaultValue: 'Débit',
+      }),
       sortable: true,
       renderCell: (r) =>
-        r.debit > 0 ? <MontantDisplay value={r.debit} /> : <span className="text-muted-foreground">—</span>,
+        r.debit > 0 ? (
+          <MontantDisplay value={r.debit} />
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
     {
       key: 'credit',
-      header: t('gestionnaire.comptabilite.journal.credit', { defaultValue: 'Crédit' }),
+      header: t('gestionnaire.comptabilite.journal.credit', {
+        defaultValue: 'Crédit',
+      }),
       sortable: true,
       renderCell: (r) =>
         r.credit > 0 ? (
@@ -1032,7 +1326,9 @@ function TabJournal({ exerciceId }: { exerciceId: number }) {
     },
     {
       key: 'piece_justificative',
-      header: t('gestionnaire.comptabilite.journal.piece', { defaultValue: 'Pièce' }),
+      header: t('gestionnaire.comptabilite.journal.piece', {
+        defaultValue: 'Pièce',
+      }),
       renderCell: (r) =>
         r.piece_justificative ? (
           <a
@@ -1086,18 +1382,24 @@ function TabJournal({ exerciceId }: { exerciceId: number }) {
         isLoading={isLoading}
         pageSize={15}
         emptyIcon={<BookOpen className="size-12 text-muted-foreground" />}
-        emptyTitle={t('gestionnaire.comptabilite.journal.titre', { defaultValue: 'Aucune écriture' })}
+        emptyTitle={t('gestionnaire.comptabilite.journal.titre', {
+          defaultValue: 'Aucune écriture',
+        })}
       />
 
       {/* Footer totals */}
       <div className="flex justify-end gap-6 rounded-lg border bg-muted/30 px-4 py-2 text-sm font-medium">
         <span>
-          {t('gestionnaire.comptabilite.journal.totalDebit', { defaultValue: 'Total débit' })}:{' '}
-          <MontantDisplay value={totalDebit} />
+          {t('gestionnaire.comptabilite.journal.totalDebit', {
+            defaultValue: 'Total débit',
+          })}
+          : <MontantDisplay value={totalDebit} />
         </span>
         <span>
-          {t('gestionnaire.comptabilite.journal.totalCredit', { defaultValue: 'Total crédit' })}:{' '}
-          <MontantDisplay value={totalCredit} className="text-green-700" />
+          {t('gestionnaire.comptabilite.journal.totalCredit', {
+            defaultValue: 'Total crédit',
+          })}
+          : <MontantDisplay value={totalCredit} className="text-green-700" />
         </span>
       </div>
     </div>
@@ -1133,27 +1435,39 @@ function TabGrandLivre({ exerciceId }: { exerciceId: number }) {
   const glColumns: Column<GrandLivreLigne>[] = [
     {
       key: 'date',
-      header: t('gestionnaire.comptabilite.journal.date', { defaultValue: 'Date' }),
+      header: t('gestionnaire.comptabilite.journal.date', {
+        defaultValue: 'Date',
+      }),
       sortable: true,
       renderCell: (r) => r.date.slice(0, 10),
     },
     {
       key: 'description',
-      header: t('gestionnaire.comptabilite.journal.description', { defaultValue: 'Description' }),
+      header: t('gestionnaire.comptabilite.journal.description', {
+        defaultValue: 'Description',
+      }),
       renderCell: (r) => (
         <span className="max-w-[240px] truncate text-sm">{r.description}</span>
       ),
     },
     {
       key: 'debit',
-      header: t('gestionnaire.comptabilite.journal.debit', { defaultValue: 'Débit' }),
+      header: t('gestionnaire.comptabilite.journal.debit', {
+        defaultValue: 'Débit',
+      }),
       sortable: true,
       renderCell: (r) =>
-        r.debit > 0 ? <MontantDisplay value={r.debit} /> : <span className="text-muted-foreground">—</span>,
+        r.debit > 0 ? (
+          <MontantDisplay value={r.debit} />
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
     {
       key: 'credit',
-      header: t('gestionnaire.comptabilite.journal.credit', { defaultValue: 'Crédit' }),
+      header: t('gestionnaire.comptabilite.journal.credit', {
+        defaultValue: 'Crédit',
+      }),
       sortable: true,
       renderCell: (r) =>
         r.credit > 0 ? (
@@ -1175,7 +1489,11 @@ function TabGrandLivre({ exerciceId }: { exerciceId: number }) {
       {/* Compte selector */}
       <div className="flex flex-wrap items-end gap-3">
         <div className="space-y-1">
-          <Label>{t('gestionnaire.comptabilite.grandLivre.title', { defaultValue: 'Compte PCG' })}</Label>
+          <Label>
+            {t('gestionnaire.comptabilite.grandLivre.title', {
+              defaultValue: 'Compte PCG',
+            })}
+          </Label>
           <Input
             value={compteSearch}
             onChange={(e) => setCompteSearch(e.target.value)}
@@ -1185,9 +1503,12 @@ function TabGrandLivre({ exerciceId }: { exerciceId: number }) {
           <Select value={selectedCompte} onValueChange={setSelectedCompte}>
             <SelectTrigger className="w-72">
               <SelectValue
-                placeholder={t('gestionnaire.comptabilite.grandLivre.selectCompte', {
-                  defaultValue: 'Sélectionner un compte...',
-                })}
+                placeholder={t(
+                  'gestionnaire.comptabilite.grandLivre.selectCompte',
+                  {
+                    defaultValue: 'Sélectionner un compte...',
+                  },
+                )}
               />
             </SelectTrigger>
             <SelectContent>
@@ -1205,7 +1526,8 @@ function TabGrandLivre({ exerciceId }: { exerciceId: number }) {
         <div className="flex h-40 items-center justify-center rounded-lg border border-dashed">
           <p className="text-sm text-muted-foreground">
             {t('gestionnaire.comptabilite.grandLivre.hint', {
-              defaultValue: 'Sélectionnez un compte PCG pour afficher le détail des écritures.',
+              defaultValue:
+                'Sélectionnez un compte PCG pour afficher le détail des écritures.',
             })}
           </p>
         </div>
@@ -1221,8 +1543,10 @@ function TabGrandLivre({ exerciceId }: { exerciceId: number }) {
               {grandLivre.numero} — {grandLivre.libelle}
             </p>
             <p className="text-sm text-muted-foreground">
-              {t('gestionnaire.comptabilite.grandLivre.soldeOuverture', { defaultValue: 'Solde d\'ouverture' })}:{' '}
-              <MontantDisplay value={grandLivre.solde_ouverture} />
+              {t('gestionnaire.comptabilite.grandLivre.soldeOuverture', {
+                defaultValue: "Solde d'ouverture",
+              })}
+              : <MontantDisplay value={grandLivre.solde_ouverture} />
             </p>
           </div>
 
@@ -1236,8 +1560,15 @@ function TabGrandLivre({ exerciceId }: { exerciceId: number }) {
 
           {/* Footer */}
           <div className="flex justify-end rounded-lg border bg-muted/30 px-4 py-2 text-sm font-bold">
-            {t('gestionnaire.comptabilite.grandLivre.soldeFinal', { defaultValue: 'Solde final' })}:{' '}
-            <MontantDisplay value={grandLivre.solde_final} className="ms-1" colorize />
+            {t('gestionnaire.comptabilite.grandLivre.soldeFinal', {
+              defaultValue: 'Solde final',
+            })}
+            :{' '}
+            <MontantDisplay
+              value={grandLivre.solde_final}
+              className="ms-1"
+              colorize
+            />
           </div>
         </div>
       ) : null}
@@ -1299,20 +1630,47 @@ function TabBalance({
   const ecartSolde = Math.abs(totals.soldeDebiteur - totals.soldeCrediteur)
 
   const CLASSE_LABELS: Record<number, { label: string; color: string }> = {
-    1: { label: 'Classe 1 — Capitaux propres',                      color: 'bg-purple-50 text-purple-700 border-purple-200' },
-    2: { label: 'Classe 2 — Immobilisations',                       color: 'bg-blue-50 text-blue-700 border-blue-200' },
-    3: { label: 'Classe 3 — Créances actif circulant',              color: 'bg-cyan-50 text-cyan-700 border-cyan-200' },
-    4: { label: 'Classe 4 — Dettes passif circulant',               color: 'bg-amber-50 text-amber-700 border-amber-200' },
-    5: { label: 'Classe 5 — Trésorerie',                            color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    6: { label: 'Classe 6 — Charges',                               color: 'bg-orange-50 text-orange-700 border-orange-200' },
-    7: { label: 'Classe 7 — Produits',                              color: 'bg-green-50 text-green-700 border-green-200' },
+    1: {
+      label: 'Classe 1 — Capitaux propres',
+      color: 'bg-purple-50 text-purple-700 border-purple-200',
+    },
+    2: {
+      label: 'Classe 2 — Immobilisations',
+      color: 'bg-blue-50 text-blue-700 border-blue-200',
+    },
+    3: {
+      label: 'Classe 3 — Créances actif circulant',
+      color: 'bg-cyan-50 text-cyan-700 border-cyan-200',
+    },
+    4: {
+      label: 'Classe 4 — Dettes passif circulant',
+      color: 'bg-amber-50 text-amber-700 border-amber-200',
+    },
+    5: {
+      label: 'Classe 5 — Trésorerie',
+      color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    },
+    6: {
+      label: 'Classe 6 — Charges',
+      color: 'bg-orange-50 text-orange-700 border-orange-200',
+    },
+    7: {
+      label: 'Classe 7 — Produits',
+      color: 'bg-green-50 text-green-700 border-green-200',
+    },
   }
 
   async function handleExportPdf() {
     setExporting(true)
     try {
       await Promise.resolve()
-      generateBalancePdf({ companyName, residenceName, city, annee: exerciceAnnee, balance })
+      generateBalancePdf({
+        companyName,
+        residenceName,
+        city,
+        annee: exerciceAnnee,
+        balance,
+      })
     } finally {
       setExporting(false)
     }
@@ -1326,22 +1684,30 @@ function TabBalance({
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <KpiCard
           icon={<ArrowDownToLine className="size-4" />}
-          label={t('gestionnaire.comptabilite.balance.totalDebit', { defaultValue: 'Total Débit' })}
+          label={t('gestionnaire.comptabilite.balance.totalDebit', {
+            defaultValue: 'Total Débit',
+          })}
           value={fmt.format(totals.debit) + ' DH'}
         />
         <KpiCard
           icon={<ArrowUpFromLine className="size-4" />}
-          label={t('gestionnaire.comptabilite.balance.totalCredit', { defaultValue: 'Total Crédit' })}
+          label={t('gestionnaire.comptabilite.balance.totalCredit', {
+            defaultValue: 'Total Crédit',
+          })}
           value={fmt.format(totals.credit) + ' DH'}
         />
         <KpiCard
           icon={<TrendingUp className="size-4" />}
-          label={t('gestionnaire.comptabilite.balance.soldeDebiteur', { defaultValue: 'Soldes débiteurs' })}
+          label={t('gestionnaire.comptabilite.balance.soldeDebiteur', {
+            defaultValue: 'Soldes débiteurs',
+          })}
           value={fmt.format(totals.soldeDebiteur) + ' DH'}
         />
         <KpiCard
           icon={<TrendingDown className="size-4" />}
-          label={t('gestionnaire.comptabilite.balance.soldeCrediteur', { defaultValue: 'Soldes créditeurs' })}
+          label={t('gestionnaire.comptabilite.balance.soldeCrediteur', {
+            defaultValue: 'Soldes créditeurs',
+          })}
           value={fmt.format(totals.soldeCrediteur) + ' DH'}
         />
       </div>
@@ -1361,10 +1727,24 @@ function TabBalance({
           <AlertCircle className="size-5 shrink-0 text-red-600" />
         )}
         <div className="flex-1">
-          <p className={cn('text-sm font-semibold', equilibre ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200')}>
+          <p
+            className={cn(
+              'text-sm font-semibold',
+              equilibre
+                ? 'text-green-800 dark:text-green-200'
+                : 'text-red-800 dark:text-red-200',
+            )}
+          >
             {equilibre ? 'Balance équilibrée' : 'Balance déséquilibrée'}
           </p>
-          <p className={cn('text-xs', equilibre ? 'text-green-700/80 dark:text-green-400/80' : 'text-red-700/80 dark:text-red-400/80')}>
+          <p
+            className={cn(
+              'text-xs',
+              equilibre
+                ? 'text-green-700/80 dark:text-green-400/80'
+                : 'text-red-700/80 dark:text-red-400/80',
+            )}
+          >
             {equilibre
               ? `Total Débit = Total Crédit = ${fmt.format(totals.debit)} DH · Écart soldes : ${fmt.format(ecartSolde)} DH`
               : `Écart débits/crédits : ${fmt.format(Math.abs(totals.debit - totals.credit))} DH — vérifier les écritures`}
@@ -1377,7 +1757,11 @@ function TabBalance({
           onClick={() => void handleExportPdf()}
           disabled={exporting || balance.length === 0}
         >
-          {exporting ? <Loader2 className="size-3.5 animate-spin" /> : <Printer className="size-3.5" />}
+          {exporting ? (
+            <Loader2 className="size-3.5 animate-spin" />
+          ) : (
+            <Printer className="size-3.5" />
+          )}
           Export PDF
         </Button>
       </div>
@@ -1394,7 +1778,10 @@ function TabBalance({
           .map(Number)
           .sort((a, b) => a - b)
           .map((classe) => {
-            const meta = CLASSE_LABELS[classe] ?? { label: `Classe ${classe}`, color: 'bg-muted text-muted-foreground border-border' }
+            const meta = CLASSE_LABELS[classe] ?? {
+              label: `Classe ${classe}`,
+              color: 'bg-muted text-muted-foreground border-border',
+            }
             const rows = byClasse[classe]
             const classTotals = rows.reduce(
               (acc, r) => ({
@@ -1406,42 +1793,94 @@ function TabBalance({
               { debit: 0, credit: 0, soldeD: 0, soldeC: 0 },
             )
             return (
-              <div key={classe} className="overflow-hidden rounded-xl border bg-card">
-                <div className={cn('flex items-center gap-2 border-b px-4 py-2.5', meta.color)}>
+              <div
+                key={classe}
+                className="overflow-hidden rounded-xl border bg-card"
+              >
+                <div
+                  className={cn(
+                    'flex items-center gap-2 border-b px-4 py-2.5',
+                    meta.color,
+                  )}
+                >
                   <span className="text-xs font-bold">{meta.label}</span>
-                  <span className="ml-auto text-xs tabular-nums opacity-70">{rows.length} compte{rows.length > 1 ? 's' : ''}</span>
+                  <span className="ml-auto text-xs tabular-nums opacity-70">
+                    {rows.length} compte{rows.length > 1 ? 's' : ''}
+                  </span>
                 </div>
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b bg-muted/30">
-                      <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">Compte</th>
-                      <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">Libellé</th>
-                      <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">Débit</th>
-                      <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">Crédit</th>
-                      <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">Solde D</th>
-                      <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">Solde C</th>
+                      <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">
+                        Compte
+                      </th>
+                      <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">
+                        Libellé
+                      </th>
+                      <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">
+                        Débit
+                      </th>
+                      <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">
+                        Crédit
+                      </th>
+                      <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">
+                        Solde D
+                      </th>
+                      <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">
+                        Solde C
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {rows.map((r) => (
-                      <tr key={r.numero} className="border-b last:border-b-0 hover:bg-muted/20">
-                        <td className="px-4 py-2 font-mono text-xs">{r.numero}</td>
+                      <tr
+                        key={r.numero}
+                        className="border-b last:border-b-0 hover:bg-muted/20"
+                      >
+                        <td className="px-4 py-2 font-mono text-xs">
+                          {r.numero}
+                        </td>
                         <td className="px-4 py-2">{r.libelle}</td>
-                        <td className="px-4 py-2 text-right tabular-nums text-xs">{r.total_debit > 0 ? fmt.format(r.total_debit) : '—'}</td>
-                        <td className="px-4 py-2 text-right tabular-nums text-xs">{r.total_credit > 0 ? fmt.format(r.total_credit) : '—'}</td>
-                        <td className="px-4 py-2 text-right tabular-nums text-xs font-medium">{r.solde_debiteur > 0 ? fmt.format(r.solde_debiteur) : '—'}</td>
-                        <td className="px-4 py-2 text-right tabular-nums text-xs font-medium">{r.solde_crediteur > 0 ? fmt.format(r.solde_crediteur) : '—'}</td>
+                        <td className="px-4 py-2 text-right tabular-nums text-xs">
+                          {r.total_debit > 0 ? fmt.format(r.total_debit) : '—'}
+                        </td>
+                        <td className="px-4 py-2 text-right tabular-nums text-xs">
+                          {r.total_credit > 0
+                            ? fmt.format(r.total_credit)
+                            : '—'}
+                        </td>
+                        <td className="px-4 py-2 text-right tabular-nums text-xs font-medium">
+                          {r.solde_debiteur > 0
+                            ? fmt.format(r.solde_debiteur)
+                            : '—'}
+                        </td>
+                        <td className="px-4 py-2 text-right tabular-nums text-xs font-medium">
+                          {r.solde_crediteur > 0
+                            ? fmt.format(r.solde_crediteur)
+                            : '—'}
+                        </td>
                       </tr>
                     ))}
                     {/* Class totals */}
                     <tr className="bg-muted/40 font-semibold">
-                      <td className="px-4 py-2 text-xs uppercase tracking-wide text-muted-foreground" colSpan={2}>
+                      <td
+                        className="px-4 py-2 text-xs uppercase tracking-wide text-muted-foreground"
+                        colSpan={2}
+                      >
                         Total Classe {classe}
                       </td>
-                      <td className="px-4 py-2 text-right tabular-nums text-xs">{fmt.format(classTotals.debit)}</td>
-                      <td className="px-4 py-2 text-right tabular-nums text-xs">{fmt.format(classTotals.credit)}</td>
-                      <td className="px-4 py-2 text-right tabular-nums text-xs">{fmt.format(classTotals.soldeD)}</td>
-                      <td className="px-4 py-2 text-right tabular-nums text-xs">{fmt.format(classTotals.soldeC)}</td>
+                      <td className="px-4 py-2 text-right tabular-nums text-xs">
+                        {fmt.format(classTotals.debit)}
+                      </td>
+                      <td className="px-4 py-2 text-right tabular-nums text-xs">
+                        {fmt.format(classTotals.credit)}
+                      </td>
+                      <td className="px-4 py-2 text-right tabular-nums text-xs">
+                        {fmt.format(classTotals.soldeD)}
+                      </td>
+                      <td className="px-4 py-2 text-right tabular-nums text-xs">
+                        {fmt.format(classTotals.soldeC)}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -1487,41 +1926,59 @@ function TabDepenses({
   const columns: Column<Depense>[] = [
     {
       key: 'date',
-      header: t('gestionnaire.comptabilite.depenses.colDate', { defaultValue: 'Date' }),
+      header: t('gestionnaire.comptabilite.depenses.colDate', {
+        defaultValue: 'Date',
+      }),
       sortable: true,
       renderCell: (r) => r.date.slice(0, 10),
     },
     {
       key: 'titre',
-      header: t('gestionnaire.comptabilite.depenses.colTitre', { defaultValue: 'Titre' }),
+      header: t('gestionnaire.comptabilite.depenses.colTitre', {
+        defaultValue: 'Titre',
+      }),
       sortable: true,
     },
     {
       key: 'compte_charge',
-      header: t('gestionnaire.comptabilite.depenses.colCompte', { defaultValue: 'Compte' }),
+      header: t('gestionnaire.comptabilite.depenses.colCompte', {
+        defaultValue: 'Compte',
+      }),
       renderCell: (r) => (
-        <span className="font-mono text-xs">{r.compte_charge} — {r.libelle_compte}</span>
+        <span className="font-mono text-xs">
+          {r.compte_charge} — {r.libelle_compte}
+        </span>
       ),
     },
     {
       key: 'prestataire_nom',
-      header: t('gestionnaire.comptabilite.depenses.colPrestataire', { defaultValue: 'Prestataire' }),
-      renderCell: (r) => r.prestataire_nom ?? <span className="text-muted-foreground">—</span>,
+      header: t('gestionnaire.comptabilite.depenses.colPrestataire', {
+        defaultValue: 'Prestataire',
+      }),
+      renderCell: (r) =>
+        r.prestataire_nom ?? <span className="text-muted-foreground">—</span>,
     },
     {
       key: 'mode_paiement',
-      header: t('gestionnaire.comptabilite.depenses.colMode', { defaultValue: 'Mode' }),
+      header: t('gestionnaire.comptabilite.depenses.colMode', {
+        defaultValue: 'Mode',
+      }),
       renderCell: (r) => {
         const cls = MODE_BADGE_STYLES[r.mode_paiement]
-        const label = t(`gestionnaire.comptabilite.depenses.modes.${r.mode_paiement}`, {
-          defaultValue: r.mode_paiement,
-        })
+        const label = t(
+          `gestionnaire.comptabilite.depenses.modes.${r.mode_paiement}`,
+          {
+            defaultValue: r.mode_paiement,
+          },
+        )
         return <Badge className={`${cls} border-0 text-xs`}>{label}</Badge>
       },
     },
     {
       key: 'montant',
-      header: t('gestionnaire.comptabilite.depenses.colMontant', { defaultValue: 'Montant' }),
+      header: t('gestionnaire.comptabilite.depenses.colMontant', {
+        defaultValue: 'Montant',
+      }),
       sortable: true,
       renderCell: (r) => <MontantDisplay value={r.montant} />,
     },
@@ -1565,7 +2022,9 @@ function TabDepenses({
       <div className="flex justify-end">
         <Button size="sm" onClick={onOpenDepenseModal} disabled={exerciceClos}>
           <Plus className="me-1.5 size-4" />
-          {t('gestionnaire.comptabilite.depenses.add', { defaultValue: 'Nouvelle dépense' })}
+          {t('gestionnaire.comptabilite.depenses.add', {
+            defaultValue: 'Nouvelle dépense',
+          })}
         </Button>
       </div>
 
@@ -1576,7 +2035,9 @@ function TabDepenses({
         isLoading={isLoading}
         searchable
         emptyIcon={<FileText className="size-12 text-muted-foreground" />}
-        emptyTitle={t('gestionnaire.comptabilite.depenses.title', { defaultValue: 'Aucune dépense' })}
+        emptyTitle={t('gestionnaire.comptabilite.depenses.title', {
+          defaultValue: 'Aucune dépense',
+        })}
       />
 
       <ConfirmModal
@@ -1601,7 +2062,14 @@ function CheckItem({ ok, label }: { ok: boolean; label: string }) {
       ) : (
         <XCircle className="size-5 shrink-0 text-red-500" />
       )}
-      <span className={cn('text-sm', ok ? 'text-foreground' : 'text-muted-foreground')}>{label}</span>
+      <span
+        className={cn(
+          'text-sm',
+          ok ? 'text-foreground' : 'text-muted-foreground',
+        )}
+      >
+        {label}
+      </span>
     </div>
   )
 }
@@ -1654,10 +2122,14 @@ function TabCloture({
           <div className="flex flex-col items-center gap-3 text-center">
             <CheckCircle2 className="size-12 text-green-600" />
             <p className="text-lg font-semibold text-green-800 dark:text-green-200">
-              {t('gestionnaire.comptabilite.cloture.already_clos', { defaultValue: 'Exercice clôturé' })}
+              {t('gestionnaire.comptabilite.cloture.already_clos', {
+                defaultValue: 'Exercice clôturé',
+              })}
             </p>
             <p className="text-sm text-green-700 dark:text-green-300">
-              {t('gestionnaire.comptabilite.cloture.clos_msg', { defaultValue: 'Cet exercice a été clôturé le' })}{' '}
+              {t('gestionnaire.comptabilite.cloture.clos_msg', {
+                defaultValue: 'Cet exercice a été clôturé le',
+              })}{' '}
               <strong>{exercice.date_cloture ?? '—'}</strong>
             </p>
           </div>
@@ -1671,7 +2143,9 @@ function TabCloture({
       <Card>
         <CardHeader>
           <CardTitle className="text-base">
-            {t('gestionnaire.comptabilite.cloture.checklist', { defaultValue: 'Checklist pré-clôture' })}
+            {t('gestionnaire.comptabilite.cloture.checklist', {
+              defaultValue: 'Checklist pré-clôture',
+            })}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
@@ -1706,22 +2180,31 @@ function TabCloture({
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-lg border bg-muted/30 px-4 py-3 text-center">
           <p className="text-xs text-muted-foreground">
-            {t('gestionnaire.comptabilite.cloture.totalDebit', { defaultValue: 'Total Débit' })}
+            {t('gestionnaire.comptabilite.cloture.totalDebit', {
+              defaultValue: 'Total Débit',
+            })}
           </p>
           <MontantDisplay value={totalDebit} className="text-lg font-bold" />
         </div>
         <div className="rounded-lg border bg-muted/30 px-4 py-3 text-center">
           <p className="text-xs text-muted-foreground">
-            {t('gestionnaire.comptabilite.cloture.totalCredit', { defaultValue: 'Total Crédit' })}
+            {t('gestionnaire.comptabilite.cloture.totalCredit', {
+              defaultValue: 'Total Crédit',
+            })}
           </p>
-          <MontantDisplay value={totalCredit} className="text-lg font-bold text-green-700" />
+          <MontantDisplay
+            value={totalCredit}
+            className="text-lg font-bold text-green-700"
+          />
         </div>
       </div>
 
       {/* Warning */}
       <p className="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-700 dark:border-orange-800 dark:bg-orange-950/20 dark:text-orange-300">
-        ⚠️ {t('gestionnaire.comptabilite.cloture.warning', {
-          defaultValue: 'Attention — après clôture, aucune écriture ne peut être modifiée.',
+        ⚠️{' '}
+        {t('gestionnaire.comptabilite.cloture.warning', {
+          defaultValue:
+            'Attention — après clôture, aucune écriture ne peut être modifiée.',
         })}
       </p>
 
@@ -1731,17 +2214,24 @@ function TabCloture({
         disabled={!allChecksPass || clotureMutation.isPending}
         onClick={() => setConfirmOpen(true)}
       >
-        {t('gestionnaire.comptabilite.cloture.btn', { defaultValue: 'Clôturer l\'exercice' })}
+        {t('gestionnaire.comptabilite.cloture.btn', {
+          defaultValue: "Clôturer l'exercice",
+        })}
       </Button>
 
       <ConfirmModal
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title={t('gestionnaire.comptabilite.cloture.confirmTitle', { defaultValue: 'Confirmer la clôture' })}
-        description={t('gestionnaire.comptabilite.cloture.confirmMsg', {
-          defaultValue: 'Cette action est irréversible. Toutes les écritures seront verrouillées. Continuer ?',
+        title={t('gestionnaire.comptabilite.cloture.confirmTitle', {
+          defaultValue: 'Confirmer la clôture',
         })}
-        confirmLabel={t('gestionnaire.comptabilite.cloture.btn', { defaultValue: 'Clôturer' })}
+        description={t('gestionnaire.comptabilite.cloture.confirmMsg', {
+          defaultValue:
+            'Cette action est irréversible. Toutes les écritures seront verrouillées. Continuer ?',
+        })}
+        confirmLabel={t('gestionnaire.comptabilite.cloture.btn', {
+          defaultValue: 'Clôturer',
+        })}
         variant="destructive"
         onConfirm={() => clotureMutation.mutate()}
         isLoading={clotureMutation.isPending}
@@ -1809,7 +2299,13 @@ function TabRapports({
     setLoadingJournal(true)
     try {
       await Promise.resolve()
-      generateJournalPdf({ companyName, residenceName, city, annee: exerciceAnnee, ecritures })
+      generateJournalPdf({
+        companyName,
+        residenceName,
+        city,
+        annee: exerciceAnnee,
+        ecritures,
+      })
     } finally {
       setLoadingJournal(false)
     }
@@ -1819,7 +2315,13 @@ function TabRapports({
     setLoadingBalance(true)
     try {
       await Promise.resolve()
-      generateBalancePdf({ companyName, residenceName, city, annee: exerciceAnnee, balance })
+      generateBalancePdf({
+        companyName,
+        residenceName,
+        city,
+        annee: exerciceAnnee,
+        balance,
+      })
     } finally {
       setLoadingBalance(false)
     }
@@ -1829,7 +2331,13 @@ function TabRapports({
     setLoadingGrandLivre(true)
     try {
       await Promise.resolve()
-      generateGrandLivrePdf({ companyName, residenceName, city, annee: exerciceAnnee, ecritures })
+      generateGrandLivrePdf({
+        companyName,
+        residenceName,
+        city,
+        annee: exerciceAnnee,
+        ecritures,
+      })
     } finally {
       setLoadingGrandLivre(false)
     }
@@ -1837,11 +2345,15 @@ function TabRapports({
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-semibold text-foreground">Rapports financiers</h2>
+      <h2 className="text-lg font-semibold text-foreground">
+        Rapports financiers
+      </h2>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Documents Légaux et Officiels</CardTitle>
+          <CardTitle className="text-base">
+            Documents Légaux et Officiels
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Rapport financier */}
@@ -1849,7 +2361,8 @@ function TabRapports({
             <div>
               <p className="font-medium text-sm">Rapport Financier Annuel</p>
               <p className="text-xs text-muted-foreground">
-                Synthèse financière, répartition des charges, analyse des impayés — 3 pages
+                Synthèse financière, répartition des charges, analyse des
+                impayés — 3 pages
               </p>
             </div>
             <Button
@@ -1944,10 +2457,12 @@ function TabRapports({
       <Card className="border-blue-100 bg-blue-50/50 dark:border-blue-900 dark:bg-blue-950/20">
         <CardContent className="pt-4">
           <p className="text-xs leading-relaxed text-blue-800 dark:text-blue-300">
-            Ce rapport est établi conformément à la Loi 18-00 (Dahir n° 1-02-298 du 3 octobre 2002)
-            relative au statut de la copropriété des immeubles bâtis. Tout copropriétaire peut en
-            demander copie au syndic selon l&apos;article 8 de ladite loi. Les documents générés ont
-            valeur informative et sont certifiés par le gestionnaire de la copropriété.
+            Ce rapport est établi conformément à la Loi 18-00 (Dahir n° 1-02-298
+            du 3 octobre 2002) relative au statut de la copropriété des
+            immeubles bâtis. Tout copropriétaire peut en demander copie au
+            syndic selon l&apos;article 8 de ladite loi. Les documents générés
+            ont valeur informative et sont certifiés par le gestionnaire de la
+            copropriété.
           </p>
         </CardContent>
       </Card>
@@ -1979,8 +2494,11 @@ export function ComptabilitePage() {
   })
 
   // Default to first open exercice, else first one
-  const defaultExercice = exercices.find((e) => e.statut === 'ouvert') ?? exercices[0]
-  const [selectedExerciceId, setSelectedExerciceId] = useState<number | null>(null)
+  const defaultExercice =
+    exercices.find((e) => e.statut === 'ouvert') ?? exercices[0]
+  const [selectedExerciceId, setSelectedExerciceId] = useState<number | null>(
+    null,
+  )
 
   const exerciceId = selectedExerciceId ?? defaultExercice?.id ?? 1
   const currentExercice = exercices.find((e) => e.id === exerciceId)
@@ -1990,17 +2508,54 @@ export function ComptabilitePage() {
   const city = residences[0]?.city ?? ''
 
   const TABS: { key: ActiveTab; label: string }[] = [
-    { key: 'dashboard', label: t('gestionnaire.comptabilite.tabs.dashboard', { defaultValue: 'Tableau de bord' }) },
-    { key: 'journal', label: t('gestionnaire.comptabilite.tabs.journal', { defaultValue: 'Journal' }) },
-    { key: 'grandLivre', label: t('gestionnaire.comptabilite.tabs.grandLivre', { defaultValue: 'Grand-Livre' }) },
-    { key: 'balance', label: t('gestionnaire.comptabilite.tabs.balance', { defaultValue: 'Balance des comptes' }) },
-    { key: 'depenses', label: t('gestionnaire.comptabilite.tabs.depenses', { defaultValue: 'Dépenses' }) },
-    { key: 'rapports', label: t('gestionnaire.comptabilite.tabs.rapports', { defaultValue: 'Rapports' }) },
-    { key: 'cloture', label: t('gestionnaire.comptabilite.tabs.cloture', { defaultValue: 'Clôture' }) },
+    {
+      key: 'dashboard',
+      label: t('gestionnaire.comptabilite.tabs.dashboard', {
+        defaultValue: 'Tableau de bord',
+      }),
+    },
+    {
+      key: 'journal',
+      label: t('gestionnaire.comptabilite.tabs.journal', {
+        defaultValue: 'Journal',
+      }),
+    },
+    {
+      key: 'grandLivre',
+      label: t('gestionnaire.comptabilite.tabs.grandLivre', {
+        defaultValue: 'Grand-Livre',
+      }),
+    },
+    {
+      key: 'balance',
+      label: t('gestionnaire.comptabilite.tabs.balance', {
+        defaultValue: 'Balance des comptes',
+      }),
+    },
+    {
+      key: 'depenses',
+      label: t('gestionnaire.comptabilite.tabs.depenses', {
+        defaultValue: 'Dépenses',
+      }),
+    },
+    {
+      key: 'rapports',
+      label: t('gestionnaire.comptabilite.tabs.rapports', {
+        defaultValue: 'Rapports',
+      }),
+    },
+    {
+      key: 'cloture',
+      label: t('gestionnaire.comptabilite.tabs.cloture', {
+        defaultValue: 'Clôture',
+      }),
+    },
   ]
 
   const pageTitle = useMemo(() => {
-    const base = t('gestionnaire.comptabilite.title', { defaultValue: 'Comptabilité' })
+    const base = t('gestionnaire.comptabilite.title', {
+      defaultValue: 'Comptabilité',
+    })
     if (currentExercice) return `${base} — ${currentExercice.annee}`
     return base
   }, [t, currentExercice])
@@ -2022,7 +2577,9 @@ export function ComptabilitePage() {
               disabled={exerciceClos}
             >
               <Plus className="me-1.5 size-4" />
-              {t('gestionnaire.comptabilite.depenses.add', { defaultValue: 'Nouvelle dépense' })}
+              {t('gestionnaire.comptabilite.depenses.add', {
+                defaultValue: 'Nouvelle dépense',
+              })}
             </Button>
             <Button
               size="sm"
@@ -2031,7 +2588,9 @@ export function ComptabilitePage() {
               disabled={exerciceClos}
             >
               <Plus className="me-1.5 size-4" />
-              {t('gestionnaire.comptabilite.encaissement.title', { defaultValue: 'Encaisser' })}
+              {t('gestionnaire.comptabilite.encaissement.title', {
+                defaultValue: 'Encaisser',
+              })}
             </Button>
             <Button
               size="sm"
@@ -2043,7 +2602,9 @@ export function ComptabilitePage() {
               disabled={exerciceClos}
             >
               <Sparkles className="me-1.5 size-4" />
-              {t('gestionnaire.comptabilite.depenses.form.importIa', { defaultValue: 'Import IA' })}
+              {t('gestionnaire.comptabilite.depenses.form.importIa', {
+                defaultValue: 'Import IA',
+              })}
             </Button>
             <ExportDropdown />
           </div>
@@ -2053,7 +2614,10 @@ export function ComptabilitePage() {
       {/* Exercice selector */}
       <div className="mb-6 flex items-center gap-3">
         <Label className="text-sm text-muted-foreground">
-          {t('gestionnaire.comptabilite.exercice', { defaultValue: 'Exercice' })} :
+          {t('gestionnaire.comptabilite.exercice', {
+            defaultValue: 'Exercice',
+          })}{' '}
+          :
         </Label>
         <Select
           value={String(exerciceId)}
@@ -2067,7 +2631,11 @@ export function ComptabilitePage() {
               <SelectItem key={e.id} value={String(e.id)}>
                 {e.annee}{' '}
                 <span className="text-muted-foreground">
-                  ({t(`gestionnaire.comptabilite.statut.${e.statut}`, { defaultValue: e.statut })})
+                  (
+                  {t(`gestionnaire.comptabilite.statut.${e.statut}`, {
+                    defaultValue: e.statut,
+                  })}
+                  )
                 </span>
               </SelectItem>
             ))}

@@ -3,8 +3,19 @@ import { useTranslation } from 'react-i18next'
 import { Upload, Columns3, Eye, Play, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { api, type ApiEnvelope } from '@/lib/axios'
-import type { ImportConfig, ImportContext, ImportRow, ColumnMapping, ImportResult } from '@/lib/import/types'
-import { parseExcelFile, autoMapColumns, applyMappings, generateTemplate } from '@/lib/import/excel-parser'
+import type {
+  ImportConfig,
+  ImportContext,
+  ImportRow,
+  ColumnMapping,
+  ImportResult,
+} from '@/lib/import/types'
+import {
+  parseExcelFile,
+  autoMapColumns,
+  applyMappings,
+  generateTemplate,
+} from '@/lib/import/excel-parser'
 import { FileDropZone } from './FileDropZone'
 import { ColumnMapper } from './ColumnMapper'
 import { ValidationPreview } from './ValidationPreview'
@@ -13,10 +24,22 @@ import { ImportProgress } from './ImportProgress'
 type Step = 'upload' | 'mapping' | 'preview' | 'execute'
 
 const STEPS: { key: Step; icon: typeof Upload; labelKey: string }[] = [
-  { key: 'upload', icon: Upload, labelKey: 'gestionnaire.imports.steps.upload' },
-  { key: 'mapping', icon: Columns3, labelKey: 'gestionnaire.imports.steps.mapping' },
+  {
+    key: 'upload',
+    icon: Upload,
+    labelKey: 'gestionnaire.imports.steps.upload',
+  },
+  {
+    key: 'mapping',
+    icon: Columns3,
+    labelKey: 'gestionnaire.imports.steps.mapping',
+  },
   { key: 'preview', icon: Eye, labelKey: 'gestionnaire.imports.steps.preview' },
-  { key: 'execute', icon: Play, labelKey: 'gestionnaire.imports.steps.execute' },
+  {
+    key: 'execute',
+    icon: Play,
+    labelKey: 'gestionnaire.imports.steps.execute',
+  },
 ]
 
 type Props = {
@@ -88,7 +111,11 @@ export function ImportStepper({ config, context, onComplete }: Props) {
             }
           }
         }
-        next[index] = { ...next[index], targetKey, confidence: targetKey ? 'manual' : 'low' }
+        next[index] = {
+          ...next[index],
+          targetKey,
+          confidence: targetKey ? 'manual' : 'low',
+        }
         return next
       })
     },
@@ -121,7 +148,12 @@ export function ImportStepper({ config, context, onComplete }: Props) {
       const total = rows.length
       setProgress({ done: 0, total })
 
-      const allResults: ImportResult = { total, success: 0, failed: 0, errors: [] }
+      const allResults: ImportResult = {
+        total,
+        success: 0,
+        failed: 0,
+        errors: [],
+      }
 
       // Build endpoint URL
       const url = config.endpoint.replace('{id}', String(context.residenceId))
@@ -141,18 +173,24 @@ export function ImportStepper({ config, context, onComplete }: Props) {
           // In dev mode with no backend, simulate success
           if (import.meta.env.DEV || import.meta.env.VITE_SHOW_DEV_BYPASS) {
             try {
-              await api.post<ApiEnvelope<{ created?: number; imported?: number; errors?: string[] }>>(
-                url,
-                { [config.id]: payloads },
-              )
+              await api.post<
+                ApiEnvelope<{
+                  created?: number
+                  imported?: number
+                  errors?: string[]
+                }>
+              >(url, { [config.id]: payloads })
             } catch {
               // Mock success in dev
             }
           } else {
-            await api.post<ApiEnvelope<{ created?: number; imported?: number; errors?: string[] }>>(
-              url,
-              { [config.id]: payloads },
-            )
+            await api.post<
+              ApiEnvelope<{
+                created?: number
+                imported?: number
+                errors?: string[]
+              }>
+            >(url, { [config.id]: payloads })
           }
 
           allResults.success += chunk.length

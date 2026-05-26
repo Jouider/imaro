@@ -13,7 +13,8 @@ type Props = {
 export function ImportProgress({ result, progress, importing, onDone }: Props) {
   const { t } = useTranslation()
 
-  const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0
+  const pct =
+    progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0
 
   return (
     <div className="space-y-6">
@@ -29,7 +30,9 @@ export function ImportProgress({ result, progress, importing, onDone }: Props) {
                   .replace('{total}', String(progress.total))}
               </span>
             </div>
-            <span className="text-xs font-medium text-muted-foreground">{pct}%</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              {pct}%
+            </span>
           </div>
           <div className="h-2.5 overflow-hidden rounded-full bg-muted">
             <div
@@ -57,7 +60,8 @@ export function ImportProgress({ result, progress, importing, onDone }: Props) {
                   )}
                 </p>
                 <p className="text-sm text-green-600 dark:text-green-400">
-                  {result.total} {result.total > 1 ? 'lignes traitées' : 'ligne traitée'}
+                  {result.total}{' '}
+                  {result.total > 1 ? 'lignes traitées' : 'ligne traitée'}
                 </p>
               </div>
             </div>

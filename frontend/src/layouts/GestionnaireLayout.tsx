@@ -300,7 +300,9 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
   return (
     <div
       className="flex h-full flex-col"
-      style={{ background: 'linear-gradient(180deg, #1a4f72 0%, #153f5c 100%)' }}
+      style={{
+        background: 'linear-gradient(180deg, #1a4f72 0%, #153f5c 100%)',
+      }}
     >
       {/* Logo */}
       <div className="flex h-16 shrink-0 items-center px-5 border-b border-white/8">
@@ -345,12 +347,16 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
                         <span
                           className={cn(
                             'transition-colors',
-                            isActive ? 'text-white' : 'text-white/45 group-hover:text-white/70',
+                            isActive
+                              ? 'text-white'
+                              : 'text-white/45 group-hover:text-white/70',
                           )}
                         >
                           {item.icon}
                         </span>
-                        <span className="flex-1 truncate">{t(item.labelKey)}</span>
+                        <span className="flex-1 truncate">
+                          {t(item.labelKey)}
+                        </span>
                         {!isActive && (
                           <ChevronRight className="size-3.5 opacity-0 group-hover:opacity-40 transition-opacity shrink-0" />
                         )}
@@ -403,7 +409,9 @@ function NotificationCenter() {
         <div className="flex items-center justify-between border-b px-4 py-3">
           <div className="flex items-center gap-2">
             <Bell className="size-4 text-[#1B4F72]" />
-            <span className="text-sm font-semibold text-foreground">Notifications</span>
+            <span className="text-sm font-semibold text-foreground">
+              Notifications
+            </span>
             {unreadCount > 0 && (
               <span className="rounded-full bg-[#E67E22] px-1.5 py-0.5 text-[10px] font-bold text-white">
                 {unreadCount}
@@ -426,7 +434,9 @@ function NotificationCenter() {
           {notifs.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
               <Bell className="size-8 text-muted-foreground/30" />
-              <p className="text-sm text-muted-foreground">Aucune notification</p>
+              <p className="text-sm text-muted-foreground">
+                Aucune notification
+              </p>
             </div>
           ) : (
             notifs.map((n) => (
@@ -453,7 +463,9 @@ function NotificationCenter() {
                     <p
                       className={cn(
                         'text-sm leading-tight',
-                        !n.read ? 'font-semibold text-foreground' : 'font-medium text-foreground/80',
+                        !n.read
+                          ? 'font-semibold text-foreground'
+                          : 'font-medium text-foreground/80',
                       )}
                     >
                       {n.title}
@@ -491,7 +503,8 @@ function NotificationCenter() {
         {notifs.length > 0 && (
           <div className="border-t px-4 py-2.5">
             <p className="text-center text-xs text-muted-foreground">
-              {notifs.length} notification{notifs.length > 1 ? 's' : ''} au total
+              {notifs.length} notification{notifs.length > 1 ? 's' : ''} au
+              total
             </p>
           </div>
         )}
@@ -523,7 +536,9 @@ function UserMenu() {
         <button
           aria-label="Menu utilisateur"
           className="flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ring-2 ring-transparent transition-all hover:ring-[#1B4F72]/30 focus:outline-none"
-          style={{ background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)' }}
+          style={{
+            background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)',
+          }}
         >
           {initials}
         </button>
@@ -534,7 +549,9 @@ function UserMenu() {
           <div className="flex items-center gap-3">
             <div
               className="flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-              style={{ background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)' }}
+              style={{
+                background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)',
+              }}
             >
               {initials}
             </div>
@@ -581,7 +598,9 @@ function UserMenu() {
           disabled={logoutMutation.isPending}
         >
           <LogOut className="size-4 shrink-0" />
-          <span>{logoutMutation.isPending ? 'Déconnexion…' : 'Déconnexion'}</span>
+          <span>
+            {logoutMutation.isPending ? 'Déconnexion…' : 'Déconnexion'}
+          </span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -602,10 +621,20 @@ function ContextPill() {
           'flex size-8 shrink-0 items-center justify-center rounded-lg overflow-hidden',
           !logoUrl && 'text-white',
         )}
-        style={!logoUrl ? { background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)' } : undefined}
+        style={
+          !logoUrl
+            ? {
+                background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)',
+              }
+            : undefined
+        }
       >
         {logoUrl ? (
-          <img src={logoUrl} alt="Logo syndic" className="size-full object-contain" />
+          <img
+            src={logoUrl}
+            alt="Logo syndic"
+            className="size-full object-contain"
+          />
         ) : (
           <Building2 className="size-4" aria-hidden="true" />
         )}
@@ -659,10 +688,8 @@ export function GestionnaireLayout() {
 
       {/* Main area */}
       <div className="flex min-h-svh flex-1 flex-col lg:ms-[240px]">
-
         {/* ── Topbar ── */}
         <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-white/95 px-4 backdrop-blur-sm dark:border-border dark:bg-card/95">
-
           {/* Mobile hamburger */}
           <Button
             variant="ghost"
@@ -682,7 +709,6 @@ export function GestionnaireLayout() {
 
           {/* Right: actions */}
           <div className="flex items-center gap-1">
-
             {/* Notification center */}
             <NotificationCenter />
 
