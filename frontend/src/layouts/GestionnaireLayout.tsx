@@ -16,6 +16,8 @@ import {
   Hammer,
   Upload,
   Scale,
+  Landmark,
+  UserCheck,
   CalendarCheck,
   ClipboardCheck,
   Activity,
@@ -93,6 +95,11 @@ const NAV_SECTIONS: NavSection[] = [
         labelKey: 'gestionnaire.nav.coproprietaires',
       },
       {
+        to: '/gestionnaire/occupants',
+        icon: <UserCheck className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.occupants',
+      },
+      {
         to: '/gestionnaire/prestataires',
         icon: <Hammer className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.prestataires',
@@ -131,6 +138,11 @@ const NAV_SECTIONS: NavSection[] = [
         to: '/gestionnaire/recouvrement',
         icon: <Scale className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.recouvrement',
+      },
+      {
+        to: '/gestionnaire/pointage',
+        icon: <Landmark className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.pointage',
       },
     ],
   },

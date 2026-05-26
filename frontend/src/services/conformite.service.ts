@@ -137,7 +137,7 @@ export async function getAuditLogs(
   return withMock(
     async () => {
       const res = await api.get<ApiEnvelope<{ logs: AuditLog[]; stats: AuditStats }>>(
-        '/audit-logs',
+        '/gestionnaire/audit-logs',
         { params: filters },
       )
       return res.data.data
@@ -192,7 +192,7 @@ export async function getAnnexes(residenceId: number, exercice: number): Promise
   return withMock(
     async () => {
       const res = await api.get<ApiEnvelope<AnnexeList>>(
-        `/residences/${residenceId}/annexes`,
+        `/gestionnaire/residences/${residenceId}/annexes`,
         { params: { exercice } },
       )
       return res.data.data
@@ -209,7 +209,7 @@ export async function regenerateAnnexe(
   return withMock(
     async () => {
       const res = await api.post<ApiEnvelope<{ pdf_url: string }>>(
-        `/residences/${residenceId}/annexes/${annexeNum}/regenerate`,
+        `/gestionnaire/residences/${residenceId}/annexes/${annexeNum}/regenerate`,
         { exercice },
       )
       return res.data.data
@@ -306,7 +306,7 @@ export async function getComplianceCalendar(
   return withMock(
     async () => {
       const res = await api.get<ApiEnvelope<ComplianceCalendar>>(
-        `/residences/${residenceId}/compliance-calendar`,
+        `/gestionnaire/residences/${residenceId}/compliance-calendar`,
         { params: { exercice } },
       )
       return res.data.data
@@ -337,7 +337,7 @@ export async function getPenaltyConfig(residenceId: number): Promise<PenaltyConf
   return withMock(
     async () => {
       const res = await api.get<ApiEnvelope<PenaltyConfig>>(
-        `/residences/${residenceId}/penalty-config`,
+        `/gestionnaire/residences/${residenceId}/penalty-config`,
       )
       return res.data.data
     },
@@ -352,7 +352,7 @@ export async function updatePenaltyConfig(
   return withMock(
     async () => {
       const res = await api.put<ApiEnvelope<PenaltyConfig>>(
-        `/residences/${residenceId}/penalty-config`,
+        `/gestionnaire/residences/${residenceId}/penalty-config`,
         config,
       )
       return res.data.data
@@ -439,7 +439,7 @@ export async function getRecouvrement(residenceId: number): Promise<Recouvrement
   return withMock(
     async () => {
       const res = await api.get<ApiEnvelope<RecouvrementData>>(
-        `/residences/${residenceId}/recouvrement`,
+        `/gestionnaire/residences/${residenceId}/recouvrement`,
       )
       return res.data.data
     },
@@ -451,7 +451,7 @@ export async function sendMiseEnDemeure(paiementId: number): Promise<{ pdf_url: 
   return withMock(
     async () => {
       const res = await api.post<ApiEnvelope<{ pdf_url: string }>>(
-        `/paiements/${paiementId}/mise-en-demeure`,
+        `/gestionnaire/paiements/${paiementId}/mise-en-demeure`,
       )
       return res.data.data
     },
@@ -459,7 +459,7 @@ export async function sendMiseEnDemeure(paiementId: number): Promise<{ pdf_url: 
   )
 }
 
-// ─── Occupants ────────────────────────────────────────────────────────────────
+// ─── Occupants (Art. 11 Loi 18-00) ────────────────────────────────────────────
 
 export type OccupantType = 'proprietaire_occupant' | 'locataire' | 'usufruitier' | 'autre'
 
@@ -473,7 +473,12 @@ export type Occupant = {
   type: OccupantType
   date_debut: string
   date_fin?: string
+  contact_urgence_nom?: string
+  contact_urgence_telephone?: string
+  notes?: string
 }
+
+export type CreateOccupantInput = Omit<Occupant, 'id'>
 
 const MOCK_OCCUPANTS: Occupant[] = [
   { id: 1, lot_id: 1, nom: 'Hassan Benali',  telephone: '+212600000010', type: 'proprietaire_occupant', date_debut: '2020-01-01' },
@@ -483,9 +488,131 @@ const MOCK_OCCUPANTS: Occupant[] = [
 export async function getOccupants(lotId: number): Promise<Occupant[]> {
   return withMock(
     async () => {
-      const res = await api.get<ApiEnvelope<{ occupants: Occupant[] }>>(`/lots/${lotId}/occupants`)
+      const res = await api.get<ApiEnvelope<{ occupants: Occupant[] }>>(`/gestionnaire/lots/${lotId}/occupants`)
       return res.data.data.occupants
     },
     MOCK_OCCUPANTS.filter((o) => o.lot_id === lotId),
   )
+}
+
+/** Vue consolidée par résidence — toutes les occupants en cours. */
+export async function getOccupantsByResidence(residenceId: number): Promise<Occupant[]> {
+  return withMock(
+    async () => {
+      const res = await api.get<ApiEnvelope<{ occupants: Occupant[] }>>(
+        `/gestionnaire/residences/${residenceId}/occupants`,
+      )
+      return res.data.data.occupants
+    },
+    MOCK_OCCUPANTS,
+  )
+}
+
+export async function createOccupant(lotId: number, input: CreateOccupantInput): Promise<Occupant> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<{ occupant: Occupant }>>(
+        `/gestionnaire/lots/${lotId}/occupants`, input,
+      )
+      return res.data.data.occupant
+    },
+    { id: Date.now(), ...input, lot_id: lotId },
+  )
+}
+
+export async function updateOccupant(occupantId: number, patch: Partial<CreateOccupantInput>): Promise<Occupant> {
+  return withMock(
+    async () => {
+      const res = await api.put<ApiEnvelope<{ occupant: Occupant }>>(
+        `/gestionnaire/occupants/${occupantId}`, patch,
+      )
+      return res.data.data.occupant
+    },
+    { id: occupantId, lot_id: 0, nom: '', type: 'autre', date_debut: '', ...patch },
+  )
+}
+
+export async function deleteOccupant(occupantId: number): Promise<void> {
+  return withMock(
+    async () => {
+      await api.delete(`/gestionnaire/occupants/${occupantId}`)
+    },
+    undefined,
+  )
+}
+
+// ─── Annexes — endpoint per-num data ──────────────────────────────────────────
+
+/** Fetch raw annexe payload from backend (for 10, 13-1, 13-2). The frontend uses
+ *  these to feed the jsPDF generators. Other annexe nums return 400 from backend
+ *  until phase 2 lands. */
+export async function getAnnexeData<T = unknown>(
+  residenceId: number, annexeNum: string, exercice: number,
+): Promise<T> {
+  const res = await api.get<ApiEnvelope<T>>(
+    `/gestionnaire/residences/${residenceId}/annexes/${annexeNum}`,
+    { params: { exercice } },
+  )
+  return res.data.data
+}
+
+// ─── Compliance task actions ──────────────────────────────────────────────────
+
+export async function completeComplianceTask(taskId: number): Promise<ComplianceTask> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<{ task: ComplianceTask }>>(
+        `/gestionnaire/compliance-tasks/${taskId}/complete`,
+      )
+      return res.data.data.task
+    },
+    {
+      id: taskId, phase: 'operations_mensuelles', task_key: '', task_label: '',
+      status: 'done', completed_at: new Date().toISOString(),
+    },
+  )
+}
+
+export async function skipComplianceTask(taskId: number, reason: string): Promise<ComplianceTask> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<{ task: ComplianceTask }>>(
+        `/gestionnaire/compliance-tasks/${taskId}/skip`, { reason },
+      )
+      return res.data.data.task
+    },
+    {
+      id: taskId, phase: 'operations_mensuelles', task_key: '', task_label: '',
+      status: 'skipped',
+    },
+  )
+}
+
+// ─── Pénalités — batch recalc ─────────────────────────────────────────────────
+
+export async function recalculatePenalties(residenceId: number): Promise<{
+  recalculated: number; total_penalty_amount: number
+}> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<{ recalculated: number; total_penalty_amount: number }>>(
+        `/gestionnaire/residences/${residenceId}/penalties/recalculate`,
+      )
+      return res.data.data
+    },
+    { recalculated: 0, total_penalty_amount: 0 },
+  )
+}
+
+// ─── Audit trail — export CSV/JSON ────────────────────────────────────────────
+
+export async function exportAuditLogs(
+  format: 'csv' | 'json' = 'csv',
+  filters: AuditFilters = {},
+): Promise<Blob> {
+  const res = await api.get('/gestionnaire/audit-logs/export', {
+    params: { format, ...filters },
+    responseType: 'blob',
+  })
+  return res.data as Blob
 }
