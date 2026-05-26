@@ -31,10 +31,9 @@ jobs:
             cd /var/www/imaro/backend
 
             echo "📦 Pull latest code..."
-            git pull origin main
-
-            echo "🔧 Fix Telescope provider..."
-            sed -i '/TelescopeServiceProvider/d' bootstrap/providers.php
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
 
             echo "📚 Install dependencies..."
             composer install --no-dev --optimize-autoloader
