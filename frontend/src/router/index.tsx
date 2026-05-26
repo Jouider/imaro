@@ -29,6 +29,13 @@ import { AuditTrailPage } from '@/pages/gestionnaire/AuditTrailPage'
 import { AnnexesPage } from '@/pages/gestionnaire/AnnexesPage'
 import { ConformitePage } from '@/pages/gestionnaire/ConformitePage'
 import { RecouvrementPage } from '@/pages/gestionnaire/RecouvrementPage'
+import { PointagePage } from '@/pages/gestionnaire/PointagePage'
+import { OccupantsPage } from '@/pages/gestionnaire/OccupantsPage'
+import { EquipementsPage } from '@/pages/gestionnaire/EquipementsPage'
+import { EmpruntsPage } from '@/pages/gestionnaire/EmpruntsPage'
+import { TravauxExceptionnelsPage } from '@/pages/gestionnaire/TravauxExceptionnelsPage'
+import { AutresRecettesPage } from '@/pages/gestionnaire/AutresRecettesPage'
+import { RemboursementsPage } from '@/pages/gestionnaire/RemboursementsPage'
 
 export const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
@@ -82,6 +89,13 @@ export const router = createBrowserRouter([
       { path: 'depenses', element: <DepensesPage /> },
       { path: 'imports', element: <ImportsPage /> },
       { path: 'recouvrement', element: <RecouvrementPage /> },
+      { path: 'pointage', element: <PointagePage /> },
+      { path: 'occupants', element: <OccupantsPage /> },
+      { path: 'equipements', element: <EquipementsPage /> },
+      { path: 'emprunts', element: <EmpruntsPage /> },
+      { path: 'travaux-exceptionnels', element: <TravauxExceptionnelsPage /> },
+      { path: 'autres-recettes', element: <AutresRecettesPage /> },
+      { path: 'remboursements', element: <RemboursementsPage /> },
       { path: 'conformite', element: <ConformitePage /> },
       { path: 'annexes', element: <AnnexesPage /> },
       { path: 'audit', element: <AuditTrailPage /> },

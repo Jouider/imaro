@@ -16,6 +16,12 @@ import {
   Hammer,
   Upload,
   Scale,
+  Landmark,
+  UserCheck,
+  Banknote,
+  HardHat,
+  Undo2,
+  TrendingUp,
   CalendarCheck,
   ClipboardCheck,
   Activity,
@@ -93,6 +99,11 @@ const NAV_SECTIONS: NavSection[] = [
         labelKey: 'gestionnaire.nav.coproprietaires',
       },
       {
+        to: '/gestionnaire/occupants',
+        icon: <UserCheck className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.occupants',
+      },
+      {
         to: '/gestionnaire/prestataires',
         icon: <Hammer className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.prestataires',
@@ -131,6 +142,41 @@ const NAV_SECTIONS: NavSection[] = [
         to: '/gestionnaire/recouvrement',
         icon: <Scale className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.recouvrement',
+      },
+      {
+        to: '/gestionnaire/pointage',
+        icon: <Landmark className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.pointage',
+      },
+      {
+        to: '/gestionnaire/autres-recettes',
+        icon: <TrendingUp className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.autresRecettes',
+      },
+      {
+        to: '/gestionnaire/remboursements',
+        icon: <Undo2 className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.remboursements',
+      },
+    ],
+  },
+  {
+    labelKey: 'gestionnaire.nav.sectionPatrimoine',
+    items: [
+      {
+        to: '/gestionnaire/equipements',
+        icon: <Wrench className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.equipements',
+      },
+      {
+        to: '/gestionnaire/emprunts',
+        icon: <Banknote className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.emprunts',
+      },
+      {
+        to: '/gestionnaire/travaux-exceptionnels',
+        icon: <HardHat className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.travauxExceptionnels',
       },
     ],
   },

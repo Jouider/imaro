@@ -225,6 +225,7 @@
       "sectionCopropriete": "الملكية المشتركة",
       "residences": "الإقامات",
       "coproprietaires": "الملاك المشاركون",
+      "occupants": "الساكنون",
       "prestataires": "المزودون",
       "sectionFinances": "المالية",
       "appelsFonds": "استدعاءات الأموال",
@@ -240,6 +241,13 @@
       "profil": "ملفي الشخصي",
       "imports": "استيراد البيانات",
       "recouvrement": "التحصيل",
+      "pointage": "التدقيق البنكي",
+      "autresRecettes": "إيرادات أخرى",
+      "remboursements": "المستردات",
+      "sectionPatrimoine": "الذمة المالية",
+      "equipements": "التجهيزات",
+      "emprunts": "القروض",
+      "travauxExceptionnels": "الأشغال الاستثنائية",
       "sectionConformite": "الامتثال",
       "conformite": "تقويم الامتثال",
       "annexes": "الملاحق المحاسبية",
@@ -674,6 +682,7 @@
         "dashboard": "لوحة التحكم",
         "journal": "اليومية المحاسبية",
         "grandLivre": "الأستاذ العام",
+        "balance": "ميزان المراجعة",
         "depenses": "المصاريف",
         "rapports": "التقارير المالية",
         "cloture": "إقفال الدورة"
@@ -1000,7 +1009,8 @@
         "coproprietaires": "الملاك المشاركون",
         "soldes": "الأرصدة الأولية",
         "paiements": "سجل المدفوعات",
-        "prestataires": "المزودون"
+        "prestataires": "المزودون",
+        "bilanOuverture": "الميزانية الافتتاحية"
       },
       "steps": {
         "upload": "تحميل",

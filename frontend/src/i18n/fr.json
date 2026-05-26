@@ -225,6 +225,7 @@
       "sectionCopropriete": "Copropriété",
       "residences": "Résidences",
       "coproprietaires": "Copropriétaires",
+      "occupants": "Occupants",
       "prestataires": "Prestataires",
       "sectionFinances": "Finances",
       "appelsFonds": "Appels de fonds",
@@ -240,6 +241,13 @@
       "profil": "Mon Profil",
       "imports": "Import données",
       "recouvrement": "Recouvrement",
+      "pointage": "Pointage bancaire",
+      "autresRecettes": "Autres recettes",
+      "remboursements": "Remboursements",
+      "sectionPatrimoine": "Patrimoine",
+      "equipements": "Équipements",
+      "emprunts": "Emprunts",
+      "travauxExceptionnels": "Travaux exceptionnels",
       "sectionConformite": "Conformité",
       "conformite": "Calendrier conformité",
       "annexes": "Annexes comptables",
@@ -674,6 +682,7 @@
         "dashboard": "Tableau de bord",
         "journal": "Journal comptable",
         "grandLivre": "Grand-Livre",
+        "balance": "Balance des comptes",
         "depenses": "Dépenses",
         "rapports": "Rapports financiers",
         "cloture": "Clôture"
@@ -1000,7 +1009,8 @@
         "coproprietaires": "Copropriétaires",
         "soldes": "Soldes initiaux",
         "paiements": "Historique paiements",
-        "prestataires": "Prestataires"
+        "prestataires": "Prestataires",
+        "bilanOuverture": "Bilan d'ouverture"
       },
       "steps": {
         "upload": "Téléverser",
