@@ -24,7 +24,10 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             set -e
-            cd /var/www/imaro-staging/backend
+            cd /var/www/imaro-staging
+
+            echo "🧹 Clean stale locks..."
+            rm -f .git/index.lock
 
             echo "📦 Pull latest code..."
             git fetch origin develop
@@ -32,6 +35,7 @@ jobs:
             git clean -fd
 
             echo "📚 Install dependencies..."
+            cd backend
             composer install --no-dev --optimize-autoloader
 
             echo "🗄️ Run migrations..."
