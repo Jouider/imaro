@@ -222,6 +222,7 @@
   "gestionnaire": {
     "nav": {
       "dashboard": "لوحة التحكم",
+      "ia": "المساعد الذكي",
       "sectionCopropriete": "الملكية المشتركة",
       "residences": "الإقامات",
       "coproprietaires": "الملاك المشاركون",

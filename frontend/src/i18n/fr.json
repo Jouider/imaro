@@ -222,6 +222,7 @@
   "gestionnaire": {
     "nav": {
       "dashboard": "Tableau de bord",
+      "ia": "Assistant IA",
       "sectionCopropriete": "Copropriété",
       "residences": "Résidences",
       "coproprietaires": "Copropriétaires",
