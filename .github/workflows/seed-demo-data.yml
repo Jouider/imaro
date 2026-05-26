@@ -1,0 +1,80 @@
+name: Seed Demo Data
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+          - both
+
+jobs:
+  seed-staging:
+    if: ${{ inputs.environment == 'staging' || inputs.environment == 'both' }}
+    name: Seed Staging
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Seed via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          command_timeout: 10m
+          script: |
+            set -e
+            cd /var/www/imaro-staging/backend
+
+            echo "🗑️ Fresh migrate..."
+            sudo -u www-data php artisan migrate:fresh --force
+
+            echo "🔑 Seed roles..."
+            sudo -u www-data php artisan db:seed --class=RolesSeeder --force
+
+            echo "📦 Seed full demo data..."
+            sudo -u www-data php artisan db:seed --class=FullDemoSeeder --force
+
+            echo "⚙️ Clear caches..."
+            sudo -u www-data php artisan config:cache
+            sudo -u www-data php artisan route:cache
+
+            echo "✅ Staging seeded successfully!"
+
+  seed-production:
+    if: ${{ inputs.environment == 'production' || inputs.environment == 'both' }}
+    name: Seed Production
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Seed via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          command_timeout: 10m
+          script: |
+            set -e
+            cd /var/www/imaro/backend
+
+            echo "🗑️ Fresh migrate..."
+            sudo -u www-data php artisan migrate:fresh --force
+
+            echo "🔑 Seed roles..."
+            sudo -u www-data php artisan db:seed --class=RolesSeeder --force
+
+            echo "📦 Seed full demo data..."
+            sudo -u www-data php artisan db:seed --class=FullDemoSeeder --force
+
+            echo "⚙️ Clear caches..."
+            sudo -u www-data php artisan config:cache
+            sudo -u www-data php artisan route:cache
+
+            echo "✅ Production seeded successfully!"
