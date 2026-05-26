@@ -3,8 +3,12 @@
 use App\Http\Controllers\Api\Gestionnaire\AnnonceController;
 use App\Http\Controllers\Api\Gestionnaire\AnnexeController;
 use App\Http\Controllers\Api\Gestionnaire\AuditLogController;
+use App\Http\Controllers\Api\Gestionnaire\AutreRecetteController;
+use App\Http\Controllers\Api\Gestionnaire\BilanOuvertureController;
 use App\Http\Controllers\Api\Gestionnaire\BudgetAnnexe5Controller;
 use App\Http\Controllers\Api\Gestionnaire\ComplianceCalendarController;
+use App\Http\Controllers\Api\Gestionnaire\EmpruntController;
+use App\Http\Controllers\Api\Gestionnaire\EquipementController;
 use App\Http\Controllers\Api\Gestionnaire\GroupeHabitationController;
 use App\Http\Controllers\Api\Gestionnaire\ImmeubleController;
 use App\Http\Controllers\Api\Gestionnaire\AppelFondsController;
@@ -22,11 +26,14 @@ use App\Http\Controllers\Api\Gestionnaire\NotificationController;
 use App\Http\Controllers\Api\Gestionnaire\OccupantController;
 use App\Http\Controllers\Api\Gestionnaire\PaiementController;
 use App\Http\Controllers\Api\Gestionnaire\PenaltyController;
+use App\Http\Controllers\Api\Gestionnaire\PointageController;
 use App\Http\Controllers\Api\Gestionnaire\PrestataireController;
 use App\Http\Controllers\Api\Gestionnaire\ProfilController;
 use App\Http\Controllers\Api\Gestionnaire\RecouvrementController;
+use App\Http\Controllers\Api\Gestionnaire\RemboursementController;
 use App\Http\Controllers\Api\Gestionnaire\ResidenceController;
 use App\Http\Controllers\Api\Gestionnaire\TicketController;
+use App\Http\Controllers\Api\Gestionnaire\TravauxExceptionnelController;
 use Illuminate\Support\Facades\Route;
 
 // Dashboard
@@ -196,6 +203,10 @@ Route::prefix('residences/{residence}')->group(function () {
     Route::get('/annexes', [AnnexeController::class, 'index']);
     Route::get('/annexes/{annexeNum}', [AnnexeController::class, 'show']);
     Route::post('/annexes/{annexeNum}/regenerate', [AnnexeController::class, 'regenerate']);
+
+    // Bilan d'ouverture
+    Route::get('/bilan-ouverture', [BilanOuvertureController::class, 'index']);
+    Route::post('/bilan-ouverture/bulk', [BilanOuvertureController::class, 'bulkStore']);
 });
 
 // Compliance tasks actions
@@ -204,3 +215,51 @@ Route::post('/compliance-tasks/{task}/skip', [ComplianceCalendarController::clas
 
 // Mise en demeure (per paiement)
 Route::post('/paiements/{paiement}/mise-en-demeure', [PenaltyController::class, 'miseEnDemeure']);
+
+// ========================================
+// Sprint 7 — Patrimoine + Recettes/Remboursements
+// ========================================
+
+Route::prefix('residences/{residence}')->group(function () {
+    // Équipements (Annexe 9)
+    Route::get('/equipements', [EquipementController::class, 'index']);
+    Route::post('/equipements', [EquipementController::class, 'store']);
+
+    // Emprunts (Annexe 8)
+    Route::get('/emprunts', [EmpruntController::class, 'index']);
+    Route::post('/emprunts', [EmpruntController::class, 'store']);
+
+    // Travaux exceptionnels (Annexe 6)
+    Route::get('/travaux-exceptionnels', [TravauxExceptionnelController::class, 'index']);
+    Route::post('/travaux-exceptionnels', [TravauxExceptionnelController::class, 'store']);
+
+    // Autres recettes
+    Route::get('/autres-recettes', [AutreRecetteController::class, 'index']);
+    Route::post('/autres-recettes', [AutreRecetteController::class, 'store']);
+
+    // Remboursements
+    Route::get('/remboursements', [RemboursementController::class, 'index']);
+    Route::post('/remboursements', [RemboursementController::class, 'store']);
+});
+
+// Flat routes for update/delete (Sprint 7)
+Route::put('/equipements/{equipement}', [EquipementController::class, 'update']);
+Route::delete('/equipements/{equipement}', [EquipementController::class, 'destroy']);
+Route::put('/emprunts/{emprunt}', [EmpruntController::class, 'update']);
+Route::delete('/emprunts/{emprunt}', [EmpruntController::class, 'destroy']);
+Route::put('/travaux-exceptionnels/{travauxExceptionnel}', [TravauxExceptionnelController::class, 'update']);
+Route::delete('/travaux-exceptionnels/{travauxExceptionnel}', [TravauxExceptionnelController::class, 'destroy']);
+Route::put('/autres-recettes/{autreRecette}', [AutreRecetteController::class, 'update']);
+Route::delete('/autres-recettes/{autreRecette}', [AutreRecetteController::class, 'destroy']);
+Route::put('/remboursements/{remboursement}', [RemboursementController::class, 'update']);
+Route::delete('/remboursements/{remboursement}', [RemboursementController::class, 'destroy']);
+
+// ========================================
+// Sprint 6 — Pointage bancaire
+// ========================================
+
+Route::prefix('residences/{residence}/pointage')->group(function () {
+    Route::post('/sessions', [PointageController::class, 'createSession']);
+    Route::get('/sessions/{session}/candidates', [PointageController::class, 'candidates']);
+    Route::post('/sessions/{session}/matches/confirm', [PointageController::class, 'confirmMatches']);
+});
