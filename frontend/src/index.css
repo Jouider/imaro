@@ -4,12 +4,13 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  /* Imaro brand colors — Indigo Edition (2026 refresh)
-     Migrated from navy #1B4F72 to a friendlier Linear-style indigo. */
-  --color-imaro-primary: #5e6ad2; /* Indigo — sidebar, headings, primary buttons */
-  --color-imaro-primary-light: #818cf8; /* Indigo light — focus, hover */
-  --color-imaro-primary-dark: #4f46e5; /* Indigo dark — active, gradient dark stop */
-  --color-imaro-primary-tint: #eef2ff; /* Indigo 50 — subtle backgrounds, surface tints */
+  /* Imaro brand colors — Royal Blue Edition (2026 refresh)
+     Migrated from navy #1B4F72 to a more vibrant, premium royal blue.
+     Reference: Vercel, Stripe Atlas, IBM Carbon. */
+  --color-imaro-primary: #1d4ed8; /* Royal blue 700 — sidebar, headings, primary buttons */
+  --color-imaro-primary-light: #2563eb; /* Blue 600 — focus, hover, secondary CTAs */
+  --color-imaro-primary-dark: #1e40af; /* Blue 800 — active, gradient dark stop */
+  --color-imaro-primary-tint: #dbeafe; /* Blue 100 — subtle backgrounds, surface tints */
   --color-imaro-accent: #e67e22; /* Orange — secondary CTAs, "Nouveau" badges */
   --color-imaro-accent-light: #f39c12;
   --color-imaro-accent-dark: #ba6118;
@@ -73,68 +74,68 @@
   --card-foreground: oklch(0.27 0.025 264);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.27 0.025 264);
-  /* Primary = Imaro indigo #5E6AD2 */
-  --primary: #5e6ad2;
+  /* Primary = Imaro royal blue #1D4ED8 */
+  --primary: #1d4ed8;
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0.015 264);
-  --secondary-foreground: #4f46e5;
-  --muted: oklch(0.97 0.015 264);
-  --muted-foreground: #6b7280;
+  --secondary: oklch(0.97 0.015 254);
+  --secondary-foreground: #1e40af;
+  --muted: oklch(0.97 0.015 254);
+  --muted-foreground: #64748b;
   /* Accent = Imaro orange #E67E22 — secondary CTA only */
   --accent: #e67e22;
   --accent-foreground: oklch(1 0 0);
   --destructive: #e74c3c;
-  --border: oklch(0.92 0.01 264);
-  --input: oklch(0.92 0.01 264);
-  --ring: #818cf8;
+  --border: oklch(0.92 0.01 254);
+  --input: oklch(0.92 0.01 254);
+  --ring: #3b82f6;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: #5e6ad2;
+  --sidebar: #1d4ed8;
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: #4f46e5;
+  --sidebar-primary: #1e40af;
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: #818cf8;
+  --sidebar-accent: #2563eb;
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: #a5b4fc;
+  --sidebar-ring: #93c5fd;
 }
 
 .dark {
-  --background: oklch(0.15 0.01 264);
+  --background: oklch(0.15 0.01 254);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.21 0.02 264);
+  --card: oklch(0.21 0.02 254);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.21 0.02 264);
+  --popover: oklch(0.21 0.02 254);
   --popover-foreground: oklch(0.985 0 0);
-  /* Primary stays indigo in dark mode (lifted lighter for contrast) */
-  --primary: #818cf8;
-  --primary-foreground: oklch(0.18 0.02 264);
-  --secondary: oklch(0.27 0.02 264);
+  /* Primary lifts to blue-500 in dark mode for contrast on dark surfaces */
+  --primary: #3b82f6;
+  --primary-foreground: oklch(0.18 0.02 254);
+  --secondary: oklch(0.27 0.02 254);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.27 0.02 264);
-  --muted-foreground: oklch(0.72 0.01 264);
+  --muted: oklch(0.27 0.02 254);
+  --muted-foreground: oklch(0.72 0.01 254);
   --accent: #f39c12;
-  --accent-foreground: oklch(0.18 0.02 264);
+  --accent-foreground: oklch(0.18 0.02 254);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: #a5b4fc;
-  --chart-1: #818cf8;
+  --ring: #60a5fa;
+  --chart-1: #3b82f6;
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.21 0.025 264);
+  --sidebar: oklch(0.21 0.025 254);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: #818cf8;
-  --sidebar-primary-foreground: oklch(0.18 0.02 264);
-  --sidebar-accent: oklch(0.27 0.02 264);
+  --sidebar-primary: #3b82f6;
+  --sidebar-primary-foreground: oklch(0.18 0.02 254);
+  --sidebar-accent: oklch(0.27 0.02 254);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: #818cf8;
+  --sidebar-ring: #60a5fa;
 }
 
 @layer base {
@@ -199,7 +200,7 @@
   .hover-lift:hover {
     transform: translateY(-2px);
     box-shadow:
-      0 4px 6px -1px rgb(94 106 210 / 0.08),
-      0 2px 4px -2px rgb(94 106 210 / 0.06);
+      0 4px 6px -1px rgb(29 78 216 / 0.1),
+      0 2px 4px -2px rgb(29 78 216 / 0.06);
   }
 }

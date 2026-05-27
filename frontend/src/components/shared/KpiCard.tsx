@@ -30,7 +30,7 @@ export function KpiCard({ icon, value, label, trend, className }: Props) {
   return (
     <Card
       className={cn(
-        'hover-lift border-[var(--color-imaro-primary)]/10 shadow-[0_1px_3px_0_rgb(94_106_210_/_0.04),0_1px_2px_-1px_rgb(94_106_210_/_0.04)]',
+        'hover-lift border-[var(--color-imaro-primary)]/10 shadow-[0_1px_3px_0_rgb(29_78_216_/_0.05),0_1px_2px_-1px_rgb(29_78_216_/_0.04)]',
         className,
       )}
     >
