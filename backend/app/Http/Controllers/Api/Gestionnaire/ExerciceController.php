@@ -19,7 +19,16 @@ class ExerciceController extends Controller
 
         $exercices = $residence->exercices()
             ->orderByDesc('annee')
-            ->get();
+            ->get()
+            ->map(fn ($e) => [
+                'id'               => $e->id,
+                'residence_id'     => $e->residence_id,
+                'annee'            => $e->annee,
+                'statut'           => $e->statut === 'cloture' ? 'clos' : 'ouvert',
+                'date_ouverture'   => $e->date_debut?->toDateString(),
+                'date_cloture'     => $e->statut === 'cloture' ? ($e->date_fin?->toDateString()) : null,
+                'seuil_comptable'  => 0,
+            ]);
 
         return response()->json([
             'status' => 'success',
