@@ -14,7 +14,7 @@ class OccupantController extends Controller
     public function index(Request $request, Lot $lot): JsonResponse
     {
         $occupants = $lot->occupants()
-            ->with('coproprietaire:id,nom')
+            ->with('coproprietaire.user:id,name')
             ->orderBy('date_debut', 'desc')
             ->get();
 
@@ -105,13 +105,13 @@ class OccupantController extends Controller
     {
         $occupants = Occupant::where('tenant_id', config('app.tenant_id'))
             ->whereIn('lot_id', $residence->lots()->pluck('id'))
-            ->with(['lot:id,numero', 'coproprietaire:id,nom'])
+            ->with(['lot:id,numero', 'coproprietaire.user:id,name'])
             ->orderBy('nom')
             ->get();
 
         return response()->json([
             'status' => 'success',
-            'data' => $occupants,
+            'data' => ['occupants' => $occupants],
         ]);
     }
 }
