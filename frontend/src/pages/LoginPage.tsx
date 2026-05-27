@@ -59,7 +59,8 @@ function BrandPanel() {
     <div
       className="hidden lg:flex flex-col justify-between p-10 h-full"
       style={{
-        background: 'linear-gradient(160deg, #1a4f72 0%, #0f3550 100%)',
+        background:
+          'linear-gradient(160deg, var(--color-imaro-primary) 0%, var(--color-imaro-primary-dark) 100%)',
       }}
     >
       {/* Logo */}
@@ -387,7 +388,7 @@ export function LoginPage() {
 
                 <Button
                   type="submit"
-                  className="h-12 w-full bg-[var(--color-imaro-primary)] text-base text-white hover:bg-[#153f5c]"
+                  className="h-12 w-full bg-[var(--color-imaro-primary)] text-base text-white hover:bg-[var(--color-imaro-primary-dark)]"
                   disabled={loginEmailMutation.isPending || !email || !password}
                 >
                   {loginEmailMutation.isPending ? 'Connexion…' : 'Se connecter'}
@@ -557,7 +558,7 @@ export function LoginPage() {
 
                 <Button
                   type="submit"
-                  className="h-12 w-full bg-[var(--color-imaro-primary)] text-base text-white hover:bg-[#153f5c]"
+                  className="h-12 w-full bg-[var(--color-imaro-primary)] text-base text-white hover:bg-[var(--color-imaro-primary-dark)]"
                   disabled={activateMutation.isPending || newCode.length < 6}
                 >
                   {activateMutation.isPending

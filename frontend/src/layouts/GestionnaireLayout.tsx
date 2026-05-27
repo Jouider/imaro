@@ -301,7 +301,8 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
     <div
       className="flex h-full flex-col"
       style={{
-        background: 'linear-gradient(180deg, #1a4f72 0%, #153f5c 100%)',
+        background:
+          'linear-gradient(180deg, var(--color-imaro-primary) 0%, var(--color-imaro-primary-dark) 100%)',
       }}
     >
       {/* Logo */}
