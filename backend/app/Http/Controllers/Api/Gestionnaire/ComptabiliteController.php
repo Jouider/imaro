@@ -442,6 +442,38 @@ class ComptabiliteController extends Controller
         ]);
     }
 
+    /**
+     * GET /api/gestionnaire/exercices/{exercice}/encaissements
+     * (alias: /api/gestionnaire/comptabilite/exercices/{exercice}/encaissements)
+     */
+    public function encaissementsIndex(Request $request, Exercice $exercice): JsonResponse
+    {
+        $this->authorizeExercice($request, $exercice);
+
+        $paiements = Paiement::where('exercice_id', $exercice->id)
+            ->with(['coproprietaire.user:id,name', 'coproprietaire.lot:id,numero'])
+            ->orderByDesc('date_paiement')
+            ->get()
+            ->map(fn (Paiement $p) => [
+                'id'                => $p->id,
+                'exercice_id'       => $p->exercice_id,
+                'coproprietaire_id' => $p->coproprietaire_id,
+                'coproprietaire_nom'=> $p->coproprietaire?->user?->name ?? '',
+                'lot_numero'        => $p->coproprietaire?->lot?->numero ?? '',
+                'montant'           => round($p->montant, 2),
+                'date'              => $p->date_paiement?->toDateString(),
+                'mode_paiement'     => $p->mode,
+                'reference_cheque'  => $p->reference,
+                'compte_destination'=> '5121',
+                'ecriture_id'       => $p->id,
+            ]);
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $paiements,
+        ]);
+    }
+
     // ── Helpers ──────────────────────────────────────────────
 
     private function authorizeExercice(Request $request, Exercice $exercice): void
