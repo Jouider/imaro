@@ -70,7 +70,7 @@ import { cn } from '@/lib/utils'
 // ─── Colors ───────────────────────────────────────────────────────────────────
 
 const PIE_COLORS = [
-  '#1B4F72',
+  'var(--color-imaro-primary)',
   '#E67E22',
   '#27AE60',
   '#8E44AD',
@@ -1048,7 +1048,11 @@ export function DepensesPage() {
                 <Tooltip
                   formatter={(v) => `${Number(v).toLocaleString('fr-MA')} DH`}
                 />
-                <Bar dataKey="montant" fill="#1B4F72" radius={[4, 4, 0, 0]} />
+                <Bar
+                  dataKey="montant"
+                  fill="var(--color-imaro-primary)"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>

@@ -149,8 +149,8 @@ export function PointagePage() {
     <div className="mx-auto max-w-6xl space-y-6 p-6">
       {/* Header */}
       <div className="flex items-start gap-3">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-[#1B4F72]/10">
-          <Landmark className="size-5 text-[#1B4F72]" />
+        <div className="flex size-10 items-center justify-center rounded-xl bg-[var(--color-imaro-primary)]/10">
+          <Landmark className="size-5 text-[var(--color-imaro-primary)]" />
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-foreground">
@@ -215,12 +215,12 @@ export function PointagePage() {
             <div
               className={cn(
                 'flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed py-12 text-center',
-                'transition-colors hover:border-[#1B4F72]/40 hover:bg-[#1B4F72]/5',
+                'transition-colors hover:border-[var(--color-imaro-primary)]/40 hover:bg-[var(--color-imaro-primary)]/5',
                 parsing && 'opacity-60 pointer-events-none',
               )}
             >
-              <div className="flex size-12 items-center justify-center rounded-full bg-[#1B4F72]/10">
-                <Upload className="size-6 text-[#1B4F72]" />
+              <div className="flex size-12 items-center justify-center rounded-full bg-[var(--color-imaro-primary)]/10">
+                <Upload className="size-6 text-[var(--color-imaro-primary)]" />
               </div>
               <div className="space-y-1">
                 <p className="text-sm font-medium text-foreground">
@@ -276,7 +276,7 @@ export function PointagePage() {
                 <Badge
                   key={b.code}
                   variant="outline"
-                  className="border-[#1B4F72]/20 bg-[#1B4F72]/5 text-[#1B4F72]"
+                  className="border-[var(--color-imaro-primary)]/20 bg-[var(--color-imaro-primary)]/5 text-[var(--color-imaro-primary)]"
                 >
                   {b.label}
                 </Badge>
@@ -291,7 +291,7 @@ export function PointagePage() {
         <>
           {/* Source banner */}
           <div className="flex flex-wrap items-center gap-3 rounded-xl border bg-card px-4 py-3">
-            <Landmark className="size-4 text-[#1B4F72]" />
+            <Landmark className="size-4 text-[var(--color-imaro-primary)]" />
             <div className="flex-1 text-sm">
               <span className="font-semibold">{parsed.fileName}</span>
               <span className="ml-2 text-muted-foreground">
@@ -307,7 +307,7 @@ export function PointagePage() {
             </div>
             <Badge
               variant="outline"
-              className="border-[#1B4F72]/30 bg-[#1B4F72]/5 text-[#1B4F72] text-xs"
+              className="border-[var(--color-imaro-primary)]/30 bg-[var(--color-imaro-primary)]/5 text-[var(--color-imaro-primary)] text-xs"
             >
               {parsed.totalLines} lignes
             </Badge>
@@ -492,9 +492,9 @@ export function PointagePage() {
 
           {/* Confirm all CTA */}
           {stats.auto_matched > 0 && (
-            <div className="flex items-center justify-between rounded-xl border-2 border-[#1B4F72]/20 bg-[#1B4F72]/5 p-4">
+            <div className="flex items-center justify-between rounded-xl border-2 border-[var(--color-imaro-primary)]/20 bg-[var(--color-imaro-primary)]/5 p-4">
               <div className="flex items-center gap-3">
-                <Sparkles className="size-5 text-[#1B4F72]" />
+                <Sparkles className="size-5 text-[var(--color-imaro-primary)]" />
                 <div>
                   <p className="text-sm font-medium text-foreground">
                     {stats.auto_matched} rapprochements automatiques prêts à
@@ -551,7 +551,8 @@ function Kpi({
   subtitle?: string
 }) {
   const toneClasses = {
-    primary: 'bg-[#1B4F72]/10 text-[#1B4F72]',
+    primary:
+      'bg-[var(--color-imaro-primary)]/10 text-[var(--color-imaro-primary)]',
     success:
       'bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-400',
     warning:
@@ -594,8 +595,8 @@ function FilterChip({
       className={cn(
         'flex items-center rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
         active
-          ? 'border-[#1B4F72] bg-[#1B4F72] text-white'
-          : 'border-border bg-card text-muted-foreground hover:border-[#1B4F72]/40 hover:text-foreground',
+          ? 'border-[var(--color-imaro-primary)] bg-[var(--color-imaro-primary)] text-white'
+          : 'border-border bg-card text-muted-foreground hover:border-[var(--color-imaro-primary)]/40 hover:text-foreground',
       )}
     >
       {children}

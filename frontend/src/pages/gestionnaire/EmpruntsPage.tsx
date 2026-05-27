@@ -192,8 +192,8 @@ export function EmpruntsPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-6">
       <div className="flex items-start gap-3">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-[#1B4F72]/10">
-          <Banknote className="size-5 text-[#1B4F72]" />
+        <div className="flex size-10 items-center justify-center rounded-xl bg-[var(--color-imaro-primary)]/10">
+          <Banknote className="size-5 text-[var(--color-imaro-primary)]" />
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-foreground">
@@ -496,7 +496,7 @@ function Kpi({
   tone: 'primary' | 'muted' | 'success' | 'danger'
 }) {
   const tones = {
-    primary: 'text-[#1B4F72]',
+    primary: 'text-[var(--color-imaro-primary)]',
     muted: 'text-muted-foreground',
     success: 'text-green-600',
     danger: 'text-orange-600',

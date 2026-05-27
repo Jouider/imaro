@@ -15,7 +15,7 @@ export const PARTS = [
   {
     title: 'Partie I — Premiers pas',
     blurb:
-      'Tout ce qu\'il faut savoir pour démarrer avec Imaro : créer son compte, prendre en main l\'interface, comprendre les rôles et basculer en arabe.',
+      "Tout ce qu'il faut savoir pour démarrer avec Imaro : créer son compte, prendre en main l'interface, comprendre les rôles et basculer en arabe.",
     chapters: [
       {
         title: 'Bienvenue dans Imaro',
@@ -26,7 +26,7 @@ export const PARTS = [
             type: 'lead',
             text: 'Imaro réunit dans une seule application toutes les obligations légales du syndic marocain et tous les outils de productivité moderne. Aucun fichier Excel à maintenir, aucun document à archiver à la main.',
           },
-          { type: 'h2', text: 'Ce qu\'Imaro fait pour vous' },
+          { type: 'h2', text: "Ce qu'Imaro fait pour vous" },
           {
             type: 'list',
             items: [
@@ -39,13 +39,13 @@ export const PARTS = [
               'Offre un portail mobile-first dédié au copropriétaire (Android, iOS, navigateur).',
             ],
           },
-          { type: 'h2', text: 'À qui s\'adresse Imaro ?' },
+          { type: 'h2', text: "À qui s'adresse Imaro ?" },
           {
             type: 'def',
             items: [
               [
                 'Cabinets syndic',
-                'qu\'ils gèrent 1 ou 100 résidences. Imaro est multi-tenant et passe à l\'échelle.',
+                "qu'ils gèrent 1 ou 100 résidences. Imaro est multi-tenant et passe à l'échelle.",
               ],
               [
                 'Syndics bénévoles',
@@ -53,7 +53,7 @@ export const PARTS = [
               ],
               [
                 'Gestionnaires patrimoine',
-                'qui gèrent un portefeuille immobilier pour le compte d\'investisseurs.',
+                "qui gèrent un portefeuille immobilier pour le compte d'investisseurs.",
               ],
             ],
           },
@@ -65,22 +65,42 @@ export const PARTS = [
           { type: 'h2', text: 'Les 8 grands modules' },
           {
             type: 'table',
-            headers: ['Module', 'À quoi ça sert', 'Fréquence d\'usage'],
+            headers: ['Module', 'À quoi ça sert', "Fréquence d'usage"],
             widths: [40, 50, 20],
             rows: [
-              ['Copropriétés', 'Résidences, lots, copropriétaires, occupants', 'Quotidien'],
-              ['Finances', 'Appels de fonds, paiements, dépenses, budgets', 'Quotidien'],
-              ['Recouvrement', 'Impayés, pénalités, mises en demeure', 'Hebdomadaire'],
-              ['Conformité', 'Annexes, calendrier, journal d\'audit', 'Mensuel'],
+              [
+                'Copropriétés',
+                'Résidences, lots, copropriétaires, occupants',
+                'Quotidien',
+              ],
+              [
+                'Finances',
+                'Appels de fonds, paiements, dépenses, budgets',
+                'Quotidien',
+              ],
+              [
+                'Recouvrement',
+                'Impayés, pénalités, mises en demeure',
+                'Hebdomadaire',
+              ],
+              ['Conformité', "Annexes, calendrier, journal d'audit", 'Mensuel'],
               ['Comptabilité', 'Partie double, balance, clôture', 'Mensuel'],
-              ['Patrimoine', 'Équipements, emprunts, travaux exceptionnels', 'Ponctuel'],
+              [
+                'Patrimoine',
+                'Équipements, emprunts, travaux exceptionnels',
+                'Ponctuel',
+              ],
               ['Pointage', 'Rapprochement bancaire automatique', 'Mensuel'],
-              ['Assistant IA', 'Audit, OCR factures, suggestions budget', 'Sur demande'],
+              [
+                'Assistant IA',
+                'Audit, OCR factures, suggestions budget',
+                'Sur demande',
+              ],
             ],
           },
           {
             type: 'tip',
-            title: 'Lisez d\'abord le chapitre 4',
+            title: "Lisez d'abord le chapitre 4",
             text: 'Le Tableau de bord est le point central depuis lequel vous pouvez atteindre 80 % des actions courantes en un clic.',
           },
         ],
@@ -88,14 +108,14 @@ export const PARTS = [
       {
         title: 'Connexion et premier login',
         intro:
-          'Imaro utilise l\'authentification par OTP WhatsApp — pas de mot de passe à retenir, pas de mail perdu.',
+          "Imaro utilise l'authentification par OTP WhatsApp — pas de mot de passe à retenir, pas de mail perdu.",
         blocks: [
           { type: 'h2', text: 'Accéder à Imaro' },
           {
             type: 'num',
             items: [
               'Ouvrez votre navigateur (Chrome, Safari, Edge ou Firefox).',
-              'Tapez l\'adresse : app.imaro.ma.',
+              "Tapez l'adresse : app.imaro.ma.",
               'Cliquez sur « Se connecter ».',
               'Saisissez votre numéro WhatsApp (format +212 6 XX XX XX XX).',
               'Recevez votre code à 6 chiffres dans la conversation WhatsApp Imaro.',
@@ -105,12 +125,12 @@ export const PARTS = [
           {
             type: 'tip',
             title: 'Code non reçu ?',
-            text: 'Un bouton « Renvoyer » apparaît après 60 secondes. Vérifiez aussi votre WhatsApp Web si vous l\'utilisez sur ordinateur.',
+            text: "Un bouton « Renvoyer » apparaît après 60 secondes. Vérifiez aussi votre WhatsApp Web si vous l'utilisez sur ordinateur.",
           },
-          { type: 'h2', text: 'Premier login d\'un nouveau syndic' },
+          { type: 'h2', text: "Premier login d'un nouveau syndic" },
           {
             type: 'p',
-            text: 'À votre toute première connexion, Imaro lance un assistant d\'onboarding en 5 étapes pour importer vos données existantes. Ce wizard est crucial si vous rejoignez Imaro en cours d\'année — il évite de saisir des centaines de copropriétaires à la main.',
+            text: "À votre toute première connexion, Imaro lance un assistant d'onboarding en 5 étapes pour importer vos données existantes. Ce wizard est crucial si vous rejoignez Imaro en cours d'année — il évite de saisir des centaines de copropriétaires à la main.",
           },
           {
             type: 'num',
@@ -118,54 +138,74 @@ export const PARTS = [
               'Importer vos lots (numéros, surfaces, quotités).',
               'Importer vos copropriétaires (nom, téléphone, lien lot).',
               'Importer les soldes initiaux par copropriétaire.',
-              'Importer l\'historique des paiements de l\'exercice en cours.',
+              "Importer l'historique des paiements de l'exercice en cours.",
               'Importer la liste de vos prestataires habituels.',
             ],
           },
           {
             type: 'tip',
             title: 'Modèles Excel pré-formatés',
-            text: 'Pour chaque étape, téléchargez le modèle proposé. Il contient déjà les bonnes colonnes — vous n\'avez qu\'à coller vos données. Voir aussi Chapitre 10 : Imports massifs.',
+            text: "Pour chaque étape, téléchargez le modèle proposé. Il contient déjà les bonnes colonnes — vous n'avez qu'à coller vos données. Voir aussi Chapitre 10 : Imports massifs.",
           },
           { type: 'h2', text: 'Rôles et permissions' },
           {
             type: 'p',
-            text: 'Imaro détecte automatiquement votre rôle à la connexion et adapte l\'interface. Tous les rôles passent par le même portail de connexion.',
+            text: "Imaro détecte automatiquement votre rôle à la connexion et adapte l'interface. Tous les rôles passent par le même portail de connexion.",
           },
           {
             type: 'table',
-            headers: ['Rôle', 'Accès', 'Cas d\'usage'],
+            headers: ['Rôle', 'Accès', "Cas d'usage"],
             widths: [30, 50, 30],
             rows: [
-              ['Super Admin', 'Tout l\'écosystème Imaro', 'Équipe Imaro uniquement'],
-              ['Syndic Owner', 'Tout le tenant + facturation', 'Patron du cabinet syndic'],
-              ['Manager / Gestionnaire', 'Toutes les opérations métier', 'Collaborateur principal'],
-              ['Agent recouvrement', 'Recouvrement + lectures', 'Suivi impayés'],
-              ['Conseil syndical', 'Lectures + AG + documents', 'Comité de surveillance'],
+              [
+                'Super Admin',
+                "Tout l'écosystème Imaro",
+                'Équipe Imaro uniquement',
+              ],
+              [
+                'Syndic Owner',
+                'Tout le tenant + facturation',
+                'Patron du cabinet syndic',
+              ],
+              [
+                'Manager / Gestionnaire',
+                'Toutes les opérations métier',
+                'Collaborateur principal',
+              ],
+              [
+                'Agent recouvrement',
+                'Recouvrement + lectures',
+                'Suivi impayés',
+              ],
+              [
+                'Conseil syndical',
+                'Lectures + AG + documents',
+                'Comité de surveillance',
+              ],
               ['Résident (Copro)', 'Son portail mobile', 'Copropriétaire'],
             ],
           },
           {
             type: 'warn',
             title: 'Sécurité',
-            text: 'Ne partagez jamais votre code OTP. Imaro ne vous demandera jamais ce code par téléphone ou par mail — uniquement à l\'écran de connexion.',
+            text: "Ne partagez jamais votre code OTP. Imaro ne vous demandera jamais ce code par téléphone ou par mail — uniquement à l'écran de connexion.",
           },
           { type: 'h2', text: 'Multi-langue' },
           {
             type: 'p',
-            text: 'Imaro est disponible en français et en arabe. Le bouton FR / AR en haut à droite bascule toute l\'interface. En arabe, le layout passe automatiquement en RTL (droite-à-gauche) — sidebar à droite, tableaux inversés, dates au format arabe.',
+            text: "Imaro est disponible en français et en arabe. Le bouton FR / AR en haut à droite bascule toute l'interface. En arabe, le layout passe automatiquement en RTL (droite-à-gauche) — sidebar à droite, tableaux inversés, dates au format arabe.",
           },
           {
             type: 'ok',
             title: 'Documents légaux',
-            text: 'Toutes les annexes PDF générées sont en français (langue officielle de l\'administration marocaine), quelle que soit la langue d\'interface choisie.',
+            text: "Toutes les annexes PDF générées sont en français (langue officielle de l'administration marocaine), quelle que soit la langue d'interface choisie.",
           },
         ],
       },
       {
         title: 'Tour du propriétaire',
         intro:
-          'Comprendre la navigation, les composants visuels et les codes couleurs d\'Imaro.',
+          "Comprendre la navigation, les composants visuels et les codes couleurs d'Imaro.",
         blocks: [
           { type: 'h2', text: 'La sidebar de navigation' },
           {
@@ -178,11 +218,20 @@ export const PARTS = [
             widths: [25, 75],
             rows: [
               ['Dashboard', 'Tableau de bord, Assistant IA'],
-              ['Copropriété', 'Résidences, Lots, Copropriétaires, Occupants, Prestataires'],
-              ['Finances', 'Paiements, Dépenses, Budgets, Recouvrement, Autres recettes, Remboursements'],
+              [
+                'Copropriété',
+                'Résidences, Lots, Copropriétaires, Occupants, Prestataires',
+              ],
+              [
+                'Finances',
+                'Paiements, Dépenses, Budgets, Recouvrement, Autres recettes, Remboursements',
+              ],
               ['Patrimoine', 'Équipements, Emprunts, Travaux exceptionnels'],
-              ['Conformité', 'Calendrier, Annexes, Journal d\'audit'],
-              ['Opérations', 'Pointage bancaire, Imports, Comptabilité, Documents, Annonces, AG, Tickets, Profil'],
+              ['Conformité', "Calendrier, Annexes, Journal d'audit"],
+              [
+                'Opérations',
+                'Pointage bancaire, Imports, Comptabilité, Documents, Annonces, AG, Tickets, Profil',
+              ],
             ],
           },
           { type: 'h2', text: 'Le header supérieur' },
@@ -202,24 +251,15 @@ export const PARTS = [
             items: [
               [
                 'Navy #1B4F72',
-                'couleur principale d\'Imaro. Sidebar, titres, boutons primaires.',
+                "couleur principale d'Imaro. Sidebar, titres, boutons primaires.",
               ],
               [
                 'Orange #E67E22',
-                'couleur d\'accent. CTA importants, badges d\'alerte, soulignements.',
+                "couleur d'accent. CTA importants, badges d'alerte, soulignements.",
               ],
-              [
-                'Vert #27AE60',
-                'succès, paiements reçus, statuts validés.',
-              ],
-              [
-                'Rouge #E74C3C',
-                'erreurs, impayés, prescriptions imminentes.',
-              ],
-              [
-                'Orange clair',
-                'partiel, en attente, mise en demeure envoyée.',
-              ],
+              ['Vert #27AE60', 'succès, paiements reçus, statuts validés.'],
+              ['Rouge #E74C3C', 'erreurs, impayés, prescriptions imminentes.'],
+              ['Orange clair', 'partiel, en attente, mise en demeure envoyée.'],
             ],
           },
           { type: 'h2', text: 'Les composants partagés' },
@@ -233,9 +273,9 @@ export const PARTS = [
               'KPIs — cartes statistiques en haut des pages (4 ou 5 indicateurs clés).',
               'Tables — tri sur les colonnes, recherche globale, pagination, export CSV.',
               'Badges statut — payé (vert), impayé (rouge), partiel (orange), retard (rouge foncé).',
-              'Montants — toujours formatés « 1 500,00 DH » (locale fr-MA + séparateur d\'espace).',
+              "Montants — toujours formatés « 1 500,00 DH » (locale fr-MA + séparateur d'espace).",
               'Modales de confirmation — toujours pour les actions destructives.',
-              'États vides — message + CTA quand une page n\'a pas encore de données.',
+              "États vides — message + CTA quand une page n'a pas encore de données.",
               'Squelettes de chargement — affichés pendant les requêtes serveur.',
             ],
           },
@@ -247,7 +287,7 @@ export const PARTS = [
           { type: 'h2', text: 'Le mode sombre' },
           {
             type: 'p',
-            text: 'Cliquez sur l\'icône lune/soleil en haut à droite. Imaro passe en mode sombre — sidebar plus claire, fond noir, contrastes adaptés. Idéal pour le travail en soirée. Votre choix est mémorisé.',
+            text: "Cliquez sur l'icône lune/soleil en haut à droite. Imaro passe en mode sombre — sidebar plus claire, fond noir, contrastes adaptés. Idéal pour le travail en soirée. Votre choix est mémorisé.",
           },
         ],
       },
@@ -258,17 +298,17 @@ export const PARTS = [
   {
     title: 'Partie II — Le quotidien du gestionnaire',
     blurb:
-      'Les pages que vous ouvrirez tous les jours : tableau de bord, résidences, lots, copropriétaires, occupants, prestataires, et l\'outil d\'import massif.',
+      "Les pages que vous ouvrirez tous les jours : tableau de bord, résidences, lots, copropriétaires, occupants, prestataires, et l'outil d'import massif.",
     chapters: [
       {
         title: 'Tableau de bord',
         intro:
-          'Le point d\'entrée central : KPIs financiers, modules clés, top impayés, AG à venir, actions rapides.',
+          "Le point d'entrée central : KPIs financiers, modules clés, top impayés, AG à venir, actions rapides.",
         blocks: [
           { type: 'p', text: 'URL : /gestionnaire/dashboard' },
           {
             type: 'lead',
-            text: 'Le tableau de bord est conçu pour répondre à la question « par où je commence aujourd\'hui ? » en un coup d\'œil. Il vous évite d\'avoir à ouvrir chaque module pour savoir ce qui demande votre attention.',
+            text: "Le tableau de bord est conçu pour répondre à la question « par où je commence aujourd'hui ? » en un coup d'œil. Il vous évite d'avoir à ouvrir chaque module pour savoir ce qui demande votre attention.",
           },
           { type: 'h2', text: 'Les 4 KPIs principaux' },
           {
@@ -277,21 +317,33 @@ export const PARTS = [
           },
           {
             type: 'table',
-            headers: ['KPI', 'Ce qu\'il mesure', 'Couleur'],
+            headers: ['KPI', "Ce qu'il mesure", 'Couleur'],
             widths: [30, 55, 15],
             rows: [
-              ['Résidences', 'Nombre de copropriétés actives dans votre tenant', 'Navy'],
-              ['Copropriétaires', 'Total des comptes copropriétaires (tous immeubles)', 'Navy'],
+              [
+                'Résidences',
+                'Nombre de copropriétés actives dans votre tenant',
+                'Navy',
+              ],
+              [
+                'Copropriétaires',
+                'Total des comptes copropriétaires (tous immeubles)',
+                'Navy',
+              ],
               ['CA mensuel', 'Encaissements du mois en cours', 'Vert'],
-              ['Total impayés', 'Somme due par les copropriétaires en retard', 'Rouge'],
+              [
+                'Total impayés',
+                'Somme due par les copropriétaires en retard',
+                'Rouge',
+              ],
             ],
           },
           {
             type: 'tip',
             title: 'Filtre par résidence',
-            text: 'Le sélecteur de résidence en haut à droite filtre les 4 KPIs et toutes les sections du dashboard sur une résidence spécifique. Idéal pour le suivi d\'une copropriété en particulier.',
+            text: "Le sélecteur de résidence en haut à droite filtre les 4 KPIs et toutes les sections du dashboard sur une résidence spécifique. Idéal pour le suivi d'une copropriété en particulier.",
           },
-          { type: 'h2', text: 'L\'aperçu modules' },
+          { type: 'h2', text: "L'aperçu modules" },
           {
             type: 'p',
             text: 'Section composée de 6 grandes cartes navigant vers les modules clés. Chaque carte affiche une valeur synthèse et un libellé court.',
@@ -299,18 +351,18 @@ export const PARTS = [
           {
             type: 'list',
             items: [
-              'Assistant IA (dégradé violet) — accès direct à l\'audit, OCR, budget IA.',
+              "Assistant IA (dégradé violet) — accès direct à l'audit, OCR, budget IA.",
               'Conformité — nombre de tâches en cours dans le calendrier.',
               'Recouvrement — montant des impayés et lots concernés.',
               'Pointage bancaire — dernière date de pointage.',
-              'Patrimoine — nombre d\'équipements + emprunts actifs.',
+              "Patrimoine — nombre d'équipements + emprunts actifs.",
               'Annexes — date de dernière génération des annexes obligatoires.',
             ],
           },
           { type: 'h2', text: 'Le graphique recouvrement' },
           {
             type: 'p',
-            text: 'Histogramme mensuel sur 12 mois glissants. Deux barres par mois : « Recouvré » (vert) et « Restant à recouvrer » (orange). Permet d\'identifier instantanément les mois faibles et les tendances.',
+            text: "Histogramme mensuel sur 12 mois glissants. Deux barres par mois : « Recouvré » (vert) et « Restant à recouvrer » (orange). Permet d'identifier instantanément les mois faibles et les tendances.",
           },
           { type: 'h2', text: 'Top impayés et tickets urgents' },
           {
@@ -336,7 +388,7 @@ export const PARTS = [
           { type: 'p', text: 'URL : /gestionnaire/residences' },
           {
             type: 'lead',
-            text: 'Une « résidence » dans Imaro représente une copropriété (un immeuble ou un ensemble immobilier). C\'est l\'entité racine qui contient lots, copropriétaires, exercices et documents.',
+            text: "Une « résidence » dans Imaro représente une copropriété (un immeuble ou un ensemble immobilier). C'est l'entité racine qui contient lots, copropriétaires, exercices et documents.",
           },
           { type: 'h2', text: 'La liste des résidences' },
           {
@@ -366,10 +418,19 @@ export const PARTS = [
           {
             type: 'def',
             items: [
-              ['Lots', 'Liste des unités (appartements, bureaux, caves, parkings, locaux commerciaux).'],
+              [
+                'Lots',
+                'Liste des unités (appartements, bureaux, caves, parkings, locaux commerciaux).',
+              ],
               ['Copropriétaires', 'Personnes propriétaires des lots.'],
-              ['Exercices', 'Périodes comptables (généralement 1er janvier - 31 décembre).'],
-              ['Documents', 'Règlement de copropriété, plans, PV d\'AG, contrats.'],
+              [
+                'Exercices',
+                'Périodes comptables (généralement 1er janvier - 31 décembre).',
+              ],
+              [
+                'Documents',
+                "Règlement de copropriété, plans, PV d'AG, contrats.",
+              ],
             ],
           },
           { type: 'h2', text: 'Créer une nouvelle résidence' },
@@ -377,9 +438,9 @@ export const PARTS = [
             type: 'num',
             items: [
               'Cliquez sur « + Nouvelle résidence » en haut à droite.',
-              'Renseignez : nom, ville, adresse, numéro de RIBR (Registre d\'Immatriculation des Biens en Régime de copropriété).',
+              "Renseignez : nom, ville, adresse, numéro de RIBR (Registre d'Immatriculation des Biens en Régime de copropriété).",
               'Indiquez le régime fiscal : simplifié (≤ 200 000 MAD/an) ou normal.',
-              'Choisissez la date de début d\'exercice (par défaut 1er janvier).',
+              "Choisissez la date de début d'exercice (par défaut 1er janvier).",
               'Cliquez « Créer ». La résidence apparaît dans la liste.',
             ],
           },
@@ -391,23 +452,23 @@ export const PARTS = [
           { type: 'h2', text: 'Édition et archivage' },
           {
             type: 'p',
-            text: 'Vous pouvez éditer les informations d\'une résidence à tout moment via le menu « ... » de la ligne. L\'archivage est une action irréversible — utilisez-la uniquement pour les résidences sorties du portefeuille (vente du syndic, dissolution).',
+            text: "Vous pouvez éditer les informations d'une résidence à tout moment via le menu « ... » de la ligne. L'archivage est une action irréversible — utilisez-la uniquement pour les résidences sorties du portefeuille (vente du syndic, dissolution).",
           },
           {
             type: 'warn',
             title: 'Archivage',
-            text: 'Une résidence archivée n\'apparaît plus dans les listes ni les statistiques. Ses données restent stockées 7 ans (rétention légale du journal d\'audit) mais ne sont plus modifiables.',
+            text: "Une résidence archivée n'apparaît plus dans les listes ni les statistiques. Ses données restent stockées 7 ans (rétention légale du journal d'audit) mais ne sont plus modifiables.",
           },
         ],
       },
       {
         title: 'Lots',
         intro:
-          'Les unités physiques d\'une copropriété : appartements, locaux, parkings, caves.',
+          "Les unités physiques d'une copropriété : appartements, locaux, parkings, caves.",
         blocks: [
           {
             type: 'lead',
-            text: 'Un lot est l\'unité de gestion de base d\'une copropriété. Chaque lot possède une quote-part (tantième) qui détermine sa contribution aux charges.',
+            text: "Un lot est l'unité de gestion de base d'une copropriété. Chaque lot possède une quote-part (tantième) qui détermine sa contribution aux charges.",
           },
           { type: 'h2', text: 'Les types de lots' },
           {
@@ -423,18 +484,27 @@ export const PARTS = [
               'Local technique — abri ascenseur, salle des machines.',
             ],
           },
-          { type: 'h2', text: 'Les attributs d\'un lot' },
+          { type: 'h2', text: "Les attributs d'un lot" },
           {
             type: 'table',
             headers: ['Attribut', 'Description'],
             widths: [25, 75],
             rows: [
-              ['Numéro', 'Identifiant unique dans la copropriété (ex : A-101, B-202)'],
+              [
+                'Numéro',
+                'Identifiant unique dans la copropriété (ex : A-101, B-202)',
+              ],
               ['Type', 'Appartement, bureau, parking, etc.'],
               ['Surface', 'En mètres carrés'],
               ['Étage', 'RDC, 1er, 2ème, sous-sol -1, etc.'],
-              ['Tantième', 'Quote-part dans les charges (sur base millième ou autre)'],
-              ['Immeuble', 'Bâtiment d\'appartenance (si la résidence en compte plusieurs)'],
+              [
+                'Tantième',
+                'Quote-part dans les charges (sur base millième ou autre)',
+              ],
+              [
+                'Immeuble',
+                "Bâtiment d'appartenance (si la résidence en compte plusieurs)",
+              ],
               ['Propriétaire', 'Lien vers le copropriétaire principal'],
             ],
           },
@@ -451,12 +521,12 @@ export const PARTS = [
           { type: 'h2', text: 'Génération assistée de lots' },
           {
             type: 'p',
-            text: 'Pour les résidences neuves ou en onboarding, un assistant « Générer des lots en masse » crée automatiquement N lots avec numérotation séquentielle (A-101, A-102, A-103…). Vous renseignez le bâtiment, l\'étage de départ, le nombre de lots par étage, et Imaro génère le tout en quelques secondes.',
+            text: "Pour les résidences neuves ou en onboarding, un assistant « Générer des lots en masse » crée automatiquement N lots avec numérotation séquentielle (A-101, A-102, A-103…). Vous renseignez le bâtiment, l'étage de départ, le nombre de lots par étage, et Imaro génère le tout en quelques secondes.",
           },
           {
             type: 'ai',
             title: 'Astuce IA',
-            text: 'Si vous avez un plan PDF du règlement de copropriété, l\'Assistant IA peut bientôt extraire automatiquement la liste des lots et leurs tantièmes. (Fonctionnalité prévue dans une prochaine version.)',
+            text: "Si vous avez un plan PDF du règlement de copropriété, l'Assistant IA peut bientôt extraire automatiquement la liste des lots et leurs tantièmes. (Fonctionnalité prévue dans une prochaine version.)",
           },
         ],
       },
@@ -468,7 +538,7 @@ export const PARTS = [
           { type: 'p', text: 'URL : /gestionnaire/coproprietaires' },
           {
             type: 'lead',
-            text: 'Le copropriétaire est la personne (physique ou morale) à qui appartient un lot. Imaro consolide tous les copropriétaires de votre tenant — peu importe la résidence ou l\'immeuble.',
+            text: "Le copropriétaire est la personne (physique ou morale) à qui appartient un lot. Imaro consolide tous les copropriétaires de votre tenant — peu importe la résidence ou l'immeuble.",
           },
           { type: 'h2', text: 'La liste consolidée' },
           {
@@ -494,7 +564,7 @@ export const PARTS = [
           {
             type: 'list',
             items: [
-              'Informations d\'identité (nom, CIN ou ICE, téléphone, email, adresse).',
+              "Informations d'identité (nom, CIN ou ICE, téléphone, email, adresse).",
               'Lots détenus avec quote-part totale.',
               'Historique complet des appels de fonds émis.',
               'Historique des paiements reçus.',
@@ -505,12 +575,12 @@ export const PARTS = [
           { type: 'h2', text: 'Inviter au portail résident' },
           {
             type: 'p',
-            text: 'Sur la fiche, un bouton « Inviter au portail » envoie un message WhatsApp avec un lien d\'activation. Le copropriétaire suit le lien, reçoit son OTP, et accède à son portail mobile.',
+            text: "Sur la fiche, un bouton « Inviter au portail » envoie un message WhatsApp avec un lien d'activation. Le copropriétaire suit le lien, reçoit son OTP, et accède à son portail mobile.",
           },
           {
             type: 'tip',
             title: 'Adoption du portail',
-            text: 'Lancez l\'invitation par vagues de 20-30 copropriétaires. Cela évite de saturer votre support si plusieurs personnes vous appellent en même temps avec des questions d\'activation.',
+            text: "Lancez l'invitation par vagues de 20-30 copropriétaires. Cela évite de saturer votre support si plusieurs personnes vous appellent en même temps avec des questions d'activation.",
           },
           { type: 'h2', text: 'Création manuelle vs import' },
           {
@@ -532,14 +602,14 @@ export const PARTS = [
           { type: 'p', text: 'URL : /gestionnaire/occupants' },
           {
             type: 'lead',
-            text: 'L\'occupant est la personne qui occupe réellement le lot — qui peut être le copropriétaire lui-même, un locataire, ou un usufruitier. Distinguer ces deux notions est essentiel pour la convocation aux AG et la communication des charges.',
+            text: "L'occupant est la personne qui occupe réellement le lot — qui peut être le copropriétaire lui-même, un locataire, ou un usufruitier. Distinguer ces deux notions est essentiel pour la convocation aux AG et la communication des charges.",
           },
           {
             type: 'legal',
             title: 'Loi 18-00 article 11',
             text: 'Le syndic doit tenir un registre à jour des occupants de chaque lot. Cette obligation existe en parallèle de celle de connaître les copropriétaires.',
           },
-          { type: 'h2', text: 'Les 3 types d\'occupants' },
+          { type: 'h2', text: "Les 3 types d'occupants" },
           {
             type: 'def',
             items: [
@@ -560,7 +630,7 @@ export const PARTS = [
           { type: 'h2', text: 'Page Occupants' },
           {
             type: 'p',
-            text: 'En haut de page, 3 KPIs : nombre de propriétaires occupants, nombre de locataires, nombre d\'usufruitiers. En dessous, la table liste tous les occupants avec leur lot, copropriétaire, type, contact, période d\'occupation, et statut du bail (le cas échéant).',
+            text: "En haut de page, 3 KPIs : nombre de propriétaires occupants, nombre de locataires, nombre d'usufruitiers. En dessous, la table liste tous les occupants avec leur lot, copropriétaire, type, contact, période d'occupation, et statut du bail (le cas échéant).",
           },
           { type: 'h2', text: 'Ajouter un occupant' },
           {
@@ -569,7 +639,7 @@ export const PARTS = [
               'Cliquez « + Nouveau ».',
               'Sélectionnez le lot concerné.',
               'Choisissez le type (propriétaire / locataire / usufruitier).',
-              'Renseignez nom et téléphone de l\'occupant.',
+              "Renseignez nom et téléphone de l'occupant.",
               'Pour un locataire : dates de bail, montant du loyer (optionnel).',
               'Cliquez « Créer ».',
             ],
@@ -577,12 +647,12 @@ export const PARTS = [
           {
             type: 'tip',
             title: 'AG et occupants',
-            text: 'Lors de la convocation à une AG, Imaro envoie automatiquement la convocation au copropriétaire (qui vote) et au locataire (qui peut assister). C\'est conforme à la pratique recommandée par la Loi 18-00.',
+            text: "Lors de la convocation à une AG, Imaro envoie automatiquement la convocation au copropriétaire (qui vote) et au locataire (qui peut assister). C'est conforme à la pratique recommandée par la Loi 18-00.",
           },
           {
             type: 'warn',
             title: 'Champ de communication',
-            text: 'Quand vous envoyez une annonce « charges du mois », elle part vers l\'occupant actuel — pas vers le copropriétaire absent. Pensez à mettre à jour la fiche dès qu\'un bail démarre ou se termine.',
+            text: "Quand vous envoyez une annonce « charges du mois », elle part vers l'occupant actuel — pas vers le copropriétaire absent. Pensez à mettre à jour la fiche dès qu'un bail démarre ou se termine.",
           },
         ],
       },
@@ -598,7 +668,7 @@ export const PARTS = [
           { type: 'h2', text: 'Liste des prestataires' },
           {
             type: 'p',
-            text: 'La table affiche : nom (raison sociale ou nom commercial), spécialité, téléphone, email, adresse, ICE, contrats en cours, dernière facture émise. Tri par n\'importe quelle colonne, recherche globale.',
+            text: "La table affiche : nom (raison sociale ou nom commercial), spécialité, téléphone, email, adresse, ICE, contrats en cours, dernière facture émise. Tri par n'importe quelle colonne, recherche globale.",
           },
           { type: 'h2', text: 'Les spécialités courantes' },
           {
@@ -617,52 +687,58 @@ export const PARTS = [
           { type: 'h2', text: 'Lier un prestataire à une dépense' },
           {
             type: 'p',
-            text: 'Lorsque vous saisissez une dépense (Chapitre 12) ou que l\'OCR IA extrait une facture, choisissez le prestataire dans la liste déroulante. Ça vous permet ensuite de suivre les montants totaux dépensés par fournisseur.',
+            text: "Lorsque vous saisissez une dépense (Chapitre 12) ou que l'OCR IA extrait une facture, choisissez le prestataire dans la liste déroulante. Ça vous permet ensuite de suivre les montants totaux dépensés par fournisseur.",
           },
           {
             type: 'tip',
             title: 'Comparaison prestataires',
-            text: 'Sur la fiche prestataire, l\'onglet « Dépenses » liste toutes les factures réglées. Idéal pour comparer les prix d\'un fournisseur à l\'autre avant un renouvellement de contrat.',
+            text: "Sur la fiche prestataire, l'onglet « Dépenses » liste toutes les factures réglées. Idéal pour comparer les prix d'un fournisseur à l'autre avant un renouvellement de contrat.",
           },
           { type: 'h2', text: 'Contrats associés' },
           {
             type: 'p',
-            text: 'Pour les prestataires sous contrat (ascensoriste, nettoyage), vous pouvez attacher le contrat PDF directement à la fiche. Imaro vous alerte 60 jours avant l\'échéance pour préparer le renouvellement ou la mise en concurrence.',
+            text: "Pour les prestataires sous contrat (ascensoriste, nettoyage), vous pouvez attacher le contrat PDF directement à la fiche. Imaro vous alerte 60 jours avant l'échéance pour préparer le renouvellement ou la mise en concurrence.",
           },
         ],
       },
       {
         title: 'Imports massifs',
         intro:
-          'Le wizard d\'import Excel en 4 étapes : upload, mapping, prévisualisation, exécution.',
+          "Le wizard d'import Excel en 4 étapes : upload, mapping, prévisualisation, exécution.",
         blocks: [
           { type: 'p', text: 'URL : /gestionnaire/imports' },
           {
             type: 'lead',
             text: 'Quand vous arrivez sur Imaro avec une copropriété existante, vous avez déjà tout dans des fichiers Excel : lots, copropriétaires, paiements, soldes, prestataires. Le module Imports vous permet de tout charger en moins de 30 minutes — au lieu de re-saisir des centaines de lignes à la main.',
           },
-          { type: 'h2', text: 'Les 6 types d\'imports disponibles' },
+          { type: 'h2', text: "Les 6 types d'imports disponibles" },
           {
             type: 'table',
-            headers: ['Onglet', 'Quand l\'utiliser'],
+            headers: ['Onglet', "Quand l'utiliser"],
             widths: [30, 70],
             rows: [
               ['Lots', 'Création initiale de votre parc immobilier.'],
               ['Copropriétaires', 'Ajout en masse des propriétaires de lots.'],
-              ['Soldes initiaux', 'Reprise de balance au démarrage d\'Imaro.'],
-              ['Paiements', 'Historique des encaissements de l\'exercice en cours.'],
+              ['Soldes initiaux', "Reprise de balance au démarrage d'Imaro."],
+              [
+                'Paiements',
+                "Historique des encaissements de l'exercice en cours.",
+              ],
               ['Prestataires', 'Annuaire fournisseurs habituel.'],
-              ['Bilan d\'ouverture', 'Reprise du bilan comptable des exercices antérieurs.'],
+              [
+                "Bilan d'ouverture",
+                'Reprise du bilan comptable des exercices antérieurs.',
+              ],
             ],
           },
           { type: 'h2', text: 'Le wizard en 4 étapes' },
           {
             type: 'num',
             items: [
-              'Upload — drag & drop d\'un fichier .xlsx, .xls ou .csv. Vous pouvez aussi télécharger un modèle pré-formaté.',
+              "Upload — drag & drop d'un fichier .xlsx, .xls ou .csv. Vous pouvez aussi télécharger un modèle pré-formaté.",
               'Mapping — Imaro analyse les colonnes de votre fichier et les fait correspondre aux champs Imaro. Vous validez ou ajustez manuellement.',
               'Prévisualisation — toutes les lignes apparaissent dans un tableau avec validations en temps réel (téléphone valide ? montant cohérent ? doublon ?).',
-              'Exécution — clic sur « Importer ». Une barre de progression vous montre l\'avancement. Vous recevez un récapitulatif final.',
+              "Exécution — clic sur « Importer ». Une barre de progression vous montre l'avancement. Vous recevez un récapitulatif final.",
             ],
           },
           {
@@ -673,7 +749,7 @@ export const PARTS = [
           {
             type: 'warn',
             title: 'Vérifiez les erreurs',
-            text: 'Si une ligne contient une erreur (téléphone invalide, lot inexistant, montant négatif anormal), elle est marquée en rouge dans la prévisualisation. Corrigez le fichier source et re-uploadez plutôt que d\'importer des lignes douteuses.',
+            text: "Si une ligne contient une erreur (téléphone invalide, lot inexistant, montant négatif anormal), elle est marquée en rouge dans la prévisualisation. Corrigez le fichier source et re-uploadez plutôt que d'importer des lignes douteuses.",
           },
           { type: 'h2', text: 'Le mapping intelligent' },
           {
@@ -685,15 +761,15 @@ export const PARTS = [
             title: 'Bonne pratique',
             text: 'Faites toujours un import test avec 3 lignes avant de lancer le fichier complet. Vous repérez ainsi un éventuel problème de format sans devoir corriger 500 lignes.',
           },
-          { type: 'h2', text: 'Reprendre un bilan d\'ouverture' },
+          { type: 'h2', text: "Reprendre un bilan d'ouverture" },
           {
             type: 'p',
-            text: 'L\'onglet « Bilan d\'ouverture » mérite une mention spéciale. Si votre copropriété existe depuis 10 ans, Imaro doit connaître la situation financière au 1er janvier de votre exercice de bascule : fonds de réserve, créances anciennes, dettes fournisseurs, trésorerie. Sans ça, vos annexes 13-1 et 13-2 ne seront pas justes.',
+            text: "L'onglet « Bilan d'ouverture » mérite une mention spéciale. Si votre copropriété existe depuis 10 ans, Imaro doit connaître la situation financière au 1er janvier de votre exercice de bascule : fonds de réserve, créances anciennes, dettes fournisseurs, trésorerie. Sans ça, vos annexes 13-1 et 13-2 ne seront pas justes.",
           },
           {
             type: 'legal',
             title: 'PCM — partie double',
-            text: 'Le bilan d\'ouverture est saisi en partie double conformément au Plan Comptable Marocain. Imaro vérifie que Total débits = Total crédits avant validation.',
+            text: "Le bilan d'ouverture est saisi en partie double conformément au Plan Comptable Marocain. Imaro vérifie que Total débits = Total crédits avant validation.",
           },
         ],
       },
@@ -714,14 +790,14 @@ export const PARTS = [
           { type: 'p', text: 'URL : /gestionnaire/paiements' },
           {
             type: 'lead',
-            text: 'L\'appel de fonds est la facture mensuelle (ou trimestrielle) envoyée à chaque copropriétaire pour sa quote-part de charges. Le paiement est l\'encaissement correspondant.',
+            text: "L'appel de fonds est la facture mensuelle (ou trimestrielle) envoyée à chaque copropriétaire pour sa quote-part de charges. Le paiement est l'encaissement correspondant.",
           },
           { type: 'h2', text: 'Émettre un appel de fonds' },
           {
             type: 'num',
             items: [
               'Cliquez « + Nouvel appel de fonds ».',
-              'Choisissez la résidence et l\'exercice cible.',
+              "Choisissez la résidence et l'exercice cible.",
               'Sélectionnez la période (par exemple : janvier 2026).',
               'Imaro calcule automatiquement le montant par copropriétaire à partir du budget voté et des tantièmes.',
               'Vérifiez le tableau récapitulatif.',
@@ -779,7 +855,7 @@ export const PARTS = [
           { type: 'p', text: 'URL : /gestionnaire/depenses' },
           {
             type: 'lead',
-            text: 'Chaque sortie d\'argent de la trésorerie de la copropriété doit être enregistrée comme une dépense, avec rattachement comptable et pièce justificative.',
+            text: "Chaque sortie d'argent de la trésorerie de la copropriété doit être enregistrée comme une dépense, avec rattachement comptable et pièce justificative.",
           },
           { type: 'h2', text: 'Saisir une dépense manuellement' },
           {
@@ -797,7 +873,7 @@ export const PARTS = [
           {
             type: 'ai',
             title: 'Saisie par IA — bien plus rapide',
-            text: 'Au lieu de tout taper, allez sur l\'Assistant IA · Extraction facture. Drop la facture PDF ou photo, l\'IA extrait tous les champs en 3 secondes. Vous cliquez « Créer la dépense » et le formulaire est pré-rempli. Voir Chapitre 31.',
+            text: "Au lieu de tout taper, allez sur l'Assistant IA · Extraction facture. Drop la facture PDF ou photo, l'IA extrait tous les champs en 3 secondes. Vous cliquez « Créer la dépense » et le formulaire est pré-rempli. Voir Chapitre 31.",
           },
           { type: 'h2', text: 'Les catégories courantes' },
           {
@@ -819,12 +895,12 @@ export const PARTS = [
           { type: 'h2', text: 'Validation et workflow' },
           {
             type: 'p',
-            text: 'Une dépense passe par deux statuts : « Enregistrée » puis « Payée ». Lorsqu\'elle est marquée payée, elle apparaît dans le pointage bancaire pour rapprochement.',
+            text: "Une dépense passe par deux statuts : « Enregistrée » puis « Payée ». Lorsqu'elle est marquée payée, elle apparaît dans le pointage bancaire pour rapprochement.",
           },
           {
             type: 'warn',
             title: 'Pièce justificative obligatoire',
-            text: 'Le Décret 2.23.700 impose la conservation des justificatifs pendant 10 ans. Toute dépense sans pièce attachée sera signalée par l\'audit IA.',
+            text: "Le Décret 2.23.700 impose la conservation des justificatifs pendant 10 ans. Toute dépense sans pièce attachée sera signalée par l'audit IA.",
           },
         ],
       },
@@ -836,14 +912,14 @@ export const PARTS = [
           { type: 'p', text: 'URL : /gestionnaire/budgets' },
           {
             type: 'lead',
-            text: 'Le budget est l\'enveloppe prévisionnelle de dépenses pour un exercice donné. Il doit être voté en AG par les copropriétaires.',
+            text: "Le budget est l'enveloppe prévisionnelle de dépenses pour un exercice donné. Il doit être voté en AG par les copropriétaires.",
           },
           { type: 'h2', text: 'Créer un budget' },
           {
             type: 'num',
             items: [
               'Cliquez « + Nouveau budget ».',
-              'Choisissez la résidence et l\'exercice cible (généralement N+1).',
+              "Choisissez la résidence et l'exercice cible (généralement N+1).",
               'Renseignez ligne par ligne les montants prévisionnels par catégorie.',
               'Total annuel calculé automatiquement.',
               'Cliquez « Enregistrer comme brouillon ».',
@@ -853,27 +929,27 @@ export const PARTS = [
           {
             type: 'ai',
             title: 'Suggestion IA',
-            text: 'Avant l\'AG, allez sur Assistant IA · Suggestions budget. L\'IA analyse vos 2 derniers exercices + inflation HCP + hausses Lydec/Redal annoncées et propose ligne par ligne le budget N+1 avec justifications. Voir Chapitre 32.',
+            text: "Avant l'AG, allez sur Assistant IA · Suggestions budget. L'IA analyse vos 2 derniers exercices + inflation HCP + hausses Lydec/Redal annoncées et propose ligne par ligne le budget N+1 avec justifications. Voir Chapitre 32.",
           },
           { type: 'h2', text: 'Suivi prévisionnel vs réalisé' },
           {
             type: 'p',
-            text: 'En cours d\'exercice, la page Budgets affiche pour chaque ligne : budget voté, réalisé à date, écart en valeur, écart en pourcentage. Code couleur : vert si vous êtes sous le budget, orange si vous approchez, rouge si vous dépassez.',
+            text: "En cours d'exercice, la page Budgets affiche pour chaque ligne : budget voté, réalisé à date, écart en valeur, écart en pourcentage. Code couleur : vert si vous êtes sous le budget, orange si vous approchez, rouge si vous dépassez.",
           },
           {
             type: 'tip',
             title: 'Alerte dépassement',
-            text: 'Si une ligne dépasse 90 % de l\'enveloppe à mi-exercice, Imaro vous alerte sur le dashboard. Vous avez ainsi le temps de réagir avant le dépassement effectif.',
+            text: "Si une ligne dépasse 90 % de l'enveloppe à mi-exercice, Imaro vous alerte sur le dashboard. Vous avez ainsi le temps de réagir avant le dépassement effectif.",
           },
           { type: 'h2', text: 'Annexe 5 — Suivi du budget' },
           {
             type: 'p',
-            text: 'À la clôture d\'exercice, la page Budgets génère automatiquement l\'Annexe 5 du Décret 2.23.700 — tableau comparatif voté / réalisé / écart à présenter aux copropriétaires.',
+            text: "À la clôture d'exercice, la page Budgets génère automatiquement l'Annexe 5 du Décret 2.23.700 — tableau comparatif voté / réalisé / écart à présenter aux copropriétaires.",
           },
           {
             type: 'legal',
             title: 'Approbation des comptes',
-            text: 'Article 25 de la Loi 18-00 : le budget N et le réalisé N-1 doivent être présentés en AG ordinaire dans les 6 mois qui suivent la clôture d\'exercice.',
+            text: "Article 25 de la Loi 18-00 : le budget N et le réalisé N-1 doivent être présentés en AG ordinaire dans les 6 mois qui suivent la clôture d'exercice.",
           },
         ],
       },
@@ -893,10 +969,19 @@ export const PARTS = [
             headers: ['KPI', 'Description'],
             widths: [30, 70],
             rows: [
-              ['Total impayé', 'Montant total dû par les copropriétaires en retard.'],
+              [
+                'Total impayé',
+                'Montant total dû par les copropriétaires en retard.',
+              ],
               ['Pénalités', 'Cumulé des pénalités appliquées sur les impayés.'],
-              ['Lots en retard', 'Nombre de lots avec solde négatif > 30 jours.'],
-              ['Risque prescription', 'Lots avec créance approchant 5 ans (Loi 18-00 art. 25).'],
+              [
+                'Lots en retard',
+                'Nombre de lots avec solde négatif > 30 jours.',
+              ],
+              [
+                'Risque prescription',
+                'Lots avec créance approchant 5 ans (Loi 18-00 art. 25).',
+              ],
             ],
           },
           {
@@ -926,12 +1011,12 @@ export const PARTS = [
           {
             type: 'warn',
             title: 'Vote AG obligatoire',
-            text: 'La Loi 18-00 article 25 impose que toute pénalité de retard soit votée en Assemblée Générale. Sans cette décision documentée, vous ne pouvez pas appliquer de pénalités, même configurées dans Imaro. L\'audit IA vous alertera si vous appliquez sans vote AG enregistré.',
+            text: "La Loi 18-00 article 25 impose que toute pénalité de retard soit votée en Assemblée Générale. Sans cette décision documentée, vous ne pouvez pas appliquer de pénalités, même configurées dans Imaro. L'audit IA vous alertera si vous appliquez sans vote AG enregistré.",
           },
           { type: 'h2', text: 'Mise en demeure' },
           {
             type: 'p',
-            text: 'Sur chaque ligne d\'impayé, un bouton « Mise en demeure » génère un PDF officiel — avec en-tête syndic, montant dû, références juridiques (Loi 18-00 art. 25, Décret 2.23.700), délai de paiement (15 jours), et menace de procédure judiciaire. Le PDF est horodaté et signé par votre cabinet.',
+            text: "Sur chaque ligne d'impayé, un bouton « Mise en demeure » génère un PDF officiel — avec en-tête syndic, montant dû, références juridiques (Loi 18-00 art. 25, Décret 2.23.700), délai de paiement (15 jours), et menace de procédure judiciaire. Le PDF est horodaté et signé par votre cabinet.",
           },
           {
             type: 'num',
@@ -941,7 +1026,7 @@ export const PARTS = [
               'Vérifiez le récap.',
               'Cliquez « Générer ». Le PDF est téléchargé et envoyé par WhatsApp au copropriétaire.',
               'Statut passe à « Mise en demeure » dans le tableau.',
-              'Imaro vous rappelle dans 16 jours si le paiement n\'a toujours pas été reçu.',
+              "Imaro vous rappelle dans 16 jours si le paiement n'a toujours pas été reçu.",
             ],
           },
           {
@@ -959,24 +1044,24 @@ export const PARTS = [
       {
         title: 'Autres recettes',
         intro:
-          'Locations annexes, antennes télécom, subventions, indemnités d\'assurance.',
+          "Locations annexes, antennes télécom, subventions, indemnités d'assurance.",
         blocks: [
           { type: 'p', text: 'URL : /gestionnaire/autres-recettes' },
           {
             type: 'lead',
-            text: 'En plus des appels de fonds, une copropriété peut avoir d\'autres rentrées d\'argent. Les enregistrer correctement améliore votre trésorerie et réduit la charge des copropriétaires.',
+            text: "En plus des appels de fonds, une copropriété peut avoir d'autres rentrées d'argent. Les enregistrer correctement améliore votre trésorerie et réduit la charge des copropriétaires.",
           },
           { type: 'h2', text: 'Types de recettes courantes' },
           {
             type: 'list',
             items: [
-              'Location d\'emplacements parking à des extérieurs.',
+              "Location d'emplacements parking à des extérieurs.",
               'Location de la salle commune pour événements.',
               'Antennes télécom (IAM, Inwi, Orange) sur le toit — bail emphytéotique annuel.',
               'Subventions publiques (rénovation énergétique, ravalement de façade).',
-              'Indemnités d\'assurance suite à sinistre.',
+              "Indemnités d'assurance suite à sinistre.",
               'Intérêts sur compte de réserve placé.',
-              'Vente d\'actifs (cuves désaffectées, mobilier).',
+              "Vente d'actifs (cuves désaffectées, mobilier).",
             ],
           },
           { type: 'h2', text: 'Enregistrer une recette' },
@@ -993,7 +1078,7 @@ export const PARTS = [
           {
             type: 'tip',
             title: 'Affectation comptable',
-            text: 'Les autres recettes alimentent généralement le fonds de réserve. L\'AG peut aussi décider de les déduire de l\'appel de fonds N+1 — option configurable dans la fiche recette.',
+            text: "Les autres recettes alimentent généralement le fonds de réserve. L'AG peut aussi décider de les déduire de l'appel de fonds N+1 — option configurable dans la fiche recette.",
           },
         ],
       },
@@ -1004,7 +1089,7 @@ export const PARTS = [
           { type: 'p', text: 'URL : /gestionnaire/remboursements' },
           {
             type: 'lead',
-            text: 'Quand un copropriétaire paie trop, vend son lot avec solde créditeur, ou bénéficie d\'une indemnité, vous devez lui reverser de l\'argent. Le module Remboursements pilote ce workflow.',
+            text: "Quand un copropriétaire paie trop, vend son lot avec solde créditeur, ou bénéficie d'une indemnité, vous devez lui reverser de l'argent. Le module Remboursements pilote ce workflow.",
           },
           { type: 'h2', text: 'Workflow en 3 statuts' },
           {
@@ -1024,13 +1109,13 @@ export const PARTS = [
               ],
             ],
           },
-          { type: 'h2', text: 'Cas d\'usage typiques' },
+          { type: 'h2', text: "Cas d'usage typiques" },
           {
             type: 'list',
             items: [
               'Vente du lot avec solde créditeur — restitution au vendeur.',
-              'Trop-perçu d\'appels de fonds (réajustement après clôture).',
-              'Indemnité d\'assurance reçue suite à dégât d\'eau dans un lot.',
+              "Trop-perçu d'appels de fonds (réajustement après clôture).",
+              "Indemnité d'assurance reçue suite à dégât d'eau dans un lot.",
               'Restitution de caution travaux à un copropriétaire.',
               'Erreur de calcul corrigée a posteriori.',
             ],
@@ -1038,19 +1123,19 @@ export const PARTS = [
           {
             type: 'warn',
             title: 'Justificatif obligatoire',
-            text: 'Tout remboursement doit être documenté (PV d\'AG, calcul de trop-perçu, attestation assurance). Sans justificatif, l\'audit IA et le Conseil syndical signaleront un risque de gestion.',
+            text: "Tout remboursement doit être documenté (PV d'AG, calcul de trop-perçu, attestation assurance). Sans justificatif, l'audit IA et le Conseil syndical signaleront un risque de gestion.",
           },
         ],
       },
       {
         title: 'Pointage bancaire',
         intro:
-          'Le killer feature d\'Imaro : rapprochement automatique du relevé bancaire avec vos paiements et dépenses.',
+          "Le killer feature d'Imaro : rapprochement automatique du relevé bancaire avec vos paiements et dépenses.",
         blocks: [
           { type: 'p', text: 'URL : /gestionnaire/pointage' },
           {
             type: 'lead',
-            text: 'Le rapprochement bancaire (pointage) est l\'exercice le plus chronophage du syndic. Imaro l\'automatise à 80-90 % — vous validez en quelques clics ce que l\'algorithme a trouvé.',
+            text: "Le rapprochement bancaire (pointage) est l'exercice le plus chronophage du syndic. Imaro l'automatise à 80-90 % — vous validez en quelques clics ce que l'algorithme a trouvé.",
           },
           { type: 'h2', text: 'Les 10 banques marocaines supportées' },
           {
@@ -1085,7 +1170,7 @@ export const PARTS = [
               'Cliquez « Tout confirmer » pour valider en masse les auto-matches.',
             ],
           },
-          { type: 'h2', text: 'L\'algorithme de matching' },
+          { type: 'h2', text: "L'algorithme de matching" },
           {
             type: 'p',
             text: 'Pour chaque ligne du relevé, Imaro cherche dans vos paiements et dépenses la meilleure correspondance selon 3 critères pondérés :',
@@ -1105,7 +1190,7 @@ export const PARTS = [
           { type: 'h2', text: 'Le dataset démo' },
           {
             type: 'p',
-            text: 'Pas envie d\'attendre un vrai relevé ? Cliquez « Démo » pour charger un dataset Attijariwafa fictif de 10 lignes. Idéal pour découvrir l\'outil sans risque.',
+            text: "Pas envie d'attendre un vrai relevé ? Cliquez « Démo » pour charger un dataset Attijariwafa fictif de 10 lignes. Idéal pour découvrir l'outil sans risque.",
           },
           {
             type: 'ok',
@@ -1121,7 +1206,7 @@ export const PARTS = [
   {
     title: 'Partie IV — Conformité et comptabilité',
     blurb:
-      'Toutes les obligations légales du Décret 2.23.700 et de la Loi 18-00. Calendrier conformité, 12 annexes, journal d\'audit, comptabilité partie double, clôture.',
+      "Toutes les obligations légales du Décret 2.23.700 et de la Loi 18-00. Calendrier conformité, 12 annexes, journal d'audit, comptabilité partie double, clôture.",
     chapters: [
       {
         title: 'Calendrier de conformité',
@@ -1131,7 +1216,7 @@ export const PARTS = [
           { type: 'p', text: 'URL : /gestionnaire/conformite' },
           {
             type: 'lead',
-            text: 'Le Décret 2.23.700 impose au syndic une série de tâches à accomplir dans l\'année. Imaro les liste, les date, et vous prévient avant chaque échéance.',
+            text: "Le Décret 2.23.700 impose au syndic une série de tâches à accomplir dans l'année. Imaro les liste, les date, et vous prévient avant chaque échéance.",
           },
           { type: 'h2', text: 'Les 4 phases du cycle annuel' },
           {
@@ -1139,10 +1224,18 @@ export const PARTS = [
             headers: ['Phase', 'Période', 'Action principale'],
             widths: [30, 30, 40],
             rows: [
-              ['Opérations mensuelles', 'Toute l\'année', 'Appels, paiements, dépenses, pointage'],
+              [
+                'Opérations mensuelles',
+                "Toute l'année",
+                'Appels, paiements, dépenses, pointage',
+              ],
               ['Clôture comptable', 'Janvier — Mars', 'Arrêté des comptes N-1'],
               ['AG annuelle', 'Avril — Juin', 'Présentation et vote'],
-              ['Archivage', 'Juin — Juillet', 'Verrouillage exercice + génération annexes'],
+              [
+                'Archivage',
+                'Juin — Juillet',
+                'Verrouillage exercice + génération annexes',
+              ],
             ],
           },
           { type: 'h2', text: 'La page Calendrier' },
@@ -1153,7 +1246,7 @@ export const PARTS = [
           {
             type: 'list',
             items: [
-              'Titre de la tâche (ex : « Émettre l\'appel de fonds de mars »).',
+              "Titre de la tâche (ex : « Émettre l'appel de fonds de mars »).",
               'Date limite réglementaire.',
               'Statut : à faire / en cours / terminée / en retard.',
               'Référence légale précise (article, décret).',
@@ -1168,7 +1261,7 @@ export const PARTS = [
           {
             type: 'tip',
             title: 'Anticipation',
-            text: 'Le calendrier vous alerte 30 jours avant chaque échéance. Combinez avec l\'audit IA mensuel pour ne rien rater.',
+            text: "Le calendrier vous alerte 30 jours avant chaque échéance. Combinez avec l'audit IA mensuel pour ne rien rater.",
           },
         ],
       },
@@ -1180,7 +1273,7 @@ export const PARTS = [
           { type: 'p', text: 'URL : /gestionnaire/annexes' },
           {
             type: 'lead',
-            text: 'Le Décret 2.23.700 du 24 mai 2023 définit 12 annexes comptables obligatoires. Imaro les génère automatiquement à partir de vos données — vous n\'avez plus jamais à recréer ces tableaux manuellement.',
+            text: "Le Décret 2.23.700 du 24 mai 2023 définit 12 annexes comptables obligatoires. Imaro les génère automatiquement à partir de vos données — vous n'avez plus jamais à recréer ces tableaux manuellement.",
           },
           { type: 'h2', text: 'Annexes obligatoires en régime simplifié' },
           {
@@ -1188,9 +1281,21 @@ export const PARTS = [
             headers: ['#', 'Nom', 'Contenu'],
             widths: [10, 30, 60],
             rows: [
-              ['10', 'État des contributions', 'Tableau par copropriétaire : appelé / payé / solde'],
-              ['13-1', 'Situation financière', 'Bilan simplifié : réserve, créances, dettes, trésorerie'],
-              ['13-2', 'Compte de gestion + budget', 'P&L sur 4 colonnes : N+1, N, N-1, approuvé'],
+              [
+                '10',
+                'État des contributions',
+                'Tableau par copropriétaire : appelé / payé / solde',
+              ],
+              [
+                '13-1',
+                'Situation financière',
+                'Bilan simplifié : réserve, créances, dettes, trésorerie',
+              ],
+              [
+                '13-2',
+                'Compte de gestion + budget',
+                'P&L sur 4 colonnes : N+1, N, N-1, approuvé',
+              ],
             ],
           },
           { type: 'h2', text: 'Annexes complémentaires' },
@@ -1213,36 +1318,36 @@ export const PARTS = [
           {
             type: 'legal',
             title: 'Régime normal',
-            text: 'Au-delà de 200 000 MAD/an d\'appels, les annexes 3 et 4 deviennent obligatoires en plus des 10, 13-1, 13-2. Imaro vous alerte automatiquement quand vous franchissez ce seuil.',
+            text: "Au-delà de 200 000 MAD/an d'appels, les annexes 3 et 4 deviennent obligatoires en plus des 10, 13-1, 13-2. Imaro vous alerte automatiquement quand vous franchissez ce seuil.",
           },
           { type: 'h2', text: 'Générer une annexe' },
           {
             type: 'num',
             items: [
-              'Sur /gestionnaire/annexes, sélectionnez la résidence et l\'exercice.',
-              'Repérez la ligne de l\'annexe souhaitée.',
+              "Sur /gestionnaire/annexes, sélectionnez la résidence et l'exercice.",
+              "Repérez la ligne de l'annexe souhaitée.",
               'Cliquez « PDF » à droite. Le téléchargement démarre.',
-              'Le PDF s\'ouvre dans votre navigateur ou téléchargement.',
+              "Le PDF s'ouvre dans votre navigateur ou téléchargement.",
             ],
           },
-          { type: 'h2', text: 'Anatomie d\'un PDF d\'annexe' },
+          { type: 'h2', text: "Anatomie d'un PDF d'annexe" },
           {
             type: 'list',
             items: [
               'Bande orange fine en haut — signature Imaro.',
-              'En-tête navy avec dégradé + logo Imaro inversé + titre de l\'annexe.',
+              "En-tête navy avec dégradé + logo Imaro inversé + titre de l'annexe.",
               'Badge vert « DOCUMENT OFFICIEL » avec checkmark.',
               'Code document unique (ex : IMA-ATLA-2026-A10-A3F2).',
               'Tableau de données proprement formaté.',
               'Bloc signatures (président, syndic, conseil) en bas.',
-              'QR code scannable · vérification d\'authenticité.',
+              "QR code scannable · vérification d'authenticité.",
               'Footer avec référence au Décret 2.23.700.',
             ],
           },
           {
             type: 'ok',
             title: 'Authenticité prouvée',
-            text: 'Le QR code lie le PDF à un hash SHA-256 stocké sur imaro.ma. Si quelqu\'un modifie le PDF, le hash ne correspond plus · la vérification échoue. Sécurité anti-fraude pour les copropriétaires.',
+            text: "Le QR code lie le PDF à un hash SHA-256 stocké sur imaro.ma. Si quelqu'un modifie le PDF, le hash ne correspond plus · la vérification échoue. Sécurité anti-fraude pour les copropriétaires.",
           },
           { type: 'h2', text: 'Génération en masse' },
           {
@@ -1252,21 +1357,21 @@ export const PARTS = [
         ],
       },
       {
-        title: 'Journal d\'audit',
+        title: "Journal d'audit",
         intro:
           'Toutes les actions sur la plateforme tracées, filtrables, exportables.',
         blocks: [
           { type: 'p', text: 'URL : /gestionnaire/audit' },
           {
             type: 'lead',
-            text: 'Le journal d\'audit est la mémoire d\'Imaro. Chaque création, modification, suppression, connexion est enregistrée avec utilisateur, date, IP, et données modifiées.',
+            text: "Le journal d'audit est la mémoire d'Imaro. Chaque création, modification, suppression, connexion est enregistrée avec utilisateur, date, IP, et données modifiées.",
           },
           {
             type: 'legal',
             title: 'Rétention 7 ans',
-            text: 'Le Décret 2.23.700 article 12 impose une rétention minimale de 7 ans pour les journaux d\'opérations comptables. Imaro respecte cette obligation de façon automatique.',
+            text: "Le Décret 2.23.700 article 12 impose une rétention minimale de 7 ans pour les journaux d'opérations comptables. Imaro respecte cette obligation de façon automatique.",
           },
-          { type: 'h2', text: 'Catégories d\'événements' },
+          { type: 'h2', text: "Catégories d'événements" },
           {
             type: 'list',
             items: [
@@ -1276,7 +1381,7 @@ export const PARTS = [
               'Configuration pénalités, paramètres tenant.',
               'Génération de PDFs (annexes, mises en demeure, quittances).',
               'Modifications de budgets.',
-              'Clôtures d\'exercices.',
+              "Clôtures d'exercices.",
               'Imports massifs.',
             ],
           },
@@ -1288,12 +1393,12 @@ export const PARTS = [
           { type: 'h2', text: 'Exports' },
           {
             type: 'p',
-            text: 'Bouton « Exporter » en haut à droite — choisissez CSV (pour Excel) ou JSON (pour archivage légal). L\'export reprend tous les filtres actifs.',
+            text: "Bouton « Exporter » en haut à droite — choisissez CSV (pour Excel) ou JSON (pour archivage légal). L'export reprend tous les filtres actifs.",
           },
           {
             type: 'tip',
             title: 'Audit annuel',
-            text: 'Exportez le journal complet à chaque clôture d\'exercice et archivez-le hors d\'Imaro (Dropbox, Google Drive). Ça vous protège en cas de contrôle ou de litige.',
+            text: "Exportez le journal complet à chaque clôture d'exercice et archivez-le hors d'Imaro (Dropbox, Google Drive). Ça vous protège en cas de contrôle ou de litige.",
           },
         ],
       },
@@ -1305,7 +1410,7 @@ export const PARTS = [
           { type: 'p', text: 'URL : /gestionnaire/comptabilite' },
           {
             type: 'lead',
-            text: 'La comptabilité d\'Imaro respecte la partie double — chaque opération crédite un compte et débite un autre. Le Plan Comptable Marocain (CGNC) est intégré nativement.',
+            text: "La comptabilité d'Imaro respecte la partie double — chaque opération crédite un compte et débite un autre. Le Plan Comptable Marocain (CGNC) est intégré nativement.",
           },
           { type: 'h2', text: 'Les 6 onglets de la page' },
           {
@@ -1313,12 +1418,15 @@ export const PARTS = [
             headers: ['Onglet', 'Contenu'],
             widths: [30, 70],
             rows: [
-              ['Tableau de bord', 'KPIs financiers : produits, charges, résultat, trésorerie.'],
+              [
+                'Tableau de bord',
+                'KPIs financiers : produits, charges, résultat, trésorerie.',
+              ],
               ['Journal comptable', 'Écritures en partie double, par date.'],
               ['Grand-Livre', 'Détail des mouvements par compte.'],
               ['Dépenses', 'Création + import IA factures (cf. Chapitre 12).'],
               ['Rapports financiers', 'PDFs métier + cross-link Annexes.'],
-              ['Clôture', 'Wizard 4 étapes pour clôturer l\'exercice.'],
+              ['Clôture', "Wizard 4 étapes pour clôturer l'exercice."],
             ],
           },
           { type: 'h2', text: 'Les classes du Plan Comptable Marocain' },
@@ -1327,9 +1435,13 @@ export const PARTS = [
             headers: ['Classe', 'Type', 'Exemples'],
             widths: [12, 30, 58],
             rows: [
-              ['1', 'Comptes de financement permanent', 'Fonds de réserve, emprunts'],
-              ['2', 'Comptes d\'actif immobilisé', 'Équipements, ascenseur'],
-              ['3', 'Comptes d\'actif circulant', 'Créances copropriétaires'],
+              [
+                '1',
+                'Comptes de financement permanent',
+                'Fonds de réserve, emprunts',
+              ],
+              ['2', "Comptes d'actif immobilisé", 'Équipements, ascenseur'],
+              ['3', "Comptes d'actif circulant", 'Créances copropriétaires'],
               ['4', 'Comptes de passif circulant', 'Dettes fournisseurs'],
               ['5', 'Comptes de trésorerie', 'Banque, caisse'],
               ['6', 'Comptes de charges', 'Eau, électricité, nettoyage'],
@@ -1349,25 +1461,29 @@ export const PARTS = [
           {
             type: 'warn',
             title: 'Déséquilibre',
-            text: 'Si la balance est déséquilibrée, c\'est qu\'une écriture est incomplète. Imaro bloque la clôture d\'exercice tant que la balance n\'est pas équilibrée.',
+            text: "Si la balance est déséquilibrée, c'est qu'une écriture est incomplète. Imaro bloque la clôture d'exercice tant que la balance n'est pas équilibrée.",
           },
         ],
       },
       {
-        title: 'Clôture d\'exercice',
-        intro: 'Le wizard en 4 étapes pour clôturer définitivement un exercice.',
+        title: "Clôture d'exercice",
+        intro:
+          'Le wizard en 4 étapes pour clôturer définitivement un exercice.',
         blocks: [
-          { type: 'p', text: 'URL : /gestionnaire/comptabilite · onglet Clôture' },
+          {
+            type: 'p',
+            text: 'URL : /gestionnaire/comptabilite · onglet Clôture',
+          },
           {
             type: 'lead',
-            text: 'La clôture verrouille définitivement un exercice. Plus aucune écriture ne peut être ajoutée ou modifiée. C\'est la dernière étape avant l\'archivage.',
+            text: "La clôture verrouille définitivement un exercice. Plus aucune écriture ne peut être ajoutée ou modifiée. C'est la dernière étape avant l'archivage.",
           },
           { type: 'h2', text: 'Les 4 étapes' },
           {
             type: 'num',
             items: [
-              'Aperçu — Imaro affiche le résultat de l\'exercice (excédent ou déficit) et un récapitulatif des points de vigilance.',
-              'Affectation du résultat — vous décidez de l\'affectation : report à nouveau, fonds de réserve, distribution.',
+              "Aperçu — Imaro affiche le résultat de l'exercice (excédent ou déficit) et un récapitulatif des points de vigilance.",
+              "Affectation du résultat — vous décidez de l'affectation : report à nouveau, fonds de réserve, distribution.",
               'Verrouillage — confirmation finale. Tous les comptes sont gelés.',
               'Terminé — récapitulatif, génération automatique des annexes finales, archivage du journal.',
             ],
@@ -1375,25 +1491,25 @@ export const PARTS = [
           {
             type: 'warn',
             title: 'Action irréversible',
-            text: 'Une fois l\'étape 3 validée, vous ne pouvez plus revenir en arrière. Vérifiez deux fois avant de cliquer.',
+            text: "Une fois l'étape 3 validée, vous ne pouvez plus revenir en arrière. Vérifiez deux fois avant de cliquer.",
           },
           { type: 'h2', text: 'Pré-requis avant clôture' },
           {
             type: 'check',
             items: [
-              'Tous les paiements de l\'exercice sont validés.',
+              "Tous les paiements de l'exercice sont validés.",
               'Toutes les dépenses sont saisies et payées.',
               'Le pointage bancaire est à jour (tous les mois pointés).',
-              'L\'audit IA a été lancé et les findings critiques sont traités.',
+              "L'audit IA a été lancé et les findings critiques sont traités.",
               'La balance est équilibrée.',
               'Les annexes 10, 13-1, 13-2 sont générées.',
-              'L\'AG annuelle a voté l\'approbation des comptes.',
+              "L'AG annuelle a voté l'approbation des comptes.",
             ],
           },
           {
             type: 'tip',
             title: 'Affectation classique',
-            text: 'En l\'absence de décision spécifique en AG, l\'excédent est généralement affecté en report à nouveau (compte 110). Il sera utilisé pour réduire l\'appel de fonds de l\'exercice suivant.',
+            text: "En l'absence de décision spécifique en AG, l'excédent est généralement affecté en report à nouveau (compte 110). Il sera utilisé pour réduire l'appel de fonds de l'exercice suivant.",
           },
         ],
       },
@@ -1414,7 +1530,7 @@ export const PARTS = [
           { type: 'p', text: 'URL : /gestionnaire/equipements' },
           {
             type: 'lead',
-            text: 'Un équipement est un bien matériel durable appartenant à la copropriété (ascenseur, chaudière, caméra, portail motorisé). Le suivi est obligatoire pour générer l\'Annexe 9 du Décret 2.23.700.',
+            text: "Un équipement est un bien matériel durable appartenant à la copropriété (ascenseur, chaudière, caméra, portail motorisé). Le suivi est obligatoire pour générer l'Annexe 9 du Décret 2.23.700.",
           },
           { type: 'h2', text: 'Les 9 catégories' },
           {
@@ -1426,12 +1542,12 @@ export const PARTS = [
               'Vidéosurveillance',
               'Plomberie collective',
               'Électricité parties communes',
-              'Espaces verts (système d\'arrosage automatique)',
+              "Espaces verts (système d'arrosage automatique)",
               'Hygiène (vide-ordures, bacs)',
               'Autres équipements techniques',
             ],
           },
-          { type: 'h2', text: 'Champs d\'un équipement' },
+          { type: 'h2', text: "Champs d'un équipement" },
           {
             type: 'table',
             headers: ['Champ', 'Description'],
@@ -1439,9 +1555,12 @@ export const PARTS = [
             rows: [
               ['Nom', 'Libellé du bien (ex : « Ascenseur OTIS bât. A »).'],
               ['Catégorie', 'Une des 9 ci-dessus.'],
-              ['Date d\'acquisition', 'Date d\'installation ou de mise en service.'],
-              ['Valeur d\'acquisition', 'Coût HT à l\'origine.'],
-              ['Durée d\'amortissement', 'En années (typiquement 10 à 20 ans).'],
+              [
+                "Date d'acquisition",
+                "Date d'installation ou de mise en service.",
+              ],
+              ["Valeur d'acquisition", "Coût HT à l'origine."],
+              ["Durée d'amortissement", 'En années (typiquement 10 à 20 ans).'],
               ['Valeur nette', 'Calculée automatiquement (linéaire).'],
               ['Statut', 'Actif / hors service.'],
               ['Prestataire de maintenance', 'Lien vers la fiche prestataire.'],
@@ -1450,26 +1569,25 @@ export const PARTS = [
           { type: 'h2', text: 'Annexe 9' },
           {
             type: 'p',
-            text: 'En fin d\'exercice, la liste des équipements alimente automatiquement l\'Annexe 9 « Suivi des équipements » du Décret 2.23.700. Tableau avec valeur d\'origine, amortissement cumulé, valeur nette, et statut.',
+            text: "En fin d'exercice, la liste des équipements alimente automatiquement l'Annexe 9 « Suivi des équipements » du Décret 2.23.700. Tableau avec valeur d'origine, amortissement cumulé, valeur nette, et statut.",
           },
           {
             type: 'tip',
             title: 'Provisions pour gros entretien',
-            text: 'Pour les équipements lourds (ascenseur, chauffage central), pensez à constituer une provision annuelle dans le fonds de réserve. Imaro vous alerte 6 mois avant la fin de vie théorique d\'un équipement.',
+            text: "Pour les équipements lourds (ascenseur, chauffage central), pensez à constituer une provision annuelle dans le fonds de réserve. Imaro vous alerte 6 mois avant la fin de vie théorique d'un équipement.",
           },
         ],
       },
       {
         title: 'Emprunts',
-        intro:
-          'Suivi des emprunts collectifs souscrits par la copropriété.',
+        intro: 'Suivi des emprunts collectifs souscrits par la copropriété.',
         blocks: [
           { type: 'p', text: 'URL : /gestionnaire/emprunts' },
           {
             type: 'lead',
-            text: 'Une copropriété peut emprunter collectivement pour financer de gros travaux : ravalement, remplacement de chaudière, mise aux normes. L\'emprunt est voté en AG à la majorité qualifiée et signé par le syndic.',
+            text: "Une copropriété peut emprunter collectivement pour financer de gros travaux : ravalement, remplacement de chaudière, mise aux normes. L'emprunt est voté en AG à la majorité qualifiée et signé par le syndic.",
           },
-          { type: 'h2', text: 'Champs d\'un emprunt' },
+          { type: 'h2', text: "Champs d'un emprunt" },
           {
             type: 'table',
             headers: ['Champ', 'Description'],
@@ -1489,24 +1607,23 @@ export const PARTS = [
           { type: 'h2', text: 'Annexe 8' },
           {
             type: 'p',
-            text: 'L\'Annexe 8 « Suivi des emprunts » est générée automatiquement et présentée en AG.',
+            text: "L'Annexe 8 « Suivi des emprunts » est générée automatiquement et présentée en AG.",
           },
           {
             type: 'warn',
             title: 'Défaut de paiement',
-            text: 'Si une mensualité n\'a pas pu être prélevée (trésorerie insuffisante), le statut passe à « En défaut ». Imaro vous alerte et vous suggère un appel de fonds exceptionnel.',
+            text: "Si une mensualité n'a pas pu être prélevée (trésorerie insuffisante), le statut passe à « En défaut ». Imaro vous alerte et vous suggère un appel de fonds exceptionnel.",
           },
         ],
       },
       {
         title: 'Travaux exceptionnels',
-        intro:
-          'Travaux votés en AG hors du budget courant.',
+        intro: 'Travaux votés en AG hors du budget courant.',
         blocks: [
           { type: 'p', text: 'URL : /gestionnaire/travaux-exceptionnels' },
           {
             type: 'lead',
-            text: 'Les travaux exceptionnels sont des opérations ponctuelles qui ne rentrent pas dans le budget récurrent : ravalement, réfection toiture, remplacement ascenseur. Ils font l\'objet d\'un appel de fonds dédié.',
+            text: "Les travaux exceptionnels sont des opérations ponctuelles qui ne rentrent pas dans le budget récurrent : ravalement, réfection toiture, remplacement ascenseur. Ils font l'objet d'un appel de fonds dédié.",
           },
           { type: 'h2', text: 'Champs et statuts' },
           {
@@ -1514,10 +1631,13 @@ export const PARTS = [
             headers: ['Champ', 'Description'],
             widths: [35, 65],
             rows: [
-              ['Libellé', 'Description courte (ex : « Ravalement façade Sud »).'],
-              ['Date vote AG', 'Date de l\'assemblée qui a voté les travaux.'],
+              [
+                'Libellé',
+                'Description courte (ex : « Ravalement façade Sud »).',
+              ],
+              ['Date vote AG', "Date de l'assemblée qui a voté les travaux."],
               ['Prestataire', 'Entreprise retenue.'],
-              ['Montant voté', 'Enveloppe approuvée par l\'AG.'],
+              ['Montant voté', "Enveloppe approuvée par l'AG."],
               ['Montant engagé', 'Total des bons de commande émis.'],
               ['Montant réglé', 'Factures déjà payées.'],
               ['Reste à régler', 'Solde engagé - réglé.'],
@@ -1527,7 +1647,7 @@ export const PARTS = [
           { type: 'h2', text: 'Annexe 6' },
           {
             type: 'p',
-            text: 'La liste des travaux exceptionnels alimente automatiquement l\'Annexe 6 du Décret 2.23.700, présentée en AG annuelle.',
+            text: "La liste des travaux exceptionnels alimente automatiquement l'Annexe 6 du Décret 2.23.700, présentée en AG annuelle.",
           },
           {
             type: 'ok',
@@ -1543,15 +1663,15 @@ export const PARTS = [
           { type: 'p', text: 'URL : /gestionnaire/assemblees' },
           {
             type: 'lead',
-            text: 'L\'Assemblée Générale est le moment où les copropriétaires décident collectivement. Imaro pilote toute la séquence : convocation, vote, PV, archivage.',
+            text: "L'Assemblée Générale est le moment où les copropriétaires décident collectivement. Imaro pilote toute la séquence : convocation, vote, PV, archivage.",
           },
-          { type: 'h2', text: 'Types d\'AG' },
+          { type: 'h2', text: "Types d'AG" },
           {
             type: 'def',
             items: [
               [
                 'AG ordinaire',
-                'annuelle, dans les 6 mois de la clôture d\'exercice. Approuve les comptes et le budget.',
+                "annuelle, dans les 6 mois de la clôture d'exercice. Approuve les comptes et le budget.",
               ],
               [
                 'AG extraordinaire',
@@ -1565,7 +1685,7 @@ export const PARTS = [
             items: [
               'Cliquez « + Nouvelle AG ».',
               'Choisissez date, heure, lieu (ou visioconférence).',
-              'Composez l\'ordre du jour (résolutions à voter).',
+              "Composez l'ordre du jour (résolutions à voter).",
               'Joignez les documents (budget, comptes, devis travaux).',
               'Cliquez « Envoyer les convocations ». WhatsApp + portail + email simultanés.',
             ],
@@ -1573,17 +1693,17 @@ export const PARTS = [
           {
             type: 'legal',
             title: 'Délai de convocation',
-            text: 'La Loi 18-00 article 12 impose un délai minimum de 15 jours entre la convocation et la tenue de l\'AG. Imaro bloque la convocation si la date d\'AG est trop proche.',
+            text: "La Loi 18-00 article 12 impose un délai minimum de 15 jours entre la convocation et la tenue de l'AG. Imaro bloque la convocation si la date d'AG est trop proche.",
           },
           { type: 'h2', text: 'Le jour J' },
           {
             type: 'p',
-            text: 'Sur Imaro, vous pouvez tenir l\'AG en mode présentiel ou hybride. Liste de présence, votes résolution par résolution, calcul automatique des majorités (simple, qualifiée, unanimité).',
+            text: "Sur Imaro, vous pouvez tenir l'AG en mode présentiel ou hybride. Liste de présence, votes résolution par résolution, calcul automatique des majorités (simple, qualifiée, unanimité).",
           },
           { type: 'h2', text: 'Le PV (Procès-Verbal)' },
           {
             type: 'p',
-            text: 'À la fin de l\'AG, Imaro génère automatiquement un PV PDF avec : liste présents, votes résolution par résolution, résultats, signatures. Vous l\'éditez si besoin, puis le distribuez aux copropriétaires.',
+            text: "À la fin de l'AG, Imaro génère automatiquement un PV PDF avec : liste présents, votes résolution par résolution, résultats, signatures. Vous l'éditez si besoin, puis le distribuez aux copropriétaires.",
           },
         ],
       },
@@ -1592,11 +1712,14 @@ export const PARTS = [
         intro:
           'Centraliser tous les documents de la copropriété et communiquer avec les résidents.',
         blocks: [
-          { type: 'p', text: 'URLs : /gestionnaire/documents · /gestionnaire/annonces' },
+          {
+            type: 'p',
+            text: 'URLs : /gestionnaire/documents · /gestionnaire/annonces',
+          },
           { type: 'h2', text: 'La GED — Gestion Électronique de Documents' },
           {
             type: 'p',
-            text: 'Tous les documents de la copropriété centralisés : règlement de copropriété, plans, PV d\'AG, contrats, devis, factures, attestations. Classement par catégorie et par exercice.',
+            text: "Tous les documents de la copropriété centralisés : règlement de copropriété, plans, PV d'AG, contrats, devis, factures, attestations. Classement par catégorie et par exercice.",
           },
           {
             type: 'list',
@@ -1604,39 +1727,41 @@ export const PARTS = [
               'Drag & drop pour uploader un PDF ou une image.',
               'Recherche texte intégrale (OCR sur PDFs scannés).',
               'Permissions : visible par tous / Conseil uniquement / Syndic uniquement.',
-              'Versionning : versions successives d\'un même document.',
+              "Versionning : versions successives d'un même document.",
               'Stockage chiffré.',
             ],
           },
           { type: 'h2', text: 'Annonces' },
           {
             type: 'p',
-            text: 'Publication d\'une information à tous les copropriétaires : coupure d\'eau, fête de fin d\'année, travaux à venir. Diffusion simultanée sur le portail résident + WhatsApp + email.',
+            text: "Publication d'une information à tous les copropriétaires : coupure d'eau, fête de fin d'année, travaux à venir. Diffusion simultanée sur le portail résident + WhatsApp + email.",
           },
           {
             type: 'tip',
-            title: 'Modèles d\'annonces',
-            text: 'Imaro propose 10 modèles prêts à l\'emploi (coupure, AG, sinistre, recouvrement…). Choisissez, personnalisez, envoyez.',
+            title: "Modèles d'annonces",
+            text: "Imaro propose 10 modèles prêts à l'emploi (coupure, AG, sinistre, recouvrement…). Choisissez, personnalisez, envoyez.",
           },
         ],
       },
       {
         title: 'Tickets et réclamations',
-        intro:
-          'Le helpdesk pour traiter les demandes des copropriétaires.',
+        intro: 'Le helpdesk pour traiter les demandes des copropriétaires.',
         blocks: [
           { type: 'p', text: 'URL : /gestionnaire/tickets' },
           {
             type: 'lead',
             text: 'Un copropriétaire signale une fuite, demande un duplicata de quittance, propose des travaux. Tous ces échanges sont gérés comme des tickets — chacun avec un statut et un historique.',
           },
-          { type: 'h2', text: 'Cycle de vie d\'un ticket' },
+          { type: 'h2', text: "Cycle de vie d'un ticket" },
           {
             type: 'def',
             items: [
               ['Ouvert', 'tout juste créé, en attente de traitement.'],
               ['En cours', 'pris en charge par un gestionnaire.'],
-              ['En attente client', 'on a posé une question, on attend la réponse.'],
+              [
+                'En attente client',
+                'on a posé une question, on attend la réponse.',
+              ],
               ['Résolu', 'la demande a été traitée.'],
               ['Fermé', 'le copropriétaire a confirmé.'],
             ],
@@ -1648,7 +1773,7 @@ export const PARTS = [
               'Technique — panne ascenseur, fuite, problème électrique.',
               'Financier — demande de quittance, échéancier de paiement.',
               'Voisinage — nuisance sonore, fumée.',
-              'Suggestion — proposition d\'amélioration.',
+              "Suggestion — proposition d'amélioration.",
               'Autre.',
             ],
           },
@@ -1666,27 +1791,39 @@ export const PARTS = [
   {
     title: 'Partie VI — Intelligence artificielle',
     blurb:
-      'Les 3 assistants IA d\'Imaro — audit conformité, OCR factures, suggestions budget. Ce qu\'ils font, comment les utiliser, et leurs limites.',
+      "Les 3 assistants IA d'Imaro — audit conformité, OCR factures, suggestions budget. Ce qu'ils font, comment les utiliser, et leurs limites.",
     chapters: [
       {
-        title: 'Assistant IA — vue d\'ensemble',
+        title: "Assistant IA — vue d'ensemble",
         intro:
           'Imaro intègre 3 outils IA qui font gagner des heures par mois aux gestionnaires.',
         blocks: [
           { type: 'p', text: 'URL : /gestionnaire/ia' },
           {
             type: 'lead',
-            text: 'L\'Assistant IA est notre moat différenciateur. Il vous aide à auditer votre conformité, à saisir vos factures, et à préparer votre budget — toutes des tâches chronophages habituellement.',
+            text: "L'Assistant IA est notre moat différenciateur. Il vous aide à auditer votre conformité, à saisir vos factures, et à préparer votre budget — toutes des tâches chronophages habituellement.",
           },
           { type: 'h2', text: 'Les 3 outils' },
           {
             type: 'table',
-            headers: ['Outil', 'Ce qu\'il fait', 'Gain de temps'],
+            headers: ['Outil', "Ce qu'il fait", 'Gain de temps'],
             widths: [35, 45, 20],
             rows: [
-              ['Audit conformité', 'Vérifie 30+ points légaux et opérationnels', '2 h · 30 s'],
-              ['OCR Factures', 'Extrait toutes les données d\'une facture PDF/photo', '5 min · 3 s'],
-              ['Suggestions budget', 'Propose ligne par ligne le budget N+1', '1 j · 2 min'],
+              [
+                'Audit conformité',
+                'Vérifie 30+ points légaux et opérationnels',
+                '2 h · 30 s',
+              ],
+              [
+                'OCR Factures',
+                "Extrait toutes les données d'une facture PDF/photo",
+                '5 min · 3 s',
+              ],
+              [
+                'Suggestions budget',
+                'Propose ligne par ligne le budget N+1',
+                '1 j · 2 min',
+              ],
             ],
           },
           { type: 'h2', text: 'Privacy et confidentialité' },
@@ -1697,19 +1834,18 @@ export const PARTS = [
           },
           {
             type: 'warn',
-            title: 'L\'IA n\'est pas infaillible',
-            text: 'Les suggestions de l\'IA sont des aides à la décision — pas des décisions. Vous gardez la main sur tout ce qui est généré. Sur des cas critiques (audit légal, signature documents), vérifiez toujours.',
+            title: "L'IA n'est pas infaillible",
+            text: "Les suggestions de l'IA sont des aides à la décision — pas des décisions. Vous gardez la main sur tout ce qui est généré. Sur des cas critiques (audit légal, signature documents), vérifiez toujours.",
           },
         ],
       },
       {
         title: 'Audit conformité IA',
-        intro:
-          'L\'auditeur conformité qui vérifie 30+ points en 30 secondes.',
+        intro: "L'auditeur conformité qui vérifie 30+ points en 30 secondes.",
         blocks: [
           {
             type: 'lead',
-            text: 'L\'audit IA passe en revue votre copropriété sous l\'angle de la conformité légale et opérationnelle. Il produit un score, des findings classés par sévérité, et des recommandations concrètes.',
+            text: "L'audit IA passe en revue votre copropriété sous l'angle de la conformité légale et opérationnelle. Il produit un score, des findings classés par sévérité, et des recommandations concrètes.",
           },
           { type: 'h2', text: 'Lancer un audit' },
           {
@@ -1718,8 +1854,8 @@ export const PARTS = [
               'Allez sur /gestionnaire/ia.',
               'Cliquez sur la carte « Audit conformité ».',
               'Choisissez la résidence cible (ou « Toutes »).',
-              'Cliquez « Lancer l\'audit IA ».',
-              'Attendez ~30 secondes. Le rapport s\'affiche.',
+              "Cliquez « Lancer l'audit IA ».",
+              "Attendez ~30 secondes. Le rapport s'affiche.",
             ],
           },
           { type: 'h2', text: 'Le score 0-100' },
@@ -1731,7 +1867,7 @@ export const PARTS = [
             type: 'def',
             items: [
               ['90-100', 'Excellent — conformité exemplaire.'],
-              ['75-89', 'Good — quelques points d\'amélioration.'],
+              ['75-89', "Good — quelques points d'amélioration."],
               ['50-74', 'Warning — risques à traiter sous 30 jours.'],
               ['0-49', 'Critical — risques majeurs, action urgente.'],
             ],
@@ -1739,14 +1875,14 @@ export const PARTS = [
           { type: 'h2', text: 'Les findings par sévérité' },
           {
             type: 'p',
-            text: 'Pour chaque problème détecté, l\'IA livre une carte avec :',
+            text: "Pour chaque problème détecté, l'IA livre une carte avec :",
           },
           {
             type: 'list',
             items: [
               'Description du problème.',
               'Sévérité (critique, élevé, modéré, faible, info).',
-              'Recommandation actionable (ex : « Génér l\'annexe 13-1 avant le 30 mars »).',
+              "Recommandation actionable (ex : « Génér l'annexe 13-1 avant le 30 mars »).",
               'Référence légale précise (article, décret).',
               'Impact estimé (financier, juridique, réputationnel).',
             ],
@@ -1759,7 +1895,7 @@ export const PARTS = [
               'Pénalités configurées sans vote AG documenté.',
               'Annexes obligatoires non générées avant échéance AG.',
               'Écarts budgétaires significatifs (>20 %) sans justification.',
-              'Pointage bancaire en retard de plus d\'un mois.',
+              "Pointage bancaire en retard de plus d'un mois.",
               'Documents légaux manquants (règlement copropriété, contrat ascenseur).',
               'Absence de provision pour gros entretien.',
               'Copropriétaires sans téléphone (impossible de leur envoyer une convocation).',
@@ -1768,23 +1904,23 @@ export const PARTS = [
           { type: 'h2', text: 'Points forts détectés' },
           {
             type: 'p',
-            text: 'L\'audit ne fait pas que pointer les problèmes — il mentionne aussi vos forces : pointage à jour, pénalités correctement votées, AG annuelle dans les temps, fonds de réserve suffisant.',
+            text: "L'audit ne fait pas que pointer les problèmes — il mentionne aussi vos forces : pointage à jour, pénalités correctement votées, AG annuelle dans les temps, fonds de réserve suffisant.",
           },
           {
             type: 'ok',
             title: 'Fréquence recommandée',
-            text: 'Lancez l\'audit une fois par mois en début de mois. Avant chaque AG, lancez-le 30 jours avant pour avoir le temps de corriger les findings critiques.',
+            text: "Lancez l'audit une fois par mois en début de mois. Avant chaque AG, lancez-le 30 jours avant pour avoir le temps de corriger les findings critiques.",
           },
         ],
       },
       {
         title: 'Extraction OCR de factures',
         intro:
-          'L\'IA lit votre facture (PDF ou photo) et pré-remplit le formulaire de dépense.',
+          "L'IA lit votre facture (PDF ou photo) et pré-remplit le formulaire de dépense.",
         blocks: [
           {
             type: 'lead',
-            text: 'L\'OCR (Optical Character Recognition) couplé à un modèle IA est le moyen le plus rapide de saisir une dépense. Au lieu de retaper toutes les données, vous dropez la facture et l\'IA fait le reste.',
+            text: "L'OCR (Optical Character Recognition) couplé à un modèle IA est le moyen le plus rapide de saisir une dépense. Au lieu de retaper toutes les données, vous dropez la facture et l'IA fait le reste.",
           },
           { type: 'h2', text: 'Le workflow' },
           {
@@ -1794,7 +1930,7 @@ export const PARTS = [
               'Drag & drop le PDF ou la photo de la facture.',
               'Attendez 3-5 secondes.',
               'Vérifiez les champs extraits dans le formulaire pré-rempli.',
-              'Cliquez « Créer la dépense ». C\'est fait.',
+              "Cliquez « Créer la dépense ». C'est fait.",
             ],
           },
           { type: 'h2', text: 'Données extraites' },
@@ -1803,7 +1939,10 @@ export const PARTS = [
             headers: ['Champ', 'Détection IA'],
             widths: [35, 65],
             rows: [
-              ['Fournisseur', 'Nom de l\'entreprise (et création auto de prestataire si nouveau)'],
+              [
+                'Fournisseur',
+                "Nom de l'entreprise (et création auto de prestataire si nouveau)",
+              ],
               ['ICE', 'Numéro ICE marocain à 15 chiffres'],
               ['Date', 'Format date français reconnu'],
               ['N° facture', 'Référence unique fournisseur'],
@@ -1813,29 +1952,29 @@ export const PARTS = [
               ['Description', 'Libellé court résumé'],
               ['Lignes détaillées', 'Postes individuels si présents'],
               ['Catégorie suggérée', 'Mappée sur compte PCM'],
-              ['Score de confiance', '0-100% — fiabilité de l\'extraction'],
+              ['Score de confiance', "0-100% — fiabilité de l'extraction"],
             ],
           },
           {
             type: 'tip',
             title: 'Qualité de la photo',
-            text: 'Pour une photo de facture, assurez-vous : éclairage uniforme, pas de flou, facture entièrement cadrée. Un PDF natif (non scanné) donne toujours de meilleurs résultats qu\'une photo.',
+            text: "Pour une photo de facture, assurez-vous : éclairage uniforme, pas de flou, facture entièrement cadrée. Un PDF natif (non scanné) donne toujours de meilleurs résultats qu'une photo.",
           },
           {
             type: 'ai',
             title: 'Catégorisation intelligente',
-            text: 'L\'IA reconnaît automatiquement le type de facture (eau, électricité, nettoyage, ascenseur…) et propose le compte PCM correspondant. Vous gardez bien sûr le contrôle final.',
+            text: "L'IA reconnaît automatiquement le type de facture (eau, électricité, nettoyage, ascenseur…) et propose le compte PCM correspondant. Vous gardez bien sûr le contrôle final.",
           },
         ],
       },
       {
         title: 'Suggestions de budget',
         intro:
-          'L\'IA prépare votre budget N+1 en analysant vos 2 derniers exercices + inflation + hausses tarifs.',
+          "L'IA prépare votre budget N+1 en analysant vos 2 derniers exercices + inflation + hausses tarifs.",
         blocks: [
           {
             type: 'lead',
-            text: 'Préparer le budget annuel est une corvée. L\'IA analyse vos données historiques + le contexte économique marocain et propose ligne par ligne ce que devrait être votre budget N+1.',
+            text: "Préparer le budget annuel est une corvée. L'IA analyse vos données historiques + le contexte économique marocain et propose ligne par ligne ce que devrait être votre budget N+1.",
           },
           { type: 'h2', text: 'Sources analysées' },
           {
@@ -1845,8 +1984,8 @@ export const PARTS = [
               'Variations annuelles par poste (en hausse ou en baisse).',
               'Inflation publiée par le HCP (Haut Commissariat au Plan).',
               'Hausses tarifaires annoncées par Lydec, Redal, Amendis, RADEEM.',
-              'Contrats en cours (ascenseur, nettoyage) avec leurs clauses d\'indexation.',
-              'Travaux exceptionnels prévus dans l\'exercice cible.',
+              "Contrats en cours (ascenseur, nettoyage) avec leurs clauses d'indexation.",
+              "Travaux exceptionnels prévus dans l'exercice cible.",
             ],
           },
           { type: 'h2', text: 'Le rapport généré' },
@@ -1860,17 +1999,26 @@ export const PARTS = [
             widths: [30, 70],
             rows: [
               ['Poste', 'Catégorie comptable (eau, électricité, nettoyage…)'],
-              ['Réalisé N-1', 'Montant réellement dépensé l\'exercice précédent'],
-              ['Suggestion N+1', 'Montant proposé par l\'IA'],
+              [
+                'Réalisé N-1',
+                "Montant réellement dépensé l'exercice précédent",
+              ],
+              ['Suggestion N+1', "Montant proposé par l'IA"],
               ['Variation', 'Écart en valeur et en %'],
-              ['Justification', 'Phrase courte expliquant le pourquoi (ex : « Hausse tarif Lydec attendue 4 % + contrat reconduit à l\'identique »)'],
-              ['Confiance', 'high / medium / low — niveau de certitude de l\'IA'],
+              [
+                'Justification',
+                "Phrase courte expliquant le pourquoi (ex : « Hausse tarif Lydec attendue 4 % + contrat reconduit à l'identique »)",
+              ],
+              [
+                'Confiance',
+                "high / medium / low — niveau de certitude de l'IA",
+              ],
             ],
           },
           { type: 'h2', text: 'Hypothèses globales' },
           {
             type: 'p',
-            text: 'En bas du rapport, l\'IA récapitule les hypothèses macro retenues : inflation HCP, taux directeur BAM, prévision démographique, météo prévisible. Vous savez sur quoi elle s\'est basée.',
+            text: "En bas du rapport, l'IA récapitule les hypothèses macro retenues : inflation HCP, taux directeur BAM, prévision démographique, météo prévisible. Vous savez sur quoi elle s'est basée.",
           },
           { type: 'h2', text: 'Importer dans le module Budgets' },
           {
@@ -1880,7 +2028,7 @@ export const PARTS = [
           {
             type: 'ok',
             title: 'Préparation AG',
-            text: 'Lancez la suggestion IA 2 mois avant l\'AG. Cela vous laisse le temps d\'affiner, de discuter avec le Conseil syndical, et d\'éviter les surprises le jour J.',
+            text: "Lancez la suggestion IA 2 mois avant l'AG. Cela vous laisse le temps d'affiner, de discuter avec le Conseil syndical, et d'éviter les surprises le jour J.",
           },
         ],
       },
@@ -1906,7 +2054,7 @@ export const PARTS = [
           { type: 'h2', text: 'Connexion résident' },
           {
             type: 'p',
-            text: 'Même mécanisme que le gestionnaire — OTP WhatsApp. Le résident reçoit son lien d\'invitation depuis votre fiche copropriétaire (chapitre 7).',
+            text: "Même mécanisme que le gestionnaire — OTP WhatsApp. Le résident reçoit son lien d'invitation depuis votre fiche copropriétaire (chapitre 7).",
           },
           { type: 'h2', text: 'Les 4 onglets du portail' },
           {
@@ -1914,8 +2062,14 @@ export const PARTS = [
             headers: ['Onglet', 'Contenu'],
             widths: [25, 75],
             rows: [
-              ['Accueil', 'KPI solde, prochain appel, dernières annonces, actualités résidence.'],
-              ['Finances', 'Historique appels et paiements, télécharger quittances, signaler un paiement.'],
+              [
+                'Accueil',
+                'KPI solde, prochain appel, dernières annonces, actualités résidence.',
+              ],
+              [
+                'Finances',
+                'Historique appels et paiements, télécharger quittances, signaler un paiement.',
+              ],
               ['Réclamations', 'Créer un ticket, suivre les tickets en cours.'],
               ['Profil', 'Coordonnées, langue, déconnexion.'],
             ],
@@ -1923,7 +2077,7 @@ export const PARTS = [
           { type: 'h2', text: 'Signaler un paiement' },
           {
             type: 'p',
-            text: 'Sur l\'onglet Finances, le résident peut indiquer qu\'il a payé un appel (virement, chèque, espèces) en uploadant une preuve. Vous validez ensuite côté gestionnaire (Chapitre 11).',
+            text: "Sur l'onglet Finances, le résident peut indiquer qu'il a payé un appel (virement, chèque, espèces) en uploadant une preuve. Vous validez ensuite côté gestionnaire (Chapitre 11).",
           },
           { type: 'h2', text: 'Notifications' },
           {
@@ -1933,7 +2087,7 @@ export const PARTS = [
           {
             type: 'tip',
             title: 'Support résident',
-            text: 'Si un résident a un problème de connexion, vous pouvez révoquer puis re-générer son lien d\'invitation depuis sa fiche copropriétaire. En 30 secondes il a un nouvel accès.',
+            text: "Si un résident a un problème de connexion, vous pouvez révoquer puis re-générer son lien d'invitation depuis sa fiche copropriétaire. En 30 secondes il a un nouvel accès.",
           },
         ],
       },
@@ -1953,17 +2107,17 @@ export const PARTS = [
         blocks: [
           {
             type: 'lead',
-            text: 'Imprimez cette checklist et affichez-la dans votre bureau. Elle couvre les 4 phases du cycle annuel d\'une copropriété.',
+            text: "Imprimez cette checklist et affichez-la dans votre bureau. Elle couvre les 4 phases du cycle annuel d'une copropriété.",
           },
           { type: 'h2', text: 'Tous les mois' },
           {
             type: 'check',
             items: [
-              'Émettre l\'appel de fonds du mois (Chapitre 11).',
+              "Émettre l'appel de fonds du mois (Chapitre 11).",
               'Importer le relevé bancaire et faire le pointage (Chapitre 17).',
               'Saisir les dépenses (Chapitre 12), idéalement via OCR IA.',
               'Vérifier les impayés et envoyer les relances (Chapitre 14).',
-              'Consulter le tableau de bord et l\'audit IA hebdomadaire.',
+              "Consulter le tableau de bord et l'audit IA hebdomadaire.",
             ],
           },
           { type: 'h2', text: 'Janvier — Mars (clôture N-1)' },
@@ -1984,7 +2138,7 @@ export const PARTS = [
               'Convocations AG envoyées au moins 15 jours avant.',
               'Documents (budget, comptes, devis) joints aux convocations.',
               'Préparer la salle ou la visio.',
-              'Tenue de l\'AG avec votes.',
+              "Tenue de l'AG avec votes.",
               'PV signé et distribué dans les 7 jours.',
             ],
           },
@@ -1994,28 +2148,27 @@ export const PARTS = [
             items: [
               'Toutes les tâches du calendrier conformité en statut « Terminé ».',
               'Régénérer toutes les annexes après vote AG.',
-              'Exporter le journal d\'audit complet.',
-              'Verrouiller l\'exercice dans Comptabilité · Clôture (Chapitre 22).',
+              "Exporter le journal d'audit complet.",
+              "Verrouiller l'exercice dans Comptabilité · Clôture (Chapitre 22).",
               'Lancer les suggestions budget IA pour N+1.',
             ],
           },
           {
             type: 'ok',
             title: 'Bonne pratique',
-            text: 'Définissez-vous un slot fixe dans votre agenda : « 1er du mois, 9h-10h : routine Imaro mensuelle ». Vous bouclerez les 5 tâches mensuelles en 1 heure et resterez à jour toute l\'année.',
+            text: "Définissez-vous un slot fixe dans votre agenda : « 1er du mois, 9h-10h : routine Imaro mensuelle ». Vous bouclerez les 5 tâches mensuelles en 1 heure et resterez à jour toute l'année.",
           },
         ],
       },
       {
         title: 'Tâches courantes — cookbook',
-        intro:
-          'Comment faire X, étape par étape, sans réfléchir.',
+        intro: 'Comment faire X, étape par étape, sans réfléchir.',
         blocks: [
           { type: 'h2', text: 'Créer un appel de fonds exceptionnel' },
           {
             type: 'num',
             items: [
-              'Faites voter l\'enveloppe en AG extraordinaire.',
+              "Faites voter l'enveloppe en AG extraordinaire.",
               'Sur /gestionnaire/paiements · « + Nouvel appel ».',
               'Choisissez « Exceptionnel » comme type.',
               'Saisissez la justification (référence PV AG).',
@@ -2034,12 +2187,12 @@ export const PARTS = [
               'Statut passe à « Mise en demeure ».',
             ],
           },
-          { type: 'h2', text: 'Générer le bilan annuel pour l\'AG' },
+          { type: 'h2', text: "Générer le bilan annuel pour l'AG" },
           {
             type: 'num',
             items: [
               '/gestionnaire/annexes.',
-              'Sélectionnez la résidence + l\'exercice.',
+              "Sélectionnez la résidence + l'exercice.",
               'Cliquez « PDF » sur Annexe 10, 13-1, 13-2.',
               'En régime normal, ajoutez les Annexes 3 et 4.',
               'Attachez les PDFs à la convocation AG.',
@@ -2068,14 +2221,17 @@ export const PARTS = [
               'Cliquez « Recalculer pénalités » pour appliquer aux impayés en cours.',
             ],
           },
-          { type: 'h2', text: 'Inviter un nouveau gestionnaire dans votre équipe' },
+          {
+            type: 'h2',
+            text: 'Inviter un nouveau gestionnaire dans votre équipe',
+          },
           {
             type: 'num',
             items: [
               '/gestionnaire/profil · onglet Équipe.',
               'Cliquez « + Inviter ».',
               'Renseignez téléphone WhatsApp + email + rôle (Manager / Agent recouvrement / Conseil).',
-              'L\'invité reçoit un OTP et un lien d\'activation.',
+              "L'invité reçoit un OTP et un lien d'activation.",
             ],
           },
           { type: 'h2', text: 'Créer une dépense depuis une facture (IA)' },
@@ -2107,7 +2263,7 @@ export const PARTS = [
               'Vérifiez la checklist pré-clôture (Chapitre 22).',
               '/gestionnaire/comptabilite · onglet Clôture.',
               'Étape 1 — Aperçu : vérifier résultat.',
-              'Étape 2 — Affectation : choisir destination de l\'excédent.',
+              "Étape 2 — Affectation : choisir destination de l'excédent.",
               'Étape 3 — Verrouiller (action irréversible).',
               'Étape 4 — Récapitulatif et archivage automatique.',
             ],
@@ -2121,32 +2277,38 @@ export const PARTS = [
           { type: 'h2', text: 'Mes données sont-elles privées ?' },
           {
             type: 'p',
-            text: 'Oui. Imaro est multi-tenant — votre tenant est complètement isolé. Aucun autre syndic ne peut voir vos données. Pour l\'IA, vos données sont traitées par Claude (Anthropic) mais ni stockées, ni utilisées pour entraîner les modèles.',
+            text: "Oui. Imaro est multi-tenant — votre tenant est complètement isolé. Aucun autre syndic ne peut voir vos données. Pour l'IA, vos données sont traitées par Claude (Anthropic) mais ni stockées, ni utilisées pour entraîner les modèles.",
           },
           { type: 'h2', text: 'Le QR code des annexes, ça sert à quoi ?' },
           {
             type: 'p',
-            text: 'Anti-tampering et preuve d\'authenticité. Quand un copropriétaire scanne le QR, il atterrit sur imaro.ma/verify/<code> qui confirme : document généré par Imaro, pour cette résidence et cet exercice, à cette date, avec ce contenu (hash SHA-256). Si quelqu\'un modifie le PDF, le hash ne correspond plus.',
+            text: "Anti-tampering et preuve d'authenticité. Quand un copropriétaire scanne le QR, il atterrit sur imaro.ma/verify/<code> qui confirme : document généré par Imaro, pour cette résidence et cet exercice, à cette date, avec ce contenu (hash SHA-256). Si quelqu'un modifie le PDF, le hash ne correspond plus.",
           },
           { type: 'h2', text: 'Imaro est-il conforme au Décret 2.23.700 ?' },
           {
             type: 'p',
-            text: 'Oui. Toutes les 12 annexes obligatoires sont générables, le Plan Comptable Marocain est respecté, le cycle annuel de conformité est suivi automatiquement, et le journal d\'audit est conservé 7 ans.',
+            text: "Oui. Toutes les 12 annexes obligatoires sont générables, le Plan Comptable Marocain est respecté, le cycle annuel de conformité est suivi automatiquement, et le journal d'audit est conservé 7 ans.",
           },
-          { type: 'h2', text: 'Que se passe-t-il si je passe en régime normal (>200K MAD/an) ?' },
+          {
+            type: 'h2',
+            text: 'Que se passe-t-il si je passe en régime normal (>200K MAD/an) ?',
+          },
           {
             type: 'p',
             text: 'Imaro détecte automatiquement le passage de seuil et ajoute les annexes additionnelles requises (3 et 4 obligatoires en plus de 10, 13-1, 13-2). Vous êtes notifié sur le dashboard.',
           },
-          { type: 'h2', text: 'Et si ma banque n\'est pas dans la liste pour le pointage ?' },
+          {
+            type: 'h2',
+            text: "Et si ma banque n'est pas dans la liste pour le pointage ?",
+          },
           {
             type: 'p',
-            text: 'Choisissez « Format générique » dans le dropdown. Imaro analyse le fichier .csv ou .xlsx et vous demande de mapper manuellement les colonnes (date, libellé, débit, crédit). Une fois mappé, l\'auto-matching fonctionne normalement.',
+            text: "Choisissez « Format générique » dans le dropdown. Imaro analyse le fichier .csv ou .xlsx et vous demande de mapper manuellement les colonnes (date, libellé, débit, crédit). Une fois mappé, l'auto-matching fonctionne normalement.",
           },
           { type: 'h2', text: 'Combien coûte Imaro ?' },
           {
             type: 'p',
-            text: 'Imaro est facturé par nombre de lots gérés, avec un plan d\'entrée et un plan pro. Contactez sales@imaro.ma pour un devis personnalisé selon votre portefeuille.',
+            text: "Imaro est facturé par nombre de lots gérés, avec un plan d'entrée et un plan pro. Contactez sales@imaro.ma pour un devis personnalisé selon votre portefeuille.",
           },
           { type: 'h2', text: 'Imaro fonctionne-t-il hors-ligne ?' },
           {
@@ -2156,17 +2318,17 @@ export const PARTS = [
           { type: 'h2', text: 'Comment changer mon mot de passe ?' },
           {
             type: 'p',
-            text: 'Il n\'y a pas de mot de passe sur Imaro. La connexion se fait par OTP WhatsApp envoyé à chaque session. Vous ne pouvez donc pas vous le faire voler.',
+            text: "Il n'y a pas de mot de passe sur Imaro. La connexion se fait par OTP WhatsApp envoyé à chaque session. Vous ne pouvez donc pas vous le faire voler.",
           },
           { type: 'h2', text: 'Puis-je télécharger toutes mes données ?' },
           {
             type: 'p',
-            text: 'Oui. Sur /gestionnaire/profil · onglet Données, le bouton « Exporter mon tenant » génère un .zip avec tous vos lots, copropriétaires, paiements, dépenses, documents, et journal d\'audit en formats standards (CSV + PDF). Conforme RGPD.',
+            text: "Oui. Sur /gestionnaire/profil · onglet Données, le bouton « Exporter mon tenant » génère un .zip avec tous vos lots, copropriétaires, paiements, dépenses, documents, et journal d'audit en formats standards (CSV + PDF). Conforme RGPD.",
           },
           { type: 'h2', text: 'Et si je veux quitter Imaro ?' },
           {
             type: 'p',
-            text: 'Vous récupérez toutes vos données via l\'export ci-dessus. Aucun verrouillage commercial. Votre tenant est archivé 7 ans (rétention légale) puis définitivement supprimé sur demande.',
+            text: "Vous récupérez toutes vos données via l'export ci-dessus. Aucun verrouillage commercial. Votre tenant est archivé 7 ans (rétention légale) puis définitivement supprimé sur demande.",
           },
         ],
       },
@@ -2192,7 +2354,7 @@ export const PARTS = [
               ],
               [
                 'CIN',
-                'Carte d\'Identité Nationale marocaine — pièce d\'identité standard.',
+                "Carte d'Identité Nationale marocaine — pièce d'identité standard.",
               ],
               [
                 'CGNC',
@@ -2200,11 +2362,11 @@ export const PARTS = [
               ],
               [
                 'Conseil syndical',
-                'Organe consultatif élu en AG. Contrôle l\'action du syndic.',
+                "Organe consultatif élu en AG. Contrôle l'action du syndic.",
               ],
               [
                 'Copropriétaire',
-                'Personne (physique ou morale) propriétaire d\'un lot dans une copropriété.',
+                "Personne (physique ou morale) propriétaire d'un lot dans une copropriété.",
               ],
               [
                 'Décret 2.23.700',
@@ -2216,7 +2378,7 @@ export const PARTS = [
               ],
               [
                 'Fonds de réserve',
-                'Compte d\'épargne de la copropriété pour gros travaux et imprévus.',
+                "Compte d'épargne de la copropriété pour gros travaux et imprévus.",
               ],
               [
                 'Gestionnaire',
@@ -2224,7 +2386,7 @@ export const PARTS = [
               ],
               [
                 'ICE',
-                'Identifiant Commun de l\'Entreprise — numéro unique à 15 chiffres pour toute entreprise marocaine.',
+                "Identifiant Commun de l'Entreprise — numéro unique à 15 chiffres pour toute entreprise marocaine.",
               ],
               [
                 'Loi 18-00',
@@ -2244,7 +2406,7 @@ export const PARTS = [
               ],
               [
                 'Partie double',
-                'Méthode comptable où chaque opération crédite un compte et débite un autre. Garantit l\'équilibre des comptes.',
+                "Méthode comptable où chaque opération crédite un compte et débite un autre. Garantit l'équilibre des comptes.",
               ],
               [
                 'Plan Comptable Marocain (PCM)',
@@ -2276,7 +2438,7 @@ export const PARTS = [
               ],
               [
                 'RIBR',
-                'Registre d\'Immatriculation des Biens en Régime de copropriété — identifie chaque copropriété.',
+                "Registre d'Immatriculation des Biens en Régime de copropriété — identifie chaque copropriété.",
               ],
               [
                 'Syndic',
@@ -2284,11 +2446,11 @@ export const PARTS = [
               ],
               [
                 'Tantième',
-                'Quote-part exprimée en millièmes (ou en autre unité) qui détermine la contribution d\'un lot aux charges.',
+                "Quote-part exprimée en millièmes (ou en autre unité) qui détermine la contribution d'un lot aux charges.",
               ],
               [
                 'Tenant',
-                'Espace isolé d\'un cabinet syndic dans Imaro. Aucune fuite de données entre tenants.',
+                "Espace isolé d'un cabinet syndic dans Imaro. Aucune fuite de données entre tenants.",
               ],
               [
                 'Trésorerie',
@@ -2300,7 +2462,7 @@ export const PARTS = [
               ],
               [
                 'Usufruitier',
-                'Personne qui a le droit de jouir d\'un bien sans en être propriétaire.',
+                "Personne qui a le droit de jouir d'un bien sans en être propriétaire.",
               ],
             ],
           },
@@ -2309,7 +2471,7 @@ export const PARTS = [
       {
         title: 'Références légales',
         intro:
-          'Les textes réglementaires qui encadrent l\'activité du syndic au Maroc.',
+          "Les textes réglementaires qui encadrent l'activité du syndic au Maroc.",
         blocks: [
           { type: 'h2', text: 'Loi 18-00 — Statut de la copropriété' },
           {
@@ -2334,11 +2496,14 @@ export const PARTS = [
             items: [
               'Définition du régime simplifié (≤ 200 000 MAD) et du régime normal.',
               'Liste des 12 annexes obligatoires.',
-              'Rétention des justificatifs (10 ans) et du journal d\'audit (7 ans).',
+              "Rétention des justificatifs (10 ans) et du journal d'audit (7 ans).",
               'Cycle de conformité annuel et calendrier des obligations.',
             ],
           },
-          { type: 'h2', text: 'Code Général de Normalisation Comptable (CGNC)' },
+          {
+            type: 'h2',
+            text: 'Code Général de Normalisation Comptable (CGNC)',
+          },
           {
             type: 'p',
             text: 'Référentiel comptable marocain — le « Plan Comptable » du pays. Imaro implémente nativement les 7 classes (1 à 7) avec une codification adaptée aux copropriétés.',
@@ -2347,7 +2512,7 @@ export const PARTS = [
           {
             type: 'list',
             items: [
-              'Loi 09-08 — Protection des personnes physiques à l\'égard du traitement des données à caractère personnel.',
+              "Loi 09-08 — Protection des personnes physiques à l'égard du traitement des données à caractère personnel.",
               'Loi 31-08 — Mesures de protection du consommateur (applicable au recouvrement amiable).',
               'Code Général des Impôts (CGI) — TVA, IS sur produits financiers de la copropriété.',
             ],
@@ -2355,7 +2520,7 @@ export const PARTS = [
           {
             type: 'tip',
             title: 'Restez à jour',
-            text: 'L\'équipe Imaro suit les évolutions réglementaires marocaines. Toute mise à jour légale est intégrée en ≤ 30 jours dans la plateforme, sans intervention de votre part.',
+            text: "L'équipe Imaro suit les évolutions réglementaires marocaines. Toute mise à jour légale est intégrée en ≤ 30 jours dans la plateforme, sans intervention de votre part.",
           },
           { type: 'h2', text: 'Support et formation' },
           {
@@ -2374,7 +2539,7 @@ export const PARTS = [
           {
             type: 'ok',
             title: 'Merci !',
-            text: 'Merci d\'avoir choisi Imaro pour gérer vos copropriétés. Toute l\'équipe est à votre disposition pour faire de votre quotidien de syndic une expérience fluide et conforme.',
+            text: "Merci d'avoir choisi Imaro pour gérer vos copropriétés. Toute l'équipe est à votre disposition pour faire de votre quotidien de syndic une expérience fluide et conforme.",
           },
         ],
       },

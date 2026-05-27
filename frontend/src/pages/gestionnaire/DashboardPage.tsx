@@ -203,7 +203,8 @@ function ModuleCard({
   tone = 'default',
 }: ModuleCardProps) {
   const toneAccent = {
-    default: 'border-border bg-card hover:border-[#1B4F72]/40',
+    default:
+      'border-border bg-card hover:border-[var(--color-imaro-primary)]/40',
     info: 'border-blue-200 bg-blue-50/30 hover:border-blue-300 dark:border-blue-900/40 dark:bg-blue-950/10',
     success:
       'border-green-200 bg-green-50/30 hover:border-green-300 dark:border-green-900/40 dark:bg-green-950/10',
@@ -452,7 +453,7 @@ export function DashboardPage() {
           {/* Assistant IA — featured top-left, gradient */}
           <button
             onClick={() => void navigate('/gestionnaire/ia')}
-            className="group relative overflow-hidden rounded-xl border-2 border-purple-300 bg-gradient-to-br from-[#1B4F72] via-[#1B4F72]/90 to-purple-600 p-4 text-left text-white shadow-md transition-all hover:shadow-lg dark:border-purple-900/40"
+            className="group relative overflow-hidden rounded-xl border-2 border-purple-300 bg-gradient-to-br from-[var(--color-imaro-primary)] via-[var(--color-imaro-primary)]/90 to-purple-600 p-4 text-left text-white shadow-md transition-all hover:shadow-lg dark:border-purple-900/40"
           >
             <div className="flex items-start justify-between">
               <div className="flex size-9 items-center justify-center rounded-lg bg-white/20 backdrop-blur">
@@ -733,7 +734,7 @@ export function DashboardPage() {
               className="gap-2"
               onClick={() => void navigate('/gestionnaire/occupants')}
             >
-              <UserCheck className="size-4 text-[#1B4F72]" />
+              <UserCheck className="size-4 text-[var(--color-imaro-primary)]" />
               {t('gestionnaire.dashboard.actions.occupants', {
                 defaultValue: 'Occupants',
               })}

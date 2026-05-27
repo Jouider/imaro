@@ -183,8 +183,8 @@ export function TravauxExceptionnelsPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-6">
       <div className="flex items-start gap-3">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-[#1B4F72]/10">
-          <HardHat className="size-5 text-[#1B4F72]" />
+        <div className="flex size-10 items-center justify-center rounded-xl bg-[var(--color-imaro-primary)]/10">
+          <HardHat className="size-5 text-[var(--color-imaro-primary)]" />
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-foreground">
@@ -230,7 +230,7 @@ export function TravauxExceptionnelsPage() {
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <div className="rounded-xl border bg-card p-4">
           <p className="mb-1 text-xs text-muted-foreground">Montant voté</p>
-          <p className="text-xl font-bold tracking-tight text-[#1B4F72]">
+          <p className="text-xl font-bold tracking-tight text-[var(--color-imaro-primary)]">
             {fmt.format(totals.vote)} DH
           </p>
         </div>

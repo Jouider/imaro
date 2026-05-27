@@ -94,7 +94,7 @@ import { cn } from '@/lib/utils'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const IMARO_PRIMARY = '#1B4F72'
+const IMARO_PRIMARY = 'var(--color-imaro-primary)'
 const IMARO_ACCENT = '#E67E22'
 
 const TYPE_BADGE_STYLES: Record<EcritureComptable['type'], string> = {
@@ -2367,7 +2367,7 @@ function TabRapports({
             </div>
             <Button
               size="sm"
-              className="bg-[#1B4F72] text-white hover:bg-[#154066]"
+              className="bg-[var(--color-imaro-primary)] text-white hover:bg-[#154066]"
               onClick={() => void handleRapportFinancier()}
               disabled={loadingRapport || !dashboard}
             >
@@ -2433,9 +2433,9 @@ function TabRapports({
       </Card>
 
       {/* Cross-link to Annexes (legal regulatory) */}
-      <Card className="border-[#1B4F72]/20 bg-[#1B4F72]/5">
+      <Card className="border-[var(--color-imaro-primary)]/20 bg-[var(--color-imaro-primary)]/5">
         <CardContent className="flex items-center gap-3 pt-4">
-          <ClipboardCheck className="size-5 text-[#1B4F72]" />
+          <ClipboardCheck className="size-5 text-[var(--color-imaro-primary)]" />
           <div className="flex-1">
             <p className="text-sm font-medium text-foreground">
               Annexes réglementaires (Décret 2.23.700)

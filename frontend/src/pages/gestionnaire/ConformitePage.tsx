@@ -35,7 +35,7 @@ const PHASE_META: Record<
   operations_mensuelles: {
     label: 'Opérations mensuelles',
     icon: Calendar,
-    color: '#2980b9',
+    color: 'var(--color-imaro-primary-light)',
   },
   cloture_exercice: {
     label: "Clôture d'exercice",
@@ -106,8 +106,8 @@ export function ConformitePage() {
     <div className="mx-auto max-w-6xl space-y-6 p-6">
       {/* Header */}
       <div className="flex items-start gap-3">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-[#1B4F72]/10">
-          <CalendarCheck className="size-5 text-[#1B4F72]" />
+        <div className="flex size-10 items-center justify-center rounded-xl bg-[var(--color-imaro-primary)]/10">
+          <CalendarCheck className="size-5 text-[var(--color-imaro-primary)]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-foreground">
@@ -162,7 +162,7 @@ export function ConformitePage() {
 
       {/* Overall progress */}
       {calendar && (
-        <div className="rounded-xl border bg-gradient-to-br from-[#1B4F72]/5 to-[#E67E22]/5 p-6">
+        <div className="rounded-xl border bg-gradient-to-br from-[var(--color-imaro-primary)]/5 to-[#E67E22]/5 p-6">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2">
@@ -204,7 +204,7 @@ export function ConformitePage() {
                   cx="40"
                   cy="40"
                   r="34"
-                  stroke="#1B4F72"
+                  stroke="var(--color-imaro-primary)"
                   strokeWidth="6"
                   fill="none"
                   strokeDasharray={`${calendar.progression_pct * 2.13} 213`}
@@ -212,7 +212,7 @@ export function ConformitePage() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-xl font-bold text-[#1B4F72]">
+                <span className="text-xl font-bold text-[var(--color-imaro-primary)]">
                   {calendar.progression_pct}%
                 </span>
                 <span className="text-[10px] uppercase text-muted-foreground">
@@ -246,7 +246,7 @@ export function ConformitePage() {
                         isDone &&
                           'bg-green-100 text-green-600 dark:bg-green-950/30',
                         isCurrent &&
-                          'bg-[#1B4F72] text-white shadow-md ring-4 ring-[#1B4F72]/15',
+                          'bg-[var(--color-imaro-primary)] text-white shadow-md ring-4 ring-[var(--color-imaro-primary)]/15',
                         !isDone &&
                           !isCurrent &&
                           'bg-muted text-muted-foreground/40',
@@ -261,7 +261,7 @@ export function ConformitePage() {
                     <span
                       className={cn(
                         'max-w-[110px] text-center text-xs font-medium',
-                        isCurrent && 'text-[#1B4F72]',
+                        isCurrent && 'text-[var(--color-imaro-primary)]',
                       )}
                     >
                       {meta.label}

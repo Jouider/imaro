@@ -283,8 +283,8 @@ export function AnnexesPage() {
     <div className="mx-auto max-w-5xl space-y-6 p-6">
       {/* Header */}
       <div className="flex items-start gap-3">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-[#1B4F72]/10">
-          <FileText className="size-5 text-[#1B4F72]" />
+        <div className="flex size-10 items-center justify-center rounded-xl bg-[var(--color-imaro-primary)]/10">
+          <FileText className="size-5 text-[var(--color-imaro-primary)]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-foreground">
@@ -419,14 +419,14 @@ function AnnexeCard({
     <div
       className={cn(
         'flex items-center gap-4 rounded-xl border bg-card p-4',
-        required && 'border-[#1B4F72]/30',
+        required && 'border-[var(--color-imaro-primary)]/30',
       )}
     >
       <div
         className={cn(
           'flex size-10 items-center justify-center rounded-lg',
           required
-            ? 'bg-[#1B4F72]/10 text-[#1B4F72]'
+            ? 'bg-[var(--color-imaro-primary)]/10 text-[var(--color-imaro-primary)]'
             : 'bg-muted text-muted-foreground',
         )}
       >
@@ -439,7 +439,7 @@ function AnnexeCard({
           {required && (
             <Badge
               variant="outline"
-              className="border-[#1B4F72]/40 bg-[#1B4F72]/5 text-[10px] text-[#1B4F72]"
+              className="border-[var(--color-imaro-primary)]/40 bg-[var(--color-imaro-primary)]/5 text-[10px] text-[var(--color-imaro-primary)]"
             >
               Requis
             </Badge>

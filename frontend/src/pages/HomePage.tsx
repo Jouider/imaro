@@ -66,8 +66,8 @@ const FEATURES: FeatureItem[] = [
   {
     key: 'residences',
     icon: Building2,
-    color: 'text-[#1B4F72]',
-    bg: 'bg-[#1B4F72]/10',
+    color: 'text-[var(--color-imaro-primary)]',
+    bg: 'bg-[var(--color-imaro-primary)]/10',
   },
   {
     key: 'appels',
@@ -84,8 +84,8 @@ const FEATURES: FeatureItem[] = [
   {
     key: 'tickets',
     icon: Wrench,
-    color: 'text-[#1B4F72]',
-    bg: 'bg-[#1B4F72]/10',
+    color: 'text-[var(--color-imaro-primary)]',
+    bg: 'bg-[var(--color-imaro-primary)]/10',
   },
   {
     key: 'assemblees',
@@ -146,7 +146,7 @@ export function HomePage() {
         {/* ══════════════════════════════════════
             1. STICKY NAVBAR
         ══════════════════════════════════════ */}
-        <header className="sticky top-0 z-50 border-b border-white/10 bg-[#1B4F72] shadow-md">
+        <header className="sticky top-0 z-50 border-b border-white/10 bg-[var(--color-imaro-primary)] shadow-md">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
             {/* Logo */}
             <Wordmark className="h-11 w-44" inverted />
@@ -184,7 +184,7 @@ export function HomePage() {
           className="relative overflow-hidden"
           style={{
             background:
-              'linear-gradient(135deg, #1B4F72 0%, #154360 60%, #0e2d41 100%)',
+              'linear-gradient(135deg, var(--color-imaro-primary) 0%, var(--color-imaro-primary-dark) 60%, #0e2d41 100%)',
             clipPath: 'polygon(0 0, 100% 0, 100% 90%, 0 100%)',
             paddingBottom: '6rem',
           }}
@@ -240,7 +240,7 @@ export function HomePage() {
               <Button
                 asChild
                 size="lg"
-                className="min-w-[200px] bg-white font-semibold text-[#1B4F72] shadow-lg hover:bg-white/90"
+                className="min-w-[200px] bg-white font-semibold text-[var(--color-imaro-primary)] shadow-lg hover:bg-white/90"
               >
                 <Link to="/login">
                   {t('home.hero.ctaGestionnaire')}
@@ -288,13 +288,13 @@ export function HomePage() {
                   className={cn(
                     'anim-fade-in flex flex-1 flex-col items-center px-4 text-center',
                     i < STATS.length - 1
-                      ? 'border-b border-[#1B4F72]/15 pb-6 sm:border-b-0 sm:border-r sm:pb-0'
+                      ? 'border-b border-[var(--color-imaro-primary)]/15 pb-6 sm:border-b-0 sm:border-r sm:pb-0'
                       : '',
                   )}
                   style={{ animationDelay: `${i * 0.1}s` }}
                 >
                   <span
-                    className="text-3xl font-extrabold tracking-tight text-[#1B4F72]"
+                    className="text-3xl font-extrabold tracking-tight text-[var(--color-imaro-primary)]"
                     style={{ fontFamily: 'var(--font-display)' }}
                   >
                     {stat.value}
@@ -316,7 +316,7 @@ export function HomePage() {
             {/* Section header */}
             <div className="mb-12 text-center">
               <h2
-                className="font-display text-3xl font-bold text-[#1B4F72] sm:text-4xl"
+                className="font-display text-3xl font-bold text-[var(--color-imaro-primary)] sm:text-4xl"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {t('home.features.title')}
@@ -367,7 +367,7 @@ export function HomePage() {
             {/* Header */}
             <div className="mb-14 text-center">
               <h2
-                className="font-display text-3xl font-bold text-[#1B4F72] sm:text-4xl"
+                className="font-display text-3xl font-bold text-[var(--color-imaro-primary)] sm:text-4xl"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {t('home.howItWorks.title')}
@@ -385,7 +385,7 @@ export function HomePage() {
                     className="flex flex-1 flex-col items-center text-center"
                   >
                     {/* Step number + icon */}
-                    <div className="relative mb-5 flex size-20 items-center justify-center rounded-full bg-[#1B4F72] shadow-lg">
+                    <div className="relative mb-5 flex size-20 items-center justify-center rounded-full bg-[var(--color-imaro-primary)] shadow-lg">
                       {/* Large background number */}
                       <span
                         className="absolute -top-3 -right-3 flex size-8 items-center justify-center rounded-full bg-[#E67E22] text-xs font-extrabold text-white shadow"
@@ -396,7 +396,7 @@ export function HomePage() {
                       <Icon className="size-8 text-white" />
                     </div>
 
-                    <h3 className="text-base font-bold text-[#1B4F72]">
+                    <h3 className="text-base font-bold text-[var(--color-imaro-primary)]">
                       {t(`home.howItWorks.${step.key}.title`)}
                     </h3>
                     <p className="mt-2 max-w-[200px] text-sm leading-relaxed text-[#7f8c8d]">
@@ -407,7 +407,7 @@ export function HomePage() {
                     {i < STEPS.length - 1 && (
                       <div
                         aria-hidden
-                        className="mt-10 hidden text-[#1B4F72]/30 md:absolute md:flex"
+                        className="mt-10 hidden text-[var(--color-imaro-primary)]/30 md:absolute md:flex"
                         style={{
                           left: `calc(${(i + 1) * (100 / STEPS.length)}% - 12px)`,
                           top: '38px',
@@ -430,7 +430,7 @@ export function HomePage() {
           <div className="mx-auto max-w-5xl px-6">
             <div className="flex flex-col gap-6 md:flex-row">
               {/* Gestionnaire card — navy */}
-              <div className="flex flex-1 flex-col items-start rounded-2xl bg-[#1B4F72] p-8 shadow-xl">
+              <div className="flex flex-1 flex-col items-start rounded-2xl bg-[var(--color-imaro-primary)] p-8 shadow-xl">
                 <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-white/15">
                   <Building2 className="size-6 text-white" />
                 </div>
@@ -483,7 +483,7 @@ export function HomePage() {
         {/* ══════════════════════════════════════
             7. FOOTER
         ══════════════════════════════════════ */}
-        <footer className="bg-[#154360] py-12">
+        <footer className="bg-[var(--color-imaro-primary-dark)] py-12">
           <div className="mx-auto max-w-6xl px-6">
             {/* Logo + tagline */}
             <div className="flex flex-col items-center text-center">

@@ -184,15 +184,15 @@ function CreateCoproprietaireDialog({
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full min-h-[44px] rounded-lg border border-border bg-white px-3 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all focus:border-[#1B4F72] focus:outline-none focus:ring-2 focus:ring-[#1B4F72]/10"
+              className="w-full min-h-[44px] rounded-lg border border-border bg-white px-3 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all focus:border-[var(--color-imaro-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-imaro-primary)]/10"
             />
           </div>
 
           {/* Phone (required) */}
           <div className="space-y-2">
             <Label htmlFor="dialog-phone">Téléphone *</Label>
-            <div className="flex overflow-hidden rounded-lg border border-border transition-all focus-within:border-[#1B4F72] focus-within:ring-2 focus-within:ring-[#1B4F72]/10">
-              <span className="flex items-center border-e bg-muted px-3 text-sm font-bold text-[#1B4F72]">
+            <div className="flex overflow-hidden rounded-lg border border-border transition-all focus-within:border-[var(--color-imaro-primary)] focus-within:ring-2 focus-within:ring-[var(--color-imaro-primary)]/10">
+              <span className="flex items-center border-e bg-muted px-3 text-sm font-bold text-[var(--color-imaro-primary)]">
                 +212
               </span>
               <input
@@ -220,13 +220,13 @@ function CreateCoproprietaireDialog({
               placeholder="email@exemple.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full min-h-[44px] rounded-lg border border-border bg-white px-3 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all focus:border-[#1B4F72] focus:outline-none focus:ring-2 focus:ring-[#1B4F72]/10"
+              className="w-full min-h-[44px] rounded-lg border border-border bg-white px-3 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all focus:border-[var(--color-imaro-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-imaro-primary)]/10"
             />
           </div>
 
           <Button
             type="submit"
-            className="h-11 w-full bg-[#1B4F72] text-white hover:bg-[#153f5c]"
+            className="h-11 w-full bg-[var(--color-imaro-primary)] text-white hover:bg-[#153f5c]"
             disabled={!canSubmit}
           >
             {mutation.isPending
@@ -293,14 +293,14 @@ function CreateLotDialog({
     !mutation.isPending
 
   const inputCls =
-    'w-full min-h-[44px] rounded-lg border border-border bg-white px-3 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all focus:border-[#1B4F72] focus:outline-none focus:ring-2 focus:ring-[#1B4F72]/10'
+    'w-full min-h-[44px] rounded-lg border border-border bg-white px-3 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all focus:border-[var(--color-imaro-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-imaro-primary)]/10'
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Building2 className="size-5 text-[#1B4F72]" />
+            <Building2 className="size-5 text-[var(--color-imaro-primary)]" />
             Créer un lot
           </DialogTitle>
           <DialogDescription>
@@ -393,7 +393,7 @@ function CreateLotDialog({
 
           <Button
             type="submit"
-            className="h-11 w-full bg-[#1B4F72] text-white hover:bg-[#153f5c]"
+            className="h-11 w-full bg-[var(--color-imaro-primary)] text-white hover:bg-[#153f5c]"
             disabled={!canSubmit}
           >
             {mutation.isPending ? 'Création…' : 'Créer et assigner le lot'}
@@ -512,7 +512,7 @@ function SuccessDialog({
             </p>
             <div className="flex gap-2">
               <Button
-                className="flex-1 gap-2 bg-[#1B4F72] text-white hover:bg-[#153f5c]"
+                className="flex-1 gap-2 bg-[var(--color-imaro-primary)] text-white hover:bg-[#153f5c]"
                 onClick={onCreateLot}
               >
                 <Building2 className="size-4" />
@@ -628,7 +628,7 @@ export function CoproprietairesPage() {
         actions={
           <Button
             onClick={() => setCreateOpen(true)}
-            className="gap-2 bg-[#1B4F72] text-white hover:bg-[#153f5c]"
+            className="gap-2 bg-[var(--color-imaro-primary)] text-white hover:bg-[#153f5c]"
           >
             <UserPlus className="size-4" />
             Ajouter un copropriétaire

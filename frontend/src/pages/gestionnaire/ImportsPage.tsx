@@ -151,8 +151,8 @@ export function ImportsPage() {
       {/* Page header */}
       <div className="space-y-1">
         <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-[#1B4F72]/10">
-            <Upload className="size-5 text-[#1B4F72]" />
+          <div className="flex size-10 items-center justify-center rounded-xl bg-[var(--color-imaro-primary)]/10">
+            <Upload className="size-5 text-[var(--color-imaro-primary)]" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">
@@ -227,8 +227,8 @@ export function ImportsPage() {
                     value={tab.id}
                     className={cn(
                       'gap-2 rounded-lg border px-4 py-2.5 transition-all',
-                      'data-[state=active]:bg-[#1B4F72] data-[state=active]:text-white data-[state=active]:border-[#1B4F72]',
-                      'data-[state=inactive]:hover:border-[#1B4F72]/40 data-[state=inactive]:hover:bg-[#1B4F72]/5',
+                      'data-[state=active]:bg-[var(--color-imaro-primary)] data-[state=active]:text-white data-[state=active]:border-[var(--color-imaro-primary)]',
+                      'data-[state=inactive]:hover:border-[var(--color-imaro-primary)]/40 data-[state=inactive]:hover:bg-[var(--color-imaro-primary)]/5',
                       isCompleted &&
                         'border-green-300 bg-green-50 dark:border-green-800 dark:bg-green-950/20',
                       hasMissingDeps &&

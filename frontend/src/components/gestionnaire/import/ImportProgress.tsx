@@ -23,7 +23,7 @@ export function ImportProgress({ result, progress, importing, onDone }: Props) {
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 className="size-4 animate-spin text-[#1B4F72]" />
+              <Loader2 className="size-4 animate-spin text-[var(--color-imaro-primary)]" />
               <span>
                 {t('gestionnaire.imports.execute.inProgress')
                   .replace('{done}', String(progress.done))
@@ -36,7 +36,7 @@ export function ImportProgress({ result, progress, importing, onDone }: Props) {
           </div>
           <div className="h-2.5 overflow-hidden rounded-full bg-muted">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[#1B4F72] to-[#2980b9] transition-all duration-300"
+              className="h-full rounded-full bg-gradient-to-r from-[var(--color-imaro-primary)] to-[var(--color-imaro-primary-light)] transition-all duration-300"
               style={{ width: `${pct}%` }}
             />
           </div>

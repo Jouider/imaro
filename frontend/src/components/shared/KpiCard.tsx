@@ -28,17 +28,24 @@ type Props = {
 export function KpiCard({ icon, value, label, trend, className }: Props) {
   const isPositive = trend && trend.value >= 0
   return (
-    <Card className={cn('', className)}>
+    <Card
+      className={cn(
+        'hover-lift border-[var(--color-imaro-primary)]/10 shadow-[0_1px_3px_0_rgb(94_106_210_/_0.04),0_1px_2px_-1px_rgb(94_106_210_/_0.04)]',
+        className,
+      )}
+    >
       <CardContent className="pt-6">
         <div className="flex items-start justify-between">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--primary)]/10 text-[var(--primary)]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-imaro-primary-tint)] text-[var(--primary)] ring-1 ring-inset ring-[var(--color-imaro-primary)]/10">
             {icon}
           </div>
           {trend && (
             <span
               className={cn(
-                'flex items-center gap-0.5 text-xs font-medium',
-                isPositive ? 'text-green-600' : 'text-red-600',
+                'flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-medium',
+                isPositive
+                  ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400'
+                  : 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400',
               )}
             >
               {isPositive ? (
@@ -51,7 +58,7 @@ export function KpiCard({ icon, value, label, trend, className }: Props) {
           )}
         </div>
         <div className="mt-3">
-          <p className="text-2xl font-semibold tabular-nums text-[var(--primary)]">
+          <p className="text-2xl font-semibold tabular-nums tracking-tight text-[var(--primary)]">
             {value}
           </p>
           <p className="mt-0.5 text-sm text-muted-foreground">{label}</p>

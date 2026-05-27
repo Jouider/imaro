@@ -99,9 +99,9 @@ export function IaAssistantPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-6">
       {/* Header — gradient AI badge */}
-      <div className="rounded-2xl border-2 border-[#1B4F72]/20 bg-gradient-to-br from-[#1B4F72]/10 via-[#E67E22]/5 to-purple-100/30 p-6 dark:from-[#1B4F72]/20 dark:via-[#E67E22]/10 dark:to-purple-900/10">
+      <div className="rounded-2xl border-2 border-[var(--color-imaro-primary)]/20 bg-gradient-to-br from-[var(--color-imaro-primary)]/10 via-[#E67E22]/5 to-purple-100/30 p-6 dark:from-[var(--color-imaro-primary)]/20 dark:via-[#E67E22]/10 dark:to-purple-900/10">
         <div className="flex items-start gap-4">
-          <div className="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#1B4F72] to-purple-600 text-white shadow-lg">
+          <div className="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--color-imaro-primary)] to-purple-600 text-white shadow-lg">
             <Sparkles className="size-6" />
           </div>
           <div className="flex-1">
@@ -201,7 +201,7 @@ function AuditTool({ residenceId }: { residenceId: number | null }) {
   if (!audit) {
     return (
       <div className="rounded-2xl border-2 border-dashed bg-card p-12 text-center">
-        <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1B4F72] to-purple-600 text-white shadow-lg">
+        <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--color-imaro-primary)] to-purple-600 text-white shadow-lg">
           <Shield className="size-8" />
         </div>
         <h2 className="text-lg font-bold">Audit conformité IA</h2>
@@ -410,7 +410,7 @@ function AuditTool({ residenceId }: { residenceId: number | null }) {
                       {f.description}
                     </p>
                     <div className="mt-3 rounded-lg bg-card p-3">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-[#1B4F72] mb-1">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-imaro-primary)] mb-1">
                         Action recommandée
                       </p>
                       <p className="text-sm">{f.recommendation}</p>
@@ -522,7 +522,7 @@ function InvoiceTool() {
       <div className="rounded-2xl border bg-card p-5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <FileText className="size-4 text-[#1B4F72]" />
+            <FileText className="size-4 text-[var(--color-imaro-primary)]" />
             <span className="text-sm font-medium">{fileName}</span>
           </div>
           <Badge
@@ -635,10 +635,10 @@ function InvoiceTool() {
       )}
 
       {/* Suggested classification */}
-      <div className="rounded-xl border-2 border-[#1B4F72]/20 bg-[#1B4F72]/5 p-4">
+      <div className="rounded-xl border-2 border-[var(--color-imaro-primary)]/20 bg-[var(--color-imaro-primary)]/5 p-4">
         <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="size-4 text-[#1B4F72]" />
-          <p className="text-sm font-semibold text-[#1B4F72]">
+          <Sparkles className="size-4 text-[var(--color-imaro-primary)]" />
+          <p className="text-sm font-semibold text-[var(--color-imaro-primary)]">
             Classification IA suggérée
           </p>
         </div>
@@ -808,7 +808,7 @@ function BudgetTool({ residenceId }: { residenceId: number | null }) {
         <ul className="space-y-1.5 text-sm">
           {suggestion.hypotheses.map((h, i) => (
             <li key={i} className="flex items-start gap-2">
-              <Info className="mt-0.5 size-3.5 shrink-0 text-[#1B4F72]" />
+              <Info className="mt-0.5 size-3.5 shrink-0 text-[var(--color-imaro-primary)]" />
               {h}
             </li>
           ))}
@@ -935,8 +935,8 @@ function ToolCard({
 }) {
   const accentClasses = {
     navy: active
-      ? 'border-[#1B4F72] bg-[#1B4F72] text-white'
-      : 'border-border bg-card hover:border-[#1B4F72]/40',
+      ? 'border-[var(--color-imaro-primary)] bg-[var(--color-imaro-primary)] text-white'
+      : 'border-border bg-card hover:border-[var(--color-imaro-primary)]/40',
     orange: active
       ? 'border-[#E67E22] bg-[#E67E22] text-white'
       : 'border-border bg-card hover:border-[#E67E22]/40',
@@ -983,7 +983,8 @@ function Field({
     <div
       className={cn(
         'rounded-lg border bg-card p-3',
-        highlight && 'border-[#1B4F72]/30 bg-[#1B4F72]/5',
+        highlight &&
+          'border-[var(--color-imaro-primary)]/30 bg-[var(--color-imaro-primary)]/5',
       )}
     >
       <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -993,7 +994,7 @@ function Field({
         className={cn(
           'mt-1 text-sm font-medium',
           mono && 'font-mono',
-          highlight && 'text-[#1B4F72] text-base font-bold',
+          highlight && 'text-[var(--color-imaro-primary)] text-base font-bold',
         )}
       >
         {value}

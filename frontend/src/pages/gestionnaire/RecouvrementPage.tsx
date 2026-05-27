@@ -175,8 +175,8 @@ export function RecouvrementPage() {
     <div className="mx-auto max-w-6xl space-y-6 p-6">
       {/* Header */}
       <div className="flex items-start gap-3">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-[#1B4F72]/10">
-          <Scale className="size-5 text-[#1B4F72]" />
+        <div className="flex size-10 items-center justify-center rounded-xl bg-[var(--color-imaro-primary)]/10">
+          <Scale className="size-5 text-[var(--color-imaro-primary)]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-foreground">
@@ -247,10 +247,10 @@ export function RecouvrementPage() {
 
       {/* Penalty configuration form */}
       {showConfig && draftConfig && (
-        <div className="rounded-xl border-2 border-[#1B4F72]/20 bg-[#1B4F72]/5 p-5">
+        <div className="rounded-xl border-2 border-[var(--color-imaro-primary)]/20 bg-[var(--color-imaro-primary)]/5 p-5">
           <div className="mb-4 flex items-center gap-2">
-            <Settings className="size-4 text-[#1B4F72]" />
-            <h2 className="text-sm font-bold text-[#1B4F72]">
+            <Settings className="size-4 text-[var(--color-imaro-primary)]" />
+            <h2 className="text-sm font-bold text-[var(--color-imaro-primary)]">
               Configuration des pénalités de retard
             </h2>
             <Badge
@@ -323,8 +323,8 @@ export function RecouvrementPage() {
                     className={cn(
                       'rounded-md border px-2 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
                       draftConfig.rate_type === type
-                        ? 'border-[#1B4F72] bg-[#1B4F72] text-white'
-                        : 'border-border bg-card text-muted-foreground hover:border-[#1B4F72]/40',
+                        ? 'border-[var(--color-imaro-primary)] bg-[var(--color-imaro-primary)] text-white'
+                        : 'border-border bg-card text-muted-foreground hover:border-[var(--color-imaro-primary)]/40',
                     )}
                   >
                     {type === 'fixed'
@@ -646,7 +646,8 @@ function Kpi({
   subtitle?: string
 }) {
   const toneClasses = {
-    primary: 'bg-[#1B4F72]/10 text-[#1B4F72]',
+    primary:
+      'bg-[var(--color-imaro-primary)]/10 text-[var(--color-imaro-primary)]',
     danger: 'bg-red-100 text-red-600 dark:bg-red-950/20 dark:text-red-400',
     warning:
       'bg-amber-100 text-amber-600 dark:bg-amber-950/20 dark:text-amber-400',

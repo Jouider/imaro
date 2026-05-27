@@ -229,15 +229,19 @@ export function ImportStepper({ config, context, onComplete }: Props) {
                 <div
                   className={cn(
                     'h-px w-8 mx-1',
-                    isDone ? 'bg-[#1B4F72]' : 'bg-muted-foreground/20',
+                    isDone
+                      ? 'bg-[var(--color-imaro-primary)]'
+                      : 'bg-muted-foreground/20',
                   )}
                 />
               )}
               <div
                 className={cn(
                   'flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all',
-                  isActive && 'bg-[#1B4F72] text-white shadow-sm',
-                  isDone && 'bg-[#1B4F72]/10 text-[#1B4F72]',
+                  isActive &&
+                    'bg-[var(--color-imaro-primary)] text-white shadow-sm',
+                  isDone &&
+                    'bg-[var(--color-imaro-primary)]/10 text-[var(--color-imaro-primary)]',
                   !isActive && !isDone && 'text-muted-foreground/50',
                 )}
               >

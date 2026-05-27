@@ -408,7 +408,7 @@ function NotificationCenter() {
         {/* Header */}
         <div className="flex items-center justify-between border-b px-4 py-3">
           <div className="flex items-center gap-2">
-            <Bell className="size-4 text-[#1B4F72]" />
+            <Bell className="size-4 text-[var(--color-imaro-primary)]" />
             <span className="text-sm font-semibold text-foreground">
               Notifications
             </span>
@@ -421,7 +421,7 @@ function NotificationCenter() {
           {unreadCount > 0 && (
             <button
               onClick={markAllRead}
-              className="flex items-center gap-1 text-xs text-[#1B4F72] hover:underline"
+              className="flex items-center gap-1 text-xs text-[var(--color-imaro-primary)] hover:underline"
             >
               <CheckCheck className="size-3.5" />
               Tout lire
@@ -446,7 +446,7 @@ function NotificationCenter() {
                   'group flex items-start gap-3 px-4 py-3 transition-colors',
                   'border-b last:border-0',
                   !n.read
-                    ? 'bg-[#1B4F72]/[0.03] dark:bg-[#1B4F72]/10'
+                    ? 'bg-[var(--color-imaro-primary)]/[0.03] dark:bg-[var(--color-imaro-primary)]/10'
                     : 'hover:bg-muted/40',
                 )}
                 onClick={() => markRead(n.id)}
@@ -535,9 +535,10 @@ function UserMenu() {
       <DropdownMenuTrigger asChild>
         <button
           aria-label="Menu utilisateur"
-          className="flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ring-2 ring-transparent transition-all hover:ring-[#1B4F72]/30 focus:outline-none"
+          className="flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ring-2 ring-transparent transition-all hover:ring-[var(--color-imaro-primary)]/30 focus:outline-none"
           style={{
-            background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)',
+            background:
+              'linear-gradient(135deg, var(--color-imaro-primary-light) 0%, var(--color-imaro-primary) 100%)',
           }}
         >
           {initials}
@@ -550,7 +551,8 @@ function UserMenu() {
             <div
               className="flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
               style={{
-                background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)',
+                background:
+                  'linear-gradient(135deg, var(--color-imaro-primary-light) 0%, var(--color-imaro-primary) 100%)',
               }}
             >
               {initials}
@@ -624,7 +626,8 @@ function ContextPill() {
         style={
           !logoUrl
             ? {
-                background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)',
+                background:
+                  'linear-gradient(135deg, var(--color-imaro-primary-light) 0%, var(--color-imaro-primary) 100%)',
               }
             : undefined
         }

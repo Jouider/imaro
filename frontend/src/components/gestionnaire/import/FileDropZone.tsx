@@ -69,8 +69,8 @@ export function FileDropZone({
         className={cn(
           'relative flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-10 transition-all cursor-pointer',
           dragOver
-            ? 'border-[#1B4F72] bg-[#1B4F72]/5 scale-[1.01]'
-            : 'border-muted-foreground/25 hover:border-[#1B4F72]/50 hover:bg-muted/30',
+            ? 'border-[var(--color-imaro-primary)] bg-[var(--color-imaro-primary)]/5 scale-[1.01]'
+            : 'border-muted-foreground/25 hover:border-[var(--color-imaro-primary)]/50 hover:bg-muted/30',
           loading && 'pointer-events-none opacity-50',
         )}
       >
@@ -124,7 +124,7 @@ export function FileDropZone({
 
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/60 backdrop-blur-sm">
-            <div className="size-6 animate-spin rounded-full border-2 border-[#1B4F72] border-t-transparent" />
+            <div className="size-6 animate-spin rounded-full border-2 border-[var(--color-imaro-primary)] border-t-transparent" />
           </div>
         )}
       </div>

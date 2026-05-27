@@ -103,8 +103,8 @@ export function AuditTrailPage() {
     <div className="mx-auto max-w-6xl space-y-6 p-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-[#1B4F72]/10">
-          <Activity className="size-5 text-[#1B4F72]" />
+        <div className="flex size-10 items-center justify-center rounded-xl bg-[var(--color-imaro-primary)]/10">
+          <Activity className="size-5 text-[var(--color-imaro-primary)]" />
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-foreground">
@@ -295,7 +295,8 @@ function Kpi({
   tone: 'primary' | 'danger' | 'warning' | 'muted'
 }) {
   const toneClasses = {
-    primary: 'bg-[#1B4F72]/10 text-[#1B4F72]',
+    primary:
+      'bg-[var(--color-imaro-primary)]/10 text-[var(--color-imaro-primary)]',
     danger: 'bg-red-100 text-red-600 dark:bg-red-950/20 dark:text-red-400',
     warning:
       'bg-amber-100 text-amber-600 dark:bg-amber-950/20 dark:text-amber-400',

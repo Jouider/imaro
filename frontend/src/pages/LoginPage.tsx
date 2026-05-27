@@ -125,7 +125,7 @@ const ROLE_CARDS: {
 // ─── Shared input style ───────────────────────────────────────────────────────
 
 const inputCls =
-  'w-full min-h-[52px] rounded-xl border-2 border-border bg-white px-4 text-base text-[#1B4F72] placeholder:text-muted-foreground/50 transition-all focus:border-[#1B4F72] focus:outline-none focus:ring-4 focus:ring-[#1B4F72]/10 dark:bg-card'
+  'w-full min-h-[52px] rounded-xl border-2 border-border bg-white px-4 text-base text-[var(--color-imaro-primary)] placeholder:text-muted-foreground/50 transition-all focus:border-[var(--color-imaro-primary)] focus:outline-none focus:ring-4 focus:ring-[var(--color-imaro-primary)]/10 dark:bg-card'
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
@@ -272,7 +272,9 @@ export function LoginPage() {
 
             {/* Heading */}
             <div className="mb-8">
-              <h1 className="text-2xl font-bold text-[#1B4F72]">{title}</h1>
+              <h1 className="text-2xl font-bold text-[var(--color-imaro-primary)]">
+                {title}
+              </h1>
               <p className="mt-1.5 text-sm text-muted-foreground">{subtitle}</p>
             </div>
 
@@ -288,21 +290,21 @@ export function LoginPage() {
                       'group w-full rounded-xl border-2 p-5 text-left',
                       'transition-all duration-150',
                       'border-transparent bg-[#f4f7fa]',
-                      'hover:border-[#1B4F72] hover:bg-white hover:shadow-md',
+                      'hover:border-[var(--color-imaro-primary)] hover:bg-white hover:shadow-md',
                     )}
                   >
                     <div className="flex items-center gap-4">
                       <div
                         className={cn(
                           'flex size-12 shrink-0 items-center justify-center rounded-xl',
-                          'bg-[#1B4F72]/8 transition-colors',
-                          'group-hover:bg-[#1B4F72]',
+                          'bg-[var(--color-imaro-primary)]/8 transition-colors',
+                          'group-hover:bg-[var(--color-imaro-primary)]',
                         )}
                       >
                         <card.icon
                           className={cn(
                             'size-6 transition-colors',
-                            'text-[#1B4F72] group-hover:text-white',
+                            'text-[var(--color-imaro-primary)] group-hover:text-white',
                           )}
                         />
                       </div>
@@ -317,7 +319,7 @@ export function LoginPage() {
                       <ChevronRight
                         className={cn(
                           'size-5 shrink-0 transition-colors',
-                          'text-muted-foreground/30 group-hover:text-[#1B4F72]',
+                          'text-muted-foreground/30 group-hover:text-[var(--color-imaro-primary)]',
                         )}
                       />
                     </div>
@@ -342,7 +344,7 @@ export function LoginPage() {
                 className="space-y-5"
               >
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 rounded-full border bg-[#1B4F72]/5 px-3 py-1 text-xs font-medium text-[#1B4F72]">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border bg-[var(--color-imaro-primary)]/5 px-3 py-1 text-xs font-medium text-[var(--color-imaro-primary)]">
                     <Building2 className="size-3.5" />
                     Syndic / Gestionnaire
                   </span>
@@ -385,7 +387,7 @@ export function LoginPage() {
 
                 <Button
                   type="submit"
-                  className="h-12 w-full bg-[#1B4F72] text-base text-white hover:bg-[#153f5c]"
+                  className="h-12 w-full bg-[var(--color-imaro-primary)] text-base text-white hover:bg-[#153f5c]"
                   disabled={loginEmailMutation.isPending || !email || !password}
                 >
                   {loginEmailMutation.isPending ? 'Connexion…' : 'Se connecter'}
@@ -403,7 +405,7 @@ export function LoginPage() {
                 }}
               >
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 rounded-full border bg-[#1B4F72]/5 px-3 py-1 text-xs font-medium text-[#1B4F72]">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border bg-[var(--color-imaro-primary)]/5 px-3 py-1 text-xs font-medium text-[var(--color-imaro-primary)]">
                     <Users className="size-3.5" />
                     Copropriétaire
                   </span>
@@ -411,8 +413,8 @@ export function LoginPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="phone">Numéro de téléphone</Label>
-                  <div className="flex overflow-hidden rounded-xl border-2 border-border transition-all focus-within:border-[#1B4F72] focus-within:ring-4 focus-within:ring-[#1B4F72]/10">
-                    <span className="flex items-center border-e bg-[#f4f7fa] px-4 text-sm font-bold text-[#1B4F72]">
+                  <div className="flex overflow-hidden rounded-xl border-2 border-border transition-all focus-within:border-[var(--color-imaro-primary)] focus-within:ring-4 focus-within:ring-[var(--color-imaro-primary)]/10">
+                    <span className="flex items-center border-e bg-[#f4f7fa] px-4 text-sm font-bold text-[var(--color-imaro-primary)]">
                       +212
                     </span>
                     <input
@@ -426,7 +428,7 @@ export function LoginPage() {
                       }
                       required
                       dir="ltr"
-                      className="min-h-[52px] flex-1 bg-white px-4 text-base text-[#1B4F72] placeholder:text-muted-foreground/50 focus:outline-none"
+                      className="min-h-[52px] flex-1 bg-white px-4 text-base text-[var(--color-imaro-primary)] placeholder:text-muted-foreground/50 focus:outline-none"
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
@@ -453,9 +455,12 @@ export function LoginPage() {
                   residentLoginMutation.mutate()
                 }}
               >
-                <div className="rounded-xl bg-[#1B4F72]/5 px-4 py-3 text-sm text-[#1B4F72]">
+                <div className="rounded-xl bg-[var(--color-imaro-primary)]/5 px-4 py-3 text-sm text-[var(--color-imaro-primary)]">
                   <span className="font-semibold">+212 {digits}</span>
-                  <span className="text-[#1B4F72]/60"> · Copropriétaire</span>
+                  <span className="text-[var(--color-imaro-primary)]/60">
+                    {' '}
+                    · Copropriétaire
+                  </span>
                 </div>
 
                 <div className="space-y-2">
@@ -552,7 +557,7 @@ export function LoginPage() {
 
                 <Button
                   type="submit"
-                  className="h-12 w-full bg-[#1B4F72] text-base text-white hover:bg-[#153f5c]"
+                  className="h-12 w-full bg-[var(--color-imaro-primary)] text-base text-white hover:bg-[#153f5c]"
                   disabled={activateMutation.isPending || newCode.length < 6}
                 >
                   {activateMutation.isPending

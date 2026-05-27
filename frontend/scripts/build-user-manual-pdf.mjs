@@ -171,12 +171,9 @@ function drawCover(logoInverted) {
   font('normal')
   doc.setFontSize(14)
   setText([200, 220, 240])
-  doc.text(
-    'Le guide complet du gestionnaire de copropriété',
-    PAGE_W / 2,
-    178,
-    { align: 'center' },
-  )
+  doc.text('Le guide complet du gestionnaire de copropriété', PAGE_W / 2, 178, {
+    align: 'center',
+  })
 
   // Orange CTA block
   setFill(ORANGE)
@@ -190,12 +187,9 @@ function drawCover(logoInverted) {
   font('normal')
   doc.setFontSize(9)
   setText([200, 220, 240])
-  doc.text(
-    'Édition 2026 · Sprint 1 à 8 · Tous modules',
-    PAGE_W / 2,
-    260,
-    { align: 'center' },
-  )
+  doc.text('Édition 2026 · Sprint 1 à 8 · Tous modules', PAGE_W / 2, 260, {
+    align: 'center',
+  })
   font('bold')
   doc.setFontSize(11)
   setText([255, 255, 255])
@@ -379,7 +373,10 @@ function table({ headers, rows, widths }) {
     const lines = row.map((cell, i) =>
       doc.splitTextToSize(String(cell ?? ''), W[i] - 4),
     )
-    const h = Math.max(rowH, Math.max(...lines.map((l) => l.length)) * 4.8 + 2.5)
+    const h = Math.max(
+      rowH,
+      Math.max(...lines.map((l) => l.length)) * 4.8 + 2.5,
+    )
     ensureSpace(h)
     if (ri % 2 === 0) {
       setFill(ROW_ALT)
@@ -594,13 +591,13 @@ function pageDeGarde() {
   doc.rect(M_L, cursorY - 8, 18, 1, 'F')
 
   paragraph(
-    'Ce manuel est le guide officiel d\'Imaro pour les gestionnaires de copropriété (syndics). Il couvre chaque module, chaque page et chaque concept clé de la plateforme — de la première connexion jusqu\'à la clôture de l\'exercice et la génération des annexes réglementaires.',
+    "Ce manuel est le guide officiel d'Imaro pour les gestionnaires de copropriété (syndics). Il couvre chaque module, chaque page et chaque concept clé de la plateforme — de la première connexion jusqu'à la clôture de l'exercice et la génération des annexes réglementaires.",
   )
   paragraph(
-    'Il a été conçu pour deux usages : (1) la formation rapide d\'un nouveau gestionnaire qui découvre l\'outil, et (2) la consultation ponctuelle pendant le travail quotidien — chaque chapitre est lisible indépendamment.',
+    "Il a été conçu pour deux usages : (1) la formation rapide d'un nouveau gestionnaire qui découvre l'outil, et (2) la consultation ponctuelle pendant le travail quotidien — chaque chapitre est lisible indépendamment.",
   )
 
-  h2('À qui s\'adresse ce manuel ?')
+  h2("À qui s'adresse ce manuel ?")
   list([
     'Syndic Owner — le dirigeant du cabinet syndic, responsable du tenant et de la facturation.',
     'Gestionnaire (Manager) — le collaborateur au quotidien, qui pilote les copropriétés.',
@@ -612,20 +609,20 @@ function pageDeGarde() {
   callout({
     kind: 'tip',
     title: 'Astuce de lecture',
-    text: 'Les chapitres sont organisés en 8 parties thématiques. La Partie I est essentielle pour les nouveaux utilisateurs. Les parties suivantes peuvent être consultées dans l\'ordre qui correspond à votre cycle annuel.',
+    text: "Les chapitres sont organisés en 8 parties thématiques. La Partie I est essentielle pour les nouveaux utilisateurs. Les parties suivantes peuvent être consultées dans l'ordre qui correspond à votre cycle annuel.",
   })
 
   list([
     'Les pavés orange (◆ Astuce) signalent un gain de temps ou une bonne pratique.',
     'Les pavés navy (§ Légal) renvoient à un texte réglementaire (Décret 2.23.700, Loi 18-00, Plan Comptable Marocain).',
     'Les pavés rouges (! Attention) signalent un risque ou une action irréversible.',
-    'Les pavés violets (✦ IA) décrivent ce que vous pouvez accélérer avec l\'Assistant IA.',
+    "Les pavés violets (✦ IA) décrivent ce que vous pouvez accélérer avec l'Assistant IA.",
     'Les pavés verts (✓ Bonne pratique) confirment une démarche conforme.',
   ])
 
   h2('Versions et mises à jour')
   paragraph(
-    'Ce manuel correspond à la version 1.0 d\'Imaro (Sprints 1 à 8). Les futures évolutions seront documentées dans des suppléments téléchargeables depuis le centre d\'aide.',
+    "Ce manuel correspond à la version 1.0 d'Imaro (Sprints 1 à 8). Les futures évolutions seront documentées dans des suppléments téléchargeables depuis le centre d'aide.",
   )
   callout({
     kind: 'legal',
@@ -681,7 +678,7 @@ function renderBlocks(blocks) {
         })
         break
       case 'ai':
-        callout({ kind: 'ai', title: b.title || 'Avec l\'IA', text: b.text })
+        callout({ kind: 'ai', title: b.title || "Avec l'IA", text: b.text })
         break
       case 'ok':
         callout({

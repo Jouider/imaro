@@ -106,7 +106,10 @@ export function ProfilPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-5 px-4 py-8">
       {/* ── 1. Page header ── */}
-      <h1 className="text-2xl font-bold" style={{ color: '#1B4F72' }}>
+      <h1
+        className="text-2xl font-bold"
+        style={{ color: 'var(--color-imaro-primary)' }}
+      >
         Mon Profil
       </h1>
 
@@ -118,7 +121,8 @@ export function ProfilPage() {
             <div
               className="flex size-20 items-center justify-center rounded-full text-2xl font-bold text-white"
               style={{
-                background: 'linear-gradient(135deg, #2980b9, #1b4f72)',
+                background:
+                  'linear-gradient(135deg, var(--color-imaro-primary-light), var(--color-imaro-primary))',
               }}
             >
               {initials}
@@ -128,7 +132,7 @@ export function ProfilPage() {
               aria-label="Modifier le profil"
               className={cn(
                 'absolute bottom-0 end-0 flex size-6 items-center justify-center rounded-full border bg-white shadow-sm transition-colors hover:bg-gray-50 dark:bg-card dark:border-border dark:hover:bg-muted',
-                editMode && 'border-[#1B4F72]',
+                editMode && 'border-[var(--color-imaro-primary)]',
               )}
             >
               <Pencil className="size-3 text-gray-500" />
@@ -143,7 +147,7 @@ export function ProfilPage() {
             <div className="mt-1 flex items-center gap-2 flex-wrap">
               <Badge
                 className="text-xs font-semibold text-white"
-                style={{ background: '#1B4F72' }}
+                style={{ background: 'var(--color-imaro-primary)' }}
               >
                 {user?.role === 'manager' ? 'Manager' : 'Gestionnaire'}
               </Badge>
@@ -197,7 +201,10 @@ export function ProfilPage() {
       {/* ── 3. Logo du syndic ── */}
       <div className="rounded-2xl bg-white shadow-sm p-6 dark:bg-card">
         <div className="flex items-center gap-2 mb-1">
-          <ImagePlus className="size-4 shrink-0" style={{ color: '#1B4F72' }} />
+          <ImagePlus
+            className="size-4 shrink-0"
+            style={{ color: 'var(--color-imaro-primary)' }}
+          />
           <h2 className="text-base font-semibold text-foreground">
             Logo du Syndic
           </h2>
@@ -260,7 +267,10 @@ export function ProfilPage() {
       {/* ── 4. Syndic & Abonnement (was 3) ── */}
       <div className="rounded-2xl bg-white shadow-sm p-6 dark:bg-card">
         <div className="flex items-center gap-2 mb-4">
-          <Building2 className="size-4 shrink-0" style={{ color: '#1B4F72' }} />
+          <Building2
+            className="size-4 shrink-0"
+            style={{ color: 'var(--color-imaro-primary)' }}
+          />
           <h2 className="text-base font-semibold text-foreground">
             Syndic & Abonnement
           </h2>
@@ -300,7 +310,10 @@ export function ProfilPage() {
       {/* ── 4. Préférences de notification ── */}
       <div className="rounded-2xl bg-white shadow-sm p-6 dark:bg-card">
         <div className="flex items-center gap-2 mb-1">
-          <Bell className="size-4 shrink-0" style={{ color: '#1B4F72' }} />
+          <Bell
+            className="size-4 shrink-0"
+            style={{ color: 'var(--color-imaro-primary)' }}
+          />
           <h2 className="text-base font-semibold text-foreground">
             Préférences de Notification
           </h2>
@@ -404,7 +417,10 @@ export function ProfilPage() {
       {/* ── 6. Données personnelles ── */}
       <div className="rounded-2xl bg-white shadow-sm p-6 dark:bg-card">
         <div className="flex items-center gap-2 mb-1">
-          <Shield className="size-4 shrink-0" style={{ color: '#1B4F72' }} />
+          <Shield
+            className="size-4 shrink-0"
+            style={{ color: 'var(--color-imaro-primary)' }}
+          />
           <h2 className="text-base font-semibold text-foreground">
             Mes Données Personnelles
           </h2>

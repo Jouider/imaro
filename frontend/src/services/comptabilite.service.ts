@@ -479,7 +479,7 @@ const MOCK_DASHBOARD: ComptabiliteDashboard = {
     {
       categorie: 'Autres rémunérations (Gardiennage)',
       montant: 3500,
-      couleur: '#1B4F72',
+      couleur: 'var(--color-imaro-primary)',
     },
     { categorie: 'Contrats de maintenance', montant: 2800, couleur: '#E67E22' },
     { categorie: 'Nettoyage des locaux', montant: 3000, couleur: '#27AE60' },
