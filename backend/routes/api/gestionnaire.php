@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\Gestionnaire\AutreRecetteController;
 use App\Http\Controllers\Api\Gestionnaire\BilanOuvertureController;
 use App\Http\Controllers\Api\Gestionnaire\BudgetAnnexe5Controller;
 use App\Http\Controllers\Api\Gestionnaire\ComplianceCalendarController;
+use App\Http\Controllers\Api\Gestionnaire\CreanceController;
+use App\Http\Controllers\Api\Gestionnaire\DepenseFinanceController;
 use App\Http\Controllers\Api\Gestionnaire\EmpruntController;
 use App\Http\Controllers\Api\Gestionnaire\EquipementController;
 use App\Http\Controllers\Api\Gestionnaire\GroupeHabitationController;
@@ -263,3 +265,44 @@ Route::prefix('residences/{residence}/pointage')->group(function () {
     Route::get('/sessions/{session}/candidates', [PointageController::class, 'candidates']);
     Route::post('/sessions/{session}/matches/confirm', [PointageController::class, 'confirmMatches']);
 });
+
+// ========================================
+// Alias routes — frontend compatibility
+// ========================================
+
+// Frontend calls /comptabilite/comptes-pcg but backend has /comptes-pcg
+Route::get('/comptabilite/comptes-pcg', [ComptabiliteController::class, 'comptesPcg']);
+
+// Frontend calls /comptabilite/exercices/{id}/... but backend has /exercices/{id}/...
+Route::prefix('comptabilite/exercices/{exercice}')->group(function () {
+    Route::get('/dashboard', [ComptabiliteController::class, 'dashboard']);
+    Route::get('/journal', [ComptabiliteController::class, 'journal']);
+    Route::get('/grand-livre', [ComptabiliteController::class, 'grandLivre']);
+    Route::get('/grand-livre/{compte}', [ComptabiliteController::class, 'grandLivre']);
+    Route::get('/balance', [ComptabiliteController::class, 'balance']);
+    Route::get('/depenses', [ComptabiliteController::class, 'depensesIndex']);
+    Route::post('/depenses', [ComptabiliteController::class, 'depensesStore']);
+    Route::delete('/depenses/{depense}', [ComptabiliteController::class, 'depensesDestroy']);
+    Route::post('/encaissements', [ComptabiliteController::class, 'storeEncaissement']);
+    Route::get('/encaissements', [ComptabiliteController::class, 'encaissementsIndex']);
+    Route::post('/cloture', [ComptabiliteController::class, 'cloturer']);
+});
+
+// Frontend calls /residences/{id}/comptabilite/exercices
+Route::get('/residences/{residence}/comptabilite/exercices', [ExerciceController::class, 'index']);
+Route::post('/residences/{residence}/comptabilite/exercices', [ExerciceController::class, 'store']);
+
+// Créances (frontend calls /creances)
+Route::get('/creances', [CreanceController::class, 'index']);
+Route::post('/creances/{id}/relancer', [CreanceController::class, 'relancer']);
+Route::post('/creances/relancer-tout', [CreanceController::class, 'relancerTout']);
+
+// Dépenses finance (frontend calls /depenses-finance)
+Route::get('/depenses-finance', [DepenseFinanceController::class, 'index']);
+Route::post('/depenses-finance', [DepenseFinanceController::class, 'store']);
+Route::get('/depenses-finance/stats', [DepenseFinanceController::class, 'stats']);
+Route::get('/depenses-finance/recurrentes', [DepenseFinanceController::class, 'recurrentes']);
+Route::post('/depenses-finance/recurrentes', [DepenseFinanceController::class, 'storeRecurrente']);
+Route::post('/depenses-finance/{depense}/approuver', [DepenseFinanceController::class, 'approuver']);
+Route::post('/depenses-finance/{depense}/rejeter', [DepenseFinanceController::class, 'rejeter']);
+Route::delete('/depenses-finance/{depense}', [DepenseFinanceController::class, 'destroy']);
