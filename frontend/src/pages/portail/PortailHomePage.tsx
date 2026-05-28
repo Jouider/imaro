@@ -1,6 +1,13 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQueryClient, useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Bell, CreditCard, Clock, MapPin, ArrowRight } from 'lucide-react'
+import {
+  Bell,
+  CreditCard,
+  Clock,
+  MapPin,
+  ArrowRight,
+  CheckCircle2,
+} from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -19,6 +26,8 @@ import {
   type AssembleePortail,
 } from '@/services/portail.service'
 import { cn } from '@/lib/utils'
+import { usePullToRefresh } from '@/hooks/usePullToRefresh'
+import { PullRefreshIndicator } from '@/components/portail/PullRefreshIndicator'
 
 const montantFormatter = new Intl.NumberFormat('fr-MA', {
   minimumFractionDigits: 2,
@@ -70,6 +79,7 @@ function AnnonceCard({ annonce }: { annonce: Annonce }) {
 
 export function PortailHomePage() {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
 
   const { data: dashboard, isLoading: dashLoading } = useQuery({
     queryKey: ['portail-dashboard'],
@@ -91,6 +101,17 @@ export function PortailHomePage() {
     queryFn: getAssembleesPortail,
   })
 
+  // Pull-to-refresh — refetch all 4 queries in parallel
+  const { pullDistance, progress, isRefreshing } = usePullToRefresh({
+    onRefresh: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['portail-dashboard'] }),
+        queryClient.invalidateQueries({ queryKey: ['portail-annonces'] }),
+        queryClient.invalidateQueries({ queryKey: ['portail-operations'] }),
+        queryClient.invalidateQueries({ queryKey: ['portail-assemblees'] }),
+      ]),
+  })
+
   const totalPaidThisYear = (operations ?? [])
     .filter((op) => op.type === 'paiement' && op.montant > 0)
     .reduce((sum, op) => sum + op.montant, 0)
@@ -102,35 +123,71 @@ export function PortailHomePage() {
     .slice(0, 2)
 
   return (
-    <div className="px-4 py-6 space-y-6">
-      {/* Hero balance card */}
-      {dashLoading ? (
-        <div className="h-36 animate-pulse rounded-xl bg-[var(--color-imaro-primary)]/20" />
-      ) : dashboard ? (
-        <div className="rounded-xl bg-[var(--color-imaro-primary)] dark:bg-card p-5 space-y-3">
-          {/* Balance label */}
-          <p className="text-sm text-white/70 dark:text-muted-foreground">
-            {t('portail.home.balance')}
-          </p>
+    <div className="px-4 py-5 space-y-6">
+      <PullRefreshIndicator
+        pullDistance={pullDistance}
+        progress={progress}
+        isRefreshing={isRefreshing}
+      />
 
-          {/* Balance amount */}
-          <div>
+      {/* Hero balance card — royal blue gradient with decorative pattern */}
+      {dashLoading ? (
+        <div className="h-44 animate-pulse rounded-2xl bg-[var(--color-imaro-primary)]/20" />
+      ) : dashboard ? (
+        <div
+          className="relative overflow-hidden rounded-2xl p-5 shadow-xl shadow-blue-500/20"
+          style={{
+            background:
+              'linear-gradient(135deg, var(--color-imaro-primary) 0%, var(--color-imaro-primary-dark) 100%)',
+          }}
+        >
+          {/* Decorative grid pattern */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-40"
+            style={{
+              backgroundImage:
+                'radial-gradient(rgba(255,255,255,0.18) 1.5px, transparent 1.5px)',
+              backgroundSize: '24px 24px',
+            }}
+          />
+          {/* Soft orange glow */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -right-16 -top-16 size-40 rounded-full opacity-30 blur-3xl"
+            style={{
+              background:
+                'radial-gradient(circle, rgba(230,126,34,0.6) 0%, transparent 70%)',
+            }}
+          />
+
+          <div className="relative">
+            {/* Balance label */}
+            <p className="text-xs font-medium uppercase tracking-wider text-white/70">
+              {t('portail.home.balance')}
+            </p>
+
+            {/* Balance amount — DM Serif */}
             <MontantDisplay
               value={dashboard.balance}
-              className="text-4xl font-bold text-white dark:text-foreground"
+              className="mt-2 block font-display text-4xl leading-none tracking-tight text-white sm:text-5xl"
             />
-          </div>
 
-          {/* Status chip */}
-          {dashboard.statut === 'a_jour' ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-imaro-success)] px-3 py-1 text-sm font-medium text-white">
-              {t('portail.home.aJour')} ✓
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-imaro-danger)] px-3 py-1 text-sm font-medium text-white">
-              {t('portail.home.enRetard')}
-            </span>
-          )}
+            {/* Status chip */}
+            <div className="mt-4 flex items-center gap-2">
+              {dashboard.statut === 'a_jour' ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm ring-1 ring-inset ring-white/20">
+                  <CheckCircle2 className="size-3.5 text-emerald-300" />
+                  {t('portail.home.aJour')}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-imaro-danger)] px-3 py-1 text-xs font-semibold text-white shadow-sm">
+                  <Clock className="size-3.5" />
+                  {t('portail.home.enRetard')}
+                </span>
+              )}
+            </div>
+          </div>
         </div>
       ) : null}
 

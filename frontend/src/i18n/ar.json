@@ -46,7 +46,28 @@
       "actualites": "الأخبار",
       "finances": "المالية",
       "reclamations": "الشكاوى",
-      "profil": "الملف الشخصي"
+      "profil": "الملف الشخصي",
+      "notifications": "الإشعارات",
+      "bottomBar": "التنقل الرئيسي"
+    },
+    "installPrompt": {
+      "title": "تثبيت Imaro",
+      "desc": "أضف Imaro إلى الشاشة الرئيسية للوصول السريع دون اتصال.",
+      "install": "تثبيت",
+      "later": "لاحقًا"
+    },
+    "pullToRefresh": {
+      "release": "حرّر للتحديث",
+      "pull": "اسحب للتحديث",
+      "refreshing": "جارٍ التحديث…"
+    },
+    "push": {
+      "title": "الإشعارات الفورية",
+      "desc": "احصل على تنبيهات فورية للمدفوعات والشكاوى.",
+      "enable": "تفعيل",
+      "disable": "تعطيل",
+      "enabled": "الإشعارات مفعّلة",
+      "unsupported": "غير مدعوم في هذا المتصفح"
     },
     "home": {
       "balance": "رصيدي",
@@ -123,7 +144,13 @@
       "title": "ملفي الشخصي",
       "apparence": "المظهر",
       "darkMode": "الوضع الداكن",
-      "logout": "تسجيل الخروج"
+      "logout": "تسجيل الخروج",
+      "contact": "بياناتي",
+      "preferences": "التفضيلات",
+      "account": "الحساب",
+      "privacy": "الخصوصية",
+      "logoutConfirmTitle": "تسجيل الخروج ؟",
+      "logoutConfirmDesc": "ستحتاج إلى إدخال رمز واتساب مرة أخرى للعودة."
     },
     "login": {
       "title": "بوابة الملاك المشاركين",

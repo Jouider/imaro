@@ -46,7 +46,28 @@
       "actualites": "Actualités",
       "finances": "Finances",
       "reclamations": "Réclamations",
-      "profil": "Profil"
+      "profil": "Profil",
+      "notifications": "Notifications",
+      "bottomBar": "Navigation principale"
+    },
+    "installPrompt": {
+      "title": "Installer Imaro",
+      "desc": "Ajoutez Imaro à votre écran d'accueil pour un accès rapide hors-ligne.",
+      "install": "Installer",
+      "later": "Plus tard"
+    },
+    "pullToRefresh": {
+      "release": "Relâcher pour actualiser",
+      "pull": "Tirer pour actualiser",
+      "refreshing": "Actualisation…"
+    },
+    "push": {
+      "title": "Notifications push",
+      "desc": "Recevez une alerte instantanée pour vos paiements et réclamations.",
+      "enable": "Activer",
+      "disable": "Désactiver",
+      "enabled": "Notifications activées",
+      "unsupported": "Non supporté sur ce navigateur"
     },
     "home": {
       "balance": "Mon solde",
@@ -123,7 +144,13 @@
       "title": "Mon profil",
       "apparence": "Apparence",
       "darkMode": "Mode sombre",
-      "logout": "Se déconnecter"
+      "logout": "Se déconnecter",
+      "contact": "Mes coordonnées",
+      "preferences": "Préférences",
+      "account": "Compte",
+      "privacy": "Confidentialité",
+      "logoutConfirmTitle": "Se déconnecter ?",
+      "logoutConfirmDesc": "Vous devrez à nouveau saisir votre OTP WhatsApp pour revenir."
     },
     "login": {
       "title": "Portail copropriétaire",
