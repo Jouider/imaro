@@ -248,4 +248,34 @@ class DepenseFinanceController extends Controller
             'data'    => null,
         ], 201);
     }
+
+    /**
+     * POST /api/gestionnaire/depenses-finance/import-ia
+     */
+    public function importIa(Request $request): JsonResponse
+    {
+        return response()->json([
+            'status' => 'success',
+            'data'   => [
+                'titre'                 => 'Facture importée',
+                'montant'               => 0,
+                'date'                  => now()->toDateString(),
+                'fournisseur'           => null,
+                'compte_charge_suggere' => '6188',
+                'confiance'             => 'faible',
+            ],
+        ]);
+    }
+
+    /**
+     * POST /api/gestionnaire/depenses-finance/recurrentes/{id}/toggle
+     */
+    public function toggleRecurrente(int $id): JsonResponse
+    {
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Modèle récurrent basculé.',
+            'data'    => null,
+        ]);
+    }
 }

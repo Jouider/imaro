@@ -589,6 +589,26 @@ class ComptabiliteController extends Controller
         ]);
     }
 
+    /**
+     * POST /api/gestionnaire/comptabilite/exercices/{exercice}/import-ia
+     */
+    public function importIa(Request $request, Exercice $exercice): JsonResponse
+    {
+        $this->authorizeExercice($request, $exercice);
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => [
+                'titre'                 => 'Facture importée',
+                'montant'               => 0,
+                'date'                  => now()->toDateString(),
+                'fournisseur'           => null,
+                'compte_charge_suggere' => '6188',
+                'confiance'             => 'faible',
+            ],
+        ]);
+    }
+
     // ── Helpers ──────────────────────────────────────────────
 
     private function authorizeExercice(Request $request, Exercice $exercice): void

@@ -8,8 +8,11 @@ use App\Http\Controllers\Api\Gestionnaire\BilanOuvertureController;
 use App\Http\Controllers\Api\Gestionnaire\BudgetAnnexe5Controller;
 use App\Http\Controllers\Api\Gestionnaire\ComplianceCalendarController;
 use App\Http\Controllers\Api\Gestionnaire\CreanceController;
+use App\Http\Controllers\Api\Gestionnaire\DecompteController;
 use App\Http\Controllers\Api\Gestionnaire\DepenseFinanceController;
 use App\Http\Controllers\Api\Gestionnaire\EmpruntController;
+use App\Http\Controllers\Api\Gestionnaire\EncaissementController;
+use App\Http\Controllers\Api\Gestionnaire\VirementDeclareController;
 use App\Http\Controllers\Api\Gestionnaire\EquipementController;
 use App\Http\Controllers\Api\Gestionnaire\GroupeHabitationController;
 use App\Http\Controllers\Api\Gestionnaire\ImmeubleController;
@@ -128,6 +131,9 @@ Route::post('/budgets/{budget}/approuver', [BudgetController::class, 'approuver'
 Route::post('/budgets/{budget}/postes', [BudgetController::class, 'storePoste']);
 Route::put('/budgets/{budget}/postes/{poste}', [BudgetController::class, 'updatePoste']);
 Route::delete('/budgets/{budget}/postes/{poste}', [BudgetController::class, 'destroyPoste']);
+// Flat postes routes (frontend uses /budgets/postes/{id} without budget)
+Route::put('/budgets/postes/{poste}', [BudgetController::class, 'updatePosteFlat']);
+Route::delete('/budgets/postes/{poste}', [BudgetController::class, 'destroyPosteFlat']);
 
 // Budget Annexe 5 — Lignes + actions
 Route::post('/budgets/{budget}/lignes', [BudgetAnnexe5Controller::class, 'storeLigne']);
@@ -303,6 +309,26 @@ Route::post('/depenses-finance', [DepenseFinanceController::class, 'store']);
 Route::get('/depenses-finance/stats', [DepenseFinanceController::class, 'stats']);
 Route::get('/depenses-finance/recurrentes', [DepenseFinanceController::class, 'recurrentes']);
 Route::post('/depenses-finance/recurrentes', [DepenseFinanceController::class, 'storeRecurrente']);
+Route::post('/depenses-finance/import-ia', [DepenseFinanceController::class, 'importIa']);
+Route::post('/depenses-finance/recurrentes/{id}/toggle', [DepenseFinanceController::class, 'toggleRecurrente']);
 Route::post('/depenses-finance/{depense}/approuver', [DepenseFinanceController::class, 'approuver']);
 Route::post('/depenses-finance/{depense}/rejeter', [DepenseFinanceController::class, 'rejeter']);
 Route::delete('/depenses-finance/{depense}', [DepenseFinanceController::class, 'destroy']);
+
+// Encaissements (paiements.service.ts)
+Route::get('/encaissements', [EncaissementController::class, 'index']);
+Route::post('/encaissements', [EncaissementController::class, 'store']);
+
+// Virements déclarés
+Route::get('/virements-declares', [VirementDeclareController::class, 'index']);
+Route::post('/virements-declares/{id}/valider', [VirementDeclareController::class, 'valider']);
+Route::post('/virements-declares/{id}/rejeter', [VirementDeclareController::class, 'rejeter']);
+
+// Décompte copropriétaire
+Route::get('/decomptes/{coproprietaire}', [DecompteController::class, 'show']);
+
+// Flat delete for comptabilite depenses (frontend uses /comptabilite/depenses/{id})
+Route::delete('/comptabilite/depenses/{depense}', [ComptabiliteController::class, 'depensesDestroy']);
+
+// Import IA comptabilite
+Route::post('/comptabilite/exercices/{exercice}/import-ia', [ComptabiliteController::class, 'importIa']);

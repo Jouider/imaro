@@ -90,6 +90,11 @@ class Residence extends Model
         return $this->groupesHabitations()->exists();
     }
 
+    public function coproprietaires(): HasManyThrough
+    {
+        return $this->hasManyThrough(Coproprietaire::class, Lot::class);
+    }
+
     public function getTauxRecouvrementAttribute(): float
     {
         $total = $this->appelsFonds()
