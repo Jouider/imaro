@@ -37,7 +37,7 @@ export function StickyNav() {
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 transition-all duration-300',
+        'fixed inset-x-0 top-0 z-50 transition-all duration-300',
         scrolled
           ? 'border-b border-[var(--color-imaro-primary)]/10 bg-white/85 shadow-[0_1px_8px_-2px_rgb(29_78_216_/_0.10)] backdrop-blur-lg'
           : 'border-b border-transparent bg-transparent',

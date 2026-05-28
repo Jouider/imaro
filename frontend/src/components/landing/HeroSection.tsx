@@ -126,92 +126,219 @@ export function HeroSection() {
 
 /**
  * Floating Imaro dashboard mockup — pure CSS, no images.
- * Mimics the actual Dashboard hero with KPI cards + module grid.
+ * Dense, credible snapshot of the gestionnaire dashboard with real-looking
+ * mock data: 3 KPIs + chart + module grid + impayé alert + recent activity.
  */
 function HeroMockup() {
   return (
-    <div className="l-float relative w-full max-w-md rounded-2xl border border-white/10 bg-white/95 p-4 shadow-2xl shadow-blue-950/40 backdrop-blur-sm dark:bg-card">
+    <div className="l-float relative w-full max-w-md rounded-2xl border border-white/10 bg-white p-3.5 shadow-2xl shadow-blue-950/50 backdrop-blur-sm dark:bg-card">
       {/* Window chrome */}
       <div className="mb-3 flex items-center gap-1.5">
         <span className="size-2.5 rounded-full bg-red-400" />
         <span className="size-2.5 rounded-full bg-yellow-400" />
         <span className="size-2.5 rounded-full bg-green-400" />
-        <div className="ms-3 flex-1 rounded-md bg-slate-100 px-2 py-1 text-[10px] font-mono text-slate-500">
+        <div className="ms-2 flex-1 rounded-md bg-slate-100 px-2 py-1 text-[10px] font-mono text-slate-500">
           app.imaro.ma/gestionnaire/dashboard
         </div>
       </div>
 
       {/* Header strip */}
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-2.5 flex items-center justify-between">
         <div>
-          <p className="font-display text-base font-medium text-[var(--primary)]">
-            Bonjour Hassan
+          <p className="font-display text-sm leading-tight text-[var(--primary)]">
+            Bonjour, Hassan
           </p>
           <p className="text-[10px] text-slate-500">
-            12 résidences · 3 actions
+            12 résidences · 3 actions urgentes
           </p>
         </div>
-        <div className="flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-imaro-primary)] to-[var(--color-imaro-primary-dark)] text-[10px] font-bold text-white">
-          HA
+        <div className="flex items-center gap-1.5">
+          <span className="relative flex size-6 items-center justify-center rounded-full bg-slate-100 text-slate-600">
+            <svg viewBox="0 0 16 16" fill="none" className="size-3">
+              <path
+                d="M8 1.5a4.5 4.5 0 0 0-4.5 4.5v3l-1 1.5h11l-1-1.5V6A4.5 4.5 0 0 0 8 1.5Z"
+                stroke="currentColor"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M6.5 12.5a1.5 1.5 0 0 0 3 0"
+                stroke="currentColor"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+              />
+            </svg>
+            <span className="absolute -right-0.5 -top-0.5 flex size-2.5 items-center justify-center rounded-full bg-[var(--accent)] text-[7px] font-bold text-white">
+              3
+            </span>
+          </span>
+          <span className="flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-imaro-primary)] to-[var(--color-imaro-primary-dark)] text-[10px] font-bold text-white">
+            HA
+          </span>
         </div>
       </div>
 
-      {/* KPI row */}
-      <div className="mb-3 grid grid-cols-2 gap-2">
-        <div className="rounded-lg border border-[var(--color-imaro-primary)]/10 bg-gradient-to-br from-white to-[var(--color-imaro-primary-tint)]/40 p-2.5">
-          <p className="text-[9px] uppercase tracking-wide text-slate-500">
+      {/* 3 KPI row */}
+      <div className="mb-2.5 grid grid-cols-3 gap-1.5">
+        <div className="rounded-lg border border-[var(--color-imaro-primary)]/10 bg-gradient-to-br from-white to-[var(--color-imaro-primary-tint)]/40 p-2">
+          <p className="text-[8px] font-medium uppercase tracking-wide text-slate-500">
             CA mensuel
           </p>
-          <p className="font-display text-lg leading-none text-[var(--primary)]">
-            48 200
+          <p className="font-display text-base leading-none tracking-tight text-[var(--primary)]">
+            48,2K
           </p>
-          <p className="text-[9px] text-emerald-600">+12.5%</p>
+          <p className="mt-0.5 text-[8px] font-semibold text-emerald-600">
+            ↑ 12,5 %
+          </p>
         </div>
-        <div className="rounded-lg border border-[var(--color-imaro-primary)]/10 bg-gradient-to-br from-white to-orange-50 p-2.5">
-          <p className="text-[9px] uppercase tracking-wide text-slate-500">
+        <div className="rounded-lg border border-[var(--color-imaro-primary)]/10 bg-gradient-to-br from-white to-orange-50 p-2">
+          <p className="text-[8px] font-medium uppercase tracking-wide text-slate-500">
             Impayés
           </p>
-          <p className="font-display text-lg leading-none text-[var(--primary)]">
-            18 250
+          <p className="font-display text-base leading-none tracking-tight text-[var(--primary)]">
+            18,2K
           </p>
-          <p className="text-[9px] text-red-600">-5.1%</p>
+          <p className="mt-0.5 text-[8px] font-semibold text-rose-600">
+            ↓ 5,1 %
+          </p>
+        </div>
+        <div className="rounded-lg border border-[var(--color-imaro-primary)]/10 bg-gradient-to-br from-white to-emerald-50/60 p-2">
+          <p className="text-[8px] font-medium uppercase tracking-wide text-slate-500">
+            Trésorerie
+          </p>
+          <p className="font-display text-base leading-none tracking-tight text-[var(--primary)]">
+            312K
+          </p>
+          <p className="mt-0.5 text-[8px] font-semibold text-emerald-600">
+            ↑ 8,3 %
+          </p>
         </div>
       </div>
 
-      {/* Modules grid */}
-      <div className="grid grid-cols-3 gap-1.5">
+      {/* Recouvrement mini-chart */}
+      <div className="mb-2.5 rounded-lg border border-slate-200/70 bg-slate-50/60 p-2">
+        <div className="mb-1.5 flex items-center justify-between">
+          <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-600">
+            Recouvrement 6 mois
+          </p>
+          <span className="rounded bg-emerald-100 px-1 py-0.5 text-[8px] font-bold text-emerald-700">
+            87 %
+          </span>
+        </div>
+        <div className="flex h-10 items-end gap-1">
+          {[
+            { p: 62, r: 38 },
+            { p: 70, r: 30 },
+            { p: 75, r: 25 },
+            { p: 82, r: 18 },
+            { p: 78, r: 22 },
+            { p: 87, r: 13 },
+          ].map((bar, i) => (
+            <div key={i} className="relative flex-1">
+              <div
+                className="absolute inset-x-0 bottom-0 rounded-sm bg-rose-300"
+                style={{ height: `${bar.p + bar.r}%` }}
+              />
+              <div
+                className="absolute inset-x-0 bottom-0 rounded-sm bg-gradient-to-t from-[var(--primary)] to-[var(--color-imaro-primary-light)]"
+                style={{ height: `${bar.p}%` }}
+              />
+            </div>
+          ))}
+        </div>
+        <div className="mt-1 flex items-center gap-2.5 text-[8px] text-slate-500">
+          <span className="flex items-center gap-1">
+            <span className="size-1.5 rounded-sm bg-[var(--primary)]" />
+            Recouvré
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="size-1.5 rounded-sm bg-rose-300" />
+            Restant
+          </span>
+        </div>
+      </div>
+
+      {/* Modules grid — 3×2 with mini stats */}
+      <div className="mb-2.5 grid grid-cols-3 gap-1.5">
         {[
-          { label: 'IA', color: 'from-violet-500 to-violet-600', pulse: true },
-          { label: 'Conformité', color: 'from-emerald-500 to-emerald-600' },
-          { label: 'Recouvrement', color: 'from-rose-500 to-rose-600' },
-          { label: 'Pointage', color: 'from-sky-500 to-sky-600' },
-          { label: 'Patrimoine', color: 'from-amber-500 to-amber-600' },
-          { label: 'Annexes', color: 'from-slate-500 to-slate-600' },
+          {
+            label: 'IA',
+            stat: '87/100',
+            sub: 'Score',
+            color: 'from-violet-500 to-violet-600',
+            pulse: true,
+          },
+          {
+            label: 'Conformité',
+            stat: '11/12',
+            sub: 'Tâches',
+            color: 'from-emerald-500 to-emerald-600',
+          },
+          {
+            label: 'Recouvrement',
+            stat: '8',
+            sub: 'Relances',
+            color: 'from-rose-500 to-rose-600',
+          },
+          {
+            label: 'Pointage',
+            stat: '42/48',
+            sub: 'Match auto',
+            color: 'from-sky-500 to-sky-600',
+          },
+          {
+            label: 'Patrimoine',
+            stat: '24',
+            sub: 'Équipements',
+            color: 'from-amber-500 to-amber-600',
+          },
+          {
+            label: 'Annexes',
+            stat: '12',
+            sub: 'Générées',
+            color: 'from-slate-500 to-slate-600',
+          },
         ].map((m) => (
           <div
             key={m.label}
-            className={`relative aspect-square rounded-md bg-gradient-to-br ${m.color} p-1.5 text-white shadow-sm`}
+            className={`relative overflow-hidden rounded-md bg-gradient-to-br ${m.color} p-1.5 text-white shadow-sm`}
           >
-            <p className="text-[7px] font-semibold uppercase tracking-wider opacity-90">
+            <p className="text-[7px] font-semibold uppercase tracking-wider opacity-80">
               {m.label}
             </p>
+            <p className="mt-0.5 font-display text-sm leading-none tracking-tight">
+              {m.stat}
+            </p>
+            <p className="text-[7px] opacity-70">{m.sub}</p>
             {m.pulse && (
-              <span className="absolute right-1 top-1 size-1.5 rounded-full bg-white l-pulse-ring" />
+              <span className="l-pulse-ring absolute right-1 top-1 size-1.5 rounded-full bg-white" />
             )}
           </div>
         ))}
       </div>
 
-      {/* Bottom strip — chart hint */}
-      <div className="mt-3 rounded-md bg-slate-50 px-2 py-1.5">
-        <div className="flex h-6 items-end gap-0.5">
-          {[35, 50, 42, 65, 70, 88, 60, 75, 92, 85, 70, 78].map((h, i) => (
-            <span
-              key={i}
-              className="flex-1 rounded-sm bg-gradient-to-t from-[var(--primary)] to-[var(--color-imaro-primary-light)]"
-              style={{ height: `${h}%` }}
-            />
-          ))}
+      {/* Bottom activity row */}
+      <div className="space-y-1">
+        <div className="flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5">
+          <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-amber-500 text-[8px] font-bold text-white">
+            !
+          </span>
+          <p className="flex-1 text-[9px] font-medium text-amber-800">
+            3 mises en demeure à envoyer
+          </p>
+          <span className="rounded bg-white px-1.5 py-0.5 text-[8px] font-semibold text-amber-700 shadow-sm">
+            Voir
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2 py-1.5">
+          <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[8px]">
+            ✓
+          </span>
+          <p className="flex-1 text-[9px] text-slate-700">
+            Pointage Attijariwafa terminé
+          </p>
+          <span className="text-[8px] text-slate-400">il y a 2 min</span>
         </div>
       </div>
     </div>
