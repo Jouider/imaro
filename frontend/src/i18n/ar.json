@@ -534,6 +534,125 @@
       }
     }
   },
+  "manager": {
+    "workspace": "فضاء المدير",
+    "optional": "اختياري",
+    "nav": {
+      "dashboard": "لوحة التحكم",
+      "residences": "الإقامات",
+      "gestionnaires": "المسيّرون",
+      "userMenu": "قائمة المستخدم",
+      "openMenu": "فتح القائمة",
+      "workspace": "فضائي",
+      "logout": "تسجيل الخروج"
+    },
+    "actions": {
+      "menu": "خيارات أخرى",
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "dashboard": {
+      "greeting": {
+        "morning": "صباح الخير",
+        "morningWithName": "صباح الخير، {{name}}",
+        "afternoon": "مساء الخير",
+        "afternoonWithName": "مساء الخير، {{name}}",
+        "evening": "مساء الخير",
+        "eveningWithName": "مساء الخير، {{name}}"
+      },
+      "subtitle": "نظرة عامة على مكتبك",
+      "kpi": {
+        "residences": "الإقامات",
+        "gestionnaires": "المسيّرون",
+        "encaissements": "المداخيل",
+        "depenses": "المصاريف",
+        "solde": "الرصيد"
+      },
+      "soldeGlobal": "الرصيد العام",
+      "soldePositif": "مكتبك في فائض للفترة الحالية.",
+      "soldeNegatif": "الرصيد العام سلبي — يُنصح بالحذر."
+    },
+    "residences": {
+      "title": "الإقامات",
+      "subtitle": "جميع الملكيات المشتركة للمكتب",
+      "add": "إقامة جديدة",
+      "searchPlaceholder": "البحث عن إقامة…",
+      "empty": "لا توجد إقامات",
+      "emptyDesc": "أنشئ أول إقامة لإدارتها في Imaro.",
+      "createTitle": "إقامة جديدة",
+      "editTitle": "تعديل الإقامة",
+      "formDesc": "املأ المعلومات الرئيسية وعيّن مسيّرًا.",
+      "deleteTitle": "حذف الإقامة ؟",
+      "deleteDesc": "هذا الإجراء لا رجعة فيه. الإقامة",
+      "assignTitle": "تعيين مسيّر",
+      "pickGestionnaire": "اختر مسيّرًا نشطًا",
+      "unassigned": "غير معيّنة",
+      "residences": "إقامات",
+      "col": {
+        "name": "الاسم",
+        "city": "العنوان",
+        "lots": "الوحدات / الملاك",
+        "gestionnaire": "المسيّر",
+        "status": "الحالة"
+      },
+      "form": {
+        "name": "اسم الإقامة",
+        "namePh": "إقامة أطلس",
+        "address": "العنوان",
+        "addressPh": "12 شارع البرتقال",
+        "city": "المدينة",
+        "cityPh": "الدار البيضاء",
+        "gestionnaire": "المسيّر المعيّن"
+      },
+      "actions": {
+        "assign": "تعيين مسيّر"
+      },
+      "toast": {
+        "created": "تم إنشاء الإقامة",
+        "createFailed": "فشل الإنشاء",
+        "updated": "تم تحديث الإقامة",
+        "updateFailed": "فشل التحديث",
+        "deleted": "تم حذف الإقامة",
+        "deleteFailed": "فشل الحذف",
+        "assigned": "تم تعيين المسيّر",
+        "assignFailed": "فشل التعيين"
+      }
+    },
+    "gestionnaires": {
+      "title": "المسيّرون",
+      "subtitle": "الفريق الذي يدير ممتلكاتك",
+      "add": "مسيّر جديد",
+      "searchPlaceholder": "البحث عن مسيّر…",
+      "empty": "لا يوجد مسيّرون",
+      "emptyDesc": "ادعُ أول مسيّر للبدء.",
+      "createTitle": "مسيّر جديد",
+      "editTitle": "تعديل المسيّر",
+      "formDesc": "يتصل المسيّرون عبر البريد الإلكتروني + OTP واتساب.",
+      "statusActive": "نشط",
+      "statusInactive": "غير نشط",
+      "toggleAria": "تفعيل أو تعطيل المسيّر",
+      "col": {
+        "name": "الاسم",
+        "contact": "الاتصال",
+        "residences": "الإقامات",
+        "status": "الحالة"
+      },
+      "form": {
+        "name": "الاسم الكامل",
+        "namePh": "حسن العلوي",
+        "email": "البريد الإلكتروني",
+        "phone": "رقم واتساب"
+      },
+      "toast": {
+        "created": "تم إنشاء المسيّر",
+        "createFailed": "فشل الإنشاء",
+        "updated": "تم تحديث المسيّر",
+        "updateFailed": "فشل التحديث",
+        "toggled": "تم تحديث الحالة",
+        "toggleFailed": "فشل تغيير الحالة"
+      }
+    }
+  },
   "gestionnaire": {
     "cmdk": {
       "title": "بحث سريع",

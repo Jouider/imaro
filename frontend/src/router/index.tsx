@@ -37,6 +37,11 @@ import { TravauxExceptionnelsPage } from '@/pages/gestionnaire/TravauxExceptionn
 import { AutresRecettesPage } from '@/pages/gestionnaire/AutresRecettesPage'
 import { RemboursementsPage } from '@/pages/gestionnaire/RemboursementsPage'
 import { IaAssistantPage } from '@/pages/gestionnaire/IaAssistantPage'
+import { ManagerGuard } from './ManagerGuard'
+import { ManagerLayout } from '@/pages/manager/ManagerLayout'
+import { ManagerDashboardPage } from '@/pages/manager/ManagerDashboardPage'
+import { ManagerResidencesPage } from '@/pages/manager/ManagerResidencesPage'
+import { ManagerGestionnairesPage } from '@/pages/manager/ManagerGestionnairesPage'
 
 export const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
@@ -105,6 +110,22 @@ export const router = createBrowserRouter([
       { path: 'annexes', element: <AnnexesPage /> },
       { path: 'audit', element: <AuditTrailPage /> },
       { path: 'profil', element: <ProfilPage /> },
+    ],
+  },
+
+  // ── Espace Manager (admin du tenant) ────────────────────
+  {
+    path: '/manager',
+    element: (
+      <ManagerGuard>
+        <ManagerLayout />
+      </ManagerGuard>
+    ),
+    children: [
+      { index: true, element: <Navigate to="/manager/dashboard" replace /> },
+      { path: 'dashboard', element: <ManagerDashboardPage /> },
+      { path: 'residences', element: <ManagerResidencesPage /> },
+      { path: 'gestionnaires', element: <ManagerGestionnairesPage /> },
     ],
   },
 ])
