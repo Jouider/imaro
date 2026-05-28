@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Resident\PortailDashboardController;
 use App\Http\Controllers\Api\Resident\PortailDocumentController;
 use App\Http\Controllers\Api\Resident\PortailOperationsController;
 use App\Http\Controllers\Api\Resident\PortailProfilController;
+use App\Http\Controllers\Api\Resident\PortailPushController;
 use App\Http\Controllers\Api\Resident\PortailReclamationController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,3 +21,6 @@ Route::post('/reclamations', [PortailReclamationController::class, 'store']);
 
 Route::get('/profil',  [PortailProfilController::class, 'show']);
 Route::put('/profil',  [PortailProfilController::class, 'update']);
+
+Route::post('/push/subscribe',   [PortailPushController::class, 'subscribe']);
+Route::delete('/push/unsubscribe', [PortailPushController::class, 'unsubscribe']);
