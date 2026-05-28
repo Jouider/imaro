@@ -18,6 +18,7 @@ import {
   Scale,
   Landmark,
   UserCheck,
+  Sparkles,
   Banknote,
   HardHat,
   Undo2,
@@ -37,6 +38,7 @@ import {
   AlertCircle,
   Info,
   CheckCheck,
+  Search,
 } from 'lucide-react'
 import { Wordmark } from '@/components/Wordmark'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
@@ -57,6 +59,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useMutation } from '@tanstack/react-query'
+import { CommandPalette } from '@/components/gestionnaire/CommandPalette'
 import { cn } from '@/lib/utils'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -82,6 +85,11 @@ const NAV_SECTIONS: NavSection[] = [
         to: '/gestionnaire/dashboard',
         icon: <LayoutDashboard className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.dashboard',
+      },
+      {
+        to: '/gestionnaire/ia',
+        icon: <Sparkles className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.ia',
       },
     ],
   },
@@ -294,7 +302,10 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
   return (
     <div
       className="flex h-full flex-col"
-      style={{ background: 'linear-gradient(180deg, #1a4f72 0%, #153f5c 100%)' }}
+      style={{
+        background:
+          'linear-gradient(180deg, var(--color-imaro-primary) 0%, var(--color-imaro-primary-dark) 100%)',
+      }}
     >
       {/* Logo */}
       <div className="flex h-16 shrink-0 items-center px-5 border-b border-white/8">
@@ -339,12 +350,16 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
                         <span
                           className={cn(
                             'transition-colors',
-                            isActive ? 'text-white' : 'text-white/45 group-hover:text-white/70',
+                            isActive
+                              ? 'text-white'
+                              : 'text-white/45 group-hover:text-white/70',
                           )}
                         >
                           {item.icon}
                         </span>
-                        <span className="flex-1 truncate">{t(item.labelKey)}</span>
+                        <span className="flex-1 truncate">
+                          {t(item.labelKey)}
+                        </span>
                         {!isActive && (
                           <ChevronRight className="size-3.5 opacity-0 group-hover:opacity-40 transition-opacity shrink-0" />
                         )}
@@ -396,8 +411,10 @@ function NotificationCenter() {
         {/* Header */}
         <div className="flex items-center justify-between border-b px-4 py-3">
           <div className="flex items-center gap-2">
-            <Bell className="size-4 text-[#1B4F72]" />
-            <span className="text-sm font-semibold text-foreground">Notifications</span>
+            <Bell className="size-4 text-[var(--color-imaro-primary)]" />
+            <span className="text-sm font-semibold text-foreground">
+              Notifications
+            </span>
             {unreadCount > 0 && (
               <span className="rounded-full bg-[#E67E22] px-1.5 py-0.5 text-[10px] font-bold text-white">
                 {unreadCount}
@@ -407,7 +424,7 @@ function NotificationCenter() {
           {unreadCount > 0 && (
             <button
               onClick={markAllRead}
-              className="flex items-center gap-1 text-xs text-[#1B4F72] hover:underline"
+              className="flex items-center gap-1 text-xs text-[var(--color-imaro-primary)] hover:underline"
             >
               <CheckCheck className="size-3.5" />
               Tout lire
@@ -420,7 +437,9 @@ function NotificationCenter() {
           {notifs.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
               <Bell className="size-8 text-muted-foreground/30" />
-              <p className="text-sm text-muted-foreground">Aucune notification</p>
+              <p className="text-sm text-muted-foreground">
+                Aucune notification
+              </p>
             </div>
           ) : (
             notifs.map((n) => (
@@ -430,7 +449,7 @@ function NotificationCenter() {
                   'group flex items-start gap-3 px-4 py-3 transition-colors',
                   'border-b last:border-0',
                   !n.read
-                    ? 'bg-[#1B4F72]/[0.03] dark:bg-[#1B4F72]/10'
+                    ? 'bg-[var(--color-imaro-primary)]/[0.03] dark:bg-[var(--color-imaro-primary)]/10'
                     : 'hover:bg-muted/40',
                 )}
                 onClick={() => markRead(n.id)}
@@ -447,7 +466,9 @@ function NotificationCenter() {
                     <p
                       className={cn(
                         'text-sm leading-tight',
-                        !n.read ? 'font-semibold text-foreground' : 'font-medium text-foreground/80',
+                        !n.read
+                          ? 'font-semibold text-foreground'
+                          : 'font-medium text-foreground/80',
                       )}
                     >
                       {n.title}
@@ -485,7 +506,8 @@ function NotificationCenter() {
         {notifs.length > 0 && (
           <div className="border-t px-4 py-2.5">
             <p className="text-center text-xs text-muted-foreground">
-              {notifs.length} notification{notifs.length > 1 ? 's' : ''} au total
+              {notifs.length} notification{notifs.length > 1 ? 's' : ''} au
+              total
             </p>
           </div>
         )}
@@ -516,8 +538,11 @@ function UserMenu() {
       <DropdownMenuTrigger asChild>
         <button
           aria-label="Menu utilisateur"
-          className="flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ring-2 ring-transparent transition-all hover:ring-[#1B4F72]/30 focus:outline-none"
-          style={{ background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)' }}
+          className="flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ring-2 ring-transparent transition-all hover:ring-[var(--color-imaro-primary)]/30 focus:outline-none"
+          style={{
+            background:
+              'linear-gradient(135deg, var(--color-imaro-primary-light) 0%, var(--color-imaro-primary) 100%)',
+          }}
         >
           {initials}
         </button>
@@ -528,7 +553,10 @@ function UserMenu() {
           <div className="flex items-center gap-3">
             <div
               className="flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-              style={{ background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)' }}
+              style={{
+                background:
+                  'linear-gradient(135deg, var(--color-imaro-primary-light) 0%, var(--color-imaro-primary) 100%)',
+              }}
             >
               {initials}
             </div>
@@ -575,7 +603,9 @@ function UserMenu() {
           disabled={logoutMutation.isPending}
         >
           <LogOut className="size-4 shrink-0" />
-          <span>{logoutMutation.isPending ? 'Déconnexion…' : 'Déconnexion'}</span>
+          <span>
+            {logoutMutation.isPending ? 'Déconnexion…' : 'Déconnexion'}
+          </span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -596,10 +626,21 @@ function ContextPill() {
           'flex size-8 shrink-0 items-center justify-center rounded-lg overflow-hidden',
           !logoUrl && 'text-white',
         )}
-        style={!logoUrl ? { background: 'linear-gradient(135deg, #2980b9 0%, #1b4f72 100%)' } : undefined}
+        style={
+          !logoUrl
+            ? {
+                background:
+                  'linear-gradient(135deg, var(--color-imaro-primary-light) 0%, var(--color-imaro-primary) 100%)',
+              }
+            : undefined
+        }
       >
         {logoUrl ? (
-          <img src={logoUrl} alt="Logo syndic" className="size-full object-contain" />
+          <img
+            src={logoUrl}
+            alt="Logo syndic"
+            className="size-full object-contain"
+          />
         ) : (
           <Building2 className="size-4" aria-hidden="true" />
         )}
@@ -623,6 +664,9 @@ export function GestionnaireLayout() {
 
   return (
     <div className="flex min-h-svh">
+      {/* Global Command Palette (Cmd+K) */}
+      <CommandPalette />
+
       {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 start-0 hidden w-[240px] lg:block shadow-xl shadow-black/10">
         <SidebarNav />
@@ -653,10 +697,8 @@ export function GestionnaireLayout() {
 
       {/* Main area */}
       <div className="flex min-h-svh flex-1 flex-col lg:ms-[240px]">
-
         {/* ── Topbar ── */}
         <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-white/95 px-4 backdrop-blur-sm dark:border-border dark:bg-card/95">
-
           {/* Mobile hamburger */}
           <Button
             variant="ghost"
@@ -674,9 +716,11 @@ export function GestionnaireLayout() {
           {/* Spacer */}
           <div className="flex-1" />
 
+          {/* Cmd+K trigger pill — desktop only */}
+          <CmdkTrigger />
+
           {/* Right: actions */}
           <div className="flex items-center gap-1">
-
             {/* Notification center */}
             <NotificationCenter />
 
@@ -700,5 +744,41 @@ export function GestionnaireLayout() {
         </main>
       </div>
     </div>
+  )
+}
+
+// ─── CmdkTrigger ──────────────────────────────────────────────────────────────
+
+/**
+ * Pill button in the topbar that triggers Cmd+K. Click dispatches the
+ * keydown event so we reuse the global listener in CommandPalette.
+ */
+function CmdkTrigger() {
+  const { t } = useTranslation()
+  const isMac =
+    typeof navigator !== 'undefined' &&
+    /Mac|iPod|iPhone|iPad/.test(navigator.platform)
+  function open() {
+    const ev = new KeyboardEvent('keydown', {
+      key: 'k',
+      metaKey: isMac,
+      ctrlKey: !isMac,
+      bubbles: true,
+    })
+    window.dispatchEvent(ev)
+  }
+  return (
+    <button
+      type="button"
+      onClick={open}
+      aria-label={t('gestionnaire.cmdk.trigger')}
+      className="hidden lg:inline-flex h-9 items-center gap-2 rounded-lg border border-[var(--color-imaro-primary)]/15 bg-[var(--color-imaro-primary-tint)]/40 px-3 text-xs text-muted-foreground transition-colors hover:bg-[var(--color-imaro-primary-tint)] hover:text-[var(--primary)]"
+    >
+      <Search className="size-3.5" />
+      <span className="font-medium">{t('gestionnaire.cmdk.trigger')}</span>
+      <kbd className="ms-2 inline-flex h-5 items-center rounded border bg-white px-1.5 font-mono text-[10px] text-muted-foreground shadow-sm dark:bg-card">
+        ⌘K
+      </kbd>
+    </button>
   )
 }

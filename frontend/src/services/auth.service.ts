@@ -10,7 +10,10 @@ type SessionData = { token: string; user: AuthUser; tenant: AuthTenant }
 export type LoginEmailResponse = ApiEnvelope<SessionData>
 
 export async function loginWithEmail(email: string, password: string) {
-  const { data } = await api.post<LoginEmailResponse>('/auth/login', { email, password })
+  const { data } = await api.post<LoginEmailResponse>('/auth/login', {
+    email,
+    password,
+  })
   return data.data
 }
 
@@ -22,8 +25,14 @@ export type ResidentLoginResponse =
   | { status: 'first_login'; data: { phone: string } }
   | { status: 'error'; message: string }
 
-export async function residentLogin(phone: string, code: string): Promise<ResidentLoginResponse> {
-  const { data } = await api.post<ResidentLoginResponse>('/auth/resident/login', { phone, code })
+export async function residentLogin(
+  phone: string,
+  code: string,
+): Promise<ResidentLoginResponse> {
+  const { data } = await api.post<ResidentLoginResponse>(
+    '/auth/resident/login',
+    { phone, code },
+  )
   return data
 }
 
@@ -33,12 +42,15 @@ export async function residentActivate(
   tempCode: string,
   newCode: string,
 ): Promise<SessionData> {
-  const { data } = await api.post<ApiEnvelope<SessionData>>('/auth/resident/activate', {
-    phone,
-    temp_code: tempCode,
-    new_code: newCode,
-    new_code_confirmation: newCode,
-  })
+  const { data } = await api.post<ApiEnvelope<SessionData>>(
+    '/auth/resident/activate',
+    {
+      phone,
+      temp_code: tempCode,
+      new_code: newCode,
+      new_code_confirmation: newCode,
+    },
+  )
   return data.data
 }
 

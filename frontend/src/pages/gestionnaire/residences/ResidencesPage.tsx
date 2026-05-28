@@ -35,9 +35,7 @@ export function ResidencesPage() {
       header: t('gestionnaire.residences.colLots'),
       sortable: true,
       className: 'text-right',
-      renderCell: (r) => (
-        <span className="tabular-nums">{r.nb_lots}</span>
-      ),
+      renderCell: (r) => <span className="tabular-nums">{r.nb_lots}</span>,
     },
     {
       key: 'taux_recouvrement',

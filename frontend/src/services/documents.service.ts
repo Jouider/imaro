@@ -5,7 +5,8 @@ import { api, type ApiEnvelope } from '@/lib/axios'
 // In production, API errors propagate normally.
 
 async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
-  if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS) return call()
+  if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS)
+    return call()
   try {
     return await call()
   } catch {
@@ -20,7 +21,7 @@ export type GestDoc = {
   nom: string
   type: 'reglement' | 'pv_ag' | 'contrat' | 'facture' | 'autre'
   residence: { id: number; name: string } | null
-  date: string      // ISO date
+  date: string // ISO date
   url: string
   taille_ko: number
 }
@@ -79,28 +80,35 @@ const MOCK_DOCS: GestDoc[] = [
 
 export async function getDocuments(): Promise<GestDoc[]> {
   return withMock(async () => {
-    const res = await api.get<ApiEnvelope<{ documents: GestDoc[] }>>('/gestionnaire/documents')
+    const res = await api.get<ApiEnvelope<{ documents: GestDoc[] }>>(
+      '/gestionnaire/documents',
+    )
     return res.data.data.documents
   }, MOCK_DOCS)
 }
 
 export async function storeDocument(data: FormData): Promise<GestDoc> {
-  return withMock(async () => {
-    const res = await api.post<ApiEnvelope<{ document: GestDoc }>>(
-      '/gestionnaire/documents',
-      data,
-      { headers: { 'Content-Type': 'multipart/form-data' } },
-    )
-    return res.data.data.document
-  }, {
-    id: Math.floor(Math.random() * 1000) + 100,
-    nom: (data.get('nom') as string | null) ?? 'Nouveau document',
-    type: ((data.get('type') as string | null) ?? 'autre') as GestDoc['type'],
-    residence: null,
-    date: (data.get('date') as string | null) ?? new Date().toISOString().slice(0, 10),
-    url: 'https://example.com/docs/nouveau.pdf',
-    taille_ko: 0,
-  })
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<{ document: GestDoc }>>(
+        '/gestionnaire/documents',
+        data,
+        { headers: { 'Content-Type': 'multipart/form-data' } },
+      )
+      return res.data.data.document
+    },
+    {
+      id: Math.floor(Math.random() * 1000) + 100,
+      nom: (data.get('nom') as string | null) ?? 'Nouveau document',
+      type: ((data.get('type') as string | null) ?? 'autre') as GestDoc['type'],
+      residence: null,
+      date:
+        (data.get('date') as string | null) ??
+        new Date().toISOString().slice(0, 10),
+      url: 'https://example.com/docs/nouveau.pdf',
+      taille_ko: 0,
+    },
+  )
 }
 
 export async function deleteDocument(id: number): Promise<void> {

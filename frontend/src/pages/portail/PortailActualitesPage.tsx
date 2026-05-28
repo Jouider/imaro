@@ -96,7 +96,9 @@ function CalendrierTab({
   const grid = buildMonthGrid(year, month)
   const todayKey = toDateKey(new Date())
 
-  const selectedAssemblees = selectedDay ? (assembleeDays.get(selectedDay) ?? []) : []
+  const selectedAssemblees = selectedDay
+    ? (assembleeDays.get(selectedDay) ?? [])
+    : []
 
   if (isLoading) {
     return (
@@ -114,7 +116,9 @@ function CalendrierTab({
           <button
             onClick={prevMonth}
             className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted transition-colors"
-            aria-label={t('portail.calendrier.prevMonth', { defaultValue: 'Mois précédent' })}
+            aria-label={t('portail.calendrier.prevMonth', {
+              defaultValue: 'Mois précédent',
+            })}
           >
             <ChevronLeft className="size-4" />
           </button>
@@ -124,7 +128,9 @@ function CalendrierTab({
           <button
             onClick={nextMonth}
             className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted transition-colors"
-            aria-label={t('portail.calendrier.nextMonth', { defaultValue: 'Mois suivant' })}
+            aria-label={t('portail.calendrier.nextMonth', {
+              defaultValue: 'Mois suivant',
+            })}
           >
             <ChevronRight className="size-4" />
           </button>
@@ -166,18 +172,24 @@ function CalendrierTab({
                   'relative flex flex-col items-center justify-center rounded-lg py-1.5 text-sm transition-colors',
                   hasEvent && 'cursor-pointer hover:bg-muted',
                   !hasEvent && 'cursor-default',
-                  isToday && 'ring-2 ring-[var(--color-imaro-primary)]/40 bg-[var(--color-imaro-primary)]/5',
-                  isSelected && 'bg-[var(--color-imaro-primary)] text-white ring-0 hover:bg-[var(--color-imaro-primary)]',
+                  isToday &&
+                    'ring-2 ring-[var(--color-imaro-primary)]/40 bg-[var(--color-imaro-primary)]/5',
+                  isSelected &&
+                    'bg-[var(--color-imaro-primary)] text-white ring-0 hover:bg-[var(--color-imaro-primary)]',
                 )}
               >
-                <span className={cn('leading-none', isSelected ? 'text-white' : '')}>
+                <span
+                  className={cn('leading-none', isSelected ? 'text-white' : '')}
+                >
                   {day}
                 </span>
                 {hasEvent && (
                   <span
                     className={cn(
                       'mt-0.5 h-1 w-1 rounded-full',
-                      isSelected ? 'bg-white' : 'bg-[var(--color-imaro-primary)]',
+                      isSelected
+                        ? 'bg-white'
+                        : 'bg-[var(--color-imaro-primary)]',
                     )}
                   />
                 )}
@@ -204,8 +216,11 @@ function CalendrierTab({
               hour: '2-digit',
               minute: '2-digit',
             })
-            const statutCls = STATUT_STYLES[ag.statut] ?? 'bg-gray-100 text-gray-600'
-            const statutLabel = t(`portail.actualites.${ag.statut}`, { defaultValue: ag.statut })
+            const statutCls =
+              STATUT_STYLES[ag.statut] ?? 'bg-gray-100 text-gray-600'
+            const statutLabel = t(`portail.actualites.${ag.statut}`, {
+              defaultValue: ag.statut,
+            })
 
             return (
               <div
@@ -213,7 +228,9 @@ function CalendrierTab({
                 className="rounded-xl border bg-card p-4 space-y-2"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <p className="font-semibold text-sm leading-snug flex-1">{ag.titre}</p>
+                  <p className="font-semibold text-sm leading-snug flex-1">
+                    {ag.titre}
+                  </p>
                   <Badge className={cn(statutCls, 'border-0 text-xs shrink-0')}>
                     {statutLabel}
                   </Badge>
@@ -237,7 +254,9 @@ function CalendrierTab({
       {/* Legend hint when no day is selected */}
       {!selectedDay && assemblees.length > 0 && (
         <p className="text-center text-xs text-muted-foreground">
-          {t('portail.calendrier.hint', { defaultValue: 'Appuyez sur un jour marqué pour voir les détails' })}
+          {t('portail.calendrier.hint', {
+            defaultValue: 'Appuyez sur un jour marqué pour voir les détails',
+          })}
         </p>
       )}
 
@@ -245,7 +264,9 @@ function CalendrierTab({
         <div className="flex flex-col items-center gap-3 py-10 text-center">
           <Calendar className="size-10 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">
-            {t('portail.calendrier.empty', { defaultValue: 'Aucune assemblée planifiée' })}
+            {t('portail.calendrier.empty', {
+              defaultValue: 'Aucune assemblée planifiée',
+            })}
           </p>
         </div>
       )}
@@ -270,7 +291,8 @@ export function PortailActualitesPage() {
   })
 
   const publishedAnnonces = annonces.filter(
-    (a) => !('statut' in a) || (a as { statut?: string }).statut !== 'brouillon',
+    (a) =>
+      !('statut' in a) || (a as { statut?: string }).statut !== 'brouillon',
   )
 
   const upcoming = assemblees.filter(
@@ -288,7 +310,10 @@ export function PortailActualitesPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 rounded-xl bg-muted p-1">
-        <TabBtn active={activeTab === 'annonces'} onClick={() => setActiveTab('annonces')}>
+        <TabBtn
+          active={activeTab === 'annonces'}
+          onClick={() => setActiveTab('annonces')}
+        >
           <Bell className="size-4" />
           {t('portail.actualites.tabAnnonces', { defaultValue: 'Annonces' })}
           {publishedAnnonces.length > 0 && (
@@ -305,9 +330,14 @@ export function PortailActualitesPage() {
           )}
         </TabBtn>
 
-        <TabBtn active={activeTab === 'assemblees'} onClick={() => setActiveTab('assemblees')}>
+        <TabBtn
+          active={activeTab === 'assemblees'}
+          onClick={() => setActiveTab('assemblees')}
+        >
           <CalendarDays className="size-4" />
-          {t('portail.actualites.tabAssemblees', { defaultValue: 'Assemblées' })}
+          {t('portail.actualites.tabAssemblees', {
+            defaultValue: 'Assemblées',
+          })}
           {upcoming.length > 0 && (
             <span
               className={cn(
@@ -322,21 +352,39 @@ export function PortailActualitesPage() {
           )}
         </TabBtn>
 
-        <TabBtn active={activeTab === 'calendrier'} onClick={() => setActiveTab('calendrier')}>
+        <TabBtn
+          active={activeTab === 'calendrier'}
+          onClick={() => setActiveTab('calendrier')}
+        >
           <Calendar className="size-4" />
-          {t('portail.actualites.tabCalendrier', { defaultValue: 'Calendrier' })}
+          {t('portail.actualites.tabCalendrier', {
+            defaultValue: 'Calendrier',
+          })}
         </TabBtn>
       </div>
 
       {/* Content */}
       {activeTab === 'annonces' && (
-        <AnnoncesTab annonces={publishedAnnonces} isLoading={loadingAnnonces} t={t} />
+        <AnnoncesTab
+          annonces={publishedAnnonces}
+          isLoading={loadingAnnonces}
+          t={t}
+        />
       )}
       {activeTab === 'assemblees' && (
-        <AssembleesTab upcoming={upcoming} past={past} isLoading={loadingAssemblees} t={t} />
+        <AssembleesTab
+          upcoming={upcoming}
+          past={past}
+          isLoading={loadingAssemblees}
+          t={t}
+        />
       )}
       {activeTab === 'calendrier' && (
-        <CalendrierTab assemblees={assemblees} isLoading={loadingAssemblees} t={t} />
+        <CalendrierTab
+          assemblees={assemblees}
+          isLoading={loadingAssemblees}
+          t={t}
+        />
       )}
     </div>
   )
@@ -396,7 +444,9 @@ function AnnoncesTab({
       <div className="flex flex-col items-center gap-3 py-16 text-center">
         <Bell className="size-12 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">
-          {t('portail.actualites.noAnnonces', { defaultValue: 'Aucune annonce' })}
+          {t('portail.actualites.noAnnonces', {
+            defaultValue: 'Aucune annonce',
+          })}
         </p>
       </div>
     )
@@ -431,14 +481,22 @@ function AnnoncesTab({
                   <div className="flex flex-wrap items-center gap-1.5 mb-1">
                     {isUrgente && (
                       <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
-                        {t('portail.actualites.urgente', { defaultValue: 'Urgent' })}
+                        {t('portail.actualites.urgente', {
+                          defaultValue: 'Urgent',
+                        })}
                       </span>
                     )}
-                    <span className="text-xs text-muted-foreground">{dateStr}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {dateStr}
+                    </span>
                   </div>
-                  <p className="font-semibold text-sm leading-snug">{a.titre}</p>
+                  <p className="font-semibold text-sm leading-snug">
+                    {a.titre}
+                  </p>
                   {!isExpanded && (
-                    <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{a.contenu}</p>
+                    <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                      {a.contenu}
+                    </p>
                   )}
                 </div>
                 <span className="shrink-0 text-muted-foreground mt-0.5">
@@ -453,7 +511,9 @@ function AnnoncesTab({
 
             {isExpanded && (
               <div className="border-t px-4 pb-4 pt-3">
-                <p className="text-sm leading-relaxed whitespace-pre-line">{a.contenu}</p>
+                <p className="text-sm leading-relaxed whitespace-pre-line">
+                  {a.contenu}
+                </p>
               </div>
             )}
           </div>
@@ -493,7 +553,9 @@ function AssembleesTab({
       <div className="flex flex-col items-center gap-3 py-16 text-center">
         <CalendarDays className="size-12 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">
-          {t('portail.actualites.noAssemblees', { defaultValue: 'Aucune assemblée' })}
+          {t('portail.actualites.noAssemblees', {
+            defaultValue: 'Aucune assemblée',
+          })}
         </p>
       </div>
     )
@@ -511,7 +573,9 @@ function AssembleesTab({
               key={ag.id}
               ag={ag}
               expanded={expandedId === ag.id}
-              onToggle={() => setExpandedId(expandedId === ag.id ? null : ag.id)}
+              onToggle={() =>
+                setExpandedId(expandedId === ag.id ? null : ag.id)
+              }
               t={t}
             />
           ))}
@@ -528,7 +592,9 @@ function AssembleesTab({
               key={ag.id}
               ag={ag}
               expanded={expandedId === ag.id}
-              onToggle={() => setExpandedId(expandedId === ag.id ? null : ag.id)}
+              onToggle={() =>
+                setExpandedId(expandedId === ag.id ? null : ag.id)
+              }
               t={t}
             />
           ))}
@@ -552,8 +618,12 @@ function AGCard({
   t: (key: string, opts?: Record<string, unknown>) => string
 }) {
   const statutCls = STATUT_STYLES[ag.statut] ?? 'bg-gray-100 text-gray-600'
-  const statutLabel = t(`portail.actualites.${ag.statut}`, { defaultValue: ag.statut })
-  const typeLabel = t(`portail.actualites.${ag.type}`, { defaultValue: ag.type })
+  const statutLabel = t(`portail.actualites.${ag.statut}`, {
+    defaultValue: ag.statut,
+  })
+  const typeLabel = t(`portail.actualites.${ag.type}`, {
+    defaultValue: ag.type,
+  })
 
   const dateObj = new Date(ag.date)
   const dateStr = dateObj.toLocaleDateString('fr-FR', {
@@ -562,7 +632,10 @@ function AGCard({
     month: 'long',
     year: 'numeric',
   })
-  const timeStr = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+  const timeStr = dateObj.toLocaleTimeString('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
   const isUpcoming = dateObj >= new Date() && ag.statut !== 'annulee'
 
   return (
@@ -576,8 +649,12 @@ function AGCard({
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
-              <Badge className={cn(statutCls, 'border-0 text-xs')}>{statutLabel}</Badge>
-              <span className="text-xs text-muted-foreground capitalize">{typeLabel}</span>
+              <Badge className={cn(statutCls, 'border-0 text-xs')}>
+                {statutLabel}
+              </Badge>
+              <span className="text-xs text-muted-foreground capitalize">
+                {typeLabel}
+              </span>
             </div>
             <p className="font-semibold text-sm leading-snug">{ag.titre}</p>
             <div className="mt-1.5 flex flex-col gap-1">
@@ -594,7 +671,11 @@ function AGCard({
             </div>
           </div>
           <span className="shrink-0 text-muted-foreground mt-0.5">
-            {expanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+            {expanded ? (
+              <ChevronUp className="size-4" />
+            ) : (
+              <ChevronDown className="size-4" />
+            )}
           </span>
         </div>
       </button>
@@ -606,7 +687,10 @@ function AGCard({
             <Users className="size-4 shrink-0 text-muted-foreground" />
             <div className="text-xs">
               <p className="font-medium">
-                {t('portail.actualites.quorum', { n: ag.quorum_requis, defaultValue: `Quorum : ${ag.quorum_requis}%` })}
+                {t('portail.actualites.quorum', {
+                  n: ag.quorum_requis,
+                  defaultValue: `Quorum : ${ag.quorum_requis}%`,
+                })}
               </p>
               <p className="text-muted-foreground">
                 {ag.participants_count !== null
@@ -614,7 +698,9 @@ function AGCard({
                       n: ag.participants_count,
                       defaultValue: `${ag.participants_count} participant(s)`,
                     })
-                  : t('portail.actualites.agNonTenue', { defaultValue: 'AG non encore tenue' })}
+                  : t('portail.actualites.agNonTenue', {
+                      defaultValue: 'AG non encore tenue',
+                    })}
               </p>
             </div>
           </div>
@@ -622,7 +708,9 @@ function AGCard({
           {/* Ordre du jour */}
           <div>
             <p className="text-xs font-semibold text-muted-foreground mb-1.5">
-              {t('portail.actualites.ordreDuJour', { defaultValue: "Ordre du jour" })}
+              {t('portail.actualites.ordreDuJour', {
+                defaultValue: 'Ordre du jour',
+              })}
             </p>
             <div className="space-y-1">
               {ag.ordre_du_jour.split('\n').map((line, i) => (

@@ -18,23 +18,24 @@ import { loadLogo } from './annexes-pdf-assets'
  */
 const VERIFY_BASE_URL: string =
   (typeof import.meta !== 'undefined' &&
-    (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_VERIFY_BASE_URL) ||
+    (import.meta as unknown as { env?: Record<string, string> }).env
+      ?.VITE_VERIFY_BASE_URL) ||
   'https://imaro.ma/verify'
 
 // ─── Imaro brand tokens ──────────────────────────────────────────────────────
 
-const NAVY:        [number, number, number] = [27, 79, 114]    // #1B4F72 — primary
-const NAVY_DEEP:   [number, number, number] = [18, 56, 84]     // darker navy for gradient
-const ORANGE:      [number, number, number] = [230, 126, 34]   // #E67E22 — accent
-const ORANGE_SOFT: [number, number, number] = [253, 240, 226]  // tinted bg
-const GREEN:       [number, number, number] = [39, 174, 96]    // #27AE60 — success
-const GREEN_DARK:  [number, number, number] = [30, 132, 73]
-const TEXT_DARK:   [number, number, number] = [44, 62, 80]     // #2c3e50
-const TEXT_MUTED:  [number, number, number] = [127, 140, 141]  // #7f8c8d
-const BORDER:      [number, number, number] = [228, 232, 237]
-const ROW_ALT:     [number, number, number] = [249, 250, 251]
-const HEADER_BG:   [number, number, number] = [241, 245, 249]
-const NAVY_TINT:   [number, number, number] = [232, 240, 247]
+const NAVY: [number, number, number] = [27, 79, 114] // #1B4F72 — primary
+const NAVY_DEEP: [number, number, number] = [18, 56, 84] // darker navy for gradient
+const ORANGE: [number, number, number] = [230, 126, 34] // #E67E22 — accent
+const ORANGE_SOFT: [number, number, number] = [253, 240, 226] // tinted bg
+const GREEN: [number, number, number] = [39, 174, 96] // #27AE60 — success
+const GREEN_DARK: [number, number, number] = [30, 132, 73]
+const TEXT_DARK: [number, number, number] = [44, 62, 80] // #2c3e50
+const TEXT_MUTED: [number, number, number] = [127, 140, 141] // #7f8c8d
+const BORDER: [number, number, number] = [228, 232, 237]
+const ROW_ALT: [number, number, number] = [249, 250, 251]
+const HEADER_BG: [number, number, number] = [241, 245, 249]
+const NAVY_TINT: [number, number, number] = [232, 240, 247]
 
 const PAGE_W = 210
 const PAGE_H = 297
@@ -45,7 +46,7 @@ const CONTENT_W = PAGE_W - MARGIN * 2
 
 export type AnnexeCommonInput = {
   residenceName: string
-  exerciceLabel: string   // e.g. "Exercice clos le 31 décembre 2026"
+  exerciceLabel: string // e.g. "Exercice clos le 31 décembre 2026"
   exercice: number
   generatedAtIso?: string
   documentCode?: string
@@ -54,15 +55,26 @@ export type AnnexeCommonInput = {
 }
 
 const fmtMad = (n: number): string =>
-  n.toLocaleString('fr-MA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' MAD'
+  n.toLocaleString('fr-MA', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }) + ' MAD'
 
 const fmtDateFr = (iso?: string): string => {
   const d = iso ? new Date(iso) : new Date()
   return d.toLocaleDateString('fr-FR')
 }
 
-function genDocCode(annexeNum: string, residenceName: string, exercice: number): string {
-  const slug = residenceName.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 4) || 'IMARO'
+function genDocCode(
+  annexeNum: string,
+  residenceName: string,
+  exercice: number,
+): string {
+  const slug =
+    residenceName
+      .replace(/[^A-Za-z]/g, '')
+      .toUpperCase()
+      .slice(0, 4) || 'IMARO'
   const rnd = Math.random().toString(16).slice(2, 6).toUpperCase()
   return `IMA-${slug}-${exercice}-A${annexeNum.replace('-', '')}-${rnd}`
 }
@@ -76,13 +88,20 @@ function drawTopAccent(doc: jsPDF): void {
 }
 
 /** Top metadata bar (above the gradient header). */
-function drawTopBar(doc: jsPDF, docCode: string, pageNum: number, totalPages: number): void {
+function drawTopBar(
+  doc: jsPDF,
+  docCode: string,
+  pageNum: number,
+  totalPages: number,
+): void {
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(7)
   doc.setTextColor(...TEXT_MUTED)
   doc.text('IMARO', MARGIN, 7)
   doc.text(docCode, PAGE_W / 2, 7, { align: 'center' })
-  doc.text(`Page ${pageNum}/${totalPages}`, PAGE_W - MARGIN, 7, { align: 'right' })
+  doc.text(`Page ${pageNum}/${totalPages}`, PAGE_W - MARGIN, 7, {
+    align: 'right',
+  })
 }
 
 /** Big navy gradient header band with the Imaro logo + Annexe title + Document Officiel badge. */
@@ -103,7 +122,13 @@ function drawHeaderBand(
     const g = Math.round(NAVY[1] + (NAVY_DEEP[1] - NAVY[1]) * t)
     const b = Math.round(NAVY[2] + (NAVY_DEEP[2] - NAVY[2]) * t)
     doc.setFillColor(r, g, b)
-    doc.rect(MARGIN + (CONTENT_W * i) / steps, bandY, CONTENT_W / steps + 0.3, bandH, 'F')
+    doc.rect(
+      MARGIN + (CONTENT_W * i) / steps,
+      bandY,
+      CONTENT_W / steps + 0.3,
+      bandH,
+      'F',
+    )
   }
 
   // Subtle orange bottom edge inside the band — Imaro orange roof concept
@@ -132,7 +157,12 @@ function drawHeaderBand(
   const titleWidth = doc.getTextWidth(`ANNEXE ${annexeNum}`)
   doc.setDrawColor(...ORANGE)
   doc.setLineWidth(0.8)
-  doc.line(PAGE_W / 2 - titleWidth / 3, bandY + 17.5, PAGE_W / 2 + titleWidth / 3, bandY + 17.5)
+  doc.line(
+    PAGE_W / 2 - titleWidth / 3,
+    bandY + 17.5,
+    PAGE_W / 2 + titleWidth / 3,
+    bandY + 17.5,
+  )
 
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(10)
@@ -152,7 +182,15 @@ function drawHeaderBand(
     const g = Math.round(GREEN[1] + (GREEN_DARK[1] - GREEN[1]) * t)
     const b = Math.round(GREEN[2] + (GREEN_DARK[2] - GREEN[2]) * t)
     doc.setFillColor(r, g, b)
-    doc.roundedRect(badgeX + (badgeW * i) / 30, badgeY, badgeW / 30 + 0.3, badgeH, 2.5, 2.5, 'F')
+    doc.roundedRect(
+      badgeX + (badgeW * i) / 30,
+      badgeY,
+      badgeW / 30 + 0.3,
+      badgeH,
+      2.5,
+      2.5,
+      'F',
+    )
   }
   // Check icon (white circle with green check)
   doc.setFillColor(255, 255, 255)
@@ -189,8 +227,8 @@ function drawInfoRow(doc: jsPDF, y: number, ctx: AnnexeCommonInput): number {
   const colW = CONTENT_W / 3
 
   const cols: { label: string; value: string }[] = [
-    { label: 'IMMEUBLE',  value: ctx.residenceName },
-    { label: 'EXERCICE',  value: ctx.exerciceLabel },
+    { label: 'IMMEUBLE', value: ctx.residenceName },
+    { label: 'EXERCICE', value: ctx.exerciceLabel },
     { label: 'GÉNÉRÉ LE', value: fmtDateFr(ctx.generatedAtIso) },
   ]
 
@@ -228,17 +266,19 @@ function drawSignatureBox(doc: jsPDF, y: number): number {
   doc.roundedRect(boxX, y, boxW, boxH, 2, 2, 'S')
 
   // Adapt inner positions to the actual height
-  const labelY    = y + 6.5
-  const sigLineY  = y + boxH * 0.62
-  const syndicY   = sigLineY + 4
-  const dateY     = y + boxH - 3
+  const labelY = y + 6.5
+  const sigLineY = y + boxH * 0.62
+  const syndicY = sigLineY + 4
+  const dateY = y + boxH - 3
   const dateLineY = dateY
 
   // Label
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(7.5)
   doc.setTextColor(...NAVY)
-  doc.text('SIGNATURE ET CACHET DU SYNDIC', boxX + boxW / 2, labelY, { align: 'center' })
+  doc.text('SIGNATURE ET CACHET DU SYNDIC', boxX + boxW / 2, labelY, {
+    align: 'center',
+  })
 
   // Signature line
   doc.setDrawColor(...NAVY)
@@ -293,7 +333,9 @@ function drawFooter(
   doc.setTextColor(...TEXT_MUTED)
   doc.text(
     'Document généré par Imaro.ma  •  Conforme au décret n° 2.23.700',
-    PAGE_W / 2, sepY + 5, { align: 'center' },
+    PAGE_W / 2,
+    sepY + 5,
+    { align: 'center' },
   )
 
   // Real scannable QR (navy on white, ~16mm square)
@@ -326,13 +368,19 @@ function drawFooter(
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(7)
   doc.setTextColor(...TEXT_MUTED)
-  doc.text('Document généré par Imaro.ma', PAGE_W / 2, qrY + 6, { align: 'center' })
-  doc.text('Conforme au décret n° 2.23.700', PAGE_W / 2, qrY + 10.5, { align: 'center' })
+  doc.text('Document généré par Imaro.ma', PAGE_W / 2, qrY + 6, {
+    align: 'center',
+  })
+  doc.text('Conforme au décret n° 2.23.700', PAGE_W / 2, qrY + 10.5, {
+    align: 'center',
+  })
 
   // Page number
   doc.setFontSize(7)
   doc.setTextColor(...TEXT_MUTED)
-  doc.text(`Page ${pageNum}/${totalPages}`, PAGE_W - MARGIN, qrY + 10.5, { align: 'right' })
+  doc.text(`Page ${pageNum}/${totalPages}`, PAGE_W - MARGIN, qrY + 10.5, {
+    align: 'right',
+  })
 }
 
 /** KPI card with orange top accent line + label + value. */
@@ -344,7 +392,10 @@ function drawKpiCard(
   h: number,
   label: string,
   value: string,
-  options: { valueColor?: [number, number, number]; accent?: [number, number, number] } = {},
+  options: {
+    valueColor?: [number, number, number]
+    accent?: [number, number, number]
+  } = {},
 ): void {
   const accent = options.accent ?? ORANGE
   const valColor = options.valueColor ?? TEXT_DARK
@@ -397,25 +448,66 @@ export type Annexe10Input = AnnexeCommonInput & {
 }
 
 export async function generateAnnexe10Pdf(data: Annexe10Input): Promise<void> {
-  const logo = data.logoInvertedDataUri ?? (await loadLogo('horizontal-inverted'))
+  const logo =
+    data.logoInvertedDataUri ?? (await loadLogo('horizontal-inverted'))
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
-  const docCode = data.documentCode ?? genDocCode('10', data.residenceName, data.exercice)
+  const docCode =
+    data.documentCode ?? genDocCode('10', data.residenceName, data.exercice)
   const verifyUrl = buildVerifyUrl(docCode)
   const qrDataUri = await generateVerifyQr(docCode)
   const totalPages = 1
 
   drawTopAccent(doc)
   drawTopBar(doc, docCode, 1, totalPages)
-  let y = drawHeaderBand(doc, '10', 'Suivi des contributions des copropriétaires', logo)
+  let y = drawHeaderBand(
+    doc,
+    '10',
+    'Suivi des contributions des copropriétaires',
+    logo,
+  )
   y = drawInfoRow(doc, y + 5, data)
 
   // 4 KPI cards — alternating accent (orange / navy / green / orange)
   const kpiW = (CONTENT_W - 9) / 4
   const kpiH = 20
-  drawKpiCard(doc, MARGIN,                  y, kpiW, kpiH, 'Solde au 01/01',        fmtMad(data.totals.soldeInitial))
-  drawKpiCard(doc, MARGIN + (kpiW + 3),     y, kpiW, kpiH, 'Montant annuel appelé', fmtMad(data.totals.appele), { accent: NAVY })
-  drawKpiCard(doc, MARGIN + (kpiW + 3) * 2, y, kpiW, kpiH, 'Versements effectués',  fmtMad(data.totals.paye), { valueColor: GREEN, accent: GREEN })
-  drawKpiCard(doc, MARGIN + (kpiW + 3) * 3, y, kpiW, kpiH, 'Solde au 31/12',        fmtMad(data.totals.soldeFinal))
+  drawKpiCard(
+    doc,
+    MARGIN,
+    y,
+    kpiW,
+    kpiH,
+    'Solde au 01/01',
+    fmtMad(data.totals.soldeInitial),
+  )
+  drawKpiCard(
+    doc,
+    MARGIN + (kpiW + 3),
+    y,
+    kpiW,
+    kpiH,
+    'Montant annuel appelé',
+    fmtMad(data.totals.appele),
+    { accent: NAVY },
+  )
+  drawKpiCard(
+    doc,
+    MARGIN + (kpiW + 3) * 2,
+    y,
+    kpiW,
+    kpiH,
+    'Versements effectués',
+    fmtMad(data.totals.paye),
+    { valueColor: GREEN, accent: GREEN },
+  )
+  drawKpiCard(
+    doc,
+    MARGIN + (kpiW + 3) * 3,
+    y,
+    kpiW,
+    kpiH,
+    'Solde au 31/12',
+    fmtMad(data.totals.soldeFinal),
+  )
 
   y += kpiH + 10
 
@@ -426,12 +518,21 @@ export async function generateAnnexe10Pdf(data: Annexe10Input): Promise<void> {
     doc.setFont('helvetica', 'italic')
     doc.setFontSize(10)
     doc.setTextColor(...TEXT_MUTED)
-    doc.text('Aucun copropriétaire enregistré', PAGE_W / 2, y + 12, { align: 'center' })
+    doc.text('Aucun copropriétaire enregistré', PAGE_W / 2, y + 12, {
+      align: 'center',
+    })
     y += 20 + 6
   } else {
     // Total must equal CONTENT_W (182mm): 17 + 53 + 28 + 24 + 24 + 36 = 182
     const colW = [17, 53, 28, 24, 24, 36]
-    const headers = ['Lot', 'Copropriétaire', 'Solde initial', 'Appelé', 'Payé', 'Solde final']
+    const headers = [
+      'Lot',
+      'Copropriétaire',
+      'Solde initial',
+      'Appelé',
+      'Payé',
+      'Solde final',
+    ]
 
     // Header row — navy with white text
     doc.setFillColor(...NAVY)
@@ -459,9 +560,12 @@ export async function generateAnnexe10Pdf(data: Annexe10Input): Promise<void> {
       }
       let rx = MARGIN + 4
       const cells = [
-        r.lotNumero, r.coproprietaireNom,
-        fmtMad(r.soldeInitial), fmtMad(r.appele),
-        fmtMad(r.paye), fmtMad(r.soldeFinal),
+        r.lotNumero,
+        r.coproprietaireNom,
+        fmtMad(r.soldeInitial),
+        fmtMad(r.appele),
+        fmtMad(r.paye),
+        fmtMad(r.soldeFinal),
       ]
       cells.forEach((c, i) => {
         const align = i >= 2 ? 'right' : 'left'
@@ -483,9 +587,12 @@ export async function generateAnnexe10Pdf(data: Annexe10Input): Promise<void> {
     doc.setTextColor(...NAVY)
     let tx = MARGIN + 4
     const totalCells = [
-      'TOTAL', '',
-      fmtMad(data.totals.soldeInitial), fmtMad(data.totals.appele),
-      fmtMad(data.totals.paye), fmtMad(data.totals.soldeFinal),
+      'TOTAL',
+      '',
+      fmtMad(data.totals.soldeInitial),
+      fmtMad(data.totals.appele),
+      fmtMad(data.totals.paye),
+      fmtMad(data.totals.soldeFinal),
     ]
     totalCells.forEach((c, i) => {
       const align = i >= 2 ? 'right' : 'left'
@@ -505,20 +612,39 @@ export async function generateAnnexe10Pdf(data: Annexe10Input): Promise<void> {
 // ─── Annexe 13-1 — État de la situation financière (très simplifié) ──────────
 
 export type Annexe13_1Input = AnnexeCommonInput & {
-  current:  { fondsReserve: number; creances: number; dettes: number; tresorerie: number }
-  previous: { fondsReserve: number; creances: number; dettes: number; tresorerie: number }
+  current: {
+    fondsReserve: number
+    creances: number
+    dettes: number
+    tresorerie: number
+  }
+  previous: {
+    fondsReserve: number
+    creances: number
+    dettes: number
+    tresorerie: number
+  }
 }
 
-export async function generateAnnexe131Pdf(data: Annexe13_1Input): Promise<void> {
-  const logo = data.logoInvertedDataUri ?? (await loadLogo('horizontal-inverted'))
+export async function generateAnnexe131Pdf(
+  data: Annexe13_1Input,
+): Promise<void> {
+  const logo =
+    data.logoInvertedDataUri ?? (await loadLogo('horizontal-inverted'))
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
-  const docCode = data.documentCode ?? genDocCode('13-1', data.residenceName, data.exercice)
+  const docCode =
+    data.documentCode ?? genDocCode('13-1', data.residenceName, data.exercice)
   const verifyUrl = buildVerifyUrl(docCode)
   const qrDataUri = await generateVerifyQr(docCode)
 
   drawTopAccent(doc)
   drawTopBar(doc, docCode, 1, 1)
-  let y = drawHeaderBand(doc, '13-1', 'État de la situation financière (très simplifié)', logo)
+  let y = drawHeaderBand(
+    doc,
+    '13-1',
+    'État de la situation financière (très simplifié)',
+    logo,
+  )
   y = drawInfoRow(doc, y + 5, data)
 
   // 3 columns: label | exercice clos (N) | exercice précédent (N-1)
@@ -531,15 +657,39 @@ export async function generateAnnexe131Pdf(data: Annexe13_1Input): Promise<void>
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(7.5)
   doc.setTextColor(255, 255, 255)
-  doc.text('EXERCICE CLOS (N)',          MARGIN + labelW + colW - 4, y + 6.5, { align: 'right' })
-  doc.text('EXERCICE PRÉCÉDENT (N-1)',   MARGIN + labelW + colW * 2 - 4, y + 6.5, { align: 'right' })
+  doc.text('EXERCICE CLOS (N)', MARGIN + labelW + colW - 4, y + 6.5, {
+    align: 'right',
+  })
+  doc.text(
+    'EXERCICE PRÉCÉDENT (N-1)',
+    MARGIN + labelW + colW * 2 - 4,
+    y + 6.5,
+    { align: 'right' },
+  )
   y += 10
 
   const rows = [
-    { label: 'Situation des comptes de réserve', current: data.current.fondsReserve, previous: data.previous.fondsReserve },
-    { label: 'Situation des créances',           current: data.current.creances,     previous: data.previous.creances },
-    { label: 'Situation des dettes',             current: data.current.dettes,       previous: data.previous.dettes },
-    { label: 'Situation de la trésorerie',       current: data.current.tresorerie,   previous: data.previous.tresorerie, highlight: true },
+    {
+      label: 'Situation des comptes de réserve',
+      current: data.current.fondsReserve,
+      previous: data.previous.fondsReserve,
+    },
+    {
+      label: 'Situation des créances',
+      current: data.current.creances,
+      previous: data.previous.creances,
+    },
+    {
+      label: 'Situation des dettes',
+      current: data.current.dettes,
+      previous: data.previous.dettes,
+    },
+    {
+      label: 'Situation de la trésorerie',
+      current: data.current.tresorerie,
+      previous: data.previous.tresorerie,
+      highlight: true,
+    },
   ]
 
   rows.forEach((r, idx) => {
@@ -554,12 +704,18 @@ export async function generateAnnexe131Pdf(data: Annexe13_1Input): Promise<void>
     }
     doc.setFont('helvetica', r.highlight ? 'bold' : 'normal')
     doc.setFontSize(9.5)
-    doc.setTextColor(r.highlight ? NAVY[0] : TEXT_DARK[0],
-                     r.highlight ? NAVY[1] : TEXT_DARK[1],
-                     r.highlight ? NAVY[2] : TEXT_DARK[2])
+    doc.setTextColor(
+      r.highlight ? NAVY[0] : TEXT_DARK[0],
+      r.highlight ? NAVY[1] : TEXT_DARK[1],
+      r.highlight ? NAVY[2] : TEXT_DARK[2],
+    )
     doc.text(r.label, MARGIN + 5, y + 7)
-    doc.text(fmtMad(r.current),  MARGIN + labelW + colW - 4,     y + 7, { align: 'right' })
-    doc.text(fmtMad(r.previous), MARGIN + labelW + colW * 2 - 4, y + 7, { align: 'right' })
+    doc.text(fmtMad(r.current), MARGIN + labelW + colW - 4, y + 7, {
+      align: 'right',
+    })
+    doc.text(fmtMad(r.previous), MARGIN + labelW + colW * 2 - 4, y + 7, {
+      align: 'right',
+    })
     y += 11
   })
 
@@ -576,7 +732,10 @@ type Quad = { n1: number; n: number; n0: number; nMinus1: number }
 function sumQuad(items: Quad[]): Quad {
   return items.reduce(
     (acc, q) => ({
-      n1: acc.n1 + q.n1, n: acc.n + q.n, n0: acc.n0 + q.n0, nMinus1: acc.nMinus1 + q.nMinus1,
+      n1: acc.n1 + q.n1,
+      n: acc.n + q.n,
+      n0: acc.n0 + q.n0,
+      nMinus1: acc.nMinus1 + q.nMinus1,
     }),
     { n1: 0, n: 0, n0: 0, nMinus1: 0 },
   )
@@ -585,30 +744,39 @@ function sumQuad(items: Quad[]): Quad {
 export type Annexe13_2Input = AnnexeCommonInput & {
   excedent: number
   recettes: {
-    cotisations:    Quad
-    fondsReserve:   Quad
-    autresAg:       Quad
+    cotisations: Quad
+    fondsReserve: Quad
+    autresAg: Quad
     autresProduits: Quad
   }
   depenses: {
-    matieres:           Quad
+    matieres: Quad
     servicesExterieurs: Quad
-    impotsTaxes:        Quad
-    personnel:          Quad
-    autresCharges:      Quad
+    impotsTaxes: Quad
+    personnel: Quad
+    autresCharges: Quad
   }
 }
 
-export async function generateAnnexe132Pdf(data: Annexe13_2Input): Promise<void> {
-  const logo = data.logoInvertedDataUri ?? (await loadLogo('horizontal-inverted'))
+export async function generateAnnexe132Pdf(
+  data: Annexe13_2Input,
+): Promise<void> {
+  const logo =
+    data.logoInvertedDataUri ?? (await loadLogo('horizontal-inverted'))
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
-  const docCode = data.documentCode ?? genDocCode('13-2', data.residenceName, data.exercice)
+  const docCode =
+    data.documentCode ?? genDocCode('13-2', data.residenceName, data.exercice)
   const verifyUrl = buildVerifyUrl(docCode)
   const qrDataUri = await generateVerifyQr(docCode)
 
   drawTopAccent(doc)
   drawTopBar(doc, docCode, 1, 1)
-  let y = drawHeaderBand(doc, '13-2', 'Compte des produits et charges et budget', logo)
+  let y = drawHeaderBand(
+    doc,
+    '13-2',
+    'Compte des produits et charges et budget',
+    logo,
+  )
   y = drawInfoRow(doc, y + 5, data)
 
   // EXCÉDENT hero card — orange-accented
@@ -619,7 +787,7 @@ export async function generateAnnexe132Pdf(data: Annexe13_2Input): Promise<void>
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(7)
   doc.setTextColor(...TEXT_MUTED)
-  doc.text('EXCÉDENT DE L\'EXERCICE', MARGIN + 6, y + 7.5)
+  doc.text("EXCÉDENT DE L'EXERCICE", MARGIN + 6, y + 7.5)
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(16)
   doc.setTextColor(...GREEN)
@@ -654,7 +822,11 @@ export async function generateAnnexe132Pdf(data: Annexe13_2Input): Promise<void>
   y += 14
 
   // Section label band
-  const drawSectionLabel = (label: string, accent: [number, number, number], yPos: number): number => {
+  const drawSectionLabel = (
+    label: string,
+    accent: [number, number, number],
+    yPos: number,
+  ): number => {
     doc.setFillColor(...NAVY_TINT)
     doc.rect(MARGIN, yPos, CONTENT_W, 7.5, 'F')
     doc.setFillColor(...accent)
@@ -668,7 +840,9 @@ export async function generateAnnexe132Pdf(data: Annexe13_2Input): Promise<void>
 
   // Data row with wrapping
   const drawDataRow = (
-    yPos: number, label: string, q: Quad,
+    yPos: number,
+    label: string,
+    q: Quad,
     opts: { alt?: boolean; bold?: boolean; highlight?: 'orange' | 'navy' } = {},
   ): number => {
     doc.setFont('helvetica', opts.bold ? 'bold' : 'normal')
@@ -692,9 +866,8 @@ export async function generateAnnexe132Pdf(data: Annexe13_2Input): Promise<void>
     }
 
     doc.setTextColor(...(opts.highlight ? NAVY : TEXT_DARK))
-    const labelStartY = labelLines.length === 1
-      ? yPos + rowH / 2 + 1.5
-      : yPos + 5
+    const labelStartY =
+      labelLines.length === 1 ? yPos + rowH / 2 + 1.5 : yPos + 5
     doc.text(labelLines, MARGIN + (opts.highlight ? 6 : 5), labelStartY)
 
     const valueY = yPos + rowH / 2 + 1.5
@@ -709,33 +882,58 @@ export async function generateAnnexe132Pdf(data: Annexe13_2Input): Promise<void>
   // Recettes
   y = drawSectionLabel('Recettes', GREEN, y)
   const recettes = [
-    { label: 'Contributions perçues (cotisations)', q: data.recettes.cotisations },
-    { label: 'Contributions au fonds de réserve',   q: data.recettes.fondsReserve },
-    { label: "Autres produits votés par l'AG",      q: data.recettes.autresAg },
-    { label: 'Autres produits',                     q: data.recettes.autresProduits },
+    {
+      label: 'Contributions perçues (cotisations)',
+      q: data.recettes.cotisations,
+    },
+    {
+      label: 'Contributions au fonds de réserve',
+      q: data.recettes.fondsReserve,
+    },
+    { label: "Autres produits votés par l'AG", q: data.recettes.autresAg },
+    { label: 'Autres produits', q: data.recettes.autresProduits },
   ]
-  recettes.forEach((r, i) => { y = drawDataRow(y, r.label, r.q, { alt: i % 2 === 1 }) })
+  recettes.forEach((r, i) => {
+    y = drawDataRow(y, r.label, r.q, { alt: i % 2 === 1 })
+  })
   const totalRecettes = sumQuad(recettes.map((r) => r.q))
-  y = drawDataRow(y, 'Total des Recettes', totalRecettes, { bold: true, highlight: 'navy' })
+  y = drawDataRow(y, 'Total des Recettes', totalRecettes, {
+    bold: true,
+    highlight: 'navy',
+  })
 
   // Dépenses
   y = drawSectionLabel('Dépenses', ORANGE, y)
   const depenses = [
-    { label: 'Matières et fournitures (eau, électricité, équipement)', q: data.depenses.matieres },
-    { label: 'Services extérieurs (nettoyage, maintenance, syndic)',   q: data.depenses.servicesExterieurs },
-    { label: 'Impôts et taxes',                                         q: data.depenses.impotsTaxes },
-    { label: 'Personnel',                                               q: data.depenses.personnel },
-    { label: 'Autres charges de fonctionnement',                        q: data.depenses.autresCharges },
+    {
+      label: 'Matières et fournitures (eau, électricité, équipement)',
+      q: data.depenses.matieres,
+    },
+    {
+      label: 'Services extérieurs (nettoyage, maintenance, syndic)',
+      q: data.depenses.servicesExterieurs,
+    },
+    { label: 'Impôts et taxes', q: data.depenses.impotsTaxes },
+    { label: 'Personnel', q: data.depenses.personnel },
+    {
+      label: 'Autres charges de fonctionnement',
+      q: data.depenses.autresCharges,
+    },
   ]
-  depenses.forEach((r, i) => { y = drawDataRow(y, r.label, r.q, { alt: i % 2 === 1 }) })
+  depenses.forEach((r, i) => {
+    y = drawDataRow(y, r.label, r.q, { alt: i % 2 === 1 })
+  })
   const totalDepenses = sumQuad(depenses.map((r) => r.q))
-  y = drawDataRow(y, 'Total des Dépenses', totalDepenses, { bold: true, highlight: 'navy' })
+  y = drawDataRow(y, 'Total des Dépenses', totalDepenses, {
+    bold: true,
+    highlight: 'navy',
+  })
 
   // Excédent row (orange highlight) — realized column tinted green
   const excQuad: Quad = {
-    n1:      totalRecettes.n1      - totalDepenses.n1,
-    n:       totalRecettes.n       - totalDepenses.n,
-    n0:      totalRecettes.n0      - totalDepenses.n0,
+    n1: totalRecettes.n1 - totalDepenses.n1,
+    n: totalRecettes.n - totalDepenses.n,
+    n0: totalRecettes.n0 - totalDepenses.n0,
     nMinus1: totalRecettes.nMinus1 - totalDepenses.nMinus1,
   }
 
@@ -751,9 +949,9 @@ export async function generateAnnexe132Pdf(data: Annexe13_2Input): Promise<void>
 
   const excValueY = y + 6
   const excVals: { v: number; tint: [number, number, number] }[] = [
-    { v: excQuad.n1,      tint: TEXT_DARK },
-    { v: excQuad.n,       tint: GREEN },     // realized → green
-    { v: excQuad.n0,      tint: TEXT_DARK },
+    { v: excQuad.n1, tint: TEXT_DARK },
+    { v: excQuad.n, tint: GREEN }, // realized → green
+    { v: excQuad.n0, tint: TEXT_DARK },
     { v: excQuad.nMinus1, tint: TEXT_DARK },
   ]
   excVals.forEach((cell, i) => {
@@ -775,7 +973,10 @@ type CodeRowValues = number[]
 
 /** Renders a section title like "ACTIF" or "CHARGES" in a colored band. */
 function drawBigSectionTitle(
-  doc: jsPDF, title: string, color: [number, number, number], y: number,
+  doc: jsPDF,
+  title: string,
+  color: [number, number, number],
+  y: number,
 ): number {
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(11)
@@ -790,7 +991,10 @@ function drawBigSectionTitle(
 
 /** Renders a subsection band like "Créances de l'Actif Circulant". */
 function drawSubsectionBand(
-  doc: jsPDF, title: string, accent: [number, number, number], y: number,
+  doc: jsPDF,
+  title: string,
+  accent: [number, number, number],
+  y: number,
 ): number {
   const h = 7
   doc.setFillColor(...NAVY_TINT)
@@ -853,7 +1057,7 @@ function drawCodeRow(
 /** Renders the column header bar for code-table layouts. */
 function drawCodeTableHeader(
   doc: jsPDF,
-  headers: string[],  // e.g. ['CODE','LIBELLÉ','EXERCICE CLOS (N)','EXERCICE PRÉCÉDENT (N-1)']
+  headers: string[], // e.g. ['CODE','LIBELLÉ','EXERCICE CLOS (N)','EXERCICE PRÉCÉDENT (N-1)']
   y: number,
   variant: 'navy' | 'tint' = 'navy',
 ): number {
@@ -907,7 +1111,12 @@ function drawEmptyState(doc: jsPDF, message: string, y: number): number {
 function drawKpiRow(
   doc: jsPDF,
   y: number,
-  cards: { label: string; value: string; accent?: [number, number, number]; color?: [number, number, number] }[],
+  cards: {
+    label: string
+    value: string
+    accent?: [number, number, number]
+    color?: [number, number, number]
+  }[],
 ): number {
   const n = cards.length
   const gap = 3
@@ -924,8 +1133,10 @@ function drawKpiRow(
 
 /** Async helper to pre-build doc-code, verify-url, QR for a given annexe. */
 async function buildPdfBase(annexeNum: string, ctx: AnnexeCommonInput) {
-  const logo = ctx.logoInvertedDataUri ?? (await loadLogo('horizontal-inverted'))
-  const docCode = ctx.documentCode ?? genDocCode(annexeNum, ctx.residenceName, ctx.exercice)
+  const logo =
+    ctx.logoInvertedDataUri ?? (await loadLogo('horizontal-inverted'))
+  const docCode =
+    ctx.documentCode ?? genDocCode(annexeNum, ctx.residenceName, ctx.exercice)
   const verifyUrl = buildVerifyUrl(docCode)
   const qrDataUri = await generateVerifyQr(docCode)
   return { logo, docCode, verifyUrl, qrDataUri }
@@ -933,7 +1144,10 @@ async function buildPdfBase(annexeNum: string, ctx: AnnexeCommonInput) {
 
 /** Re-draw header bar + top accent on each new page. */
 function startPage(
-  doc: jsPDF, docCode: string, page: number, totalPages: number,
+  doc: jsPDF,
+  docCode: string,
+  page: number,
+  totalPages: number,
 ): void {
   if (page > 1) doc.addPage()
   drawTopAccent(doc)
@@ -973,21 +1187,44 @@ export async function generateAnnexe3Pdf(data: Annexe3Input): Promise<void> {
 
   // Page 1 — ACTIF
   startPage(doc, docCode, 1, totalPages)
-  let y = drawHeaderBand(doc, '3', 'État de la Situation Financière (Bilan)', logo)
+  let y = drawHeaderBand(
+    doc,
+    '3',
+    'État de la Situation Financière (Bilan)',
+    logo,
+  )
   y = drawInfoRow(doc, y + 5, data)
   y = drawKpiRow(doc, y, [
-    { label: 'Total Actif',  value: fmtMad(data.actif.total.currentValue),  accent: ORANGE },
-    { label: 'Total Passif', value: fmtMad(data.passif.total.currentValue), accent: NAVY },
+    {
+      label: 'Total Actif',
+      value: fmtMad(data.actif.total.currentValue),
+      accent: ORANGE,
+    },
+    {
+      label: 'Total Passif',
+      value: fmtMad(data.passif.total.currentValue),
+      accent: NAVY,
+    },
     {
       label: 'Bilan',
-      value: Math.abs(data.actif.total.currentValue - data.passif.total.currentValue) < 0.01 ? 'Équilibré' : 'Déséquilibré',
-      accent: GREEN, color: GREEN,
+      value:
+        Math.abs(
+          data.actif.total.currentValue - data.passif.total.currentValue,
+        ) < 0.01
+          ? 'Équilibré'
+          : 'Déséquilibré',
+      accent: GREEN,
+      color: GREEN,
     },
   ])
   y += 6
 
   y = drawBigSectionTitle(doc, 'ACTIF', NAVY, y)
-  y = drawCodeTableHeader(doc, ['CODE', 'LIBELLÉ', 'EXERCICE CLOS (N)', 'EXERCICE PRÉCÉDENT / (N-1)'], y)
+  y = drawCodeTableHeader(
+    doc,
+    ['CODE', 'LIBELLÉ', 'EXERCICE CLOS (N)', 'EXERCICE PRÉCÉDENT / (N-1)'],
+    y,
+  )
 
   const renderBilanSection = (
     sections: Annexe3BilanSubsection[],
@@ -1002,19 +1239,42 @@ export async function generateAnnexe3Pdf(data: Annexe3Input): Promise<void> {
       sections.forEach((sec) => {
         yy = drawSubsectionBand(doc, sec.title, accent, yy)
         sec.rows.forEach((r, i) => {
-          yy = drawCodeRow(doc, r.code, r.libelle, [r.currentValue, r.previousValue], yy, {
-            alt: i % 2 === 1,
-          })
+          yy = drawCodeRow(
+            doc,
+            r.code,
+            r.libelle,
+            [r.currentValue, r.previousValue],
+            yy,
+            {
+              alt: i % 2 === 1,
+            },
+          )
         })
-        yy = drawCodeRow(doc, '', `Total ${sec.title}`, [sec.total.currentValue, sec.total.previousValue], yy, {
-          bold: true, highlight: true,
-        })
+        yy = drawCodeRow(
+          doc,
+          '',
+          `Total ${sec.title}`,
+          [sec.total.currentValue, sec.total.previousValue],
+          yy,
+          {
+            bold: true,
+            highlight: true,
+          },
+        )
       })
     }
     // Grand total
-    yy = drawCodeRow(doc, '', 'Total', [total.currentValue, total.previousValue], yy, {
-      bold: true, highlight: true,
-    })
+    yy = drawCodeRow(
+      doc,
+      '',
+      'Total',
+      [total.currentValue, total.previousValue],
+      yy,
+      {
+        bold: true,
+        highlight: true,
+      },
+    )
     return yy
   }
 
@@ -1026,14 +1286,20 @@ export async function generateAnnexe3Pdf(data: Annexe3Input): Promise<void> {
   startPage(doc, docCode, 2, totalPages)
   let y2 = 14
   y2 = drawBigSectionTitle(doc, 'PASSIF', GREEN, y2)
-  y2 = drawCodeTableHeader(doc, ['CODE', 'LIBELLÉ', 'EXERCICE CLOS (N)', 'EXERCICE PRÉCÉDENT / (N-1)'], y2)
+  y2 = drawCodeTableHeader(
+    doc,
+    ['CODE', 'LIBELLÉ', 'EXERCICE CLOS (N)', 'EXERCICE PRÉCÉDENT / (N-1)'],
+    y2,
+  )
   y2 = renderBilanSection(data.passif.sections, data.passif.total, GREEN, y2)
 
   // Bilan équilibré final row
-  const equilibre = Math.abs(data.actif.total.currentValue - data.passif.total.currentValue) < 0.01
+  const equilibre =
+    Math.abs(data.actif.total.currentValue - data.passif.total.currentValue) <
+    0.01
   const DANGER_SOFT: [number, number, number] = [254, 226, 226]
   const DANGER: [number, number, number] = [220, 38, 38]
-  const bgClr  = equilibre ? ORANGE_SOFT : DANGER_SOFT
+  const bgClr = equilibre ? ORANGE_SOFT : DANGER_SOFT
   const barClr = equilibre ? GREEN : DANGER
   doc.setFillColor(...bgClr)
   doc.rect(MARGIN, y2 + 4, CONTENT_W, 9, 'F')
@@ -1042,10 +1308,18 @@ export async function generateAnnexe3Pdf(data: Annexe3Input): Promise<void> {
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(9.5)
   doc.setTextColor(...NAVY)
-  doc.text(equilibre ? 'Bilan équilibré' : 'Bilan déséquilibré', MARGIN + 6, y2 + 10)
   doc.text(
-    fmtMad(Math.abs(data.actif.total.currentValue - data.passif.total.currentValue)),
-    PAGE_W - MARGIN - 4, y2 + 10, { align: 'right' },
+    equilibre ? 'Bilan équilibré' : 'Bilan déséquilibré',
+    MARGIN + 6,
+    y2 + 10,
+  )
+  doc.text(
+    fmtMad(
+      Math.abs(data.actif.total.currentValue - data.passif.total.currentValue),
+    ),
+    PAGE_W - MARGIN - 4,
+    y2 + 10,
+    { align: 'right' },
   )
 
   drawSignatureBox(doc, y2 + 20)
@@ -1057,12 +1331,16 @@ export async function generateAnnexe3Pdf(data: Annexe3Input): Promise<void> {
 // ─── Annexe 4 — COMPTE DE RÉSULTAT (complet) ─────────────────────────────────
 
 export type Annexe4Row = { code: string; libelle: string; q: Quad }
-export type Annexe4Subsection = { title: string; rows: Annexe4Row[]; total: Quad }
+export type Annexe4Subsection = {
+  title: string
+  rows: Annexe4Row[]
+  total: Quad
+}
 
 export type Annexe4Input = AnnexeCommonInput & {
   totals: { charges: number; produits: number; resultat: number }
-  chargesSections: Annexe4Subsection[]   // Courantes, Non Courantes, Dotations
-  produitsSections: Annexe4Subsection[]  // Courants, Non Courants, Reprises
+  chargesSections: Annexe4Subsection[] // Courantes, Non Courantes, Dotations
+  produitsSections: Annexe4Subsection[] // Courants, Non Courants, Reprises
   totalCharges: Quad
   totalProduits: Quad
   resultatNet: Quad
@@ -1073,41 +1351,88 @@ export async function generateAnnexe4Pdf(data: Annexe4Input): Promise<void> {
   const { logo, docCode, verifyUrl, qrDataUri } = await buildPdfBase('4', data)
   const totalPages = 2
 
-  const plHeaders = ['CODE', 'LIBELLÉ', 'BUDGET VOTÉ / (N+1)', 'RÉALISÉ CLOS / (N)', 'BUDGET VOTÉ / (N)', 'APPROUVÉ / (N-1)']
+  const plHeaders = [
+    'CODE',
+    'LIBELLÉ',
+    'BUDGET VOTÉ / (N+1)',
+    'RÉALISÉ CLOS / (N)',
+    'BUDGET VOTÉ / (N)',
+    'APPROUVÉ / (N-1)',
+  ]
 
   const renderPLSection = (
-    sections: Annexe4Subsection[], grandTotal: Quad, grandLabel: string,
-    accent: [number, number, number], startY: number,
+    sections: Annexe4Subsection[],
+    grandTotal: Quad,
+    grandLabel: string,
+    accent: [number, number, number],
+    startY: number,
   ): number => {
     let yy = startY
     if (sections.length === 0) {
       yy = drawEmptyState(doc, 'Aucune donnée comptable pour cet exercice', yy)
-      yy = drawCodeRow(doc, '', grandLabel, [grandTotal.n1, grandTotal.n, grandTotal.n0, grandTotal.nMinus1], yy, {
-        bold: true, highlight: true,
-      })
+      yy = drawCodeRow(
+        doc,
+        '',
+        grandLabel,
+        [grandTotal.n1, grandTotal.n, grandTotal.n0, grandTotal.nMinus1],
+        yy,
+        {
+          bold: true,
+          highlight: true,
+        },
+      )
       return yy
     }
     sections.forEach((sec) => {
       yy = drawSubsectionBand(doc, sec.title, accent, yy)
       sec.rows.forEach((r, i) => {
-        yy = drawCodeRow(doc, r.code, r.libelle, [r.q.n1, r.q.n, r.q.n0, r.q.nMinus1], yy, {
-          alt: i % 2 === 1,
-        })
+        yy = drawCodeRow(
+          doc,
+          r.code,
+          r.libelle,
+          [r.q.n1, r.q.n, r.q.n0, r.q.nMinus1],
+          yy,
+          {
+            alt: i % 2 === 1,
+          },
+        )
         // page break if needed
         if (yy > 248) {
-          drawFooter(doc, doc.getNumberOfPages(), totalPages, qrDataUri, verifyUrl)
+          drawFooter(
+            doc,
+            doc.getNumberOfPages(),
+            totalPages,
+            qrDataUri,
+            verifyUrl,
+          )
           startPage(doc, docCode, doc.getNumberOfPages() + 1, totalPages)
           yy = 14
           yy = drawCodeTableHeader(doc, plHeaders, yy)
         }
       })
-      yy = drawCodeRow(doc, '', `Total ${sec.title}`, [sec.total.n1, sec.total.n, sec.total.n0, sec.total.nMinus1], yy, {
-        bold: true, highlight: true,
-      })
+      yy = drawCodeRow(
+        doc,
+        '',
+        `Total ${sec.title}`,
+        [sec.total.n1, sec.total.n, sec.total.n0, sec.total.nMinus1],
+        yy,
+        {
+          bold: true,
+          highlight: true,
+        },
+      )
     })
-    yy = drawCodeRow(doc, '', grandLabel, [grandTotal.n1, grandTotal.n, grandTotal.n0, grandTotal.nMinus1], yy, {
-      bold: true, highlight: true,
-    })
+    yy = drawCodeRow(
+      doc,
+      '',
+      grandLabel,
+      [grandTotal.n1, grandTotal.n, grandTotal.n0, grandTotal.nMinus1],
+      yy,
+      {
+        bold: true,
+        highlight: true,
+      },
+    )
     return yy
   }
 
@@ -1116,35 +1441,88 @@ export async function generateAnnexe4Pdf(data: Annexe4Input): Promise<void> {
   let y = drawHeaderBand(doc, '4', 'Compte de Gestion Général', logo)
   y = drawInfoRow(doc, y + 5, data)
   y = drawKpiRow(doc, y, [
-    { label: 'Total Charges',  value: fmtMad(data.totals.charges),  accent: ORANGE },
-    { label: 'Total Produits', value: fmtMad(data.totals.produits), accent: GREEN, color: GREEN },
-    { label: 'Résultat Net',   value: fmtMad(data.totals.resultat), accent: NAVY,  color: data.totals.resultat >= 0 ? GREEN : [220, 38, 38] as [number, number, number] },
+    {
+      label: 'Total Charges',
+      value: fmtMad(data.totals.charges),
+      accent: ORANGE,
+    },
+    {
+      label: 'Total Produits',
+      value: fmtMad(data.totals.produits),
+      accent: GREEN,
+      color: GREEN,
+    },
+    {
+      label: 'Résultat Net',
+      value: fmtMad(data.totals.resultat),
+      accent: NAVY,
+      color:
+        data.totals.resultat >= 0
+          ? GREEN
+          : ([220, 38, 38] as [number, number, number]),
+    },
   ])
   y += 6
   y = drawBigSectionTitle(doc, 'CHARGES', ORANGE, y)
   y = drawCodeTableHeader(doc, plHeaders, y)
-  y = renderPLSection(data.chargesSections, data.totalCharges, 'Total Charges', ORANGE, y)
+  y = renderPLSection(
+    data.chargesSections,
+    data.totalCharges,
+    'Total Charges',
+    ORANGE,
+    y,
+  )
 
   // PRODUITS section (page break if needed handled inside renderPLSection)
   y += 4
   y = drawBigSectionTitle(doc, 'PRODUITS', GREEN, y)
   y = drawCodeTableHeader(doc, plHeaders, y)
-  y = renderPLSection(data.produitsSections, data.totalProduits, 'Total Produits', GREEN, y)
+  y = renderPLSection(
+    data.produitsSections,
+    data.totalProduits,
+    'Total Produits',
+    GREEN,
+    y,
+  )
 
   // Résultat Net row
-  y = drawCodeRow(doc, '', 'Résultat Net', [data.resultatNet.n1, data.resultatNet.n, data.resultatNet.n0, data.resultatNet.nMinus1], y, {
-    bold: true, highlight: true,
-  })
+  y = drawCodeRow(
+    doc,
+    '',
+    'Résultat Net',
+    [
+      data.resultatNet.n1,
+      data.resultatNet.n,
+      data.resultatNet.n0,
+      data.resultatNet.nMinus1,
+    ],
+    y,
+    {
+      bold: true,
+      highlight: true,
+    },
+  )
 
   drawSignatureBox(doc, Math.min(y + 6, 230))
-  drawFooter(doc, doc.getNumberOfPages(), doc.getNumberOfPages(), qrDataUri, verifyUrl)
+  drawFooter(
+    doc,
+    doc.getNumberOfPages(),
+    doc.getNumberOfPages(),
+    qrDataUri,
+    verifyUrl,
+  )
 
   doc.save(`annexe4_${data.exercice}.pdf`)
 }
 
 // ─── Annexe 5 — Suivi du Budget Prévisionnel vs Réalisé ──────────────────────
 
-export type Annexe5Row = { libelle: string; prevu: number; realise: number; ecart: number }
+export type Annexe5Row = {
+  libelle: string
+  prevu: number
+  realise: number
+  ecart: number
+}
 export type Annexe5Input = AnnexeCommonInput & {
   totals: { prevu: number; realise: number; ecart: number }
   rows: Annexe5Row[]
@@ -1155,17 +1533,39 @@ export async function generateAnnexe5Pdf(data: Annexe5Input): Promise<void> {
   const { logo, docCode, verifyUrl, qrDataUri } = await buildPdfBase('5', data)
 
   startPage(doc, docCode, 1, 1)
-  let y = drawHeaderBand(doc, '5', 'Suivi du Budget — Prévisionnel vs Réalisé', logo)
+  let y = drawHeaderBand(
+    doc,
+    '5',
+    'Suivi du Budget — Prévisionnel vs Réalisé',
+    logo,
+  )
   y = drawInfoRow(doc, y + 5, data)
   y = drawKpiRow(doc, y, [
-    { label: 'Budget prévu',  value: fmtMad(data.totals.prevu),   accent: NAVY },
-    { label: 'Réalisé',        value: fmtMad(data.totals.realise), accent: GREEN, color: GREEN },
-    { label: 'Écart',          value: fmtMad(data.totals.ecart),   accent: ORANGE, color: data.totals.ecart < 0 ? [220, 38, 38] as [number, number, number] : GREEN },
+    { label: 'Budget prévu', value: fmtMad(data.totals.prevu), accent: NAVY },
+    {
+      label: 'Réalisé',
+      value: fmtMad(data.totals.realise),
+      accent: GREEN,
+      color: GREEN,
+    },
+    {
+      label: 'Écart',
+      value: fmtMad(data.totals.ecart),
+      accent: ORANGE,
+      color:
+        data.totals.ecart < 0
+          ? ([220, 38, 38] as [number, number, number])
+          : GREEN,
+    },
   ])
   y += 6
 
   if (data.rows.length === 0) {
-    y = drawEmptyState(doc, 'Aucun budget prévisionnel saisi pour cet exercice.', y)
+    y = drawEmptyState(
+      doc,
+      'Aucun budget prévisionnel saisi pour cet exercice.',
+      y,
+    )
   } else {
     const colW = [78, 33, 33, 38]
     // header
@@ -1191,12 +1591,14 @@ export async function generateAnnexe5Pdf(data: Annexe5Input): Promise<void> {
       doc.setFontSize(8.5)
       doc.setTextColor(...TEXT_DARK)
       let rx = MARGIN + 4
-      ;[r.libelle, fmtMad(r.prevu), fmtMad(r.realise), fmtMad(r.ecart)].forEach((c, i) => {
-        const align = i === 0 ? 'left' : 'right'
-        const tx = align === 'right' ? rx + colW[i] - 4 : rx
-        doc.text(c, tx, y + 5.5, { align })
-        rx += colW[i]
-      })
+      ;[r.libelle, fmtMad(r.prevu), fmtMad(r.realise), fmtMad(r.ecart)].forEach(
+        (c, i) => {
+          const align = i === 0 ? 'left' : 'right'
+          const tx = align === 'right' ? rx + colW[i] - 4 : rx
+          doc.text(c, tx, y + 5.5, { align })
+          rx += colW[i]
+        },
+      )
       y += 8
     })
     // totals
@@ -1208,7 +1610,12 @@ export async function generateAnnexe5Pdf(data: Annexe5Input): Promise<void> {
     doc.setFontSize(8.5)
     doc.setTextColor(...NAVY)
     let tx = MARGIN + 4
-    ;['TOTAL', fmtMad(data.totals.prevu), fmtMad(data.totals.realise), fmtMad(data.totals.ecart)].forEach((c, i) => {
+    ;[
+      'TOTAL',
+      fmtMad(data.totals.prevu),
+      fmtMad(data.totals.realise),
+      fmtMad(data.totals.ecart),
+    ].forEach((c, i) => {
       const align = i === 0 ? 'left' : 'right'
       const cxt = align === 'right' ? tx + colW[i] - 4 : tx
       doc.text(c, cxt, y + 6, { align })
@@ -1243,13 +1650,35 @@ export async function generateAnnexe6Pdf(data: Annexe6Input): Promise<void> {
   const { logo, docCode, verifyUrl, qrDataUri } = await buildPdfBase('6', data)
 
   startPage(doc, docCode, 1, 1)
-  let y = drawHeaderBand(doc, '6', 'Suivi des Travaux et Opérations Non Courantes', logo)
+  let y = drawHeaderBand(
+    doc,
+    '6',
+    'Suivi des Travaux et Opérations Non Courantes',
+    logo,
+  )
   y = drawInfoRow(doc, y + 5, data)
   y = drawKpiRow(doc, y, [
-    { label: 'Montant voté',    value: fmtMad(data.totals.vote),   accent: NAVY },
-    { label: 'Montant engagé',  value: fmtMad(data.totals.engage), accent: ORANGE },
-    { label: 'Montant réglé',   value: fmtMad(data.totals.regle),  accent: GREEN, color: GREEN },
-    { label: 'Reste à régler',  value: fmtMad(data.totals.reste),  accent: ORANGE, color: data.totals.reste > 0 ? [220, 38, 38] as [number, number, number] : TEXT_DARK },
+    { label: 'Montant voté', value: fmtMad(data.totals.vote), accent: NAVY },
+    {
+      label: 'Montant engagé',
+      value: fmtMad(data.totals.engage),
+      accent: ORANGE,
+    },
+    {
+      label: 'Montant réglé',
+      value: fmtMad(data.totals.regle),
+      accent: GREEN,
+      color: GREEN,
+    },
+    {
+      label: 'Reste à régler',
+      value: fmtMad(data.totals.reste),
+      accent: ORANGE,
+      color:
+        data.totals.reste > 0
+          ? ([220, 38, 38] as [number, number, number])
+          : TEXT_DARK,
+    },
   ])
   y += 6
 
@@ -1279,7 +1708,13 @@ export async function generateAnnexe6Pdf(data: Annexe6Input): Promise<void> {
       doc.setFontSize(8)
       doc.setTextColor(...TEXT_DARK)
       let rx = MARGIN + 4
-      ;[r.libelle, r.date, fmtMad(r.montantVote), fmtMad(r.montantEngage), fmtMad(r.montantRegle)].forEach((c, i) => {
+      ;[
+        r.libelle,
+        r.date,
+        fmtMad(r.montantVote),
+        fmtMad(r.montantEngage),
+        fmtMad(r.montantRegle),
+      ].forEach((c, i) => {
         const align = i <= 1 ? 'left' : 'right'
         const tx = align === 'right' ? rx + colW[i] - 4 : rx
         doc.text(c, tx, y + 5.5, { align })
@@ -1299,7 +1734,12 @@ export async function generateAnnexe6Pdf(data: Annexe6Input): Promise<void> {
 
 export type Annexe7FlowRow = { libelle: string; montant: number; date?: string }
 export type Annexe7Input = AnnexeCommonInput & {
-  totals: { soldeOuverture: number; encaissements: number; decaissements: number; soldeCloture: number }
+  totals: {
+    soldeOuverture: number
+    encaissements: number
+    decaissements: number
+    soldeCloture: number
+  }
   encaissements: Annexe7FlowRow[]
   decaissements: Annexe7FlowRow[]
 }
@@ -1312,20 +1752,47 @@ export async function generateAnnexe7Pdf(data: Annexe7Input): Promise<void> {
   let y = drawHeaderBand(doc, '7', 'Mouvements de Trésorerie', logo)
   y = drawInfoRow(doc, y + 5, data)
   y = drawKpiRow(doc, y, [
-    { label: 'Solde ouverture',  value: fmtMad(data.totals.soldeOuverture),  accent: NAVY },
-    { label: 'Encaissements',    value: fmtMad(data.totals.encaissements),   accent: GREEN, color: GREEN },
-    { label: 'Décaissements',    value: fmtMad(data.totals.decaissements),   accent: ORANGE },
-    { label: 'Solde clôture',    value: fmtMad(data.totals.soldeCloture),    accent: NAVY,
-      color: data.totals.soldeCloture >= 0 ? GREEN : [220, 38, 38] as [number, number, number] },
+    {
+      label: 'Solde ouverture',
+      value: fmtMad(data.totals.soldeOuverture),
+      accent: NAVY,
+    },
+    {
+      label: 'Encaissements',
+      value: fmtMad(data.totals.encaissements),
+      accent: GREEN,
+      color: GREEN,
+    },
+    {
+      label: 'Décaissements',
+      value: fmtMad(data.totals.decaissements),
+      accent: ORANGE,
+    },
+    {
+      label: 'Solde clôture',
+      value: fmtMad(data.totals.soldeCloture),
+      accent: NAVY,
+      color:
+        data.totals.soldeCloture >= 0
+          ? GREEN
+          : ([220, 38, 38] as [number, number, number]),
+    },
   ])
   y += 6
 
   const renderFlowTable = (
-    title: string, rows: Annexe7FlowRow[], accent: [number, number, number], yStart: number,
+    title: string,
+    rows: Annexe7FlowRow[],
+    accent: [number, number, number],
+    yStart: number,
   ): number => {
     let yy = drawSubsectionBand(doc, title, accent, yStart)
     if (rows.length === 0) {
-      yy = drawEmptyState(doc, `Aucun ${title.toLowerCase()} pour cet exercice`, yy)
+      yy = drawEmptyState(
+        doc,
+        `Aucun ${title.toLowerCase()} pour cet exercice`,
+        yy,
+      )
     } else {
       const colW = [110, 30, 42]
       doc.setFillColor(...HEADER_BG)
@@ -1334,8 +1801,12 @@ export async function generateAnnexe7Pdf(data: Annexe7Input): Promise<void> {
       doc.setFontSize(7.5)
       doc.setTextColor(...NAVY)
       doc.text('LIBELLÉ', MARGIN + 4, yy + 5.5)
-      doc.text('DATE',    MARGIN + colW[0] + colW[1] - 4, yy + 5.5, { align: 'right' })
-      doc.text('MONTANT', MARGIN + colW[0] + colW[1] + colW[2] - 4, yy + 5.5, { align: 'right' })
+      doc.text('DATE', MARGIN + colW[0] + colW[1] - 4, yy + 5.5, {
+        align: 'right',
+      })
+      doc.text('MONTANT', MARGIN + colW[0] + colW[1] + colW[2] - 4, yy + 5.5, {
+        align: 'right',
+      })
       yy += 8
       rows.forEach((r, i) => {
         if (i % 2 === 1) {
@@ -1346,8 +1817,15 @@ export async function generateAnnexe7Pdf(data: Annexe7Input): Promise<void> {
         doc.setFontSize(8.5)
         doc.setTextColor(...TEXT_DARK)
         doc.text(r.libelle, MARGIN + 4, yy + 5)
-        doc.text(r.date ?? '—', MARGIN + colW[0] + colW[1] - 4, yy + 5, { align: 'right' })
-        doc.text(fmtMad(r.montant), MARGIN + colW[0] + colW[1] + colW[2] - 4, yy + 5, { align: 'right' })
+        doc.text(r.date ?? '—', MARGIN + colW[0] + colW[1] - 4, yy + 5, {
+          align: 'right',
+        })
+        doc.text(
+          fmtMad(r.montant),
+          MARGIN + colW[0] + colW[1] + colW[2] - 4,
+          yy + 5,
+          { align: 'right' },
+        )
         yy += 7.5
       })
     }
@@ -1388,9 +1866,26 @@ export async function generateAnnexe8Pdf(data: Annexe8Input): Promise<void> {
   let y = drawHeaderBand(doc, '8', 'Suivi des Emprunts', logo)
   y = drawInfoRow(doc, y + 5, data)
   y = drawKpiRow(doc, y, [
-    { label: 'Total emprunté',  value: fmtMad(data.totals.emprunte), accent: NAVY },
-    { label: 'Payé cet exercice', value: fmtMad(data.totals.paye),   accent: GREEN, color: GREEN },
-    { label: 'Reste à payer',   value: fmtMad(data.totals.reste),    accent: ORANGE, color: data.totals.reste > 0 ? [220, 38, 38] as [number, number, number] : TEXT_DARK },
+    {
+      label: 'Total emprunté',
+      value: fmtMad(data.totals.emprunte),
+      accent: NAVY,
+    },
+    {
+      label: 'Payé cet exercice',
+      value: fmtMad(data.totals.paye),
+      accent: GREEN,
+      color: GREEN,
+    },
+    {
+      label: 'Reste à payer',
+      value: fmtMad(data.totals.reste),
+      accent: ORANGE,
+      color:
+        data.totals.reste > 0
+          ? ([220, 38, 38] as [number, number, number])
+          : TEXT_DARK,
+    },
   ])
   y += 6
 
@@ -1404,12 +1899,14 @@ export async function generateAnnexe8Pdf(data: Annexe8Input): Promise<void> {
     doc.setFontSize(7)
     doc.setTextColor(255, 255, 255)
     let cx = MARGIN + 4
-    ;['LIBELLÉ', 'ORGANISME', 'DÉBUT', 'INITIAL', 'PAYÉ', 'RESTE'].forEach((h, i) => {
-      const align = i <= 2 ? 'left' : 'right'
-      const tx = align === 'right' ? cx + colW[i] - 4 : cx
-      doc.text(h, tx, y + 6, { align })
-      cx += colW[i]
-    })
+    ;['LIBELLÉ', 'ORGANISME', 'DÉBUT', 'INITIAL', 'PAYÉ', 'RESTE'].forEach(
+      (h, i) => {
+        const align = i <= 2 ? 'left' : 'right'
+        const tx = align === 'right' ? cx + colW[i] - 4 : cx
+        doc.text(h, tx, y + 6, { align })
+        cx += colW[i]
+      },
+    )
     y += 9
     data.rows.forEach((r, idx) => {
       if (idx % 2 === 1) {
@@ -1420,7 +1917,14 @@ export async function generateAnnexe8Pdf(data: Annexe8Input): Promise<void> {
       doc.setFontSize(8)
       doc.setTextColor(...TEXT_DARK)
       let rx = MARGIN + 4
-      ;[r.libelle, r.organisme, r.dateDebut, fmtMad(r.montantInitial), fmtMad(r.paye), fmtMad(r.reste)].forEach((c, i) => {
+      ;[
+        r.libelle,
+        r.organisme,
+        r.dateDebut,
+        fmtMad(r.montantInitial),
+        fmtMad(r.paye),
+        fmtMad(r.reste),
+      ].forEach((c, i) => {
         const align = i <= 2 ? 'left' : 'right'
         const tx = align === 'right' ? rx + colW[i] - 4 : rx
         doc.text(c, tx, y + 5.5, { align })
@@ -1447,7 +1951,11 @@ export type Annexe9Row = {
 }
 
 export type Annexe9Input = AnnexeCommonInput & {
-  totals: { nbArticles: number; valeurTotale: number; valeurNetteTotale: number }
+  totals: {
+    nbArticles: number
+    valeurTotale: number
+    valeurNetteTotale: number
+  }
   rows: Annexe9Row[]
 }
 
@@ -1459,9 +1967,22 @@ export async function generateAnnexe9Pdf(data: Annexe9Input): Promise<void> {
   let y = drawHeaderBand(doc, '9', 'Suivi des Équipements', logo)
   y = drawInfoRow(doc, y + 5, data)
   y = drawKpiRow(doc, y, [
-    { label: "Nombre d'articles",   value: String(data.totals.nbArticles),       accent: NAVY },
-    { label: 'Valeur acquisition',  value: fmtMad(data.totals.valeurTotale),     accent: ORANGE },
-    { label: 'Valeur nette actuelle', value: fmtMad(data.totals.valeurNetteTotale), accent: GREEN, color: GREEN },
+    {
+      label: "Nombre d'articles",
+      value: String(data.totals.nbArticles),
+      accent: NAVY,
+    },
+    {
+      label: 'Valeur acquisition',
+      value: fmtMad(data.totals.valeurTotale),
+      accent: ORANGE,
+    },
+    {
+      label: 'Valeur nette actuelle',
+      value: fmtMad(data.totals.valeurNetteTotale),
+      accent: GREEN,
+      color: GREEN,
+    },
   ])
   y += 6
 
@@ -1475,7 +1996,13 @@ export async function generateAnnexe9Pdf(data: Annexe9Input): Promise<void> {
     doc.setFontSize(7)
     doc.setTextColor(255, 255, 255)
     let cx = MARGIN + 4
-    ;['DÉSIGNATION', 'CATÉGORIE', 'ACQUIS LE', 'V. ACQUISITION', 'V. NETTE'].forEach((h, i) => {
+    ;[
+      'DÉSIGNATION',
+      'CATÉGORIE',
+      'ACQUIS LE',
+      'V. ACQUISITION',
+      'V. NETTE',
+    ].forEach((h, i) => {
       const align = i <= 2 ? 'left' : 'right'
       const tx = align === 'right' ? cx + colW[i] - 4 : cx
       doc.text(h, tx, y + 6, { align })
@@ -1491,7 +2018,13 @@ export async function generateAnnexe9Pdf(data: Annexe9Input): Promise<void> {
       doc.setFontSize(8)
       doc.setTextColor(...TEXT_DARK)
       let rx = MARGIN + 4
-      ;[r.designation, r.categorie, r.dateAcquisition, fmtMad(r.valeurAcquisition), fmtMad(r.valeurNette)].forEach((c, i) => {
+      ;[
+        r.designation,
+        r.categorie,
+        r.dateAcquisition,
+        fmtMad(r.valeurAcquisition),
+        fmtMad(r.valeurNette),
+      ].forEach((c, i) => {
         const align = i <= 2 ? 'left' : 'right'
         const tx = align === 'right' ? rx + colW[i] - 4 : rx
         doc.text(c, tx, y + 5.5, { align })
@@ -1520,38 +2053,76 @@ export async function generateAnnexe11Pdf(data: Annexe11Input): Promise<void> {
   const { logo, docCode, verifyUrl, qrDataUri } = await buildPdfBase('11', data)
 
   startPage(doc, docCode, 1, 1)
-  let y = drawHeaderBand(doc, '11', 'État simplifié de la situation financière', logo)
+  let y = drawHeaderBand(
+    doc,
+    '11',
+    'État simplifié de la situation financière',
+    logo,
+  )
   y = drawInfoRow(doc, y + 5, data)
   const equilibre = Math.abs(data.totals.actif - data.totals.passif) < 0.01
   y = drawKpiRow(doc, y, [
-    { label: 'Total Actif',  value: fmtMad(data.totals.actif),  accent: ORANGE },
+    { label: 'Total Actif', value: fmtMad(data.totals.actif), accent: ORANGE },
     { label: 'Total Passif', value: fmtMad(data.totals.passif), accent: NAVY },
-    { label: 'Bilan', value: equilibre ? 'Équilibré' : 'Déséquilibré', accent: GREEN, color: equilibre ? GREEN : [220, 38, 38] as [number, number, number] },
+    {
+      label: 'Bilan',
+      value: equilibre ? 'Équilibré' : 'Déséquilibré',
+      accent: GREEN,
+      color: equilibre ? GREEN : ([220, 38, 38] as [number, number, number]),
+    },
   ])
   y += 6
 
   y = drawBigSectionTitle(doc, 'ACTIF', NAVY, y)
-  y = drawCodeTableHeader(doc, ['CODE', 'LIBELLÉ', 'EXERCICE CLOS (N)', 'EXERCICE PRÉCÉDENT / (N-1)'], y)
+  y = drawCodeTableHeader(
+    doc,
+    ['CODE', 'LIBELLÉ', 'EXERCICE CLOS (N)', 'EXERCICE PRÉCÉDENT / (N-1)'],
+    y,
+  )
   if (data.actifRows.length === 0) {
     y = drawEmptyState(doc, 'Aucune donnée de bilan', y)
   } else {
     data.actifRows.forEach((r, i) => {
-      y = drawCodeRow(doc, r.code, r.libelle, [r.currentValue, r.previousValue], y, { alt: i % 2 === 1 })
+      y = drawCodeRow(
+        doc,
+        r.code,
+        r.libelle,
+        [r.currentValue, r.previousValue],
+        y,
+        { alt: i % 2 === 1 },
+      )
     })
   }
-  y = drawCodeRow(doc, '', 'Total Actif', [data.totals.actif, 0], y, { bold: true, highlight: true })
+  y = drawCodeRow(doc, '', 'Total Actif', [data.totals.actif, 0], y, {
+    bold: true,
+    highlight: true,
+  })
   y += 4
 
   y = drawBigSectionTitle(doc, 'PASSIF', GREEN, y)
-  y = drawCodeTableHeader(doc, ['CODE', 'LIBELLÉ', 'EXERCICE CLOS (N)', 'EXERCICE PRÉCÉDENT / (N-1)'], y)
+  y = drawCodeTableHeader(
+    doc,
+    ['CODE', 'LIBELLÉ', 'EXERCICE CLOS (N)', 'EXERCICE PRÉCÉDENT / (N-1)'],
+    y,
+  )
   if (data.passifRows.length === 0) {
     y = drawEmptyState(doc, 'Aucune donnée de bilan', y)
   } else {
     data.passifRows.forEach((r, i) => {
-      y = drawCodeRow(doc, r.code, r.libelle, [r.currentValue, r.previousValue], y, { alt: i % 2 === 1 })
+      y = drawCodeRow(
+        doc,
+        r.code,
+        r.libelle,
+        [r.currentValue, r.previousValue],
+        y,
+        { alt: i % 2 === 1 },
+      )
     })
   }
-  y = drawCodeRow(doc, '', 'Total Passif', [data.totals.passif, 0], y, { bold: true, highlight: true })
+  y = drawCodeRow(doc, '', 'Total Passif', [data.totals.passif, 0], y, {
+    bold: true,
+    highlight: true,
+  })
 
   drawSignatureBox(doc, Math.max(y + 6, 215))
   drawFooter(doc, 1, 1, qrDataUri, verifyUrl)
@@ -1564,14 +2135,14 @@ export async function generateAnnexe11Pdf(data: Annexe11Input): Promise<void> {
 export type Annexe12Input = AnnexeCommonInput & {
   resultatFinal: number
   // Charges groupées
-  chargesCourantes: Annexe4Row[]      // 611, 612, 613/614, 616, 617
+  chargesCourantes: Annexe4Row[] // 611, 612, 613/614, 616, 617
   totalChargesCourantes: Quad
-  chargesNonCourantes: Annexe4Row[]   // 651, 691
+  chargesNonCourantes: Annexe4Row[] // 651, 691
   totalChargesNonCourantes: Quad
   // Produits groupés
-  produitsCourants: Annexe4Row[]      // 711, 712
+  produitsCourants: Annexe4Row[] // 711, 712
   totalProduitsCourants: Quad
-  produitsNonCourants: Annexe4Row[]   // 751, 791
+  produitsNonCourants: Annexe4Row[] // 751, 791
   totalProduitsNonCourants: Quad
   // Computed
   resultatCourant: Quad
@@ -1598,53 +2169,183 @@ export async function generateAnnexe12Pdf(data: Annexe12Input): Promise<void> {
   doc.text('RÉSULTAT FINAL (VII = III + VI)', MARGIN + 6, y + 7.5)
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(16)
-  doc.setTextColor(...(data.resultatFinal >= 0 ? GREEN : [220, 38, 38] as [number, number, number]))
+  doc.setTextColor(
+    ...(data.resultatFinal >= 0
+      ? GREEN
+      : ([220, 38, 38] as [number, number, number])),
+  )
   doc.text(fmtMad(data.resultatFinal), MARGIN + 6, y + 16)
   y += 20 + 6
 
-  const plHeaders = ['CODE', 'LIBELLÉ', 'BUDGET VOTÉ / (N+1)', 'RÉALISÉ CLOS / (N)', 'BUDGET VOTÉ / (N)', 'APPROUVÉ / (N-1)']
+  const plHeaders = [
+    'CODE',
+    'LIBELLÉ',
+    'BUDGET VOTÉ / (N+1)',
+    'RÉALISÉ CLOS / (N)',
+    'BUDGET VOTÉ / (N)',
+    'APPROUVÉ / (N-1)',
+  ]
   y = drawCodeTableHeader(doc, plHeaders, y)
 
   // CHARGES
   y = drawBigSectionTitle(doc, 'CHARGES', ORANGE, y)
   data.chargesCourantes.forEach((r, i) => {
-    y = drawCodeRow(doc, r.code, r.libelle, [r.q.n1, r.q.n, r.q.n0, r.q.nMinus1], y, { alt: i % 2 === 1 })
+    y = drawCodeRow(
+      doc,
+      r.code,
+      r.libelle,
+      [r.q.n1, r.q.n, r.q.n0, r.q.nMinus1],
+      y,
+      { alt: i % 2 === 1 },
+    )
   })
-  y = drawCodeRow(doc, '', 'Total Charges Courantes (I)', [data.totalChargesCourantes.n1, data.totalChargesCourantes.n, data.totalChargesCourantes.n0, data.totalChargesCourantes.nMinus1], y, {
-    bold: true, highlight: true,
-  })
+  y = drawCodeRow(
+    doc,
+    '',
+    'Total Charges Courantes (I)',
+    [
+      data.totalChargesCourantes.n1,
+      data.totalChargesCourantes.n,
+      data.totalChargesCourantes.n0,
+      data.totalChargesCourantes.nMinus1,
+    ],
+    y,
+    {
+      bold: true,
+      highlight: true,
+    },
+  )
   data.chargesNonCourantes.forEach((r, i) => {
-    y = drawCodeRow(doc, r.code, r.libelle, [r.q.n1, r.q.n, r.q.n0, r.q.nMinus1], y, { alt: i % 2 === 1 })
+    y = drawCodeRow(
+      doc,
+      r.code,
+      r.libelle,
+      [r.q.n1, r.q.n, r.q.n0, r.q.nMinus1],
+      y,
+      { alt: i % 2 === 1 },
+    )
   })
-  y = drawCodeRow(doc, '', 'Total Charges Non Courantes (II)', [data.totalChargesNonCourantes.n1, data.totalChargesNonCourantes.n, data.totalChargesNonCourantes.n0, data.totalChargesNonCourantes.nMinus1], y, {
-    bold: true, highlight: true,
-  })
+  y = drawCodeRow(
+    doc,
+    '',
+    'Total Charges Non Courantes (II)',
+    [
+      data.totalChargesNonCourantes.n1,
+      data.totalChargesNonCourantes.n,
+      data.totalChargesNonCourantes.n0,
+      data.totalChargesNonCourantes.nMinus1,
+    ],
+    y,
+    {
+      bold: true,
+      highlight: true,
+    },
+  )
 
   // PRODUITS
   y = drawBigSectionTitle(doc, 'PRODUITS', GREEN, y)
   data.produitsCourants.forEach((r, i) => {
-    y = drawCodeRow(doc, r.code, r.libelle, [r.q.n1, r.q.n, r.q.n0, r.q.nMinus1], y, { alt: i % 2 === 1 })
+    y = drawCodeRow(
+      doc,
+      r.code,
+      r.libelle,
+      [r.q.n1, r.q.n, r.q.n0, r.q.nMinus1],
+      y,
+      { alt: i % 2 === 1 },
+    )
   })
-  y = drawCodeRow(doc, '', 'Total Produits Courants (III)', [data.totalProduitsCourants.n1, data.totalProduitsCourants.n, data.totalProduitsCourants.n0, data.totalProduitsCourants.nMinus1], y, {
-    bold: true, highlight: true,
-  })
+  y = drawCodeRow(
+    doc,
+    '',
+    'Total Produits Courants (III)',
+    [
+      data.totalProduitsCourants.n1,
+      data.totalProduitsCourants.n,
+      data.totalProduitsCourants.n0,
+      data.totalProduitsCourants.nMinus1,
+    ],
+    y,
+    {
+      bold: true,
+      highlight: true,
+    },
+  )
   data.produitsNonCourants.forEach((r, i) => {
-    y = drawCodeRow(doc, r.code, r.libelle, [r.q.n1, r.q.n, r.q.n0, r.q.nMinus1], y, { alt: i % 2 === 1 })
+    y = drawCodeRow(
+      doc,
+      r.code,
+      r.libelle,
+      [r.q.n1, r.q.n, r.q.n0, r.q.nMinus1],
+      y,
+      { alt: i % 2 === 1 },
+    )
   })
-  y = drawCodeRow(doc, '', 'Total Produits Non Courants (IV)', [data.totalProduitsNonCourants.n1, data.totalProduitsNonCourants.n, data.totalProduitsNonCourants.n0, data.totalProduitsNonCourants.nMinus1], y, {
-    bold: true, highlight: true,
-  })
+  y = drawCodeRow(
+    doc,
+    '',
+    'Total Produits Non Courants (IV)',
+    [
+      data.totalProduitsNonCourants.n1,
+      data.totalProduitsNonCourants.n,
+      data.totalProduitsNonCourants.n0,
+      data.totalProduitsNonCourants.nMinus1,
+    ],
+    y,
+    {
+      bold: true,
+      highlight: true,
+    },
+  )
 
   // Résultats
-  y = drawCodeRow(doc, '', 'Résultat Courant (III - I)', [data.resultatCourant.n1, data.resultatCourant.n, data.resultatCourant.n0, data.resultatCourant.nMinus1], y, {
-    bold: true, highlight: true,
-  })
-  y = drawCodeRow(doc, '', 'Résultat Non Courant (IV - II)', [data.resultatNonCourant.n1, data.resultatNonCourant.n, data.resultatNonCourant.n0, data.resultatNonCourant.nMinus1], y, {
-    bold: true, highlight: true,
-  })
-  y = drawCodeRow(doc, '', 'Résultat Final (VII = III + VI)', [data.resultatFinalQuad.n1, data.resultatFinalQuad.n, data.resultatFinalQuad.n0, data.resultatFinalQuad.nMinus1], y, {
-    bold: true, highlight: true,
-  })
+  y = drawCodeRow(
+    doc,
+    '',
+    'Résultat Courant (III - I)',
+    [
+      data.resultatCourant.n1,
+      data.resultatCourant.n,
+      data.resultatCourant.n0,
+      data.resultatCourant.nMinus1,
+    ],
+    y,
+    {
+      bold: true,
+      highlight: true,
+    },
+  )
+  y = drawCodeRow(
+    doc,
+    '',
+    'Résultat Non Courant (IV - II)',
+    [
+      data.resultatNonCourant.n1,
+      data.resultatNonCourant.n,
+      data.resultatNonCourant.n0,
+      data.resultatNonCourant.nMinus1,
+    ],
+    y,
+    {
+      bold: true,
+      highlight: true,
+    },
+  )
+  y = drawCodeRow(
+    doc,
+    '',
+    'Résultat Final (VII = III + VI)',
+    [
+      data.resultatFinalQuad.n1,
+      data.resultatFinalQuad.n,
+      data.resultatFinalQuad.n0,
+      data.resultatFinalQuad.nMinus1,
+    ],
+    y,
+    {
+      bold: true,
+      highlight: true,
+    },
+  )
 
   drawSignatureBox(doc, Math.max(y + 6, 215))
   drawFooter(doc, 1, 1, qrDataUri, verifyUrl)
@@ -1662,7 +2363,8 @@ export async function generateAnnexePdf(
   annexeNum: string,
   ctx: AnnexeCommonInput,
 ): Promise<void> {
-  const logoInvertedDataUri = ctx.logoInvertedDataUri ?? (await loadLogo('horizontal-inverted'))
+  const logoInvertedDataUri =
+    ctx.logoInvertedDataUri ?? (await loadLogo('horizontal-inverted'))
   const enriched = { ...ctx, logoInvertedDataUri }
 
   const zero4: Quad = { n1: 0, n: 0, n0: 0, nMinus1: 0 }
@@ -1672,15 +2374,18 @@ export async function generateAnnexePdf(
     case '3':
       return generateAnnexe3Pdf({
         ...enriched,
-        actif:  { sections: [], total: emptyTotal },
+        actif: { sections: [], total: emptyTotal },
         passif: { sections: [], total: emptyTotal },
       })
     case '4':
       return generateAnnexe4Pdf({
         ...enriched,
         totals: { charges: 0, produits: 0, resultat: 0 },
-        chargesSections: [], produitsSections: [],
-        totalCharges: zero4, totalProduits: zero4, resultatNet: zero4,
+        chargesSections: [],
+        produitsSections: [],
+        totalCharges: zero4,
+        totalProduits: zero4,
+        resultatNet: zero4,
       })
     case '5':
       return generateAnnexe5Pdf({
@@ -1697,8 +2402,14 @@ export async function generateAnnexePdf(
     case '7':
       return generateAnnexe7Pdf({
         ...enriched,
-        totals: { soldeOuverture: 0, encaissements: 0, decaissements: 0, soldeCloture: 0 },
-        encaissements: [], decaissements: [],
+        totals: {
+          soldeOuverture: 0,
+          encaissements: 0,
+          decaissements: 0,
+          soldeCloture: 0,
+        },
+        encaissements: [],
+        decaissements: [],
       })
     case '8':
       return generateAnnexe8Pdf({
@@ -1722,22 +2433,29 @@ export async function generateAnnexePdf(
       return generateAnnexe11Pdf({
         ...enriched,
         totals: { actif: 0, passif: 0 },
-        actifRows: [], passifRows: [],
+        actifRows: [],
+        passifRows: [],
       })
     case '12':
       return generateAnnexe12Pdf({
         ...enriched,
         resultatFinal: 0,
-        chargesCourantes: [], totalChargesCourantes: zero4,
-        chargesNonCourantes: [], totalChargesNonCourantes: zero4,
-        produitsCourants: [], totalProduitsCourants: zero4,
-        produitsNonCourants: [], totalProduitsNonCourants: zero4,
-        resultatCourant: zero4, resultatNonCourant: zero4, resultatFinalQuad: zero4,
+        chargesCourantes: [],
+        totalChargesCourantes: zero4,
+        chargesNonCourantes: [],
+        totalChargesNonCourantes: zero4,
+        produitsCourants: [],
+        totalProduitsCourants: zero4,
+        produitsNonCourants: [],
+        totalProduitsNonCourants: zero4,
+        resultatCourant: zero4,
+        resultatNonCourant: zero4,
+        resultatFinalQuad: zero4,
       })
     case '13-1':
       return generateAnnexe131Pdf({
         ...enriched,
-        current:  { fondsReserve: 0, creances: 0, dettes: 0, tresorerie: 0 },
+        current: { fondsReserve: 0, creances: 0, dettes: 0, tresorerie: 0 },
         previous: { fondsReserve: 0, creances: 0, dettes: 0, tresorerie: 0 },
       })
     case '13-2':
@@ -1745,11 +2463,17 @@ export async function generateAnnexePdf(
         ...enriched,
         excedent: 0,
         recettes: {
-          cotisations: zero4, fondsReserve: zero4, autresAg: zero4, autresProduits: zero4,
+          cotisations: zero4,
+          fondsReserve: zero4,
+          autresAg: zero4,
+          autresProduits: zero4,
         },
         depenses: {
-          matieres: zero4, servicesExterieurs: zero4, impotsTaxes: zero4,
-          personnel: zero4, autresCharges: zero4,
+          matieres: zero4,
+          servicesExterieurs: zero4,
+          impotsTaxes: zero4,
+          personnel: zero4,
+          autresCharges: zero4,
         },
       })
     default:

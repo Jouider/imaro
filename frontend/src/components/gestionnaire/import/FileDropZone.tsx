@@ -13,7 +13,12 @@ type Props = {
 
 const ACCEPTED = '.xlsx,.csv,.xls'
 
-export function FileDropZone({ onFileSelected, onDownloadTemplate, accept = ACCEPTED, loading }: Props) {
+export function FileDropZone({
+  onFileSelected,
+  onDownloadTemplate,
+  accept = ACCEPTED,
+  loading,
+}: Props) {
   const { t } = useTranslation()
   const [dragOver, setDragOver] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -54,15 +59,18 @@ export function FileDropZone({ onFileSelected, onDownloadTemplate, accept = ACCE
     <div className="space-y-4">
       {/* Drop zone */}
       <div
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+        onDragOver={(e) => {
+          e.preventDefault()
+          setDragOver(true)
+        }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
         className={cn(
           'relative flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-10 transition-all cursor-pointer',
           dragOver
-            ? 'border-[#1B4F72] bg-[#1B4F72]/5 scale-[1.01]'
-            : 'border-muted-foreground/25 hover:border-[#1B4F72]/50 hover:bg-muted/30',
+            ? 'border-[var(--color-imaro-primary)] bg-[var(--color-imaro-primary)]/5 scale-[1.01]'
+            : 'border-muted-foreground/25 hover:border-[var(--color-imaro-primary)]/50 hover:bg-muted/30',
           loading && 'pointer-events-none opacity-50',
         )}
       >
@@ -79,9 +87,14 @@ export function FileDropZone({ onFileSelected, onDownloadTemplate, accept = ACCE
           <>
             <FileSpreadsheet className="size-10 text-green-600" />
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-foreground">{selectedFile.name}</span>
+              <span className="text-sm font-medium text-foreground">
+                {selectedFile.name}
+              </span>
               <button
-                onClick={(e) => { e.stopPropagation(); clearFile() }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  clearFile()
+                }}
                 className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
                 aria-label="Retirer le fichier"
               >
@@ -111,7 +124,7 @@ export function FileDropZone({ onFileSelected, onDownloadTemplate, accept = ACCE
 
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-background/60 backdrop-blur-sm">
-            <div className="size-6 animate-spin rounded-full border-2 border-[#1B4F72] border-t-transparent" />
+            <div className="size-6 animate-spin rounded-full border-2 border-[var(--color-imaro-primary)] border-t-transparent" />
           </div>
         )}
       </div>
@@ -121,7 +134,10 @@ export function FileDropZone({ onFileSelected, onDownloadTemplate, accept = ACCE
         <Button
           variant="outline"
           size="sm"
-          onClick={(e) => { e.stopPropagation(); onDownloadTemplate() }}
+          onClick={(e) => {
+            e.stopPropagation()
+            onDownloadTemplate()
+          }}
           className="gap-2 text-xs"
         >
           <Download className="size-3.5" />

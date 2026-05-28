@@ -36,6 +36,7 @@ import { EmpruntsPage } from '@/pages/gestionnaire/EmpruntsPage'
 import { TravauxExceptionnelsPage } from '@/pages/gestionnaire/TravauxExceptionnelsPage'
 import { AutresRecettesPage } from '@/pages/gestionnaire/AutresRecettesPage'
 import { RemboursementsPage } from '@/pages/gestionnaire/RemboursementsPage'
+import { IaAssistantPage } from '@/pages/gestionnaire/IaAssistantPage'
 
 export const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
@@ -77,7 +78,10 @@ export const router = createBrowserRouter([
       { path: 'residences', element: <ResidencesPage /> },
       { path: 'residences/:id', element: <ResidencePage /> },
       { path: 'coproprietaires', element: <CoproprietairesPage /> },
-      { path: 'appels-fonds', element: <Navigate to="/gestionnaire/paiements" replace /> },
+      {
+        path: 'appels-fonds',
+        element: <Navigate to="/gestionnaire/paiements" replace />,
+      },
       { path: 'paiements', element: <PaiementsPage /> },
       { path: 'tickets', element: <TicketsPage /> },
       { path: 'assemblees', element: <AssembleesPage /> },
@@ -96,6 +100,7 @@ export const router = createBrowserRouter([
       { path: 'travaux-exceptionnels', element: <TravauxExceptionnelsPage /> },
       { path: 'autres-recettes', element: <AutresRecettesPage /> },
       { path: 'remboursements', element: <RemboursementsPage /> },
+      { path: 'ia', element: <IaAssistantPage /> },
       { path: 'conformite', element: <ConformitePage /> },
       { path: 'annexes', element: <AnnexesPage /> },
       { path: 'audit', element: <AuditTrailPage /> },

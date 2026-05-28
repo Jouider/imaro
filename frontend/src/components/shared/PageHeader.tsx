@@ -66,7 +66,7 @@ export function PageHeader({
       )}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-[var(--primary)]">
+          <h1 className="font-display text-3xl leading-tight tracking-tight text-[var(--primary)]">
             {title}
           </h1>
           {subtitle && (

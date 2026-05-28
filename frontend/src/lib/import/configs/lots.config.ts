@@ -1,7 +1,14 @@
 import type { ImportConfig, ImportContext } from '../types'
 import { validateNumber, parseNumber } from '../validators'
 
-const LOT_TYPES = ['appartement', 'commerce', 'parking', 'cave', 'bureau', 'autre']
+const LOT_TYPES = [
+  'appartement',
+  'commerce',
+  'parking',
+  'cave',
+  'bureau',
+  'autre',
+]
 
 export type LotImportPayload = {
   numero: string
@@ -20,7 +27,16 @@ export const lotsConfig: ImportConfig<LotImportPayload> = {
     {
       key: 'numero',
       label: 'Numéro du lot',
-      aliases: ['numero', 'num lot', 'n° lot', 'n°lot', 'lot', 'unit', 'numero lot', 'num'],
+      aliases: [
+        'numero',
+        'num lot',
+        'n° lot',
+        'n°lot',
+        'lot',
+        'unit',
+        'numero lot',
+        'num',
+      ],
       type: 'string',
       required: true,
     },
@@ -48,14 +64,30 @@ export const lotsConfig: ImportConfig<LotImportPayload> = {
     {
       key: 'tantieme',
       label: 'Tantième',
-      aliases: ['tantieme', 'tantième', 'millieme', 'millième', 'quote-part', 'quote part', 'tantiemes', 'tantièmes'],
+      aliases: [
+        'tantieme',
+        'tantième',
+        'millieme',
+        'millième',
+        'quote-part',
+        'quote part',
+        'tantiemes',
+        'tantièmes',
+      ],
       type: 'number',
       required: true,
     },
     {
       key: 'immeuble',
       label: 'Immeuble',
-      aliases: ['immeuble', 'building', 'bloc', 'block', 'batiment', 'bâtiment'],
+      aliases: [
+        'immeuble',
+        'building',
+        'bloc',
+        'block',
+        'batiment',
+        'bâtiment',
+      ],
       type: 'string',
       required: false,
     },
@@ -75,9 +107,13 @@ export const lotsConfig: ImportConfig<LotImportPayload> = {
       errors.push('Tantième doit être > 0')
     }
 
-    const typeVal = String(row.type ?? '').trim().toLowerCase()
+    const typeVal = String(row.type ?? '')
+      .trim()
+      .toLowerCase()
     if (typeVal && !LOT_TYPES.includes(typeVal)) {
-      errors.push(`Type inconnu: "${typeVal}" (attendu: ${LOT_TYPES.join(', ')})`)
+      errors.push(
+        `Type inconnu: "${typeVal}" (attendu: ${LOT_TYPES.join(', ')})`,
+      )
     }
 
     const superficieStr = String(row.superficie ?? '').trim()
@@ -93,8 +129,13 @@ export const lotsConfig: ImportConfig<LotImportPayload> = {
     return errors
   },
 
-  transform(row: Record<string, unknown>, ctx: ImportContext): LotImportPayload {
-    const typeVal = String(row.type ?? '').trim().toLowerCase()
+  transform(
+    row: Record<string, unknown>,
+    ctx: ImportContext,
+  ): LotImportPayload {
+    const typeVal = String(row.type ?? '')
+      .trim()
+      .toLowerCase()
     const immeubleStr = String(row.immeuble ?? '').trim()
     const etageStr = String(row.etage ?? '').trim()
     const superficieStr = String(row.superficie ?? '').trim()
@@ -123,7 +164,21 @@ export const lotsConfig: ImportConfig<LotImportPayload> = {
   chunkSize: 50,
   templateFileName: 'imaro-lots-template.xlsx',
   templateExampleRows: [
-    { numero: 'A-101', type: 'appartement', etage: 1, superficie: 85, tantieme: 45, immeuble: 'Bloc A' },
-    { numero: 'P-01', type: 'parking', etage: -1, superficie: 15, tantieme: 8, immeuble: 'Bloc A' },
+    {
+      numero: 'A-101',
+      type: 'appartement',
+      etage: 1,
+      superficie: 85,
+      tantieme: 45,
+      immeuble: 'Bloc A',
+    },
+    {
+      numero: 'P-01',
+      type: 'parking',
+      etage: -1,
+      superficie: 15,
+      tantieme: 8,
+      immeuble: 'Bloc A',
+    },
   ],
 }

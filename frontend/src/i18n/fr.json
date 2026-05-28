@@ -46,7 +46,28 @@
       "actualites": "Actualités",
       "finances": "Finances",
       "reclamations": "Réclamations",
-      "profil": "Profil"
+      "profil": "Profil",
+      "notifications": "Notifications",
+      "bottomBar": "Navigation principale"
+    },
+    "installPrompt": {
+      "title": "Installer Imaro",
+      "desc": "Ajoutez Imaro à votre écran d'accueil pour un accès rapide hors-ligne.",
+      "install": "Installer",
+      "later": "Plus tard"
+    },
+    "pullToRefresh": {
+      "release": "Relâcher pour actualiser",
+      "pull": "Tirer pour actualiser",
+      "refreshing": "Actualisation…"
+    },
+    "push": {
+      "title": "Notifications push",
+      "desc": "Recevez une alerte instantanée pour vos paiements et réclamations.",
+      "enable": "Activer",
+      "disable": "Désactiver",
+      "enabled": "Notifications activées",
+      "unsupported": "Non supporté sur ce navigateur"
     },
     "home": {
       "balance": "Mon solde",
@@ -123,7 +144,13 @@
       "title": "Mon profil",
       "apparence": "Apparence",
       "darkMode": "Mode sombre",
-      "logout": "Se déconnecter"
+      "logout": "Se déconnecter",
+      "contact": "Mes coordonnées",
+      "preferences": "Préférences",
+      "account": "Compte",
+      "privacy": "Confidentialité",
+      "logoutConfirmTitle": "Se déconnecter ?",
+      "logoutConfirmDesc": "Vous devrez à nouveau saisir votre OTP WhatsApp pour revenir."
     },
     "login": {
       "title": "Portail copropriétaire",
@@ -187,19 +214,46 @@
     "features": {
       "title": "Tout ce dont vous avez besoin",
       "sub": "Une solution complète pour la gestion moderne de copropriété",
-      "residences": { "title": "Gestion des résidences", "desc": "Lots, tantièmes et copropriétaires centralisés" },
-      "appels": { "title": "Appels de fonds automatisés", "desc": "Calcul par tantième, envoi WhatsApp instantané" },
-      "paiements": { "title": "Suivi des paiements", "desc": "Historique complet et impayés en temps réel" },
-      "tickets": { "title": "Tickets & réclamations", "desc": "Traitement avec photos et suivi de statut" },
-      "assemblees": { "title": "Assemblées générales", "desc": "Convocations, ordres du jour et procès-verbaux" },
-      "portail": { "title": "Portail copropriétaire", "desc": "Application mobile pour chaque résident" }
+      "residences": {
+        "title": "Gestion des résidences",
+        "desc": "Lots, tantièmes et copropriétaires centralisés"
+      },
+      "appels": {
+        "title": "Appels de fonds automatisés",
+        "desc": "Calcul par tantième, envoi WhatsApp instantané"
+      },
+      "paiements": {
+        "title": "Suivi des paiements",
+        "desc": "Historique complet et impayés en temps réel"
+      },
+      "tickets": {
+        "title": "Tickets & réclamations",
+        "desc": "Traitement avec photos et suivi de statut"
+      },
+      "assemblees": {
+        "title": "Assemblées générales",
+        "desc": "Convocations, ordres du jour et procès-verbaux"
+      },
+      "portail": {
+        "title": "Portail copropriétaire",
+        "desc": "Application mobile pour chaque résident"
+      }
     },
     "howItWorks": {
       "title": "Opérationnel en 3 étapes",
       "sub": "Démarrez en quelques minutes, sans formation technique",
-      "step1": { "title": "Créez votre résidence", "desc": "Ajoutez vos lots, tantièmes et copropriétaires en quelques clics" },
-      "step2": { "title": "Invitez vos copropriétaires", "desc": "Ils reçoivent un accès WhatsApp à leur portail personnel" },
-      "step3": { "title": "Gérez en temps réel", "desc": "Tableau de bord, relances automatiques, rapports instantanés" }
+      "step1": {
+        "title": "Créez votre résidence",
+        "desc": "Ajoutez vos lots, tantièmes et copropriétaires en quelques clics"
+      },
+      "step2": {
+        "title": "Invitez vos copropriétaires",
+        "desc": "Ils reçoivent un accès WhatsApp à leur portail personnel"
+      },
+      "step3": {
+        "title": "Gérez en temps réel",
+        "desc": "Tableau de bord, relances automatiques, rapports instantanés"
+      }
     },
     "portals": {
       "gestionnaire": {
@@ -219,9 +273,288 @@
       "copyright": "© 2026 Imaro. Tous droits réservés."
     }
   },
+  "landing": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "ia": "IA",
+      "pricing": "Tarifs",
+      "faq": "FAQ",
+      "login": "Connexion",
+      "cta": "Demander une démo"
+    },
+    "hero": {
+      "eyebrow": "Décret 2.23.700 · 100 % conforme",
+      "title1": "Le syndic,",
+      "title2": "simplifié.",
+      "subtitle": "Imaro réunit comptabilité, conformité, recouvrement et IA dans une seule plateforme — pensée pour le marché marocain.",
+      "ctaPrimary": "Essayer gratuitement",
+      "ctaSecondary": "Voir le produit",
+      "trust1": "OTP WhatsApp natif",
+      "trust2": "Plan Comptable Marocain",
+      "trust3": "Conforme Loi 18-00"
+    },
+    "logoBar": {
+      "title": "Ils nous font confiance"
+    },
+    "stats": {
+      "residences": "Résidences gérées",
+      "copros": "Copropriétaires actifs",
+      "uptime": "Disponibilité",
+      "compliance": "Décret 2.23.700"
+    },
+    "features": {
+      "eyebrow": "Modules métier",
+      "title": "Tout ce dont un syndic a besoin",
+      "subtitle": "Huit modules intégrés, plus de 60 fonctionnalités, zéro Excel à maintenir.",
+      "learnMore": "En savoir plus",
+      "recouvrement": {
+        "title": "Recouvrement intelligent",
+        "desc": "Pilotage des impayés, mises en demeure automatiques et alertes prescription quinquennale (Loi 18-00 art. 25)."
+      },
+      "conformite": {
+        "title": "Conformité légale",
+        "desc": "Calendrier annuel, 12 annexes du Décret 2.23.700 générées en un clic, journal d'audit conservé 7 ans."
+      },
+      "pointage": {
+        "title": "Pointage bancaire",
+        "desc": "10 banques marocaines supportées. Auto-match du relevé bancaire avec vos paiements et dépenses en quelques secondes."
+      },
+      "comptabilite": {
+        "title": "Comptabilité partie double",
+        "desc": "Journal, grand-livre, balance, clôture d'exercice — aux normes du Plan Comptable Marocain (CGNC)."
+      },
+      "patrimoine": {
+        "title": "Suivi du patrimoine",
+        "desc": "Équipements amortis, emprunts collectifs, travaux exceptionnels votés en AG — tout est tracé."
+      },
+      "ia": {
+        "title": "Assistant IA",
+        "desc": "Audit de conformité automatisé, OCR des factures, suggestions de budget basées sur l'inflation HCP."
+      }
+    },
+    "ia": {
+      "eyebrow": "Notre moat différenciateur",
+      "title": "L'IA qui rend votre syndic intelligent",
+      "subtitle": "Trois assistants propulsés par Claude qui vous font gagner des heures chaque semaine.",
+      "audit": {
+        "title": "Audit conformité en 30 secondes",
+        "desc": "Vérifie 30+ points légaux et opérationnels, produit un score et des findings actionables."
+      },
+      "ocr": {
+        "title": "OCR factures intelligent",
+        "desc": "Drop une facture PDF ou photo, l'IA extrait fournisseur, ICE, HT/TVA/TTC, et propose le compte PCM."
+      },
+      "budget": {
+        "title": "Suggestions budget basées sur les données",
+        "desc": "Analyse vos exercices passés + inflation HCP + hausses Lydec/Redal pour proposer le budget N+1."
+      },
+      "report": {
+        "title": "Rapport d'audit",
+        "subtitle": "Résidence Atlas · 2026",
+        "status": "Bon",
+        "f1": "Findings critiques",
+        "f2": "Recommandations",
+        "f3": "Points forts",
+        "finding1": {
+          "title": "Pénalités configurées",
+          "desc": "Vote AG non trouvé dans les PV — vérifier conformité Loi 18-00 art. 25"
+        },
+        "finding2": {
+          "title": "Annexes 10, 13-1, 13-2 générées",
+          "desc": "Cycle de conformité à jour pour l'exercice en cours"
+        }
+      }
+    },
+    "pointage": {
+      "eyebrow": "Pointage bancaire",
+      "title": "Adieu le rapprochement manuel",
+      "subtitle": "Connectez n'importe quelle banque marocaine. Imaro fait le reste.",
+      "banksTitle": "Banques supportées",
+      "fileSize": "32 KB · 124 opérations",
+      "benefit1": "10 banques marocaines + format générique pour le reste",
+      "benefit2": "Auto-matching sur montant, date et libellé avec fuzzy matching",
+      "benefit3": "Confirmation en masse en un clic — fini les heures sur Excel",
+      "summary": "Auto-matché",
+      "timeGain": "de gain par mois sur le pointage"
+    },
+    "comparison": {
+      "eyebrow": "Pourquoi changer",
+      "title": "Excel & courrier vs Imaro",
+      "subtitle": "Pour chaque tâche du syndic, Imaro élimine la saisie manuelle et les erreurs.",
+      "colExcel": "Excel + courrier",
+      "colImaro": "Imaro",
+      "row": {
+        "recouvrement": {
+          "label": "Recouvrement",
+          "excel": "Suivi manuel en tableur, lettres papier",
+          "imaro": "Pénalités auto, mises en demeure générées"
+        },
+        "annexes": {
+          "label": "Annexes Décret 2.23.700",
+          "excel": "Excel + formatage Word à chaque exercice",
+          "imaro": "12 annexes PDF générées en un clic"
+        },
+        "pointage": {
+          "label": "Pointage bancaire",
+          "excel": "2 heures par mois à pointer ligne par ligne",
+          "imaro": "Auto-match 80 % en moins de 10 minutes"
+        },
+        "reporting": {
+          "label": "Reporting AG",
+          "excel": "Compilation manuelle de 5+ documents",
+          "imaro": "Bilan complet + comptes générés automatiquement"
+        },
+        "archivage": {
+          "label": "Archivage",
+          "excel": "Classeurs papier dans le bureau",
+          "imaro": "GED chiffrée + rétention 7 ans automatique"
+        },
+        "ia": {
+          "label": "Saisie factures",
+          "excel": "Re-typer chaque facture à la main",
+          "imaro": "OCR IA en 3 secondes par facture"
+        }
+      }
+    },
+    "testimonials": {
+      "eyebrow": "Témoignages",
+      "title": "Ce qu'en disent les syndics",
+      "residences": "résidences",
+      "t1": {
+        "quote": "On a fait passer notre cabinet de 8 à 24 résidences sans embaucher. Imaro a remplacé 3 outils différents et nous a fait gagner 2 jours par mois en pointage.",
+        "name": "Hassan Alaoui",
+        "role": "Syndic Owner, Atlas Promotion"
+      },
+      "t2": {
+        "quote": "L'audit IA m'a évité une non-conformité majeure avant une AG. Le rapport est livré en 30 secondes, c'est bluffant.",
+        "name": "Salma Bennani",
+        "role": "Gestionnaire, Anfa Gestion"
+      },
+      "t3": {
+        "quote": "Nos copropriétaires adorent le portail mobile. Le taux d'impayés a baissé de 18 % en 6 mois grâce aux notifications WhatsApp.",
+        "name": "Karim El Fassi",
+        "role": "Conseil syndical, Marina Tower"
+      }
+    },
+    "pricing": {
+      "eyebrow": "Tarifs",
+      "title": "Un plan pour chaque cabinet",
+      "subtitle": "Tarification par lots gérés. Sans engagement, support inclus.",
+      "popular": "Le plus choisi",
+      "from": "à partir de",
+      "currency": "DH",
+      "perMonth": "par mois, HT",
+      "onQuote": "Sur devis",
+      "ctaStart": "Commencer",
+      "ctaContact": "Nous contacter",
+      "features": {
+        "residences": "Résidences illimitées",
+        "copros": "Copropriétaires illimités",
+        "support": "Support email + WhatsApp",
+        "ia": "Assistant IA (audit, OCR, budget)",
+        "pointage": "Pointage bancaire 10 banques",
+        "multitenant": "Multi-tenant + équipes"
+      },
+      "starter": {
+        "name": "Starter",
+        "tagline": "Pour les petits cabinets jusqu'à 5 résidences"
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "Pour les cabinets en croissance"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "tagline": "Pour les grands portefeuilles et groupes immobiliers"
+      }
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Vos questions, nos réponses",
+      "subtitle": "Si la vôtre n'est pas listée, écrivez-nous à support@imaro.ma.",
+      "q1": {
+        "question": "Imaro est-il conforme au Décret 2.23.700 et à la Loi 18-00 ?",
+        "answer": "Oui — totalement. Les 12 annexes obligatoires sont générables en PDF signés. Le calendrier de conformité suit le cycle annuel automatiquement. Le journal d'audit est conservé 7 ans comme l'exige l'article 12."
+      },
+      "q2": {
+        "question": "Combien coûte Imaro pour mon cabinet ?",
+        "answer": "Tarification par tranches de lots gérés. Plan Starter à partir de 299 DH/mois, Pro à 599 DH/mois, Enterprise sur devis. Pas de frais d'installation, pas d'engagement annuel — sans contrainte."
+      },
+      "q3": {
+        "question": "Mes données sont-elles sécurisées ?",
+        "answer": "Multi-tenant strict : votre cabinet est totalement isolé. Aucun autre syndic ne peut voir vos données. Hébergement EU avec sauvegardes quotidiennes. L'IA traite les données via Claude (Anthropic) sans les stocker ni les utiliser pour entraîner les modèles."
+      },
+      "q4": {
+        "question": "Combien de temps prend la migration depuis Excel ?",
+        "answer": "Moins de 30 minutes pour une copropriété moyenne. Le wizard d'import accepte vos fichiers Excel existants, auto-mappe les colonnes et valide chaque ligne avant import. Vous gardez tout votre historique."
+      },
+      "q5": {
+        "question": "Le portail résident est-il vraiment utilisé par les copropriétaires ?",
+        "answer": "Oui — taux d'activation moyen de 78 % dans nos cabinets clients. Connexion par OTP WhatsApp (pas de mot de passe à retenir), interface mobile-first 16 px minimum. Les notifications WhatsApp tiennent le résident au courant en temps réel."
+      },
+      "q6": {
+        "question": "Et si je suis arabophone ?",
+        "answer": "L'interface bascule intégralement en arabe avec layout RTL (droite-à-gauche) en un clic. Tous les modules sont traduits. Les annexes PDF restent en français (langue officielle de l'administration marocaine)."
+      }
+    },
+    "cta": {
+      "eyebrow": "Prêt à passer au syndic moderne ?",
+      "title": "Imaro vous attend.",
+      "subtitle": "Essayez gratuitement pendant 14 jours. Aucun engagement, aucune carte bancaire requise.",
+      "primary": "Démarrer l'essai gratuit",
+      "secondary": "Parler à un expert",
+      "fineprint": "Configuration en moins de 30 minutes · Migration depuis Excel offerte"
+    },
+    "footer": {
+      "tagline": "La plateforme de gestion de copropriété pensée pour le Maroc.",
+      "address": "Casablanca, Maroc",
+      "copyright": "© 2026 Imaro. Tous droits réservés.",
+      "compliance": "✓ Conforme Décret 2.23.700",
+      "maroc": "🇲🇦 Made in Maroc",
+      "col": {
+        "product": "Produit",
+        "company": "Société",
+        "resources": "Ressources",
+        "legal": "Légal"
+      },
+      "link": {
+        "features": "Fonctionnalités",
+        "pricing": "Tarifs",
+        "ia": "Assistant IA",
+        "security": "Sécurité",
+        "about": "À propos",
+        "careers": "Carrières",
+        "contact": "Contact",
+        "blog": "Blog",
+        "docs": "Documentation",
+        "manual": "Manuel utilisateur",
+        "help": "Centre d'aide",
+        "status": "Statut",
+        "terms": "Conditions générales",
+        "privacy": "Confidentialité",
+        "compliance": "Conformité",
+        "cookies": "Cookies"
+      }
+    }
+  },
   "gestionnaire": {
+    "cmdk": {
+      "title": "Recherche rapide",
+      "description": "Tapez pour rechercher une page, lancer une action ou retrouver un copropriétaire",
+      "placeholder": "Rechercher pages, actions, données…",
+      "empty": "Aucun résultat. Essayez un autre mot-clé.",
+      "trigger": "Recherche rapide",
+      "navHeading": "Navigation",
+      "actionsHeading": "Actions rapides",
+      "newTicket": "Créer un ticket",
+      "recordPayment": "Encaisser un paiement",
+      "runAudit": "Lancer l'audit IA",
+      "generateAnnexe": "Générer une annexe",
+      "import": "Importer des données"
+    },
     "nav": {
       "dashboard": "Tableau de bord",
+      "ia": "Assistant IA",
       "sectionCopropriete": "Copropriété",
       "residences": "Résidences",
       "coproprietaires": "Copropriétaires",
@@ -415,6 +748,18 @@
     },
     "dashboard": {
       "title": "Tableau de bord",
+      "greeting": {
+        "morning": "Bonjour",
+        "morningWithName": "Bonjour, {{name}}",
+        "afternoon": "Bon après-midi",
+        "afternoonWithName": "Bon après-midi, {{name}}",
+        "evening": "Bonsoir",
+        "eveningWithName": "Bonsoir, {{name}}"
+      },
+      "residencesSg": "résidence",
+      "residencesPl": "résidences",
+      "actionsSg": "action urgente",
+      "actionsPl": "actions urgentes",
       "filterAll": "Toutes les résidences",
       "kpi": {
         "residences": "Résidences",

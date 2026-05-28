@@ -1,7 +1,8 @@
 import { api, type ApiEnvelope } from '@/lib/axios'
 
 async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
-  if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS) return call()
+  if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS)
+    return call()
   try {
     return await call()
   } catch {
@@ -208,7 +209,7 @@ const MOCK_RECLAMATIONS: Reclamation[] = [
     id: 3,
     reference: 'REC-2026-003',
     categorie: 'Parties communes',
-    sujet: 'Éclairage défectueux cage d\'escalier',
+    sujet: "Éclairage défectueux cage d'escalier",
     statut: 'ouvert',
     priorite: 'normal',
     created_at: '2026-05-12T11:00:00Z',
@@ -226,7 +227,8 @@ const MOCK_ASSEMBLEES_PORTAIL: AssembleePortail[] = [
     statut: 'convoquee',
     quorum_requis: 50,
     participants_count: null,
-    ordre_du_jour: "1. Approbation des comptes 2025\n2. Budget prévisionnel 2026\n3. Élection du syndic\n4. Questions diverses",
+    ordre_du_jour:
+      '1. Approbation des comptes 2025\n2. Budget prévisionnel 2026\n3. Élection du syndic\n4. Questions diverses',
     residence_name: 'Résidence Al Blanca',
   },
   {
@@ -238,7 +240,8 @@ const MOCK_ASSEMBLEES_PORTAIL: AssembleePortail[] = [
     statut: 'convoquee',
     quorum_requis: 75,
     participants_count: null,
-    ordre_du_jour: "1. Validation du devis travaux façade\n2. Modalités de financement\n3. Calendrier des travaux",
+    ordre_du_jour:
+      '1. Validation du devis travaux façade\n2. Modalités de financement\n3. Calendrier des travaux',
     residence_name: 'Résidence Al Blanca',
   },
   {
@@ -250,7 +253,8 @@ const MOCK_ASSEMBLEES_PORTAIL: AssembleePortail[] = [
     statut: 'tenue',
     quorum_requis: 50,
     participants_count: 18,
-    ordre_du_jour: "1. Approbation des comptes 2024\n2. Budget prévisionnel 2025\n3. Questions diverses",
+    ordre_du_jour:
+      '1. Approbation des comptes 2024\n2. Budget prévisionnel 2025\n3. Questions diverses',
     residence_name: 'Résidence Al Blanca',
   },
 ]
@@ -273,28 +277,35 @@ export async function getPortailDashboard(): Promise<DashboardData> {
 
 export async function getOperations(): Promise<Operation[]> {
   return withMock(async () => {
-    const res = await api.get<ApiEnvelope<{ operations: Operation[] }>>('/portail/operations')
+    const res = await api.get<ApiEnvelope<{ operations: Operation[] }>>(
+      '/portail/operations',
+    )
     return res.data.data.operations
   }, MOCK_OPERATIONS)
 }
 
 export async function getAnnonces(): Promise<Annonce[]> {
   return withMock(async () => {
-    const res = await api.get<ApiEnvelope<{ annonces: Annonce[] }>>('/portail/annonces')
+    const res =
+      await api.get<ApiEnvelope<{ annonces: Annonce[] }>>('/portail/annonces')
     return res.data.data.annonces
   }, MOCK_ANNONCES)
 }
 
 export async function getAssembleesPortail(): Promise<AssembleePortail[]> {
   return withMock(async () => {
-    const res = await api.get<ApiEnvelope<{ assemblees: AssembleePortail[] }>>('/portail/assemblees')
+    const res = await api.get<ApiEnvelope<{ assemblees: AssembleePortail[] }>>(
+      '/portail/assemblees',
+    )
     return res.data.data.assemblees
   }, MOCK_ASSEMBLEES_PORTAIL)
 }
 
 export async function getMyReclamations(): Promise<Reclamation[]> {
   return withMock(async () => {
-    const res = await api.get<ApiEnvelope<{ reclamations: Reclamation[] }>>('/portail/reclamations')
+    const res = await api.get<ApiEnvelope<{ reclamations: Reclamation[] }>>(
+      '/portail/reclamations',
+    )
     return res.data.data.reclamations
   }, MOCK_RECLAMATIONS)
 }
@@ -306,11 +317,19 @@ export async function getProfile(): Promise<ResidentProfile> {
   }, MOCK_PROFILE)
 }
 
-export async function updateProfile(data: Partial<Pick<ResidentProfile, 'name' | 'email'>>): Promise<ResidentProfile> {
-  return withMock(async () => {
-    const res = await api.put<ApiEnvelope<ResidentProfile>>('/portail/profil', data)
-    return res.data.data
-  }, { ...MOCK_PROFILE, ...data })
+export async function updateProfile(
+  data: Partial<Pick<ResidentProfile, 'name' | 'email'>>,
+): Promise<ResidentProfile> {
+  return withMock(
+    async () => {
+      const res = await api.put<ApiEnvelope<ResidentProfile>>(
+        '/portail/profil',
+        data,
+      )
+      return res.data.data
+    },
+    { ...MOCK_PROFILE, ...data },
+  )
 }
 
 export async function createReclamation(data: {
@@ -335,7 +354,11 @@ export async function createReclamation(data: {
 
 // ─── Portail Documents ────────────────────────────────────────────────────────
 
-export type PortailDocumentType = 'reglement' | 'pv_ag' | 'contrat_facture' | 'autre'
+export type PortailDocumentType =
+  | 'reglement'
+  | 'pv_ag'
+  | 'contrat_facture'
+  | 'autre'
 
 export type PortailDocument = {
   id: number
@@ -383,7 +406,10 @@ const MOCK_PORTAIL_DOCUMENTS: PortailDocument[] = [
 
 export async function getPortailDocuments(): Promise<PortailDocument[]> {
   return withMock(async () => {
-    const res = await api.get<ApiEnvelope<{ documents: PortailDocument[] }>>('/portail/documents')
+    const res =
+      await api.get<ApiEnvelope<{ documents: PortailDocument[] }>>(
+        '/portail/documents',
+      )
     return res.data.data.documents
   }, MOCK_PORTAIL_DOCUMENTS)
 }

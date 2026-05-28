@@ -14,7 +14,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { createReclamation, getMyReclamations, type Reclamation } from '@/services/portail.service'
+import {
+  createReclamation,
+  getMyReclamations,
+  type Reclamation,
+} from '@/services/portail.service'
 import { cn } from '@/lib/utils'
 
 type Tab = 'submit' | 'history'
@@ -67,19 +71,21 @@ export function PortailReclamationsPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 border-b">
-        <TabBtn active={activeTab === 'submit'} onClick={() => setActiveTab('submit')}>
+        <TabBtn
+          active={activeTab === 'submit'}
+          onClick={() => setActiveTab('submit')}
+        >
           Signaler
         </TabBtn>
-        <TabBtn active={activeTab === 'history'} onClick={() => setActiveTab('history')}>
+        <TabBtn
+          active={activeTab === 'history'}
+          onClick={() => setActiveTab('history')}
+        >
           Mes réclamations
         </TabBtn>
       </div>
 
-      {activeTab === 'submit' ? (
-        <SubmitForm t={t} qc={qc} />
-      ) : (
-        <HistoryTab />
-      )}
+      {activeTab === 'submit' ? <SubmitForm t={t} qc={qc} /> : <HistoryTab />}
     </div>
   )
 }
@@ -136,14 +142,16 @@ function SubmitForm({
       setPreviews([])
       void qc.invalidateQueries({ queryKey: ['portail-reclamations'] })
     },
-    onError: () => toast.error('Erreur lors de l\'envoi'),
+    onError: () => toast.error("Erreur lors de l'envoi"),
   })
 
   function validate(): boolean {
     const next: Partial<FormState> = {}
     if (!form.categorie) next.categorie = t('portail.reclamations.categorie')
-    if (form.sujet.trim().length < 5) next.sujet = t('portail.reclamations.sujet')
-    if (!form.description.trim()) next.description = t('portail.reclamations.description')
+    if (form.sujet.trim().length < 5)
+      next.sujet = t('portail.reclamations.sujet')
+    if (!form.description.trim())
+      next.description = t('portail.reclamations.description')
     setErrors(next)
     return Object.keys(next).length === 0
   }
@@ -151,7 +159,12 @@ function SubmitForm({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!validate()) return
-    mutation.mutate({ categorie: form.categorie, sujet: form.sujet.trim(), description: form.description.trim(), images })
+    mutation.mutate({
+      categorie: form.categorie,
+      sujet: form.sujet.trim(),
+      description: form.description.trim(),
+      images,
+    })
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -159,11 +172,17 @@ function SubmitForm({
     e.target.value = ''
     if (!files.length) return
     const oversized = files.find((f) => f.size > MAX_SIZE_BYTES)
-    if (oversized) { toast.error(t('portail.reclamations.photoSizeError')); return }
+    if (oversized) {
+      toast.error(t('portail.reclamations.photoSizeError'))
+      return
+    }
     const slots = MAX_IMAGES - images.length
     const toAdd = files.slice(0, slots)
     setImages((prev) => [...prev, ...toAdd])
-    setPreviews((prev) => [...prev, ...toAdd.map((f) => URL.createObjectURL(f))])
+    setPreviews((prev) => [
+      ...prev,
+      ...toAdd.map((f) => URL.createObjectURL(f)),
+    ])
   }
 
   function handleRemoveImage(index: number) {
@@ -175,20 +194,37 @@ function SubmitForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-5 pt-2" noValidate>
       <div className="space-y-1.5">
-        <Label htmlFor="categorie" className="text-base">{t('portail.reclamations.categorie')}</Label>
-        <Select value={form.categorie} onValueChange={(val) => setForm((f) => ({ ...f, categorie: val }))}>
-          <SelectTrigger id="categorie" className="w-full h-12 text-base" data-invalid={!!errors.categorie}>
+        <Label htmlFor="categorie" className="text-base">
+          {t('portail.reclamations.categorie')}
+        </Label>
+        <Select
+          value={form.categorie}
+          onValueChange={(val) => setForm((f) => ({ ...f, categorie: val }))}
+        >
+          <SelectTrigger
+            id="categorie"
+            className="w-full h-12 text-base"
+            data-invalid={!!errors.categorie}
+          >
             <SelectValue placeholder={t('portail.reclamations.categorie')} />
           </SelectTrigger>
           <SelectContent>
-            {CATEGORIES.map((cat) => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+            {CATEGORIES.map((cat) => (
+              <SelectItem key={cat} value={cat}>
+                {cat}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
-        {errors.categorie && <p className="text-xs text-destructive">{errors.categorie}</p>}
+        {errors.categorie && (
+          <p className="text-xs text-destructive">{errors.categorie}</p>
+        )}
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="sujet" className="text-base">{t('portail.reclamations.sujet')}</Label>
+        <Label htmlFor="sujet" className="text-base">
+          {t('portail.reclamations.sujet')}
+        </Label>
         <Input
           id="sujet"
           value={form.sujet}
@@ -197,20 +233,28 @@ function SubmitForm({
           minLength={5}
           required
         />
-        {errors.sujet && <p className="text-xs text-destructive">{errors.sujet}</p>}
+        {errors.sujet && (
+          <p className="text-xs text-destructive">{errors.sujet}</p>
+        )}
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="description" className="text-base">{t('portail.reclamations.description')}</Label>
+        <Label htmlFor="description" className="text-base">
+          {t('portail.reclamations.description')}
+        </Label>
         <textarea
           id="description"
           rows={4}
           value={form.description}
-          onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+          onChange={(e) =>
+            setForm((f) => ({ ...f, description: e.target.value }))
+          }
           required
           className="flex min-h-[96px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 resize-none dark:bg-input/30"
         />
-        {errors.description && <p className="text-xs text-destructive">{errors.description}</p>}
+        {errors.description && (
+          <p className="text-xs text-destructive">{errors.description}</p>
+        )}
       </div>
 
       {/* Photo upload */}
@@ -226,7 +270,11 @@ function SubmitForm({
         <div className="flex flex-wrap gap-2">
           {previews.map((src, i) => (
             <div key={src} className="relative shrink-0">
-              <img src={src} alt={`Photo ${i + 1}`} className="h-20 w-20 rounded-lg object-cover border border-border" />
+              <img
+                src={src}
+                alt={`Photo ${i + 1}`}
+                className="h-20 w-20 rounded-lg object-cover border border-border"
+              />
               <button
                 type="button"
                 onClick={() => handleRemoveImage(i)}
@@ -244,11 +292,15 @@ function SubmitForm({
               className="flex h-20 w-20 shrink-0 flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-input text-xs text-muted-foreground transition-colors hover:border-[var(--color-imaro-primary)] hover:text-[var(--color-imaro-primary)]"
             >
               <Camera className="size-5" aria-hidden="true" />
-              {images.length === 0 ? t('portail.reclamations.addPhoto') : `+${MAX_IMAGES - images.length}`}
+              {images.length === 0
+                ? t('portail.reclamations.addPhoto')
+                : `+${MAX_IMAGES - images.length}`}
             </button>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">{t('portail.reclamations.photoHint')}</p>
+        <p className="text-xs text-muted-foreground">
+          {t('portail.reclamations.photoHint')}
+        </p>
       </div>
 
       <Button
@@ -256,7 +308,9 @@ function SubmitForm({
         className="w-full h-12 text-base bg-[var(--color-imaro-accent)] text-white hover:bg-[var(--color-imaro-accent-dark)]"
         disabled={mutation.isPending}
       >
-        {mutation.isPending ? t('actions.loading') : t('portail.reclamations.submit')}
+        {mutation.isPending
+          ? t('actions.loading')
+          : t('portail.reclamations.submit')}
       </Button>
 
       <div className="rounded-xl bg-muted px-4 py-3 text-sm text-muted-foreground">
@@ -277,7 +331,9 @@ function HistoryTab() {
   if (isLoading) {
     return (
       <div className="space-y-3 pt-2">
-        {[1, 2, 3].map((i) => <div key={i} className="h-24 animate-pulse rounded-xl bg-muted" />)}
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-24 animate-pulse rounded-xl bg-muted" />
+        ))}
       </div>
     )
   }
@@ -287,14 +343,18 @@ function HistoryTab() {
       <div className="flex flex-col items-center gap-3 py-16 text-center">
         <FileText className="size-12 text-muted-foreground" />
         <p className="font-medium text-sm">Aucune réclamation</p>
-        <p className="text-xs text-muted-foreground">Vos réclamations soumises apparaîtront ici.</p>
+        <p className="text-xs text-muted-foreground">
+          Vos réclamations soumises apparaîtront ici.
+        </p>
       </div>
     )
   }
 
   return (
     <div className="space-y-3 pt-2">
-      {reclamations.map((r) => <ReclamationCard key={r.id} rec={r} />)}
+      {reclamations.map((r) => (
+        <ReclamationCard key={r.id} rec={r} />
+      ))}
     </div>
   )
 }
@@ -313,8 +373,12 @@ function ReclamationCard({ rec }: { rec: Reclamation }) {
     <div className="rounded-xl border bg-card p-4 space-y-2">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="font-medium text-sm leading-snug truncate">{rec.sujet}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">{rec.reference} · {rec.categorie}</p>
+          <p className="font-medium text-sm leading-snug truncate">
+            {rec.sujet}
+          </p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {rec.reference} · {rec.categorie}
+          </p>
         </div>
         <Badge className={cn(cls, 'border-0 shrink-0 text-xs')}>
           {STATUT_LABELS[rec.statut] ?? rec.statut}
@@ -327,7 +391,9 @@ function ReclamationCard({ rec }: { rec: Reclamation }) {
           {dateStr}
         </span>
         {rec.nb_photos > 0 && (
-          <span>{rec.nb_photos} photo{rec.nb_photos > 1 ? 's' : ''}</span>
+          <span>
+            {rec.nb_photos} photo{rec.nb_photos > 1 ? 's' : ''}
+          </span>
         )}
       </div>
 

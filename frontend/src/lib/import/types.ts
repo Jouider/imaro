@@ -27,11 +27,22 @@ export type ImportConfig<T = Record<string, unknown>> = {
 export type ImportContext = {
   residenceId: number
   existingLots: { id: number; numero: string; tantieme: number }[]
-  existingCoproprietaires: { id: number; name: string; phone: string; lot_id?: number }[]
+  existingCoproprietaires: {
+    id: number
+    name: string
+    phone: string
+    lot_id?: number
+  }[]
   existingImmeubles: { id: number; nom: string }[]
 }
 
-export type RowStatus = 'pending' | 'valid' | 'error' | 'importing' | 'success' | 'failed'
+export type RowStatus =
+  | 'pending'
+  | 'valid'
+  | 'error'
+  | 'importing'
+  | 'success'
+  | 'failed'
 
 export type ImportRow = {
   _index: number

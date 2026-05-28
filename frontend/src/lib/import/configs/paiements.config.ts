@@ -1,5 +1,10 @@
 import type { ImportConfig, ImportContext } from '../types'
-import { validateNumber, parseNumber, validateDate, parseFlexDate } from '../validators'
+import {
+  validateNumber,
+  parseNumber,
+  validateDate,
+  parseFlexDate,
+} from '../validators'
 
 const MODES_PAIEMENT = ['especes', 'virement', 'cheque', 'mobile', 'cb']
 
@@ -21,7 +26,15 @@ export const paiementsConfig: ImportConfig<PaiementImportPayload> = {
     {
       key: 'lot_numero',
       label: 'Numéro du lot',
-      aliases: ['lot', 'numero lot', 'numéro lot', 'n° lot', 'n°lot', 'unit', 'num lot'],
+      aliases: [
+        'lot',
+        'numero lot',
+        'numéro lot',
+        'n° lot',
+        'n°lot',
+        'unit',
+        'num lot',
+      ],
       type: 'string',
       required: true,
     },
@@ -35,21 +48,41 @@ export const paiementsConfig: ImportConfig<PaiementImportPayload> = {
     {
       key: 'date',
       label: 'Date de paiement',
-      aliases: ['date', 'date paiement', 'date_paiement', 'date de paiement', 'paye le', 'payé le'],
+      aliases: [
+        'date',
+        'date paiement',
+        'date_paiement',
+        'date de paiement',
+        'paye le',
+        'payé le',
+      ],
       type: 'date',
       required: true,
     },
     {
       key: 'mode',
       label: 'Mode de paiement',
-      aliases: ['mode', 'mode paiement', 'mode de paiement', 'type paiement', 'methode'],
+      aliases: [
+        'mode',
+        'mode paiement',
+        'mode de paiement',
+        'type paiement',
+        'methode',
+      ],
       type: 'string',
       required: false,
     },
     {
       key: 'reference',
       label: 'Référence',
-      aliases: ['reference', 'référence', 'ref', 'num cheque', 'n° cheque', 'n° chèque'],
+      aliases: [
+        'reference',
+        'référence',
+        'ref',
+        'num cheque',
+        'n° cheque',
+        'n° chèque',
+      ],
       type: 'string',
       required: false,
     },
@@ -93,15 +126,22 @@ export const paiementsConfig: ImportConfig<PaiementImportPayload> = {
       errors.push('Date invalide (formats: YYYY-MM-DD ou DD/MM/YYYY)')
     }
 
-    const mode = String(row.mode ?? '').trim().toLowerCase()
+    const mode = String(row.mode ?? '')
+      .trim()
+      .toLowerCase()
     if (mode && !MODES_PAIEMENT.includes(mode)) {
-      errors.push(`Mode inconnu: "${mode}" (attendu: ${MODES_PAIEMENT.join(', ')})`)
+      errors.push(
+        `Mode inconnu: "${mode}" (attendu: ${MODES_PAIEMENT.join(', ')})`,
+      )
     }
 
     return errors
   },
 
-  transform(row: Record<string, unknown>, ctx: ImportContext): PaiementImportPayload {
+  transform(
+    row: Record<string, unknown>,
+    ctx: ImportContext,
+  ): PaiementImportPayload {
     const lotNumero = String(row.lot_numero ?? '').trim()
     const lot = ctx.existingLots.find(
       (l) => l.numero.toLowerCase() === lotNumero.toLowerCase(),
@@ -110,7 +150,9 @@ export const paiementsConfig: ImportConfig<PaiementImportPayload> = {
     // Try to resolve coproprietaire from lot
     const copro = ctx.existingCoproprietaires.find((c) => c.lot_id === lot?.id)
 
-    const mode = String(row.mode ?? '').trim().toLowerCase()
+    const mode = String(row.mode ?? '')
+      .trim()
+      .toLowerCase()
     const reference = String(row.reference ?? '').trim()
     const note = String(row.note ?? '').trim()
 
@@ -119,7 +161,9 @@ export const paiementsConfig: ImportConfig<PaiementImportPayload> = {
       ...(copro ? { coproprietaire_id: copro.id } : {}),
       montant: parseNumber(String(row.montant ?? '0')),
       date_paiement: parseFlexDate(String(row.date ?? '')),
-      ...(mode && MODES_PAIEMENT.includes(mode) ? { mode } : { mode: 'especes' }),
+      ...(mode && MODES_PAIEMENT.includes(mode)
+        ? { mode }
+        : { mode: 'especes' }),
       ...(reference ? { reference } : {}),
       ...(note ? { note } : {}),
     }
@@ -130,7 +174,21 @@ export const paiementsConfig: ImportConfig<PaiementImportPayload> = {
   chunkSize: 50,
   templateFileName: 'imaro-paiements-template.xlsx',
   templateExampleRows: [
-    { lot_numero: 'A-101', montant: 750, date: '15/01/2026', mode: 'virement', reference: 'VIR-001', note: '' },
-    { lot_numero: 'A-102', montant: 500, date: '20/02/2026', mode: 'especes', reference: '', note: 'Paiement partiel' },
+    {
+      lot_numero: 'A-101',
+      montant: 750,
+      date: '15/01/2026',
+      mode: 'virement',
+      reference: 'VIR-001',
+      note: '',
+    },
+    {
+      lot_numero: 'A-102',
+      montant: 500,
+      date: '20/02/2026',
+      mode: 'especes',
+      reference: '',
+      note: 'Paiement partiel',
+    },
   ],
 }

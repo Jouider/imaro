@@ -17,9 +17,12 @@ export type Notif = {
 // ─── Mock seed data ───────────────────────────────────────────────────────────
 
 const now = new Date()
-const minsAgo = (m: number) => new Date(now.getTime() - m * 60_000).toISOString()
-const hoursAgo = (h: number) => new Date(now.getTime() - h * 3_600_000).toISOString()
-const daysAgo = (d: number) => new Date(now.getTime() - d * 86_400_000).toISOString()
+const minsAgo = (m: number) =>
+  new Date(now.getTime() - m * 60_000).toISOString()
+const hoursAgo = (h: number) =>
+  new Date(now.getTime() - h * 3_600_000).toISOString()
+const daysAgo = (d: number) =>
+  new Date(now.getTime() - d * 86_400_000).toISOString()
 
 const SEED_NOTIFS: Notif[] = [
   {

@@ -13,7 +13,8 @@ type Props = {
 export function ImportProgress({ result, progress, importing, onDone }: Props) {
   const { t } = useTranslation()
 
-  const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0
+  const pct =
+    progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0
 
   return (
     <div className="space-y-6">
@@ -22,18 +23,20 @@ export function ImportProgress({ result, progress, importing, onDone }: Props) {
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 className="size-4 animate-spin text-[#1B4F72]" />
+              <Loader2 className="size-4 animate-spin text-[var(--color-imaro-primary)]" />
               <span>
                 {t('gestionnaire.imports.execute.inProgress')
                   .replace('{done}', String(progress.done))
                   .replace('{total}', String(progress.total))}
               </span>
             </div>
-            <span className="text-xs font-medium text-muted-foreground">{pct}%</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              {pct}%
+            </span>
           </div>
           <div className="h-2.5 overflow-hidden rounded-full bg-muted">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[#1B4F72] to-[#2980b9] transition-all duration-300"
+              className="h-full rounded-full bg-gradient-to-r from-[var(--color-imaro-primary)] to-[var(--color-imaro-primary-light)] transition-all duration-300"
               style={{ width: `${pct}%` }}
             />
           </div>
@@ -57,7 +60,8 @@ export function ImportProgress({ result, progress, importing, onDone }: Props) {
                   )}
                 </p>
                 <p className="text-sm text-green-600 dark:text-green-400">
-                  {result.total} {result.total > 1 ? 'lignes traitées' : 'ligne traitée'}
+                  {result.total}{' '}
+                  {result.total > 1 ? 'lignes traitées' : 'ligne traitée'}
                 </p>
               </div>
             </div>

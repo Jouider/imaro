@@ -2,7 +2,18 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Loader2, Receipt, Sparkles, Settings2, Download, Trash2, CheckCircle, X, ToggleLeft, ToggleRight } from 'lucide-react'
+import {
+  Loader2,
+  Receipt,
+  Sparkles,
+  Settings2,
+  Download,
+  Trash2,
+  CheckCircle,
+  X,
+  ToggleLeft,
+  ToggleRight,
+} from 'lucide-react'
 import {
   BarChart,
   Bar,
@@ -58,7 +69,14 @@ import { cn } from '@/lib/utils'
 
 // ─── Colors ───────────────────────────────────────────────────────────────────
 
-const PIE_COLORS = ['#1B4F72', '#E67E22', '#27AE60', '#8E44AD', '#E74C3C', '#2ECC71']
+const PIE_COLORS = [
+  'var(--color-imaro-primary)',
+  '#E67E22',
+  '#27AE60',
+  '#8E44AD',
+  '#E74C3C',
+  '#2ECC71',
+]
 
 const APPROBATION_CLS: Record<string, string> = {
   approuve: 'bg-green-100 text-green-800',
@@ -125,12 +143,16 @@ function NouvelleDepenseModal({
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['depenses-finance'] })
       void qc.invalidateQueries({ queryKey: ['depenses-stats'] })
-      toast.success(t('gestionnaire.depenses.saveSuccess', { defaultValue: 'Dépense enregistrée' }))
+      toast.success(
+        t('gestionnaire.depenses.saveSuccess', {
+          defaultValue: 'Dépense enregistrée',
+        }),
+      )
       setForm(EMPTY_FORM)
       setIaResult(null)
       onOpenChange(false)
     },
-    onError: () => toast.error('Erreur lors de l\'enregistrement'),
+    onError: () => toast.error("Erreur lors de l'enregistrement"),
   })
 
   const handleAnalyseIa = async () => {
@@ -140,7 +162,7 @@ function NouvelleDepenseModal({
       const result = await importFactureIa(iaFile)
       setIaResult(result)
     } catch {
-      toast.error('Erreur lors de l\'analyse')
+      toast.error("Erreur lors de l'analyse")
     } finally {
       setIaLoading(false)
     }
@@ -167,7 +189,9 @@ function NouvelleDepenseModal({
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {t('gestionnaire.depenses.add', { defaultValue: 'Ajouter une dépense' })}
+            {t('gestionnaire.depenses.add', {
+              defaultValue: 'Ajouter une dépense',
+            })}
           </DialogTitle>
         </DialogHeader>
 
@@ -180,7 +204,9 @@ function NouvelleDepenseModal({
               className="flex w-full items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               <Sparkles className="size-4 text-amber-500" />
-              {t('gestionnaire.depenses.form.scanner', { defaultValue: 'Analyser avec l\'IA' })}
+              {t('gestionnaire.depenses.form.scanner', {
+                defaultValue: "Analyser avec l'IA",
+              })}
             </button>
 
             {iaExpanded && (
@@ -198,7 +224,11 @@ function NouvelleDepenseModal({
                     onClick={handleAnalyseIa}
                     disabled={!iaFile || iaLoading}
                   >
-                    {iaLoading ? <Loader2 className="size-4 animate-spin" /> : 'Analyser'}
+                    {iaLoading ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      'Analyser'
+                    )}
                   </Button>
                 </div>
 
@@ -209,19 +239,28 @@ function NouvelleDepenseModal({
                       <Badge
                         className={cn(
                           'border-0 text-xs',
-                          iaResult.confiance === 'haute' ? 'bg-green-100 text-green-800' :
-                          iaResult.confiance === 'moyenne' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800',
+                          iaResult.confiance === 'haute'
+                            ? 'bg-green-100 text-green-800'
+                            : iaResult.confiance === 'moyenne'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-red-100 text-red-800',
                         )}
                       >
                         {iaResult.confiance}
                       </Badge>
                     </div>
                     <p className="text-muted-foreground">
-                      {iaResult.montant.toLocaleString('fr-MA')} MAD · {iaResult.date} · Compte {iaResult.compte_charge_suggere}
+                      {iaResult.montant.toLocaleString('fr-MA')} MAD ·{' '}
+                      {iaResult.date} · Compte {iaResult.compte_charge_suggere}
                     </p>
-                    <Button size="sm" className="w-full mt-2" onClick={handleUseIaData}>
-                      {t('gestionnaire.depenses.form.utiliser', { defaultValue: 'Utiliser ces données' })}
+                    <Button
+                      size="sm"
+                      className="w-full mt-2"
+                      onClick={handleUseIaData}
+                    >
+                      {t('gestionnaire.depenses.form.utiliser', {
+                        defaultValue: 'Utiliser ces données',
+                      })}
                     </Button>
                   </div>
                 )}
@@ -232,38 +271,72 @@ function NouvelleDepenseModal({
           {needsApproval && (
             <div className="flex items-start gap-2 rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-sm text-orange-800">
               <span className="mt-0.5">⚠</span>
-              <span>{t('gestionnaire.depenses.form.seuilWarning', { defaultValue: 'Cette dépense nécessite une approbation du conseil syndical' })}</span>
+              <span>
+                {t('gestionnaire.depenses.form.seuilWarning', {
+                  defaultValue:
+                    'Cette dépense nécessite une approbation du conseil syndical',
+                })}
+              </span>
             </div>
           )}
 
           <div className="space-y-1">
-            <Label>{t('gestionnaire.depenses.form.titre', { defaultValue: 'Titre' })}</Label>
+            <Label>
+              {t('gestionnaire.depenses.form.titre', { defaultValue: 'Titre' })}
+            </Label>
             <Input
               value={form.titre}
-              onChange={(e) => setForm((f) => ({ ...f, titre: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, titre: e.target.value }))
+              }
               placeholder="Gardiennage Juin 2026"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label>{t('gestionnaire.depenses.form.montant', { defaultValue: 'Montant (MAD)' })}</Label>
+              <Label>
+                {t('gestionnaire.depenses.form.montant', {
+                  defaultValue: 'Montant (MAD)',
+                })}
+              </Label>
               <Input
                 type="number"
                 value={form.montant}
-                onChange={(e) => setForm((f) => ({ ...f, montant: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, montant: e.target.value }))
+                }
               />
             </div>
             <div className="space-y-1">
-              <Label>{t('gestionnaire.depenses.form.date', { defaultValue: 'Date' })}</Label>
-              <Input type="date" value={form.date} onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))} />
+              <Label>
+                {t('gestionnaire.depenses.form.date', { defaultValue: 'Date' })}
+              </Label>
+              <Input
+                type="date"
+                value={form.date}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, date: e.target.value }))
+                }
+              />
             </div>
           </div>
 
           <div className="space-y-1">
-            <Label>{t('gestionnaire.depenses.form.compte', { defaultValue: 'Compte de charge' })}</Label>
-            <Select value={form.compte_charge} onValueChange={(v) => setForm((f) => ({ ...f, compte_charge: v }))}>
-              <SelectTrigger className="w-full"><SelectValue placeholder="Sélectionner un compte" /></SelectTrigger>
+            <Label>
+              {t('gestionnaire.depenses.form.compte', {
+                defaultValue: 'Compte de charge',
+              })}
+            </Label>
+            <Select
+              value={form.compte_charge}
+              onValueChange={(v) =>
+                setForm((f) => ({ ...f, compte_charge: v }))
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Sélectionner un compte" />
+              </SelectTrigger>
               <SelectContent>
                 {compteClasse6.map((c) => (
                   <SelectItem key={c.numero} value={c.numero}>
@@ -275,43 +348,89 @@ function NouvelleDepenseModal({
           </div>
 
           <div className="space-y-1">
-            <Label>{t('gestionnaire.depenses.form.mode', { defaultValue: 'Mode de paiement' })}</Label>
-            <Select value={form.mode_paiement} onValueChange={(v) => setForm((f) => ({ ...f, mode_paiement: v }))}>
-              <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+            <Label>
+              {t('gestionnaire.depenses.form.mode', {
+                defaultValue: 'Mode de paiement',
+              })}
+            </Label>
+            <Select
+              value={form.mode_paiement}
+              onValueChange={(v) =>
+                setForm((f) => ({ ...f, mode_paiement: v }))
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {(['virement', 'cheque', 'especes', 'cb', 'prelevement', 'autre'] as const).map((m) => (
-                  <SelectItem key={m} value={m}>{m}</SelectItem>
+                {(
+                  [
+                    'virement',
+                    'cheque',
+                    'especes',
+                    'cb',
+                    'prelevement',
+                    'autre',
+                  ] as const
+                ).map((m) => (
+                  <SelectItem key={m} value={m}>
+                    {m}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-1">
-            <Label>{t('gestionnaire.depenses.form.prestataire', { defaultValue: 'Prestataire (optionnel)' })}</Label>
+            <Label>
+              {t('gestionnaire.depenses.form.prestataire', {
+                defaultValue: 'Prestataire (optionnel)',
+              })}
+            </Label>
             <Input
               value={form.prestataire}
-              onChange={(e) => setForm((f) => ({ ...f, prestataire: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, prestataire: e.target.value }))
+              }
               placeholder="Sécurité Atlas SARL"
             />
           </div>
 
           <div className="space-y-1">
-            <Label>{t('gestionnaire.depenses.form.justificatif', { defaultValue: 'Pièce justificative' })}</Label>
+            <Label>
+              {t('gestionnaire.depenses.form.justificatif', {
+                defaultValue: 'Pièce justificative',
+              })}
+            </Label>
             <Input
               type="file"
               accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => setForm((f) => ({ ...f, justificatif: e.target.files?.[0] ?? null }))}
+              onChange={(e) =>
+                setForm((f) => ({
+                  ...f,
+                  justificatif: e.target.files?.[0] ?? null,
+                }))
+              }
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={storeMutation.isPending}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={storeMutation.isPending}
+          >
             {t('actions.cancel')}
           </Button>
           <Button
             onClick={() => storeMutation.mutate()}
-            disabled={!form.titre || !form.montant || !form.compte_charge || storeMutation.isPending}
+            disabled={
+              !form.titre ||
+              !form.montant ||
+              !form.compte_charge ||
+              storeMutation.isPending
+            }
           >
             {storeMutation.isPending ? t('actions.loading') : t('actions.save')}
           </Button>
@@ -323,7 +442,13 @@ function NouvelleDepenseModal({
 
 // ─── ModèlesRecurrentsModal ───────────────────────────────────────────────────
 
-function ModelesRecurrentsModal({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+function ModelesRecurrentsModal({
+  open,
+  onOpenChange,
+}: {
+  open: boolean
+  onOpenChange: (o: boolean) => void
+}) {
   const { t } = useTranslation()
   const qc = useQueryClient()
   const [newModeleOpen, setNewModeleOpen] = useState(false)
@@ -353,20 +478,22 @@ function ModelesRecurrentsModal({ open, onOpenChange }: { open: boolean; onOpenC
 
   const toggleMutation = useMutation({
     mutationFn: (id: number) => toggleModeleRecurrent(id),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ['modeles-recurrents'] }),
+    onSuccess: () =>
+      void qc.invalidateQueries({ queryKey: ['modeles-recurrents'] }),
   })
 
   const storeMutation = useMutation({
-    mutationFn: () => storeModeleRecurrent({
-      titre: form.titre,
-      montant: Number(form.montant),
-      compte_charge: form.compte_charge,
-      prestataire_nom: form.prestataire_nom || null,
-      frequence: form.frequence,
-      jour_emission: Number(form.jour_emission),
-      date_debut: form.date_debut,
-      date_fin: form.date_fin || null,
-    }),
+    mutationFn: () =>
+      storeModeleRecurrent({
+        titre: form.titre,
+        montant: Number(form.montant),
+        compte_charge: form.compte_charge,
+        prestataire_nom: form.prestataire_nom || null,
+        frequence: form.frequence,
+        jour_emission: Number(form.jour_emission),
+        date_debut: form.date_debut,
+        date_fin: form.date_fin || null,
+      }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['modeles-recurrents'] })
       setNewModeleOpen(false)
@@ -376,10 +503,20 @@ function ModelesRecurrentsModal({ open, onOpenChange }: { open: boolean; onOpenC
   })
 
   const FREQ_LABELS: Record<string, string> = {
-    mensuelle: t('gestionnaire.depenses.recurrentModal.frequences.mensuelle', { defaultValue: 'Mensuelle' }),
-    trimestrielle: t('gestionnaire.depenses.recurrentModal.frequences.trimestrielle', { defaultValue: 'Trimestrielle' }),
-    semestrielle: t('gestionnaire.depenses.recurrentModal.frequences.semestrielle', { defaultValue: 'Semestrielle' }),
-    annuelle: t('gestionnaire.depenses.recurrentModal.frequences.annuelle', { defaultValue: 'Annuelle' }),
+    mensuelle: t('gestionnaire.depenses.recurrentModal.frequences.mensuelle', {
+      defaultValue: 'Mensuelle',
+    }),
+    trimestrielle: t(
+      'gestionnaire.depenses.recurrentModal.frequences.trimestrielle',
+      { defaultValue: 'Trimestrielle' },
+    ),
+    semestrielle: t(
+      'gestionnaire.depenses.recurrentModal.frequences.semestrielle',
+      { defaultValue: 'Semestrielle' },
+    ),
+    annuelle: t('gestionnaire.depenses.recurrentModal.frequences.annuelle', {
+      defaultValue: 'Annuelle',
+    }),
   }
 
   return (
@@ -388,10 +525,18 @@ function ModelesRecurrentsModal({ open, onOpenChange }: { open: boolean; onOpenC
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle>
-              {t('gestionnaire.depenses.recurrentModal.title', { defaultValue: 'Dépenses récurrentes' })}
+              {t('gestionnaire.depenses.recurrentModal.title', {
+                defaultValue: 'Dépenses récurrentes',
+              })}
             </DialogTitle>
-            <Button size="sm" variant="outline" onClick={() => setNewModeleOpen(true)}>
-              {t('gestionnaire.depenses.recurrentModal.nouveau', { defaultValue: 'Nouveau modèle' })}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setNewModeleOpen(true)}
+            >
+              {t('gestionnaire.depenses.recurrentModal.nouveau', {
+                defaultValue: 'Nouveau modèle',
+              })}
             </Button>
           </div>
         </DialogHeader>
@@ -403,7 +548,10 @@ function ModelesRecurrentsModal({ open, onOpenChange }: { open: boolean; onOpenC
         ) : (
           <div className="divide-y rounded-lg border">
             {modeles.map((m) => (
-              <div key={m.id} className="flex items-center justify-between px-4 py-3">
+              <div
+                key={m.id}
+                className="flex items-center justify-between px-4 py-3"
+              >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-sm">{m.titre}</span>
@@ -411,14 +559,19 @@ function ModelesRecurrentsModal({ open, onOpenChange }: { open: boolean; onOpenC
                       {FREQ_LABELS[m.frequence] ?? m.frequence}
                     </Badge>
                     {!m.actif && (
-                      <Badge className="border-0 bg-gray-100 text-gray-600 text-xs">Inactif</Badge>
+                      <Badge className="border-0 bg-gray-100 text-gray-600 text-xs">
+                        Inactif
+                      </Badge>
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     <MontantDisplay value={m.montant} className="text-xs" />
                     {m.prestataire_nom && ` · ${m.prestataire_nom}`}
                     {' · '}
-                    {t('gestionnaire.depenses.recurrentModal.prochaine', { defaultValue: 'Prochaine' })} : {m.prochaine_emission}
+                    {t('gestionnaire.depenses.recurrentModal.prochaine', {
+                      defaultValue: 'Prochaine',
+                    })}{' '}
+                    : {m.prochaine_emission}
                   </p>
                 </div>
                 <button
@@ -426,14 +579,18 @@ function ModelesRecurrentsModal({ open, onOpenChange }: { open: boolean; onOpenC
                   disabled={toggleMutation.isPending}
                   className="ml-3 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {m.actif
-                    ? <ToggleRight className="size-6 text-green-600" />
-                    : <ToggleLeft className="size-6" />}
+                  {m.actif ? (
+                    <ToggleRight className="size-6 text-green-600" />
+                  ) : (
+                    <ToggleLeft className="size-6" />
+                  )}
                 </button>
               </div>
             ))}
             {modeles.length === 0 && (
-              <p className="py-8 text-center text-sm text-muted-foreground">Aucun modèle récurrent</p>
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                Aucun modèle récurrent
+              </p>
             )}
           </div>
         )}
@@ -445,36 +602,84 @@ function ModelesRecurrentsModal({ open, onOpenChange }: { open: boolean; onOpenC
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label>Titre</Label>
-                <Input value={form.titre} onChange={(e) => setForm((f) => ({ ...f, titre: e.target.value }))} />
+                <Input
+                  value={form.titre}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, titre: e.target.value }))
+                  }
+                />
               </div>
               <div className="space-y-1">
                 <Label>Montant (MAD)</Label>
-                <Input type="number" value={form.montant} onChange={(e) => setForm((f) => ({ ...f, montant: e.target.value }))} />
+                <Input
+                  type="number"
+                  value={form.montant}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, montant: e.target.value }))
+                  }
+                />
               </div>
             </div>
             <div className="space-y-1">
               <Label>Compte PCG</Label>
-              <Select value={form.compte_charge} onValueChange={(v) => setForm((f) => ({ ...f, compte_charge: v }))}>
-                <SelectTrigger className="w-full"><SelectValue placeholder="Compte de charge" /></SelectTrigger>
+              <Select
+                value={form.compte_charge}
+                onValueChange={(v) =>
+                  setForm((f) => ({ ...f, compte_charge: v }))
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Compte de charge" />
+                </SelectTrigger>
                 <SelectContent>
                   {compteClasse6.map((c) => (
-                    <SelectItem key={c.numero} value={c.numero}>{c.numero} — {c.libelle}</SelectItem>
+                    <SelectItem key={c.numero} value={c.numero}>
+                      {c.numero} — {c.libelle}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label>{t('gestionnaire.depenses.recurrentModal.jourEmission', { defaultValue: 'Jour d\'émission' })}</Label>
-                <Input type="number" min={1} max={28} value={form.jour_emission} onChange={(e) => setForm((f) => ({ ...f, jour_emission: e.target.value }))} />
+                <Label>
+                  {t('gestionnaire.depenses.recurrentModal.jourEmission', {
+                    defaultValue: "Jour d'émission",
+                  })}
+                </Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={28}
+                  value={form.jour_emission}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, jour_emission: e.target.value }))
+                  }
+                />
               </div>
               <div className="space-y-1">
                 <Label>Fréquence</Label>
-                <Select value={form.frequence} onValueChange={(v) => setForm((f) => ({ ...f, frequence: v }))}>
-                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                <Select
+                  value={form.frequence}
+                  onValueChange={(v) =>
+                    setForm((f) => ({ ...f, frequence: v }))
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
-                    {(['mensuelle', 'trimestrielle', 'semestrielle', 'annuelle'] as const).map((f) => (
-                      <SelectItem key={f} value={f}>{FREQ_LABELS[f]}</SelectItem>
+                    {(
+                      [
+                        'mensuelle',
+                        'trimestrielle',
+                        'semestrielle',
+                        'annuelle',
+                      ] as const
+                    ).map((f) => (
+                      <SelectItem key={f} value={f}>
+                        {FREQ_LABELS[f]}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -483,21 +688,46 @@ function ModelesRecurrentsModal({ open, onOpenChange }: { open: boolean; onOpenC
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label>Date début</Label>
-                <Input type="date" value={form.date_debut} onChange={(e) => setForm((f) => ({ ...f, date_debut: e.target.value }))} />
+                <Input
+                  type="date"
+                  value={form.date_debut}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, date_debut: e.target.value }))
+                  }
+                />
               </div>
               <div className="space-y-1">
                 <Label>Date fin (optionnel)</Label>
-                <Input type="date" value={form.date_fin} onChange={(e) => setForm((f) => ({ ...f, date_fin: e.target.value }))} />
+                <Input
+                  type="date"
+                  value={form.date_fin}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, date_fin: e.target.value }))
+                  }
+                />
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" size="sm" onClick={() => setNewModeleOpen(false)}>{t('actions.cancel')}</Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setNewModeleOpen(false)}
+              >
+                {t('actions.cancel')}
+              </Button>
               <Button
                 size="sm"
                 onClick={() => storeMutation.mutate()}
-                disabled={!form.titre || !form.montant || !form.compte_charge || storeMutation.isPending}
+                disabled={
+                  !form.titre ||
+                  !form.montant ||
+                  !form.compte_charge ||
+                  storeMutation.isPending
+                }
               >
-                {storeMutation.isPending ? t('actions.loading') : t('actions.save')}
+                {storeMutation.isPending
+                  ? t('actions.loading')
+                  : t('actions.save')}
               </Button>
             </div>
           </div>
@@ -567,7 +797,8 @@ export function DepensesPage() {
   })
 
   const rejeterMutation = useMutation({
-    mutationFn: ({ id, motif }: { id: number; motif: string }) => rejeterDepense(id, motif),
+    mutationFn: ({ id, motif }: { id: number; motif: string }) =>
+      rejeterDepense(id, motif),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['depenses-finance'] })
       setRejetTarget(null)
@@ -580,8 +811,13 @@ export function DepensesPage() {
   // ── Filters ────────────────────────────────────────────────────────────────
 
   const filtered = depenses.filter((d) => {
-    if (filterCompte !== 'tous' && d.compte_charge !== filterCompte) return false
-    if (filterApprobation !== 'tous' && d.statut_approbation !== filterApprobation) return false
+    if (filterCompte !== 'tous' && d.compte_charge !== filterCompte)
+      return false
+    if (
+      filterApprobation !== 'tous' &&
+      d.statut_approbation !== filterApprobation
+    )
+      return false
     if (filterFrom && d.date < filterFrom) return false
     if (filterTo && d.date > filterTo) return false
     if (filterSearch) {
@@ -589,7 +825,8 @@ export function DepensesPage() {
       if (
         !d.titre.toLowerCase().includes(q) &&
         !(d.prestataire_nom ?? '').toLowerCase().includes(q)
-      ) return false
+      )
+        return false
     }
     return true
   })
@@ -610,12 +847,17 @@ export function DepensesPage() {
     },
     {
       key: 'prestataire_nom',
-      header: t('gestionnaire.depenses.cols.prestataire', { defaultValue: 'Prestataire' }),
-      renderCell: (r) => r.prestataire_nom ?? <span className="text-muted-foreground">—</span>,
+      header: t('gestionnaire.depenses.cols.prestataire', {
+        defaultValue: 'Prestataire',
+      }),
+      renderCell: (r) =>
+        r.prestataire_nom ?? <span className="text-muted-foreground">—</span>,
     },
     {
       key: 'compte_charge',
-      header: t('gestionnaire.depenses.cols.compte', { defaultValue: 'Compte PCG' }),
+      header: t('gestionnaire.depenses.cols.compte', {
+        defaultValue: 'Compte PCG',
+      }),
       renderCell: (r) => (
         <Badge className="border-0 bg-slate-100 text-slate-700 text-xs font-mono">
           {r.compte_charge}
@@ -624,32 +866,56 @@ export function DepensesPage() {
     },
     {
       key: 'montant',
-      header: t('gestionnaire.depenses.cols.montant', { defaultValue: 'Montant' }),
+      header: t('gestionnaire.depenses.cols.montant', {
+        defaultValue: 'Montant',
+      }),
       sortable: true,
       renderCell: (r) => <MontantDisplay value={r.montant} />,
     },
     {
       key: 'mode_paiement',
       header: t('gestionnaire.depenses.cols.mode', { defaultValue: 'Mode' }),
-      renderCell: (r) => <span className="text-sm capitalize">{r.mode_paiement}</span>,
+      renderCell: (r) => (
+        <span className="text-sm capitalize">{r.mode_paiement}</span>
+      ),
     },
     {
       key: 'justificatif_path',
       header: 'Justificatif',
-      renderCell: (r) => r.justificatif_path
-        ? <Button variant="ghost" size="sm" className="h-6 px-2" onClick={() => toast.info('Téléchargement...')}><Download className="size-3.5" /></Button>
-        : <span className="text-muted-foreground">—</span>,
+      renderCell: (r) =>
+        r.justificatif_path ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 px-2"
+            onClick={() => toast.info('Téléchargement...')}
+          >
+            <Download className="size-3.5" />
+          </Button>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
     {
       key: 'statut_approbation',
-      header: t('gestionnaire.depenses.cols.approbation', { defaultValue: 'Approbation' }),
-      renderCell: (r) => r.statut_approbation
-        ? (
-          <Badge className={cn(APPROBATION_CLS[r.statut_approbation], 'border-0 text-xs')}>
-            {t(`gestionnaire.depenses.approbation.${r.statut_approbation}`, { defaultValue: r.statut_approbation })}
+      header: t('gestionnaire.depenses.cols.approbation', {
+        defaultValue: 'Approbation',
+      }),
+      renderCell: (r) =>
+        r.statut_approbation ? (
+          <Badge
+            className={cn(
+              APPROBATION_CLS[r.statut_approbation],
+              'border-0 text-xs',
+            )}
+          >
+            {t(`gestionnaire.depenses.approbation.${r.statut_approbation}`, {
+              defaultValue: r.statut_approbation,
+            })}
           </Badge>
-        )
-        : <span className="text-muted-foreground">—</span>,
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
     {
       key: 'id',
@@ -694,20 +960,39 @@ export function DepensesPage() {
     <div className="p-6 space-y-6">
       <PageHeader
         title={t('gestionnaire.depenses.title', { defaultValue: 'Dépenses' })}
-        subtitle={t('gestionnaire.depenses.subtitle', { defaultValue: 'Suivi des charges de copropriété' })}
+        subtitle={t('gestionnaire.depenses.subtitle', {
+          defaultValue: 'Suivi des charges de copropriété',
+        })}
         actions={
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => { toast.info('Import IA...'); setAddOpen(true) }}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                toast.info('Import IA...')
+                setAddOpen(true)
+              }}
+            >
               <Sparkles className="me-1.5 size-4 text-amber-500" />
-              {t('gestionnaire.depenses.importIa', { defaultValue: 'Import IA' })}
+              {t('gestionnaire.depenses.importIa', {
+                defaultValue: 'Import IA',
+              })}
             </Button>
             <Button size="sm" onClick={() => setAddOpen(true)}>
               <Receipt className="me-1.5 size-4" />
-              {t('gestionnaire.depenses.add', { defaultValue: 'Ajouter une dépense' })}
+              {t('gestionnaire.depenses.add', {
+                defaultValue: 'Ajouter une dépense',
+              })}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setRecurrentesOpen(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setRecurrentesOpen(true)}
+            >
               <Settings2 className="me-1.5 size-4" />
-              {t('gestionnaire.depenses.recurrentes', { defaultValue: 'Récurrentes' })}
+              {t('gestionnaire.depenses.recurrentes', {
+                defaultValue: 'Récurrentes',
+              })}
             </Button>
           </div>
         }
@@ -717,23 +1002,35 @@ export function DepensesPage() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <KpiCard
           icon={<Receipt className="size-5" />}
-          value={stats ? `${(stats.total_periode).toLocaleString('fr-MA')} DH` : '—'}
-          label={t('gestionnaire.depenses.kpi.total', { defaultValue: 'Total période' })}
+          value={
+            stats ? `${stats.total_periode.toLocaleString('fr-MA')} DH` : '—'
+          }
+          label={t('gestionnaire.depenses.kpi.total', {
+            defaultValue: 'Total période',
+          })}
         />
         <KpiCard
           icon={<Receipt className="size-5" />}
           value={stats?.nb_depenses ?? '—'}
-          label={t('gestionnaire.depenses.kpi.nb', { defaultValue: 'Nb dépenses' })}
+          label={t('gestionnaire.depenses.kpi.nb', {
+            defaultValue: 'Nb dépenses',
+          })}
         />
         <KpiCard
           icon={<Receipt className="size-5" />}
-          value={stats ? `${(stats.montant_moyen).toLocaleString('fr-MA')} DH` : '—'}
-          label={t('gestionnaire.depenses.kpi.moyen', { defaultValue: 'Montant moyen' })}
+          value={
+            stats ? `${stats.montant_moyen.toLocaleString('fr-MA')} DH` : '—'
+          }
+          label={t('gestionnaire.depenses.kpi.moyen', {
+            defaultValue: 'Montant moyen',
+          })}
         />
         <KpiCard
           icon={<Receipt className="size-5" />}
           value={stats?.en_attente_approbation ?? '—'}
-          label={t('gestionnaire.depenses.kpi.enAttente', { defaultValue: 'En attente approbation' })}
+          label={t('gestionnaire.depenses.kpi.enAttente', {
+            defaultValue: 'En attente approbation',
+          })}
         />
       </div>
 
@@ -748,15 +1045,23 @@ export function DepensesPage() {
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis dataKey="mois" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip formatter={(v) => `${Number(v).toLocaleString('fr-MA')} DH`} />
-                <Bar dataKey="montant" fill="#1B4F72" radius={[4, 4, 0, 0]} />
+                <Tooltip
+                  formatter={(v) => `${Number(v).toLocaleString('fr-MA')} DH`}
+                />
+                <Bar
+                  dataKey="montant"
+                  fill="var(--color-imaro-primary)"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
           {/* Pie chart: répartition par compte PCG */}
           <div className="rounded-xl border bg-card p-4">
-            <p className="mb-3 text-sm font-medium">Répartition par compte PCG</p>
+            <p className="mb-3 text-sm font-medium">
+              Répartition par compte PCG
+            </p>
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
                 <Pie
@@ -770,11 +1075,20 @@ export function DepensesPage() {
                   paddingAngle={3}
                 >
                   {stats.top_comptes.map((_entry, index) => (
-                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={PIE_COLORS[index % PIE_COLORS.length]}
+                    />
                   ))}
                 </Pie>
-                <Legend formatter={(value: string) => <span className="text-xs">{value}</span>} />
-                <Tooltip formatter={(v) => `${Number(v).toLocaleString('fr-MA')} DH`} />
+                <Legend
+                  formatter={(value: string) => (
+                    <span className="text-xs">{value}</span>
+                  )}
+                />
+                <Tooltip
+                  formatter={(v) => `${Number(v).toLocaleString('fr-MA')} DH`}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -800,7 +1114,9 @@ export function DepensesPage() {
                   <td className="py-2 text-right tabular-nums">
                     <MontantDisplay value={p.montant} />
                   </td>
-                  <td className="py-2 text-right tabular-nums text-muted-foreground">{p.nb}</td>
+                  <td className="py-2 text-right tabular-nums text-muted-foreground">
+                    {p.nb}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -818,25 +1134,56 @@ export function DepensesPage() {
             className="max-w-xs"
           />
           <Select value={filterCompte} onValueChange={setFilterCompte}>
-            <SelectTrigger className="w-48"><SelectValue placeholder="Tous comptes" /></SelectTrigger>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Tous comptes" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="tous">Tous comptes</SelectItem>
               {compteClasse6.map((c) => (
-                <SelectItem key={c.numero} value={c.numero}>{c.numero} — {c.libelle}</SelectItem>
+                <SelectItem key={c.numero} value={c.numero}>
+                  {c.numero} — {c.libelle}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <Select value={filterApprobation} onValueChange={setFilterApprobation}>
-            <SelectTrigger className="w-44"><SelectValue placeholder="Approbation" /></SelectTrigger>
+          <Select
+            value={filterApprobation}
+            onValueChange={setFilterApprobation}
+          >
+            <SelectTrigger className="w-44">
+              <SelectValue placeholder="Approbation" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="tous">Tous statuts</SelectItem>
-              <SelectItem value="approuve">{t('gestionnaire.depenses.approbation.approuve', { defaultValue: 'Approuvé' })}</SelectItem>
-              <SelectItem value="en_attente">{t('gestionnaire.depenses.approbation.en_attente', { defaultValue: 'En attente' })}</SelectItem>
-              <SelectItem value="rejete">{t('gestionnaire.depenses.approbation.rejete', { defaultValue: 'Rejeté' })}</SelectItem>
+              <SelectItem value="approuve">
+                {t('gestionnaire.depenses.approbation.approuve', {
+                  defaultValue: 'Approuvé',
+                })}
+              </SelectItem>
+              <SelectItem value="en_attente">
+                {t('gestionnaire.depenses.approbation.en_attente', {
+                  defaultValue: 'En attente',
+                })}
+              </SelectItem>
+              <SelectItem value="rejete">
+                {t('gestionnaire.depenses.approbation.rejete', {
+                  defaultValue: 'Rejeté',
+                })}
+              </SelectItem>
             </SelectContent>
           </Select>
-          <Input type="date" value={filterFrom} onChange={(e) => setFilterFrom(e.target.value)} className="w-40" />
-          <Input type="date" value={filterTo} onChange={(e) => setFilterTo(e.target.value)} className="w-40" />
+          <Input
+            type="date"
+            value={filterFrom}
+            onChange={(e) => setFilterFrom(e.target.value)}
+            className="w-40"
+          />
+          <Input
+            type="date"
+            value={filterTo}
+            onChange={(e) => setFilterTo(e.target.value)}
+            className="w-40"
+          />
         </div>
 
         <DataTable
@@ -853,18 +1200,28 @@ export function DepensesPage() {
       {/* ── Modals ── */}
       <NouvelleDepenseModal open={addOpen} onOpenChange={setAddOpen} />
 
-      <ModelesRecurrentsModal open={recurrentesOpen} onOpenChange={setRecurrentesOpen} />
+      <ModelesRecurrentsModal
+        open={recurrentesOpen}
+        onOpenChange={setRecurrentesOpen}
+      />
 
       <ConfirmModal
         open={!!deleteTarget}
         onOpenChange={(o) => !o && setDeleteTarget(null)}
         title="Supprimer la dépense"
-        description={deleteTarget ? `La dépense "${deleteTarget.titre}" sera supprimée définitivement.` : ''}
+        description={
+          deleteTarget
+            ? `La dépense "${deleteTarget.titre}" sera supprimée définitivement.`
+            : ''
+        }
         onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
         isLoading={deleteMutation.isPending}
       />
 
-      <Dialog open={!!rejetTarget} onOpenChange={(o) => !o && setRejetTarget(null)}>
+      <Dialog
+        open={!!rejetTarget}
+        onOpenChange={(o) => !o && setRejetTarget(null)}
+      >
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Rejeter la dépense</DialogTitle>
@@ -878,12 +1235,24 @@ export function DepensesPage() {
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setRejetTarget(null); setRejetMotif('') }}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setRejetTarget(null)
+                setRejetMotif('')
+              }}
+            >
               {t('actions.cancel')}
             </Button>
             <Button
               variant="destructive"
-              onClick={() => rejetTarget && rejeterMutation.mutate({ id: rejetTarget.id, motif: rejetMotif })}
+              onClick={() =>
+                rejetTarget &&
+                rejeterMutation.mutate({
+                  id: rejetTarget.id,
+                  motif: rejetMotif,
+                })
+              }
               disabled={!rejetMotif.trim() || rejeterMutation.isPending}
             >
               {rejeterMutation.isPending ? t('actions.loading') : 'Rejeter'}

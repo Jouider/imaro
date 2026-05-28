@@ -3,7 +3,14 @@ import { useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Plus, Send, FileText, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
+import {
+  Plus,
+  Send,
+  FileText,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+} from 'lucide-react'
 import {
   getAppelsFonds,
   getResidences,
@@ -94,7 +101,9 @@ function RepartitionPreview({
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center justify-between text-sm font-medium"
       >
-        <span>{isFixe ? 'Répartition par montant fixe' : 'Répartition par tantième'}</span>
+        <span>
+          {isFixe ? 'Répartition par montant fixe' : 'Répartition par tantième'}
+        </span>
         {open ? (
           <ChevronUp className="size-4 text-muted-foreground" />
         ) : (
@@ -123,7 +132,10 @@ function RepartitionPreview({
               {lots.map((lot) => {
                 if (isFixe) {
                   return (
-                    <tr key={lot.id} className="border-b border-muted last:border-0">
+                    <tr
+                      key={lot.id}
+                      className="border-b border-muted last:border-0"
+                    >
                       <td className="py-1 font-mono">{lot.numero}</td>
                       <td className="py-1 text-right tabular-nums">
                         {fmt.format(montantFixe ?? 0)}
@@ -138,7 +150,10 @@ function RepartitionPreview({
                     ? (lot.tantieme / totalTantieme) * montantTotal
                     : 0
                 return (
-                  <tr key={lot.id} className="border-b border-muted last:border-0">
+                  <tr
+                    key={lot.id}
+                    className="border-b border-muted last:border-0"
+                  >
                     <td className="py-1 font-mono">{lot.numero}</td>
                     <td className="py-1 text-right tabular-nums">
                       {lot.tantieme}
@@ -162,7 +177,9 @@ function RepartitionPreview({
                   </td>
                 ) : (
                   <>
-                    <td className="py-1 text-right tabular-nums">{totalTantieme}</td>
+                    <td className="py-1 text-right tabular-nums">
+                      {totalTantieme}
+                    </td>
                     <td className="py-1 text-right tabular-nums">100 %</td>
                     <td className="py-1 text-right tabular-nums">
                       {fmt.format(montantTotal)}
@@ -186,7 +203,9 @@ export function AppelsFondsPage() {
   const qc = useQueryClient()
   const [searchParams] = useSearchParams()
 
-  const [createOpen, setCreateOpen] = useState(() => searchParams.get('create') === '1')
+  const [createOpen, setCreateOpen] = useState(
+    () => searchParams.get('create') === '1',
+  )
   const [form, setForm] = useState<AppelForm>(EMPTY_FORM)
   const [envoyerTarget, setEnvoyerTarget] = useState<AppelFonds | null>(null)
 
@@ -221,7 +240,9 @@ export function AppelsFondsPage() {
   const showRepartition =
     !!form.residence_id && montantTotal > 0 && !lotsLoading && lots.length > 0
 
-  const selectedResidence = residences.find((r) => r.id === Number(form.residence_id))
+  const selectedResidence = residences.find(
+    (r) => r.id === Number(form.residence_id),
+  )
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -231,7 +252,9 @@ export function AppelsFondsPage() {
         montant_total: Number(form.montant_total),
         date_echeance: form.date_echeance,
         description: form.description || undefined,
-        ...(form.groupe_habitation_id ? { groupe_habitation_id: Number(form.groupe_habitation_id) } : {}),
+        ...(form.groupe_habitation_id
+          ? { groupe_habitation_id: Number(form.groupe_habitation_id) }
+          : {}),
       }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['appels-fonds'] })
@@ -292,21 +315,17 @@ export function AppelsFondsPage() {
       key: 'date_echeance',
       header: t('gestionnaire.appelsFonds.colEcheance'),
       sortable: true,
-      renderCell: (r) =>
-        r.date_echeance ? r.date_echeance.slice(0, 10) : '—',
+      renderCell: (r) => (r.date_echeance ? r.date_echeance.slice(0, 10) : '—'),
     },
     {
       key: 'statut',
       header: t('gestionnaire.appelsFonds.colStatut'),
       renderCell: (r) => {
         const cls = STATUT_STYLES[r.statut] ?? 'bg-gray-100 text-gray-700'
-        const label =
-          t(`gestionnaire.appelsFonds.statut.${r.statut}`, {
-            defaultValue: r.statut,
-          })
-        return (
-          <Badge className={`${cls} hover:${cls} border-0`}>{label}</Badge>
-        )
+        const label = t(`gestionnaire.appelsFonds.statut.${r.statut}`, {
+          defaultValue: r.statut,
+        })
+        return <Badge className={`${cls} hover:${cls} border-0`}>{label}</Badge>
       },
     },
     {
@@ -382,7 +401,11 @@ export function AppelsFondsPage() {
               <Select
                 value={form.residence_id}
                 onValueChange={(v) =>
-                  setForm((f) => ({ ...f, residence_id: v, groupe_habitation_id: '' }))
+                  setForm((f) => ({
+                    ...f,
+                    residence_id: v,
+                    groupe_habitation_id: '',
+                  }))
                 }
               >
                 <SelectTrigger className="w-full">
@@ -403,7 +426,9 @@ export function AppelsFondsPage() {
                 <Label>Tranche (optionnel)</Label>
                 <Select
                   value={form.groupe_habitation_id}
-                  onValueChange={(v) => setForm((f) => ({ ...f, groupe_habitation_id: v }))}
+                  onValueChange={(v) =>
+                    setForm((f) => ({ ...f, groupe_habitation_id: v }))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Toutes les tranches" />
@@ -444,8 +469,9 @@ export function AppelsFondsPage() {
             </div>
 
             {/* Répartition par tantième preview */}
-            {!!form.residence_id && montantTotal > 0 && (
-              lotsLoading ? (
+            {!!form.residence_id &&
+              montantTotal > 0 &&
+              (lotsLoading ? (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Loader2 className="size-3.5 animate-spin" />
                   Calcul de la répartition…
@@ -458,8 +484,7 @@ export function AppelsFondsPage() {
                   mode={selectedResidence?.mode_cotisation}
                   montantFixe={selectedResidence?.montant_fixe}
                 />
-              ) : null
-            )}
+              ) : null)}
 
             <div className="space-y-1">
               <Label>{t('gestionnaire.appelsFonds.form.description')}</Label>
@@ -484,7 +509,9 @@ export function AppelsFondsPage() {
               onClick={() => createMutation.mutate()}
               disabled={!isFormValid || createMutation.isPending}
             >
-              {createMutation.isPending ? t('actions.loading') : t('actions.save')}
+              {createMutation.isPending
+                ? t('actions.loading')
+                : t('actions.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
