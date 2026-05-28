@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { KpiCard, LoadingSkeleton, EmptyState } from '@/components/shared'
+import { useAuthStore } from '@/stores/authStore'
 import {
   getDashboard,
   getRecouvrementMensuel,
@@ -361,6 +362,7 @@ const ALL_RESIDENCES = '__all__'
 export function DashboardPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const user = useAuthStore((s) => s.user)
   const [residenceFilter, setResidenceFilter] = useState<string>(ALL_RESIDENCES)
 
   const residenceId =
@@ -385,13 +387,43 @@ export function DashboardPage() {
   const dashboard = dashboardQuery.data
   const residences = residencesQuery.data ?? []
 
+  // Greeting based on local time
+  const hour = new Date().getHours()
+  const greetingKey =
+    hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening'
+  const firstName = (user?.name ?? '').split(' ')[0] || ''
+  const totalResidences = residences.length
+  const urgentTickets = dashboard?.tickets_urgents?.length ?? 0
+  const subtitleParts: string[] = []
+  if (totalResidences > 0) {
+    subtitleParts.push(
+      `${totalResidences} ${totalResidences > 1 ? t('gestionnaire.dashboard.residencesPl') : t('gestionnaire.dashboard.residencesSg')}`,
+    )
+  }
+  if (urgentTickets > 0) {
+    subtitleParts.push(
+      `${urgentTickets} ${urgentTickets > 1 ? t('gestionnaire.dashboard.actionsPl') : t('gestionnaire.dashboard.actionsSg')}`,
+    )
+  }
+
   return (
     <div className="p-6 space-y-6">
-      {/* Page heading */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold text-[var(--color-imaro-primary)] dark:text-foreground">
-          {t('gestionnaire.dashboard.title')}
-        </h1>
+      {/* Page heading — DM Serif greeting + contextual subtitle */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="font-display text-3xl leading-tight tracking-tight text-[var(--primary)] sm:text-4xl">
+            {firstName
+              ? t(`gestionnaire.dashboard.greeting.${greetingKey}WithName`, {
+                  name: firstName,
+                })
+              : t(`gestionnaire.dashboard.greeting.${greetingKey}`)}
+          </h1>
+          {subtitleParts.length > 0 && (
+            <p className="mt-1 text-sm text-muted-foreground">
+              {subtitleParts.join(' · ')}
+            </p>
+          )}
+        </div>
 
         {/* A — Filtre résidence */}
         <Select value={residenceFilter} onValueChange={setResidenceFilter}>

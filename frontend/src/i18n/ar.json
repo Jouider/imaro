@@ -535,6 +535,20 @@
     }
   },
   "gestionnaire": {
+    "cmdk": {
+      "title": "بحث سريع",
+      "description": "اكتب للبحث عن صفحة، تشغيل إجراء، أو إيجاد مالك",
+      "placeholder": "البحث في الصفحات والإجراءات والبيانات…",
+      "empty": "لا توجد نتائج. جرّب كلمة أخرى.",
+      "trigger": "بحث سريع",
+      "navHeading": "التنقل",
+      "actionsHeading": "إجراءات سريعة",
+      "newTicket": "إنشاء تذكرة",
+      "recordPayment": "تسجيل دفعة",
+      "runAudit": "تشغيل التدقيق الذكي",
+      "generateAnnexe": "إنشاء ملحق",
+      "import": "استيراد بيانات"
+    },
     "nav": {
       "dashboard": "لوحة التحكم",
       "ia": "المساعد الذكي",
@@ -954,6 +968,18 @@
     },
     "dashboard": {
       "title": "لوحة التحكم",
+      "greeting": {
+        "morning": "صباح الخير",
+        "morningWithName": "صباح الخير، {{name}}",
+        "afternoon": "مساء الخير",
+        "afternoonWithName": "مساء الخير، {{name}}",
+        "evening": "مساء الخير",
+        "eveningWithName": "مساء الخير، {{name}}"
+      },
+      "residencesSg": "إقامة",
+      "residencesPl": "إقامات",
+      "actionsSg": "إجراء عاجل",
+      "actionsPl": "إجراءات عاجلة",
       "filterAll": "جميع الإقامات",
       "kpi": {
         "residences": "الإقامات",

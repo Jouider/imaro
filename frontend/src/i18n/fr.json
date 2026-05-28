@@ -538,6 +538,20 @@
     }
   },
   "gestionnaire": {
+    "cmdk": {
+      "title": "Recherche rapide",
+      "description": "Tapez pour rechercher une page, lancer une action ou retrouver un copropriétaire",
+      "placeholder": "Rechercher pages, actions, données…",
+      "empty": "Aucun résultat. Essayez un autre mot-clé.",
+      "trigger": "Recherche rapide",
+      "navHeading": "Navigation",
+      "actionsHeading": "Actions rapides",
+      "newTicket": "Créer un ticket",
+      "recordPayment": "Encaisser un paiement",
+      "runAudit": "Lancer l'audit IA",
+      "generateAnnexe": "Générer une annexe",
+      "import": "Importer des données"
+    },
     "nav": {
       "dashboard": "Tableau de bord",
       "ia": "Assistant IA",
@@ -734,6 +748,18 @@
     },
     "dashboard": {
       "title": "Tableau de bord",
+      "greeting": {
+        "morning": "Bonjour",
+        "morningWithName": "Bonjour, {{name}}",
+        "afternoon": "Bon après-midi",
+        "afternoonWithName": "Bon après-midi, {{name}}",
+        "evening": "Bonsoir",
+        "eveningWithName": "Bonsoir, {{name}}"
+      },
+      "residencesSg": "résidence",
+      "residencesPl": "résidences",
+      "actionsSg": "action urgente",
+      "actionsPl": "actions urgentes",
       "filterAll": "Toutes les résidences",
       "kpi": {
         "residences": "Résidences",

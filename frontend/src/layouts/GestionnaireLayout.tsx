@@ -38,6 +38,7 @@ import {
   AlertCircle,
   Info,
   CheckCheck,
+  Search,
 } from 'lucide-react'
 import { Wordmark } from '@/components/Wordmark'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
@@ -58,6 +59,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useMutation } from '@tanstack/react-query'
+import { CommandPalette } from '@/components/gestionnaire/CommandPalette'
 import { cn } from '@/lib/utils'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -662,6 +664,9 @@ export function GestionnaireLayout() {
 
   return (
     <div className="flex min-h-svh">
+      {/* Global Command Palette (Cmd+K) */}
+      <CommandPalette />
+
       {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 start-0 hidden w-[240px] lg:block shadow-xl shadow-black/10">
         <SidebarNav />
@@ -711,6 +716,9 @@ export function GestionnaireLayout() {
           {/* Spacer */}
           <div className="flex-1" />
 
+          {/* Cmd+K trigger pill — desktop only */}
+          <CmdkTrigger />
+
           {/* Right: actions */}
           <div className="flex items-center gap-1">
             {/* Notification center */}
@@ -736,5 +744,41 @@ export function GestionnaireLayout() {
         </main>
       </div>
     </div>
+  )
+}
+
+// ─── CmdkTrigger ──────────────────────────────────────────────────────────────
+
+/**
+ * Pill button in the topbar that triggers Cmd+K. Click dispatches the
+ * keydown event so we reuse the global listener in CommandPalette.
+ */
+function CmdkTrigger() {
+  const { t } = useTranslation()
+  const isMac =
+    typeof navigator !== 'undefined' &&
+    /Mac|iPod|iPhone|iPad/.test(navigator.platform)
+  function open() {
+    const ev = new KeyboardEvent('keydown', {
+      key: 'k',
+      metaKey: isMac,
+      ctrlKey: !isMac,
+      bubbles: true,
+    })
+    window.dispatchEvent(ev)
+  }
+  return (
+    <button
+      type="button"
+      onClick={open}
+      aria-label={t('gestionnaire.cmdk.trigger')}
+      className="hidden lg:inline-flex h-9 items-center gap-2 rounded-lg border border-[var(--color-imaro-primary)]/15 bg-[var(--color-imaro-primary-tint)]/40 px-3 text-xs text-muted-foreground transition-colors hover:bg-[var(--color-imaro-primary-tint)] hover:text-[var(--primary)]"
+    >
+      <Search className="size-3.5" />
+      <span className="font-medium">{t('gestionnaire.cmdk.trigger')}</span>
+      <kbd className="ms-2 inline-flex h-5 items-center rounded border bg-white px-1.5 font-mono text-[10px] text-muted-foreground shadow-sm dark:bg-card">
+        ⌘K
+      </kbd>
+    </button>
   )
 }
