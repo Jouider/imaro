@@ -40,9 +40,19 @@ class User extends Authenticatable
         return $this->belongsTo(Tenant::class);
     }
 
+    public function coproprietaire(): BelongsTo
+    {
+        return $this->belongsTo(Coproprietaire::class, 'id', 'user_id');
+    }
+
     public function coproprietaires(): HasMany
     {
         return $this->hasMany(Coproprietaire::class);
+    }
+
+    public function residences(): HasMany
+    {
+        return $this->hasMany(Residence::class, 'gestionnaire_id');
     }
 
     public function tickets(): HasMany

@@ -211,4 +211,26 @@ class BudgetController extends Controller
 
         return $data;
     }
+
+    /**
+     * PUT /api/gestionnaire/budgets/postes/{poste} — flat route (no budget ID)
+     */
+    public function updatePosteFlat(Request $request, PosteBudgetaire $poste): JsonResponse
+    {
+        $budget = $poste->budget;
+        abort_if($budget->tenant_id !== config('app.tenant_id'), 403);
+
+        return $this->updatePoste($request, $budget, $poste);
+    }
+
+    /**
+     * DELETE /api/gestionnaire/budgets/postes/{poste} — flat route (no budget ID)
+     */
+    public function destroyPosteFlat(PosteBudgetaire $poste): JsonResponse
+    {
+        $budget = $poste->budget;
+        abort_if($budget->tenant_id !== config('app.tenant_id'), 403);
+
+        return $this->destroyPoste($budget, $poste);
+    }
 }
