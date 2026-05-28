@@ -537,6 +537,125 @@
       }
     }
   },
+  "manager": {
+    "workspace": "Espace Manager",
+    "optional": "optionnel",
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "residences": "Résidences",
+      "gestionnaires": "Gestionnaires",
+      "userMenu": "Menu utilisateur",
+      "openMenu": "Ouvrir le menu",
+      "workspace": "Mon espace",
+      "logout": "Se déconnecter"
+    },
+    "actions": {
+      "menu": "Plus d'options",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    },
+    "dashboard": {
+      "greeting": {
+        "morning": "Bonjour",
+        "morningWithName": "Bonjour, {{name}}",
+        "afternoon": "Bon après-midi",
+        "afternoonWithName": "Bon après-midi, {{name}}",
+        "evening": "Bonsoir",
+        "eveningWithName": "Bonsoir, {{name}}"
+      },
+      "subtitle": "Vue d'ensemble de votre cabinet syndic",
+      "kpi": {
+        "residences": "Résidences",
+        "gestionnaires": "Gestionnaires",
+        "encaissements": "Encaissements",
+        "depenses": "Dépenses",
+        "solde": "Solde"
+      },
+      "soldeGlobal": "Solde global",
+      "soldePositif": "Votre cabinet est en excédent sur la période en cours.",
+      "soldeNegatif": "Le solde global est négatif — vigilance recommandée."
+    },
+    "residences": {
+      "title": "Résidences",
+      "subtitle": "Toutes les copropriétés du cabinet",
+      "add": "Nouvelle résidence",
+      "searchPlaceholder": "Rechercher une résidence…",
+      "empty": "Aucune résidence",
+      "emptyDesc": "Créez votre première résidence pour la gérer dans Imaro.",
+      "createTitle": "Nouvelle résidence",
+      "editTitle": "Modifier la résidence",
+      "formDesc": "Renseignez les informations principales puis assignez un gestionnaire.",
+      "deleteTitle": "Supprimer la résidence ?",
+      "deleteDesc": "Cette action est irréversible. La résidence",
+      "assignTitle": "Assigner un gestionnaire",
+      "pickGestionnaire": "Choisir un gestionnaire actif",
+      "unassigned": "Non assignée",
+      "residences": "résidences",
+      "col": {
+        "name": "Nom",
+        "city": "Adresse",
+        "lots": "Lots / Coprop.",
+        "gestionnaire": "Gestionnaire",
+        "status": "Statut"
+      },
+      "form": {
+        "name": "Nom de la résidence",
+        "namePh": "Résidence Atlas",
+        "address": "Adresse",
+        "addressPh": "12 rue des Orangers",
+        "city": "Ville",
+        "cityPh": "Casablanca",
+        "gestionnaire": "Gestionnaire assigné"
+      },
+      "actions": {
+        "assign": "Assigner gestionnaire"
+      },
+      "toast": {
+        "created": "Résidence créée",
+        "createFailed": "Échec de la création",
+        "updated": "Résidence mise à jour",
+        "updateFailed": "Échec de la mise à jour",
+        "deleted": "Résidence supprimée",
+        "deleteFailed": "Échec de la suppression",
+        "assigned": "Gestionnaire assigné",
+        "assignFailed": "Échec de l'assignation"
+      }
+    },
+    "gestionnaires": {
+      "title": "Gestionnaires",
+      "subtitle": "L'équipe qui gère vos copropriétés",
+      "add": "Nouveau gestionnaire",
+      "searchPlaceholder": "Rechercher un gestionnaire…",
+      "empty": "Aucun gestionnaire",
+      "emptyDesc": "Invitez votre premier gestionnaire pour démarrer.",
+      "createTitle": "Nouveau gestionnaire",
+      "editTitle": "Modifier le gestionnaire",
+      "formDesc": "Les gestionnaires se connectent avec leur email + OTP WhatsApp.",
+      "statusActive": "Actif",
+      "statusInactive": "Inactif",
+      "toggleAria": "Activer ou désactiver le gestionnaire",
+      "col": {
+        "name": "Nom",
+        "contact": "Contact",
+        "residences": "Résidences",
+        "status": "Statut"
+      },
+      "form": {
+        "name": "Nom complet",
+        "namePh": "Hassan Alaoui",
+        "email": "Email",
+        "phone": "Téléphone WhatsApp"
+      },
+      "toast": {
+        "created": "Gestionnaire créé",
+        "createFailed": "Échec de la création",
+        "updated": "Gestionnaire mis à jour",
+        "updateFailed": "Échec de la mise à jour",
+        "toggled": "Statut mis à jour",
+        "toggleFailed": "Échec du changement de statut"
+      }
+    }
+  },
   "gestionnaire": {
     "cmdk": {
       "title": "Recherche rapide",
