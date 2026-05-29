@@ -137,7 +137,72 @@ it('updates residence info', function () {
             'city' => 'Marrakech',
         ])
         ->assertStatus(200)
-        ->assertJsonPath('data.residence.city', 'Marrakech');
+        ->assertJsonPath('data.city', 'Marrakech');
+});
+
+it('creates a residence with mode_cotisation fixe', function () {
+    $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
+        ->postJson('/api/gestionnaire/residences', [
+            'name'            => 'Résidence Nouvelle',
+            'city'            => 'Tanger',
+            'address'         => '12 Av. Mohamed VI',
+            'mode_cotisation' => 'fixe',
+            'montant_fixe'    => 1500,
+            'jour_echeance'   => 5,
+        ])
+        ->assertStatus(201)
+        ->assertJsonPath('data.name', 'Résidence Nouvelle')
+        ->assertJsonPath('data.city', 'Tanger')
+        ->assertJsonPath('data.mode_cotisation', 'fixe')
+        ->assertJsonPath('data.montant_fixe', 1500)
+        ->assertJsonPath('data.jour_echeance', 5);
+});
+
+it('rejects residence creation when mode_cotisation=fixe and montant_fixe missing', function () {
+    $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
+        ->postJson('/api/gestionnaire/residences', [
+            'name'            => 'Résidence Invalide',
+            'city'            => 'Tanger',
+            'mode_cotisation' => 'fixe',
+        ])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['montant_fixe']);
+});
+
+it('soft-deletes a residence', function () {
+    $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
+        ->deleteJson("/api/gestionnaire/residences/{$this->residence->id}")
+        ->assertStatus(200)
+        ->assertJsonPath('data.id', $this->residence->id);
+
+    expect(Residence::withTrashed()->find($this->residence->id)->trashed())->toBeTrue();
+});
+
+it('returns overview KPIs for a residence', function () {
+    $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
+        ->getJson("/api/gestionnaire/residences/{$this->residence->id}/overview")
+        ->assertStatus(200)
+        ->assertJsonStructure(['data' => [
+            'nb_lots', 'nb_coproprietaires', 'taux_recouvrement',
+            'paye_ce_mois', 'en_attente', 'en_retard', 'nb_impayes',
+            'tresorerie', 'fonds_reserve',
+        ]]);
+});
+
+it('forbids overview access to a non-assigned gestionnaire', function () {
+    $other = User::create([
+        'tenant_id' => $this->tenant->id,
+        'name'      => 'Autre',
+        'phone'     => '+212611000099',
+        'role'      => 'gestionnaire',
+        'status'    => 'active',
+    ]);
+    $other->assignRole('gestionnaire');
+    $otherToken = $other->createToken('t')->plainTextToken;
+
+    $this->withHeaders(['Authorization' => "Bearer {$otherToken}"])
+        ->getJson("/api/gestionnaire/residences/{$this->residence->id}/overview")
+        ->assertStatus(403);
 });
 
 // ─── Lots ────────────────────────────────────────────────────────────────────
