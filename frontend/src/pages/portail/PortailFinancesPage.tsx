@@ -149,7 +149,7 @@ function DocumentPreviewModal({
           </Button>
           <Button
             size="sm"
-            className="bg-[var(--color-imaro-primary)] hover:bg-[var(--color-imaro-primary)]/90"
+            className="bg-gradient-imaro shadow-md hover:brightness-110"
             asChild
           >
             <a

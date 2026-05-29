@@ -59,7 +59,7 @@ export function InstallPrompt() {
             <Button
               size="sm"
               onClick={handleInstall}
-              className="h-8 bg-[var(--primary)] text-white hover:bg-[var(--color-imaro-primary-dark)]"
+              className="h-8 bg-gradient-imaro text-white shadow-sm hover:brightness-110"
             >
               {t('portail.installPrompt.install')}
             </Button>

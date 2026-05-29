@@ -388,7 +388,7 @@ export function LoginPage() {
 
                 <Button
                   type="submit"
-                  className="h-12 w-full bg-[var(--color-imaro-primary)] text-base text-white hover:bg-[var(--color-imaro-primary-dark)]"
+                  className="h-12 w-full bg-gradient-imaro text-base text-white shadow-sm hover:brightness-110"
                   disabled={loginEmailMutation.isPending || !email || !password}
                 >
                   {loginEmailMutation.isPending ? 'Connexion…' : 'Se connecter'}
@@ -558,7 +558,7 @@ export function LoginPage() {
 
                 <Button
                   type="submit"
-                  className="h-12 w-full bg-[var(--color-imaro-primary)] text-base text-white hover:bg-[var(--color-imaro-primary-dark)]"
+                  className="h-12 w-full bg-gradient-imaro text-base text-white shadow-sm hover:brightness-110"
                   disabled={activateMutation.isPending || newCode.length < 6}
                 >
                   {activateMutation.isPending

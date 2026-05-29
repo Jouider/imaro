@@ -226,7 +226,7 @@ function CreateCoproprietaireDialog({
 
           <Button
             type="submit"
-            className="h-11 w-full bg-[var(--color-imaro-primary)] text-white hover:bg-[var(--color-imaro-primary-dark)]"
+            className="h-11 w-full bg-gradient-imaro text-white shadow-sm hover:brightness-110"
             disabled={!canSubmit}
           >
             {mutation.isPending
@@ -393,7 +393,7 @@ function CreateLotDialog({
 
           <Button
             type="submit"
-            className="h-11 w-full bg-[var(--color-imaro-primary)] text-white hover:bg-[var(--color-imaro-primary-dark)]"
+            className="h-11 w-full bg-gradient-imaro text-white shadow-sm hover:brightness-110"
             disabled={!canSubmit}
           >
             {mutation.isPending ? 'Création…' : 'Créer et assigner le lot'}
@@ -512,7 +512,7 @@ function SuccessDialog({
             </p>
             <div className="flex gap-2">
               <Button
-                className="flex-1 gap-2 bg-[var(--color-imaro-primary)] text-white hover:bg-[var(--color-imaro-primary-dark)]"
+                className="flex-1 gap-2 bg-gradient-imaro text-white shadow-sm hover:brightness-110"
                 onClick={onCreateLot}
               >
                 <Building2 className="size-4" />
@@ -628,7 +628,7 @@ export function CoproprietairesPage() {
         actions={
           <Button
             onClick={() => setCreateOpen(true)}
-            className="gap-2 bg-[var(--color-imaro-primary)] text-white hover:bg-[var(--color-imaro-primary-dark)]"
+            className="gap-2 bg-gradient-imaro text-white shadow-sm hover:brightness-110"
           >
             <UserPlus className="size-4" />
             Ajouter un copropriétaire
