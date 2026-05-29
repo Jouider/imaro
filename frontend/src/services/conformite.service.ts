@@ -6,7 +6,8 @@
 import { api, type ApiEnvelope } from '@/lib/axios'
 
 async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
-  if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS) return call()
+  if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS)
+    return call()
   try {
     return await call()
   } catch {
@@ -17,8 +18,17 @@ async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
 // ─── Audit trail ──────────────────────────────────────────────────────────────
 
 export type AuditLogCategory =
-  | 'immeuble' | 'lot' | 'coproprietaire' | 'paiement' | 'depense'
-  | 'budget' | 'ag' | 'document' | 'user' | 'auth' | 'system'
+  | 'immeuble'
+  | 'lot'
+  | 'coproprietaire'
+  | 'paiement'
+  | 'depense'
+  | 'budget'
+  | 'ag'
+  | 'document'
+  | 'user'
+  | 'auth'
+  | 'system'
 
 export type AuditLogSeverity = 'info' | 'warning' | 'sensitive' | 'error'
 
@@ -116,8 +126,10 @@ const MOCK_AUDIT_LOGS: AuditLog[] = [
 
 function filterMockLogs(filters: AuditFilters): AuditLog[] {
   let logs = MOCK_AUDIT_LOGS
-  if (filters.category) logs = logs.filter((l) => l.category === filters.category)
-  if (filters.severity) logs = logs.filter((l) => l.severity === filters.severity)
+  if (filters.category)
+    logs = logs.filter((l) => l.category === filters.category)
+  if (filters.severity)
+    logs = logs.filter((l) => l.severity === filters.severity)
   if (filters.search) {
     const q = filters.search.toLowerCase()
     logs = logs.filter(
@@ -136,10 +148,9 @@ export async function getAuditLogs(
   const mockLogs = filterMockLogs(filters)
   return withMock(
     async () => {
-      const res = await api.get<ApiEnvelope<{ logs: AuditLog[]; stats: AuditStats }>>(
-        '/gestionnaire/audit-logs',
-        { params: filters },
-      )
+      const res = await api.get<
+        ApiEnvelope<{ logs: AuditLog[]; stats: AuditStats }>
+      >('/gestionnaire/audit-logs', { params: filters })
       return res.data.data
     },
     {
@@ -147,7 +158,8 @@ export async function getAuditLogs(
       stats: {
         total: MOCK_AUDIT_LOGS.length,
         errors: MOCK_AUDIT_LOGS.filter((l) => l.severity === 'error').length,
-        sensitive: MOCK_AUDIT_LOGS.filter((l) => l.severity === 'sensitive').length,
+        sensitive: MOCK_AUDIT_LOGS.filter((l) => l.severity === 'sensitive')
+          .length,
         error_rate: 0,
       },
     },
@@ -173,22 +185,40 @@ const MOCK_ANNEXES: AnnexeList = {
   exercice: 2026,
   regime: 'simplifie',
   annexes: [
-    { num: '10',   required: true,  available: true, last_generated: '2026-05-20T10:00:00Z' },
-    { num: '13-1', required: true,  available: true, last_generated: '2026-05-20T10:01:00Z' },
-    { num: '13-2', required: true,  available: true, last_generated: '2026-05-20T10:02:00Z' },
-    { num: '3',    required: false, available: true },
-    { num: '4',    required: false, available: true },
-    { num: '5',    required: false, available: true },
-    { num: '6',    required: false, available: true },
-    { num: '7',    required: false, available: true },
-    { num: '8',    required: false, available: true },
-    { num: '9',    required: false, available: true },
-    { num: '11',   required: false, available: true },
-    { num: '12',   required: false, available: true },
+    {
+      num: '10',
+      required: true,
+      available: true,
+      last_generated: '2026-05-20T10:00:00Z',
+    },
+    {
+      num: '13-1',
+      required: true,
+      available: true,
+      last_generated: '2026-05-20T10:01:00Z',
+    },
+    {
+      num: '13-2',
+      required: true,
+      available: true,
+      last_generated: '2026-05-20T10:02:00Z',
+    },
+    { num: '3', required: false, available: true },
+    { num: '4', required: false, available: true },
+    { num: '5', required: false, available: true },
+    { num: '6', required: false, available: true },
+    { num: '7', required: false, available: true },
+    { num: '8', required: false, available: true },
+    { num: '9', required: false, available: true },
+    { num: '11', required: false, available: true },
+    { num: '12', required: false, available: true },
   ],
 }
 
-export async function getAnnexes(residenceId: number, exercice: number): Promise<AnnexeList> {
+export async function getAnnexes(
+  residenceId: number,
+  exercice: number,
+): Promise<AnnexeList> {
   return withMock(
     async () => {
       const res = await api.get<ApiEnvelope<AnnexeList>>(
@@ -221,7 +251,10 @@ export async function regenerateAnnexe(
 // ─── Calendrier de conformité ─────────────────────────────────────────────────
 
 export type CompliancePhase =
-  | 'operations_mensuelles' | 'cloture_exercice' | 'preparation_ag' | 'archivage'
+  | 'operations_mensuelles'
+  | 'cloture_exercice'
+  | 'preparation_ag'
+  | 'archivage'
 
 export type ComplianceTask = {
   id: number
@@ -255,45 +288,196 @@ const MOCK_COMPLIANCE_CALENDAR: ComplianceCalendar = {
       phase: 'operations_mensuelles',
       progress_pct: 42,
       tasks: [
-        { id: 1, phase: 'operations_mensuelles', task_key: 'appel_jan', task_label: 'Appel de fonds émis — Janvier', due_date: '2026-01-31', status: 'done', completed_at: '2026-01-28T10:00:00Z' },
-        { id: 2, phase: 'operations_mensuelles', task_key: 'appel_fev', task_label: 'Appel de fonds émis — Février', due_date: '2026-02-28', status: 'done', completed_at: '2026-02-25T10:00:00Z' },
-        { id: 3, phase: 'operations_mensuelles', task_key: 'appel_mar', task_label: 'Appel de fonds émis — Mars', due_date: '2026-03-31', status: 'done', completed_at: '2026-03-28T10:00:00Z' },
-        { id: 4, phase: 'operations_mensuelles', task_key: 'appel_avr', task_label: 'Appel de fonds émis — Avril', due_date: '2026-04-30', status: 'done', completed_at: '2026-04-27T10:00:00Z' },
-        { id: 5, phase: 'operations_mensuelles', task_key: 'appel_mai', task_label: 'Appel de fonds émis — Mai', due_date: '2026-05-31', status: 'in_progress' },
-        { id: 6, phase: 'operations_mensuelles', task_key: 'appel_jun', task_label: 'Appel de fonds émis — Juin', due_date: '2026-06-30', status: 'pending' },
-        { id: 7, phase: 'operations_mensuelles', task_key: 'appel_jul', task_label: 'Appel de fonds émis — Juillet', due_date: '2026-07-31', status: 'pending' },
-        { id: 8, phase: 'operations_mensuelles', task_key: 'appel_aoa', task_label: 'Appel de fonds émis — Août', due_date: '2026-08-31', status: 'pending' },
-        { id: 9, phase: 'operations_mensuelles', task_key: 'appel_sep', task_label: 'Appel de fonds émis — Septembre', due_date: '2026-09-30', status: 'pending' },
-        { id: 10, phase: 'operations_mensuelles', task_key: 'appel_oct', task_label: 'Appel de fonds émis — Octobre', due_date: '2026-10-31', status: 'pending' },
-        { id: 11, phase: 'operations_mensuelles', task_key: 'appel_nov', task_label: 'Appel de fonds émis — Novembre', due_date: '2026-11-30', status: 'pending' },
-        { id: 12, phase: 'operations_mensuelles', task_key: 'appel_dec', task_label: 'Appel de fonds émis — Décembre', due_date: '2026-12-31', status: 'pending' },
+        {
+          id: 1,
+          phase: 'operations_mensuelles',
+          task_key: 'appel_jan',
+          task_label: 'Appel de fonds émis — Janvier',
+          due_date: '2026-01-31',
+          status: 'done',
+          completed_at: '2026-01-28T10:00:00Z',
+        },
+        {
+          id: 2,
+          phase: 'operations_mensuelles',
+          task_key: 'appel_fev',
+          task_label: 'Appel de fonds émis — Février',
+          due_date: '2026-02-28',
+          status: 'done',
+          completed_at: '2026-02-25T10:00:00Z',
+        },
+        {
+          id: 3,
+          phase: 'operations_mensuelles',
+          task_key: 'appel_mar',
+          task_label: 'Appel de fonds émis — Mars',
+          due_date: '2026-03-31',
+          status: 'done',
+          completed_at: '2026-03-28T10:00:00Z',
+        },
+        {
+          id: 4,
+          phase: 'operations_mensuelles',
+          task_key: 'appel_avr',
+          task_label: 'Appel de fonds émis — Avril',
+          due_date: '2026-04-30',
+          status: 'done',
+          completed_at: '2026-04-27T10:00:00Z',
+        },
+        {
+          id: 5,
+          phase: 'operations_mensuelles',
+          task_key: 'appel_mai',
+          task_label: 'Appel de fonds émis — Mai',
+          due_date: '2026-05-31',
+          status: 'in_progress',
+        },
+        {
+          id: 6,
+          phase: 'operations_mensuelles',
+          task_key: 'appel_jun',
+          task_label: 'Appel de fonds émis — Juin',
+          due_date: '2026-06-30',
+          status: 'pending',
+        },
+        {
+          id: 7,
+          phase: 'operations_mensuelles',
+          task_key: 'appel_jul',
+          task_label: 'Appel de fonds émis — Juillet',
+          due_date: '2026-07-31',
+          status: 'pending',
+        },
+        {
+          id: 8,
+          phase: 'operations_mensuelles',
+          task_key: 'appel_aoa',
+          task_label: 'Appel de fonds émis — Août',
+          due_date: '2026-08-31',
+          status: 'pending',
+        },
+        {
+          id: 9,
+          phase: 'operations_mensuelles',
+          task_key: 'appel_sep',
+          task_label: 'Appel de fonds émis — Septembre',
+          due_date: '2026-09-30',
+          status: 'pending',
+        },
+        {
+          id: 10,
+          phase: 'operations_mensuelles',
+          task_key: 'appel_oct',
+          task_label: 'Appel de fonds émis — Octobre',
+          due_date: '2026-10-31',
+          status: 'pending',
+        },
+        {
+          id: 11,
+          phase: 'operations_mensuelles',
+          task_key: 'appel_nov',
+          task_label: 'Appel de fonds émis — Novembre',
+          due_date: '2026-11-30',
+          status: 'pending',
+        },
+        {
+          id: 12,
+          phase: 'operations_mensuelles',
+          task_key: 'appel_dec',
+          task_label: 'Appel de fonds émis — Décembre',
+          due_date: '2026-12-31',
+          status: 'pending',
+        },
       ],
     },
     {
       phase: 'cloture_exercice',
       progress_pct: 0,
       tasks: [
-        { id: 13, phase: 'cloture_exercice', task_key: 'arret_comptes', task_label: 'Arrêt des comptes 2026', due_date: '2027-03-31', status: 'pending' },
-        { id: 14, phase: 'cloture_exercice', task_key: 'audit_interne', task_label: 'Audit interne', due_date: '2027-04-30', status: 'pending' },
-        { id: 15, phase: 'cloture_exercice', task_key: 'provisions_creances', task_label: 'Provisions créances douteuses', due_date: '2027-04-30', status: 'pending' },
+        {
+          id: 13,
+          phase: 'cloture_exercice',
+          task_key: 'arret_comptes',
+          task_label: 'Arrêt des comptes 2026',
+          due_date: '2027-03-31',
+          status: 'pending',
+        },
+        {
+          id: 14,
+          phase: 'cloture_exercice',
+          task_key: 'audit_interne',
+          task_label: 'Audit interne',
+          due_date: '2027-04-30',
+          status: 'pending',
+        },
+        {
+          id: 15,
+          phase: 'cloture_exercice',
+          task_key: 'provisions_creances',
+          task_label: 'Provisions créances douteuses',
+          due_date: '2027-04-30',
+          status: 'pending',
+        },
       ],
     },
     {
       phase: 'preparation_ag',
       progress_pct: 0,
       tasks: [
-        { id: 16, phase: 'preparation_ag', task_key: 'convocation_envoyee', task_label: 'Convocations AG envoyées', due_date: '2027-05-15', status: 'pending' },
-        { id: 17, phase: 'preparation_ag', task_key: 'documents_disposition', task_label: 'Documents à disposition', due_date: '2027-05-15', status: 'pending' },
-        { id: 18, phase: 'preparation_ag', task_key: 'tenue_ag', task_label: 'Tenue de l\'AG', due_date: '2027-05-30', status: 'pending' },
+        {
+          id: 16,
+          phase: 'preparation_ag',
+          task_key: 'convocation_envoyee',
+          task_label: 'Convocations AG envoyées',
+          due_date: '2027-05-15',
+          status: 'pending',
+        },
+        {
+          id: 17,
+          phase: 'preparation_ag',
+          task_key: 'documents_disposition',
+          task_label: 'Documents à disposition',
+          due_date: '2027-05-15',
+          status: 'pending',
+        },
+        {
+          id: 18,
+          phase: 'preparation_ag',
+          task_key: 'tenue_ag',
+          task_label: "Tenue de l'AG",
+          due_date: '2027-05-30',
+          status: 'pending',
+        },
       ],
     },
     {
       phase: 'archivage',
       progress_pct: 0,
       tasks: [
-        { id: 19, phase: 'archivage', task_key: 'pv_signe', task_label: 'PV de l\'AG signé', due_date: '2027-06-30', status: 'pending' },
-        { id: 20, phase: 'archivage', task_key: 'annexes_generees', task_label: 'Annexes 10, 13-1, 13-2 générées', due_date: '2027-06-30', status: 'pending' },
-        { id: 21, phase: 'archivage', task_key: 'archivage_complet', task_label: 'Archivage exercice clôturé', due_date: '2027-07-30', status: 'pending' },
+        {
+          id: 19,
+          phase: 'archivage',
+          task_key: 'pv_signe',
+          task_label: "PV de l'AG signé",
+          due_date: '2027-06-30',
+          status: 'pending',
+        },
+        {
+          id: 20,
+          phase: 'archivage',
+          task_key: 'annexes_generees',
+          task_label: 'Annexes 10, 13-1, 13-2 générées',
+          due_date: '2027-06-30',
+          status: 'pending',
+        },
+        {
+          id: 21,
+          phase: 'archivage',
+          task_key: 'archivage_complet',
+          task_label: 'Archivage exercice clôturé',
+          due_date: '2027-07-30',
+          status: 'pending',
+        },
       ],
     },
   ],
@@ -333,32 +517,28 @@ const MOCK_PENALTY_CONFIG: PenaltyConfig = {
   rate_value: 5,
 }
 
-export async function getPenaltyConfig(residenceId: number): Promise<PenaltyConfig> {
-  return withMock(
-    async () => {
-      const res = await api.get<ApiEnvelope<PenaltyConfig>>(
-        `/gestionnaire/residences/${residenceId}/penalty-config`,
-      )
-      return res.data.data
-    },
-    MOCK_PENALTY_CONFIG,
-  )
+export async function getPenaltyConfig(
+  residenceId: number,
+): Promise<PenaltyConfig> {
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<PenaltyConfig>>(
+      `/gestionnaire/residences/${residenceId}/penalty-config`,
+    )
+    return res.data.data
+  }, MOCK_PENALTY_CONFIG)
 }
 
 export async function updatePenaltyConfig(
   residenceId: number,
   config: PenaltyConfig,
 ): Promise<PenaltyConfig> {
-  return withMock(
-    async () => {
-      const res = await api.put<ApiEnvelope<PenaltyConfig>>(
-        `/gestionnaire/residences/${residenceId}/penalty-config`,
-        config,
-      )
-      return res.data.data
-    },
-    config,
-  )
+  return withMock(async () => {
+    const res = await api.put<ApiEnvelope<PenaltyConfig>>(
+      `/gestionnaire/residences/${residenceId}/penalty-config`,
+      config,
+    )
+    return res.data.data
+  }, config)
 }
 
 // ─── Recouvrement (prescription) ──────────────────────────────────────────────
@@ -395,7 +575,7 @@ export type RecouvrementData = {
 
 const MOCK_RECOUVREMENT: RecouvrementData = {
   total_impaye: 12_450,
-  total_penalites: 622.50,
+  total_penalites: 622.5,
   nb_lots_en_retard: 5,
   prescription_risks: [
     {
@@ -427,27 +607,68 @@ const MOCK_RECOUVREMENT: RecouvrementData = {
     },
   ],
   lots: [
-    { lot_id: 3, lot_numero: 'B-01', coproprietaire_nom: 'Karim El Fassi', montant_du: 3200, montant_penalites: 160, anciennete_jours: 1530, statut: 'contentieux' },
-    { lot_id: 7, lot_numero: 'P-02', coproprietaire_nom: 'Saïd Bennani', montant_du: 1100, montant_penalites: 55, anciennete_jours: 1006, statut: 'mise_en_demeure' },
-    { lot_id: 12, lot_numero: 'A-04', coproprietaire_nom: 'Nadia Berrada', montant_du: 850, montant_penalites: 42.50, anciennete_jours: 833, statut: 'en_retard' },
-    { lot_id: 15, lot_numero: 'C-01', coproprietaire_nom: 'Imane Ouazzani', montant_du: 4200, montant_penalites: 210, anciennete_jours: 95, statut: 'en_retard' },
-    { lot_id: 18, lot_numero: 'A-02', coproprietaire_nom: 'Yassine Tazi', montant_du: 3100, montant_penalites: 155, anciennete_jours: 47, statut: 'en_retard' },
+    {
+      lot_id: 3,
+      lot_numero: 'B-01',
+      coproprietaire_nom: 'Karim El Fassi',
+      montant_du: 3200,
+      montant_penalites: 160,
+      anciennete_jours: 1530,
+      statut: 'contentieux',
+    },
+    {
+      lot_id: 7,
+      lot_numero: 'P-02',
+      coproprietaire_nom: 'Saïd Bennani',
+      montant_du: 1100,
+      montant_penalites: 55,
+      anciennete_jours: 1006,
+      statut: 'mise_en_demeure',
+    },
+    {
+      lot_id: 12,
+      lot_numero: 'A-04',
+      coproprietaire_nom: 'Nadia Berrada',
+      montant_du: 850,
+      montant_penalites: 42.5,
+      anciennete_jours: 833,
+      statut: 'en_retard',
+    },
+    {
+      lot_id: 15,
+      lot_numero: 'C-01',
+      coproprietaire_nom: 'Imane Ouazzani',
+      montant_du: 4200,
+      montant_penalites: 210,
+      anciennete_jours: 95,
+      statut: 'en_retard',
+    },
+    {
+      lot_id: 18,
+      lot_numero: 'A-02',
+      coproprietaire_nom: 'Yassine Tazi',
+      montant_du: 3100,
+      montant_penalites: 155,
+      anciennete_jours: 47,
+      statut: 'en_retard',
+    },
   ],
 }
 
-export async function getRecouvrement(residenceId: number): Promise<RecouvrementData> {
-  return withMock(
-    async () => {
-      const res = await api.get<ApiEnvelope<RecouvrementData>>(
-        `/gestionnaire/residences/${residenceId}/recouvrement`,
-      )
-      return res.data.data
-    },
-    MOCK_RECOUVREMENT,
-  )
+export async function getRecouvrement(
+  residenceId: number,
+): Promise<RecouvrementData> {
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<RecouvrementData>>(
+      `/gestionnaire/residences/${residenceId}/recouvrement`,
+    )
+    return res.data.data
+  }, MOCK_RECOUVREMENT)
 }
 
-export async function sendMiseEnDemeure(paiementId: number): Promise<{ pdf_url: string }> {
+export async function sendMiseEnDemeure(
+  paiementId: number,
+): Promise<{ pdf_url: string }> {
   return withMock(
     async () => {
       const res = await api.post<ApiEnvelope<{ pdf_url: string }>>(
@@ -461,7 +682,11 @@ export async function sendMiseEnDemeure(paiementId: number): Promise<{ pdf_url: 
 
 // ─── Occupants (Art. 11 Loi 18-00) ────────────────────────────────────────────
 
-export type OccupantType = 'proprietaire_occupant' | 'locataire' | 'usufruitier' | 'autre'
+export type OccupantType =
+  | 'proprietaire_occupant'
+  | 'locataire'
+  | 'usufruitier'
+  | 'autre'
 
 export type Occupant = {
   id: number
@@ -481,14 +706,31 @@ export type Occupant = {
 export type CreateOccupantInput = Omit<Occupant, 'id'>
 
 const MOCK_OCCUPANTS: Occupant[] = [
-  { id: 1, lot_id: 1, nom: 'Hassan Benali',  telephone: '+212600000010', type: 'proprietaire_occupant', date_debut: '2020-01-01' },
-  { id: 2, lot_id: 2, nom: 'Mohammed Tazi',  telephone: '+212600000020', type: 'locataire',             date_debut: '2024-09-01', date_fin: '2026-08-31' },
+  {
+    id: 1,
+    lot_id: 1,
+    nom: 'Hassan Benali',
+    telephone: '+212600000010',
+    type: 'proprietaire_occupant',
+    date_debut: '2020-01-01',
+  },
+  {
+    id: 2,
+    lot_id: 2,
+    nom: 'Mohammed Tazi',
+    telephone: '+212600000020',
+    type: 'locataire',
+    date_debut: '2024-09-01',
+    date_fin: '2026-08-31',
+  },
 ]
 
 export async function getOccupants(lotId: number): Promise<Occupant[]> {
   return withMock(
     async () => {
-      const res = await api.get<ApiEnvelope<{ occupants: Occupant[] }>>(`/gestionnaire/lots/${lotId}/occupants`)
+      const res = await api.get<ApiEnvelope<{ occupants: Occupant[] }>>(
+        `/gestionnaire/lots/${lotId}/occupants`,
+      )
       return res.data.data.occupants
     },
     MOCK_OCCUPANTS.filter((o) => o.lot_id === lotId),
@@ -496,23 +738,26 @@ export async function getOccupants(lotId: number): Promise<Occupant[]> {
 }
 
 /** Vue consolidée par résidence — toutes les occupants en cours. */
-export async function getOccupantsByResidence(residenceId: number): Promise<Occupant[]> {
-  return withMock(
-    async () => {
-      const res = await api.get<ApiEnvelope<{ occupants: Occupant[] }>>(
-        `/gestionnaire/residences/${residenceId}/occupants`,
-      )
-      return res.data.data.occupants
-    },
-    MOCK_OCCUPANTS,
-  )
+export async function getOccupantsByResidence(
+  residenceId: number,
+): Promise<Occupant[]> {
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<{ occupants: Occupant[] }>>(
+      `/gestionnaire/residences/${residenceId}/occupants`,
+    )
+    return res.data.data.occupants
+  }, MOCK_OCCUPANTS)
 }
 
-export async function createOccupant(lotId: number, input: CreateOccupantInput): Promise<Occupant> {
+export async function createOccupant(
+  lotId: number,
+  input: CreateOccupantInput,
+): Promise<Occupant> {
   return withMock(
     async () => {
       const res = await api.post<ApiEnvelope<{ occupant: Occupant }>>(
-        `/gestionnaire/lots/${lotId}/occupants`, input,
+        `/gestionnaire/lots/${lotId}/occupants`,
+        input,
       )
       return res.data.data.occupant
     },
@@ -520,25 +765,33 @@ export async function createOccupant(lotId: number, input: CreateOccupantInput):
   )
 }
 
-export async function updateOccupant(occupantId: number, patch: Partial<CreateOccupantInput>): Promise<Occupant> {
+export async function updateOccupant(
+  occupantId: number,
+  patch: Partial<CreateOccupantInput>,
+): Promise<Occupant> {
   return withMock(
     async () => {
       const res = await api.put<ApiEnvelope<{ occupant: Occupant }>>(
-        `/gestionnaire/occupants/${occupantId}`, patch,
+        `/gestionnaire/occupants/${occupantId}`,
+        patch,
       )
       return res.data.data.occupant
     },
-    { id: occupantId, lot_id: 0, nom: '', type: 'autre', date_debut: '', ...patch },
+    {
+      id: occupantId,
+      lot_id: 0,
+      nom: '',
+      type: 'autre',
+      date_debut: '',
+      ...patch,
+    },
   )
 }
 
 export async function deleteOccupant(occupantId: number): Promise<void> {
-  return withMock(
-    async () => {
-      await api.delete(`/gestionnaire/occupants/${occupantId}`)
-    },
-    undefined,
-  )
+  return withMock(async () => {
+    await api.delete(`/gestionnaire/occupants/${occupantId}`)
+  }, undefined)
 }
 
 // ─── Annexes — endpoint per-num data ──────────────────────────────────────────
@@ -547,7 +800,9 @@ export async function deleteOccupant(occupantId: number): Promise<void> {
  *  these to feed the jsPDF generators. Other annexe nums return 400 from backend
  *  until phase 2 lands. */
 export async function getAnnexeData<T = unknown>(
-  residenceId: number, annexeNum: string, exercice: number,
+  residenceId: number,
+  annexeNum: string,
+  exercice: number,
 ): Promise<T> {
   const res = await api.get<ApiEnvelope<T>>(
     `/gestionnaire/residences/${residenceId}/annexes/${annexeNum}`,
@@ -558,7 +813,9 @@ export async function getAnnexeData<T = unknown>(
 
 // ─── Compliance task actions ──────────────────────────────────────────────────
 
-export async function completeComplianceTask(taskId: number): Promise<ComplianceTask> {
+export async function completeComplianceTask(
+  taskId: number,
+): Promise<ComplianceTask> {
   return withMock(
     async () => {
       const res = await api.post<ApiEnvelope<{ task: ComplianceTask }>>(
@@ -567,22 +824,33 @@ export async function completeComplianceTask(taskId: number): Promise<Compliance
       return res.data.data.task
     },
     {
-      id: taskId, phase: 'operations_mensuelles', task_key: '', task_label: '',
-      status: 'done', completed_at: new Date().toISOString(),
+      id: taskId,
+      phase: 'operations_mensuelles',
+      task_key: '',
+      task_label: '',
+      status: 'done',
+      completed_at: new Date().toISOString(),
     },
   )
 }
 
-export async function skipComplianceTask(taskId: number, reason: string): Promise<ComplianceTask> {
+export async function skipComplianceTask(
+  taskId: number,
+  reason: string,
+): Promise<ComplianceTask> {
   return withMock(
     async () => {
       const res = await api.post<ApiEnvelope<{ task: ComplianceTask }>>(
-        `/gestionnaire/compliance-tasks/${taskId}/skip`, { reason },
+        `/gestionnaire/compliance-tasks/${taskId}/skip`,
+        { reason },
       )
       return res.data.data.task
     },
     {
-      id: taskId, phase: 'operations_mensuelles', task_key: '', task_label: '',
+      id: taskId,
+      phase: 'operations_mensuelles',
+      task_key: '',
+      task_label: '',
       status: 'skipped',
     },
   )
@@ -591,13 +859,14 @@ export async function skipComplianceTask(taskId: number, reason: string): Promis
 // ─── Pénalités — batch recalc ─────────────────────────────────────────────────
 
 export async function recalculatePenalties(residenceId: number): Promise<{
-  recalculated: number; total_penalty_amount: number
+  recalculated: number
+  total_penalty_amount: number
 }> {
   return withMock(
     async () => {
-      const res = await api.post<ApiEnvelope<{ recalculated: number; total_penalty_amount: number }>>(
-        `/gestionnaire/residences/${residenceId}/penalties/recalculate`,
-      )
+      const res = await api.post<
+        ApiEnvelope<{ recalculated: number; total_penalty_amount: number }>
+      >(`/gestionnaire/residences/${residenceId}/penalties/recalculate`)
       return res.data.data
     },
     { recalculated: 0, total_penalty_amount: 0 },

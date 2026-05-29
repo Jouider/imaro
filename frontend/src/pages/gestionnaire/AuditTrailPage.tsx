@@ -2,52 +2,76 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import {
-  Activity, ShieldAlert, AlertCircle, Eye, Download,
-  Filter, RefreshCw,
+  Activity,
+  ShieldAlert,
+  AlertCircle,
+  Eye,
+  Download,
+  Filter,
+  RefreshCw,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select'
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 import {
   getAuditLogs,
-  type AuditLogCategory, type AuditLogSeverity,
+  type AuditLogCategory,
+  type AuditLogSeverity,
 } from '@/services/conformite.service'
 
 const CATEGORIES: { value: AuditLogCategory; label: string }[] = [
-  { value: 'immeuble',       label: 'Immeuble' },
-  { value: 'lot',            label: 'Lot' },
+  { value: 'immeuble', label: 'Immeuble' },
+  { value: 'lot', label: 'Lot' },
   { value: 'coproprietaire', label: 'Copropriétaire' },
-  { value: 'paiement',       label: 'Paiement' },
-  { value: 'depense',        label: 'Dépense' },
-  { value: 'budget',         label: 'Budget' },
-  { value: 'ag',             label: 'Assemblée' },
-  { value: 'document',       label: 'Document' },
-  { value: 'user',           label: 'Utilisateur' },
-  { value: 'auth',           label: 'Authentification' },
-  { value: 'system',         label: 'Système' },
+  { value: 'paiement', label: 'Paiement' },
+  { value: 'depense', label: 'Dépense' },
+  { value: 'budget', label: 'Budget' },
+  { value: 'ag', label: 'Assemblée' },
+  { value: 'document', label: 'Document' },
+  { value: 'user', label: 'Utilisateur' },
+  { value: 'auth', label: 'Authentification' },
+  { value: 'system', label: 'Système' },
 ]
 
 const SEVERITY_STYLES: Record<AuditLogSeverity, string> = {
-  info:      'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-300 dark:border-blue-900/30',
-  warning:   'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-300 dark:border-amber-900/30',
-  sensitive: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/20 dark:text-orange-300 dark:border-orange-900/30',
-  error:     'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-300 dark:border-red-900/30',
+  info: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-300 dark:border-blue-900/30',
+  warning:
+    'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-300 dark:border-amber-900/30',
+  sensitive:
+    'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/20 dark:text-orange-300 dark:border-orange-900/30',
+  error:
+    'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-300 dark:border-red-900/30',
 }
 
 const SEVERITY_LABELS: Record<AuditLogSeverity, string> = {
-  info: 'Info', warning: 'Avertissement', sensitive: 'Sensible', error: 'Erreur',
+  info: 'Info',
+  warning: 'Avertissement',
+  sensitive: 'Sensible',
+  error: 'Erreur',
 }
 
 const dt = new Intl.DateTimeFormat('fr-MA', {
-  day: '2-digit', month: '2-digit', year: 'numeric',
-  hour: '2-digit', minute: '2-digit',
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
 })
 
 export function AuditTrailPage() {
@@ -59,22 +83,28 @@ export function AuditTrailPage() {
 
   const auditQ = useQuery({
     queryKey: ['audit-logs', { category, severity, search }],
-    queryFn: () => getAuditLogs({
-      category: category || undefined,
-      severity: severity || undefined,
-      search: search || undefined,
-    }),
+    queryFn: () =>
+      getAuditLogs({
+        category: category || undefined,
+        severity: severity || undefined,
+        search: search || undefined,
+      }),
   })
 
   const logs = auditQ.data?.logs ?? []
-  const stats = auditQ.data?.stats ?? { total: 0, errors: 0, sensitive: 0, error_rate: 0 }
+  const stats = auditQ.data?.stats ?? {
+    total: 0,
+    errors: 0,
+    sensitive: 0,
+    error_rate: 0,
+  }
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-[#1B4F72]/10">
-          <Activity className="size-5 text-[#1B4F72]" />
+        <div className="flex size-10 items-center justify-center rounded-xl bg-[var(--color-imaro-primary)]/10">
+          <Activity className="size-5 text-[var(--color-imaro-primary)]" />
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-foreground">
@@ -82,7 +112,8 @@ export function AuditTrailPage() {
           </h1>
           <p className="text-sm text-muted-foreground">
             {t('gestionnaire.audit.subtitle', {
-              defaultValue: 'Traçabilité complète des actions sur la plateforme',
+              defaultValue:
+                'Traçabilité complète des actions sur la plateforme',
             })}
           </p>
         </div>
@@ -90,18 +121,45 @@ export function AuditTrailPage() {
           <Download className="size-4" />
           Exporter CSV
         </Button>
-        <Button variant="outline" size="sm" className="gap-2" onClick={() => auditQ.refetch()}>
-          <RefreshCw className={cn('size-4', auditQ.isFetching && 'animate-spin')} />
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={() => auditQ.refetch()}
+        >
+          <RefreshCw
+            className={cn('size-4', auditQ.isFetching && 'animate-spin')}
+          />
           Actualiser
         </Button>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <Kpi label="Total événements" value={stats.total} icon={<Activity className="size-4" />} tone="primary" />
-        <Kpi label="Erreurs" value={stats.errors} icon={<AlertCircle className="size-4" />} tone="danger" />
-        <Kpi label="Actions sensibles" value={stats.sensitive} icon={<ShieldAlert className="size-4" />} tone="warning" />
-        <Kpi label="Taux d'erreur" value={`${stats.error_rate.toFixed(1)}%`} icon={<Activity className="size-4" />} tone="muted" />
+        <Kpi
+          label="Total événements"
+          value={stats.total}
+          icon={<Activity className="size-4" />}
+          tone="primary"
+        />
+        <Kpi
+          label="Erreurs"
+          value={stats.errors}
+          icon={<AlertCircle className="size-4" />}
+          tone="danger"
+        />
+        <Kpi
+          label="Actions sensibles"
+          value={stats.sensitive}
+          icon={<ShieldAlert className="size-4" />}
+          tone="warning"
+        />
+        <Kpi
+          label="Taux d'erreur"
+          value={`${stats.error_rate.toFixed(1)}%`}
+          icon={<Activity className="size-4" />}
+          tone="muted"
+        />
       </div>
 
       {/* Filters */}
@@ -115,25 +173,37 @@ export function AuditTrailPage() {
         />
         <Select
           value={category || '__all__'}
-          onValueChange={(v) => setCategory(v === '__all__' ? '' : (v as AuditLogCategory))}
+          onValueChange={(v) =>
+            setCategory(v === '__all__' ? '' : (v as AuditLogCategory))
+          }
         >
-          <SelectTrigger className="w-44"><SelectValue placeholder="Catégorie" /></SelectTrigger>
+          <SelectTrigger className="w-44">
+            <SelectValue placeholder="Catégorie" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="__all__">Toutes catégories</SelectItem>
             {CATEGORIES.map((c) => (
-              <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+              <SelectItem key={c.value} value={c.value}>
+                {c.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
         <Select
           value={severity || '__all__'}
-          onValueChange={(v) => setSeverity(v === '__all__' ? '' : (v as AuditLogSeverity))}
+          onValueChange={(v) =>
+            setSeverity(v === '__all__' ? '' : (v as AuditLogSeverity))
+          }
         >
-          <SelectTrigger className="w-44"><SelectValue placeholder="Sévérité" /></SelectTrigger>
+          <SelectTrigger className="w-44">
+            <SelectValue placeholder="Sévérité" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="__all__">Toutes</SelectItem>
-            {(['info','warning','sensitive','error'] as const).map((s) => (
-              <SelectItem key={s} value={s}>{SEVERITY_LABELS[s]}</SelectItem>
+            {(['info', 'warning', 'sensitive', 'error'] as const).map((s) => (
+              <SelectItem key={s} value={s}>
+                {SEVERITY_LABELS[s]}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -156,13 +226,19 @@ export function AuditTrailPage() {
           <TableBody>
             {auditQ.isLoading ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-sm text-muted-foreground py-8">
+                <TableCell
+                  colSpan={7}
+                  className="text-center text-sm text-muted-foreground py-8"
+                >
                   Chargement...
                 </TableCell>
               </TableRow>
             ) : logs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-sm text-muted-foreground py-12">
+                <TableCell
+                  colSpan={7}
+                  className="text-center text-sm text-muted-foreground py-12"
+                >
                   Aucun événement pour cette période ou ce filtre.
                 </TableCell>
               </TableRow>
@@ -173,14 +249,25 @@ export function AuditTrailPage() {
                     {dt.format(new Date(log.created_at))}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={cn('text-xs', SEVERITY_STYLES[log.severity])}>
+                    <Badge
+                      variant="outline"
+                      className={cn('text-xs', SEVERITY_STYLES[log.severity])}
+                    >
                       {SEVERITY_LABELS[log.severity]}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm capitalize">{log.category}</TableCell>
-                  <TableCell className="font-mono text-xs">{log.action}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{log.user_email ?? '—'}</TableCell>
-                  <TableCell className="text-sm">{log.target_label ?? '—'}</TableCell>
+                  <TableCell className="text-sm capitalize">
+                    {log.category}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs">
+                    {log.action}
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {log.user_email ?? '—'}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {log.target_label ?? '—'}
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" className="size-7">
                       <Eye className="size-4" />
@@ -197,7 +284,10 @@ export function AuditTrailPage() {
 }
 
 function Kpi({
-  label, value, icon, tone,
+  label,
+  value,
+  icon,
+  tone,
 }: {
   label: string
   value: string | number
@@ -205,16 +295,23 @@ function Kpi({
   tone: 'primary' | 'danger' | 'warning' | 'muted'
 }) {
   const toneClasses = {
-    primary: 'bg-[#1B4F72]/10 text-[#1B4F72]',
-    danger:  'bg-red-100 text-red-600 dark:bg-red-950/20 dark:text-red-400',
-    warning: 'bg-amber-100 text-amber-600 dark:bg-amber-950/20 dark:text-amber-400',
-    muted:   'bg-muted text-muted-foreground',
+    primary:
+      'bg-[var(--color-imaro-primary)]/10 text-[var(--color-imaro-primary)]',
+    danger: 'bg-red-100 text-red-600 dark:bg-red-950/20 dark:text-red-400',
+    warning:
+      'bg-amber-100 text-amber-600 dark:bg-amber-950/20 dark:text-amber-400',
+    muted: 'bg-muted text-muted-foreground',
   }[tone]
 
   return (
     <div className="rounded-xl border bg-card p-4">
       <div className="mb-2 flex items-center gap-2">
-        <div className={cn('flex size-7 items-center justify-center rounded-lg', toneClasses)}>
+        <div
+          className={cn(
+            'flex size-7 items-center justify-center rounded-lg',
+            toneClasses,
+          )}
+        >
           {icon}
         </div>
         <p className="text-xs text-muted-foreground">{label}</p>

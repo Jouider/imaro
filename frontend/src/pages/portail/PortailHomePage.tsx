@@ -1,9 +1,19 @@
-import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useQueryClient, useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Bell, CreditCard, Clock, MapPin, ArrowRight } from 'lucide-react'
+import {
+  Bell,
+  CreditCard,
+  Clock,
+  MapPin,
+  ArrowRight,
+  CheckCircle2,
+  Wallet,
+} from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { PaiementSheet } from '@/components/portail/PaiementSheet'
 import {
   MontantDisplay,
   KpiCard,
@@ -19,6 +29,8 @@ import {
   type AssembleePortail,
 } from '@/services/portail.service'
 import { cn } from '@/lib/utils'
+import { usePullToRefresh } from '@/hooks/usePullToRefresh'
+import { PullRefreshIndicator } from '@/components/portail/PullRefreshIndicator'
 
 const montantFormatter = new Intl.NumberFormat('fr-MA', {
   minimumFractionDigits: 2,
@@ -70,6 +82,8 @@ function AnnonceCard({ annonce }: { annonce: Annonce }) {
 
 export function PortailHomePage() {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
+  const [payOpen, setPayOpen] = useState(false)
 
   const { data: dashboard, isLoading: dashLoading } = useQuery({
     queryKey: ['portail-dashboard'],
@@ -91,6 +105,17 @@ export function PortailHomePage() {
     queryFn: getAssembleesPortail,
   })
 
+  // Pull-to-refresh — refetch all 4 queries in parallel
+  const { pullDistance, progress, isRefreshing } = usePullToRefresh({
+    onRefresh: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['portail-dashboard'] }),
+        queryClient.invalidateQueries({ queryKey: ['portail-annonces'] }),
+        queryClient.invalidateQueries({ queryKey: ['portail-operations'] }),
+        queryClient.invalidateQueries({ queryKey: ['portail-assemblees'] }),
+      ]),
+  })
+
   const totalPaidThisYear = (operations ?? [])
     .filter((op) => op.type === 'paiement' && op.montant > 0)
     .reduce((sum, op) => sum + op.montant, 0)
@@ -102,35 +127,81 @@ export function PortailHomePage() {
     .slice(0, 2)
 
   return (
-    <div className="px-4 py-6 space-y-6">
-      {/* Hero balance card */}
-      {dashLoading ? (
-        <div className="h-36 animate-pulse rounded-xl bg-[var(--color-imaro-primary)]/20" />
-      ) : dashboard ? (
-        <div className="rounded-xl bg-[var(--color-imaro-primary)] dark:bg-card p-5 space-y-3">
-          {/* Balance label */}
-          <p className="text-sm text-white/70 dark:text-muted-foreground">
-            {t('portail.home.balance')}
-          </p>
+    <div className="px-4 py-5 space-y-6">
+      <PullRefreshIndicator
+        pullDistance={pullDistance}
+        progress={progress}
+        isRefreshing={isRefreshing}
+      />
 
-          {/* Balance amount */}
-          <div>
+      {/* Hero balance card — royal blue gradient with decorative pattern */}
+      {dashLoading ? (
+        <div className="h-44 animate-pulse rounded-2xl bg-[var(--color-imaro-primary)]/20" />
+      ) : dashboard ? (
+        <div
+          className="relative overflow-hidden rounded-2xl p-5 shadow-xl shadow-blue-500/20"
+          style={{
+            background:
+              'linear-gradient(135deg, var(--color-imaro-primary) 0%, var(--color-imaro-primary-dark) 100%)',
+          }}
+        >
+          {/* Decorative grid pattern */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-40"
+            style={{
+              backgroundImage:
+                'radial-gradient(rgba(255,255,255,0.18) 1.5px, transparent 1.5px)',
+              backgroundSize: '24px 24px',
+            }}
+          />
+          {/* Soft orange glow */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -right-16 -top-16 size-40 rounded-full opacity-30 blur-3xl"
+            style={{
+              background:
+                'radial-gradient(circle, rgba(230,126,34,0.6) 0%, transparent 70%)',
+            }}
+          />
+
+          <div className="relative">
+            {/* Balance label */}
+            <p className="text-xs font-medium uppercase tracking-wider text-white/70">
+              {t('portail.home.balance')}
+            </p>
+
+            {/* Balance amount — DM Serif */}
             <MontantDisplay
               value={dashboard.balance}
-              className="text-4xl font-bold text-white dark:text-foreground"
+              className="mt-2 block font-display text-4xl leading-none tracking-tight text-white sm:text-5xl"
             />
-          </div>
 
-          {/* Status chip */}
-          {dashboard.statut === 'a_jour' ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-imaro-success)] px-3 py-1 text-sm font-medium text-white">
-              {t('portail.home.aJour')} ✓
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-imaro-danger)] px-3 py-1 text-sm font-medium text-white">
-              {t('portail.home.enRetard')}
-            </span>
-          )}
+            {/* Status chip */}
+            <div className="mt-4 flex items-center gap-2">
+              {dashboard.statut === 'a_jour' ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm ring-1 ring-inset ring-white/20">
+                  <CheckCircle2 className="size-3.5 text-emerald-300" />
+                  {t('portail.home.aJour')}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-imaro-danger)] px-3 py-1 text-xs font-semibold text-white shadow-sm">
+                  <Clock className="size-3.5" />
+                  {t('portail.home.enRetard')}
+                </span>
+              )}
+            </div>
+
+            {/* Pay CTA */}
+            <button
+              type="button"
+              onClick={() => setPayOpen(true)}
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-[var(--color-imaro-primary)] shadow-sm transition-transform active:scale-[0.98]"
+            >
+              <Wallet className="size-4" />
+              {t('portail.finances.pay')}
+            </button>
+          </div>
         </div>
       ) : null}
 
@@ -223,6 +294,20 @@ export function PortailHomePage() {
           </div>
         )}
       </section>
+
+      <PaiementSheet
+        open={payOpen}
+        onOpenChange={setPayOpen}
+        defaultMontant={pendingAmount > 0 ? pendingAmount : undefined}
+        onSuccess={() => {
+          void queryClient.invalidateQueries({
+            queryKey: ['portail-dashboard'],
+          })
+          void queryClient.invalidateQueries({
+            queryKey: ['portail-operations'],
+          })
+        }}
+      />
     </div>
   )
 }
@@ -251,7 +336,9 @@ function ProchainPaiementCard({
       <div
         className={cn(
           'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
-          isOverdue ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600',
+          isOverdue
+            ? 'bg-orange-100 text-orange-600'
+            : 'bg-blue-100 text-blue-600',
         )}
       >
         <Bell className="size-5" aria-hidden="true" />
@@ -260,7 +347,9 @@ function ProchainPaiementCard({
       {/* Label + amount + date */}
       <div className="flex-1 min-w-0">
         <p className="text-xs text-muted-foreground">
-          {t('portail.home.prochainPaiement', { defaultValue: 'Prochain paiement' })}
+          {t('portail.home.prochainPaiement', {
+            defaultValue: 'Prochain paiement',
+          })}
         </p>
         <div className="flex items-baseline gap-1.5 flex-wrap">
           <MontantDisplay
@@ -268,7 +357,8 @@ function ProchainPaiementCard({
             className="font-semibold text-base"
           />
           <span className="text-xs text-muted-foreground">
-            {t('portail.home.le', { defaultValue: 'le' })} {formatDate(prochain_appel.date)}
+            {t('portail.home.le', { defaultValue: 'le' })}{' '}
+            {formatDate(prochain_appel.date)}
           </span>
         </div>
       </div>
@@ -295,30 +385,43 @@ function AssembleePreviewCard({ ag }: { ag: AssembleePortail }) {
   const dateObj = new Date(ag.date)
   const day = dateObj.toLocaleDateString('fr-FR', { day: '2-digit' })
   const month = dateObj.toLocaleDateString('fr-FR', { month: 'short' })
-  const time = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+  const time = dateObj.toLocaleTimeString('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
   const isExtraordinaire = ag.type === 'extraordinaire'
 
   return (
     <Link to="/portail/actualites" className="block">
-      <div className={cn(
-        'flex items-center gap-3 rounded-xl border bg-card p-3',
-        isExtraordinaire && 'border-orange-200 bg-orange-50/50 dark:bg-orange-950/10',
-      )}>
+      <div
+        className={cn(
+          'flex items-center gap-3 rounded-xl border bg-card p-3',
+          isExtraordinaire &&
+            'border-orange-200 bg-orange-50/50 dark:bg-orange-950/10',
+        )}
+      >
         {/* Date badge */}
-        <div className={cn(
-          'flex h-12 w-10 shrink-0 flex-col items-center justify-center rounded-lg text-white',
-          isExtraordinaire ? 'bg-orange-500' : 'bg-[var(--color-imaro-primary)]',
-        )}>
+        <div
+          className={cn(
+            'flex h-12 w-10 shrink-0 flex-col items-center justify-center rounded-lg text-white',
+            isExtraordinaire
+              ? 'bg-orange-500'
+              : 'bg-[var(--color-imaro-primary)]',
+          )}
+        >
           <span className="text-lg font-bold leading-none">{day}</span>
           <span className="text-xs uppercase leading-none mt-0.5">{month}</span>
         </div>
 
         {/* Info */}
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold leading-snug truncate">{ag.titre}</p>
+          <p className="text-sm font-semibold leading-snug truncate">
+            {ag.titre}
+          </p>
           <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <MapPin className="size-3" />{ag.lieu.split(',')[0]}
+              <MapPin className="size-3" />
+              {ag.lieu.split(',')[0]}
             </span>
             <span>{time}</span>
           </div>

@@ -140,7 +140,9 @@ export function AnnoncesPage() {
   }
 
   const isConfirmPending =
-    publishMutation.isPending || archiveMutation.isPending || deleteMutation.isPending
+    publishMutation.isPending ||
+    archiveMutation.isPending ||
+    deleteMutation.isPending
 
   const isFormValid = form.titre.trim() && form.contenu.trim()
 
@@ -204,7 +206,9 @@ export function AnnoncesPage() {
         <div className="flex flex-col items-center gap-3 py-20 text-center">
           <Megaphone className="size-12 text-muted-foreground" />
           <p className="font-medium">{t('gestionnaire.annonces.empty')}</p>
-          <p className="text-sm text-muted-foreground">{t('gestionnaire.annonces.emptyDesc')}</p>
+          <p className="text-sm text-muted-foreground">
+            {t('gestionnaire.annonces.emptyDesc')}
+          </p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -233,7 +237,9 @@ export function AnnoncesPage() {
               <Label>{t('gestionnaire.annonces.form.titre')}</Label>
               <Input
                 value={form.titre}
-                onChange={(e) => setForm((f) => ({ ...f, titre: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, titre: e.target.value }))
+                }
                 placeholder="Travaux ascenseur — interruption de service"
               />
             </div>
@@ -243,7 +249,12 @@ export function AnnoncesPage() {
                 <Label>{t('gestionnaire.annonces.form.priorite')}</Label>
                 <Select
                   value={form.priorite}
-                  onValueChange={(v) => setForm((f) => ({ ...f, priorite: v as 'normale' | 'urgente' }))}
+                  onValueChange={(v) =>
+                    setForm((f) => ({
+                      ...f,
+                      priorite: v as 'normale' | 'urgente',
+                    }))
+                  }
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue />
@@ -262,13 +273,22 @@ export function AnnoncesPage() {
                 <Label>{t('gestionnaire.annonces.form.residence')}</Label>
                 <Select
                   value={form.residence_id}
-                  onValueChange={(v) => setForm((f) => ({ ...f, residence_id: v === '_all' ? '' : v }))}
+                  onValueChange={(v) =>
+                    setForm((f) => ({
+                      ...f,
+                      residence_id: v === '_all' ? '' : v,
+                    }))
+                  }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t('gestionnaire.annonces.toutes')} />
+                    <SelectValue
+                      placeholder={t('gestionnaire.annonces.toutes')}
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="_all">{t('gestionnaire.annonces.toutes')}</SelectItem>
+                    <SelectItem value="_all">
+                      {t('gestionnaire.annonces.toutes')}
+                    </SelectItem>
                     {residences.map((r) => (
                       <SelectItem key={r.id} value={String(r.id)}>
                         {r.name}
@@ -283,7 +303,9 @@ export function AnnoncesPage() {
               <Label>{t('gestionnaire.annonces.form.contenu')}</Label>
               <textarea
                 value={form.contenu}
-                onChange={(e) => setForm((f) => ({ ...f, contenu: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, contenu: e.target.value }))
+                }
                 placeholder="Décrivez l'annonce…"
                 className="w-full min-h-[120px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
@@ -302,27 +324,38 @@ export function AnnoncesPage() {
               onClick={() => createMutation.mutate()}
               disabled={!isFormValid || createMutation.isPending}
             >
-              {createMutation.isPending ? t('actions.loading') : t('actions.save')}
+              {createMutation.isPending
+                ? t('actions.loading')
+                : t('actions.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Confirm action dialog */}
-      <Dialog open={!!confirmAction} onOpenChange={(open) => !open && setConfirmAction(null)}>
+      <Dialog
+        open={!!confirmAction}
+        onOpenChange={(open) => !open && setConfirmAction(null)}
+      >
         {confirmAction && (
           <DialogContent className="max-w-sm">
             <DialogHeader>
               <DialogTitle>
-                {confirmAction.type === 'publish' && t('gestionnaire.annonces.publishConfirm')}
-                {confirmAction.type === 'archive' && t('gestionnaire.annonces.archiveConfirm')}
-                {confirmAction.type === 'delete' && t('gestionnaire.annonces.deleteConfirm')}
+                {confirmAction.type === 'publish' &&
+                  t('gestionnaire.annonces.publishConfirm')}
+                {confirmAction.type === 'archive' &&
+                  t('gestionnaire.annonces.archiveConfirm')}
+                {confirmAction.type === 'delete' &&
+                  t('gestionnaire.annonces.deleteConfirm')}
               </DialogTitle>
             </DialogHeader>
             <p className="text-sm text-muted-foreground">
-              {confirmAction.type === 'publish' && t('gestionnaire.annonces.publishDesc')}
-              {confirmAction.type === 'archive' && t('gestionnaire.annonces.archiveDesc')}
-              {confirmAction.type === 'delete' && t('gestionnaire.annonces.deleteDesc')}
+              {confirmAction.type === 'publish' &&
+                t('gestionnaire.annonces.publishDesc')}
+              {confirmAction.type === 'archive' &&
+                t('gestionnaire.annonces.archiveDesc')}
+              {confirmAction.type === 'delete' &&
+                t('gestionnaire.annonces.deleteDesc')}
             </p>
             <DialogFooter>
               <Button
@@ -333,7 +366,9 @@ export function AnnoncesPage() {
                 {t('actions.cancel')}
               </Button>
               <Button
-                variant={confirmAction.type === 'delete' ? 'destructive' : 'default'}
+                variant={
+                  confirmAction.type === 'delete' ? 'destructive' : 'default'
+                }
                 onClick={handleConfirm}
                 disabled={isConfirmPending}
               >
@@ -357,7 +392,13 @@ type AnnonceCardProps = {
   onDelete: () => void
 }
 
-function AnnonceCard({ annonce, t, onPublish, onArchive, onDelete }: AnnonceCardProps) {
+function AnnonceCard({
+  annonce,
+  t,
+  onPublish,
+  onArchive,
+  onDelete,
+}: AnnonceCardProps) {
   const statutCls = STATUT_STYLES[annonce.statut] ?? 'bg-gray-100 text-gray-600'
   const dateLabel = annonce.date_publication
     ? new Date(annonce.date_publication).toLocaleDateString('fr-FR', {
@@ -382,13 +423,17 @@ function AnnonceCard({ annonce, t, onPublish, onArchive, onDelete }: AnnonceCard
             </Badge>
           )}
           <Badge className={cn(statutCls, 'hover:opacity-80 border-0 text-xs')}>
-            {t(`gestionnaire.annonces.statut.${annonce.statut}`, { defaultValue: annonce.statut })}
+            {t(`gestionnaire.annonces.statut.${annonce.statut}`, {
+              defaultValue: annonce.statut,
+            })}
           </Badge>
           <span className="text-xs text-muted-foreground">{dateLabel}</span>
         </div>
 
         <h3 className="font-medium text-sm leading-snug">{annonce.titre}</h3>
-        <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{annonce.contenu}</p>
+        <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+          {annonce.contenu}
+        </p>
 
         <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
           {annonce.residence ? (

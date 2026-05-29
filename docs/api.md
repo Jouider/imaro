@@ -319,18 +319,82 @@ Détail complet avec GH, immeubles, lots.
 
 ---
 
-### PUT /api/gestionnaire/residences/{id}
+### POST /api/gestionnaire/residences
+
+Crée une nouvelle résidence. Le `tenant_id` est injecté depuis le middleware ;
+le `gestionnaire_id` est automatiquement défini sur l'utilisateur courant si
+celui-ci a le rôle `gestionnaire`.
 
 **Body**
+| Champ | Type | Requis | Notes |
+|---|---|---|---|
+| `name` | string | ✓ | max 255 |
+| `address` | string | ✗ | max 500 |
+| `city` | string | ✓ | max 100 |
+| `mode_cotisation` | `'tantieme' \| 'fixe'` | ✓ | |
+| `montant_fixe` | number | si `mode_cotisation='fixe'` | DH, persisté dans `cotisation_mensuelle` |
+| `jour_echeance` | int (1–28) | ✗ | Jour du mois où les cotisations sont dues |
+
+**Response 201** → `data` = objet Résidence créé (cf. shape ci-dessus, sans wrapper `residence`).
+
+---
+
+### PUT /api/gestionnaire/residences/{id}
+
+**Body** (partiel — tous les champs du POST sont supportés en `sometimes`)
 ```json
 {
   "name": "Résidence Atlas",
-  "address": "12 Bd Zerktouni",
   "city": "Casablanca",
   "mode_cotisation": "fixe",
-  "cotisation_mensuelle": 2500.00
+  "montant_fixe": 2500.00,
+  "jour_echeance": 5,
+  "status": "active"
 }
 ```
+
+**Response 200** → `data` = objet Résidence à jour (pas de wrapper `residence`).
+
+---
+
+### DELETE /api/gestionnaire/residences/{id}
+Soft-delete (les lots / paiements liés sont conservés en historique).
+
+**Response 200**
+```json
+{ "status": "success", "message": "Résidence supprimée", "data": { "id": 12 } }
+```
+
+---
+
+### GET /api/gestionnaire/residences/{id}/overview
+KPIs financiers et opérationnels affichés dans l'espace de gestion.
+
+**Response 200**
+```json
+{
+  "status": "success",
+  "data": {
+    "nb_lots": 24,
+    "nb_coproprietaires": 22,
+    "taux_recouvrement": 83.0,
+    "paye_ce_mois": 29880,
+    "en_attente": 2448,
+    "en_retard": 3672,
+    "nb_impayes": 4,
+    "tresorerie": 89640,
+    "fonds_reserve": 0
+  }
+}
+```
+
+Notes :
+- `taux_recouvrement` = total payé / total dû (sur appels de fonds non brouillon)
+- `en_attente` = restant à recouvrer pour les appels dont l'échéance est à venir
+- `en_retard` = restant à recouvrer pour les appels dont l'échéance est passée
+- `nb_impayes` = nombre de lignes en retard (non payées + échéance dépassée)
+- `tresorerie` = total encaissé − total dépensé (toutes périodes)
+- `fonds_reserve` = 0 tant que le module Réserve n'est pas livré (sprint 3+)
 
 ---
 

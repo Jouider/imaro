@@ -86,7 +86,9 @@ function KanbanCard({ ticket, onDragStart, onClick }: KanbanCardProps) {
         <span className="font-mono text-xs text-muted-foreground">
           #{ticket.id}
         </span>
-        <Badge className={`${priorityCls} hover:${priorityCls} border-0 text-[10px]`}>
+        <Badge
+          className={`${priorityCls} hover:${priorityCls} border-0 text-[10px]`}
+        >
           {t(`gestionnaire.tickets.priorite.${ticket.priorite}`, {
             defaultValue: ticket.priorite,
           })}
@@ -158,7 +160,10 @@ function KanbanColumn({
           {t(`gestionnaire.tickets.statut.${statut}`, { defaultValue: statut })}
         </span>
         <Badge
-          className={cn(headerBadgeCls, 'ms-auto border-0 text-xs tabular-nums')}
+          className={cn(
+            headerBadgeCls,
+            'ms-auto border-0 text-xs tabular-nums',
+          )}
         >
           {tickets.length}
         </Badge>
@@ -201,7 +206,10 @@ function KanbanBoard({ tickets, onCardClick, onMove }: KanbanBoardProps) {
     e.dataTransfer.effectAllowed = 'move'
   }
 
-  function handleDrop(e: React.DragEvent<HTMLDivElement>, targetStatut: StatutKey) {
+  function handleDrop(
+    e: React.DragEvent<HTMLDivElement>,
+    targetStatut: StatutKey,
+  ) {
     e.preventDefault()
     if (dragId === null) return
     const ticket = tickets.find((t) => t.id === dragId)
@@ -288,9 +296,7 @@ export function TicketsPage() {
       key: 'id',
       header: t('gestionnaire.tickets.colRef'),
       renderCell: (r) => (
-        <span className="font-mono text-sm text-muted-foreground">
-          #{r.id}
-        </span>
+        <span className="font-mono text-sm text-muted-foreground">#{r.id}</span>
       ),
       className: 'w-16',
     },
@@ -312,8 +318,7 @@ export function TicketsPage() {
       key: 'priorite',
       header: t('gestionnaire.tickets.colPriorite'),
       renderCell: (r) => {
-        const cls =
-          PRIORITE_STYLES[r.priorite] ?? 'bg-gray-100 text-gray-600'
+        const cls = PRIORITE_STYLES[r.priorite] ?? 'bg-gray-100 text-gray-600'
         return (
           <Badge className={`${cls} hover:${cls} border-0`}>
             {t(`gestionnaire.tickets.priorite.${r.priorite}`, {
@@ -374,7 +379,9 @@ export function TicketsPage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{t('gestionnaire.tickets.filterAll')}</SelectItem>
+            <SelectItem value="all">
+              {t('gestionnaire.tickets.filterAll')}
+            </SelectItem>
             {STATUTS.map((s) => (
               <SelectItem key={s} value={s}>
                 {t(`gestionnaire.tickets.statut.${s}`)}
@@ -388,7 +395,9 @@ export function TicketsPage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{t('gestionnaire.tickets.filterAll')}</SelectItem>
+            <SelectItem value="all">
+              {t('gestionnaire.tickets.filterAll')}
+            </SelectItem>
             {PRIORITES.map((p) => (
               <SelectItem key={p} value={p}>
                 {t(`gestionnaire.tickets.priorite.${p}`)}
@@ -496,10 +505,9 @@ export function TicketsPage() {
                     'border-0',
                   )}
                 >
-                  {t(
-                    `gestionnaire.tickets.priorite.${detailTicket.priorite}`,
-                    { defaultValue: detailTicket.priorite },
-                  )}
+                  {t(`gestionnaire.tickets.priorite.${detailTicket.priorite}`, {
+                    defaultValue: detailTicket.priorite,
+                  })}
                 </Badge>
               </div>
 
@@ -548,10 +556,7 @@ export function TicketsPage() {
                   <p className="text-sm font-medium">
                     {t('gestionnaire.tickets.colStatut')}
                   </p>
-                  <Select
-                    value={newStatut}
-                    onValueChange={setNewStatut}
-                  >
+                  <Select value={newStatut} onValueChange={setNewStatut}>
                     <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>

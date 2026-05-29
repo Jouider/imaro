@@ -1,10 +1,17 @@
 import { jsPDF } from 'jspdf'
-import type { ComptabiliteDashboard, EcritureComptable, BalanceLigne } from '@/services/comptabilite.service'
+import type {
+  ComptabiliteDashboard,
+  EcritureComptable,
+  BalanceLigne,
+} from '@/services/comptabilite.service'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const fmt = (n: number) =>
-  n.toLocaleString('fr-MA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' MAD'
+  n.toLocaleString('fr-MA', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }) + ' MAD'
 
 const fmtDate = (iso: string) => new Date(iso).toLocaleDateString('fr-FR')
 
@@ -72,17 +79,19 @@ function addFooter(doc: jsPDF, pageNum: number, totalPages: number): void {
   doc.setFontSize(7)
   doc.setTextColor(120, 120, 120)
   doc.text(
-    "Document établi conformément à la Loi 18-00 relative au statut de la copropriété des immeubles bâtis",
+    'Document établi conformément à la Loi 18-00 relative au statut de la copropriété des immeubles bâtis',
     MARGIN,
     y + 2,
   )
   doc.text(
-    "Document généré par Imaro — Plateforme de Gestion de Syndic",
+    'Document généré par Imaro — Plateforme de Gestion de Syndic',
     PAGE_W / 2,
     y + 7,
     { align: 'center' },
   )
-  doc.text(`Page ${pageNum} / ${totalPages}`, PAGE_W - MARGIN, y + 2, { align: 'right' })
+  doc.text(`Page ${pageNum} / ${totalPages}`, PAGE_W - MARGIN, y + 2, {
+    align: 'right',
+  })
 }
 
 function addSectionHeader(doc: jsPDF, title: string, y: number): number {
@@ -101,7 +110,11 @@ function addSectionHeader(doc: jsPDF, title: string, y: number): number {
 // Returns the Y position after the table.
 function drawTable(
   doc: jsPDF,
-  headers: Array<{ label: string; width: number; align?: 'left' | 'right' | 'center' }>,
+  headers: Array<{
+    label: string
+    width: number
+    align?: 'left' | 'right' | 'center'
+  }>,
   rows: string[][],
   startY: number,
   rowHeight = 7,
@@ -125,7 +138,12 @@ function drawTable(
   let x = MARGIN
   for (const h of headers) {
     const align = h.align ?? 'left'
-    const textX = align === 'right' ? x + h.width - 2 : align === 'center' ? x + h.width / 2 : x + 2
+    const textX =
+      align === 'right'
+        ? x + h.width - 2
+        : align === 'center'
+          ? x + h.width / 2
+          : x + 2
     doc.text(h.label, textX, startY + 5.5, { align })
     x += h.width
   }
@@ -157,10 +175,17 @@ function drawTable(
       const align = h.align ?? 'left'
       const cellText = row[j] ?? ''
       const textX =
-        align === 'right' ? cx + h.width - 2 : align === 'center' ? cx + h.width / 2 : cx + 2
+        align === 'right'
+          ? cx + h.width - 2
+          : align === 'center'
+            ? cx + h.width / 2
+            : cx + 2
       // Truncate long text
       const maxChars = Math.floor(h.width / 2.2)
-      const truncated = cellText.length > maxChars ? cellText.slice(0, maxChars - 1) + '…' : cellText
+      const truncated =
+        cellText.length > maxChars
+          ? cellText.slice(0, maxChars - 1) + '…'
+          : cellText
       doc.text(truncated, textX, y + rowHeight / 2 + 1.5, { align })
       cx += h.width
     }
@@ -174,7 +199,11 @@ function drawTable(
 // Draw a total row (bold, slightly different background)
 function drawTotalRow(
   doc: jsPDF,
-  headers: Array<{ label: string; width: number; align?: 'left' | 'right' | 'center' }>,
+  headers: Array<{
+    label: string
+    width: number
+    align?: 'left' | 'right' | 'center'
+  }>,
   cells: string[],
   y: number,
   rowHeight = 7,
@@ -194,7 +223,12 @@ function drawTotalRow(
     const h = headers[j]
     const align = h.align ?? 'left'
     const cellText = cells[j] ?? ''
-    const textX = align === 'right' ? cx + h.width - 2 : align === 'center' ? cx + h.width / 2 : cx + 2
+    const textX =
+      align === 'right'
+        ? cx + h.width - 2
+        : align === 'center'
+          ? cx + h.width / 2
+          : cx + 2
     doc.text(cellText, textX, y + rowHeight / 2 + 1.5, { align })
     cx += h.width
   }
@@ -238,14 +272,32 @@ export function generateRapportFinancier(params: RapportFinancierParams): void {
   const boxW = (CONTENT_W - 6) / 2
   const boxH = 28
 
-  type KpiBox = { label: string; value: string; r: number; g: number; b: number }
+  type KpiBox = {
+    label: string
+    value: string
+    r: number
+    g: number
+    b: number
+  }
 
   const resultatColor: [number, number, number] =
     dashboard.resultat >= 0 ? [39, 174, 96] : [231, 76, 60]
 
   const kpiBoxes: KpiBox[] = [
-    { label: 'Total Encaissements', value: fmt(dashboard.produits), r: 39, g: 174, b: 96 },
-    { label: 'Total Charges (Dépenses)', value: fmt(dashboard.charges), r: 231, g: 76, b: 60 },
+    {
+      label: 'Total Encaissements',
+      value: fmt(dashboard.produits),
+      r: 39,
+      g: 174,
+      b: 96,
+    },
+    {
+      label: 'Total Charges (Dépenses)',
+      value: fmt(dashboard.charges),
+      r: 231,
+      g: 76,
+      b: 60,
+    },
     {
       label: 'Excédent / Déficit',
       value: fmt(dashboard.resultat),
@@ -253,7 +305,13 @@ export function generateRapportFinancier(params: RapportFinancierParams): void {
       g: resultatColor[1],
       b: resultatColor[2],
     },
-    { label: 'Trésorerie en fin d\'exercice', value: fmt(dashboard.tresorerie), r: 39, g: 174, b: 96 },
+    {
+      label: "Trésorerie en fin d'exercice",
+      value: fmt(dashboard.tresorerie),
+      r: 39,
+      g: 174,
+      b: 96,
+    },
   ]
 
   const boxPositions = [
@@ -304,7 +362,7 @@ export function generateRapportFinancier(params: RapportFinancierParams): void {
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(9)
   doc.setTextColor(50, 50, 50)
-  doc.text('Solde en début d\'exercice : 0,00 MAD', MARGIN, y)
+  doc.text("Solde en début d'exercice : 0,00 MAD", MARGIN, y)
   y += 6
   doc.text(`${nbLots} lots`, MARGIN, y)
 
@@ -317,17 +375,26 @@ export function generateRapportFinancier(params: RapportFinancierParams): void {
 
   y = addSectionHeader(doc, 'RÉPARTITION DES CHARGES', y) + 4
 
-  const chargeHeaders: Array<{ label: string; width: number; align?: 'left' | 'right' | 'center' }> = [
+  const chargeHeaders: Array<{
+    label: string
+    width: number
+    align?: 'left' | 'right' | 'center'
+  }> = [
     { label: 'CATÉGORIE', width: 110 },
     { label: 'MONTANT', width: 42, align: 'right' },
     { label: '%', width: 30, align: 'right' },
   ]
 
-  const totalCharges = dashboard.charges_par_categorie.reduce((s, c) => s + c.montant, 0)
+  const totalCharges = dashboard.charges_par_categorie.reduce(
+    (s, c) => s + c.montant,
+    0,
+  )
   const chargeRows = dashboard.charges_par_categorie.map((c) => [
     c.categorie,
     fmt(c.montant),
-    totalCharges > 0 ? ((c.montant / totalCharges) * 100).toFixed(1) + '%' : '0.0%',
+    totalCharges > 0
+      ? ((c.montant / totalCharges) * 100).toFixed(1) + '%'
+      : '0.0%',
   ])
 
   y = drawTable(doc, chargeHeaders, chargeRows, y)
@@ -343,7 +410,11 @@ export function generateRapportFinancier(params: RapportFinancierParams): void {
   y = addSectionHeader(doc, 'ANALYSE DES IMPAYÉS', y) + 4
 
   // Table headers
-  const impayeHeaders: Array<{ label: string; width: number; align?: 'left' | 'right' | 'center' }> = [
+  const impayeHeaders: Array<{
+    label: string
+    width: number
+    align?: 'left' | 'right' | 'center'
+  }> = [
     { label: 'ANCIENNETÉ', width: 68 },
     { label: 'NB. LOTS', width: 30, align: 'right' },
     { label: 'MONTANT', width: 54, align: 'right' },
@@ -380,11 +451,11 @@ export function generateRapportFinancier(params: RapportFinancierParams): void {
 
   // Dot colors per row
   const dotColors: Array<[number, number, number]> = [
-    [39, 174, 96],   // À jour — green
-    [241, 196, 15],  // ≤ 3 mois — yellow
-    [230, 126, 34],  // 4-6 mois — orange
-    [231, 76, 60],   // 7-12 mois — red
-    [136, 14, 14],   // > 1 an — dark red
+    [39, 174, 96], // À jour — green
+    [241, 196, 15], // ≤ 3 mois — yellow
+    [230, 126, 34], // 4-6 mois — orange
+    [231, 76, 60], // 7-12 mois — red
+    [136, 14, 14], // > 1 an — dark red
   ]
 
   const rowH = 7
@@ -423,7 +494,13 @@ export function generateRapportFinancier(params: RapportFinancierParams): void {
     y += rowH
   }
 
-  y = drawTotalRow(doc, impayeHeaders, ['TOTAL', String(nbLots), fmt(dashboard.produits), '100%'], y) + 8
+  y =
+    drawTotalRow(
+      doc,
+      impayeHeaders,
+      ['TOTAL', String(nbLots), fmt(dashboard.produits), '100%'],
+      y,
+    ) + 8
 
   // Legal text block
   doc.setFont('helvetica', 'normal')
@@ -431,11 +508,11 @@ export function generateRapportFinancier(params: RapportFinancierParams): void {
   doc.setTextColor(60, 60, 60)
 
   const legalLines = [
-    'Conformément à l\'article 37 de la Loi 18-00, tout copropriétaire est tenu de contribuer aux charges',
+    "Conformément à l'article 37 de la Loi 18-00, tout copropriétaire est tenu de contribuer aux charges",
     'communes proportionnellement à ses quotes-parts. Le syndic est habilité à engager des procédures de',
-    'recouvrement à l\'encontre de tout copropriétaire défaillant, incluant les intérêts de retard au taux légal.',
+    "recouvrement à l'encontre de tout copropriétaire défaillant, incluant les intérêts de retard au taux légal.",
     '',
-    'Les impayés supérieurs à 3 mois font l\'objet d\'une mise en demeure formelle. Les impayés supérieurs à',
+    "Les impayés supérieurs à 3 mois font l'objet d'une mise en demeure formelle. Les impayés supérieurs à",
     '6 mois peuvent engager des procédures judiciaires conformément aux articles 30 à 42 de la Loi 18-00.',
   ]
 
@@ -471,7 +548,11 @@ export function generateJournalPdf(params: JournalPdfParams): void {
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
 
-  const headers: Array<{ label: string; width: number; align?: 'left' | 'right' | 'center' }> = [
+  const headers: Array<{
+    label: string
+    width: number
+    align?: 'left' | 'right' | 'center'
+  }> = [
     { label: 'DATE', width: 22 },
     { label: 'N° PIÈCE', width: 20 },
     { label: 'COMPTE', width: 40 },
@@ -509,7 +590,12 @@ export function generateJournalPdf(params: JournalPdfParams): void {
     y = drawTable(doc, headers, chunk, y)
 
     if (isLastPage) {
-      drawTotalRow(doc, headers, ['TOTAUX', '', '', '', fmt(totalDebit), fmt(totalCredit)], y)
+      drawTotalRow(
+        doc,
+        headers,
+        ['TOTAUX', '', '', '', fmt(totalDebit), fmt(totalCredit)],
+        y,
+      )
     }
 
     addFooter(doc, page + 1, totalChunks)
@@ -536,7 +622,7 @@ export function generateBalancePdf(params: BalancePdfParams): void {
 
   const CLASS_LABELS: Record<number, string> = {
     1: 'Classe 1 — Comptes de financement permanent',
-    2: 'Classe 2 — Comptes d\'actif immobilisé',
+    2: "Classe 2 — Comptes d'actif immobilisé",
     3: 'Classe 3 — Comptes de stocks',
     4: 'Classe 4 — Comptes de tiers',
     5: 'Classe 5 — Trésorerie',
@@ -544,7 +630,11 @@ export function generateBalancePdf(params: BalancePdfParams): void {
     7: 'Classe 7 — Comptes de produits',
   }
 
-  const headers: Array<{ label: string; width: number; align?: 'left' | 'right' | 'center' }> = [
+  const headers: Array<{
+    label: string
+    width: number
+    align?: 'left' | 'right' | 'center'
+  }> = [
     { label: 'N° COMPTE', width: 24 },
     { label: 'LIBELLÉ', width: 60 },
     { label: 'TOTAL DÉBIT', width: 28, align: 'right' },
@@ -646,7 +736,10 @@ export function generateBalancePdf(params: BalancePdfParams): void {
       const tx = align === 'right' ? cx + h.width - 2 : cx + 2
       const maxChars = Math.floor(h.width / 2)
       const cellText = cells[j] ?? ''
-      const truncated = cellText.length > maxChars ? cellText.slice(0, maxChars - 1) + '…' : cellText
+      const truncated =
+        cellText.length > maxChars
+          ? cellText.slice(0, maxChars - 1) + '…'
+          : cellText
       doc.text(truncated, tx, y + rowH / 2 + 1.5, { align })
       cx += h.width
     }
@@ -671,7 +764,14 @@ export function generateBalancePdf(params: BalancePdfParams): void {
   drawTotalRow(
     doc,
     headers,
-    ['', 'TOTAUX GÉNÉRAUX', fmt(totalDebit), fmt(totalCredit), fmt(totalSoldeDeb), fmt(totalSoldeCred)],
+    [
+      '',
+      'TOTAUX GÉNÉRAUX',
+      fmt(totalDebit),
+      fmt(totalCredit),
+      fmt(totalSoldeDeb),
+      fmt(totalSoldeCred),
+    ],
     y,
   )
 
@@ -697,7 +797,10 @@ export function generateGrandLivrePdf(params: GrandLivrePdfParams): void {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
 
   // Group ecritures by compte
-  const grouped = new Map<string, { libelle: string; lignes: EcritureComptable[] }>()
+  const grouped = new Map<
+    string,
+    { libelle: string; lignes: EcritureComptable[] }
+  >()
   for (const e of ecritures) {
     const key = e.numero_compte
     if (!grouped.has(key)) {
@@ -706,9 +809,15 @@ export function generateGrandLivrePdf(params: GrandLivrePdfParams): void {
     grouped.get(key)!.lignes.push(e)
   }
 
-  const comptes = [...grouped.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+  const comptes = [...grouped.entries()].sort((a, b) =>
+    a[0].localeCompare(b[0]),
+  )
 
-  const headers: Array<{ label: string; width: number; align?: 'left' | 'right' | 'center' }> = [
+  const headers: Array<{
+    label: string
+    width: number
+    align?: 'left' | 'right' | 'center'
+  }> = [
     { label: 'DATE', width: 24 },
     { label: 'LIBELLÉ', width: 74 },
     { label: 'DÉBIT', width: 28, align: 'right' },
@@ -834,7 +943,10 @@ export function generateGrandLivrePdf(params: GrandLivrePdfParams): void {
         const tx = align === 'right' ? cx + h.width - 2 : cx + 2
         const maxChars = Math.floor(h.width / 2)
         const cellText = cells[j] ?? ''
-        const truncated = cellText.length > maxChars ? cellText.slice(0, maxChars - 1) + '…' : cellText
+        const truncated =
+          cellText.length > maxChars
+            ? cellText.slice(0, maxChars - 1) + '…'
+            : cellText
         doc.text(truncated, tx, y + rowH / 2 + 1.5, { align })
         cx += h.width
       }
@@ -845,7 +957,18 @@ export function generateGrandLivrePdf(params: GrandLivrePdfParams): void {
     // Account total row
     const acctDebit = lignes.reduce((s, e) => s + e.debit, 0)
     const acctCredit = lignes.reduce((s, e) => s + e.credit, 0)
-    drawTotalRow(doc, headers, ['', `Total ${numero}`, fmt(acctDebit), fmt(acctCredit), fmt(Math.abs(runningBalance))], y)
+    drawTotalRow(
+      doc,
+      headers,
+      [
+        '',
+        `Total ${numero}`,
+        fmt(acctDebit),
+        fmt(acctCredit),
+        fmt(Math.abs(runningBalance)),
+      ],
+      y,
+    )
   }
 
   addFooter(doc, pageNum, pageNum)

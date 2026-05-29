@@ -1,7 +1,8 @@
 import { api, type ApiEnvelope } from '@/lib/axios'
 
 async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
-  if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS) return call()
+  if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS)
+    return call()
   try {
     return await call()
   } catch {
@@ -101,7 +102,11 @@ const MOCK_CONTRATS: Contrat[] = [
   {
     id: 1,
     titre: 'Contrat maintenance ascenseurs 2026',
-    prestataire: { id: 1, name: 'Ascenseurs Maroc SARL', specialite: 'ascenseurs' },
+    prestataire: {
+      id: 1,
+      name: 'Ascenseurs Maroc SARL',
+      specialite: 'ascenseurs',
+    },
     residence: { id: 1, name: 'Atlas Casablanca' },
     type_contrat: 'maintenance',
     montant_annuel: 18000,
@@ -158,10 +163,18 @@ export async function getPrestataires(params?: {
   statut?: string
   specialite?: string
 }): Promise<Prestataire[]> {
-  return withMock(async () => {
-    const res = await api.get<ApiEnvelope<{ prestataires: Prestataire[] }>>('/gestionnaire/prestataires', { params })
-    return res.data.data.prestataires
-  }, params?.statut ? MOCK_PRESTATAIRES.filter((p) => p.statut === params.statut) : MOCK_PRESTATAIRES)
+  return withMock(
+    async () => {
+      const res = await api.get<ApiEnvelope<{ prestataires: Prestataire[] }>>(
+        '/gestionnaire/prestataires',
+        { params },
+      )
+      return res.data.data.prestataires
+    },
+    params?.statut
+      ? MOCK_PRESTATAIRES.filter((p) => p.statut === params.statut)
+      : MOCK_PRESTATAIRES,
+  )
 }
 
 export async function storePrestataire(data: {
@@ -171,20 +184,32 @@ export async function storePrestataire(data: {
   email: string
   adresse: string
 }): Promise<Prestataire> {
-  return withMock(async () => {
-    const res = await api.post<ApiEnvelope<{ prestataire: Prestataire }>>('/gestionnaire/prestataires', data)
-    return res.data.data.prestataire
-  }, {
-    id: Math.floor(Math.random() * 1000) + 100,
-    ...data,
-    note_satisfaction: null,
-    nb_interventions: 0,
-    statut: 'actif' as const,
-  })
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<{ prestataire: Prestataire }>>(
+        '/gestionnaire/prestataires',
+        data,
+      )
+      return res.data.data.prestataire
+    },
+    {
+      id: Math.floor(Math.random() * 1000) + 100,
+      ...data,
+      note_satisfaction: null,
+      nb_interventions: 0,
+      statut: 'actif' as const,
+    },
+  )
 }
 
-export async function updatePrestataire(id: number, data: Partial<Prestataire>): Promise<Prestataire> {
-  const res = await api.put<ApiEnvelope<{ prestataire: Prestataire }>>(`/gestionnaire/prestataires/${id}`, data)
+export async function updatePrestataire(
+  id: number,
+  data: Partial<Prestataire>,
+): Promise<Prestataire> {
+  const res = await api.put<ApiEnvelope<{ prestataire: Prestataire }>>(
+    `/gestionnaire/prestataires/${id}`,
+    data,
+  )
   return res.data.data.prestataire
 }
 
@@ -192,10 +217,18 @@ export async function getContrats(params?: {
   residence_id?: number
   statut?: string
 }): Promise<Contrat[]> {
-  return withMock(async () => {
-    const res = await api.get<ApiEnvelope<{ contrats: Contrat[] }>>('/gestionnaire/contrats', { params })
-    return res.data.data.contrats
-  }, params?.statut ? MOCK_CONTRATS.filter((c) => c.statut === params.statut) : MOCK_CONTRATS)
+  return withMock(
+    async () => {
+      const res = await api.get<ApiEnvelope<{ contrats: Contrat[] }>>(
+        '/gestionnaire/contrats',
+        { params },
+      )
+      return res.data.data.contrats
+    },
+    params?.statut
+      ? MOCK_CONTRATS.filter((c) => c.statut === params.statut)
+      : MOCK_CONTRATS,
+  )
 }
 
 export async function storeContrat(data: {
@@ -208,20 +241,30 @@ export async function storeContrat(data: {
   date_fin: string
   renouvellement_auto: boolean
 }): Promise<Contrat> {
-  return withMock(async () => {
-    const res = await api.post<ApiEnvelope<{ contrat: Contrat }>>('/gestionnaire/contrats', data)
-    return res.data.data.contrat
-  }, {
-    id: Math.floor(Math.random() * 1000) + 100,
-    titre: data.titre,
-    prestataire: MOCK_PRESTATAIRES.find((p) => p.id === data.prestataire_id) ?? { id: data.prestataire_id, name: 'Prestataire', specialite: '' },
-    residence: { id: data.residence_id, name: 'Résidence' },
-    type_contrat: data.type_contrat,
-    montant_annuel: data.montant_annuel,
-    date_debut: data.date_debut,
-    date_fin: data.date_fin,
-    statut: 'actif' as const,
-    renouvellement_auto: data.renouvellement_auto,
-    jours_avant_expiration: Math.floor((new Date(data.date_fin).getTime() - Date.now()) / 86_400_000),
-  })
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<{ contrat: Contrat }>>(
+        '/gestionnaire/contrats',
+        data,
+      )
+      return res.data.data.contrat
+    },
+    {
+      id: Math.floor(Math.random() * 1000) + 100,
+      titre: data.titre,
+      prestataire: MOCK_PRESTATAIRES.find(
+        (p) => p.id === data.prestataire_id,
+      ) ?? { id: data.prestataire_id, name: 'Prestataire', specialite: '' },
+      residence: { id: data.residence_id, name: 'Résidence' },
+      type_contrat: data.type_contrat,
+      montant_annuel: data.montant_annuel,
+      date_debut: data.date_debut,
+      date_fin: data.date_fin,
+      statut: 'actif' as const,
+      renouvellement_auto: data.renouvellement_auto,
+      jours_avant_expiration: Math.floor(
+        (new Date(data.date_fin).getTime() - Date.now()) / 86_400_000,
+      ),
+    },
+  )
 }

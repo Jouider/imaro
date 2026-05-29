@@ -36,6 +36,9 @@ import { EmpruntsPage } from '@/pages/gestionnaire/EmpruntsPage'
 import { TravauxExceptionnelsPage } from '@/pages/gestionnaire/TravauxExceptionnelsPage'
 import { AutresRecettesPage } from '@/pages/gestionnaire/AutresRecettesPage'
 import { RemboursementsPage } from '@/pages/gestionnaire/RemboursementsPage'
+import { IaAssistantPage } from '@/pages/gestionnaire/IaAssistantPage'
+import { UtilisateursPage } from '@/pages/gestionnaire/UtilisateursPage'
+import { PersonnelPage } from '@/pages/gestionnaire/PersonnelPage'
 
 export const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
@@ -77,7 +80,10 @@ export const router = createBrowserRouter([
       { path: 'residences', element: <ResidencesPage /> },
       { path: 'residences/:id', element: <ResidencePage /> },
       { path: 'coproprietaires', element: <CoproprietairesPage /> },
-      { path: 'appels-fonds', element: <Navigate to="/gestionnaire/paiements" replace /> },
+      {
+        path: 'appels-fonds',
+        element: <Navigate to="/gestionnaire/paiements" replace />,
+      },
       { path: 'paiements', element: <PaiementsPage /> },
       { path: 'tickets', element: <TicketsPage /> },
       { path: 'assemblees', element: <AssembleesPage /> },
@@ -96,10 +102,31 @@ export const router = createBrowserRouter([
       { path: 'travaux-exceptionnels', element: <TravauxExceptionnelsPage /> },
       { path: 'autres-recettes', element: <AutresRecettesPage /> },
       { path: 'remboursements', element: <RemboursementsPage /> },
+      { path: 'ia', element: <IaAssistantPage /> },
       { path: 'conformite', element: <ConformitePage /> },
       { path: 'annexes', element: <AnnexesPage /> },
       { path: 'audit', element: <AuditTrailPage /> },
+      { path: 'utilisateurs', element: <UtilisateursPage /> },
+      { path: 'personnel', element: <PersonnelPage /> },
       { path: 'profil', element: <ProfilPage /> },
     ],
+  },
+
+  // ── Anciennes routes /manager → fusionnées dans /gestionnaire ──
+  {
+    path: '/manager',
+    element: <Navigate to="/gestionnaire/dashboard" replace />,
+  },
+  {
+    path: '/manager/gestionnaires',
+    element: <Navigate to="/gestionnaire/utilisateurs" replace />,
+  },
+  {
+    path: '/manager/residences',
+    element: <Navigate to="/gestionnaire/residences" replace />,
+  },
+  {
+    path: '/manager/dashboard',
+    element: <Navigate to="/gestionnaire/dashboard" replace />,
   },
 ])

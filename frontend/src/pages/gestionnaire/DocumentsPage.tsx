@@ -36,14 +36,20 @@ import {
 
 type DocType = GestDoc['type']
 
-const DOC_TYPES: DocType[] = ['reglement', 'pv_ag', 'contrat', 'facture', 'autre']
+const DOC_TYPES: DocType[] = [
+  'reglement',
+  'pv_ag',
+  'contrat',
+  'facture',
+  'autre',
+]
 
 const TYPE_BADGE_STYLES: Record<DocType, string> = {
   reglement: 'bg-blue-100 text-blue-800',
-  pv_ag:     'bg-purple-100 text-purple-800',
-  contrat:   'bg-green-100 text-green-800',
-  facture:   'bg-orange-100 text-orange-800',
-  autre:     'bg-gray-100 text-gray-600',
+  pv_ag: 'bg-purple-100 text-purple-800',
+  contrat: 'bg-green-100 text-green-800',
+  facture: 'bg-orange-100 text-orange-800',
+  autre: 'bg-gray-100 text-gray-600',
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -134,10 +140,18 @@ export function DocumentsPage() {
       void qc.invalidateQueries({ queryKey: ['documents'] })
       setAddOpen(false)
       setForm(EMPTY_FORM)
-      toast.success(t('gestionnaire.documents.addSuccess', { defaultValue: 'Document ajouté' }))
+      toast.success(
+        t('gestionnaire.documents.addSuccess', {
+          defaultValue: 'Document ajouté',
+        }),
+      )
     },
     onError: () =>
-      toast.error(t('gestionnaire.documents.addError', { defaultValue: "Erreur lors de l'ajout" })),
+      toast.error(
+        t('gestionnaire.documents.addError', {
+          defaultValue: "Erreur lors de l'ajout",
+        }),
+      ),
   })
 
   const deleteMutation = useMutation({
@@ -145,15 +159,24 @@ export function DocumentsPage() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['documents'] })
       setDeleteTarget(null)
-      toast.success(t('gestionnaire.documents.deleteSuccess', { defaultValue: 'Document supprimé' }))
+      toast.success(
+        t('gestionnaire.documents.deleteSuccess', {
+          defaultValue: 'Document supprimé',
+        }),
+      )
     },
     onError: () =>
-      toast.error(t('gestionnaire.documents.deleteError', { defaultValue: 'Erreur lors de la suppression' })),
+      toast.error(
+        t('gestionnaire.documents.deleteError', {
+          defaultValue: 'Erreur lors de la suppression',
+        }),
+      ),
   })
 
   // ── Form validation ───────────────────────────────────────────────────────
 
-  const isFormValid = form.nom.trim() !== '' && form.date !== '' && form.file !== null
+  const isFormValid =
+    form.nom.trim() !== '' && form.date !== '' && form.file !== null
 
   // ── Columns ───────────────────────────────────────────────────────────────
 
@@ -162,28 +185,34 @@ export function DocumentsPage() {
       key: 'nom',
       header: t('gestionnaire.documents.col.nom', { defaultValue: 'Nom' }),
       sortable: true,
-      renderCell: (doc) => (
-        <span className="font-medium">{doc.nom}</span>
-      ),
+      renderCell: (doc) => <span className="font-medium">{doc.nom}</span>,
     },
     {
       key: 'type',
       header: t('gestionnaire.documents.col.type', { defaultValue: 'Type' }),
       renderCell: (doc) => (
-        <Badge className={`${TYPE_BADGE_STYLES[doc.type]} border-0 text-xs hover:opacity-80`}>
-          {t(`gestionnaire.documents.type.${doc.type}`, { defaultValue: doc.type })}
+        <Badge
+          className={`${TYPE_BADGE_STYLES[doc.type]} border-0 text-xs hover:opacity-80`}
+        >
+          {t(`gestionnaire.documents.type.${doc.type}`, {
+            defaultValue: doc.type,
+          })}
         </Badge>
       ),
     },
     {
       key: 'residence',
-      header: t('gestionnaire.documents.col.residence', { defaultValue: 'Résidence' }),
+      header: t('gestionnaire.documents.col.residence', {
+        defaultValue: 'Résidence',
+      }),
       renderCell: (doc) =>
         doc.residence ? (
           <span>{doc.residence.name}</span>
         ) : (
           <span className="text-muted-foreground text-xs">
-            {t('gestionnaire.documents.allResidences', { defaultValue: 'Toutes' })}
+            {t('gestionnaire.documents.allResidences', {
+              defaultValue: 'Toutes',
+            })}
           </span>
         ),
     },
@@ -195,9 +224,13 @@ export function DocumentsPage() {
     },
     {
       key: 'taille_ko',
-      header: t('gestionnaire.documents.col.taille', { defaultValue: 'Taille' }),
+      header: t('gestionnaire.documents.col.taille', {
+        defaultValue: 'Taille',
+      }),
       renderCell: (doc) => (
-        <span className="text-muted-foreground text-sm">{formatSize(doc.taille_ko)}</span>
+        <span className="text-muted-foreground text-sm">
+          {formatSize(doc.taille_ko)}
+        </span>
       ),
     },
     {
@@ -206,8 +239,13 @@ export function DocumentsPage() {
       className: 'w-24 text-right',
       renderCell: (doc) => (
         <div className="flex items-center justify-end gap-1">
-          <Button variant="ghost" size="sm" asChild
-            title={t('gestionnaire.documents.download', { defaultValue: 'Télécharger PDF' })}
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            title={t('gestionnaire.documents.download', {
+              defaultValue: 'Télécharger PDF',
+            })}
           >
             <a
               href={doc.url}
@@ -223,7 +261,9 @@ export function DocumentsPage() {
             size="sm"
             onClick={() => setDeleteTarget(doc)}
             className="text-destructive hover:text-destructive"
-            title={t('gestionnaire.documents.delete', { defaultValue: 'Supprimer' })}
+            title={t('gestionnaire.documents.delete', {
+              defaultValue: 'Supprimer',
+            })}
           >
             <Trash2 className="size-4" />
           </Button>
@@ -261,27 +301,30 @@ export function DocumentsPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="_all">
-              {t('gestionnaire.documents.filterAllTypes', { defaultValue: 'Tous les types' })}
+              {t('gestionnaire.documents.filterAllTypes', {
+                defaultValue: 'Tous les types',
+              })}
             </SelectItem>
             {DOC_TYPES.map((type) => (
               <SelectItem key={type} value={type}>
-                {t(`gestionnaire.documents.type.${type}`, { defaultValue: type })}
+                {t(`gestionnaire.documents.type.${type}`, {
+                  defaultValue: type,
+                })}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         {/* Résidence filter */}
-        <Select
-          value={filterResidence}
-          onValueChange={setFilterResidence}
-        >
+        <Select value={filterResidence} onValueChange={setFilterResidence}>
           <SelectTrigger className="w-52">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="_all">
-              {t('gestionnaire.documents.filterAllResidences', { defaultValue: 'Toutes les résidences' })}
+              {t('gestionnaire.documents.filterAllResidences', {
+                defaultValue: 'Toutes les résidences',
+              })}
             </SelectItem>
             {residences.map((r) => (
               <SelectItem key={r.id} value={String(r.id)}>
@@ -303,18 +346,29 @@ export function DocumentsPage() {
           defaultValue: 'Rechercher un document…',
         })}
         emptyIcon={<FileText className="size-12" />}
-        emptyTitle={t('gestionnaire.documents.emptyTitle', { defaultValue: 'Aucun document' })}
+        emptyTitle={t('gestionnaire.documents.emptyTitle', {
+          defaultValue: 'Aucun document',
+        })}
         emptyDescription={t('gestionnaire.documents.emptyDesc', {
-          defaultValue: 'Ajoutez votre premier document en cliquant sur Ajouter.',
+          defaultValue:
+            'Ajoutez votre premier document en cliquant sur Ajouter.',
         })}
       />
 
       {/* Add dialog */}
-      <Dialog open={addOpen} onOpenChange={(open) => { setAddOpen(open); if (!open) setForm(EMPTY_FORM) }}>
+      <Dialog
+        open={addOpen}
+        onOpenChange={(open) => {
+          setAddOpen(open)
+          if (!open) setForm(EMPTY_FORM)
+        }}
+      >
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>
-              {t('gestionnaire.documents.addDialog.title', { defaultValue: 'Ajouter un document' })}
+              {t('gestionnaire.documents.addDialog.title', {
+                defaultValue: 'Ajouter un document',
+              })}
             </DialogTitle>
           </DialogHeader>
 
@@ -322,12 +376,16 @@ export function DocumentsPage() {
             {/* Nom */}
             <div className="space-y-1">
               <Label htmlFor="doc-nom">
-                {t('gestionnaire.documents.form.nom', { defaultValue: 'Nom du document' })}
+                {t('gestionnaire.documents.form.nom', {
+                  defaultValue: 'Nom du document',
+                })}
               </Label>
               <Input
                 id="doc-nom"
                 value={form.nom}
-                onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, nom: e.target.value }))
+                }
                 placeholder={t('gestionnaire.documents.form.nomPlaceholder', {
                   defaultValue: 'Ex: Règlement de copropriété 2026',
                 })}
@@ -338,11 +396,15 @@ export function DocumentsPage() {
               {/* Type */}
               <div className="space-y-1">
                 <Label>
-                  {t('gestionnaire.documents.form.type', { defaultValue: 'Type' })}
+                  {t('gestionnaire.documents.form.type', {
+                    defaultValue: 'Type',
+                  })}
                 </Label>
                 <Select
                   value={form.type}
-                  onValueChange={(v) => setForm((f) => ({ ...f, type: v as DocType }))}
+                  onValueChange={(v) =>
+                    setForm((f) => ({ ...f, type: v as DocType }))
+                  }
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue />
@@ -350,7 +412,9 @@ export function DocumentsPage() {
                   <SelectContent>
                     {DOC_TYPES.map((type) => (
                       <SelectItem key={type} value={type}>
-                        {t(`gestionnaire.documents.type.${type}`, { defaultValue: type })}
+                        {t(`gestionnaire.documents.type.${type}`, {
+                          defaultValue: type,
+                        })}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -360,13 +424,17 @@ export function DocumentsPage() {
               {/* Date */}
               <div className="space-y-1">
                 <Label htmlFor="doc-date">
-                  {t('gestionnaire.documents.form.date', { defaultValue: 'Date' })}
+                  {t('gestionnaire.documents.form.date', {
+                    defaultValue: 'Date',
+                  })}
                 </Label>
                 <Input
                   id="doc-date"
                   type="date"
                   value={form.date}
-                  onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, date: e.target.value }))
+                  }
                 />
               </div>
             </div>
@@ -374,12 +442,17 @@ export function DocumentsPage() {
             {/* Résidence (optional) */}
             <div className="space-y-1">
               <Label>
-                {t('gestionnaire.documents.form.residence', { defaultValue: 'Résidence (optionnel)' })}
+                {t('gestionnaire.documents.form.residence', {
+                  defaultValue: 'Résidence (optionnel)',
+                })}
               </Label>
               <Select
                 value={form.residence_id || '_all'}
                 onValueChange={(v) =>
-                  setForm((f) => ({ ...f, residence_id: v === '_all' ? '' : v }))
+                  setForm((f) => ({
+                    ...f,
+                    residence_id: v === '_all' ? '' : v,
+                  }))
                 }
               >
                 <SelectTrigger className="w-full">
@@ -391,7 +464,9 @@ export function DocumentsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="_all">
-                    {t('gestionnaire.documents.allResidences', { defaultValue: 'Toutes les résidences' })}
+                    {t('gestionnaire.documents.allResidences', {
+                      defaultValue: 'Toutes les résidences',
+                    })}
                   </SelectItem>
                   {residences.map((r) => (
                     <SelectItem key={r.id} value={String(r.id)}>
@@ -405,7 +480,9 @@ export function DocumentsPage() {
             {/* File */}
             <div className="space-y-1">
               <Label htmlFor="doc-file">
-                {t('gestionnaire.documents.form.file', { defaultValue: 'Fichier' })}
+                {t('gestionnaire.documents.form.file', {
+                  defaultValue: 'Fichier',
+                })}
               </Label>
               <Input
                 id="doc-file"
@@ -419,7 +496,8 @@ export function DocumentsPage() {
               />
               {form.file && (
                 <p className="text-xs text-muted-foreground">
-                  {form.file.name} — {formatSize(Math.round(form.file.size / 1024))}
+                  {form.file.name} —{' '}
+                  {formatSize(Math.round(form.file.size / 1024))}
                 </p>
               )}
             </div>
@@ -428,7 +506,10 @@ export function DocumentsPage() {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => { setAddOpen(false); setForm(EMPTY_FORM) }}
+              onClick={() => {
+                setAddOpen(false)
+                setForm(EMPTY_FORM)
+              }}
               disabled={addMutation.isPending}
             >
               {t('actions.cancel', { defaultValue: 'Annuler' })}
@@ -448,8 +529,12 @@ export function DocumentsPage() {
       {/* Delete confirmation modal */}
       <ConfirmModal
         open={deleteTarget !== null}
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
-        title={t('gestionnaire.documents.deleteConfirm.title', { defaultValue: 'Supprimer le document ?' })}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null)
+        }}
+        title={t('gestionnaire.documents.deleteConfirm.title', {
+          defaultValue: 'Supprimer le document ?',
+        })}
         description={
           deleteTarget
             ? t('gestionnaire.documents.deleteConfirm.desc', {
@@ -458,7 +543,9 @@ export function DocumentsPage() {
               })
             : ''
         }
-        onConfirm={() => { if (deleteTarget) deleteMutation.mutate(deleteTarget.id) }}
+        onConfirm={() => {
+          if (deleteTarget) deleteMutation.mutate(deleteTarget.id)
+        }}
         isLoading={deleteMutation.isPending}
       />
     </div>

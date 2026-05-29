@@ -55,7 +55,9 @@ export function autoMapColumns(
       if (usedTargets.has(col.key)) continue
 
       // Exact alias match → high confidence
-      const hasExact = col.aliases.some((a) => normalizeHeader(a) === normalized)
+      const hasExact = col.aliases.some(
+        (a) => normalizeHeader(a) === normalized,
+      )
       if (hasExact) {
         bestMatch = { key: col.key, confidence: 'high' }
         break

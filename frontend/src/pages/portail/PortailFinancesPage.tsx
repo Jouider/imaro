@@ -1,7 +1,15 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { ArrowDown, ArrowUp, Download, FileText, Eye, X } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowUp,
+  Download,
+  FileText,
+  Eye,
+  Wallet,
+  X,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -17,12 +25,15 @@ import {
 } from '@/components/shared'
 import {
   getOperations,
+  getPortailDashboard,
   getPortailDocuments,
   type Operation,
   type OperationType,
   type PortailDocument,
   type PortailDocumentType,
 } from '@/services/portail.service'
+import { StickyCta } from '@/components/portail/StickyCta'
+import { PaiementSheet } from '@/components/portail/PaiementSheet'
 import { cn } from '@/lib/utils'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -79,11 +90,20 @@ function DocumentPreviewModal({
               {doc.nom}
             </DialogTitle>
             <div className="flex items-center gap-2 mt-1">
-              <span className={cn('rounded-full px-2 py-0.5 text-xs font-medium', chipClass)}>
+              <span
+                className={cn(
+                  'rounded-full px-2 py-0.5 text-xs font-medium',
+                  chipClass,
+                )}
+              >
                 {typeLabel}
               </span>
-              <span className="text-xs text-muted-foreground">{formatTaille(doc.taille_ko)}</span>
-              <span className="text-xs text-muted-foreground">{formatDate(doc.date)}</span>
+              <span className="text-xs text-muted-foreground">
+                {formatTaille(doc.taille_ko)}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {formatDate(doc.date)}
+              </span>
             </div>
           </div>
           <button
@@ -114,7 +134,9 @@ function DocumentPreviewModal({
             <div className="flex flex-col items-center gap-3 py-10 text-muted-foreground">
               <FileText className="size-16 opacity-30" />
               <p className="text-sm">
-                {t('portail.finances.previewUnavailable', { defaultValue: 'Aperçu non disponible' })}
+                {t('portail.finances.previewUnavailable', {
+                  defaultValue: 'Aperçu non disponible',
+                })}
               </p>
             </div>
           )}
@@ -137,7 +159,9 @@ function DocumentPreviewModal({
               rel="noopener noreferrer"
             >
               <Download className="me-1.5 size-4" />
-              {t('portail.finances.documents.download', { defaultValue: 'Télécharger' })}
+              {t('portail.finances.documents.download', {
+                defaultValue: 'Télécharger',
+              })}
             </a>
           </Button>
         </div>
@@ -227,8 +251,12 @@ function OperationRow({ op }: { op: Operation }) {
             className="h-8 w-8"
             title={
               op.recu_url
-                ? t('portail.finances.recu', { defaultValue: 'Télécharger le reçu' })
-                : t('portail.finances.recuIndispo', { defaultValue: 'Reçu non disponible' })
+                ? t('portail.finances.recu', {
+                    defaultValue: 'Télécharger le reçu',
+                  })
+                : t('portail.finances.recuIndispo', {
+                    defaultValue: 'Reçu non disponible',
+                  })
             }
             disabled={!op.recu_url}
             onClick={() => {
@@ -269,16 +297,25 @@ function DocumentCard({
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm leading-snug truncate">{doc.nom}</p>
         <div className="flex items-center gap-1.5 mt-0.5">
-          <span className={cn('rounded-full px-2 py-0.5 text-xs font-medium', chipClass)}>
+          <span
+            className={cn(
+              'rounded-full px-2 py-0.5 text-xs font-medium',
+              chipClass,
+            )}
+          >
             {typeLabel}
           </span>
-          <span className="text-xs text-muted-foreground">{formatTaille(doc.taille_ko)}</span>
+          <span className="text-xs text-muted-foreground">
+            {formatTaille(doc.taille_ko)}
+          </span>
         </div>
       </div>
 
       {/* Date + actions */}
       <div className="flex flex-col items-end gap-1.5 shrink-0">
-        <span className="text-xs text-muted-foreground">{formatDate(doc.date)}</span>
+        <span className="text-xs text-muted-foreground">
+          {formatDate(doc.date)}
+        </span>
         <div className="flex gap-1">
           <Button
             size="sm"
@@ -320,7 +357,10 @@ function DocumentsSkeleton() {
           <div className="h-4 w-32 animate-pulse rounded bg-muted" />
           <div className="rounded-xl border bg-card px-4">
             {[1, 2].map((i) => (
-              <div key={i} className="flex items-center gap-3 py-3 border-b last:border-b-0">
+              <div
+                key={i}
+                className="flex items-center gap-3 py-3 border-b last:border-b-0"
+              >
                 <div className="h-10 w-10 animate-pulse rounded-full bg-muted shrink-0" />
                 <div className="flex-1 space-y-1.5">
                   <div className="h-3.5 w-3/4 animate-pulse rounded bg-muted" />
@@ -340,7 +380,11 @@ function DocumentsSkeleton() {
 
 function DocumentsTab() {
   const { t } = useTranslation()
-  const [previewDoc, setPreviewDoc] = useState<{ doc: PortailDocument; chipClass: string; typeLabel: string } | null>(null)
+  const [previewDoc, setPreviewDoc] = useState<{
+    doc: PortailDocument
+    chipClass: string
+    typeLabel: string
+  } | null>(null)
 
   const { data: documents, isLoading } = useQuery({
     queryKey: ['portail-documents'],
@@ -353,7 +397,9 @@ function DocumentsTab() {
     return (
       <EmptyState
         icon={<FileText className="size-12" />}
-        title={t('portail.finances.documents.empty', { defaultValue: 'Aucun document disponible' })}
+        title={t('portail.finances.documents.empty', {
+          defaultValue: 'Aucun document disponible',
+        })}
       />
     )
   }
@@ -371,7 +417,9 @@ function DocumentsTab() {
           const docs = byType.get(group.type)
           if (!docs || docs.length === 0) return null
 
-          const groupLabel = t(group.labelKey, { defaultValue: group.defaultLabel })
+          const groupLabel = t(group.labelKey, {
+            defaultValue: group.defaultLabel,
+          })
 
           return (
             <section key={group.type} className="space-y-2">
@@ -385,7 +433,13 @@ function DocumentsTab() {
                     doc={doc}
                     chipClass={group.chipClass}
                     typeLabel={groupLabel}
-                    onPreview={() => setPreviewDoc({ doc, chipClass: group.chipClass, typeLabel: groupLabel })}
+                    onPreview={() =>
+                      setPreviewDoc({
+                        doc,
+                        chipClass: group.chipClass,
+                        typeLabel: groupLabel,
+                      })
+                    }
                   />
                 ))}
               </div>
@@ -411,13 +465,24 @@ function DocumentsTab() {
 
 export function PortailFinancesPage() {
   const { t } = useTranslation()
+  const qc = useQueryClient()
   const [activeTab, setActiveTab] = useState<MainTab>('finances')
   const [filter, setFilter] = useState<Filter>('all')
+  const [payOpen, setPayOpen] = useState(false)
 
   const { data: operations, isLoading } = useQuery({
     queryKey: ['portail-operations'],
     queryFn: getOperations,
   })
+
+  const { data: dashboard } = useQuery({
+    queryKey: ['portail-dashboard'],
+    queryFn: getPortailDashboard,
+  })
+
+  // Solde négatif = montant dû par le copropriétaire.
+  const amountDue =
+    dashboard && dashboard.balance < 0 ? Math.abs(dashboard.balance) : undefined
 
   const filtered =
     !operations || filter === 'all'
@@ -426,13 +491,27 @@ export function PortailFinancesPage() {
 
   type FilterOption = { value: Filter; labelKey: string; defaultLabel: string }
   const filterOptions: FilterOption[] = [
-    { value: 'all', labelKey: 'portail.finances.filter.all', defaultLabel: 'Tout' },
-    { value: 'appel_fonds', labelKey: 'portail.finances.filter.appels', defaultLabel: 'Appels' },
-    { value: 'paiement', labelKey: 'portail.finances.filter.paiements', defaultLabel: 'Paiements' },
+    {
+      value: 'all',
+      labelKey: 'portail.finances.filter.all',
+      defaultLabel: 'Tout',
+    },
+    {
+      value: 'appel_fonds',
+      labelKey: 'portail.finances.filter.appels',
+      defaultLabel: 'Appels',
+    },
+    {
+      value: 'paiement',
+      labelKey: 'portail.finances.filter.paiements',
+      defaultLabel: 'Paiements',
+    },
   ]
 
   return (
-    <div className="px-4 py-6 space-y-4">
+    <div
+      className={cn('px-4 py-6 space-y-4', activeTab === 'finances' && 'pb-28')}
+    >
       {/* Page title */}
       <h1 className="text-xl font-semibold text-[var(--color-imaro-primary)]">
         {t('portail.finances.title', { defaultValue: 'Finances' })}
@@ -491,7 +570,9 @@ export function PortailFinancesPage() {
           ) : filtered.length === 0 ? (
             <EmptyState
               icon={<FileText className="size-12" />}
-              title={t('portail.finances.empty', { defaultValue: 'Aucune opération' })}
+              title={t('portail.finances.empty', {
+                defaultValue: 'Aucune opération',
+              })}
             />
           ) : (
             <div className="rounded-xl border bg-card px-4">
@@ -504,6 +585,38 @@ export function PortailFinancesPage() {
       )}
 
       {activeTab === 'documents' && <DocumentsTab />}
+
+      {/* Sticky pay CTA (finances tab only) */}
+      {activeTab === 'finances' && (
+        <StickyCta
+          context={
+            amountDue != null ? (
+              <span className="flex items-center justify-between">
+                <span>{t('portail.finances.amountDue')}</span>
+                <MontantDisplay
+                  value={amountDue}
+                  className="font-semibold text-foreground"
+                />
+              </span>
+            ) : undefined
+          }
+        >
+          <Button className="w-full" onClick={() => setPayOpen(true)}>
+            <Wallet className="me-2 size-4" />
+            {t('portail.finances.pay')}
+          </Button>
+        </StickyCta>
+      )}
+
+      <PaiementSheet
+        open={payOpen}
+        onOpenChange={setPayOpen}
+        defaultMontant={amountDue}
+        onSuccess={() => {
+          void qc.invalidateQueries({ queryKey: ['portail-operations'] })
+          void qc.invalidateQueries({ queryKey: ['portail-dashboard'] })
+        }}
+      />
     </div>
   )
 }

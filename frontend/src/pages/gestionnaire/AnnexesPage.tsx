@@ -5,31 +5,45 @@ import { FileText, Download, RefreshCw, Check, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import {
-  getResidences, getCoproprietaires, getImpayes,
-  type Coproprietaire, type Impaye,
+  getResidences,
+  getCoproprietaires,
+  getImpayes,
+  type Coproprietaire,
+  type Impaye,
 } from '@/services/gestionnaire.service'
-import { getAnnexes, regenerateAnnexe, getAnnexeData } from '@/services/conformite.service'
 import {
-  generateAnnexe10Pdf, generateAnnexe131Pdf, generateAnnexe132Pdf,
-  generateAnnexePdf, type Annexe10Row,
+  getAnnexes,
+  regenerateAnnexe,
+  getAnnexeData,
+} from '@/services/conformite.service'
+import {
+  generateAnnexe10Pdf,
+  generateAnnexe131Pdf,
+  generateAnnexe132Pdf,
+  generateAnnexePdf,
+  type Annexe10Row,
 } from '@/lib/annexes-pdf'
 
 const ANNEXE_LABELS: Record<string, string> = {
-  '3':    'Annexe 3 — Bilan (État de la situation financière)',
-  '4':    'Annexe 4 — Compte de gestion général',
-  '5':    'Annexe 5 — Suivi du budget prévisionnel',
-  '6':    'Annexe 6 — Travaux et opérations non courantes',
-  '7':    'Annexe 7 — Mouvements de trésorerie',
-  '8':    'Annexe 8 — Suivi des emprunts',
-  '9':    'Annexe 9 — Suivi des équipements',
-  '10':   'Annexe 10 — État des contributions des copropriétaires',
-  '11':   'Annexe 11 — État simplifié de la situation financière',
-  '12':   'Annexe 12 — Compte de résultat simplifié',
+  '3': 'Annexe 3 — Bilan (État de la situation financière)',
+  '4': 'Annexe 4 — Compte de gestion général',
+  '5': 'Annexe 5 — Suivi du budget prévisionnel',
+  '6': 'Annexe 6 — Travaux et opérations non courantes',
+  '7': 'Annexe 7 — Mouvements de trésorerie',
+  '8': 'Annexe 8 — Suivi des emprunts',
+  '9': 'Annexe 9 — Suivi des équipements',
+  '10': 'Annexe 10 — État des contributions des copropriétaires',
+  '11': 'Annexe 11 — État simplifié de la situation financière',
+  '12': 'Annexe 12 — Compte de résultat simplifié',
   '13-1': 'Annexe 13-1 — État de la situation financière (très simplifié)',
   '13-2': 'Annexe 13-2 — Compte des produits et charges et budget',
 }
@@ -37,10 +51,15 @@ const ANNEXE_LABELS: Record<string, string> = {
 export function AnnexesPage() {
   const { t } = useTranslation()
 
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(null)
+  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
+    null,
+  )
   const [exercice, setExercice] = useState(2026)
 
-  const residencesQ = useQuery({ queryKey: ['residences'], queryFn: () => getResidences() })
+  const residencesQ = useQuery({
+    queryKey: ['residences'],
+    queryFn: () => getResidences(),
+  })
 
   // Derive effective residence id (picked or auto first)
   const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
@@ -83,15 +102,26 @@ export function AnnexesPage() {
   }
 
   /** Aggregate impayés per coproprietaire to compute appelé/payé. */
-  function buildAnnexe10Rows(): { rows: Annexe10Row[]; totals: { soldeInitial: number; appele: number; paye: number; soldeFinal: number } } {
+  function buildAnnexe10Rows(): {
+    rows: Annexe10Row[]
+    totals: {
+      soldeInitial: number
+      appele: number
+      paye: number
+      soldeFinal: number
+    }
+  } {
     const coprops: Coproprietaire[] = copropQ.data ?? []
     const impayes: Impaye[] = impayesQ.data ?? []
 
     const impayesByCopro = new Map<number, { appele: number; paye: number }>()
     impayes.forEach((imp) => {
-      const cur = impayesByCopro.get(imp.coproprietaire.id) ?? { appele: 0, paye: 0 }
+      const cur = impayesByCopro.get(imp.coproprietaire.id) ?? {
+        appele: 0,
+        paye: 0,
+      }
       cur.appele += imp.montant_du
-      cur.paye   += imp.montant_paye
+      cur.paye += imp.montant_paye
       impayesByCopro.set(imp.coproprietaire.id, cur)
     })
 
@@ -102,7 +132,7 @@ export function AnnexesPage() {
         return {
           lotNumero: c.lot?.numero ?? '—',
           coproprietaireNom: c.name,
-          soldeInitial: 0,           // requires bilan d'ouverture endpoint
+          soldeInitial: 0, // requires bilan d'ouverture endpoint
           appele: agg.appele,
           paye: agg.paye,
           soldeFinal: c.solde,
@@ -112,9 +142,9 @@ export function AnnexesPage() {
     const totals = rows.reduce(
       (acc, r) => ({
         soldeInitial: acc.soldeInitial + r.soldeInitial,
-        appele:       acc.appele + r.appele,
-        paye:         acc.paye + r.paye,
-        soldeFinal:   acc.soldeFinal + r.soldeFinal,
+        appele: acc.appele + r.appele,
+        paye: acc.paye + r.paye,
+        soldeFinal: acc.soldeFinal + r.soldeFinal,
       }),
       { soldeInitial: 0, appele: 0, paye: 0, soldeFinal: 0 },
     )
@@ -125,22 +155,43 @@ export function AnnexesPage() {
   // Backend payload shapes (match Abdellah's API responses for annexes 10/13-1/13-2).
   // Source : docs/sprint-4-conformite-legale.md §9.2 + his PR #63.
   type Annexe10Payload = {
-    totals: { soldeInitial: number; appele: number; paye: number; soldeFinal: number }
+    totals: {
+      soldeInitial: number
+      appele: number
+      paye: number
+      soldeFinal: number
+    }
     rows: Annexe10Row[]
   }
   type Annexe131Payload = {
-    current:  { fondsReserve: number; creances: number; dettes: number; tresorerie: number }
-    previous: { fondsReserve: number; creances: number; dettes: number; tresorerie: number }
+    current: {
+      fondsReserve: number
+      creances: number
+      dettes: number
+      tresorerie: number
+    }
+    previous: {
+      fondsReserve: number
+      creances: number
+      dettes: number
+      tresorerie: number
+    }
   }
   type Quad4 = { n1: number; n: number; n0: number; nMinus1: number }
   type Annexe132Payload = {
     excedent: number
     recettes: {
-      cotisations: Quad4; fondsReserve: Quad4; autresAg: Quad4; autresProduits: Quad4
+      cotisations: Quad4
+      fondsReserve: Quad4
+      autresAg: Quad4
+      autresProduits: Quad4
     }
     depenses: {
-      matieres: Quad4; servicesExterieurs: Quad4; impotsTaxes: Quad4;
-      personnel: Quad4; autresCharges: Quad4
+      matieres: Quad4
+      servicesExterieurs: Quad4
+      impotsTaxes: Quad4
+      personnel: Quad4
+      autresCharges: Quad4
     }
   }
 
@@ -152,7 +203,11 @@ export function AnnexesPage() {
       if (annexeNum === '10') {
         let data: { totals: Annexe10Payload['totals']; rows: Annexe10Row[] }
         try {
-          const payload = await getAnnexeData<Annexe10Payload>(residenceId, '10', exercice)
+          const payload = await getAnnexeData<Annexe10Payload>(
+            residenceId,
+            '10',
+            exercice,
+          )
           data = { totals: payload.totals, rows: payload.rows }
         } catch {
           // backend unavailable → use client-computed data
@@ -162,22 +217,46 @@ export function AnnexesPage() {
       } else if (annexeNum === '13-1') {
         let payload: Annexe131Payload
         try {
-          payload = await getAnnexeData<Annexe131Payload>(residenceId, '13-1', exercice)
+          payload = await getAnnexeData<Annexe131Payload>(
+            residenceId,
+            '13-1',
+            exercice,
+          )
         } catch {
-          const zero = { fondsReserve: 0, creances: 0, dettes: 0, tresorerie: 0 }
+          const zero = {
+            fondsReserve: 0,
+            creances: 0,
+            dettes: 0,
+            tresorerie: 0,
+          }
           payload = { current: zero, previous: zero }
         }
         await generateAnnexe131Pdf({ ...commonCtx, ...payload })
       } else if (annexeNum === '13-2') {
         let payload: Annexe132Payload
         try {
-          payload = await getAnnexeData<Annexe132Payload>(residenceId, '13-2', exercice)
+          payload = await getAnnexeData<Annexe132Payload>(
+            residenceId,
+            '13-2',
+            exercice,
+          )
         } catch {
           const z: Quad4 = { n1: 0, n: 0, n0: 0, nMinus1: 0 }
           payload = {
             excedent: 0,
-            recettes: { cotisations: z, fondsReserve: z, autresAg: z, autresProduits: z },
-            depenses: { matieres: z, servicesExterieurs: z, impotsTaxes: z, personnel: z, autresCharges: z },
+            recettes: {
+              cotisations: z,
+              fondsReserve: z,
+              autresAg: z,
+              autresProduits: z,
+            },
+            depenses: {
+              matieres: z,
+              servicesExterieurs: z,
+              impotsTaxes: z,
+              personnel: z,
+              autresCharges: z,
+            },
           }
         }
         await generateAnnexe132Pdf({ ...commonCtx, ...payload })
@@ -204,12 +283,14 @@ export function AnnexesPage() {
     <div className="mx-auto max-w-5xl space-y-6 p-6">
       {/* Header */}
       <div className="flex items-start gap-3">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-[#1B4F72]/10">
-          <FileText className="size-5 text-[#1B4F72]" />
+        <div className="flex size-10 items-center justify-center rounded-xl bg-[var(--color-imaro-primary)]/10">
+          <FileText className="size-5 text-[var(--color-imaro-primary)]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-foreground">
-            {t('gestionnaire.annexes.title', { defaultValue: 'Annexes Comptables' })}
+            {t('gestionnaire.annexes.title', {
+              defaultValue: 'Annexes Comptables',
+            })}
           </h1>
           <p className="text-sm text-muted-foreground">
             {t('gestionnaire.annexes.subtitle', {
@@ -226,20 +307,31 @@ export function AnnexesPage() {
           value={residenceId ? String(residenceId) : ''}
           onValueChange={(v) => setPickedResidenceId(Number(v))}
         >
-          <SelectTrigger className="w-64"><SelectValue placeholder="Sélectionner" /></SelectTrigger>
+          <SelectTrigger className="w-64">
+            <SelectValue placeholder="Sélectionner" />
+          </SelectTrigger>
           <SelectContent>
             {(residencesQ.data ?? []).map((r) => (
-              <SelectItem key={r.id} value={String(r.id)}>{r.name}</SelectItem>
+              <SelectItem key={r.id} value={String(r.id)}>
+                {r.name}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <label className="text-sm font-medium">Exercice</label>
-        <Select value={String(exercice)} onValueChange={(v) => setExercice(Number(v))}>
-          <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
+        <Select
+          value={String(exercice)}
+          onValueChange={(v) => setExercice(Number(v))}
+        >
+          <SelectTrigger className="w-28">
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             {[2024, 2025, 2026, 2027].map((y) => (
-              <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+              <SelectItem key={y} value={String(y)}>
+                {y}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -306,7 +398,13 @@ export function AnnexesPage() {
 }
 
 function AnnexeCard({
-  label, available, lastGenerated, required, onRegenerate, onDownload, loading,
+  label,
+  available,
+  lastGenerated,
+  required,
+  onRegenerate,
+  onDownload,
+  loading,
 }: {
   num: string
   label: string
@@ -318,14 +416,20 @@ function AnnexeCard({
   loading: boolean
 }) {
   return (
-    <div className={cn(
-      'flex items-center gap-4 rounded-xl border bg-card p-4',
-      required && 'border-[#1B4F72]/30',
-    )}>
-      <div className={cn(
-        'flex size-10 items-center justify-center rounded-lg',
-        required ? 'bg-[#1B4F72]/10 text-[#1B4F72]' : 'bg-muted text-muted-foreground',
-      )}>
+    <div
+      className={cn(
+        'flex items-center gap-4 rounded-xl border bg-card p-4',
+        required && 'border-[var(--color-imaro-primary)]/30',
+      )}
+    >
+      <div
+        className={cn(
+          'flex size-10 items-center justify-center rounded-lg',
+          required
+            ? 'bg-[var(--color-imaro-primary)]/10 text-[var(--color-imaro-primary)]'
+            : 'bg-muted text-muted-foreground',
+        )}
+      >
         {available ? <Check className="size-5" /> : <Lock className="size-5" />}
       </div>
 
@@ -333,7 +437,10 @@ function AnnexeCard({
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-semibold">{label}</h3>
           {required && (
-            <Badge variant="outline" className="border-[#1B4F72]/40 bg-[#1B4F72]/5 text-[10px] text-[#1B4F72]">
+            <Badge
+              variant="outline"
+              className="border-[var(--color-imaro-primary)]/40 bg-[var(--color-imaro-primary)]/5 text-[10px] text-[var(--color-imaro-primary)]"
+            >
               Requis
             </Badge>
           )}

@@ -1,5 +1,10 @@
 import type { ImportConfig, ImportContext } from '../types'
-import { validateNumber, parseNumber, validateDate, parseFlexDate } from '../validators'
+import {
+  validateNumber,
+  parseNumber,
+  validateDate,
+  parseFlexDate,
+} from '../validators'
 
 export type SoldeImportPayload = {
   lot_id: number
@@ -15,21 +20,47 @@ export const soldesConfig: ImportConfig<SoldeImportPayload> = {
     {
       key: 'lot_numero',
       label: 'Numéro du lot',
-      aliases: ['lot', 'numero lot', 'numéro lot', 'n° lot', 'n°lot', 'unit', 'num lot'],
+      aliases: [
+        'lot',
+        'numero lot',
+        'numéro lot',
+        'n° lot',
+        'n°lot',
+        'unit',
+        'num lot',
+      ],
       type: 'string',
       required: true,
     },
     {
       key: 'solde',
       label: 'Solde (DH)',
-      aliases: ['solde', 'balance', 'montant du', 'montant dû', 'arriere', 'arriéré', 'impaye', 'impayé', 'dette', 'montant'],
+      aliases: [
+        'solde',
+        'balance',
+        'montant du',
+        'montant dû',
+        'arriere',
+        'arriéré',
+        'impaye',
+        'impayé',
+        'dette',
+        'montant',
+      ],
       type: 'number',
       required: true,
     },
     {
       key: 'date_arrete',
       label: "Date d'arrêté",
-      aliases: ['date', 'date arrete', 'date arrêté', 'au', 'date solde', 'a la date du'],
+      aliases: [
+        'date',
+        'date arrete',
+        'date arrêté',
+        'au',
+        'date solde',
+        'a la date du',
+      ],
       type: 'date',
       required: false,
     },
@@ -65,7 +96,10 @@ export const soldesConfig: ImportConfig<SoldeImportPayload> = {
     return errors
   },
 
-  transform(row: Record<string, unknown>, ctx: ImportContext): SoldeImportPayload {
+  transform(
+    row: Record<string, unknown>,
+    ctx: ImportContext,
+  ): SoldeImportPayload {
     const lotNumero = String(row.lot_numero ?? '').trim()
     const lot = ctx.existingLots.find(
       (l) => l.numero.toLowerCase() === lotNumero.toLowerCase(),

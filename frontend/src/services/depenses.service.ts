@@ -2,7 +2,8 @@ import { api, type ApiEnvelope } from '@/lib/axios'
 
 // ─── Dev mock fallback ────────────────────────────────────────────────────────
 async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
-  if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS) return call()
+  if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS)
+    return call()
   try {
     return await call()
   } catch {
@@ -24,7 +25,13 @@ export type DepenseFinance = {
   prestataire_nom: string | null
   compte_charge: string
   libelle_compte: string
-  mode_paiement: 'virement' | 'cheque' | 'especes' | 'cb' | 'prelevement' | 'autre'
+  mode_paiement:
+    | 'virement'
+    | 'cheque'
+    | 'especes'
+    | 'cb'
+    | 'prelevement'
+    | 'autre'
   justificatif_path: string | null
   ecriture_id: number
   est_recurrente: boolean
@@ -56,7 +63,12 @@ export type DepensesStats = {
   montant_moyen: number
   en_attente_approbation: number
   evolution_mensuelle: Array<{ mois: string; montant: number }>
-  top_comptes: Array<{ compte: string; libelle: string; montant: number; pct: number }>
+  top_comptes: Array<{
+    compte: string
+    libelle: string
+    montant: number
+    pct: number
+  }>
   top_prestataires: Array<{ nom: string; montant: number; nb: number }>
 }
 
@@ -256,7 +268,12 @@ const MOCK_STATS: DepensesStats = {
   ],
   top_comptes: [
     { compte: '6138', libelle: 'Autres rémunérations', montant: 3500, pct: 29 },
-    { compte: '6134', libelle: 'Contrats de maintenance', montant: 2800, pct: 23 },
+    {
+      compte: '6134',
+      libelle: 'Contrats de maintenance',
+      montant: 2800,
+      pct: 23,
+    },
     { compte: '6136', libelle: "Primes d'assurances", montant: 2400, pct: 20 },
     { compte: '6131', libelle: 'Nettoyage des locaux', montant: 1500, pct: 12 },
   ],
@@ -285,47 +302,71 @@ export async function getDepensesFinance(params?: {
   to?: string
   statut_approbation?: string
 }): Promise<DepenseFinance[]> {
-  return withMock(async () => {
-    const res = await api.get<ApiEnvelope<DepenseFinance[]>>('/gestionnaire/depenses-finance', { params })
-    return res.data.data
-  }, (() => {
-    let data = MOCK_DEPENSES
-    if (params?.compte) data = data.filter((d) => d.compte_charge === params.compte)
-    if (params?.prestataire) data = data.filter((d) => d.prestataire_nom?.toLowerCase().includes(params.prestataire!.toLowerCase()))
-    if (params?.from) data = data.filter((d) => d.date >= params.from!)
-    if (params?.to) data = data.filter((d) => d.date <= params.to!)
-    if (params?.statut_approbation) data = data.filter((d) => d.statut_approbation === params.statut_approbation)
-    return data
-  })())
+  return withMock(
+    async () => {
+      const res = await api.get<ApiEnvelope<DepenseFinance[]>>(
+        '/gestionnaire/depenses-finance',
+        { params },
+      )
+      return res.data.data
+    },
+    (() => {
+      let data = MOCK_DEPENSES
+      if (params?.compte)
+        data = data.filter((d) => d.compte_charge === params.compte)
+      if (params?.prestataire)
+        data = data.filter((d) =>
+          d.prestataire_nom
+            ?.toLowerCase()
+            .includes(params.prestataire!.toLowerCase()),
+        )
+      if (params?.from) data = data.filter((d) => d.date >= params.from!)
+      if (params?.to) data = data.filter((d) => d.date <= params.to!)
+      if (params?.statut_approbation)
+        data = data.filter(
+          (d) => d.statut_approbation === params.statut_approbation,
+        )
+      return data
+    })(),
+  )
 }
 
-export async function storeDepenseFinance(data: FormData): Promise<DepenseFinance> {
-  return withMock(async () => {
-    const res = await api.post<ApiEnvelope<DepenseFinance>>(
-      '/gestionnaire/depenses-finance',
-      data,
-      { headers: { 'Content-Type': 'multipart/form-data' } },
-    )
-    return res.data.data
-  }, {
-    id: Math.floor(Math.random() * 1000) + 100,
-    exercice_id: 1,
-    residence_id: 1,
-    residence_nom: 'Atlas Casablanca',
-    titre: (data.get('titre') as string) ?? 'Nouvelle dépense',
-    montant: Number(data.get('montant') ?? 0),
-    date: (data.get('date') as string) ?? new Date().toISOString().slice(0, 10),
-    prestataire_id: null,
-    prestataire_nom: (data.get('prestataire') as string) || null,
-    compte_charge: (data.get('compte_charge') as string) ?? '6135',
-    libelle_compte: 'Entretien et petites réparations',
-    mode_paiement: ((data.get('mode_paiement') as string) ?? 'virement') as DepenseFinance['mode_paiement'],
-    justificatif_path: null,
-    ecriture_id: Math.floor(Math.random() * 1000) + 100,
-    est_recurrente: false,
-    statut_approbation: Number(data.get('montant') ?? 0) > 5000 ? 'en_attente' : 'approuve',
-    approuve_par: Number(data.get('montant') ?? 0) > 5000 ? null : 'Admin Gestionnaire',
-  })
+export async function storeDepenseFinance(
+  data: FormData,
+): Promise<DepenseFinance> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<DepenseFinance>>(
+        '/gestionnaire/depenses-finance',
+        data,
+        { headers: { 'Content-Type': 'multipart/form-data' } },
+      )
+      return res.data.data
+    },
+    {
+      id: Math.floor(Math.random() * 1000) + 100,
+      exercice_id: 1,
+      residence_id: 1,
+      residence_nom: 'Atlas Casablanca',
+      titre: (data.get('titre') as string) ?? 'Nouvelle dépense',
+      montant: Number(data.get('montant') ?? 0),
+      date:
+        (data.get('date') as string) ?? new Date().toISOString().slice(0, 10),
+      prestataire_id: null,
+      prestataire_nom: (data.get('prestataire') as string) || null,
+      compte_charge: (data.get('compte_charge') as string) ?? '6135',
+      libelle_compte: 'Entretien et petites réparations',
+      mode_paiement: ((data.get('mode_paiement') as string) ??
+        'virement') as DepenseFinance['mode_paiement'],
+      justificatif_path: null,
+      ecriture_id: Math.floor(Math.random() * 1000) + 100,
+      est_recurrente: false,
+      statut_approbation:
+        Number(data.get('montant') ?? 0) > 5000 ? 'en_attente' : 'approuve',
+      approuve_par:
+        Number(data.get('montant') ?? 0) > 5000 ? null : 'Admin Gestionnaire',
+    },
+  )
 }
 
 export async function deleteDepenseFinance(id: number): Promise<void> {
@@ -335,86 +376,119 @@ export async function deleteDepenseFinance(id: number): Promise<void> {
 }
 
 export async function importFactureIa(file: File): Promise<ImportIaDepense> {
-  return withMock(async () => {
-    const fd = new FormData()
-    fd.append('file', file)
-    const res = await api.post<ApiEnvelope<ImportIaDepense>>(
-      '/gestionnaire/depenses-finance/import-ia',
-      fd,
-      { headers: { 'Content-Type': 'multipart/form-data' } },
-    )
-    return res.data.data
-  }, { ...MOCK_IMPORT_IA, titre: file.name.replace(/\.[^.]+$/, '') })
+  return withMock(
+    async () => {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await api.post<ApiEnvelope<ImportIaDepense>>(
+        '/gestionnaire/depenses-finance/import-ia',
+        fd,
+        { headers: { 'Content-Type': 'multipart/form-data' } },
+      )
+      return res.data.data
+    },
+    { ...MOCK_IMPORT_IA, titre: file.name.replace(/\.[^.]+$/, '') },
+  )
 }
 
 export async function getDepensesStats(): Promise<DepensesStats> {
   return withMock(async () => {
-    const res = await api.get<ApiEnvelope<DepensesStats>>('/gestionnaire/depenses-finance/stats')
+    const res = await api.get<ApiEnvelope<DepensesStats>>(
+      '/gestionnaire/depenses-finance/stats',
+    )
     return res.data.data
   }, MOCK_STATS)
 }
 
 export async function getModelesRecurrents(): Promise<ModeleRecurrent[]> {
   return withMock(async () => {
-    const res = await api.get<ApiEnvelope<ModeleRecurrent[]>>('/gestionnaire/depenses-finance/recurrentes')
+    const res = await api.get<ApiEnvelope<ModeleRecurrent[]>>(
+      '/gestionnaire/depenses-finance/recurrentes',
+    )
     return res.data.data
   }, MOCK_MODELES)
 }
 
-export async function storeModeleRecurrent(data: object): Promise<ModeleRecurrent> {
-  return withMock(async () => {
-    const res = await api.post<ApiEnvelope<ModeleRecurrent>>('/gestionnaire/depenses-finance/recurrentes', data)
-    return res.data.data
-  }, {
-    id: Math.floor(Math.random() * 1000) + 100,
-    residence_id: 1,
-    residence_nom: 'Atlas Casablanca',
-    titre: 'Nouveau modèle',
-    montant: 0,
-    compte_charge: '6135',
-    libelle_compte: 'Entretien et petites réparations',
-    mode_paiement: 'virement',
-    prestataire_nom: null,
-    frequence: 'mensuelle' as const,
-    jour_emission: 1,
-    date_debut: new Date().toISOString().slice(0, 10),
-    date_fin: null,
-    actif: true,
-    prochaine_emission: new Date().toISOString().slice(0, 10),
-    ...data,
-  } as ModeleRecurrent)
+export async function storeModeleRecurrent(
+  data: object,
+): Promise<ModeleRecurrent> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<ModeleRecurrent>>(
+        '/gestionnaire/depenses-finance/recurrentes',
+        data,
+      )
+      return res.data.data
+    },
+    {
+      id: Math.floor(Math.random() * 1000) + 100,
+      residence_id: 1,
+      residence_nom: 'Atlas Casablanca',
+      titre: 'Nouveau modèle',
+      montant: 0,
+      compte_charge: '6135',
+      libelle_compte: 'Entretien et petites réparations',
+      mode_paiement: 'virement',
+      prestataire_nom: null,
+      frequence: 'mensuelle' as const,
+      jour_emission: 1,
+      date_debut: new Date().toISOString().slice(0, 10),
+      date_fin: null,
+      actif: true,
+      prochaine_emission: new Date().toISOString().slice(0, 10),
+      ...data,
+    } as ModeleRecurrent,
+  )
 }
 
-export async function toggleModeleRecurrent(id: number): Promise<ModeleRecurrent> {
-  return withMock(async () => {
-    const res = await api.post<ApiEnvelope<ModeleRecurrent>>(`/gestionnaire/depenses-finance/recurrentes/${id}/toggle`)
-    return res.data.data
-  }, {
-    ...(MOCK_MODELES.find((m) => m.id === id) ?? MOCK_MODELES[0]),
-    actif: !(MOCK_MODELES.find((m) => m.id === id)?.actif ?? true),
-  })
+export async function toggleModeleRecurrent(
+  id: number,
+): Promise<ModeleRecurrent> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<ModeleRecurrent>>(
+        `/gestionnaire/depenses-finance/recurrentes/${id}/toggle`,
+      )
+      return res.data.data
+    },
+    {
+      ...(MOCK_MODELES.find((m) => m.id === id) ?? MOCK_MODELES[0]),
+      actif: !(MOCK_MODELES.find((m) => m.id === id)?.actif ?? true),
+    },
+  )
 }
 
 export async function approuverDepense(id: number): Promise<DepenseFinance> {
-  return withMock(async () => {
-    const res = await api.post<ApiEnvelope<DepenseFinance>>(`/gestionnaire/depenses-finance/${id}/approuver`)
-    return res.data.data
-  }, {
-    ...(MOCK_DEPENSES.find((d) => d.id === id) ?? MOCK_DEPENSES[0]),
-    statut_approbation: 'approuve' as const,
-    approuve_par: 'Admin Gestionnaire',
-  })
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<DepenseFinance>>(
+        `/gestionnaire/depenses-finance/${id}/approuver`,
+      )
+      return res.data.data
+    },
+    {
+      ...(MOCK_DEPENSES.find((d) => d.id === id) ?? MOCK_DEPENSES[0]),
+      statut_approbation: 'approuve' as const,
+      approuve_par: 'Admin Gestionnaire',
+    },
+  )
 }
 
-export async function rejeterDepense(id: number, motif: string): Promise<DepenseFinance> {
-  return withMock(async () => {
-    const res = await api.post<ApiEnvelope<DepenseFinance>>(
-      `/gestionnaire/depenses-finance/${id}/rejeter`,
-      { motif },
-    )
-    return res.data.data
-  }, {
-    ...(MOCK_DEPENSES.find((d) => d.id === id) ?? MOCK_DEPENSES[0]),
-    statut_approbation: 'rejete' as const,
-  })
+export async function rejeterDepense(
+  id: number,
+  motif: string,
+): Promise<DepenseFinance> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<DepenseFinance>>(
+        `/gestionnaire/depenses-finance/${id}/rejeter`,
+        { motif },
+      )
+      return res.data.data
+    },
+    {
+      ...(MOCK_DEPENSES.find((d) => d.id === id) ?? MOCK_DEPENSES[0]),
+      statut_approbation: 'rejete' as const,
+    },
+  )
 }

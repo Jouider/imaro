@@ -30,7 +30,7 @@ export function LanguageSwitcher() {
           className={cn(
             'min-w-[32px] rounded-md px-2 py-1 text-xs font-bold transition-all duration-150',
             current === code
-              ? 'bg-[#1B4F72] text-white shadow-sm'
+              ? 'bg-[var(--color-imaro-primary)] text-white shadow-sm'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >

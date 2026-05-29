@@ -44,10 +44,12 @@ use Illuminate\Support\Facades\Route;
 // Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index']);
 
-// Résidences + lots + copropriétaires + exercices (KAN-13)
-Route::apiResource('residences', ResidenceController::class)->only(['index', 'show', 'update']);
+// Résidences + lots + copropriétaires + exercices (KAN-13 + issue #95)
+Route::apiResource('residences', ResidenceController::class)
+    ->only(['index', 'show', 'store', 'update', 'destroy']);
 
 Route::prefix('residences/{residence}')->group(function () {
+    Route::get('/overview', [ResidenceController::class, 'overview']);
     Route::get('/lots', [LotController::class, 'index']);
     Route::post('/lots', [LotController::class, 'store']);
     Route::post('/lots/bulk', [LotController::class, 'bulkStore']);

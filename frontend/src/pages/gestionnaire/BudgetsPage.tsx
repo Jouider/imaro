@@ -2,7 +2,21 @@ import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { PiggyBank, Plus, Trash2, Lock, Send, Sparkles, TrendingDown, TrendingUp, CheckCircle2, Download, Loader2, ChevronDown, ChevronUp } from 'lucide-react'
+import {
+  PiggyBank,
+  Plus,
+  Trash2,
+  Lock,
+  Send,
+  Sparkles,
+  TrendingDown,
+  TrendingUp,
+  CheckCircle2,
+  Download,
+  Loader2,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react'
 import {
   BarChart,
   Bar,
@@ -75,7 +89,15 @@ function barColor(pct: number) {
 
 // ─── SimulationModal ──────────────────────────────────────────────────────────
 
-function SimulationModal({ budgetId, open, onOpenChange }: { budgetId: number; open: boolean; onOpenChange: (o: boolean) => void }) {
+function SimulationModal({
+  budgetId,
+  open,
+  onOpenChange,
+}: {
+  budgetId: number
+  open: boolean
+  onOpenChange: (o: boolean) => void
+}) {
   const { t } = useTranslation()
   const { data, isLoading } = useQuery({
     queryKey: ['simulation-cotisation', budgetId],
@@ -88,23 +110,34 @@ function SimulationModal({ budgetId, open, onOpenChange }: { budgetId: number; o
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {t('gestionnaire.budget.simulation.title', { defaultValue: 'Simulateur de cotisations' })}
+            {t('gestionnaire.budget.simulation.title', {
+              defaultValue: 'Simulateur de cotisations',
+            })}
           </DialogTitle>
         </DialogHeader>
 
         {isLoading ? (
-          <div className="flex justify-center py-8"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>
+          <div className="flex justify-center py-8">
+            <Loader2 className="size-6 animate-spin text-muted-foreground" />
+          </div>
         ) : data ? (
           <div className="space-y-4">
             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
               <span>
-                {t('gestionnaire.budget.simulation.budgetTotal', { defaultValue: 'Budget charges total' })} :{' '}
-                <strong className="text-foreground"><MontantDisplay value={data.budget_charges_total} /></strong>
+                {t('gestionnaire.budget.simulation.budgetTotal', {
+                  defaultValue: 'Budget charges total',
+                })}{' '}
+                :{' '}
+                <strong className="text-foreground">
+                  <MontantDisplay value={data.budget_charges_total} />
+                </strong>
               </span>
               <span>·</span>
               <span>
-                {t('gestionnaire.budget.simulation.tantiemesTotal', { defaultValue: 'Tantièmes totaux' })} :{' '}
-                <strong className="text-foreground">1000</strong>
+                {t('gestionnaire.budget.simulation.tantiemesTotal', {
+                  defaultValue: 'Tantièmes totaux',
+                })}{' '}
+                : <strong className="text-foreground">1000</strong>
               </span>
             </div>
 
@@ -112,29 +145,76 @@ function SimulationModal({ budgetId, open, onOpenChange }: { budgetId: number; o
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b bg-muted/40 text-xs text-muted-foreground">
-                    <th className="px-4 py-3 text-left font-medium">{t('gestionnaire.budget.simulation.colLot', { defaultValue: 'Lot' })}</th>
-                    <th className="px-4 py-3 text-left font-medium">{t('gestionnaire.budget.simulation.colCopro', { defaultValue: 'Copropriétaire' })}</th>
-                    <th className="px-4 py-3 text-right font-medium">{t('gestionnaire.budget.simulation.colTantieme', { defaultValue: 'Tantième' })}</th>
-                    <th className="px-4 py-3 text-right font-medium">{t('gestionnaire.budget.simulation.colPct', { defaultValue: 'Quote-part' })}</th>
-                    <th className="px-4 py-3 text-right font-medium">{t('gestionnaire.budget.simulation.colAnnuelle', { defaultValue: 'Cotis. annuelle' })}</th>
-                    <th className="px-4 py-3 text-right font-medium">{t('gestionnaire.budget.simulation.colMensuelle', { defaultValue: 'Cotis. mensuelle' })}</th>
-                    <th className="px-4 py-3 text-right font-medium">{t('gestionnaire.budget.simulation.colVariation', { defaultValue: 'Variation vs N-1' })}</th>
+                    <th className="px-4 py-3 text-left font-medium">
+                      {t('gestionnaire.budget.simulation.colLot', {
+                        defaultValue: 'Lot',
+                      })}
+                    </th>
+                    <th className="px-4 py-3 text-left font-medium">
+                      {t('gestionnaire.budget.simulation.colCopro', {
+                        defaultValue: 'Copropriétaire',
+                      })}
+                    </th>
+                    <th className="px-4 py-3 text-right font-medium">
+                      {t('gestionnaire.budget.simulation.colTantieme', {
+                        defaultValue: 'Tantième',
+                      })}
+                    </th>
+                    <th className="px-4 py-3 text-right font-medium">
+                      {t('gestionnaire.budget.simulation.colPct', {
+                        defaultValue: 'Quote-part',
+                      })}
+                    </th>
+                    <th className="px-4 py-3 text-right font-medium">
+                      {t('gestionnaire.budget.simulation.colAnnuelle', {
+                        defaultValue: 'Cotis. annuelle',
+                      })}
+                    </th>
+                    <th className="px-4 py-3 text-right font-medium">
+                      {t('gestionnaire.budget.simulation.colMensuelle', {
+                        defaultValue: 'Cotis. mensuelle',
+                      })}
+                    </th>
+                    <th className="px-4 py-3 text-right font-medium">
+                      {t('gestionnaire.budget.simulation.colVariation', {
+                        defaultValue: 'Variation vs N-1',
+                      })}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
                   {data.lots.map((lot) => (
                     <tr key={lot.lot_numero} className="hover:bg-muted/20">
-                      <td className="px-4 py-3 font-mono text-sm">{lot.lot_numero}</td>
+                      <td className="px-4 py-3 font-mono text-sm">
+                        {lot.lot_numero}
+                      </td>
                       <td className="px-4 py-3">{lot.coproprietaire_nom}</td>
-                      <td className="px-4 py-3 text-right tabular-nums">{lot.tantieme}</td>
-                      <td className="px-4 py-3 text-right tabular-nums">{lot.pct.toFixed(1)} %</td>
-                      <td className="px-4 py-3 text-right tabular-nums"><MontantDisplay value={lot.cotisation_annuelle} /></td>
-                      <td className="px-4 py-3 text-right tabular-nums"><MontantDisplay value={lot.cotisation_mensuelle} /></td>
                       <td className="px-4 py-3 text-right tabular-nums">
-                        <span className={cn('flex items-center justify-end gap-1', lot.variation_vs_n1 > 0 ? 'text-red-600' : 'text-green-600')}>
-                          {lot.variation_vs_n1 > 0
-                            ? <TrendingUp className="size-3.5" />
-                            : <TrendingDown className="size-3.5" />}
+                        {lot.tantieme}
+                      </td>
+                      <td className="px-4 py-3 text-right tabular-nums">
+                        {lot.pct.toFixed(1)} %
+                      </td>
+                      <td className="px-4 py-3 text-right tabular-nums">
+                        <MontantDisplay value={lot.cotisation_annuelle} />
+                      </td>
+                      <td className="px-4 py-3 text-right tabular-nums">
+                        <MontantDisplay value={lot.cotisation_mensuelle} />
+                      </td>
+                      <td className="px-4 py-3 text-right tabular-nums">
+                        <span
+                          className={cn(
+                            'flex items-center justify-end gap-1',
+                            lot.variation_vs_n1 > 0
+                              ? 'text-red-600'
+                              : 'text-green-600',
+                          )}
+                        >
+                          {lot.variation_vs_n1 > 0 ? (
+                            <TrendingUp className="size-3.5" />
+                          ) : (
+                            <TrendingDown className="size-3.5" />
+                          )}
                           {Math.abs(lot.variation_vs_n1).toFixed(1)} %
                         </span>
                       </td>
@@ -145,9 +225,15 @@ function SimulationModal({ budgetId, open, onOpenChange }: { budgetId: number; o
             </div>
 
             <div className="flex justify-end">
-              <Button variant="outline" size="sm" onClick={() => toast.info('Export en cours...')}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => toast.info('Export en cours...')}
+              >
                 <Download className="me-1.5 size-4" />
-                {t('gestionnaire.budget.simulation.exporter', { defaultValue: 'Exporter PDF' })}
+                {t('gestionnaire.budget.simulation.exporter', {
+                  defaultValue: 'Exporter PDF',
+                })}
               </Button>
             </div>
           </div>
@@ -201,18 +287,25 @@ function IaSuggestionsModal({
           <DialogTitle>
             <span className="flex items-center gap-2">
               <Sparkles className="size-5 text-amber-500" />
-              {t('gestionnaire.budget.ia.title', { defaultValue: 'Suggestions IA' })}
+              {t('gestionnaire.budget.ia.title', {
+                defaultValue: 'Suggestions IA',
+              })}
             </span>
           </DialogTitle>
         </DialogHeader>
 
         {isLoading ? (
-          <div className="flex justify-center py-8"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>
+          <div className="flex justify-center py-8">
+            <Loader2 className="size-6 animate-spin text-muted-foreground" />
+          </div>
         ) : (
           <div className="space-y-4">
             <div className="divide-y rounded-lg border">
               {suggestions.map((s) => (
-                <div key={s.compte_pcg} className="flex items-start gap-3 px-4 py-4">
+                <div
+                  key={s.compte_pcg}
+                  className="flex items-start gap-3 px-4 py-4"
+                >
                   <input
                     type="checkbox"
                     checked={selected.has(s.compte_pcg)}
@@ -221,27 +314,58 @@ function IaSuggestionsModal({
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded">{s.compte_pcg}</span>
+                      <span className="font-mono text-xs bg-slate-100 px-1.5 py-0.5 rounded">
+                        {s.compte_pcg}
+                      </span>
                       <span className="font-medium text-sm">{s.libelle}</span>
                     </div>
                     <div className="flex flex-wrap gap-4 mt-1.5 text-sm text-muted-foreground">
-                      <span>N-1 : <MontantDisplay value={s.montant_n1} className="text-sm" /></span>
-                      <span>Suggéré : <MontantDisplay value={s.montant_suggere} className="text-sm font-medium text-foreground" /></span>
-                      <span className={cn('flex items-center gap-1', s.variation_pct > 0 ? 'text-red-600' : 'text-green-600')}>
-                        {s.variation_pct > 0 ? <TrendingUp className="size-3.5" /> : <TrendingDown className="size-3.5" />}
+                      <span>
+                        N-1 :{' '}
+                        <MontantDisplay
+                          value={s.montant_n1}
+                          className="text-sm"
+                        />
+                      </span>
+                      <span>
+                        Suggéré :{' '}
+                        <MontantDisplay
+                          value={s.montant_suggere}
+                          className="text-sm font-medium text-foreground"
+                        />
+                      </span>
+                      <span
+                        className={cn(
+                          'flex items-center gap-1',
+                          s.variation_pct > 0
+                            ? 'text-red-600'
+                            : 'text-green-600',
+                        )}
+                      >
+                        {s.variation_pct > 0 ? (
+                          <TrendingUp className="size-3.5" />
+                        ) : (
+                          <TrendingDown className="size-3.5" />
+                        )}
                         {Math.abs(s.variation_pct).toFixed(1)} %
                       </span>
                     </div>
-                    <p className="mt-1 text-xs text-muted-foreground">{s.justification}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {s.justification}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
 
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">{selected.size} ligne(s) sélectionnée(s)</span>
+              <span className="text-sm text-muted-foreground">
+                {selected.size} ligne(s) sélectionnée(s)
+              </span>
               <Button onClick={handleApply} disabled={selected.size === 0}>
-                {t('gestionnaire.budget.ia.appliquer', { defaultValue: 'Appliquer les suggestions sélectionnées' })}
+                {t('gestionnaire.budget.ia.appliquer', {
+                  defaultValue: 'Appliquer les suggestions sélectionnées',
+                })}
               </Button>
             </div>
           </div>
@@ -276,22 +400,27 @@ function LigneRow({ ligne, verrouille, onDelete, onUpdate }: LigneRowProps) {
     }, 800)
   }
 
-  const rowCls = ligne.pct_consomme >= 100
-    ? 'bg-red-50 hover:bg-red-100/60'
-    : ligne.pct_consomme >= 80
-      ? 'bg-orange-50 hover:bg-orange-100/60'
-      : 'hover:bg-muted/20'
+  const rowCls =
+    ligne.pct_consomme >= 100
+      ? 'bg-red-50 hover:bg-red-100/60'
+      : ligne.pct_consomme >= 80
+        ? 'bg-orange-50 hover:bg-orange-100/60'
+        : 'hover:bg-muted/20'
 
   return (
     <tr className={cn('transition-colors', rowCls)}>
-      <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">{ligne.compte_pcg}</td>
+      <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">
+        {ligne.compte_pcg}
+      </td>
       <td className="px-4 py-2.5 text-sm">{ligne.libelle}</td>
       <td className="px-4 py-2.5 text-right tabular-nums text-sm text-muted-foreground">
         <MontantDisplay value={ligne.realise_n1} />
       </td>
       <td className="px-4 py-2.5 text-right">
         {verrouille ? (
-          <span className="tabular-nums text-sm"><MontantDisplay value={localVal} /></span>
+          <span className="tabular-nums text-sm">
+            <MontantDisplay value={localVal} />
+          </span>
         ) : (
           <div className="flex items-center justify-end gap-1.5">
             <input
@@ -303,7 +432,9 @@ function LigneRow({ ligne, verrouille, onDelete, onUpdate }: LigneRowProps) {
             {saved && (
               <span className="flex items-center gap-0.5 text-xs text-green-600 whitespace-nowrap">
                 <CheckCircle2 className="size-3" />
-                {t('gestionnaire.budget.annexe5.saved', { defaultValue: 'Sauvegardé ✓' })}
+                {t('gestionnaire.budget.annexe5.saved', {
+                  defaultValue: 'Sauvegardé ✓',
+                })}
               </span>
             )}
           </div>
@@ -326,7 +457,9 @@ function LigneRow({ ligne, verrouille, onDelete, onUpdate }: LigneRowProps) {
               }}
             />
           </div>
-          <span className="tabular-nums text-xs w-9 text-right">{ligne.pct_consomme}%</span>
+          <span className="tabular-nums text-xs w-9 text-right">
+            {ligne.pct_consomme}%
+          </span>
         </div>
       </td>
       {!verrouille && (
@@ -358,14 +491,26 @@ type SectionProps = {
   showAdd?: boolean
 }
 
-function Section({ title, lignes, verrouille, onDelete, onUpdate, onAddLigne, type, showAdd = true }: SectionProps) {
+function Section({
+  title,
+  lignes,
+  verrouille,
+  onDelete,
+  onUpdate,
+  onAddLigne,
+  type,
+  showAdd = true,
+}: SectionProps) {
   const { t } = useTranslation()
   const colSpan = verrouille ? 7 : 8
 
   return (
     <>
       <tr className="bg-muted/60">
-        <td colSpan={colSpan} className="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <td
+          colSpan={colSpan}
+          className="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+        >
           {title}
         </td>
       </tr>
@@ -407,9 +552,17 @@ export function BudgetsPage() {
   const [iaOpen, setIaOpen] = useState(false)
   const [soumettreOpen, setSoumettreOpen] = useState(false)
   const [verrouillageOpen, setVerrouillageOpen] = useState(false)
-  const [addLigneDialog, setAddLigneDialog] = useState<{ type: LigneBudget['type'] } | null>(null)
-  const [deleteLigneTarget, setDeleteLigneTarget] = useState<number | null>(null)
-  const [addLigneForm, setAddLigneForm] = useState({ compte_pcg: '', libelle: '', budget_n: '' })
+  const [addLigneDialog, setAddLigneDialog] = useState<{
+    type: LigneBudget['type']
+  } | null>(null)
+  const [deleteLigneTarget, setDeleteLigneTarget] = useState<number | null>(
+    null,
+  )
+  const [addLigneForm, setAddLigneForm] = useState({
+    compte_pcg: '',
+    libelle: '',
+    budget_n: '',
+  })
   const [prestataireOpen, setPrestataireOpen] = useState(false)
   const [prestataireForm, setPrestataireForm] = useState({
     prestataire_id: '',
@@ -451,7 +604,9 @@ export function BudgetsPage() {
     enabled: !!addLigneDialog && prestataireOpen,
   })
 
-  const selectedPrestataireId = prestataireForm.prestataire_id ? Number(prestataireForm.prestataire_id) : undefined
+  const selectedPrestataireId = prestataireForm.prestataire_id
+    ? Number(prestataireForm.prestataire_id)
+    : undefined
 
   const { data: contrats = [] } = useQuery({
     queryKey: ['contrats', selectedPrestataireId],
@@ -462,14 +617,25 @@ export function BudgetsPage() {
   // ── Mutations ─────────────────────────────────────────────────────────────
 
   const createBudgetMutation = useMutation({
-    mutationFn: () => createBudget({ residence_id: Number(residenceId), exercice_id: Number(exerciceId) }),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ['budget-annexe5', residenceId, exerciceId] }),
+    mutationFn: () =>
+      createBudget({
+        residence_id: Number(residenceId),
+        exercice_id: Number(exerciceId),
+      }),
+    onSuccess: () =>
+      void qc.invalidateQueries({
+        queryKey: ['budget-annexe5', residenceId, exerciceId],
+      }),
     onError: () => toast.error('Erreur lors de la création'),
   })
 
   const updateLigneMutation = useMutation({
-    mutationFn: ({ id, val }: { id: number; val: number }) => updateLigneBudget(id, val),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ['budget-annexe5', residenceId, exerciceId] }),
+    mutationFn: ({ id, val }: { id: number; val: number }) =>
+      updateLigneBudget(id, val),
+    onSuccess: () =>
+      void qc.invalidateQueries({
+        queryKey: ['budget-annexe5', residenceId, exerciceId],
+      }),
     onError: () => toast.error('Erreur lors de la sauvegarde'),
   })
 
@@ -477,13 +643,22 @@ export function BudgetsPage() {
     setAddLigneDialog(null)
     setAddLigneForm({ compte_pcg: '', libelle: '', budget_n: '' })
     setPrestataireOpen(false)
-    setPrestataireForm({ prestataire_id: '', contrat_id: '', nombre: '', prix_unitaire: '', date_debut: '', date_fin: '' })
+    setPrestataireForm({
+      prestataire_id: '',
+      contrat_id: '',
+      nombre: '',
+      prix_unitaire: '',
+      date_debut: '',
+      date_fin: '',
+    })
   }
 
   const ajouterLigneMutation = useMutation({
     mutationFn: (data: Partial<LigneBudget>) => ajouterLigne(budget!.id, data),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['budget-annexe5', residenceId, exerciceId] })
+      void qc.invalidateQueries({
+        queryKey: ['budget-annexe5', residenceId, exerciceId],
+      })
       resetAddLigneDialog()
       toast.success('Ligne ajoutée')
     },
@@ -493,7 +668,9 @@ export function BudgetsPage() {
   const supprimerLigneMutation = useMutation({
     mutationFn: (id: number) => supprimerLigne(id),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['budget-annexe5', residenceId, exerciceId] })
+      void qc.invalidateQueries({
+        queryKey: ['budget-annexe5', residenceId, exerciceId],
+      })
       setDeleteLigneTarget(null)
       toast.success('Ligne supprimée')
     },
@@ -503,9 +680,15 @@ export function BudgetsPage() {
   const soumettreMutation = useMutation({
     mutationFn: () => soumettreBudgetAg(budget!.id),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['budget-annexe5', residenceId, exerciceId] })
+      void qc.invalidateQueries({
+        queryKey: ['budget-annexe5', residenceId, exerciceId],
+      })
       setSoumettreOpen(false)
-      toast.success(t('gestionnaire.budget.soumettre', { defaultValue: 'Budget soumis à l\'AG' }))
+      toast.success(
+        t('gestionnaire.budget.soumettre', {
+          defaultValue: "Budget soumis à l'AG",
+        }),
+      )
     },
     onError: () => toast.error('Erreur'),
   })
@@ -513,9 +696,15 @@ export function BudgetsPage() {
   const verrouillerMutation = useMutation({
     mutationFn: () => verrouillerBudget(budget!.id),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['budget-annexe5', residenceId, exerciceId] })
+      void qc.invalidateQueries({
+        queryKey: ['budget-annexe5', residenceId, exerciceId],
+      })
       setVerrouillageOpen(false)
-      toast.success(t('gestionnaire.budget.verrouiller', { defaultValue: 'Budget verrouillé' }))
+      toast.success(
+        t('gestionnaire.budget.verrouiller', {
+          defaultValue: 'Budget verrouillé',
+        }),
+      )
     },
     onError: () => toast.error('Erreur'),
   })
@@ -523,7 +712,8 @@ export function BudgetsPage() {
   // ── Computed ───────────────────────────────────────────────────────────────
 
   const verrouille = budget?.statut === 'verrouille'
-  const canSubmit = budget && budget.statut !== 'approuve' && budget.statut !== 'verrouille'
+  const canSubmit =
+    budget && budget.statut !== 'approuve' && budget.statut !== 'verrouille'
 
   const lignes = budget?.lignes ?? []
   const chargesCourantes = lignes.filter((l) => l.type === 'charge_courante')
@@ -537,7 +727,8 @@ export function BudgetsPage() {
   const totalEngage = lignes.reduce((s, l) => s + l.engagement, 0)
   const totalRealise = lignes.reduce((s, l) => s + l.realise, 0)
   const totalPrevu = lignes.reduce((s, l) => {
-    if (l.type === 'charge_courante' || l.type === 'charge_travaux') return s + l.budget_n
+    if (l.type === 'charge_courante' || l.type === 'charge_travaux')
+      return s + l.budget_n
     return s
   }, 0)
   const resteADepenser = totalCharges - totalRealise
@@ -557,14 +748,18 @@ export function BudgetsPage() {
         await updateLigneBudget(ligne.id, s.montant_suggere)
       }
     }
-    void qc.invalidateQueries({ queryKey: ['budget-annexe5', residenceId, exerciceId] })
+    void qc.invalidateQueries({
+      queryKey: ['budget-annexe5', residenceId, exerciceId],
+    })
     toast.success(`${selected.length} ligne(s) mise(s) à jour`)
   }
 
   return (
     <div className="p-6 space-y-6">
       <PageHeader
-        title={t('gestionnaire.budget.title', { defaultValue: 'Budget Prévisionnel' })}
+        title={t('gestionnaire.budget.title', {
+          defaultValue: 'Budget Prévisionnel',
+        })}
         subtitle={
           budget
             ? `Exercice ${budget.exercice.annee} · ${budget.residence.name}`
@@ -576,31 +771,63 @@ export function BudgetsPage() {
               {verrouille && (
                 <Badge className="border-0 bg-slate-100 text-slate-700 self-center">
                   <Lock className="me-1 size-3" />
-                  {t('gestionnaire.budget.statuts.verrouille', { defaultValue: 'Verrouillé' })}
+                  {t('gestionnaire.budget.statuts.verrouille', {
+                    defaultValue: 'Verrouillé',
+                  })}
                 </Badge>
               )}
-              <Button variant="outline" size="sm" onClick={() => setIaOpen(true)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIaOpen(true)}
+              >
                 <Sparkles className="me-1.5 size-4 text-amber-500" />
-                {t('gestionnaire.budget.ia.title', { defaultValue: 'Suggestion IA' })}
+                {t('gestionnaire.budget.ia.title', {
+                  defaultValue: 'Suggestion IA',
+                })}
               </Button>
-              <Button variant="outline" size="sm" onClick={() => setSimulationOpen(true)}>
-                {t('gestionnaire.budget.simulation.title', { defaultValue: 'Simuler cotisations' })}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSimulationOpen(true)}
+              >
+                {t('gestionnaire.budget.simulation.title', {
+                  defaultValue: 'Simuler cotisations',
+                })}
               </Button>
               {canSubmit && (
-                <Button variant="outline" size="sm" onClick={() => setSoumettreOpen(true)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSoumettreOpen(true)}
+                >
                   <Send className="me-1.5 size-4" />
-                  {t('gestionnaire.budget.soumettre', { defaultValue: 'Soumettre à l\'AG' })}
+                  {t('gestionnaire.budget.soumettre', {
+                    defaultValue: "Soumettre à l'AG",
+                  })}
                 </Button>
               )}
               {!verrouille && budget.statut === 'approuve' && (
-                <Button variant="outline" size="sm" onClick={() => setVerrouillageOpen(true)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setVerrouillageOpen(true)}
+                >
                   <Lock className="me-1.5 size-4" />
-                  {t('gestionnaire.budget.verrouiller', { defaultValue: 'Verrouiller' })}
+                  {t('gestionnaire.budget.verrouiller', {
+                    defaultValue: 'Verrouiller',
+                  })}
                 </Button>
               )}
-              <Button variant="outline" size="sm" onClick={() => toast.info('Export en cours...')}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => toast.info('Export en cours...')}
+              >
                 <Download className="me-1.5 size-4" />
-                {t('gestionnaire.budget.exporter', { defaultValue: 'Export PDF' })}
+                {t('gestionnaire.budget.exporter', {
+                  defaultValue: 'Export PDF',
+                })}
               </Button>
             </div>
           ) : null
@@ -609,27 +836,49 @@ export function BudgetsPage() {
 
       {/* Selectors */}
       <div className="flex flex-wrap gap-3">
-        <Select value={residenceId} onValueChange={(v) => { setResidenceId(v); setExerciceId('') }}>
+        <Select
+          value={residenceId}
+          onValueChange={(v) => {
+            setResidenceId(v)
+            setExerciceId('')
+          }}
+        >
           <SelectTrigger className="w-56">
-            <SelectValue placeholder={t('gestionnaire.budgets.selectResidence', { defaultValue: 'Résidence' })} />
+            <SelectValue
+              placeholder={t('gestionnaire.budgets.selectResidence', {
+                defaultValue: 'Résidence',
+              })}
+            />
           </SelectTrigger>
           <SelectContent>
             {residences.map((r) => (
-              <SelectItem key={r.id} value={String(r.id)}>{r.name}</SelectItem>
+              <SelectItem key={r.id} value={String(r.id)}>
+                {r.name}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         {residenceId && (
-          <Select value={exerciceId} onValueChange={setExerciceId} disabled={exercices.length === 0}>
+          <Select
+            value={exerciceId}
+            onValueChange={setExerciceId}
+            disabled={exercices.length === 0}
+          >
             <SelectTrigger className="w-44">
-              <SelectValue placeholder={exercices.length === 0 ? 'Aucun exercice' : 'Exercice'} />
+              <SelectValue
+                placeholder={
+                  exercices.length === 0 ? 'Aucun exercice' : 'Exercice'
+                }
+              />
             </SelectTrigger>
             <SelectContent>
               {exercices.map((e: Exercice) => (
                 <SelectItem key={e.id} value={String(e.id)}>
                   {e.annee}
-                  {e.statut === 'actif' && <span className="ml-1.5 text-xs text-green-600">●</span>}
+                  {e.statut === 'actif' && (
+                    <span className="ml-1.5 text-xs text-green-600">●</span>
+                  )}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -637,8 +886,12 @@ export function BudgetsPage() {
         )}
 
         {budget && (
-          <Badge className={cn(STATUT_CLS[budget.statut], 'border-0 self-center')}>
-            {t(`gestionnaire.budget.statuts.${budget.statut}`, { defaultValue: budget.statut })}
+          <Badge
+            className={cn(STATUT_CLS[budget.statut], 'border-0 self-center')}
+          >
+            {t(`gestionnaire.budget.statuts.${budget.statut}`, {
+              defaultValue: budget.statut,
+            })}
           </Badge>
         )}
       </div>
@@ -647,13 +900,19 @@ export function BudgetsPage() {
       {(!residenceId || !exerciceId) && (
         <div className="flex flex-col items-center gap-3 py-20 text-center">
           <PiggyBank className="size-12 text-muted-foreground" />
-          <p className="font-medium">{t('gestionnaire.budgets.empty', { defaultValue: 'Sélectionnez une résidence et un exercice' })}</p>
+          <p className="font-medium">
+            {t('gestionnaire.budgets.empty', {
+              defaultValue: 'Sélectionnez une résidence et un exercice',
+            })}
+          </p>
         </div>
       )}
 
       {residenceId && exerciceId && isLoading && (
         <div className="space-y-3">
-          {[1, 2, 3, 4].map((i) => <div key={i} className="h-12 animate-pulse rounded-lg bg-muted" />)}
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-12 animate-pulse rounded-lg bg-muted" />
+          ))}
         </div>
       )}
 
@@ -661,9 +920,14 @@ export function BudgetsPage() {
         <div className="flex flex-col items-center gap-4 py-20 text-center">
           <PiggyBank className="size-12 text-muted-foreground" />
           <p className="font-medium">Aucun budget pour cette sélection</p>
-          <Button onClick={() => createBudgetMutation.mutate()} disabled={createBudgetMutation.isPending}>
+          <Button
+            onClick={() => createBudgetMutation.mutate()}
+            disabled={createBudgetMutation.isPending}
+          >
             <Plus className="me-1.5 size-4" />
-            {t('gestionnaire.budget.creer', { defaultValue: 'Créer le budget' })}
+            {t('gestionnaire.budget.creer', {
+              defaultValue: 'Créer le budget',
+            })}
           </Button>
         </div>
       )}
@@ -675,23 +939,33 @@ export function BudgetsPage() {
             <KpiCard
               icon={<PiggyBank className="size-5" />}
               value={`${totalPrevu.toLocaleString('fr-MA')} DH`}
-              label={t('gestionnaire.budget.kpi.prevu', { defaultValue: 'Budget prévu' })}
+              label={t('gestionnaire.budget.kpi.prevu', {
+                defaultValue: 'Budget prévu',
+              })}
             />
             <KpiCard
               icon={<PiggyBank className="size-5" />}
               value={`${totalEngage.toLocaleString('fr-MA')} DH`}
-              label={t('gestionnaire.budget.kpi.engage', { defaultValue: 'Engagé / Émis' })}
+              label={t('gestionnaire.budget.kpi.engage', {
+                defaultValue: 'Engagé / Émis',
+              })}
             />
             <KpiCard
               icon={<PiggyBank className="size-5" />}
               value={`${totalRealise.toLocaleString('fr-MA')} DH`}
-              label={t('gestionnaire.budget.kpi.realise', { defaultValue: 'Réalisé' })}
+              label={t('gestionnaire.budget.kpi.realise', {
+                defaultValue: 'Réalisé',
+              })}
             />
             <KpiCard
               icon={<PiggyBank className="size-5" />}
               value={`${resteADepenser.toLocaleString('fr-MA')} DH`}
-              label={t('gestionnaire.budget.kpi.reste', { defaultValue: 'Reste à dépenser' })}
-              className={resteADepenser < 0 ? '[&_p:last-of-type]:text-red-600' : ''}
+              label={t('gestionnaire.budget.kpi.reste', {
+                defaultValue: 'Reste à dépenser',
+              })}
+              className={
+                resteADepenser < 0 ? '[&_p:last-of-type]:text-red-600' : ''
+              }
             />
           </div>
 
@@ -701,39 +975,81 @@ export function BudgetsPage() {
             <div className="lg:col-span-2 overflow-x-auto rounded-xl border bg-card">
               <div className="flex items-center justify-between border-b px-4 py-3">
                 <p className="text-sm font-semibold">
-                  {t('gestionnaire.budget.annexe5.title', { defaultValue: 'Tableau Annexe 5' })}
+                  {t('gestionnaire.budget.annexe5.title', {
+                    defaultValue: 'Tableau Annexe 5',
+                  })}
                 </p>
-                <span className="text-xs text-muted-foreground">v{budget.version}</span>
+                <span className="text-xs text-muted-foreground">
+                  v{budget.version}
+                </span>
               </div>
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b bg-muted/30 text-xs text-muted-foreground">
-                    <th className="px-4 py-2.5 text-left font-medium">{t('gestionnaire.budget.annexe5.colCompte', { defaultValue: 'Compte' })}</th>
-                    <th className="px-4 py-2.5 text-left font-medium">{t('gestionnaire.budget.annexe5.colLibelle', { defaultValue: 'Libellé' })}</th>
-                    <th className="px-4 py-2.5 text-right font-medium">{t('gestionnaire.budget.annexe5.colRealiseN1', { defaultValue: 'Réal. N-1' })}</th>
-                    <th className="px-4 py-2.5 text-right font-medium">{t('gestionnaire.budget.annexe5.colBudgetN', { defaultValue: 'Budget N' })}</th>
-                    <th className="px-4 py-2.5 text-right font-medium">{t('gestionnaire.budget.annexe5.colEngage', { defaultValue: 'Engagé' })}</th>
-                    <th className="px-4 py-2.5 text-right font-medium">{t('gestionnaire.budget.annexe5.colRealise', { defaultValue: 'Réalisé' })}</th>
-                    <th className="px-4 py-2.5 font-medium">{t('gestionnaire.budget.annexe5.colPct', { defaultValue: '% Cons.' })}</th>
+                    <th className="px-4 py-2.5 text-left font-medium">
+                      {t('gestionnaire.budget.annexe5.colCompte', {
+                        defaultValue: 'Compte',
+                      })}
+                    </th>
+                    <th className="px-4 py-2.5 text-left font-medium">
+                      {t('gestionnaire.budget.annexe5.colLibelle', {
+                        defaultValue: 'Libellé',
+                      })}
+                    </th>
+                    <th className="px-4 py-2.5 text-right font-medium">
+                      {t('gestionnaire.budget.annexe5.colRealiseN1', {
+                        defaultValue: 'Réal. N-1',
+                      })}
+                    </th>
+                    <th className="px-4 py-2.5 text-right font-medium">
+                      {t('gestionnaire.budget.annexe5.colBudgetN', {
+                        defaultValue: 'Budget N',
+                      })}
+                    </th>
+                    <th className="px-4 py-2.5 text-right font-medium">
+                      {t('gestionnaire.budget.annexe5.colEngage', {
+                        defaultValue: 'Engagé',
+                      })}
+                    </th>
+                    <th className="px-4 py-2.5 text-right font-medium">
+                      {t('gestionnaire.budget.annexe5.colRealise', {
+                        defaultValue: 'Réalisé',
+                      })}
+                    </th>
+                    <th className="px-4 py-2.5 font-medium">
+                      {t('gestionnaire.budget.annexe5.colPct', {
+                        defaultValue: '% Cons.',
+                      })}
+                    </th>
                     {!verrouille && <th className="px-4 py-2.5 w-10" />}
                   </tr>
                 </thead>
                 <tbody className="divide-y">
                   <Section
-                    title={t('gestionnaire.budget.annexe5.sections.chargesCourantes', { defaultValue: 'I — Charges courantes' })}
+                    title={t(
+                      'gestionnaire.budget.annexe5.sections.chargesCourantes',
+                      { defaultValue: 'I — Charges courantes' },
+                    )}
                     lignes={chargesCourantes}
                     verrouille={verrouille}
                     onDelete={(id) => setDeleteLigneTarget(id)}
-                    onUpdate={(id, val) => updateLigneMutation.mutate({ id, val })}
+                    onUpdate={(id, val) =>
+                      updateLigneMutation.mutate({ id, val })
+                    }
                     onAddLigne={(type) => setAddLigneDialog({ type })}
                     type="charge_courante"
                   />
                   <Section
-                    title={t('gestionnaire.budget.annexe5.sections.chargesTravaux', { defaultValue: 'II — Charges travaux' })}
+                    title={t(
+                      'gestionnaire.budget.annexe5.sections.chargesTravaux',
+                      { defaultValue: 'II — Charges travaux' },
+                    )}
                     lignes={chargesTravaux}
                     verrouille={verrouille}
                     onDelete={(id) => setDeleteLigneTarget(id)}
-                    onUpdate={(id, val) => updateLigneMutation.mutate({ id, val })}
+                    onUpdate={(id, val) =>
+                      updateLigneMutation.mutate({ id, val })
+                    }
                     onAddLigne={(type) => setAddLigneDialog({ type })}
                     type="charge_travaux"
                   />
@@ -741,16 +1057,22 @@ export function BudgetsPage() {
                   {/* Total charges */}
                   <tr className="bg-muted/50 font-semibold border-t-2">
                     <td colSpan={2} className="px-4 py-2.5 text-sm">
-                      {t('gestionnaire.budget.annexe5.sections.totalCharges', { defaultValue: 'III — Total charges' })}
+                      {t('gestionnaire.budget.annexe5.sections.totalCharges', {
+                        defaultValue: 'III — Total charges',
+                      })}
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums text-sm text-muted-foreground">
-                      <MontantDisplay value={chargesAll.reduce((s, l) => s + l.realise_n1, 0)} />
+                      <MontantDisplay
+                        value={chargesAll.reduce((s, l) => s + l.realise_n1, 0)}
+                      />
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums text-sm">
                       <MontantDisplay value={totalCharges} />
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums text-sm">
-                      <MontantDisplay value={chargesAll.reduce((s, l) => s + l.engagement, 0)} />
+                      <MontantDisplay
+                        value={chargesAll.reduce((s, l) => s + l.engagement, 0)}
+                      />
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums text-sm">
                       <MontantDisplay value={totalRealise} />
@@ -760,20 +1082,30 @@ export function BudgetsPage() {
                   </tr>
 
                   <Section
-                    title={t('gestionnaire.budget.annexe5.sections.produitsCourants', { defaultValue: 'IV — Produits courants' })}
+                    title={t(
+                      'gestionnaire.budget.annexe5.sections.produitsCourants',
+                      { defaultValue: 'IV — Produits courants' },
+                    )}
                     lignes={produitsCourants}
                     verrouille={verrouille}
                     onDelete={(id) => setDeleteLigneTarget(id)}
-                    onUpdate={(id, val) => updateLigneMutation.mutate({ id, val })}
+                    onUpdate={(id, val) =>
+                      updateLigneMutation.mutate({ id, val })
+                    }
                     onAddLigne={(type) => setAddLigneDialog({ type })}
                     type="produit_courant"
                   />
                   <Section
-                    title={t('gestionnaire.budget.annexe5.sections.produitsTravaux', { defaultValue: 'V — Produits travaux' })}
+                    title={t(
+                      'gestionnaire.budget.annexe5.sections.produitsTravaux',
+                      { defaultValue: 'V — Produits travaux' },
+                    )}
                     lignes={produitsTravaux}
                     verrouille={verrouille}
                     onDelete={(id) => setDeleteLigneTarget(id)}
-                    onUpdate={(id, val) => updateLigneMutation.mutate({ id, val })}
+                    onUpdate={(id, val) =>
+                      updateLigneMutation.mutate({ id, val })
+                    }
                     onAddLigne={(type) => setAddLigneDialog({ type })}
                     type="produit_travaux"
                   />
@@ -781,10 +1113,17 @@ export function BudgetsPage() {
                   {/* Total produits */}
                   <tr className="bg-muted/50 font-semibold border-t-2">
                     <td colSpan={2} className="px-4 py-2.5 text-sm">
-                      {t('gestionnaire.budget.annexe5.sections.totalProduits', { defaultValue: 'VI — Total produits' })}
+                      {t('gestionnaire.budget.annexe5.sections.totalProduits', {
+                        defaultValue: 'VI — Total produits',
+                      })}
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums text-sm text-muted-foreground">
-                      <MontantDisplay value={[...produitsCourants, ...produitsTravaux].reduce((s, l) => s + l.realise_n1, 0)} />
+                      <MontantDisplay
+                        value={[...produitsCourants, ...produitsTravaux].reduce(
+                          (s, l) => s + l.realise_n1,
+                          0,
+                        )}
+                      />
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums text-sm">
                       <MontantDisplay value={totalProduits} />
@@ -794,11 +1133,23 @@ export function BudgetsPage() {
                   </tr>
 
                   {/* Résultat */}
-                  <tr className={cn('font-bold border-t-2', resultat >= 0 ? 'bg-green-50' : 'bg-red-50')}>
+                  <tr
+                    className={cn(
+                      'font-bold border-t-2',
+                      resultat >= 0 ? 'bg-green-50' : 'bg-red-50',
+                    )}
+                  >
                     <td colSpan={3} className="px-4 py-3 text-sm">
-                      {t('gestionnaire.budget.annexe5.sections.resultat', { defaultValue: 'VII — Résultat' })}
+                      {t('gestionnaire.budget.annexe5.sections.resultat', {
+                        defaultValue: 'VII — Résultat',
+                      })}
                     </td>
-                    <td className={cn('px-4 py-3 text-right tabular-nums text-sm', resultat >= 0 ? 'text-green-700' : 'text-red-700')}>
+                    <td
+                      className={cn(
+                        'px-4 py-3 text-right tabular-nums text-sm',
+                        resultat >= 0 ? 'text-green-700' : 'text-red-700',
+                      )}
+                    >
                       <MontantDisplay value={resultat} />
                     </td>
                     <td colSpan={3} />
@@ -825,17 +1176,27 @@ export function BudgetsPage() {
                       tick={{ fontSize: 11 }}
                       tickFormatter={(v: number) => `${v}%`}
                     />
-                    <YAxis type="category" dataKey="libelle" width={120} tick={{ fontSize: 11 }} />
+                    <YAxis
+                      type="category"
+                      dataKey="libelle"
+                      width={120}
+                      tick={{ fontSize: 11 }}
+                    />
                     <Tooltip formatter={(v) => `${v}%`} />
                     <Bar dataKey="pct" radius={[0, 4, 4, 0]}>
                       {chartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={barColor(entry.pct)} />
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={barColor(entry.pct)}
+                        />
                       ))}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="py-10 text-center text-sm text-muted-foreground">Aucune donnée</p>
+                <p className="py-10 text-center text-sm text-muted-foreground">
+                  Aucune donnée
+                </p>
               )}
             </div>
           </div>
@@ -862,7 +1223,9 @@ export function BudgetsPage() {
       <ConfirmModal
         open={soumettreOpen}
         onOpenChange={setSoumettreOpen}
-        title={t('gestionnaire.budget.soumettre', { defaultValue: 'Soumettre à l\'AG' })}
+        title={t('gestionnaire.budget.soumettre', {
+          defaultValue: "Soumettre à l'AG",
+        })}
         description="Le budget sera soumis pour approbation lors de la prochaine Assemblée Générale."
         confirmLabel="Soumettre"
         variant="default"
@@ -873,7 +1236,9 @@ export function BudgetsPage() {
       <ConfirmModal
         open={verrouillageOpen}
         onOpenChange={setVerrouillageOpen}
-        title={t('gestionnaire.budget.verrouiller', { defaultValue: 'Verrouiller le budget' })}
+        title={t('gestionnaire.budget.verrouiller', {
+          defaultValue: 'Verrouiller le budget',
+        })}
         description="Le budget sera verrouillé et ne pourra plus être modifié."
         confirmLabel="Verrouiller"
         variant="destructive"
@@ -886,12 +1251,18 @@ export function BudgetsPage() {
         onOpenChange={(o) => !o && setDeleteLigneTarget(null)}
         title="Supprimer la ligne"
         description="Cette ligne budgétaire sera supprimée définitivement."
-        onConfirm={() => deleteLigneTarget !== null && supprimerLigneMutation.mutate(deleteLigneTarget)}
+        onConfirm={() =>
+          deleteLigneTarget !== null &&
+          supprimerLigneMutation.mutate(deleteLigneTarget)
+        }
         isLoading={supprimerLigneMutation.isPending}
       />
 
       {/* Add ligne dialog */}
-      <Dialog open={!!addLigneDialog} onOpenChange={(o) => !o && resetAddLigneDialog()}>
+      <Dialog
+        open={!!addLigneDialog}
+        onOpenChange={(o) => !o && resetAddLigneDialog()}
+      >
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Ajouter une ligne</DialogTitle>
@@ -901,17 +1272,26 @@ export function BudgetsPage() {
               <Label>Compte PCG</Label>
               <Select
                 value={addLigneForm.compte_pcg}
-                onValueChange={(v) => setAddLigneForm((f) => ({ ...f, compte_pcg: v }))}
+                onValueChange={(v) =>
+                  setAddLigneForm((f) => ({ ...f, compte_pcg: v }))
+                }
               >
-                <SelectTrigger className="w-full"><SelectValue placeholder="Sélectionner" /></SelectTrigger>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Sélectionner" />
+                </SelectTrigger>
                 <SelectContent>
-                  {comptes.filter((c) => {
-                    if (!addLigneDialog) return false
-                    if (addLigneDialog.type.startsWith('charge')) return c.classe === 6
-                    return c.classe === 7
-                  }).map((c) => (
-                    <SelectItem key={c.numero} value={c.numero}>{c.numero} — {c.libelle}</SelectItem>
-                  ))}
+                  {comptes
+                    .filter((c) => {
+                      if (!addLigneDialog) return false
+                      if (addLigneDialog.type.startsWith('charge'))
+                        return c.classe === 6
+                      return c.classe === 7
+                    })
+                    .map((c) => (
+                      <SelectItem key={c.numero} value={c.numero}>
+                        {c.numero} — {c.libelle}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
@@ -919,7 +1299,9 @@ export function BudgetsPage() {
               <Label>Libellé</Label>
               <Input
                 value={addLigneForm.libelle}
-                onChange={(e) => setAddLigneForm((f) => ({ ...f, libelle: e.target.value }))}
+                onChange={(e) =>
+                  setAddLigneForm((f) => ({ ...f, libelle: e.target.value }))
+                }
                 placeholder="Description de la ligne"
               />
             </div>
@@ -928,7 +1310,9 @@ export function BudgetsPage() {
               <Input
                 type="number"
                 value={addLigneForm.budget_n}
-                onChange={(e) => setAddLigneForm((f) => ({ ...f, budget_n: e.target.value }))}
+                onChange={(e) =>
+                  setAddLigneForm((f) => ({ ...f, budget_n: e.target.value }))
+                }
               />
             </div>
 
@@ -940,7 +1324,11 @@ export function BudgetsPage() {
                 onClick={() => setPrestataireOpen((o) => !o)}
               >
                 <span>Lier un prestataire (optionnel)</span>
-                {prestataireOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+                {prestataireOpen ? (
+                  <ChevronUp className="size-4" />
+                ) : (
+                  <ChevronDown className="size-4" />
+                )}
               </button>
 
               {prestataireOpen && (
@@ -950,7 +1338,11 @@ export function BudgetsPage() {
                     <Select
                       value={prestataireForm.prestataire_id}
                       onValueChange={(v) =>
-                        setPrestataireForm((f) => ({ ...f, prestataire_id: v, contrat_id: '' }))
+                        setPrestataireForm((f) => ({
+                          ...f,
+                          prestataire_id: v,
+                          contrat_id: '',
+                        }))
                       }
                     >
                       <SelectTrigger className="w-full">
@@ -959,7 +1351,8 @@ export function BudgetsPage() {
                       <SelectContent>
                         {prestataires.map((p) => (
                           <SelectItem key={p.id} value={String(p.id)}>
-                            {p.nom}{p.secteur ? ` — ${p.secteur}` : ''}
+                            {p.nom}
+                            {p.secteur ? ` — ${p.secteur}` : ''}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -970,15 +1363,25 @@ export function BudgetsPage() {
                     <Label>Contrat</Label>
                     <Select
                       value={prestataireForm.contrat_id}
-                      onValueChange={(v) => setPrestataireForm((f) => ({ ...f, contrat_id: v }))}
+                      onValueChange={(v) =>
+                        setPrestataireForm((f) => ({ ...f, contrat_id: v }))
+                      }
                       disabled={contrats.length === 0}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder={contrats.length === 0 ? 'Aucun contrat' : 'Sélectionner un contrat'} />
+                        <SelectValue
+                          placeholder={
+                            contrats.length === 0
+                              ? 'Aucun contrat'
+                              : 'Sélectionner un contrat'
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {contrats.map((c) => (
-                          <SelectItem key={c.id} value={String(c.id)}>{c.titre}</SelectItem>
+                          <SelectItem key={c.id} value={String(c.id)}>
+                            {c.titre}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -995,8 +1398,13 @@ export function BudgetsPage() {
                           const nombre = e.target.value
                           setPrestataireForm((f) => ({ ...f, nombre }))
                           if (nombre && prestataireForm.prix_unitaire) {
-                            const computed = Number(nombre) * Number(prestataireForm.prix_unitaire)
-                            setAddLigneForm((f) => ({ ...f, budget_n: String(computed) }))
+                            const computed =
+                              Number(nombre) *
+                              Number(prestataireForm.prix_unitaire)
+                            setAddLigneForm((f) => ({
+                              ...f,
+                              budget_n: String(computed),
+                            }))
                           }
                         }}
                       />
@@ -1011,8 +1419,13 @@ export function BudgetsPage() {
                           const prix_unitaire = e.target.value
                           setPrestataireForm((f) => ({ ...f, prix_unitaire }))
                           if (prestataireForm.nombre && prix_unitaire) {
-                            const computed = Number(prestataireForm.nombre) * Number(prix_unitaire)
-                            setAddLigneForm((f) => ({ ...f, budget_n: String(computed) }))
+                            const computed =
+                              Number(prestataireForm.nombre) *
+                              Number(prix_unitaire)
+                            setAddLigneForm((f) => ({
+                              ...f,
+                              budget_n: String(computed),
+                            }))
                           }
                         }}
                       />
@@ -1021,7 +1434,15 @@ export function BudgetsPage() {
 
                   {prestataireForm.nombre && prestataireForm.prix_unitaire && (
                     <p className="text-xs text-muted-foreground">
-                      Montant auto-calculé : <strong className="text-foreground">{(Number(prestataireForm.nombre) * Number(prestataireForm.prix_unitaire)).toLocaleString('fr-MA')} DH</strong> — modifiable dans le champ Budget N ci-dessus.
+                      Montant auto-calculé :{' '}
+                      <strong className="text-foreground">
+                        {(
+                          Number(prestataireForm.nombre) *
+                          Number(prestataireForm.prix_unitaire)
+                        ).toLocaleString('fr-MA')}{' '}
+                        DH
+                      </strong>{' '}
+                      — modifiable dans le champ Budget N ci-dessus.
                     </p>
                   )}
 
@@ -1031,7 +1452,12 @@ export function BudgetsPage() {
                       <Input
                         type="date"
                         value={prestataireForm.date_debut}
-                        onChange={(e) => setPrestataireForm((f) => ({ ...f, date_debut: e.target.value }))}
+                        onChange={(e) =>
+                          setPrestataireForm((f) => ({
+                            ...f,
+                            date_debut: e.target.value,
+                          }))
+                        }
                       />
                     </div>
                     <div className="space-y-1">
@@ -1039,7 +1465,12 @@ export function BudgetsPage() {
                       <Input
                         type="date"
                         value={prestataireForm.date_fin}
-                        onChange={(e) => setPrestataireForm((f) => ({ ...f, date_fin: e.target.value }))}
+                        onChange={(e) =>
+                          setPrestataireForm((f) => ({
+                            ...f,
+                            date_fin: e.target.value,
+                          }))
+                        }
                       />
                     </div>
                   </div>
@@ -1048,7 +1479,11 @@ export function BudgetsPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={resetAddLigneDialog} disabled={ajouterLigneMutation.isPending}>
+            <Button
+              variant="outline"
+              onClick={resetAddLigneDialog}
+              disabled={ajouterLigneMutation.isPending}
+            >
               {t('actions.cancel')}
             </Button>
             <Button
@@ -1061,18 +1496,34 @@ export function BudgetsPage() {
                   type: addLigneDialog.type,
                 }
                 if (prestataireOpen) {
-                  if (prestataireForm.prestataire_id) payload.prestataire_id = Number(prestataireForm.prestataire_id)
-                  if (prestataireForm.contrat_id) payload.contrat_id = Number(prestataireForm.contrat_id)
-                  if (prestataireForm.nombre) payload.nombre = Number(prestataireForm.nombre)
-                  if (prestataireForm.prix_unitaire) payload.prix_unitaire = Number(prestataireForm.prix_unitaire)
-                  if (prestataireForm.date_debut) payload.date_debut = prestataireForm.date_debut
-                  if (prestataireForm.date_fin) payload.date_fin = prestataireForm.date_fin
+                  if (prestataireForm.prestataire_id)
+                    payload.prestataire_id = Number(
+                      prestataireForm.prestataire_id,
+                    )
+                  if (prestataireForm.contrat_id)
+                    payload.contrat_id = Number(prestataireForm.contrat_id)
+                  if (prestataireForm.nombre)
+                    payload.nombre = Number(prestataireForm.nombre)
+                  if (prestataireForm.prix_unitaire)
+                    payload.prix_unitaire = Number(
+                      prestataireForm.prix_unitaire,
+                    )
+                  if (prestataireForm.date_debut)
+                    payload.date_debut = prestataireForm.date_debut
+                  if (prestataireForm.date_fin)
+                    payload.date_fin = prestataireForm.date_fin
                 }
                 ajouterLigneMutation.mutate(payload)
               }}
-              disabled={!addLigneForm.libelle || !addLigneForm.budget_n || ajouterLigneMutation.isPending}
+              disabled={
+                !addLigneForm.libelle ||
+                !addLigneForm.budget_n ||
+                ajouterLigneMutation.isPending
+              }
             >
-              {ajouterLigneMutation.isPending ? t('actions.loading') : t('actions.save')}
+              {ajouterLigneMutation.isPending
+                ? t('actions.loading')
+                : t('actions.save')}
             </Button>
           </DialogFooter>
         </DialogContent>

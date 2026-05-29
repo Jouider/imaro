@@ -18,7 +18,7 @@ class Residence extends Model
     protected $fillable = [
         'tenant_id', 'gestionnaire_id', 'name', 'address',
         'city', 'photo', 'total_tantieme', 'nb_lots', 'status',
-        'mode_cotisation', 'cotisation_mensuelle',
+        'mode_cotisation', 'cotisation_mensuelle', 'jour_echeance',
     ];
 
     protected static function booted(): void

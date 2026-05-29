@@ -1,0 +1,390 @@
+import { useRef, useState } from 'react'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
+import {
+  ArrowLeft,
+  Check,
+  Copy,
+  Info,
+  Loader2,
+  QrCode,
+  Upload,
+} from 'lucide-react'
+import {
+  declarePaiement,
+  getMyResidenceBankAccounts,
+  type PaiementMethode,
+  type PortailBankAccount,
+} from '@/services/portail.service'
+import { banqueLabel, buildPaymentPayload } from '@/lib/payment'
+import { BottomSheet } from '@/components/portail/BottomSheet'
+import { PaymentQr } from '@/components/shared'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { cn } from '@/lib/utils'
+
+type Props = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  /** Montant pré-rempli (ex. solde dû). */
+  defaultMontant?: number
+  /** Référence suggérée (ex. lot / appel de fonds). */
+  defaultReference?: string
+  onSuccess?: () => void
+}
+
+type Step = 'how' | 'declare'
+
+const METHODES: PaiementMethode[] = [
+  'virement',
+  'versement',
+  'cheque',
+  'especes',
+]
+
+const todayIso = () => new Date().toISOString().slice(0, 10)
+
+export function PaiementSheet({
+  open,
+  onOpenChange,
+  defaultMontant,
+  defaultReference,
+  onSuccess,
+}: Props) {
+  const { t } = useTranslation()
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  const [step, setStep] = useState<Step>('how')
+  const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [showQr, setShowQr] = useState(false)
+  const [copiedId, setCopiedId] = useState<number | null>(null)
+
+  // Declare form
+  const [montant, setMontant] = useState('')
+  const [date, setDate] = useState(todayIso())
+  const [methode, setMethode] = useState<PaiementMethode>('virement')
+  const [reference, setReference] = useState('')
+  const [justificatif, setJustificatif] = useState<File | null>(null)
+  const [wasOpen, setWasOpen] = useState(false)
+
+  const { data: accounts = [], isLoading } = useQuery({
+    queryKey: ['portail-bank-accounts'],
+    queryFn: getMyResidenceBankAccounts,
+    enabled: open,
+  })
+
+  // Reset/populate on closed → open transition (render-time, no effect).
+  if (open && !wasOpen) {
+    setWasOpen(true)
+    setStep('how')
+    setSelectedId(null)
+    setShowQr(false)
+    setMontant(defaultMontant != null ? String(defaultMontant) : '')
+    setDate(todayIso())
+    setMethode('virement')
+    setReference(defaultReference ?? '')
+    setJustificatif(null)
+  } else if (!open && wasOpen) {
+    setWasOpen(false)
+  }
+
+  const selectedAccount =
+    accounts.find((a) => a.id === selectedId) ??
+    accounts.find((a) => a.is_primary) ??
+    accounts[0]
+
+  const declareMutation = useMutation({
+    mutationFn: () =>
+      declarePaiement({
+        montant: Number(montant),
+        date,
+        methode,
+        reference: reference.trim() || undefined,
+        justificatif: justificatif ?? undefined,
+      }),
+    onSuccess: () => {
+      toast.success(t('portail.paiement.toast.declared'))
+      onOpenChange(false)
+      onSuccess?.()
+    },
+    onError: () => toast.error(t('portail.paiement.toast.error')),
+  })
+
+  async function copyRib(account: PortailBankAccount) {
+    try {
+      await navigator.clipboard.writeText(account.rib)
+      setCopiedId(account.id)
+      window.setTimeout(() => setCopiedId(null), 1500)
+      toast.success(t('portail.paiement.ribCopied'))
+    } catch {
+      toast.error(t('portail.paiement.copyError'))
+    }
+  }
+
+  const montantValue = Number(montant)
+  const canSubmit =
+    Number.isFinite(montantValue) && montantValue > 0 && date !== ''
+
+  const title =
+    step === 'how'
+      ? t('portail.paiement.howTitle')
+      : t('portail.paiement.declareTitle')
+
+  return (
+    <BottomSheet open={open} onOpenChange={onOpenChange} title={title}>
+      {step === 'how' ? (
+        <div className="space-y-4 pb-2">
+          <p className="text-sm text-muted-foreground">
+            {t('portail.paiement.howIntro')}
+          </p>
+
+          {isLoading ? (
+            <div className="space-y-3">
+              {[1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="h-28 animate-pulse rounded-xl bg-muted"
+                />
+              ))}
+            </div>
+          ) : accounts.length === 0 ? (
+            <div className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+              {t('portail.paiement.noAccounts')}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {accounts.map((account) => {
+                const active = selectedAccount?.id === account.id
+                return (
+                  <button
+                    key={account.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedId(account.id)
+                      setShowQr(false)
+                    }}
+                    className={cn(
+                      'w-full rounded-xl border bg-card p-4 text-start transition-colors',
+                      active
+                        ? 'border-[var(--color-imaro-primary)] ring-1 ring-[var(--color-imaro-primary)]/30'
+                        : 'hover:border-[var(--color-imaro-primary)]/40',
+                    )}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-display text-base text-foreground">
+                        {banqueLabel(account.banque)}
+                      </span>
+                      {account.is_primary && (
+                        <span className="rounded-full bg-[var(--color-imaro-primary-tint)] px-2 py-0.5 text-xs font-medium text-[var(--color-imaro-primary)]">
+                          {t('portail.paiement.recommended')}
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {account.titulaire}
+                    </p>
+                    <div className="mt-2 flex items-center justify-between gap-2 rounded-lg bg-muted/60 px-3 py-2">
+                      <code className="truncate font-mono text-sm tabular-nums text-foreground">
+                        {account.rib}
+                      </code>
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        aria-label={t('portail.paiement.copyRib')}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          void copyRib(account)
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            void copyRib(account)
+                          }
+                        }}
+                        className="flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-background"
+                      >
+                        {copiedId === account.id ? (
+                          <Check className="size-4 text-[var(--color-imaro-success)]" />
+                        ) : (
+                          <Copy className="size-4" />
+                        )}
+                      </span>
+                    </div>
+                    {account.iban && (
+                      <p className="mt-1 truncate font-mono text-xs text-muted-foreground">
+                        {account.iban}
+                      </p>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          {/* QR toggle */}
+          {selectedAccount && (
+            <div className="rounded-xl border bg-card p-4">
+              <button
+                type="button"
+                onClick={() => setShowQr((v) => !v)}
+                className="flex w-full items-center justify-between gap-2 text-sm font-medium text-[var(--color-imaro-primary)]"
+              >
+                <span className="flex items-center gap-2">
+                  <QrCode className="size-4" />
+                  {t('portail.paiement.showQr')}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {showQr ? t('actions.hide') : t('actions.show')}
+                </span>
+              </button>
+              {showQr && (
+                <div className="mt-3 flex flex-col items-center gap-2">
+                  <PaymentQr
+                    value={buildPaymentPayload(selectedAccount, {
+                      montant: canSubmit ? montantValue : undefined,
+                      reference: reference.trim() || undefined,
+                    })}
+                    size={200}
+                  />
+                  <p className="text-center text-xs text-muted-foreground">
+                    {t('portail.paiement.qrHint')}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Instructions */}
+          <div className="flex gap-2 rounded-xl bg-[var(--color-imaro-primary-tint)] p-3 text-xs text-[var(--color-imaro-primary)]">
+            <Info className="size-4 shrink-0" />
+            <p>{t('portail.paiement.instructions')}</p>
+          </div>
+
+          <Button
+            className="w-full"
+            disabled={accounts.length === 0}
+            onClick={() => setStep('declare')}
+          >
+            {t('portail.paiement.iPaid')}
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-4 pb-2">
+          <button
+            type="button"
+            onClick={() => setStep('how')}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground"
+          >
+            <ArrowLeft className="size-4 rtl:rotate-180" />
+            {t('portail.paiement.backToHow')}
+          </button>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="pay-montant">{t('portail.paiement.montant')}</Label>
+            <Input
+              id="pay-montant"
+              type="number"
+              inputMode="decimal"
+              min={0}
+              value={montant}
+              onChange={(e) => setMontant(e.target.value)}
+              placeholder="1500"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="pay-date">{t('portail.paiement.date')}</Label>
+            <Input
+              id="pay-date"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>{t('portail.paiement.methode')}</Label>
+            <Select
+              value={methode}
+              onValueChange={(v) => setMethode(v as PaiementMethode)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {METHODES.map((m) => (
+                  <SelectItem key={m} value={m}>
+                    {t(`portail.paiement.methodes.${m}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="pay-ref">{t('portail.paiement.reference')}</Label>
+            <Input
+              id="pay-ref"
+              value={reference}
+              onChange={(e) => setReference(e.target.value)}
+              placeholder={t('portail.paiement.referencePlaceholder')}
+            />
+          </div>
+
+          {/* Justificatif upload */}
+          <div className="space-y-1.5">
+            <Label>{t('portail.paiement.justificatif')}</Label>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*,application/pdf"
+              className="hidden"
+              onChange={(e) => setJustificatif(e.target.files?.[0] ?? null)}
+            />
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              className="flex w-full items-center gap-3 rounded-xl border border-dashed px-4 py-3 text-start text-sm hover:border-[var(--color-imaro-primary)]/50"
+            >
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-imaro-primary-tint)] text-[var(--color-imaro-primary)]">
+                <Upload className="size-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                {justificatif ? (
+                  <span className="block truncate font-medium text-foreground">
+                    {justificatif.name}
+                  </span>
+                ) : (
+                  <span className="block text-muted-foreground">
+                    {t('portail.paiement.justificatifHint')}
+                  </span>
+                )}
+              </span>
+            </button>
+          </div>
+
+          <Button
+            className="w-full"
+            disabled={!canSubmit || declareMutation.isPending}
+            onClick={() => declareMutation.mutate()}
+          >
+            {declareMutation.isPending && (
+              <Loader2 className="me-2 size-4 animate-spin" />
+            )}
+            {t('portail.paiement.submit')}
+          </Button>
+        </div>
+      )}
+    </BottomSheet>
+  )
+}

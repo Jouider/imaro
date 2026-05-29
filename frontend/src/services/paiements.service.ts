@@ -2,7 +2,8 @@ import { api, type ApiEnvelope } from '@/lib/axios'
 
 // ─── Dev mock fallback ────────────────────────────────────────────────────────
 async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
-  if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS) return call()
+  if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS)
+    return call()
   try {
     return await call()
   } catch {
@@ -46,6 +47,8 @@ export type Encaissement = {
   est_rapproche: boolean
 }
 
+export type VirementMethode = 'virement' | 'versement' | 'cheque' | 'especes'
+
 export type VirementDeclare = {
   id: number
   coproprietaire_id: number
@@ -53,6 +56,8 @@ export type VirementDeclare = {
   lot_numero: string
   montant: number
   date_declaration: string
+  /** Méthode déclarée par le copropriétaire. */
+  methode: VirementMethode
   reference: string
   justificatif_path: string | null
   statut: 'en_attente' | 'valide' | 'rejete'
@@ -311,8 +316,10 @@ const MOCK_VIREMENTS: VirementDeclare[] = [
     lot_numero: 'B-01',
     montant: 650,
     date_declaration: '2026-05-10',
+    methode: 'virement',
     reference: 'VIR-MAR-2026-0441',
-    justificatif_path: 'virement-khalid.pdf',
+    justificatif_path:
+      'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800',
     statut: 'en_attente',
     valide_par: null,
     date_validation: null,
@@ -324,6 +331,7 @@ const MOCK_VIREMENTS: VirementDeclare[] = [
     lot_numero: 'B-02',
     montant: 580,
     date_declaration: '2026-05-05',
+    methode: 'versement',
     reference: 'VIR-ATW-2026-0089',
     justificatif_path: 'virement-zineb.pdf',
     statut: 'valide',
@@ -337,6 +345,7 @@ const MOCK_VIREMENTS: VirementDeclare[] = [
     lot_numero: 'B-03',
     montant: 650,
     date_declaration: '2026-04-28',
+    methode: 'cheque',
     reference: 'VIR-BCP-2026-1203',
     justificatif_path: null,
     statut: 'rejete',
@@ -356,7 +365,13 @@ const MOCK_DECOMPTES: Decompte[] = [
     total_paye: 0,
     solde: -900,
     detail: [
-      { appel_fonds_titre: 'Charges Q1 2026', date_echeance: '2026-03-31', montant_du: 900, montant_paye: 0, statut: 'en_retard' },
+      {
+        appel_fonds_titre: 'Charges Q1 2026',
+        date_echeance: '2026-03-31',
+        montant_du: 900,
+        montant_paye: 0,
+        statut: 'en_retard',
+      },
     ],
   },
   {
@@ -369,7 +384,13 @@ const MOCK_DECOMPTES: Decompte[] = [
     total_paye: 750,
     solde: 0,
     detail: [
-      { appel_fonds_titre: 'Charges Q1 2026', date_echeance: '2026-03-31', montant_du: 750, montant_paye: 750, statut: 'paye' },
+      {
+        appel_fonds_titre: 'Charges Q1 2026',
+        date_echeance: '2026-03-31',
+        montant_du: 750,
+        montant_paye: 750,
+        statut: 'paye',
+      },
     ],
   },
   {
@@ -382,105 +403,161 @@ const MOCK_DECOMPTES: Decompte[] = [
     total_paye: 325,
     solde: -325,
     detail: [
-      { appel_fonds_titre: 'Charges Q1 2026', date_echeance: '2026-03-31', montant_du: 650, montant_paye: 325, statut: 'partiellement_paye' },
+      {
+        appel_fonds_titre: 'Charges Q1 2026',
+        date_echeance: '2026-03-31',
+        montant_du: 650,
+        montant_paye: 325,
+        statut: 'partiellement_paye',
+      },
     ],
   },
 ]
 
 // ─── Service functions ────────────────────────────────────────────────────────
 
-export async function getCreances(params?: { statut?: string; search?: string }): Promise<Creance[]> {
-  return withMock(async () => {
-    const res = await api.get<ApiEnvelope<Creance[]>>('/gestionnaire/creances', { params })
-    return res.data.data
-  }, (() => {
-    let data = MOCK_CREANCES
-    if (params?.statut) data = data.filter((c) => c.statut === params.statut)
-    if (params?.search) {
-      const q = params.search.toLowerCase()
-      data = data.filter((c) =>
-        c.coproprietaire_nom.toLowerCase().includes(q) ||
-        c.lot_numero.toLowerCase().includes(q),
+export async function getCreances(params?: {
+  statut?: string
+  search?: string
+}): Promise<Creance[]> {
+  return withMock(
+    async () => {
+      const res = await api.get<ApiEnvelope<Creance[]>>(
+        '/gestionnaire/creances',
+        { params },
       )
-    }
-    return data
-  })())
+      return res.data.data
+    },
+    (() => {
+      let data = MOCK_CREANCES
+      if (params?.statut) data = data.filter((c) => c.statut === params.statut)
+      if (params?.search) {
+        const q = params.search.toLowerCase()
+        data = data.filter(
+          (c) =>
+            c.coproprietaire_nom.toLowerCase().includes(q) ||
+            c.lot_numero.toLowerCase().includes(q),
+        )
+      }
+      return data
+    })(),
+  )
 }
 
-export async function getEncaissements(params?: { methode?: string; from?: string; to?: string }): Promise<Encaissement[]> {
-  return withMock(async () => {
-    const res = await api.get<ApiEnvelope<Encaissement[]>>('/gestionnaire/encaissements', { params })
-    return res.data.data
-  }, (() => {
-    let data = MOCK_ENCAISSEMENTS
-    if (params?.methode) data = data.filter((e) => e.methode === params.methode)
-    if (params?.from) data = data.filter((e) => e.date_paiement >= params.from!)
-    if (params?.to) data = data.filter((e) => e.date_paiement <= params.to!)
-    return data
-  })())
+export async function getEncaissements(params?: {
+  methode?: string
+  from?: string
+  to?: string
+}): Promise<Encaissement[]> {
+  return withMock(
+    async () => {
+      const res = await api.get<ApiEnvelope<Encaissement[]>>(
+        '/gestionnaire/encaissements',
+        { params },
+      )
+      return res.data.data
+    },
+    (() => {
+      let data = MOCK_ENCAISSEMENTS
+      if (params?.methode)
+        data = data.filter((e) => e.methode === params.methode)
+      if (params?.from)
+        data = data.filter((e) => e.date_paiement >= params.from!)
+      if (params?.to) data = data.filter((e) => e.date_paiement <= params.to!)
+      return data
+    })(),
+  )
 }
 
-export async function storeEncaissement(data: PaiementForm): Promise<Encaissement> {
-  return withMock(async () => {
-    const res = await api.post<ApiEnvelope<Encaissement>>('/gestionnaire/encaissements', data)
-    return res.data.data
-  }, {
-    id: Math.floor(Math.random() * 1000) + 100,
-    creance_id: data.creance_id,
-    coproprietaire_id: 0,
-    coproprietaire_nom: 'Copropriétaire',
-    lot_numero: 'A-XX',
-    appel_fonds_titre: 'Charges Q1 2026',
-    montant: data.montant,
-    date_paiement: data.date_paiement,
-    methode: data.methode as Encaissement['methode'],
-    reference_cheque: data.reference_cheque || null,
-    compte_destination: data.compte_destination as Encaissement['compte_destination'],
-    est_avance: false,
-    recu_path: null,
-    est_rapproche: false,
-  })
+export async function storeEncaissement(
+  data: PaiementForm,
+): Promise<Encaissement> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<Encaissement>>(
+        '/gestionnaire/encaissements',
+        data,
+      )
+      return res.data.data
+    },
+    {
+      id: Math.floor(Math.random() * 1000) + 100,
+      creance_id: data.creance_id,
+      coproprietaire_id: 0,
+      coproprietaire_nom: 'Copropriétaire',
+      lot_numero: 'A-XX',
+      appel_fonds_titre: 'Charges Q1 2026',
+      montant: data.montant,
+      date_paiement: data.date_paiement,
+      methode: data.methode as Encaissement['methode'],
+      reference_cheque: data.reference_cheque || null,
+      compte_destination:
+        data.compte_destination as Encaissement['compte_destination'],
+      est_avance: false,
+      recu_path: null,
+      est_rapproche: false,
+    },
+  )
 }
 
 export async function getVirementsDeclares(): Promise<VirementDeclare[]> {
   return withMock(async () => {
-    const res = await api.get<ApiEnvelope<VirementDeclare[]>>('/gestionnaire/virements-declares')
+    const res = await api.get<ApiEnvelope<VirementDeclare[]>>(
+      '/gestionnaire/virements-declares',
+    )
     return res.data.data
   }, MOCK_VIREMENTS)
 }
 
 export async function validerVirement(id: number): Promise<VirementDeclare> {
-  return withMock(async () => {
-    const res = await api.post<ApiEnvelope<VirementDeclare>>(`/gestionnaire/virements-declares/${id}/valider`)
-    return res.data.data
-  }, {
-    ...(MOCK_VIREMENTS.find((v) => v.id === id) ?? MOCK_VIREMENTS[0]),
-    statut: 'valide' as const,
-    valide_par: 'Admin Gestionnaire',
-    date_validation: new Date().toISOString().slice(0, 10),
-  })
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<VirementDeclare>>(
+        `/gestionnaire/virements-declares/${id}/valider`,
+      )
+      return res.data.data
+    },
+    {
+      ...(MOCK_VIREMENTS.find((v) => v.id === id) ?? MOCK_VIREMENTS[0]),
+      statut: 'valide' as const,
+      valide_par: 'Admin Gestionnaire',
+      date_validation: new Date().toISOString().slice(0, 10),
+    },
+  )
 }
 
-export async function rejeterVirement(id: number, motif: string): Promise<VirementDeclare> {
-  return withMock(async () => {
-    const res = await api.post<ApiEnvelope<VirementDeclare>>(
-      `/gestionnaire/virements-declares/${id}/rejeter`,
-      { motif },
-    )
-    return res.data.data
-  }, {
-    ...(MOCK_VIREMENTS.find((v) => v.id === id) ?? MOCK_VIREMENTS[0]),
-    statut: 'rejete' as const,
-    valide_par: 'Admin Gestionnaire',
-    date_validation: new Date().toISOString().slice(0, 10),
-  })
+export async function rejeterVirement(
+  id: number,
+  motif: string,
+): Promise<VirementDeclare> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<VirementDeclare>>(
+        `/gestionnaire/virements-declares/${id}/rejeter`,
+        { motif },
+      )
+      return res.data.data
+    },
+    {
+      ...(MOCK_VIREMENTS.find((v) => v.id === id) ?? MOCK_VIREMENTS[0]),
+      statut: 'rejete' as const,
+      valide_par: 'Admin Gestionnaire',
+      date_validation: new Date().toISOString().slice(0, 10),
+    },
+  )
 }
 
 export async function getDecompte(coproprietaireId: number): Promise<Decompte> {
-  return withMock(async () => {
-    const res = await api.get<ApiEnvelope<Decompte>>(`/gestionnaire/decomptes/${coproprietaireId}`)
-    return res.data.data
-  }, MOCK_DECOMPTES.find((d) => d.coproprietaire_id === coproprietaireId) ?? MOCK_DECOMPTES[0])
+  return withMock(
+    async () => {
+      const res = await api.get<ApiEnvelope<Decompte>>(
+        `/gestionnaire/decomptes/${coproprietaireId}`,
+      )
+      return res.data.data
+    },
+    MOCK_DECOMPTES.find((d) => d.coproprietaire_id === coproprietaireId) ??
+      MOCK_DECOMPTES[0],
+  )
 }
 
 export async function relancerCreance(creanceId: number): Promise<void> {
@@ -490,8 +567,13 @@ export async function relancerCreance(creanceId: number): Promise<void> {
 }
 
 export async function relancerTout(): Promise<{ nb_envoye: number }> {
-  return withMock(async () => {
-    const res = await api.post<ApiEnvelope<{ nb_envoye: number }>>('/gestionnaire/creances/relancer-tout')
-    return res.data.data
-  }, { nb_envoye: MOCK_CREANCES.filter((c) => c.statut === 'en_retard').length })
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<{ nb_envoye: number }>>(
+        '/gestionnaire/creances/relancer-tout',
+      )
+      return res.data.data
+    },
+    { nb_envoye: MOCK_CREANCES.filter((c) => c.statut === 'en_retard').length },
+  )
 }

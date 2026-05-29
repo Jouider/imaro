@@ -1,12 +1,24 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Plus, Pencil, Trash2, Lock, Zap, Building2 } from 'lucide-react'
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Lock,
+  Zap,
+  Building2,
+  MapPin,
+  CalendarClock,
+} from 'lucide-react'
 import { GenerateLotsModal } from '@/components/gestionnaire/GenerateLotsModal'
+import { ResidenceFormDialog } from '@/components/gestionnaire/ResidenceFormDialog'
 import {
   getResidence,
+  updateResidence,
+  deleteResidence,
   getLots,
   getCoproprietaires,
   getExercices,
@@ -17,9 +29,12 @@ import {
   storeImmeuble,
   updateImmeuble,
   deleteImmeuble,
+  type CreateResidenceInput,
   type Lot,
   type Immeuble,
 } from '@/services/gestionnaire.service'
+import { ResidenceOverviewTab } from '@/components/gestionnaire/ResidenceOverviewTab'
+import { ResidenceBankAccountsTab } from '@/components/gestionnaire/ResidenceBankAccountsTab'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { MontantDisplay } from '@/components/shared/MontantDisplay'
@@ -44,7 +59,13 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 
-type Tab = 'lots' | 'coproprietaires' | 'exercices' | 'immeubles'
+type Tab =
+  | 'overview'
+  | 'lots'
+  | 'coproprietaires'
+  | 'exercices'
+  | 'immeubles'
+  | 'encaissement'
 
 const LOT_TYPES = [
   'appartement',
@@ -86,8 +107,11 @@ export function ResidencePage() {
   const { id } = useParams<{ id: string }>()
   const residenceId = Number(id)
   const qc = useQueryClient()
+  const navigate = useNavigate()
 
-  const [activeTab, setActiveTab] = useState<Tab>('lots')
+  const [activeTab, setActiveTab] = useState<Tab>('overview')
+  const [editResidenceOpen, setEditResidenceOpen] = useState(false)
+  const [deleteResidenceOpen, setDeleteResidenceOpen] = useState(false)
   const [lotDialogOpen, setLotDialogOpen] = useState(false)
   const [editingLot, setEditingLot] = useState<Lot | null>(null)
   const [deletingLot, setDeletingLot] = useState<Lot | null>(null)
@@ -96,12 +120,17 @@ export function ResidencePage() {
   // Immeuble dialog state
   const [immeubleDialogOpen, setImmeubleDialogOpen] = useState(false)
   const [editingImmeuble, setEditingImmeuble] = useState<Immeuble | null>(null)
-  const [deletingImmeuble, setDeletingImmeuble] = useState<Immeuble | null>(null)
-  const [immeubleForm, setImmeubleForm] = useState<ImmeubleForm>(EMPTY_IMMEUBLE_FORM)
+  const [deletingImmeuble, setDeletingImmeuble] = useState<Immeuble | null>(
+    null,
+  )
+  const [immeubleForm, setImmeubleForm] =
+    useState<ImmeubleForm>(EMPTY_IMMEUBLE_FORM)
 
   // Generate lots modal state
   const [generateOpen, setGenerateOpen] = useState(false)
-  const [generateImmeubleId, setGenerateImmeubleId] = useState<number | null>(null)
+  const [generateImmeubleId, setGenerateImmeubleId] = useState<number | null>(
+    null,
+  )
 
   // ── Queries ──────────────────────────────────────────────────────────────
 
@@ -115,6 +144,30 @@ export function ResidencePage() {
     queryKey: ['lots', residenceId],
     queryFn: () => getLots(residenceId),
     enabled: !!residenceId && activeTab === 'lots',
+  })
+
+  // ── Residence Mutations ────────────────────────────────────────────────────
+
+  const updateResidenceMutation = useMutation({
+    mutationFn: (data: CreateResidenceInput) =>
+      updateResidence(residenceId, data),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['residence', residenceId] })
+      void qc.invalidateQueries({ queryKey: ['residences'] })
+      setEditResidenceOpen(false)
+      toast.success(t('gestionnaire.residences.toast.updated'))
+    },
+    onError: () => toast.error(t('gestionnaire.residences.toast.updateError')),
+  })
+
+  const deleteResidenceMutation = useMutation({
+    mutationFn: () => deleteResidence(residenceId),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['residences'] })
+      toast.success(t('gestionnaire.residences.toast.deleted'))
+      navigate('/gestionnaire/residences')
+    },
+    onError: () => toast.error(t('gestionnaire.residences.toast.deleteError')),
   })
 
   const { data: coproprietaires = [], isLoading: loadingCopro } = useQuery({
@@ -183,35 +236,73 @@ export function ResidencePage() {
   const storeImmeubleMutation = useMutation({
     mutationFn: (data: { nom: string }) => storeImmeuble(residenceId, data),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['gestionnaire', 'immeubles', residenceId] })
+      void qc.invalidateQueries({
+        queryKey: ['gestionnaire', 'immeubles', residenceId],
+      })
       setImmeubleDialogOpen(false)
       setImmeubleForm(EMPTY_IMMEUBLE_FORM)
-      toast.success(t('gestionnaire.residence.immeubles.added', { defaultValue: 'Immeuble ajouté' }))
+      toast.success(
+        t('gestionnaire.residence.immeubles.added', {
+          defaultValue: 'Immeuble ajouté',
+        }),
+      )
     },
-    onError: () => toast.error(t('gestionnaire.residence.immeubles.addError', { defaultValue: "Erreur lors de l'ajout de l'immeuble" })),
+    onError: () =>
+      toast.error(
+        t('gestionnaire.residence.immeubles.addError', {
+          defaultValue: "Erreur lors de l'ajout de l'immeuble",
+        }),
+      ),
   })
 
   const updateImmeubleMutation = useMutation({
-    mutationFn: ({ immeubleId, data }: { immeubleId: number; data: { nom: string } }) =>
-      updateImmeuble(residenceId, immeubleId, data),
+    mutationFn: ({
+      immeubleId,
+      data,
+    }: {
+      immeubleId: number
+      data: { nom: string }
+    }) => updateImmeuble(residenceId, immeubleId, data),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['gestionnaire', 'immeubles', residenceId] })
+      void qc.invalidateQueries({
+        queryKey: ['gestionnaire', 'immeubles', residenceId],
+      })
       setImmeubleDialogOpen(false)
       setEditingImmeuble(null)
       setImmeubleForm(EMPTY_IMMEUBLE_FORM)
-      toast.success(t('gestionnaire.residence.immeubles.updated', { defaultValue: 'Immeuble modifié' }))
+      toast.success(
+        t('gestionnaire.residence.immeubles.updated', {
+          defaultValue: 'Immeuble modifié',
+        }),
+      )
     },
-    onError: () => toast.error(t('gestionnaire.residence.immeubles.updateError', { defaultValue: "Erreur lors de la modification de l'immeuble" })),
+    onError: () =>
+      toast.error(
+        t('gestionnaire.residence.immeubles.updateError', {
+          defaultValue: "Erreur lors de la modification de l'immeuble",
+        }),
+      ),
   })
 
   const deleteImmeubleMutation = useMutation({
     mutationFn: (immeubleId: number) => deleteImmeuble(residenceId, immeubleId),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['gestionnaire', 'immeubles', residenceId] })
+      void qc.invalidateQueries({
+        queryKey: ['gestionnaire', 'immeubles', residenceId],
+      })
       setDeletingImmeuble(null)
-      toast.success(t('gestionnaire.residence.immeubles.deleted', { defaultValue: 'Immeuble supprimé' }))
+      toast.success(
+        t('gestionnaire.residence.immeubles.deleted', {
+          defaultValue: 'Immeuble supprimé',
+        }),
+      )
     },
-    onError: () => toast.error(t('gestionnaire.residence.immeubles.deleteError', { defaultValue: "Erreur lors de la suppression de l'immeuble" })),
+    onError: () =>
+      toast.error(
+        t('gestionnaire.residence.immeubles.deleteError', {
+          defaultValue: "Erreur lors de la suppression de l'immeuble",
+        }),
+      ),
   })
 
   // ── Lot Handlers ─────────────────────────────────────────────────────────────
@@ -274,7 +365,10 @@ export function ResidencePage() {
 
   function handleSubmitImmeuble() {
     if (editingImmeuble) {
-      updateImmeubleMutation.mutate({ immeubleId: editingImmeuble.id, data: { nom: immeubleForm.nom } })
+      updateImmeubleMutation.mutate({
+        immeubleId: editingImmeuble.id,
+        data: { nom: immeubleForm.nom },
+      })
     } else {
       storeImmeubleMutation.mutate({ nom: immeubleForm.nom })
     }
@@ -283,12 +377,20 @@ export function ResidencePage() {
   // ── Columns ───────────────────────────────────────────────────────────────────
 
   const lotsColumns: Column<Lot>[] = [
-    { key: 'numero', header: t('gestionnaire.residence.colNumero'), sortable: true },
+    {
+      key: 'numero',
+      header: t('gestionnaire.residence.colNumero'),
+      sortable: true,
+    },
     {
       key: 'immeuble',
-      header: t('gestionnaire.residence.lots.immeuble', { defaultValue: 'Immeuble' }),
+      header: t('gestionnaire.residence.lots.immeuble', {
+        defaultValue: 'Immeuble',
+      }),
       renderCell: (r) => (
-        <span className="text-sm text-muted-foreground">{r.immeuble?.nom ?? '—'}</span>
+        <span className="text-sm text-muted-foreground">
+          {r.immeuble?.nom ?? '—'}
+        </span>
       ),
     },
     {
@@ -296,11 +398,17 @@ export function ResidencePage() {
       header: t('gestionnaire.residence.colType'),
       renderCell: (r) => (
         <span className="capitalize">
-          {t(`gestionnaire.residence.lotTypes.${r.type}`, { defaultValue: r.type })}
+          {t(`gestionnaire.residence.lotTypes.${r.type}`, {
+            defaultValue: r.type,
+          })}
         </span>
       ),
     },
-    { key: 'etage', header: t('gestionnaire.residence.colEtage'), sortable: true },
+    {
+      key: 'etage',
+      header: t('gestionnaire.residence.colEtage'),
+      sortable: true,
+    },
     {
       key: 'superficie',
       header: t('gestionnaire.residence.colSuperficie'),
@@ -312,9 +420,7 @@ export function ResidencePage() {
       key: 'tantieme',
       header: t('gestionnaire.residence.colTantieme'),
       sortable: true,
-      renderCell: (r) => (
-        <span className="tabular-nums">{r.tantieme}</span>
-      ),
+      renderCell: (r) => <span className="tabular-nums">{r.tantieme}</span>,
     },
     {
       key: 'coproprietaire',
@@ -354,7 +460,13 @@ export function ResidencePage() {
     },
   ]
 
-  type CoproRow = { id: number; name: string; phone: string; lot_numero: string; solde: number }
+  type CoproRow = {
+    id: number
+    name: string
+    phone: string
+    lot_numero: string
+    solde: number
+  }
   const coproRows: CoproRow[] = coproprietaires.map((c) => ({
     id: c.id,
     name: c.name,
@@ -371,17 +483,33 @@ export function ResidencePage() {
       key: 'solde',
       header: t('gestionnaire.residence.colSolde'),
       sortable: true,
-      renderCell: (r) => (
-        <MontantDisplay value={r.solde} colorize />
-      ),
+      renderCell: (r) => <MontantDisplay value={r.solde} colorize />,
     },
   ]
 
-  type ExerciceRow = { id: number; annee: number; date_debut: string; date_fin: string; statut: string }
+  type ExerciceRow = {
+    id: number
+    annee: number
+    date_debut: string
+    date_fin: string
+    statut: string
+  }
   const exerciceColumns: Column<ExerciceRow>[] = [
-    { key: 'annee', header: t('gestionnaire.residence.colAnnee'), sortable: true },
-    { key: 'date_debut', header: 'Début', renderCell: (r) => r.date_debut.slice(0, 10) },
-    { key: 'date_fin', header: 'Fin', renderCell: (r) => r.date_fin.slice(0, 10) },
+    {
+      key: 'annee',
+      header: t('gestionnaire.residence.colAnnee'),
+      sortable: true,
+    },
+    {
+      key: 'date_debut',
+      header: 'Début',
+      renderCell: (r) => r.date_debut.slice(0, 10),
+    },
+    {
+      key: 'date_fin',
+      header: 'Fin',
+      renderCell: (r) => r.date_fin.slice(0, 10),
+    },
     {
       key: 'statut',
       header: t('gestionnaire.residence.colStatut'),
@@ -419,10 +547,18 @@ export function ResidencePage() {
   }))
 
   const immeubleColumns: Column<ImmeubleRow>[] = [
-    { key: 'nom', header: t('gestionnaire.residence.immeubles.colNom', { defaultValue: 'Nom' }), sortable: true },
+    {
+      key: 'nom',
+      header: t('gestionnaire.residence.immeubles.colNom', {
+        defaultValue: 'Nom',
+      }),
+      sortable: true,
+    },
     {
       key: 'nb_lots',
-      header: t('gestionnaire.residence.immeubles.colNbLots', { defaultValue: 'Nb lots' }),
+      header: t('gestionnaire.residence.immeubles.colNbLots', {
+        defaultValue: 'Nb lots',
+      }),
       sortable: true,
       renderCell: (r) => <span className="tabular-nums">{r.nb_lots}</span>,
     },
@@ -463,14 +599,28 @@ export function ResidencePage() {
   // ── Render ────────────────────────────────────────────────────────────────────
 
   const TABS: { key: Tab; label: string }[] = [
+    { key: 'overview', label: t('gestionnaire.residence.tabOverview') },
     { key: 'lots', label: t('gestionnaire.residence.tabLots') },
-    { key: 'coproprietaires', label: t('gestionnaire.residence.tabCoproprietaires') },
+    {
+      key: 'coproprietaires',
+      label: t('gestionnaire.residence.tabCoproprietaires'),
+    },
     { key: 'exercices', label: t('gestionnaire.residence.tabExercices') },
-    { key: 'immeubles', label: t('gestionnaire.residence.tabImmeubles', { defaultValue: 'Immeubles' }) },
+    {
+      key: 'immeubles',
+      label: t('gestionnaire.residence.tabImmeubles', {
+        defaultValue: 'Immeubles',
+      }),
+    },
+    {
+      key: 'encaissement',
+      label: t('gestionnaire.residence.tabEncaissement'),
+    },
   ]
 
   const isMutating = storeMutation.isPending || updateMutation.isPending
-  const isImmeublesMutating = storeImmeubleMutation.isPending || updateImmeubleMutation.isPending
+  const isImmeublesMutating =
+    storeImmeubleMutation.isPending || updateImmeubleMutation.isPending
 
   return (
     <div className="p-6">
@@ -483,38 +633,91 @@ export function ResidencePage() {
           { label: residence?.name ?? '…' },
         ]}
         title={loadingResidence ? '…' : (residence?.name ?? '')}
-        subtitle={
-          residence
-            ? `${residence.city} · ${residence.nb_lots} lots`
-            : undefined
-        }
         actions={
-          activeTab === 'lots' ? (
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setGenerateImmeubleId(immeubles[0]?.id ?? null)
-                  setGenerateOpen(true)
-                }}
-              >
-                <Zap className="me-1.5 size-4" />
-                Générer des lots
-              </Button>
-              <Button onClick={openCreate} size="sm">
+          <div className="flex flex-wrap items-center gap-2">
+            {activeTab === 'lots' && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setGenerateImmeubleId(immeubles[0]?.id ?? null)
+                    setGenerateOpen(true)
+                  }}
+                >
+                  <Zap className="me-1.5 size-4" />
+                  {t('gestionnaire.residence.generateLots')}
+                </Button>
+                <Button onClick={openCreate} size="sm">
+                  <Plus className="me-1.5 size-4" />
+                  {t('gestionnaire.residence.addLot')}
+                </Button>
+              </>
+            )}
+            {activeTab === 'immeubles' && (
+              <Button onClick={openCreateImmeuble} size="sm">
                 <Plus className="me-1.5 size-4" />
-                {t('gestionnaire.residence.addLot')}
+                {t('gestionnaire.residence.immeubles.add', {
+                  defaultValue: 'Ajouter un immeuble',
+                })}
               </Button>
-            </div>
-          ) : activeTab === 'immeubles' ? (
-            <Button onClick={openCreateImmeuble} size="sm">
-              <Plus className="me-1.5 size-4" />
-              {t('gestionnaire.residence.immeubles.add', { defaultValue: 'Ajouter un immeuble' })}
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setEditResidenceOpen(true)}
+            >
+              <Pencil className="me-1.5 size-4" />
+              {t('actions.edit')}
             </Button>
-          ) : undefined
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-destructive hover:text-destructive"
+              onClick={() => setDeleteResidenceOpen(true)}
+            >
+              <Trash2 className="me-1.5 size-4" />
+              {t('actions.delete')}
+            </Button>
+          </div>
         }
       />
+
+      {/* Meta chips */}
+      {residence && (
+        <div className="mb-6 flex flex-wrap items-center gap-2 text-sm">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-muted-foreground">
+            <MapPin className="size-3.5" />
+            {residence.city}
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-muted-foreground">
+            <Building2 className="size-3.5" />
+            {t('gestionnaire.residence.lotsCount', {
+              count: residence.nb_lots,
+            })}
+          </span>
+          {residence.jour_echeance != null && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-muted-foreground">
+              <CalendarClock className="size-3.5" />
+              {t('gestionnaire.residence.echeanceChip', {
+                day: residence.jour_echeance,
+              })}
+            </span>
+          )}
+          <span
+            className={cn(
+              'inline-flex items-center gap-1.5 rounded-full px-3 py-1 ring-1 ring-inset',
+              residence.status === 'actif'
+                ? 'bg-green-100 text-green-800 ring-green-600/20'
+                : 'bg-muted text-muted-foreground ring-border',
+            )}
+          >
+            {residence.status === 'actif'
+              ? t('gestionnaire.residences.statusActif')
+              : t('gestionnaire.residences.statusInactif')}
+          </span>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="mb-6 flex gap-1 border-b">
@@ -535,6 +738,17 @@ export function ResidencePage() {
       </div>
 
       {/* Tab content */}
+      {activeTab === 'overview' && residence && (
+        <ResidenceOverviewTab
+          residenceId={residenceId}
+          residence={residence}
+          immeublesCount={immeubles.length}
+          onGoToImmeubles={() => setActiveTab('immeubles')}
+          onGoToLots={() => setActiveTab('lots')}
+          onGoToCoproprietaires={() => setActiveTab('coproprietaires')}
+        />
+      )}
+
       {activeTab === 'lots' && (
         <>
           {lotsData && (
@@ -548,8 +762,12 @@ export function ResidencePage() {
             <div className="flex flex-col items-center gap-4 py-16 text-center">
               <Building2 className="size-12 text-muted-foreground/40" />
               <div>
-                <p className="font-medium text-muted-foreground">Aucun lot dans cet immeuble</p>
-                <p className="text-sm text-muted-foreground/70">Ajoutez des lots un par un ou générez-en plusieurs</p>
+                <p className="font-medium text-muted-foreground">
+                  Aucun lot dans cet immeuble
+                </p>
+                <p className="text-sm text-muted-foreground/70">
+                  Ajoutez des lots un par un ou générez-en plusieurs
+                </p>
               </div>
               <Button
                 onClick={() => {
@@ -604,6 +822,10 @@ export function ResidencePage() {
         />
       )}
 
+      {activeTab === 'encaissement' && (
+        <ResidenceBankAccountsTab residenceId={residenceId} />
+      )}
+
       {/* Lot form dialog */}
       <Dialog open={lotDialogOpen} onOpenChange={setLotDialogOpen}>
         <DialogContent className="max-w-md">
@@ -618,13 +840,24 @@ export function ResidencePage() {
           <div className="space-y-4 py-2">
             {/* Immeuble selector */}
             <div className="flex flex-col gap-1">
-              <Label>{t('gestionnaire.residence.lots.immeuble', { defaultValue: 'Immeuble' })}</Label>
+              <Label>
+                {t('gestionnaire.residence.lots.immeuble', {
+                  defaultValue: 'Immeuble',
+                })}
+              </Label>
               <Select
                 value={form.immeuble_id}
-                onValueChange={(v) => setForm((f) => ({ ...f, immeuble_id: v }))}
+                onValueChange={(v) =>
+                  setForm((f) => ({ ...f, immeuble_id: v }))
+                }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={t('gestionnaire.residence.lots.selectImmeuble', { defaultValue: 'Sélectionner un immeuble' })} />
+                  <SelectValue
+                    placeholder={t(
+                      'gestionnaire.residence.lots.selectImmeuble',
+                      { defaultValue: 'Sélectionner un immeuble' },
+                    )}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {immeubles.map((imm) => (
@@ -641,7 +874,9 @@ export function ResidencePage() {
                 <Label>{t('gestionnaire.residence.colNumero')}</Label>
                 <Input
                   value={form.numero}
-                  onChange={(e) => setForm((f) => ({ ...f, numero: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, numero: e.target.value }))
+                  }
                   placeholder="A-01"
                 />
               </div>
@@ -672,7 +907,9 @@ export function ResidencePage() {
                 <Input
                   type="number"
                   value={form.etage}
-                  onChange={(e) => setForm((f) => ({ ...f, etage: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, etage: e.target.value }))
+                  }
                 />
               </div>
               <div className="space-y-1">
@@ -680,7 +917,9 @@ export function ResidencePage() {
                 <Input
                   type="number"
                   value={form.superficie}
-                  onChange={(e) => setForm((f) => ({ ...f, superficie: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, superficie: e.target.value }))
+                  }
                 />
               </div>
               <div className="space-y-1">
@@ -688,7 +927,9 @@ export function ResidencePage() {
                 <Input
                   type="number"
                   value={form.tantieme}
-                  onChange={(e) => setForm((f) => ({ ...f, tantieme: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, tantieme: e.target.value }))
+                  }
                 />
               </div>
             </div>
@@ -727,18 +968,31 @@ export function ResidencePage() {
           <DialogHeader>
             <DialogTitle>
               {editingImmeuble
-                ? t('gestionnaire.residence.immeubles.edit', { defaultValue: 'Modifier l\'immeuble' })
-                : t('gestionnaire.residence.immeubles.add', { defaultValue: 'Ajouter un immeuble' })}
+                ? t('gestionnaire.residence.immeubles.edit', {
+                    defaultValue: "Modifier l'immeuble",
+                  })
+                : t('gestionnaire.residence.immeubles.add', {
+                    defaultValue: 'Ajouter un immeuble',
+                  })}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
             <div className="space-y-1">
-              <Label>{t('gestionnaire.residence.immeubles.colNom', { defaultValue: 'Nom' })}</Label>
+              <Label>
+                {t('gestionnaire.residence.immeubles.colNom', {
+                  defaultValue: 'Nom',
+                })}
+              </Label>
               <Input
                 value={immeubleForm.nom}
-                onChange={(e) => setImmeubleForm((f) => ({ ...f, nom: e.target.value }))}
-                placeholder={t('gestionnaire.residence.immeubles.nomPlaceholder', { defaultValue: 'ex: Bâtiment A' })}
+                onChange={(e) =>
+                  setImmeubleForm((f) => ({ ...f, nom: e.target.value }))
+                }
+                placeholder={t(
+                  'gestionnaire.residence.immeubles.nomPlaceholder',
+                  { defaultValue: 'ex: Bâtiment A' },
+                )}
               />
             </div>
           </div>
@@ -751,7 +1005,10 @@ export function ResidencePage() {
             >
               {t('actions.cancel')}
             </Button>
-            <Button onClick={handleSubmitImmeuble} disabled={isImmeublesMutating || !immeubleForm.nom.trim()}>
+            <Button
+              onClick={handleSubmitImmeuble}
+              disabled={isImmeublesMutating || !immeubleForm.nom.trim()}
+            >
               {isImmeublesMutating ? t('actions.loading') : t('actions.save')}
             </Button>
           </DialogFooter>
@@ -762,13 +1019,39 @@ export function ResidencePage() {
       <ConfirmModal
         open={!!deletingImmeuble}
         onOpenChange={(open) => !open && setDeletingImmeuble(null)}
-        title={t('gestionnaire.residence.immeubles.delete', { defaultValue: 'Supprimer l\'immeuble' })}
+        title={t('gestionnaire.residence.immeubles.delete', {
+          defaultValue: "Supprimer l'immeuble",
+        })}
         description={t('gestionnaire.residence.immeubles.deleteDesc', {
           nom: deletingImmeuble?.nom ?? '',
           defaultValue: `Supprimer l'immeuble "${deletingImmeuble?.nom ?? ''}" ?`,
         })}
-        onConfirm={() => deletingImmeuble && deleteImmeubleMutation.mutate(deletingImmeuble.id)}
+        onConfirm={() =>
+          deletingImmeuble && deleteImmeubleMutation.mutate(deletingImmeuble.id)
+        }
         isLoading={deleteImmeubleMutation.isPending}
+      />
+
+      {/* Residence edit dialog */}
+      <ResidenceFormDialog
+        open={editResidenceOpen}
+        onOpenChange={setEditResidenceOpen}
+        residence={residence}
+        onSubmit={(data) => updateResidenceMutation.mutate(data)}
+        isLoading={updateResidenceMutation.isPending}
+      />
+
+      {/* Delete residence confirmation */}
+      <ConfirmModal
+        open={deleteResidenceOpen}
+        onOpenChange={setDeleteResidenceOpen}
+        title={t('gestionnaire.residences.deleteTitle')}
+        description={t('gestionnaire.residences.deleteDesc', {
+          name: residence?.name ?? '',
+        })}
+        variant="destructive"
+        onConfirm={() => deleteResidenceMutation.mutate()}
+        isLoading={deleteResidenceMutation.isPending}
       />
 
       {/* Generate lots modal */}
@@ -778,7 +1061,9 @@ export function ResidencePage() {
           onOpenChange={setGenerateOpen}
           residenceId={residenceId}
           immeubleId={generateImmeubleId}
-          immeubleName={immeubles.find((i) => i.id === generateImmeubleId)?.nom ?? ''}
+          immeubleName={
+            immeubles.find((i) => i.id === generateImmeubleId)?.nom ?? ''
+          }
           onSuccess={(count) => {
             void qc.invalidateQueries({ queryKey: ['lots', residenceId] })
             toast.success(`${count} lots créés avec succès`)

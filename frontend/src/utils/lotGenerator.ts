@@ -10,8 +10,8 @@ export type LotTemplate =
 
 export interface GeneratedLot {
   numero: string
-  etage: number   // 0 if not floor-based
-  type: string    // default 'appartement'
+  etage: number // 0 if not floor-based
+  type: string // default 'appartement'
   tantieme: number // default 1
 }
 
@@ -89,7 +89,9 @@ export type LotConfig =
 
 // ─── Generators ──────────────────────────────────────────────────────────────
 
-function generateSimpleSequential(config: SimpleSequentialConfig): GeneratedLot[] {
+function generateSimpleSequential(
+  config: SimpleSequentialConfig,
+): GeneratedLot[] {
   const lots: GeneratedLot[] = []
   for (let i = 0; i < config.totalLots; i++) {
     lots.push({
@@ -111,7 +113,12 @@ function generateWingsFloors(config: WingsFloorsConfig): GeneratedLot[] {
       for (let unitIdx = 0; unitIdx < config.unitsPerFloor; unitIdx++) {
         const unitNum = config.startingNumber + unitIdx
         const numero = `${wing}${floorLabel}${String(unitNum).padStart(2, '0')}`
-        lots.push({ numero, etage, type: config.type, tantieme: config.tantieme })
+        lots.push({
+          numero,
+          etage,
+          type: config.type,
+          tantieme: config.tantieme,
+        })
       }
     }
   }
@@ -140,12 +147,19 @@ function generateVillaTownhouse(config: VillaTownhouseConfig): GeneratedLot[] {
       config.phase.trim() !== ''
         ? `${config.phase.trim()}-${config.prefix} ${n}`
         : `${config.prefix} ${n}`
-    lots.push({ numero, etage: 0, type: config.type, tantieme: config.tantieme })
+    lots.push({
+      numero,
+      etage: 0,
+      type: config.type,
+      tantieme: config.tantieme,
+    })
   }
   return lots
 }
 
-function generateResidenceEnsemble(config: ResidenceEnsembleConfig): GeneratedLot[] {
+function generateResidenceEnsemble(
+  config: ResidenceEnsembleConfig,
+): GeneratedLot[] {
   const lots: GeneratedLot[] = []
   for (const entrance of config.entrances) {
     if (entrance.count <= 0) continue
@@ -163,15 +177,15 @@ function generateResidenceEnsemble(config: ResidenceEnsembleConfig): GeneratedLo
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-function generateCommercialMixed(config: CommercialMixedConfig): GeneratedLot[] {
+function generateCommercialMixed(
+  config: CommercialMixedConfig,
+): GeneratedLot[] {
   const lots: GeneratedLot[] = []
   for (const unitType of config.unitTypes) {
     if (unitType.count <= 0) continue
     for (let i = 0; i < unitType.count; i++) {
       const suffix =
-        unitType.count <= 26
-          ? LETTERS[i] ?? String(i + 1)
-          : String(i + 1)
+        unitType.count <= 26 ? (LETTERS[i] ?? String(i + 1)) : String(i + 1)
       lots.push({
         numero: `${unitType.label} ${suffix}`,
         etage: 0,
@@ -207,7 +221,11 @@ export function countLots(config: LotConfig): number {
     case 'simple_sequential':
       return Math.max(0, config.totalLots)
     case 'wings_floors':
-      return config.wings.length * Math.max(0, config.floors) * Math.max(0, config.unitsPerFloor)
+      return (
+        config.wings.length *
+        Math.max(0, config.floors) *
+        Math.max(0, config.unitsPerFloor)
+      )
     case 'floor_based':
       return Math.max(0, config.floors) * Math.max(0, config.unitsPerFloor)
     case 'villa_townhouse':
