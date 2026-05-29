@@ -534,120 +534,141 @@
       }
     }
   },
-  "manager": {
-    "workspace": "فضاء المدير",
+  "equipe": {
     "optional": "اختياري",
-    "nav": {
-      "dashboard": "لوحة التحكم",
-      "residences": "الإقامات",
-      "gestionnaires": "المسيّرون",
-      "userMenu": "قائمة المستخدم",
-      "openMenu": "فتح القائمة",
-      "workspace": "فضائي",
-      "logout": "تسجيل الخروج"
-    },
+    "statusActive": "نشط",
+    "statusInactive": "غير نشط",
     "actions": {
       "menu": "خيارات أخرى",
       "edit": "تعديل",
       "delete": "حذف"
     },
-    "dashboard": {
-      "greeting": {
-        "morning": "صباح الخير",
-        "morningWithName": "صباح الخير، {{name}}",
-        "afternoon": "مساء الخير",
-        "afternoonWithName": "مساء الخير، {{name}}",
-        "evening": "مساء الخير",
-        "eveningWithName": "مساء الخير، {{name}}"
-      },
-      "subtitle": "نظرة عامة على مكتبك",
-      "kpi": {
-        "residences": "الإقامات",
-        "gestionnaires": "المسيّرون",
-        "encaissements": "المداخيل",
-        "depenses": "المصاريف",
-        "solde": "الرصيد"
-      },
-      "soldeGlobal": "الرصيد العام",
-      "soldePositif": "مكتبك في فائض للفترة الحالية.",
-      "soldeNegatif": "الرصيد العام سلبي — يُنصح بالحذر."
+    "permissions": {
+      "residences": "الإقامات",
+      "coproprietaires": "الملاك",
+      "finances": "المالية والمدفوعات",
+      "depenses": "المصاريف",
+      "recouvrement": "التحصيل",
+      "assemblees": "الجمعيات",
+      "documents": "الوثائق",
+      "personnel": "الموظفون",
+      "parametres": "الإعدادات"
     },
-    "residences": {
-      "title": "الإقامات",
-      "subtitle": "جميع الملكيات المشتركة للمكتب",
-      "add": "إقامة جديدة",
-      "searchPlaceholder": "البحث عن إقامة…",
-      "empty": "لا توجد إقامات",
-      "emptyDesc": "أنشئ أول إقامة لإدارتها في Imaro.",
-      "createTitle": "إقامة جديدة",
-      "editTitle": "تعديل الإقامة",
-      "formDesc": "املأ المعلومات الرئيسية وعيّن مسيّرًا.",
-      "deleteTitle": "حذف الإقامة ؟",
-      "deleteDesc": "هذا الإجراء لا رجعة فيه. الإقامة",
-      "assignTitle": "تعيين مسيّر",
-      "pickGestionnaire": "اختر مسيّرًا نشطًا",
-      "unassigned": "غير معيّنة",
-      "residences": "إقامات",
-      "col": {
-        "name": "الاسم",
-        "city": "العنوان",
-        "lots": "الوحدات / الملاك",
+    "staffPerm": {
+      "acces_residence": "الدخول إلى الإقامة",
+      "gestion_visiteurs": "إدارة الزوار",
+      "pointage": "تسجيل الحضور",
+      "incidents": "الإبلاغ عن الحوادث",
+      "cles": "إدارة المفاتيح",
+      "livraisons": "استلام الطرود"
+    },
+    "utilisateurs": {
+      "title": "المستخدمون",
+      "subtitle": "الأعضاء الذين يديرون التطبيق: السنديك، المحاسب، المسيّر…",
+      "add": "مستخدم جديد",
+      "searchPlaceholder": "البحث عن مستخدم…",
+      "empty": "لا يوجد مستخدمون",
+      "emptyDesc": "أضف الأعضاء الذين يشغّلون Imaro مع صلاحياتهم.",
+      "createTitle": "مستخدم جديد",
+      "editTitle": "تعديل المستخدم",
+      "formDesc": "أدخل البريد الإلكتروني، أنشئ كلمة مرور وامنح الصلاحيات.",
+      "deleteTitle": "حذف المستخدم ؟",
+      "deleteDesc": "هذا الإجراء لا رجعة فيه. المستخدم",
+      "toggleAria": "تفعيل أو تعطيل المستخدم",
+      "allAccess": "وصول كامل",
+      "nbPermissions": "{{count}} صلاحية",
+      "nbPermissions_other": "{{count}} صلاحيات",
+      "allResidences": "الكل",
+      "nbResidences": "{{count}} ملكية مشتركة",
+      "nbResidences_other": "{{count}} ملكيات مشتركة",
+      "role": {
+        "administrateur": "مدير النظام",
         "gestionnaire": "المسيّر",
-        "status": "الحالة"
+        "assistant": "مساعد",
+        "comptable": "المحاسب"
       },
-      "form": {
-        "name": "اسم الإقامة",
-        "namePh": "إقامة أطلس",
-        "address": "العنوان",
-        "addressPh": "12 شارع البرتقال",
-        "city": "المدينة",
-        "cityPh": "الدار البيضاء",
-        "gestionnaire": "المسيّر المعيّن"
-      },
-      "actions": {
-        "assign": "تعيين مسيّر"
-      },
-      "toast": {
-        "created": "تم إنشاء الإقامة",
-        "createFailed": "فشل الإنشاء",
-        "updated": "تم تحديث الإقامة",
-        "updateFailed": "فشل التحديث",
-        "deleted": "تم حذف الإقامة",
-        "deleteFailed": "فشل الحذف",
-        "assigned": "تم تعيين المسيّر",
-        "assignFailed": "فشل التعيين"
-      }
-    },
-    "gestionnaires": {
-      "title": "المسيّرون",
-      "subtitle": "الفريق الذي يدير ممتلكاتك",
-      "add": "مسيّر جديد",
-      "searchPlaceholder": "البحث عن مسيّر…",
-      "empty": "لا يوجد مسيّرون",
-      "emptyDesc": "ادعُ أول مسيّر للبدء.",
-      "createTitle": "مسيّر جديد",
-      "editTitle": "تعديل المسيّر",
-      "formDesc": "يتصل المسيّرون عبر البريد الإلكتروني + OTP واتساب.",
-      "statusActive": "نشط",
-      "statusInactive": "غير نشط",
-      "toggleAria": "تفعيل أو تعطيل المسيّر",
       "col": {
-        "name": "الاسم",
-        "contact": "الاتصال",
-        "residences": "الإقامات",
+        "name": "المستخدم",
+        "role": "الدور",
+        "residences": "الملكيات المشتركة",
+        "permissions": "الصلاحيات",
         "status": "الحالة"
       },
       "form": {
         "name": "الاسم الكامل",
         "namePh": "حسن العلوي",
         "email": "البريد الإلكتروني",
-        "phone": "رقم واتساب"
+        "role": "الدور",
+        "password": "كلمة المرور",
+        "resetPassword": "إعادة تعيين كلمة المرور",
+        "passwordKeep": "اتركه فارغًا للإبقاء على الحالي",
+        "passwordHint": "تم إنشاء كلمة المرور تلقائيًا — أرسلها إلى المستخدم.",
+        "regenerate": "إعادة الإنشاء",
+        "copy": "نسخ",
+        "residences": "الملكيات المشتركة المُدارة",
+        "residencesHint": "بدون تحديد = جميع الملكيات المشتركة.",
+        "noResidences": "لا توجد ملكية مشتركة متاحة.",
+        "permissions": "الصلاحيات الممنوحة"
       },
       "toast": {
-        "created": "تم إنشاء المسيّر",
+        "created": "تم إنشاء المستخدم",
         "createFailed": "فشل الإنشاء",
-        "updated": "تم تحديث المسيّر",
+        "updated": "تم تحديث المستخدم",
         "updateFailed": "فشل التحديث",
+        "deleted": "تم حذف المستخدم",
+        "deleteFailed": "فشل الحذف",
+        "toggled": "تم تحديث الحالة",
+        "toggleFailed": "فشل تغيير الحالة",
+        "copyFailed": "تعذّر النسخ"
+      }
+    },
+    "personnel": {
+      "title": "الموظفون",
+      "subtitle": "موظفو الميدان المعيّنون في الإقامات: الأمن، النظافة، الحراسة…",
+      "add": "موظف جديد",
+      "searchPlaceholder": "البحث عن موظف…",
+      "empty": "لا يوجد موظفون",
+      "emptyDesc": "أضف موظفي الميدان وعيّنهم لإقامة.",
+      "createTitle": "موظف جديد",
+      "editTitle": "تعديل الموظف",
+      "formDesc": "عيّن الموظف لإقامة وامنحه صلاحياته.",
+      "deleteTitle": "حذف هذا الموظف ؟",
+      "deleteDesc": "هذا الإجراء لا رجعة فيه. الموظف",
+      "toggleAria": "تفعيل أو تعطيل الموظف",
+      "nbPermissions": "{{count}} صلاحية",
+      "nbPermissions_other": "{{count}} صلاحيات",
+      "poste": {
+        "securite": "عون أمن",
+        "menage": "عاملة نظافة",
+        "gardien": "حارس",
+        "jardinier": "بستاني",
+        "technicien": "تقني",
+        "concierge": "بواب"
+      },
+      "col": {
+        "name": "الاسم",
+        "poste": "المنصب",
+        "residence": "الإقامة",
+        "contact": "الاتصال",
+        "permissions": "الصلاحيات",
+        "status": "الحالة"
+      },
+      "form": {
+        "name": "الاسم الكامل",
+        "namePh": "محمد وهبي",
+        "poste": "المنصب",
+        "residence": "الإقامة المعيّنة",
+        "residencePh": "اختر إقامة",
+        "phone": "الهاتف",
+        "permissions": "الصلاحيات الممنوحة"
+      },
+      "toast": {
+        "created": "تمت إضافة الموظف",
+        "createFailed": "فشل الإضافة",
+        "updated": "تم تحديث الموظف",
+        "updateFailed": "فشل التحديث",
+        "deleted": "تم حذف الموظف",
+        "deleteFailed": "فشل الحذف",
         "toggled": "تم تحديث الحالة",
         "toggleFailed": "فشل تغيير الحالة"
       }
@@ -700,7 +721,10 @@
       "sectionConformite": "الامتثال",
       "conformite": "تقويم الامتثال",
       "annexes": "الملاحق المحاسبية",
-      "audit": "سجل التدقيق"
+      "audit": "سجل التدقيق",
+      "sectionAdministration": "الإدارة",
+      "utilisateurs": "المستخدمون",
+      "personnel": "الموظفون"
     },
     "residences": {
       "title": "الإقامات",

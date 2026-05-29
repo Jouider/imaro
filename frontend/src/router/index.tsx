@@ -37,11 +37,8 @@ import { TravauxExceptionnelsPage } from '@/pages/gestionnaire/TravauxExceptionn
 import { AutresRecettesPage } from '@/pages/gestionnaire/AutresRecettesPage'
 import { RemboursementsPage } from '@/pages/gestionnaire/RemboursementsPage'
 import { IaAssistantPage } from '@/pages/gestionnaire/IaAssistantPage'
-import { ManagerGuard } from './ManagerGuard'
-import { ManagerLayout } from '@/pages/manager/ManagerLayout'
-import { ManagerDashboardPage } from '@/pages/manager/ManagerDashboardPage'
-import { ManagerResidencesPage } from '@/pages/manager/ManagerResidencesPage'
-import { ManagerGestionnairesPage } from '@/pages/manager/ManagerGestionnairesPage'
+import { UtilisateursPage } from '@/pages/gestionnaire/UtilisateursPage'
+import { PersonnelPage } from '@/pages/gestionnaire/PersonnelPage'
 
 export const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
@@ -109,23 +106,27 @@ export const router = createBrowserRouter([
       { path: 'conformite', element: <ConformitePage /> },
       { path: 'annexes', element: <AnnexesPage /> },
       { path: 'audit', element: <AuditTrailPage /> },
+      { path: 'utilisateurs', element: <UtilisateursPage /> },
+      { path: 'personnel', element: <PersonnelPage /> },
       { path: 'profil', element: <ProfilPage /> },
     ],
   },
 
-  // ── Espace Manager (admin du tenant) ────────────────────
+  // ── Anciennes routes /manager → fusionnées dans /gestionnaire ──
   {
     path: '/manager',
-    element: (
-      <ManagerGuard>
-        <ManagerLayout />
-      </ManagerGuard>
-    ),
-    children: [
-      { index: true, element: <Navigate to="/manager/dashboard" replace /> },
-      { path: 'dashboard', element: <ManagerDashboardPage /> },
-      { path: 'residences', element: <ManagerResidencesPage /> },
-      { path: 'gestionnaires', element: <ManagerGestionnairesPage /> },
-    ],
+    element: <Navigate to="/gestionnaire/dashboard" replace />,
+  },
+  {
+    path: '/manager/gestionnaires',
+    element: <Navigate to="/gestionnaire/utilisateurs" replace />,
+  },
+  {
+    path: '/manager/residences',
+    element: <Navigate to="/gestionnaire/residences" replace />,
+  },
+  {
+    path: '/manager/dashboard',
+    element: <Navigate to="/gestionnaire/dashboard" replace />,
   },
 ])
