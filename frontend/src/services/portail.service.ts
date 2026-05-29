@@ -1,4 +1,5 @@
 import { api, type ApiEnvelope } from '@/lib/axios'
+import type { BankAccount } from '@/services/gestionnaire.service'
 
 async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
   if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS)
@@ -412,4 +413,73 @@ export async function getPortailDocuments(): Promise<PortailDocument[]> {
       )
     return res.data.data.documents
   }, MOCK_PORTAIL_DOCUMENTS)
+}
+
+// ─── Portail Paiement (déclaration de virement) ────────────────────────────────
+
+/** Comptes bancaires de la résidence du copropriétaire connecté. */
+export type PortailBankAccount = Pick<
+  BankAccount,
+  'id' | 'banque' | 'titulaire' | 'rib' | 'iban' | 'is_primary'
+>
+
+export type PaiementMethode = 'virement' | 'versement' | 'cheque' | 'especes'
+
+export type DeclarePaiementInput = {
+  montant: number
+  date: string
+  methode: PaiementMethode
+  reference?: string
+  justificatif?: File
+}
+
+const MOCK_PORTAIL_BANK_ACCOUNTS: PortailBankAccount[] = [
+  {
+    id: 1,
+    banque: 'attijariwafa',
+    titulaire: 'Syndic Résidence Al Blanca',
+    rib: '007 780 0001234567890123 45',
+    iban: 'MA64 0077 8000 0123 4567 8901 2345',
+    is_primary: true,
+  },
+  {
+    id: 2,
+    banque: 'cih',
+    titulaire: 'Syndic Résidence Al Blanca',
+    rib: '230 810 0009876543210987 65',
+    is_primary: false,
+  },
+]
+
+/** Comptes sur lesquels le copropriétaire peut régler sa cotisation. */
+export async function getMyResidenceBankAccounts(): Promise<
+  PortailBankAccount[]
+> {
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<{ comptes: PortailBankAccount[] }>>(
+      '/portail/comptes-bancaires',
+    )
+    return res.data.data.comptes
+  }, MOCK_PORTAIL_BANK_ACCOUNTS)
+}
+
+/**
+ * Déclare un paiement effectué (virement, versement…) avec justificatif.
+ * Crée un virement « en attente » côté gestionnaire (cf. paiements.service).
+ */
+export async function declarePaiement(
+  data: DeclarePaiementInput,
+): Promise<void> {
+  const fd = new FormData()
+  fd.append('montant', String(data.montant))
+  fd.append('date', data.date)
+  fd.append('methode', data.methode)
+  if (data.reference) fd.append('reference', data.reference)
+  if (data.justificatif) fd.append('justificatif', data.justificatif)
+
+  await withMock(async () => {
+    await api.post('/portail/paiements', fd, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  }, undefined)
 }

@@ -47,6 +47,8 @@ export type Encaissement = {
   est_rapproche: boolean
 }
 
+export type VirementMethode = 'virement' | 'versement' | 'cheque' | 'especes'
+
 export type VirementDeclare = {
   id: number
   coproprietaire_id: number
@@ -54,6 +56,8 @@ export type VirementDeclare = {
   lot_numero: string
   montant: number
   date_declaration: string
+  /** Méthode déclarée par le copropriétaire. */
+  methode: VirementMethode
   reference: string
   justificatif_path: string | null
   statut: 'en_attente' | 'valide' | 'rejete'
@@ -312,8 +316,10 @@ const MOCK_VIREMENTS: VirementDeclare[] = [
     lot_numero: 'B-01',
     montant: 650,
     date_declaration: '2026-05-10',
+    methode: 'virement',
     reference: 'VIR-MAR-2026-0441',
-    justificatif_path: 'virement-khalid.pdf',
+    justificatif_path:
+      'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800',
     statut: 'en_attente',
     valide_par: null,
     date_validation: null,
@@ -325,6 +331,7 @@ const MOCK_VIREMENTS: VirementDeclare[] = [
     lot_numero: 'B-02',
     montant: 580,
     date_declaration: '2026-05-05',
+    methode: 'versement',
     reference: 'VIR-ATW-2026-0089',
     justificatif_path: 'virement-zineb.pdf',
     statut: 'valide',
@@ -338,6 +345,7 @@ const MOCK_VIREMENTS: VirementDeclare[] = [
     lot_numero: 'B-03',
     montant: 650,
     date_declaration: '2026-04-28',
+    methode: 'cheque',
     reference: 'VIR-BCP-2026-1203',
     justificatif_path: null,
     statut: 'rejete',

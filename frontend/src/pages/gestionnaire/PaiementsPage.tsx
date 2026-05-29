@@ -9,6 +9,7 @@ import {
   CheckCircle,
   X,
   Download,
+  Eye,
   FileText,
   ChevronDown,
   ChevronUp,
@@ -94,6 +95,97 @@ const VIREMENT_STATUT_CLS: Record<string, string> = {
   en_attente: 'bg-yellow-100 text-yellow-800',
   valide: 'bg-green-100 text-green-800',
   rejete: 'bg-red-100 text-red-800',
+}
+
+const VIREMENT_METHODE_CLS: Record<string, string> = {
+  virement: 'bg-blue-100 text-blue-800',
+  versement: 'bg-cyan-100 text-cyan-800',
+  cheque: 'bg-purple-100 text-purple-800',
+  especes: 'bg-green-100 text-green-800',
+}
+
+// ─── Justificatif preview modal ──────────────────────────────────────────────
+
+function detectVirementFileType(url: string): 'pdf' | 'image' | 'other' {
+  const clean = url.toLowerCase().split('?')[0]
+  if (clean.endsWith('.pdf')) return 'pdf'
+  if (/\.(jpg|jpeg|png|webp|gif|svg)$/.test(clean)) return 'image'
+  // Unsplash & co. servent des images sans extension → on tente l'image.
+  if (clean.startsWith('http')) return 'image'
+  return 'other'
+}
+
+function JustificatifModal({
+  virement,
+  onClose,
+}: {
+  virement: VirementDeclare | null
+  onClose: () => void
+}) {
+  const { t } = useTranslation()
+  const url = virement?.justificatif_path ?? ''
+  const fileType = url ? detectVirementFileType(url) : 'other'
+
+  return (
+    <Dialog open={!!virement} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-lg overflow-hidden rounded-2xl p-0">
+        <DialogHeader className="flex-row items-start justify-between gap-2 border-b px-4 pb-3 pt-4">
+          <div className="min-w-0">
+            <DialogTitle className="truncate text-sm font-semibold">
+              {t('gestionnaire.paiements.virements.justificatif', {
+                defaultValue: 'Justificatif',
+              })}
+            </DialogTitle>
+            {virement && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {virement.coproprietaire_nom} · {virement.lot_numero} ·{' '}
+                {virement.reference}
+              </p>
+            )}
+          </div>
+        </DialogHeader>
+
+        <div className="flex min-h-48 items-center justify-center bg-muted/30">
+          {fileType === 'pdf' && (
+            <iframe src={url} title="justificatif" className="h-72 w-full" />
+          )}
+          {fileType === 'image' && (
+            <img
+              src={url}
+              alt="justificatif"
+              className="max-h-72 w-full object-contain"
+            />
+          )}
+          {fileType === 'other' && (
+            <div className="flex flex-col items-center gap-3 py-10 text-muted-foreground">
+              <FileText className="size-16 opacity-30" />
+              <p className="text-sm">
+                {t('gestionnaire.paiements.virements.previewUnavailable', {
+                  defaultValue: 'Aperçu non disponible',
+                })}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end gap-2 border-t px-4 py-3">
+          <Button variant="outline" size="sm" onClick={onClose}>
+            {t('actions.close', { defaultValue: 'Fermer' })}
+          </Button>
+          {url && (
+            <Button size="sm" asChild>
+              <a href={url} target="_blank" rel="noopener noreferrer">
+                <Download className="me-1.5 size-4" />
+                {t('gestionnaire.paiements.virements.openProof', {
+                  defaultValue: 'Ouvrir',
+                })}
+              </a>
+            </Button>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
 }
 
 // ─── Small list of coproprietaires for avance modal ──────────────────────────
@@ -681,6 +773,8 @@ export function PaiementsPage() {
   const [avanceOpen, setAvanceOpen] = useState(false)
   const [rejeterVirementTarget, setRejeterVirementTarget] =
     useState<VirementDeclare | null>(null)
+  const [justificatifTarget, setJustificatifTarget] =
+    useState<VirementDeclare | null>(null)
   const [relancerAllOpen, setRelancerAllOpen] = useState(false)
 
   // Créances tab filters
@@ -1161,6 +1255,24 @@ export function PaiementsPage() {
       renderCell: (r) => <MontantDisplay value={r.montant} />,
     },
     {
+      key: 'methode',
+      header: t('gestionnaire.paiements.virements.methode', {
+        defaultValue: 'Méthode',
+      }),
+      renderCell: (r) => (
+        <Badge
+          className={cn(
+            VIREMENT_METHODE_CLS[r.methode] ?? 'bg-gray-100 text-gray-700',
+            'border-0 text-xs',
+          )}
+        >
+          {t(`gestionnaire.paiements.virements.methodes.${r.methode}`, {
+            defaultValue: r.methode,
+          })}
+        </Badge>
+      ),
+    },
+    {
       key: 'reference',
       header: 'Référence',
       renderCell: (r) => (
@@ -1172,8 +1284,16 @@ export function PaiementsPage() {
       header: 'Justificatif',
       renderCell: (r) =>
         r.justificatif_path ? (
-          <Button variant="ghost" size="sm" className="h-6 px-2">
-            <FileText className="size-3.5" />
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 gap-1 px-2 text-[var(--color-imaro-primary)]"
+            onClick={() => setJustificatifTarget(r)}
+          >
+            <Eye className="size-3.5" />
+            {t('gestionnaire.paiements.virements.voir', {
+              defaultValue: 'Voir',
+            })}
           </Button>
         ) : (
           <span className="text-muted-foreground">—</span>
@@ -1228,7 +1348,11 @@ export function PaiementsPage() {
 
   // ── Tabs definition ────────────────────────────────────────────────────────
 
-  const TABS: { key: Tab; label: string }[] = [
+  const pendingVirements = virements.filter(
+    (v) => v.statut === 'en_attente',
+  ).length
+
+  const TABS: { key: Tab; label: string; badge?: number }[] = [
     {
       key: 'creances',
       label: t('gestionnaire.paiements.tabs.creances', {
@@ -1258,6 +1382,7 @@ export function PaiementsPage() {
       label: t('gestionnaire.paiements.tabs.virements', {
         defaultValue: 'Virements',
       }),
+      badge: pendingVirements,
     },
   ]
 
@@ -1317,13 +1442,18 @@ export function PaiementsPage() {
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={cn(
-              'px-4 py-2 text-sm font-medium transition-colors',
+              'flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors',
               activeTab === tab.key
                 ? 'border-b-2 border-[var(--color-imaro-primary)] text-[var(--color-imaro-primary)]'
                 : 'text-muted-foreground hover:text-foreground',
             )}
           >
             {tab.label}
+            {tab.badge != null && tab.badge > 0 && (
+              <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-[var(--color-imaro-danger)] px-1.5 py-0.5 text-xs font-semibold leading-none text-white">
+                {tab.badge}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -1738,6 +1868,11 @@ export function PaiementsPage() {
           })
         }
         isLoading={rejeterVirementMutation.isPending}
+      />
+
+      <JustificatifModal
+        virement={justificatifTarget}
+        onClose={() => setJustificatifTarget(null)}
       />
 
       <ConfirmModal

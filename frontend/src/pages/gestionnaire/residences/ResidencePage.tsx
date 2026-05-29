@@ -34,6 +34,7 @@ import {
   type Immeuble,
 } from '@/services/gestionnaire.service'
 import { ResidenceOverviewTab } from '@/components/gestionnaire/ResidenceOverviewTab'
+import { ResidenceBankAccountsTab } from '@/components/gestionnaire/ResidenceBankAccountsTab'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { MontantDisplay } from '@/components/shared/MontantDisplay'
@@ -58,7 +59,13 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 
-type Tab = 'overview' | 'lots' | 'coproprietaires' | 'exercices' | 'immeubles'
+type Tab =
+  | 'overview'
+  | 'lots'
+  | 'coproprietaires'
+  | 'exercices'
+  | 'immeubles'
+  | 'encaissement'
 
 const LOT_TYPES = [
   'appartement',
@@ -605,6 +612,10 @@ export function ResidencePage() {
         defaultValue: 'Immeubles',
       }),
     },
+    {
+      key: 'encaissement',
+      label: t('gestionnaire.residence.tabEncaissement'),
+    },
   ]
 
   const isMutating = storeMutation.isPending || updateMutation.isPending
@@ -809,6 +820,10 @@ export function ResidencePage() {
           isLoading={immeublesQuery.isLoading}
           searchable
         />
+      )}
+
+      {activeTab === 'encaissement' && (
+        <ResidenceBankAccountsTab residenceId={residenceId} />
       )}
 
       {/* Lot form dialog */}

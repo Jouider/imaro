@@ -39,7 +39,9 @@
     "edit": "Modifier",
     "add": "Ajouter",
     "save": "Enregistrer",
-    "close": "Fermer"
+    "close": "Fermer",
+    "show": "Afficher",
+    "hide": "Masquer"
   },
   "portail": {
     "nav": {
@@ -126,6 +128,41 @@
         "groupPvAg": "PV Assemblées",
         "groupContratFacture": "Contrats / Factures",
         "groupAutre": "Autres documents"
+      },
+      "pay": "Payer ma cotisation",
+      "amountDue": "Solde à régler"
+    },
+    "paiement": {
+      "howTitle": "Comment payer",
+      "declareTitle": "Déclarer mon paiement",
+      "howIntro": "Effectuez un virement ou un versement vers l'un des comptes du syndic, puis déclarez votre paiement avec un justificatif.",
+      "noAccounts": "Aucun compte bancaire n'est encore configuré pour votre résidence. Contactez votre syndic.",
+      "recommended": "Recommandé",
+      "copyRib": "Copier le RIB",
+      "ribCopied": "RIB copié",
+      "copyError": "Impossible de copier le RIB",
+      "showQr": "Afficher le QR de paiement",
+      "qrHint": "Scannez ce code avec votre application bancaire pour pré-remplir le virement.",
+      "instructions": "Après votre virement, déclarez le paiement ci-dessous et joignez la capture d'écran ou le relevé. Votre syndic le rapprochera de son relevé bancaire.",
+      "iPaid": "J'ai effectué le paiement",
+      "backToHow": "Revenir aux coordonnées",
+      "montant": "Montant payé (DH)",
+      "date": "Date du paiement",
+      "methode": "Méthode de paiement",
+      "methodes": {
+        "virement": "Virement bancaire",
+        "versement": "Versement en agence",
+        "cheque": "Chèque",
+        "especes": "Espèces"
+      },
+      "reference": "Référence (optionnel)",
+      "referencePlaceholder": "Réf. du virement, n° de bordereau…",
+      "justificatif": "Justificatif (capture / relevé)",
+      "justificatifHint": "Ajouter une photo ou un PDF",
+      "submit": "Déclarer le paiement",
+      "toast": {
+        "declared": "Paiement déclaré. Votre syndic va le vérifier.",
+        "error": "Une erreur est survenue. Réessayez."
       }
     },
     "reclamations": {
@@ -658,6 +695,15 @@
     }
   },
   "gestionnaire": {
+    "pointage": {
+      "title": "Pointage bancaire",
+      "subtitle": "Rapprochement automatique du relevé bancaire avec vos paiements et dépenses",
+      "declaredBadge": "Déclaré par résident",
+      "matchConfirmed": "Rapprochement confirmé",
+      "declaredConfirmed": "Paiement du résident validé — argent confirmé reçu",
+      "declaredError": "Impossible de valider le paiement déclaré",
+      "allConfirmed": "{{count}} rapprochements confirmés"
+    },
     "cmdk": {
       "title": "Recherche rapide",
       "description": "Tapez pour rechercher une page, lancer une action ou retrouver un copropriétaire",
@@ -760,6 +806,39 @@
       "tabCoproprietaires": "Copropriétaires",
       "tabExercices": "Exercices",
       "tabImmeubles": "Immeubles",
+      "tabEncaissement": "Encaissement",
+      "encaissement": {
+        "intro": "Les comptes bancaires sur lesquels les copropriétaires règlent leurs cotisations.",
+        "add": "Ajouter un compte",
+        "emptyTitle": "Aucun compte bancaire",
+        "emptyDesc": "Ajoutez un compte pour permettre aux copropriétaires de payer par virement.",
+        "primaryBadge": "Principal",
+        "setPrimary": "Définir principal",
+        "showQr": "Afficher le QR de paiement",
+        "copy": "Copier le RIB",
+        "copied": "RIB copié",
+        "copyError": "Impossible de copier le RIB",
+        "createTitle": "Ajouter un compte bancaire",
+        "editTitle": "Modifier le compte bancaire",
+        "subtitle": "Renseignez les coordonnées bancaires de la copropriété.",
+        "banque": "Banque",
+        "titulaire": "Titulaire du compte",
+        "titulairePlaceholder": "Syndic Résidence Al Andalous",
+        "rib": "RIB (24 chiffres)",
+        "iban": "IBAN (optionnel)",
+        "isPrimary": "Compte principal pour les encaissements",
+        "createSubmit": "Ajouter le compte",
+        "qrTitle": "QR de paiement",
+        "deleteTitle": "Supprimer le compte",
+        "deleteDesc": "Supprimer le compte {{banque}} ? Cette action est irréversible.",
+        "toast": {
+          "created": "Compte bancaire ajouté",
+          "updated": "Compte bancaire mis à jour",
+          "deleted": "Compte bancaire supprimé",
+          "primarySet": "Compte principal défini",
+          "error": "Une erreur est survenue"
+        }
+      },
       "generateLots": "Générer des lots",
       "lotsCount_one": "{{count}} lot",
       "lotsCount_other": "{{count}} lots",
@@ -1425,6 +1504,17 @@
         "motif": "Motif du rejet",
         "valideSuccess": "Virement validé",
         "rejeteSuccess": "Virement rejeté",
+        "methode": "Méthode",
+        "justificatif": "Justificatif",
+        "voir": "Voir",
+        "openProof": "Ouvrir",
+        "previewUnavailable": "Aperçu non disponible",
+        "methodes": {
+          "virement": "Virement",
+          "versement": "Versement",
+          "cheque": "Chèque",
+          "especes": "Espèces"
+        },
         "statuts": {
           "en_attente": "En attente",
           "valide": "Validé",

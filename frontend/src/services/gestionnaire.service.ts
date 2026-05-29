@@ -1,4 +1,5 @@
 import { api, type ApiEnvelope } from '@/lib/axios'
+import type { Banque } from '@/services/pointage.service'
 
 // ─── Dev mock fallback ────────────────────────────────────────────────────────
 // In dev, if the backend is unreachable the functions return mock data silently.
@@ -107,6 +108,34 @@ export type ResidenceOverview = {
   tresorerie: number
   fonds_reserve: number
 }
+
+/**
+ * Compte bancaire d'encaissement d'une résidence. Le syndic y renseigne le RIB
+ * sur lequel les copropriétaires versent leurs cotisations. Le portail résident
+ * affiche le RIB + un QR généré pour faciliter le virement.
+ */
+export type BankAccount = {
+  id: number
+  residence_id: number
+  banque: Banque
+  /** Titulaire du compte (ex: "Syndic Résidence Atlas"). */
+  titulaire: string
+  /** RIB marocain — 24 chiffres. */
+  rib: string
+  iban?: string
+  /** Compte principal affiché par défaut au résident. */
+  is_primary: boolean
+}
+
+export type CreateBankAccountInput = {
+  banque: Banque
+  titulaire: string
+  rib: string
+  iban?: string
+  is_primary?: boolean
+}
+
+export type UpdateBankAccountInput = Partial<CreateBankAccountInput>
 
 export type GroupeHabitation = {
   id: number
@@ -777,6 +806,105 @@ export async function getResidenceOverview(
     )
     return res.data.data
   }, mock)
+}
+
+// ─── Comptes bancaires (encaissement) ──────────────────────────────────────────
+
+const MOCK_BANK_ACCOUNTS: BankAccount[] = [
+  {
+    id: 1,
+    residence_id: 1,
+    banque: 'attijariwafa',
+    titulaire: 'Syndic Résidence Atlas',
+    rib: '007 780 0001234567890123 45',
+    iban: 'MA64 0077 8000 0123 4567 8901 2345',
+    is_primary: true,
+  },
+  {
+    id: 2,
+    residence_id: 1,
+    banque: 'cih',
+    titulaire: 'Syndic Résidence Atlas',
+    rib: '230 810 1122334455667788 90',
+    is_primary: false,
+  },
+]
+
+export async function getResidenceBankAccounts(
+  residenceId: number,
+): Promise<BankAccount[]> {
+  return withMock(
+    async () => {
+      const res = await api.get<ApiEnvelope<{ comptes: BankAccount[] }>>(
+        `/gestionnaire/residences/${residenceId}/comptes-bancaires`,
+      )
+      return res.data.data.comptes
+    },
+    MOCK_BANK_ACCOUNTS.filter((c) => c.residence_id === residenceId),
+  )
+}
+
+export async function storeBankAccount(
+  residenceId: number,
+  data: CreateBankAccountInput,
+): Promise<BankAccount> {
+  const mock: BankAccount = {
+    id: Date.now(),
+    residence_id: residenceId,
+    banque: data.banque,
+    titulaire: data.titulaire,
+    rib: data.rib,
+    iban: data.iban,
+    is_primary: data.is_primary ?? false,
+  }
+  return withMock(async () => {
+    const res = await api.post<ApiEnvelope<BankAccount>>(
+      `/gestionnaire/residences/${residenceId}/comptes-bancaires`,
+      data,
+    )
+    return res.data.data
+  }, mock)
+}
+
+export async function updateBankAccount(
+  residenceId: number,
+  accountId: number,
+  data: UpdateBankAccountInput,
+): Promise<BankAccount> {
+  const base =
+    MOCK_BANK_ACCOUNTS.find((c) => c.id === accountId) ?? MOCK_BANK_ACCOUNTS[0]
+  return withMock(
+    async () => {
+      const res = await api.put<ApiEnvelope<BankAccount>>(
+        `/gestionnaire/residences/${residenceId}/comptes-bancaires/${accountId}`,
+        data,
+      )
+      return res.data.data
+    },
+    { ...base, ...data, id: accountId, residence_id: residenceId },
+  )
+}
+
+export async function deleteBankAccount(
+  residenceId: number,
+  accountId: number,
+): Promise<void> {
+  return withMock(async () => {
+    await api.delete(
+      `/gestionnaire/residences/${residenceId}/comptes-bancaires/${accountId}`,
+    )
+  }, undefined)
+}
+
+export async function setPrimaryBankAccount(
+  residenceId: number,
+  accountId: number,
+): Promise<void> {
+  return withMock(async () => {
+    await api.post(
+      `/gestionnaire/residences/${residenceId}/comptes-bancaires/${accountId}/primary`,
+    )
+  }, undefined)
 }
 
 // ─── Lots ────────────────────────────────────────────────────────────────────

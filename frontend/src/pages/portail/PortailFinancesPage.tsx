@@ -1,7 +1,15 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { ArrowDown, ArrowUp, Download, FileText, Eye, X } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowUp,
+  Download,
+  FileText,
+  Eye,
+  Wallet,
+  X,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -17,12 +25,15 @@ import {
 } from '@/components/shared'
 import {
   getOperations,
+  getPortailDashboard,
   getPortailDocuments,
   type Operation,
   type OperationType,
   type PortailDocument,
   type PortailDocumentType,
 } from '@/services/portail.service'
+import { StickyCta } from '@/components/portail/StickyCta'
+import { PaiementSheet } from '@/components/portail/PaiementSheet'
 import { cn } from '@/lib/utils'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -454,13 +465,24 @@ function DocumentsTab() {
 
 export function PortailFinancesPage() {
   const { t } = useTranslation()
+  const qc = useQueryClient()
   const [activeTab, setActiveTab] = useState<MainTab>('finances')
   const [filter, setFilter] = useState<Filter>('all')
+  const [payOpen, setPayOpen] = useState(false)
 
   const { data: operations, isLoading } = useQuery({
     queryKey: ['portail-operations'],
     queryFn: getOperations,
   })
+
+  const { data: dashboard } = useQuery({
+    queryKey: ['portail-dashboard'],
+    queryFn: getPortailDashboard,
+  })
+
+  // Solde négatif = montant dû par le copropriétaire.
+  const amountDue =
+    dashboard && dashboard.balance < 0 ? Math.abs(dashboard.balance) : undefined
 
   const filtered =
     !operations || filter === 'all'
@@ -487,7 +509,9 @@ export function PortailFinancesPage() {
   ]
 
   return (
-    <div className="px-4 py-6 space-y-4">
+    <div
+      className={cn('px-4 py-6 space-y-4', activeTab === 'finances' && 'pb-28')}
+    >
       {/* Page title */}
       <h1 className="text-xl font-semibold text-[var(--color-imaro-primary)]">
         {t('portail.finances.title', { defaultValue: 'Finances' })}
@@ -561,6 +585,38 @@ export function PortailFinancesPage() {
       )}
 
       {activeTab === 'documents' && <DocumentsTab />}
+
+      {/* Sticky pay CTA (finances tab only) */}
+      {activeTab === 'finances' && (
+        <StickyCta
+          context={
+            amountDue != null ? (
+              <span className="flex items-center justify-between">
+                <span>{t('portail.finances.amountDue')}</span>
+                <MontantDisplay
+                  value={amountDue}
+                  className="font-semibold text-foreground"
+                />
+              </span>
+            ) : undefined
+          }
+        >
+          <Button className="w-full" onClick={() => setPayOpen(true)}>
+            <Wallet className="me-2 size-4" />
+            {t('portail.finances.pay')}
+          </Button>
+        </StickyCta>
+      )}
+
+      <PaiementSheet
+        open={payOpen}
+        onOpenChange={setPayOpen}
+        defaultMontant={amountDue}
+        onSuccess={() => {
+          void qc.invalidateQueries({ queryKey: ['portail-operations'] })
+          void qc.invalidateQueries({ queryKey: ['portail-dashboard'] })
+        }}
+      />
     </div>
   )
 }
