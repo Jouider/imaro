@@ -12,6 +12,7 @@
  * client-side. Ça permet à l'utilisateur de tester immédiatement sans backend.
  */
 import * as XLSX from 'xlsx'
+import type { VirementDeclare } from '@/services/paiements.service'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -61,6 +62,10 @@ export type Match = {
   score: number // 0-1, plus c'est élevé plus le match est sûr
   reasons: string[] // ex: ["Montant exact", "+/- 2j", "Nom détecté"]
   status: 'pending' | 'confirmed' | 'rejected'
+  /** true si la cible est un paiement déclaré par un résident depuis le portail. */
+  declared?: boolean
+  /** id du virement déclaré à valider lorsque le match est confirmé. */
+  virementId?: number
 }
 
 export type ParseResult = {
@@ -310,6 +315,10 @@ export type MatchableTarget =
       date: string
       label: string
       tags: string[]
+      /** Paiement déclaré par un résident (portail) en attente de rapprochement. */
+      declared?: boolean
+      /** id du virement déclaré associé (pour validation au moment du match). */
+      virementId?: number
     }
   | {
       type: 'depense'
@@ -318,6 +327,8 @@ export type MatchableTarget =
       date: string
       label: string
       tags: string[]
+      declared?: boolean
+      virementId?: number
     }
 
 function daysBetween(a: string, b: string): number {
@@ -418,7 +429,33 @@ export function findBestMatch(
     score: bestScore,
     reasons: bestReasons,
     status: 'pending',
+    declared: matchedTarget.declared,
+    virementId: matchedTarget.virementId,
   }
+}
+
+/**
+ * Convertit les paiements déclarés par les résidents (portail) en cibles de
+ * rapprochement. Le rejet est exclu ; en_attente + validé restent matchables
+ * pour confirmer que l'argent est bien arrivé sur le relevé du syndic.
+ */
+export function buildVirementTargets(
+  virements: VirementDeclare[],
+): MatchableTarget[] {
+  return virements
+    .filter((v) => v.statut !== 'rejete')
+    .map((v) => ({
+      type: 'paiement' as const,
+      id: v.id,
+      montant: v.montant,
+      date: v.date_declaration,
+      label: `${v.coproprietaire_nom} — ${v.lot_numero}`,
+      tags: [v.coproprietaire_nom, v.reference].filter((s): s is string =>
+        Boolean(s),
+      ),
+      declared: true,
+      virementId: v.id,
+    }))
 }
 
 /** Match all bank lines against all candidates. */
@@ -536,6 +573,15 @@ const MOCK_BANK_LINES: BankLine[] = [
     banque: 'attijariwafa',
     balance: 29035,
   },
+  {
+    id: 'aB',
+    date: '2026-05-10',
+    libelle: 'VIRT KHALID BENNANI VIR-MAR-2026-0441',
+    debit: 0,
+    credit: 650.0,
+    banque: 'attijariwafa',
+    balance: 29685,
+  },
 ]
 
 const MOCK_TARGETS: MatchableTarget[] = [
@@ -612,7 +658,7 @@ const MOCK_PARSE_RESULT: ParseResult = {
   totalLines: MOCK_BANK_LINES.length,
   totalDebit: MOCK_BANK_LINES.reduce((s, l) => s + l.debit, 0),
   totalCredit: MOCK_BANK_LINES.reduce((s, l) => s + l.credit, 0),
-  periode: { from: '2026-04-22', to: '2026-05-08' },
+  periode: { from: '2026-04-22', to: '2026-05-10' },
   lines: MOCK_BANK_LINES,
 }
 

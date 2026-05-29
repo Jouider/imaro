@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Landmark,
   Upload,
@@ -11,8 +12,13 @@ import {
   ArrowUpFromLine,
   Calendar,
   RefreshCw,
+  UserCheck,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import {
+  getVirementsDeclares,
+  validerVirement,
+} from '@/services/paiements.service'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -37,6 +43,7 @@ import {
   autoMatchAll,
   getMockParseResult,
   getMockTargets,
+  buildVirementTargets,
   computeStats,
   type Banque,
   type ParseResult,
@@ -66,9 +73,19 @@ export function PointagePage() {
   const [banque, setBanque] = useState<Banque>('attijariwafa')
   const [parsing, setParsing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const queryClient = useQueryClient()
 
-  // Mock targets (paiements + dépenses en attente de matching)
-  const targets: MatchableTarget[] = useMemo(() => getMockTargets(), [])
+  // Paiements déclarés par les résidents (portail) → cibles de rapprochement.
+  const { data: virements = [] } = useQuery({
+    queryKey: ['virements-declares'],
+    queryFn: () => getVirementsDeclares(),
+  })
+
+  // Cibles = paiements/dépenses attendus (mock) + paiements déclarés résidents.
+  const targets: MatchableTarget[] = useMemo(
+    () => [...getMockTargets(), ...buildVirementTargets(virements)],
+    [virements],
+  )
 
   const stats = useMemo(() => {
     if (!parsed) return null
@@ -116,7 +133,18 @@ export function PointagePage() {
       ...prev,
       [lineId]: { ...match, status: 'confirmed' },
     }))
-    toast.success('Match confirmé')
+    // Si la ligne rapproche un paiement déclaré par un résident, on valide le
+    // virement déclaré : l'argent est confirmé reçu sur le relevé du syndic.
+    if (match.declared && match.virementId) {
+      void validerVirement(match.virementId)
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ['virements-declares'] })
+          toast.success(t('gestionnaire.pointage.declaredConfirmed'))
+        })
+        .catch(() => toast.error(t('gestionnaire.pointage.declaredError')))
+    } else {
+      toast.success(t('gestionnaire.pointage.matchConfirmed'))
+    }
   }
 
   const handleReject = (lineId: string) => {
@@ -510,17 +538,31 @@ export function PointagePage() {
                 size="sm"
                 className="gap-2"
                 onClick={() => {
+                  const declaredIds: number[] = []
                   setMatches((prev) => {
                     const next = { ...prev }
                     Object.entries(next).forEach(([k, v]) => {
                       if (v?.confidence === 'auto' && v.status === 'pending') {
                         next[k] = { ...v, status: 'confirmed' }
+                        if (v.declared && v.virementId)
+                          declaredIds.push(v.virementId)
                       }
                     })
                     return next
                   })
+                  if (declaredIds.length > 0) {
+                    void Promise.all(
+                      declaredIds.map((id) => validerVirement(id)),
+                    ).then(() =>
+                      queryClient.invalidateQueries({
+                        queryKey: ['virements-declares'],
+                      }),
+                    )
+                  }
                   toast.success(
-                    `${stats.auto_matched} rapprochements confirmés`,
+                    t('gestionnaire.pointage.allConfirmed', {
+                      count: stats.auto_matched,
+                    }),
                   )
                 }}
               >
@@ -605,6 +647,7 @@ function FilterChip({
 }
 
 function MatchCell({ match }: { match: Match | null | undefined }) {
+  const { t } = useTranslation()
   if (!match) {
     return (
       <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
@@ -639,6 +682,12 @@ function MatchCell({ match }: { match: Match | null | undefined }) {
           </span>
         </span>
         <span className="text-sm font-medium">{match.targetLabel}</span>
+        {match.declared && (
+          <span className="inline-flex items-center gap-1 rounded-md border border-[var(--color-imaro-primary)]/30 bg-[var(--color-imaro-primary)]/10 px-1.5 py-0.5 text-[10px] font-medium text-[var(--color-imaro-primary)]">
+            <UserCheck className="size-3" />
+            {t('gestionnaire.pointage.declaredBadge')}
+          </span>
+        )}
       </div>
       <p className="text-[10px] text-muted-foreground">
         {match.reasons.join(' · ')}

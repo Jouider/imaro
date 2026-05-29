@@ -38,7 +38,10 @@
     "delete": "حذف",
     "edit": "تعديل",
     "add": "إضافة",
-    "save": "حفظ"
+    "save": "حفظ",
+    "close": "إغلاق",
+    "show": "إظهار",
+    "hide": "إخفاء"
   },
   "portail": {
     "nav": {
@@ -125,6 +128,41 @@
         "groupPvAg": "محاضر الجمعيات",
         "groupContratFacture": "العقود / الفواتير",
         "groupAutre": "وثائق أخرى"
+      },
+      "pay": "أداء مساهمتي",
+      "amountDue": "المبلغ المستحق"
+    },
+    "paiement": {
+      "howTitle": "كيفية الأداء",
+      "declareTitle": "التصريح بأداء دفعتي",
+      "howIntro": "قم بتحويل أو إيداع المبلغ في أحد حسابات المتصرف، ثم صرّح بأداء دفعتك مع إرفاق ما يثبت ذلك.",
+      "noAccounts": "لم يتم بعد إعداد أي حساب بنكي لإقامتك. يرجى الاتصال بالمتصرف.",
+      "recommended": "موصى به",
+      "copyRib": "نسخ RIB",
+      "ribCopied": "تم نسخ RIB",
+      "copyError": "تعذّر نسخ RIB",
+      "showQr": "عرض رمز الدفع",
+      "qrHint": "امسح هذا الرمز بتطبيق البنك لملء التحويل تلقائيًا.",
+      "instructions": "بعد التحويل، صرّح بالدفعة أدناه وأرفق لقطة الشاشة أو الكشف البنكي. سيقوم المتصرف بمطابقتها مع كشفه البنكي.",
+      "iPaid": "لقد قمت بالأداء",
+      "backToHow": "العودة إلى المعلومات البنكية",
+      "montant": "المبلغ المدفوع (درهم)",
+      "date": "تاريخ الأداء",
+      "methode": "طريقة الأداء",
+      "methodes": {
+        "virement": "تحويل بنكي",
+        "versement": "إيداع بالوكالة",
+        "cheque": "شيك",
+        "especes": "نقدًا"
+      },
+      "reference": "المرجع (اختياري)",
+      "referencePlaceholder": "مرجع التحويل، رقم الإشعار…",
+      "justificatif": "ما يثبت الأداء (لقطة / كشف)",
+      "justificatifHint": "إضافة صورة أو ملف PDF",
+      "submit": "التصريح بالدفعة",
+      "toast": {
+        "declared": "تم التصريح بالدفعة. سيقوم المتصرف بالتحقق منها.",
+        "error": "حدث خطأ. حاول مرة أخرى."
       }
     },
     "reclamations": {
@@ -675,6 +713,15 @@
     }
   },
   "gestionnaire": {
+    "pointage": {
+      "title": "التدقيق البنكي",
+      "subtitle": "مطابقة تلقائية للكشف البنكي مع مدفوعاتك ونفقاتك",
+      "declaredBadge": "مُصرَّح من طرف الساكن",
+      "matchConfirmed": "تم تأكيد المطابقة",
+      "declaredConfirmed": "تم اعتماد دفعة الساكن — تأكيد استلام المبلغ",
+      "declaredError": "تعذّر اعتماد الدفعة المصرَّح بها",
+      "allConfirmed": "تم تأكيد {{count}} مطابقات"
+    },
     "cmdk": {
       "title": "بحث سريع",
       "description": "اكتب للبحث عن صفحة، تشغيل إجراء، أو إيجاد مالك",
@@ -729,19 +776,137 @@
     "residences": {
       "title": "الإقامات",
       "subtitle": "جميع مجمعات الملكية المشتركة المُدارة",
-      "searchPlaceholder": "ابحث بالاسم أو المدينة…",
+      "searchPlaceholder": "ابحث بالاسم أو العنوان أو المدينة…",
       "colNom": "الاسم",
       "colAdresse": "العنوان",
       "colVille": "المدينة",
       "colLots": "الشقق",
       "colRecouvrement": "نسبة التحصيل",
+      "add": "إضافة إقامة",
+      "allCities": "جميع المدن",
+      "sortName": "ترتيب حسب الاسم",
+      "sortLots": "ترتيب حسب الشقق",
+      "sortRecouvrement": "ترتيب حسب التحصيل",
+      "noMatch": "لا توجد إقامة تطابق بحثك.",
+      "manage": "إدارة",
+      "statusActif": "نشطة",
+      "statusInactif": "غير نشطة",
+      "deleteTitle": "حذف الإقامة",
+      "deleteDesc": "سيتم حذف الإقامة «{{name}}» وجميع بياناتها نهائيًا.",
       "empty": "لا توجد إقامات",
-      "emptyDesc": "لا تدير حسابك أي إقامة حتى الآن."
+      "emptyDesc": "لا تدير حسابك أي إقامة حتى الآن.",
+      "toast": {
+        "created": "تم إنشاء الإقامة",
+        "createError": "خطأ أثناء إنشاء الإقامة",
+        "updated": "تم تعديل الإقامة",
+        "updateError": "خطأ أثناء التعديل",
+        "deleted": "تم حذف الإقامة",
+        "deleteError": "خطأ أثناء الحذف"
+      },
+      "form": {
+        "createTitle": "إقامة جديدة",
+        "editTitle": "تعديل الإقامة",
+        "subtitle": "أدخل معلومات الملكية المشتركة.",
+        "name": "الاسم",
+        "namePlaceholder": "مثال: إقامة البستان",
+        "address": "العنوان",
+        "addressPlaceholder": "مثال: 12 شارع البرتقال",
+        "city": "المدينة",
+        "cityPlaceholder": "مثال: الدار البيضاء",
+        "jourEcheance": "يوم الاستحقاق",
+        "modeCotisation": "طريقة الاشتراك",
+        "modeTantieme": "حسب الحصة",
+        "modeFixe": "مبلغ ثابت",
+        "montantFixe": "المبلغ الثابت (د.م)",
+        "createSubmit": "إنشاء الإقامة"
+      }
     },
     "residence": {
+      "tabOverview": "نظرة عامة",
       "tabLots": "الشقق",
       "tabCoproprietaires": "الملاك",
       "tabExercices": "السنوات المالية",
+      "tabImmeubles": "العمارات",
+      "tabEncaissement": "التحصيل",
+      "encaissement": {
+        "intro": "الحسابات البنكية التي يسدد عبرها الملاك مساهماتهم.",
+        "add": "إضافة حساب",
+        "emptyTitle": "لا يوجد حساب بنكي",
+        "emptyDesc": "أضف حسابًا لتمكين الملاك من الدفع عبر التحويل البنكي.",
+        "primaryBadge": "رئيسي",
+        "setPrimary": "تعيين كرئيسي",
+        "showQr": "عرض رمز الدفع",
+        "copy": "نسخ RIB",
+        "copied": "تم نسخ RIB",
+        "copyError": "تعذّر نسخ RIB",
+        "createTitle": "إضافة حساب بنكي",
+        "editTitle": "تعديل الحساب البنكي",
+        "subtitle": "أدخل المعلومات البنكية للملكية المشتركة.",
+        "banque": "البنك",
+        "titulaire": "صاحب الحساب",
+        "titulairePlaceholder": "متصرف إقامة الأندلس",
+        "rib": "RIB (24 رقمًا)",
+        "iban": "IBAN (اختياري)",
+        "isPrimary": "الحساب الرئيسي للتحصيل",
+        "createSubmit": "إضافة الحساب",
+        "qrTitle": "رمز الدفع",
+        "deleteTitle": "حذف الحساب",
+        "deleteDesc": "حذف حساب {{banque}}؟ لا يمكن التراجع عن هذا الإجراء.",
+        "toast": {
+          "created": "تمت إضافة الحساب البنكي",
+          "updated": "تم تحديث الحساب البنكي",
+          "deleted": "تم حذف الحساب البنكي",
+          "primarySet": "تم تعيين الحساب الرئيسي",
+          "error": "حدث خطأ"
+        }
+      },
+      "generateLots": "توليد الشقق",
+      "lotsCount_one": "شقة واحدة",
+      "lotsCount_other": "{{count}} شقق",
+      "echeanceChip": "الاستحقاق يوم {{day}}",
+      "checklist": {
+        "title": "هيّئ ملكيتك المشتركة",
+        "subtitle": "بضع خطوات لبدء الإدارة.",
+        "progress": "{{done}}/{{total}}",
+        "immeuble": "إضافة عمارة",
+        "lots": "إضافة الشقق",
+        "coproprietaires": "تعيين الملاك",
+        "cotisation": "تحديد طريقة الاشتراك"
+      },
+      "overview": {
+        "kpiLots": "الشقق",
+        "kpiCopros": "الملاك",
+        "kpiRecouvrement": "نسبة التحصيل",
+        "kpiTresorerie": "الخزينة",
+        "paymentsTitle": "المدفوعات",
+        "payeCeMois": "المدفوع هذا الشهر",
+        "enAttente": "قيد الانتظار",
+        "enRetard": "متأخر",
+        "nbImpayes": "شقق غير مسددة",
+        "treasuryTitle": "الخزينة",
+        "tresorerie": "الرصيد الجاري",
+        "fondsReserve": "صندوق الاحتياط",
+        "viewCopros": "عرض الملاك"
+      },
+      "immeubles": {
+        "add": "إضافة عمارة",
+        "edit": "تعديل العمارة",
+        "delete": "حذف العمارة",
+        "deleteDesc": "حذف العمارة «{{nom}}»؟",
+        "colNom": "الاسم",
+        "colNbLots": "عدد الشقق",
+        "nomPlaceholder": "مثال: عمارة أ",
+        "added": "تمت إضافة العمارة",
+        "addError": "خطأ أثناء إضافة العمارة",
+        "updated": "تم تعديل العمارة",
+        "updateError": "خطأ أثناء تعديل العمارة",
+        "deleted": "تم حذف العمارة",
+        "deleteError": "خطأ أثناء حذف العمارة"
+      },
+      "lots": {
+        "immeuble": "العمارة",
+        "selectImmeuble": "اختر عمارة"
+      },
       "colNumero": "رقم",
       "colType": "النوع",
       "colEtage": "الطابق",
@@ -1360,6 +1525,17 @@
         "motif": "سبب الرفض",
         "valideSuccess": "تم التحقق من التحويل",
         "rejeteSuccess": "تم رفض التحويل",
+        "methode": "الطريقة",
+        "justificatif": "ما يثبت الأداء",
+        "voir": "عرض",
+        "openProof": "فتح",
+        "previewUnavailable": "المعاينة غير متاحة",
+        "methodes": {
+          "virement": "تحويل",
+          "versement": "إيداع",
+          "cheque": "شيك",
+          "especes": "نقدًا"
+        },
         "statuts": {
           "en_attente": "قيد الانتظار",
           "valide": "مُتحقَّق",

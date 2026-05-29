@@ -38,7 +38,10 @@
     "delete": "Supprimer",
     "edit": "Modifier",
     "add": "Ajouter",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "close": "Fermer",
+    "show": "Afficher",
+    "hide": "Masquer"
   },
   "portail": {
     "nav": {
@@ -125,6 +128,41 @@
         "groupPvAg": "PV Assemblées",
         "groupContratFacture": "Contrats / Factures",
         "groupAutre": "Autres documents"
+      },
+      "pay": "Payer ma cotisation",
+      "amountDue": "Solde à régler"
+    },
+    "paiement": {
+      "howTitle": "Comment payer",
+      "declareTitle": "Déclarer mon paiement",
+      "howIntro": "Effectuez un virement ou un versement vers l'un des comptes du syndic, puis déclarez votre paiement avec un justificatif.",
+      "noAccounts": "Aucun compte bancaire n'est encore configuré pour votre résidence. Contactez votre syndic.",
+      "recommended": "Recommandé",
+      "copyRib": "Copier le RIB",
+      "ribCopied": "RIB copié",
+      "copyError": "Impossible de copier le RIB",
+      "showQr": "Afficher le QR de paiement",
+      "qrHint": "Scannez ce code avec votre application bancaire pour pré-remplir le virement.",
+      "instructions": "Après votre virement, déclarez le paiement ci-dessous et joignez la capture d'écran ou le relevé. Votre syndic le rapprochera de son relevé bancaire.",
+      "iPaid": "J'ai effectué le paiement",
+      "backToHow": "Revenir aux coordonnées",
+      "montant": "Montant payé (DH)",
+      "date": "Date du paiement",
+      "methode": "Méthode de paiement",
+      "methodes": {
+        "virement": "Virement bancaire",
+        "versement": "Versement en agence",
+        "cheque": "Chèque",
+        "especes": "Espèces"
+      },
+      "reference": "Référence (optionnel)",
+      "referencePlaceholder": "Réf. du virement, n° de bordereau…",
+      "justificatif": "Justificatif (capture / relevé)",
+      "justificatifHint": "Ajouter une photo ou un PDF",
+      "submit": "Déclarer le paiement",
+      "toast": {
+        "declared": "Paiement déclaré. Votre syndic va le vérifier.",
+        "error": "Une erreur est survenue. Réessayez."
       }
     },
     "reclamations": {
@@ -678,6 +716,15 @@
     }
   },
   "gestionnaire": {
+    "pointage": {
+      "title": "Pointage bancaire",
+      "subtitle": "Rapprochement automatique du relevé bancaire avec vos paiements et dépenses",
+      "declaredBadge": "Déclaré par résident",
+      "matchConfirmed": "Rapprochement confirmé",
+      "declaredConfirmed": "Paiement du résident validé — argent confirmé reçu",
+      "declaredError": "Impossible de valider le paiement déclaré",
+      "allConfirmed": "{{count}} rapprochements confirmés"
+    },
     "cmdk": {
       "title": "Recherche rapide",
       "description": "Tapez pour rechercher une page, lancer une action ou retrouver un copropriétaire",
@@ -732,19 +779,137 @@
     "residences": {
       "title": "Résidences",
       "subtitle": "Toutes les copropriétés gérées",
-      "searchPlaceholder": "Rechercher par nom ou ville…",
+      "searchPlaceholder": "Rechercher par nom, adresse ou ville…",
       "colNom": "Nom",
       "colAdresse": "Adresse",
       "colVille": "Ville",
       "colLots": "Lots",
       "colRecouvrement": "Recouvrement",
+      "add": "Ajouter une résidence",
+      "allCities": "Toutes les villes",
+      "sortName": "Trier par nom",
+      "sortLots": "Trier par lots",
+      "sortRecouvrement": "Trier par recouvrement",
+      "noMatch": "Aucune résidence ne correspond à votre recherche.",
+      "manage": "Gérer",
+      "statusActif": "Active",
+      "statusInactif": "Inactive",
+      "deleteTitle": "Supprimer la résidence",
+      "deleteDesc": "La résidence « {{name}} » et toutes ses données seront supprimées définitivement.",
       "empty": "Aucune résidence",
-      "emptyDesc": "Votre compte ne gère aucune résidence pour l'instant."
+      "emptyDesc": "Votre compte ne gère aucune résidence pour l'instant.",
+      "toast": {
+        "created": "Résidence créée",
+        "createError": "Erreur lors de la création de la résidence",
+        "updated": "Résidence modifiée",
+        "updateError": "Erreur lors de la modification",
+        "deleted": "Résidence supprimée",
+        "deleteError": "Erreur lors de la suppression"
+      },
+      "form": {
+        "createTitle": "Nouvelle résidence",
+        "editTitle": "Modifier la résidence",
+        "subtitle": "Renseignez les informations de la copropriété.",
+        "name": "Nom",
+        "namePlaceholder": "ex : Résidence Al Boustane",
+        "address": "Adresse",
+        "addressPlaceholder": "ex : 12 rue des Orangers",
+        "city": "Ville",
+        "cityPlaceholder": "ex : Casablanca",
+        "jourEcheance": "Jour d'échéance",
+        "modeCotisation": "Mode de cotisation",
+        "modeTantieme": "Au tantième",
+        "modeFixe": "Montant fixe",
+        "montantFixe": "Montant fixe (DH)",
+        "createSubmit": "Créer la résidence"
+      }
     },
     "residence": {
+      "tabOverview": "Vue d'ensemble",
       "tabLots": "Lots",
       "tabCoproprietaires": "Copropriétaires",
       "tabExercices": "Exercices",
+      "tabImmeubles": "Immeubles",
+      "tabEncaissement": "Encaissement",
+      "encaissement": {
+        "intro": "Les comptes bancaires sur lesquels les copropriétaires règlent leurs cotisations.",
+        "add": "Ajouter un compte",
+        "emptyTitle": "Aucun compte bancaire",
+        "emptyDesc": "Ajoutez un compte pour permettre aux copropriétaires de payer par virement.",
+        "primaryBadge": "Principal",
+        "setPrimary": "Définir principal",
+        "showQr": "Afficher le QR de paiement",
+        "copy": "Copier le RIB",
+        "copied": "RIB copié",
+        "copyError": "Impossible de copier le RIB",
+        "createTitle": "Ajouter un compte bancaire",
+        "editTitle": "Modifier le compte bancaire",
+        "subtitle": "Renseignez les coordonnées bancaires de la copropriété.",
+        "banque": "Banque",
+        "titulaire": "Titulaire du compte",
+        "titulairePlaceholder": "Syndic Résidence Al Andalous",
+        "rib": "RIB (24 chiffres)",
+        "iban": "IBAN (optionnel)",
+        "isPrimary": "Compte principal pour les encaissements",
+        "createSubmit": "Ajouter le compte",
+        "qrTitle": "QR de paiement",
+        "deleteTitle": "Supprimer le compte",
+        "deleteDesc": "Supprimer le compte {{banque}} ? Cette action est irréversible.",
+        "toast": {
+          "created": "Compte bancaire ajouté",
+          "updated": "Compte bancaire mis à jour",
+          "deleted": "Compte bancaire supprimé",
+          "primarySet": "Compte principal défini",
+          "error": "Une erreur est survenue"
+        }
+      },
+      "generateLots": "Générer des lots",
+      "lotsCount_one": "{{count}} lot",
+      "lotsCount_other": "{{count}} lots",
+      "echeanceChip": "Échéance le {{day}}",
+      "checklist": {
+        "title": "Configurez votre copropriété",
+        "subtitle": "Quelques étapes pour démarrer la gestion.",
+        "progress": "{{done}}/{{total}}",
+        "immeuble": "Ajouter un immeuble",
+        "lots": "Ajouter des lots",
+        "coproprietaires": "Affecter des copropriétaires",
+        "cotisation": "Définir le mode de cotisation"
+      },
+      "overview": {
+        "kpiLots": "Lots",
+        "kpiCopros": "Copropriétaires",
+        "kpiRecouvrement": "Recouvrement",
+        "kpiTresorerie": "Trésorerie",
+        "paymentsTitle": "Paiements",
+        "payeCeMois": "Payé ce mois",
+        "enAttente": "En attente",
+        "enRetard": "En retard",
+        "nbImpayes": "Lots en impayé",
+        "treasuryTitle": "Trésorerie",
+        "tresorerie": "Solde courant",
+        "fondsReserve": "Fonds de réserve",
+        "viewCopros": "Voir les copropriétaires"
+      },
+      "immeubles": {
+        "add": "Ajouter un immeuble",
+        "edit": "Modifier l'immeuble",
+        "delete": "Supprimer l'immeuble",
+        "deleteDesc": "Supprimer l'immeuble « {{nom}} » ?",
+        "colNom": "Nom",
+        "colNbLots": "Nb lots",
+        "nomPlaceholder": "ex : Bâtiment A",
+        "added": "Immeuble ajouté",
+        "addError": "Erreur lors de l'ajout de l'immeuble",
+        "updated": "Immeuble modifié",
+        "updateError": "Erreur lors de la modification de l'immeuble",
+        "deleted": "Immeuble supprimé",
+        "deleteError": "Erreur lors de la suppression de l'immeuble"
+      },
+      "lots": {
+        "immeuble": "Immeuble",
+        "selectImmeuble": "Sélectionner un immeuble"
+      },
       "colNumero": "N°",
       "colType": "Type",
       "colEtage": "Étage",
@@ -1363,6 +1528,17 @@
         "motif": "Motif du rejet",
         "valideSuccess": "Virement validé",
         "rejeteSuccess": "Virement rejeté",
+        "methode": "Méthode",
+        "justificatif": "Justificatif",
+        "voir": "Voir",
+        "openProof": "Ouvrir",
+        "previewUnavailable": "Aperçu non disponible",
+        "methodes": {
+          "virement": "Virement",
+          "versement": "Versement",
+          "cheque": "Chèque",
+          "especes": "Espèces"
+        },
         "statuts": {
           "en_attente": "En attente",
           "valide": "Validé",

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useQueryClient, useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
@@ -7,10 +8,12 @@ import {
   MapPin,
   ArrowRight,
   CheckCircle2,
+  Wallet,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { PaiementSheet } from '@/components/portail/PaiementSheet'
 import {
   MontantDisplay,
   KpiCard,
@@ -80,6 +83,7 @@ function AnnonceCard({ annonce }: { annonce: Annonce }) {
 export function PortailHomePage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
+  const [payOpen, setPayOpen] = useState(false)
 
   const { data: dashboard, isLoading: dashLoading } = useQuery({
     queryKey: ['portail-dashboard'],
@@ -187,6 +191,16 @@ export function PortailHomePage() {
                 </span>
               )}
             </div>
+
+            {/* Pay CTA */}
+            <button
+              type="button"
+              onClick={() => setPayOpen(true)}
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-[var(--color-imaro-primary)] shadow-sm transition-transform active:scale-[0.98]"
+            >
+              <Wallet className="size-4" />
+              {t('portail.finances.pay')}
+            </button>
           </div>
         </div>
       ) : null}
@@ -280,6 +294,20 @@ export function PortailHomePage() {
           </div>
         )}
       </section>
+
+      <PaiementSheet
+        open={payOpen}
+        onOpenChange={setPayOpen}
+        defaultMontant={pendingAmount > 0 ? pendingAmount : undefined}
+        onSuccess={() => {
+          void queryClient.invalidateQueries({
+            queryKey: ['portail-dashboard'],
+          })
+          void queryClient.invalidateQueries({
+            queryKey: ['portail-operations'],
+          })
+        }}
+      />
     </div>
   )
 }
