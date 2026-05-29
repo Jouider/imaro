@@ -26,6 +26,7 @@ import {
   CalendarCheck,
   ClipboardCheck,
   Activity,
+  ShieldCheck,
   LogOut,
   Menu,
   X,
@@ -230,6 +231,21 @@ const NAV_SECTIONS: NavSection[] = [
         to: '/gestionnaire/documents',
         icon: <FileText className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.documents',
+      },
+    ],
+  },
+  {
+    labelKey: 'gestionnaire.nav.sectionAdministration',
+    items: [
+      {
+        to: '/gestionnaire/utilisateurs',
+        icon: <ShieldCheck className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.utilisateurs',
+      },
+      {
+        to: '/gestionnaire/personnel',
+        icon: <HardHat className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.personnel',
       },
     ],
   },
