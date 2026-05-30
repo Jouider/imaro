@@ -58,7 +58,7 @@ export function KpiCard({ icon, value, label, trend, className }: Props) {
           )}
         </div>
         <div className="mt-3">
-          <p className="text-2xl font-semibold tabular-nums tracking-tight text-[var(--primary)]">
+          <p className="text-lg font-semibold tabular-nums tracking-tight text-[var(--primary)] sm:text-2xl">
             {value}
           </p>
           <p className="mt-0.5 text-sm text-muted-foreground">{label}</p>

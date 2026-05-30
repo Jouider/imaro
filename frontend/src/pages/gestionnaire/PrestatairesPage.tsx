@@ -302,7 +302,7 @@ export function PrestatairesPage() {
   ]
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         title={t('gestionnaire.prestataires.title')}
         subtitle={t('gestionnaire.prestataires.subtitle')}

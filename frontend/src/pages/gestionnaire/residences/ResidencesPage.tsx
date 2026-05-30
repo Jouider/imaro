@@ -132,7 +132,7 @@ export function ResidencesPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         title={t('gestionnaire.residences.title')}
         subtitle={t('gestionnaire.residences.subtitle')}

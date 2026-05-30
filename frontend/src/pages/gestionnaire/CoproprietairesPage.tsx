@@ -621,7 +621,7 @@ export function CoproprietairesPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         title={t('gestionnaire.coproprietaires.title')}
         subtitle={t('gestionnaire.coproprietaires.subtitle')}
