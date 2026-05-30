@@ -36,6 +36,7 @@ class AuthController extends Controller
         $user = User::withoutGlobalScopes()
             ->with('tenant')
             ->where('email', $request->email)
+            ->whereNull('deleted_at')
             ->first();
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
@@ -104,6 +105,7 @@ class AuthController extends Controller
             ->with('tenant')
             ->where('phone', $request->phone)
             ->where('role', 'resident')
+            ->whereNull('deleted_at')
             ->first();
 
         if (! $user || ! $user->access_code || ! Hash::check($request->code, $user->access_code)) {
@@ -176,6 +178,7 @@ class AuthController extends Controller
             ->with('tenant')
             ->where('phone', $request->phone)
             ->where('role', 'resident')
+            ->whereNull('deleted_at')
             ->first();
 
         if (! $user || ! $user->access_code || ! Hash::check($request->temp_code, $user->access_code)) {
