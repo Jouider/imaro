@@ -200,6 +200,36 @@ it('residences scope uses equipe_residence_ids for equipe gestionnaire', functio
     expect($data[0]['id'])->toBe($this->residence1->id);
 });
 
+it('manager can recreate a gestionnaire with same email after soft-delete', function () {
+    // Create first
+    $response = $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
+        'name'        => 'Salma',
+        'email'       => 'salma@test.ma',
+        'password'    => 'secret123',
+        'role'        => 'assistant',
+        'permissions' => ['residences'],
+    ]);
+    $response->assertStatus(201);
+    $userId = $response->json('data.id');
+
+    // Delete (soft-delete)
+    $deleteResponse = $this->actingAs($this->manager)
+        ->deleteJson("/api/equipe/utilisateurs/{$userId}");
+    $deleteResponse->assertStatus(200);
+
+    // Recreate with same email — must succeed
+    $recreateResponse = $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
+        'name'        => 'Salma Nouvelle',
+        'email'       => 'salma@test.ma',
+        'password'    => 'newsecret123',
+        'role'        => 'gestionnaire',
+        'permissions' => ['residences', 'finances'],
+    ]);
+    $recreateResponse->assertStatus(201);
+    expect($recreateResponse->json('data.name'))->toBe('Salma Nouvelle');
+    expect($recreateResponse->json('data.id'))->not->toBe($userId);
+});
+
 it('UserResource returns permissions and residence_ids in /api/auth/me', function () {
     $gestionnaire = User::create([
         'tenant_id'            => $this->tenant->id,
