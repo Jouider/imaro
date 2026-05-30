@@ -87,37 +87,47 @@ Route::put('/lots/{lot}', [LotController::class, 'updateFlat']);
 Route::delete('/lots/{lot}', [LotController::class, 'destroyFlat']);
 
 // Copropriétaires — liste globale + création + import bulk + code d'accès
-Route::get('/coproprietaires', [CoproprietaireController::class, 'indexGlobal']);
-Route::post('/coproprietaires/bulk', [CoproprietaireController::class, 'bulkStore']);
-Route::post('/coproprietaires', [CoproprietaireController::class, 'store']);
-Route::post('/coproprietaires/{coproprietaire}/generate-code', [CoproprietaireController::class, 'generateCode']);
+Route::middleware(['app.permission:coproprietaires'])->group(function () {
+    Route::get('/coproprietaires', [CoproprietaireController::class, 'indexGlobal']);
+    Route::post('/coproprietaires/bulk', [CoproprietaireController::class, 'bulkStore']);
+    Route::post('/coproprietaires', [CoproprietaireController::class, 'store']);
+    Route::post('/coproprietaires/{coproprietaire}/generate-code', [CoproprietaireController::class, 'generateCode']);
+});
 
 // Appels de fonds (KAN-14)
-Route::apiResource('appels-fonds', AppelFondsController::class)
-    ->only(['index', 'store', 'show', 'update'])
-    ->parameters(['appels-fonds' => 'appelFonds']);
-Route::post('appels-fonds/{appelFonds}/envoyer', [AppelFondsController::class, 'envoyer']);
+Route::middleware(['app.permission:finances'])->group(function () {
+    Route::apiResource('appels-fonds', AppelFondsController::class)
+        ->only(['index', 'store', 'show', 'update'])
+        ->parameters(['appels-fonds' => 'appelFonds']);
+    Route::post('appels-fonds/{appelFonds}/envoyer', [AppelFondsController::class, 'envoyer']);
+});
 
 // Paiements + impayés (KAN-15)
-Route::get('/paiements', [PaiementController::class, 'index']);
-Route::post('/paiements', [PaiementController::class, 'store']);
-Route::get('/impayes', [ImpayeController::class, 'index']);
+Route::middleware(['app.permission:finances'])->group(function () {
+    Route::get('/paiements', [PaiementController::class, 'index']);
+    Route::post('/paiements', [PaiementController::class, 'store']);
+});
+Route::middleware(['app.permission:recouvrement,finances'])->group(function () {
+    Route::get('/impayes', [ImpayeController::class, 'index']);
+});
 
 // Tickets (KAN-21)
 Route::apiResource('tickets', TicketController::class)->only(['index', 'store', 'show', 'update']);
 Route::post('tickets/{ticket}/clos', [TicketController::class, 'clos']);
 
 // Assemblées (Sprint 2)
-Route::get('/assemblees', [AssembleeController::class, 'index']);
-Route::post('/assemblees', [AssembleeController::class, 'store']);
+Route::middleware(['app.permission:assemblees'])->group(function () {
+    Route::get('/assemblees', [AssembleeController::class, 'index']);
+    Route::post('/assemblees', [AssembleeController::class, 'store']);
 
-// Annonces (Sprint 2)
-Route::get('/annonces', [AnnonceController::class, 'index']);
-Route::post('/annonces', [AnnonceController::class, 'store']);
-Route::put('/annonces/{annonce}', [AnnonceController::class, 'update']);
-Route::post('/annonces/{annonce}/publier', [AnnonceController::class, 'publier']);
-Route::post('/annonces/{annonce}/archiver', [AnnonceController::class, 'archiver']);
-Route::delete('/annonces/{annonce}', [AnnonceController::class, 'destroy']);
+    // Annonces
+    Route::get('/annonces', [AnnonceController::class, 'index']);
+    Route::post('/annonces', [AnnonceController::class, 'store']);
+    Route::put('/annonces/{annonce}', [AnnonceController::class, 'update']);
+    Route::post('/annonces/{annonce}/publier', [AnnonceController::class, 'publier']);
+    Route::post('/annonces/{annonce}/archiver', [AnnonceController::class, 'archiver']);
+    Route::delete('/annonces/{annonce}', [AnnonceController::class, 'destroy']);
+});
 
 // Prestataires + Contrats (Sprint 2)
 Route::get('/prestataires', [PrestataireController::class, 'index']);
@@ -129,30 +139,32 @@ Route::get('/contrats', [ContratController::class, 'index']);
 Route::post('/contrats', [ContratController::class, 'store']);
 
 // Budgets + Postes budgétaires (Sprint 2)
-Route::get('/budgets', [BudgetController::class, 'index']);
-Route::post('/budgets', [BudgetController::class, 'store']);
-Route::post('/budgets/{budget}/approuver', [BudgetController::class, 'approuver']);
-Route::post('/budgets/{budget}/postes', [BudgetController::class, 'storePoste']);
-Route::put('/budgets/{budget}/postes/{poste}', [BudgetController::class, 'updatePoste']);
-Route::delete('/budgets/{budget}/postes/{poste}', [BudgetController::class, 'destroyPoste']);
-// Flat postes routes (frontend uses /budgets/postes/{id} without budget)
-Route::put('/budgets/postes/{poste}', [BudgetController::class, 'updatePosteFlat']);
-Route::delete('/budgets/postes/{poste}', [BudgetController::class, 'destroyPosteFlat']);
-
-// Budget Annexe 5 — Lignes + actions
-Route::post('/budgets/{budget}/lignes', [BudgetAnnexe5Controller::class, 'storeLigne']);
-Route::put('/budgets/{budget}/lignes/bulk', [BudgetAnnexe5Controller::class, 'bulkUpdateLignes']);
-Route::put('/budgets/lignes/{ligne}', [BudgetAnnexe5Controller::class, 'updateLigne']);
-Route::delete('/budgets/lignes/{ligne}', [BudgetAnnexe5Controller::class, 'destroyLigne']);
-Route::post('/budgets/{budget}/soumettre-ag', [BudgetAnnexe5Controller::class, 'soumettreAg']);
-Route::post('/budgets/{budget}/verrouiller', [BudgetAnnexe5Controller::class, 'verrouiller']);
-Route::get('/budgets/{budget}/simulation', [BudgetAnnexe5Controller::class, 'simulation']);
-Route::get('/budgets/{budget}/suggestions-ia', [BudgetAnnexe5Controller::class, 'suggestionsIa']);
+Route::middleware(['app.permission:finances'])->group(function () {
+    Route::get('/budgets', [BudgetController::class, 'index']);
+    Route::post('/budgets', [BudgetController::class, 'store']);
+    Route::post('/budgets/{budget}/approuver', [BudgetController::class, 'approuver']);
+    Route::post('/budgets/{budget}/postes', [BudgetController::class, 'storePoste']);
+    Route::put('/budgets/{budget}/postes/{poste}', [BudgetController::class, 'updatePoste']);
+    Route::delete('/budgets/{budget}/postes/{poste}', [BudgetController::class, 'destroyPoste']);
+    Route::put('/budgets/postes/{poste}', [BudgetController::class, 'updatePosteFlat']);
+    Route::delete('/budgets/postes/{poste}', [BudgetController::class, 'destroyPosteFlat']);
+    // Budget Annexe 5 — Lignes + actions
+    Route::post('/budgets/{budget}/lignes', [BudgetAnnexe5Controller::class, 'storeLigne']);
+    Route::put('/budgets/{budget}/lignes/bulk', [BudgetAnnexe5Controller::class, 'bulkUpdateLignes']);
+    Route::put('/budgets/lignes/{ligne}', [BudgetAnnexe5Controller::class, 'updateLigne']);
+    Route::delete('/budgets/lignes/{ligne}', [BudgetAnnexe5Controller::class, 'destroyLigne']);
+    Route::post('/budgets/{budget}/soumettre-ag', [BudgetAnnexe5Controller::class, 'soumettreAg']);
+    Route::post('/budgets/{budget}/verrouiller', [BudgetAnnexe5Controller::class, 'verrouiller']);
+    Route::get('/budgets/{budget}/simulation', [BudgetAnnexe5Controller::class, 'simulation']);
+    Route::get('/budgets/{budget}/suggestions-ia', [BudgetAnnexe5Controller::class, 'suggestionsIa']);
+});
 
 // Documents (Sprint 2)
-Route::get('/documents', [DocumentController::class, 'index']);
-Route::post('/documents', [DocumentController::class, 'store']);
-Route::delete('/documents/{document}', [DocumentController::class, 'destroy']);
+Route::middleware(['app.permission:documents'])->group(function () {
+    Route::get('/documents', [DocumentController::class, 'index']);
+    Route::post('/documents', [DocumentController::class, 'store']);
+    Route::delete('/documents/{document}', [DocumentController::class, 'destroy']);
+});
 
 // Profil gestionnaire
 Route::get('/profil', [ProfilController::class, 'show']);
@@ -166,7 +178,7 @@ Route::patch('/notifications/read-all', [NotificationController::class, 'markAll
 Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
 
 // Comptabilité — exercice-scoped endpoints
-Route::prefix('exercices/{exercice}')->group(function () {
+Route::middleware(['app.permission:finances,depenses'])->prefix('exercices/{exercice}')->group(function () {
     Route::get('/dashboard', [ComptabiliteController::class, 'dashboard']);
     Route::get('/journal', [ComptabiliteController::class, 'journal']);
     Route::get('/grand-livre', [ComptabiliteController::class, 'grandLivre']);
@@ -303,33 +315,39 @@ Route::get('/residences/{residence}/comptabilite/exercices', [ExerciceController
 Route::post('/residences/{residence}/comptabilite/exercices', [ExerciceController::class, 'store']);
 
 // Créances (frontend calls /creances)
-Route::get('/creances', [CreanceController::class, 'index']);
-Route::post('/creances/{id}/relancer', [CreanceController::class, 'relancer']);
-Route::post('/creances/relancer-tout', [CreanceController::class, 'relancerTout']);
+Route::middleware(['app.permission:recouvrement,finances'])->group(function () {
+    Route::get('/creances', [CreanceController::class, 'index']);
+    Route::post('/creances/{id}/relancer', [CreanceController::class, 'relancer']);
+    Route::post('/creances/relancer-tout', [CreanceController::class, 'relancerTout']);
+});
 
 // Dépenses finance (frontend calls /depenses-finance)
-Route::get('/depenses-finance', [DepenseFinanceController::class, 'index']);
-Route::post('/depenses-finance', [DepenseFinanceController::class, 'store']);
-Route::get('/depenses-finance/stats', [DepenseFinanceController::class, 'stats']);
-Route::get('/depenses-finance/recurrentes', [DepenseFinanceController::class, 'recurrentes']);
-Route::post('/depenses-finance/recurrentes', [DepenseFinanceController::class, 'storeRecurrente']);
-Route::post('/depenses-finance/import-ia', [DepenseFinanceController::class, 'importIa']);
-Route::post('/depenses-finance/recurrentes/{id}/toggle', [DepenseFinanceController::class, 'toggleRecurrente']);
-Route::post('/depenses-finance/{depense}/approuver', [DepenseFinanceController::class, 'approuver']);
-Route::post('/depenses-finance/{depense}/rejeter', [DepenseFinanceController::class, 'rejeter']);
-Route::delete('/depenses-finance/{depense}', [DepenseFinanceController::class, 'destroy']);
+Route::middleware(['app.permission:depenses,finances'])->group(function () {
+    Route::get('/depenses-finance', [DepenseFinanceController::class, 'index']);
+    Route::post('/depenses-finance', [DepenseFinanceController::class, 'store']);
+    Route::get('/depenses-finance/stats', [DepenseFinanceController::class, 'stats']);
+    Route::get('/depenses-finance/recurrentes', [DepenseFinanceController::class, 'recurrentes']);
+    Route::post('/depenses-finance/recurrentes', [DepenseFinanceController::class, 'storeRecurrente']);
+    Route::post('/depenses-finance/import-ia', [DepenseFinanceController::class, 'importIa']);
+    Route::post('/depenses-finance/recurrentes/{id}/toggle', [DepenseFinanceController::class, 'toggleRecurrente']);
+    Route::post('/depenses-finance/{depense}/approuver', [DepenseFinanceController::class, 'approuver']);
+    Route::post('/depenses-finance/{depense}/rejeter', [DepenseFinanceController::class, 'rejeter']);
+    Route::delete('/depenses-finance/{depense}', [DepenseFinanceController::class, 'destroy']);
+});
 
 // Encaissements (paiements.service.ts)
-Route::get('/encaissements', [EncaissementController::class, 'index']);
-Route::post('/encaissements', [EncaissementController::class, 'store']);
+Route::middleware(['app.permission:finances'])->group(function () {
+    Route::get('/encaissements', [EncaissementController::class, 'index']);
+    Route::post('/encaissements', [EncaissementController::class, 'store']);
 
-// Virements déclarés
-Route::get('/virements-declares', [VirementDeclareController::class, 'index']);
-Route::post('/virements-declares/{id}/valider', [VirementDeclareController::class, 'valider']);
-Route::post('/virements-declares/{id}/rejeter', [VirementDeclareController::class, 'rejeter']);
+    // Virements déclarés
+    Route::get('/virements-declares', [VirementDeclareController::class, 'index']);
+    Route::post('/virements-declares/{id}/valider', [VirementDeclareController::class, 'valider']);
+    Route::post('/virements-declares/{id}/rejeter', [VirementDeclareController::class, 'rejeter']);
 
-// Décompte copropriétaire
-Route::get('/decomptes/{coproprietaire}', [DecompteController::class, 'show']);
+    // Décompte copropriétaire
+    Route::get('/decomptes/{coproprietaire}', [DecompteController::class, 'show']);
+});
 
 // Flat delete for comptabilite depenses (frontend uses /comptabilite/depenses/{id})
 Route::delete('/comptabilite/depenses/{depense}', [ComptabiliteController::class, 'depensesDestroy']);
@@ -341,12 +359,14 @@ Route::post('/comptabilite/exercices/{exercice}/import-ia', [ComptabiliteControl
 // Équipe — utilisateurs app + personnel terrain
 // ========================================
 
-Route::get('/equipe/utilisateurs', [EquipeUtilisateurController::class, 'index']);
-Route::post('/equipe/utilisateurs', [EquipeUtilisateurController::class, 'store']);
-Route::put('/equipe/utilisateurs/{id}', [EquipeUtilisateurController::class, 'update']);
-Route::delete('/equipe/utilisateurs/{id}', [EquipeUtilisateurController::class, 'destroy']);
+Route::middleware(['app.permission:personnel'])->group(function () {
+    Route::get('/equipe/utilisateurs', [EquipeUtilisateurController::class, 'index']);
+    Route::post('/equipe/utilisateurs', [EquipeUtilisateurController::class, 'store']);
+    Route::put('/equipe/utilisateurs/{id}', [EquipeUtilisateurController::class, 'update']);
+    Route::delete('/equipe/utilisateurs/{id}', [EquipeUtilisateurController::class, 'destroy']);
 
-Route::get('/equipe/personnel', [EquipePersonnelController::class, 'index']);
-Route::post('/equipe/personnel', [EquipePersonnelController::class, 'store']);
-Route::put('/equipe/personnel/{id}', [EquipePersonnelController::class, 'update']);
-Route::delete('/equipe/personnel/{id}', [EquipePersonnelController::class, 'destroy']);
+    Route::get('/equipe/personnel', [EquipePersonnelController::class, 'index']);
+    Route::post('/equipe/personnel', [EquipePersonnelController::class, 'store']);
+    Route::put('/equipe/personnel/{id}', [EquipePersonnelController::class, 'update']);
+    Route::delete('/equipe/personnel/{id}', [EquipePersonnelController::class, 'destroy']);
+});
