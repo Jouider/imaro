@@ -40,7 +40,7 @@ class FikriBetaSeeder extends Seeder
             [
                 'tenant_id' => $tenant->id,
                 'name'      => 'Mohammed Fikri',
-                'email'     => 'fikri@blancasyndic.ma',
+                'email'     => 'fikri@blancasyndic-test.ma',
                 'password'  => Hash::make('Imaro2026!'),
                 'role'      => 'manager',
                 'status'    => 'active',
@@ -59,7 +59,7 @@ class FikriBetaSeeder extends Seeder
         $this->command->info("║  Tenant     : BlancaSyndic Beta (id={$tenant->id})");
         $this->command->info('║  Subdomain  : blancasyndic-test');
         $this->command->info("║  Manager    : Mohammed Fikri (id={$fikri->id})");
-        $this->command->info('║  Email      : fikri@blancasyndic.ma');
+        $this->command->info('║  Email      : fikri@blancasyndic-test.ma');
         $this->command->info('║  Password   : Imaro2026!');
         $this->command->info('║  Login URL  : https://staging.imaro.ma');
         $this->command->info('║  Auth flow  : email + password (POST /api/auth/login)');
