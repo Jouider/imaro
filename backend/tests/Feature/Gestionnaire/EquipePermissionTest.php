@@ -230,6 +230,40 @@ it('manager can recreate a gestionnaire with same email after soft-delete', func
     expect($recreateResponse->json('data.id'))->not->toBe($userId);
 });
 
+it('newly created equipe user can login (soft-deleted predecessor does not interfere)', function () {
+    // Create a first user, soft-delete it
+    $first = $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
+        'name'        => 'Salma',
+        'email'       => 'salma@test.ma',
+        'password'    => 'oldpass123',
+        'role'        => 'assistant',
+        'permissions' => ['residences'],
+    ])->assertStatus(201);
+
+    $firstId = $first->json('data.id');
+    $this->actingAs($this->manager)->deleteJson("/api/equipe/utilisateurs/{$firstId}")
+        ->assertStatus(200);
+
+    // Recreate with same email but new password
+    $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
+        'name'        => 'Salma Nouvelle',
+        'email'       => 'salma@test.ma',
+        'password'    => 'newpass456',
+        'role'        => 'assistant',
+        'permissions' => ['residences'],
+    ])->assertStatus(201);
+
+    // Login with the NEW password must succeed
+    $loginResponse = $this->postJson('/api/auth/login', [
+        'email'    => 'salma@test.ma',
+        'password' => 'newpass456',
+    ]);
+
+    $loginResponse->assertStatus(200);
+    $loginResponse->assertJsonPath('status', 'success');
+    expect($loginResponse->json('data.user.name'))->toBe('Salma Nouvelle');
+});
+
 it('UserResource returns permissions and residence_ids in /api/auth/me', function () {
     $gestionnaire = User::create([
         'tenant_id'            => $this->tenant->id,
