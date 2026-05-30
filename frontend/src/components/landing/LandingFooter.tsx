@@ -12,7 +12,7 @@ export function LandingFooter() {
     {
       title: t('landing.footer.col.product'),
       links: [
-        { label: t('landing.footer.link.features'), href: '#features' },
+        { label: t('landing.footer.link.features'), href: '#modules' },
         { label: t('landing.footer.link.pricing'), href: '#pricing' },
         { label: t('landing.footer.link.ia'), href: '#ia' },
         { label: t('landing.footer.link.security'), href: '#' },
@@ -56,9 +56,9 @@ export function LandingFooter() {
   return (
     <footer className="border-t border-slate-200/70 bg-white py-16 dark:bg-card">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="grid gap-10 lg:grid-cols-[1.6fr_repeat(4,1fr)]">
-          {/* Brand column */}
-          <div>
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:gap-10 lg:grid-cols-[1.6fr_repeat(4,1fr)]">
+          {/* Brand column — full width on mobile, 1 col on desktop */}
+          <div className="col-span-2 lg:col-span-1">
             <Link to="/" className="inline-flex">
               <Wordmark className="h-10 w-40" />
             </Link>
@@ -70,7 +70,7 @@ export function LandingFooter() {
             </p>
           </div>
 
-          {/* Link columns */}
+          {/* Link columns — 2-up on mobile, inline on desktop */}
           {sections.map((s) => (
             <div key={s.title}>
               <p className="text-xs font-semibold uppercase tracking-widest text-[var(--primary)]">
@@ -93,9 +93,9 @@ export function LandingFooter() {
         </div>
 
         {/* Bottom strip */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-200/60 pt-6 text-xs text-muted-foreground sm:flex-row">
+        <div className="mt-12 flex flex-col items-center gap-4 border-t border-slate-200/60 pt-6 text-center text-xs text-muted-foreground sm:flex-row sm:justify-between sm:text-start">
           <span>{t('landing.footer.copyright')}</span>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-3">
             <span className="rounded-full bg-[var(--color-imaro-primary-tint)] px-2.5 py-1 font-medium text-[var(--primary)]">
               {t('landing.footer.compliance')}
             </span>

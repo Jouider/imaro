@@ -3,9 +3,10 @@ import { StickyNav } from '@/components/landing/StickyNav'
 import { HeroSection } from '@/components/landing/HeroSection'
 import { LogoBar } from '@/components/landing/LogoBar'
 import { StatsCounter } from '@/components/landing/StatsCounter'
-import { FeatureGrid } from '@/components/landing/FeatureGrid'
+import { ModulesShowcase } from '@/components/landing/ModulesShowcase'
 import { IaSpotlight } from '@/components/landing/IaSpotlight'
 import { PointageSpotlight } from '@/components/landing/PointageSpotlight'
+import { ConformiteSpotlight } from '@/components/landing/ConformiteSpotlight'
 import { ComparisonTable } from '@/components/landing/ComparisonTable'
 import { TestimonialCards } from '@/components/landing/TestimonialCards'
 import { PricingTable } from '@/components/landing/PricingTable'
@@ -14,21 +15,25 @@ import { FooterCta } from '@/components/landing/FooterCta'
 import { LandingFooter } from '@/components/landing/LandingFooter'
 
 /**
- * Imaro landing page — Royal Blue Edition.
+ * Imaro landing page — "Moroccan fintech editorial" edition.
  *
- * 12 sections marketing-first :
- *   1. Sticky nav (transparent → frosted au scroll)
- *   2. Hero (h1 DM Serif + product mockup)
- *   3. Logo bar (marquee continu)
- *   4. Stats animées (4 KPIs)
- *   5. Features grid (6 cards)
- *   6. IA spotlight (score ring animé)
- *   7. Pointage spotlight (10 banques → match)
- *   8. Comparison Excel vs Imaro
- *   9. Testimonials (3 syndics)
- *  10. Pricing (3 plans, Pro featured)
- *  11. FAQ Accordion
- *  12. Footer CTA + LandingFooter
+ * Deliberate light↔dark rhythm: warm off-white content bands punctuated by
+ * deep-navy authority bands (Hero, IA, Conformité, Footer CTA) so the page
+ * never reads as a monotone slab. Every section reveals on scroll.
+ *
+ *   1. Sticky nav (transparent → frosted)
+ *   2. Hero ............................ DARK navy
+ *   3. Logo bar (marquee) .............. light
+ *   4. Stats (animated counters) ....... light
+ *   5. Modules bento (full surface) .... warm light
+ *   6. IA spotlight .................... DARK navy
+ *   7. Pointage spotlight .............. light
+ *   8. Conformité Décret 2.23.700 ...... DARK navy
+ *   9. Comparison Excel vs Imaro ....... light
+ *  10. Testimonials .................... light
+ *  11. Pricing ......................... light
+ *  12. FAQ ............................. light
+ *  13. Footer CTA ..................... DARK navy + footer
  */
 export function HomePage() {
   return (
@@ -39,9 +44,10 @@ export function HomePage() {
         <HeroSection />
         <LogoBar />
         <StatsCounter />
-        <FeatureGrid />
+        <ModulesShowcase />
         <IaSpotlight />
         <PointageSpotlight />
+        <ConformiteSpotlight />
         <ComparisonTable />
         <TestimonialCards />
         <PricingTable />
