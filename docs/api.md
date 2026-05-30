@@ -406,6 +406,10 @@ Notes :
 
 ### GET /api/gestionnaire/residences/{id}/groupes-habitations
 
+Retourne la liste des tranches de la résidence, avec `nb_immeubles` dénormalisé
+(via `withCount`). La relation `immeubles[]` n'est PAS chargée ici pour limiter
+la payload — utilise l'endpoint `/immeubles` pour la liste détaillée.
+
 **Response 200**
 ```json
 {
@@ -415,9 +419,11 @@ Notes :
       {
         "id": 1,
         "nom": "Tranche A",
+        "code": "TA",
+        "residence_id": 1,
         "description": "Bâtiment Nord — 16 appartements",
         "total_tantieme": 1000,
-        "immeubles": [ { "id": 1, "nom": "Immeuble A", "nb_lots": 16 } ]
+        "nb_immeubles": 2
       }
     ]
   }
@@ -429,27 +435,36 @@ Notes :
 ### POST /api/gestionnaire/residences/{id}/groupes-habitations
 
 **Body**
-```json
-{ "nom": "Tranche A", "description": "Bâtiment Nord", "total_tantieme": 1000 }
-```
+| Champ | Type | Requis | Notes |
+|---|---|---|---|
+| `nom` | string | ✓ | max 255, unique par résidence |
+| `code` | string | ✗ | max 20, unique par résidence si fourni (ex: "TA", "TN") |
+| `description` | string | ✗ | |
+| `total_tantieme` | number | ✗ | défaut 1000 |
 
-**Response 201**
+**Response 201** — même shape que GET, avec `nb_immeubles = 0`.
+
+**Erreurs :**
+- `422` — nom ou code déjà utilisé dans cette résidence
 
 ---
 
 ### PUT /api/gestionnaire/residences/{id}/groupes-habitations/{gh}
 
-**Body** (champs optionnels)
+**Body** (tous champs optionnels)
 ```json
-{ "nom": "Tranche A - Révisé", "description": "...", "total_tantieme": 1000 }
+{ "nom": "Tranche A - Révisé", "code": "TA1", "description": "...", "total_tantieme": 1000 }
 ```
 
 ---
 
 ### DELETE /api/gestionnaire/residences/{id}/groupes-habitations/{gh}
 
-**Erreurs :**
-- `422` — impossible de supprimer si le GH contient des immeubles
+Supprime la tranche. Les immeubles rattachés voient leur `groupe_habitation_id`
+mis à `null` (pas de cascade destructive — la FK est `nullOnDelete`, et le
+controller le fait aussi explicitement pour rester audit-friendly).
+
+**Response 200** — `{ "status": "success", "message": "Groupe supprimé" }`
 
 ---
 

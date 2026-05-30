@@ -20,6 +20,7 @@ class GroupeHabitation extends Model
         'tenant_id',
         'residence_id',
         'nom',
+        'code',
         'description',
         'total_tantieme',
     ];
