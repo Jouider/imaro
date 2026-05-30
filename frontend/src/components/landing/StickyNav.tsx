@@ -88,7 +88,7 @@ export function StickyNav() {
           <Button
             asChild
             size="sm"
-            className="bg-[var(--primary)] font-semibold text-white shadow-sm hover:bg-[var(--color-imaro-primary-dark)]"
+            className="hidden bg-gradient-to-br from-[var(--color-imaro-primary)] to-[var(--color-imaro-primary-light)] font-semibold text-white shadow-md transition-all hover:shadow-lg hover:brightness-110 sm:inline-flex"
           >
             <Link to="/login">{t('landing.nav.cta')}</Link>
           </Button>
@@ -133,6 +133,15 @@ export function StickyNav() {
                 <Link to="/login">{t('landing.nav.login')}</Link>
               </Button>
             </div>
+            <Button
+              asChild
+              size="sm"
+              className="mt-2 w-full bg-gradient-to-br from-[var(--color-imaro-primary)] to-[var(--color-imaro-primary-light)] font-semibold text-white shadow-md hover:brightness-110"
+            >
+              <Link to="/login" onClick={() => setMobileOpen(false)}>
+                {t('landing.nav.cta')}
+              </Link>
+            </Button>
           </nav>
         </div>
       )}

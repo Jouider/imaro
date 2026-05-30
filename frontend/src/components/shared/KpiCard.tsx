@@ -36,7 +36,7 @@ export function KpiCard({ icon, value, label, trend, className }: Props) {
     >
       <CardContent className="pt-6">
         <div className="flex items-start justify-between">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-imaro-primary-tint)] text-[var(--primary)] ring-1 ring-inset ring-[var(--color-imaro-primary)]/10">
+          <div className="bg-gradient-imaro flex h-10 w-10 items-center justify-center rounded-lg text-white shadow-sm ring-1 ring-inset ring-[var(--color-imaro-primary)]/20">
             {icon}
           </div>
           {trend && (
@@ -58,7 +58,7 @@ export function KpiCard({ icon, value, label, trend, className }: Props) {
           )}
         </div>
         <div className="mt-3">
-          <p className="text-2xl font-semibold tabular-nums tracking-tight text-[var(--primary)]">
+          <p className="text-lg font-semibold tabular-nums tracking-tight text-[var(--primary)] sm:text-2xl">
             {value}
           </p>
           <p className="mt-0.5 text-sm text-muted-foreground">{label}</p>

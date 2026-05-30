@@ -32,7 +32,7 @@ type Props = {
 function actionClassName(variant: ActionVariant = 'primary') {
   switch (variant) {
     case 'primary':
-      return 'bg-[var(--primary)] text-white hover:bg-[var(--color-imaro-primary-dark)]'
+      return 'bg-gradient-imaro text-white shadow-sm hover:brightness-110'
     case 'secondary':
       return 'bg-[var(--accent)] text-white hover:bg-[var(--color-imaro-accent-dark)]'
     case 'outline':

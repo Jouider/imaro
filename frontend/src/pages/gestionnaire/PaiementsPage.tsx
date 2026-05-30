@@ -1391,7 +1391,7 @@ export function PaiementsPage() {
   const montantTotal = Number(appelForm.montant_total) || 0
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         title={t('gestionnaire.paiements.title', {
           defaultValue: 'Suivi des paiements',

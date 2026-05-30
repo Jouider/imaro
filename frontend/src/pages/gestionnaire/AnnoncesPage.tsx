@@ -160,7 +160,7 @@ export function AnnoncesPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         title={t('gestionnaire.annonces.title')}
         subtitle={t('gestionnaire.annonces.subtitle')}

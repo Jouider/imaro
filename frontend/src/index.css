@@ -4,13 +4,13 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  /* Imaro brand colors — Royal Blue Edition (2026 refresh)
-     Migrated from navy #1B4F72 to a more vibrant, premium royal blue.
-     Reference: Vercel, Stripe Atlas, IBM Carbon. */
-  --color-imaro-primary: #1d4ed8; /* Royal blue 700 — sidebar, headings, primary buttons */
-  --color-imaro-primary-light: #2563eb; /* Blue 600 — focus, hover, secondary CTAs */
-  --color-imaro-primary-dark: #1e40af; /* Blue 800 — active, gradient dark stop */
-  --color-imaro-primary-tint: #dbeafe; /* Blue 100 — subtle backgrounds, surface tints */
+  /* Imaro brand colors — Deep Navy Edition (2026 refresh)
+     Migrated to a deep, premium near-black navy #001244.
+     Reference: Mercury, Ramp, Linear dark. */
+  --color-imaro-primary: #001244; /* Deep navy — sidebar, headings, primary buttons */
+  --color-imaro-primary-light: #1b3b80; /* Lifted navy — focus, hover, secondary CTAs */
+  --color-imaro-primary-dark: #000b2b; /* Near-black navy — active, gradient dark stop */
+  --color-imaro-primary-tint: #dde3f0; /* Pale navy — subtle backgrounds, surface tints */
   --color-imaro-accent: #e67e22; /* Orange — secondary CTAs, "Nouveau" badges */
   --color-imaro-accent-light: #f39c12;
   --color-imaro-accent-dark: #ba6118;
@@ -74,11 +74,11 @@
   --card-foreground: oklch(0.27 0.025 264);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.27 0.025 264);
-  /* Primary = Imaro royal blue #1D4ED8 */
-  --primary: #1d4ed8;
+  /* Primary = Imaro deep navy #001244 */
+  --primary: #001244;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0.015 254);
-  --secondary-foreground: #1e40af;
+  --secondary-foreground: #1b3b80;
   --muted: oklch(0.97 0.015 254);
   --muted-foreground: #64748b;
   /* Accent = Imaro orange #E67E22 — secondary CTA only */
@@ -87,20 +87,20 @@
   --destructive: #e74c3c;
   --border: oklch(0.92 0.01 254);
   --input: oklch(0.92 0.01 254);
-  --ring: #3b82f6;
+  --ring: #1b3b80;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: #1d4ed8;
+  --sidebar: #001244;
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: #1e40af;
+  --sidebar-primary: #1b3b80;
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: #2563eb;
+  --sidebar-accent: #0a1d52;
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: #93c5fd;
+  --sidebar-ring: #6b86c9;
 }
 
 .dark {
@@ -110,9 +110,9 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.21 0.02 254);
   --popover-foreground: oklch(0.985 0 0);
-  /* Primary lifts to blue-500 in dark mode for contrast on dark surfaces */
-  --primary: #3b82f6;
-  --primary-foreground: oklch(0.18 0.02 254);
+  /* Primary lifts to periwinkle in dark mode for contrast on dark surfaces */
+  --primary: #6486d9;
+  --primary-foreground: oklch(0.18 0.04 264);
   --secondary: oklch(0.27 0.02 254);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.27 0.02 254);
@@ -122,20 +122,20 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: #60a5fa;
-  --chart-1: #3b82f6;
+  --ring: #6486d9;
+  --chart-1: #6486d9;
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
   --sidebar: oklch(0.21 0.025 254);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: #3b82f6;
-  --sidebar-primary-foreground: oklch(0.18 0.02 254);
+  --sidebar-primary: #6486d9;
+  --sidebar-primary-foreground: oklch(0.18 0.04 264);
   --sidebar-accent: oklch(0.27 0.02 254);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: #60a5fa;
+  --sidebar-ring: #6486d9;
 }
 
 @layer base {
@@ -189,6 +189,72 @@
     );
     background-size: 200% 100%;
     animation: imaro-shimmer 1.6s ease-in-out infinite;
+  }
+
+  /* Navy gradient utilities derived from --color-imaro-primary (#001244)
+     Use on primary CTAs, icon chips, sidebar, hero surfaces to lift the
+     deep navy palette. Avoid hand-editing src/components/ui/** — apply
+     these classes from feature components instead. */
+  .bg-gradient-imaro {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-imaro-primary) 0%,
+      var(--color-imaro-primary-light) 100%
+    );
+  }
+  .bg-gradient-imaro-dark {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-imaro-primary-dark) 0%,
+      var(--color-imaro-primary) 60%,
+      var(--color-imaro-primary-light) 100%
+    );
+  }
+  .bg-gradient-imaro-soft {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-imaro-primary-tint) 0%,
+      #ffffff 100%
+    );
+  }
+  .bg-gradient-imaro-radial {
+    background-image: radial-gradient(
+      circle at 30% 20%,
+      var(--color-imaro-primary-light) 0%,
+      var(--color-imaro-primary) 45%,
+      var(--color-imaro-primary-dark) 100%
+    );
+  }
+  .bg-gradient-imaro-accent {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-imaro-primary) 0%,
+      var(--color-imaro-accent) 140%
+    );
+  }
+  .text-gradient-imaro {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-imaro-primary) 0%,
+      var(--color-imaro-primary-light) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .ring-gradient-imaro {
+    box-shadow:
+      0 1px 2px 0 rgb(0 18 68 / 0.05),
+      0 8px 24px -8px rgb(0 18 68 / 0.25);
+  }
+  .hover-gradient-shift {
+    background-size: 200% 200%;
+    background-position: 0% 0%;
+    transition: background-position 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .hover-gradient-shift:hover {
+    background-position: 100% 100%;
   }
 
   /* Subtle hover lift used on KpiCard, ModuleCard */

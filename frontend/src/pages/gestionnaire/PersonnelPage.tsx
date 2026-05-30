@@ -357,7 +357,7 @@ export function PersonnelPage() {
         actions={
           <Button
             onClick={openCreate}
-            className="bg-[var(--primary)] text-white hover:bg-[var(--color-imaro-primary-dark)]"
+            className="bg-gradient-imaro text-white shadow-sm hover:brightness-110"
           >
             <Plus className="size-4" />
             {t('equipe.personnel.add')}
@@ -504,7 +504,7 @@ export function PersonnelPage() {
                 createMut.isPending ||
                 updateMut.isPending
               }
-              className="bg-[var(--primary)] text-white hover:bg-[var(--color-imaro-primary-dark)]"
+              className="bg-gradient-imaro text-white shadow-sm hover:brightness-110"
             >
               {isEdit ? t('actions.save') : t('actions.create')}
             </Button>

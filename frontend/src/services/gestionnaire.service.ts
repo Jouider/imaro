@@ -710,102 +710,54 @@ export async function getRecouvrementMensuel(): Promise<RecouvrementMois[]> {
 // ─── Résidences ──────────────────────────────────────────────────────────────
 
 export async function getResidences(search?: string): Promise<Residence[]> {
-  return withMock(async () => {
-    const params: Record<string, string> = {}
-    if (search) params.search = search
-    const res = await api.get<ApiEnvelope<{ residences: Residence[] }>>(
-      '/gestionnaire/residences',
-      { params },
-    )
-    return res.data.data.residences
-  }, MOCK_RESIDENCES)
+  const params: Record<string, string> = {}
+  if (search) params.search = search
+  const res = await api.get<ApiEnvelope<{ residences: Residence[] }>>(
+    '/gestionnaire/residences',
+    { params },
+  )
+  return res.data.data.residences
 }
 
 export async function getResidence(id: number): Promise<Residence> {
-  return withMock(
-    async () => {
-      const res = await api.get<ApiEnvelope<Residence>>(
-        `/gestionnaire/residences/${id}`,
-      )
-      return res.data.data
-    },
-    MOCK_RESIDENCES.find((r) => r.id === id) ?? MOCK_RESIDENCES[0],
+  const res = await api.get<ApiEnvelope<Residence>>(
+    `/gestionnaire/residences/${id}`,
   )
+  return res.data.data
 }
 
 export async function storeResidence(
   data: CreateResidenceInput,
 ): Promise<Residence> {
-  const mock: Residence = {
-    id: Date.now(),
-    name: data.name,
-    address: data.address,
-    city: data.city,
-    nb_lots: 0,
-    total_tantieme: 0,
-    status: 'actif',
-    taux_recouvrement: 0,
-    mode_cotisation: data.mode_cotisation,
-    montant_fixe: data.montant_fixe,
-    jour_echeance: data.jour_echeance,
-  }
-  return withMock(async () => {
-    const res = await api.post<ApiEnvelope<Residence>>(
-      '/gestionnaire/residences',
-      data,
-    )
-    return res.data.data
-  }, mock)
+  const res = await api.post<ApiEnvelope<Residence>>(
+    '/gestionnaire/residences',
+    data,
+  )
+  return res.data.data
 }
 
 export async function updateResidence(
   id: number,
   data: UpdateResidenceInput,
 ): Promise<Residence> {
-  const base = MOCK_RESIDENCES.find((r) => r.id === id) ?? MOCK_RESIDENCES[0]
-  return withMock(
-    async () => {
-      const res = await api.put<ApiEnvelope<Residence>>(
-        `/gestionnaire/residences/${id}`,
-        data,
-      )
-      return res.data.data
-    },
-    { ...base, ...data, id },
+  const res = await api.put<ApiEnvelope<Residence>>(
+    `/gestionnaire/residences/${id}`,
+    data,
   )
+  return res.data.data
 }
 
 export async function deleteResidence(id: number): Promise<void> {
-  return withMock(async () => {
-    await api.delete(`/gestionnaire/residences/${id}`)
-  }, undefined)
+  await api.delete(`/gestionnaire/residences/${id}`)
 }
 
 export async function getResidenceOverview(
   id: number,
 ): Promise<ResidenceOverview> {
-  const r = MOCK_RESIDENCES.find((x) => x.id === id) ?? MOCK_RESIDENCES[0]
-  const cotisation = r.montant_fixe ?? 1500
-  const attendu = r.nb_lots * cotisation
-  const paye = Math.round((attendu * r.taux_recouvrement) / 100)
-  const enRetard = attendu - paye
-  const mock: ResidenceOverview = {
-    nb_lots: r.nb_lots,
-    nb_coproprietaires: Math.max(0, r.nb_lots - 2),
-    taux_recouvrement: r.taux_recouvrement,
-    paye_ce_mois: paye,
-    en_attente: Math.round(enRetard * 0.4),
-    en_retard: Math.round(enRetard * 0.6),
-    nb_impayes: Math.round((r.nb_lots * (100 - r.taux_recouvrement)) / 100),
-    tresorerie: paye * 3,
-    fonds_reserve: Math.round(paye * 1.5),
-  }
-  return withMock(async () => {
-    const res = await api.get<ApiEnvelope<ResidenceOverview>>(
-      `/gestionnaire/residences/${id}/overview`,
-    )
-    return res.data.data
-  }, mock)
+  const res = await api.get<ApiEnvelope<ResidenceOverview>>(
+    `/gestionnaire/residences/${id}/overview`,
+  )
+  return res.data.data
 }
 
 // ─── Comptes bancaires (encaissement) ──────────────────────────────────────────

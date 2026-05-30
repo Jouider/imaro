@@ -366,7 +366,7 @@ export function TicketsPage() {
   ]
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         title={t('gestionnaire.tickets.title')}
         subtitle={t('gestionnaire.tickets.subtitle')}

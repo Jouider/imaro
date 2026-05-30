@@ -175,8 +175,8 @@ export function RecouvrementPage() {
     <div className="mx-auto max-w-6xl space-y-6 p-6">
       {/* Header */}
       <div className="flex items-start gap-3">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-[var(--color-imaro-primary)]/10">
-          <Scale className="size-5 text-[var(--color-imaro-primary)]" />
+        <div className="bg-gradient-imaro flex size-10 items-center justify-center rounded-xl shadow-sm ring-1 ring-inset ring-[var(--color-imaro-primary)]/20">
+          <Scale className="size-5 text-white" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-foreground">
