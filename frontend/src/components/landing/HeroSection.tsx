@@ -24,32 +24,55 @@ export function HeroSection() {
           'linear-gradient(135deg, var(--color-imaro-primary) 0%, var(--color-imaro-primary-dark) 60%, #0b1f4a 100%)',
       }}
     >
-      {/* Grid overlay */}
+      {/* Masked grid — fades toward edges so it never reads as flat wallpaper */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-50"
+        className="pointer-events-none absolute inset-0 opacity-60"
         style={{
           backgroundImage: `
-            repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 64px),
-            repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 64px)
+            repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 60px),
+            repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 60px)
           `,
+          maskImage:
+            'radial-gradient(ellipse 90% 80% at 60% 30%, black 30%, transparent 80%)',
+          WebkitMaskImage:
+            'radial-gradient(ellipse 90% 80% at 60% 30%, black 30%, transparent 80%)',
         }}
       />
-      {/* Radial glow */}
+      {/* Animated aurora blobs — give the hero life instead of a static slab */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-32 -top-32 size-[600px] rounded-full opacity-40 blur-3xl"
+        className="l-aurora pointer-events-none absolute -right-40 -top-40 size-[640px] rounded-full opacity-50 blur-3xl"
         style={{
           background:
-            'radial-gradient(circle, rgba(59,130,246,0.4) 0%, transparent 70%)',
+            'radial-gradient(circle, rgba(99,134,217,0.55) 0%, transparent 70%)',
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-32 bottom-0 size-[400px] rounded-full opacity-30 blur-3xl"
+        className="l-aurora pointer-events-none absolute -left-40 bottom-[-10%] size-[480px] rounded-full opacity-40 blur-3xl"
         style={{
           background:
-            'radial-gradient(circle, rgba(230,126,34,0.3) 0%, transparent 70%)',
+            'radial-gradient(circle, rgba(230,126,34,0.4) 0%, transparent 70%)',
+          animationDelay: '4s',
+        }}
+      />
+      <div
+        aria-hidden
+        className="l-aurora pointer-events-none absolute left-1/2 top-1/4 size-[360px] rounded-full opacity-30 blur-3xl"
+        style={{
+          background:
+            'radial-gradient(circle, rgba(45,212,191,0.35) 0%, transparent 70%)',
+          animationDelay: '2s',
+        }}
+      />
+      {/* Fine grain overlay for texture */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.04] mix-blend-overlay"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
         }}
       />
 
@@ -63,11 +86,39 @@ export function HeroSection() {
           </div>
 
           {/* Headline */}
-          <h1 className="l-fade-up l-d-100 mt-5 font-display text-5xl leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl">
+          <h1 className="l-fade-up l-d-100 mt-5 font-display text-5xl leading-[1.02] tracking-tight text-white sm:text-6xl lg:text-[5rem]">
             {t('landing.hero.title1')}
             <br />
-            <span className="bg-gradient-to-r from-white via-blue-100 to-[var(--accent)] bg-clip-text text-transparent">
-              {t('landing.hero.title2')}
+            <span className="relative inline-block">
+              {/* Soft glow behind the accent word */}
+              <span
+                aria-hidden
+                className="absolute -inset-x-4 inset-y-0 -z-10 rounded-full bg-[var(--accent)]/25 blur-2xl"
+              />
+              <span className="l-drift bg-gradient-to-r from-amber-200 via-[var(--color-imaro-accent-light)] to-[var(--accent)] bg-clip-text text-transparent">
+                {t('landing.hero.title2')}
+              </span>
+              {/* Hand-drawn underline stroke */}
+              <svg
+                aria-hidden
+                viewBox="0 0 300 18"
+                preserveAspectRatio="none"
+                className="absolute -bottom-2 left-0 h-3 w-full"
+              >
+                <path
+                  d="M3 12 C 60 4, 120 4, 160 9 S 250 15, 297 6"
+                  fill="none"
+                  stroke="var(--accent)"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  pathLength={1}
+                  style={{
+                    strokeDasharray: 1,
+                    strokeDashoffset: 1,
+                    animation: 'landing-dash 1.1s ease 0.6s forwards',
+                  }}
+                />
+              </svg>
             </span>
           </h1>
 
@@ -226,36 +277,75 @@ function HeroMockup() {
             87 %
           </span>
         </div>
-        <div className="flex h-10 items-end gap-1">
-          {[
-            { p: 62, r: 38 },
-            { p: 70, r: 30 },
-            { p: 75, r: 25 },
-            { p: 82, r: 18 },
-            { p: 78, r: 22 },
-            { p: 87, r: 13 },
-          ].map((bar, i) => (
-            <div key={i} className="relative flex-1">
-              <div
-                className="absolute inset-x-0 bottom-0 rounded-sm bg-rose-300"
-                style={{ height: `${bar.p + bar.r}%` }}
+        <svg
+          viewBox="0 0 200 56"
+          preserveAspectRatio="none"
+          className="h-14 w-full"
+        >
+          <defs>
+            <linearGradient id="hero-area" x1="0" y1="0" x2="0" y2="1">
+              <stop
+                offset="0%"
+                stopColor="var(--color-imaro-primary-light)"
+                stopOpacity="0.45"
               />
-              <div
-                className="absolute inset-x-0 bottom-0 rounded-sm bg-gradient-to-t from-[var(--primary)] to-[var(--color-imaro-primary-light)]"
-                style={{ height: `${bar.p}%` }}
+              <stop
+                offset="100%"
+                stopColor="var(--color-imaro-primary-light)"
+                stopOpacity="0"
               />
-            </div>
+            </linearGradient>
+          </defs>
+          {/* baseline grid */}
+          {[14, 28, 42].map((y) => (
+            <line
+              key={y}
+              x1="0"
+              y1={y}
+              x2="200"
+              y2={y}
+              stroke="rgb(0 18 68 / 0.06)"
+              strokeWidth="1"
+            />
           ))}
-        </div>
-        <div className="mt-1 flex items-center gap-2.5 text-[8px] text-slate-500">
-          <span className="flex items-center gap-1">
-            <span className="size-1.5 rounded-sm bg-[var(--primary)]" />
-            Recouvré
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="size-1.5 rounded-sm bg-rose-300" />
-            Restant
-          </span>
+          {/* area fill */}
+          <path
+            d="M6 32 L43 27 L80 23 L117 18 L154 21 L194 14 L194 50 L6 50 Z"
+            fill="url(#hero-area)"
+          />
+          {/* recouvré line */}
+          <path
+            d="M6 32 L43 27 L80 23 L117 18 L154 21 L194 14"
+            fill="none"
+            stroke="var(--color-imaro-primary)"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* data points */}
+          {[
+            [6, 32],
+            [43, 27],
+            [80, 23],
+            [117, 18],
+            [154, 21],
+            [194, 14],
+          ].map(([x, y], i) => (
+            <circle
+              key={i}
+              cx={x}
+              cy={y}
+              r={i === 5 ? 3.5 : 2}
+              fill="white"
+              stroke="var(--color-imaro-primary)"
+              strokeWidth="2"
+            />
+          ))}
+        </svg>
+        <div className="mt-1 flex items-center justify-between text-[8px] text-slate-400">
+          {['Déc', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai'].map((m) => (
+            <span key={m}>{m}</span>
+          ))}
         </div>
       </div>
 

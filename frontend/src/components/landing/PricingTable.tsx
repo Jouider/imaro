@@ -1,58 +1,55 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Check, Sparkles } from 'lucide-react'
+import { Check, ArrowRight, Sparkles, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useReveal } from './useReveal'
 
-type Plan = {
-  key: 'starter' | 'pro' | 'enterprise'
-  priceFrom: number | null
-  featured?: boolean
-  /** 6 boolean flags matching landing.pricing.features.* */
-  features: boolean[]
-}
-
-const PLANS: Plan[] = [
-  {
-    key: 'starter',
-    priceFrom: 299,
-    features: [true, true, true, false, false, false],
-  },
-  {
-    key: 'pro',
-    priceFrom: 599,
-    featured: true,
-    features: [true, true, true, true, true, false],
-  },
-  {
-    key: 'enterprise',
-    priceFrom: null, // "Sur devis"
-    features: [true, true, true, true, true, true],
-  },
-]
-
-const FEATURE_KEYS = [
-  'residences',
-  'copros',
-  'support',
-  'ia',
-  'pointage',
-  'multitenant',
+const INCLUDED = [
+  'included1',
+  'included2',
+  'included3',
+  'included4',
+  'included5',
+  'included6',
 ] as const
 
 /**
- * Pricing — 3 plans côte à côte. Plan Pro mis en avant avec gradient bleu.
+ * Pricing — no rigid grid. Every copropriété is unique, so the offer is
+ * built per client ("sur devis"). One premium navy card on a light band:
+ * left = positioning + dual CTA, right = everything-included checklist.
  */
 export function PricingTable() {
   const { t } = useTranslation()
+  const { ref, shown } = useReveal<HTMLDivElement>()
+
   return (
-    <section id="pricing" className="bg-slate-50/60 py-24 dark:bg-background">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-[var(--accent)]">
+    <section
+      id="pricing"
+      className="relative overflow-hidden bg-[#fbfaf7] py-24 dark:bg-background"
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.5] dark:opacity-20"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle at 1px 1px, rgb(0 18 68 / 0.06) 1px, transparent 0)',
+          backgroundSize: '32px 32px',
+        }}
+      />
+
+      <div ref={ref} className="relative mx-auto max-w-5xl px-5 sm:px-8">
+        {/* Header */}
+        <div
+          className={cn(
+            'mx-auto max-w-2xl text-center l-reveal',
+            shown && 'l-shown',
+          )}
+        >
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
             {t('landing.pricing.eyebrow')}
           </p>
-          <h2 className="mt-3 font-display text-4xl leading-tight tracking-tight text-[var(--primary)] sm:text-5xl">
+          <h2 className="mt-3 font-display text-4xl leading-[1.1] tracking-tight text-[var(--primary)] sm:text-5xl">
             {t('landing.pricing.title')}
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
@@ -60,141 +57,85 @@ export function PricingTable() {
           </p>
         </div>
 
-        <div className="mt-14 grid gap-6 lg:grid-cols-3 lg:gap-4">
-          {PLANS.map((p) => (
-            <article
-              key={p.key}
-              className={cn(
-                'relative flex flex-col rounded-3xl p-7 transition-all duration-300',
-                p.featured
-                  ? 'border-2 border-[var(--primary)] bg-gradient-to-b from-[var(--color-imaro-primary)] to-[var(--color-imaro-primary-dark)] text-white shadow-2xl shadow-blue-500/30 lg:-mt-6 lg:scale-105'
-                  : 'border border-slate-200/70 bg-white hover:-translate-y-1 hover:shadow-xl dark:bg-card',
-              )}
-            >
-              {p.featured && (
-                <span className="absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-[var(--accent)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg">
-                  <Sparkles className="size-3" />
-                  {t('landing.pricing.popular')}
+        {/* Devis card */}
+        <div
+          style={{ ['--l-delay' as string]: '0.15s' }}
+          className={cn('l-reveal-scale mt-14', shown && 'l-shown')}
+        >
+          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-imaro-radial p-1 shadow-2xl shadow-[var(--color-imaro-primary)]/25">
+            {/* Aurora */}
+            <div
+              aria-hidden
+              className="l-aurora pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-[var(--accent)]/25 blur-3xl"
+            />
+            <div className="relative grid gap-8 rounded-[1.85rem] p-8 sm:p-10 lg:grid-cols-2 lg:gap-12">
+              {/* Left — positioning + CTA */}
+              <div className="flex flex-col justify-center text-white">
+                <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white/85 backdrop-blur">
+                  <Sparkles className="size-3.5 text-[var(--color-imaro-accent-light)]" />
+                  {t('landing.pricing.cardEyebrow')}
                 </span>
-              )}
-
-              {/* Name */}
-              <h3
-                className={cn(
-                  'font-display text-2xl tracking-tight',
-                  p.featured ? 'text-white' : 'text-[var(--primary)]',
-                )}
-              >
-                {t(`landing.pricing.${p.key}.name`)}
-              </h3>
-              <p
-                className={cn(
-                  'mt-1 text-sm',
-                  p.featured ? 'text-white/80' : 'text-muted-foreground',
-                )}
-              >
-                {t(`landing.pricing.${p.key}.tagline`)}
-              </p>
-
-              {/* Price */}
-              <div className="mt-6 flex items-baseline gap-1">
-                {p.priceFrom === null ? (
-                  <span
-                    className={cn(
-                      'font-display text-4xl tracking-tight',
-                      p.featured ? 'text-white' : 'text-[var(--primary)]',
-                    )}
-                  >
-                    {t('landing.pricing.onQuote')}
-                  </span>
-                ) : (
-                  <>
-                    <span
-                      className={cn(
-                        'text-sm',
-                        p.featured ? 'text-white/70' : 'text-muted-foreground',
-                      )}
-                    >
-                      {t('landing.pricing.from')}
-                    </span>
-                    <span
-                      className={cn(
-                        'font-display text-5xl leading-none tracking-tight',
-                        p.featured ? 'text-white' : 'text-[var(--primary)]',
-                      )}
-                    >
-                      {p.priceFrom}
-                    </span>
-                    <span
-                      className={cn(
-                        'text-sm font-medium',
-                        p.featured ? 'text-white/80' : 'text-muted-foreground',
-                      )}
-                    >
-                      {t('landing.pricing.currency')}
-                    </span>
-                  </>
-                )}
-              </div>
-              {p.priceFrom !== null && (
-                <p
-                  className={cn(
-                    'mt-1 text-xs',
-                    p.featured ? 'text-white/70' : 'text-muted-foreground',
-                  )}
-                >
-                  {t('landing.pricing.perMonth')}
+                <p className="mt-5 font-display text-5xl leading-none tracking-tight sm:text-6xl">
+                  {t('landing.pricing.cardPrice')}
                 </p>
-              )}
+                <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/70">
+                  {t('landing.pricing.cardDesc')}
+                </p>
 
-              {/* CTA */}
-              <Button
-                asChild
-                size="lg"
-                className={cn(
-                  'mt-7 h-11 font-semibold',
-                  p.featured
-                    ? 'bg-white text-[var(--primary)] hover:bg-white/90'
-                    : 'bg-gradient-imaro text-white shadow-sm hover:brightness-110',
-                )}
-              >
-                <Link to="/login">
-                  {p.priceFrom === null
-                    ? t('landing.pricing.ctaContact')
-                    : t('landing.pricing.ctaStart')}
-                </Link>
-              </Button>
-
-              {/* Features */}
-              <ul className="mt-7 space-y-3 border-t pt-6 text-sm">
-                {FEATURE_KEYS.map((fk, i) => (
-                  <li
-                    key={fk}
-                    className={cn(
-                      'flex items-start gap-2',
-                      !p.features[i] && 'opacity-40',
-                    )}
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                  <Button
+                    asChild
+                    size="lg"
+                    className="h-12 bg-white px-6 text-base font-semibold text-[var(--primary)] shadow-lg hover:bg-white/90"
                   >
-                    <Check
+                    <Link to="/login">
+                      {t('landing.pricing.ctaQuote')}
+                      <ArrowRight className="ms-1.5 size-4 rtl:rotate-180" />
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    size="lg"
+                    variant="outline"
+                    className="h-12 border-white/30 bg-white/5 px-6 text-base font-semibold text-white backdrop-blur hover:bg-white/15 hover:text-white"
+                  >
+                    <a href="mailto:contact@imaro.ma">
+                      <MessageCircle className="me-1.5 size-4" />
+                      {t('landing.pricing.ctaExpert')}
+                    </a>
+                  </Button>
+                </div>
+
+                <p className="mt-5 text-xs text-white/55">
+                  {t('landing.pricing.note')}
+                </p>
+              </div>
+
+              {/* Right — everything included */}
+              <div className="rounded-2xl border border-white/12 bg-white/[0.06] p-6 backdrop-blur-xl">
+                <p className="text-xs font-semibold uppercase tracking-wider text-white/55">
+                  {t('landing.pricing.includedTitle')}
+                </p>
+                <ul className="mt-4 space-y-3">
+                  {INCLUDED.map((k, i) => (
+                    <li
+                      key={k}
+                      style={{ ['--l-delay' as string]: `${0.25 + i * 0.06}s` }}
                       className={cn(
-                        'mt-0.5 size-4 shrink-0',
-                        p.featured
-                          ? 'text-[var(--accent)]'
-                          : 'text-emerald-500',
-                      )}
-                    />
-                    <span
-                      className={cn(
-                        p.featured ? 'text-white/90' : 'text-foreground',
+                        'l-reveal flex items-start gap-3 text-sm text-white/90',
+                        shown && 'l-shown',
                       )}
                     >
-                      {t(`landing.pricing.features.${fk}`)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
+                      <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-imaro-success)]/90 text-white">
+                        <Check className="size-3" strokeWidth={3} />
+                      </span>
+                      {t(`landing.pricing.${k}`)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
