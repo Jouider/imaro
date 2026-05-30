@@ -155,7 +155,7 @@ export function PricingTable() {
                   'mt-7 h-11 font-semibold',
                   p.featured
                     ? 'bg-white text-[var(--primary)] hover:bg-white/90'
-                    : 'bg-[var(--primary)] text-white hover:bg-[var(--color-imaro-primary-dark)]',
+                    : 'bg-gradient-imaro text-white shadow-sm hover:brightness-110',
                 )}
               >
                 <Link to="/login">

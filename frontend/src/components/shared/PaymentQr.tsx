@@ -12,11 +12,11 @@ type Props = {
 
 /** Couleur foncée du QR, résolue depuis le token de marque (fallback bleu Imaro). */
 function resolveQrColor(): string {
-  if (typeof window === 'undefined') return '#1D4ED8'
+  if (typeof window === 'undefined') return '#001244'
   const v = getComputedStyle(document.documentElement)
     .getPropertyValue('--color-imaro-primary')
     .trim()
-  return v || '#1D4ED8'
+  return v || '#001244'
 }
 
 /**
