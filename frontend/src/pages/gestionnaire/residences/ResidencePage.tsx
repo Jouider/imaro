@@ -12,6 +12,7 @@ import {
   Building2,
   MapPin,
   CalendarClock,
+  Layers,
 } from 'lucide-react'
 import { GenerateLotsModal } from '@/components/gestionnaire/GenerateLotsModal'
 import { ResidenceFormDialog } from '@/components/gestionnaire/ResidenceFormDialog'
@@ -29,9 +30,14 @@ import {
   storeImmeuble,
   updateImmeuble,
   deleteImmeuble,
+  getGroupesHabitations,
+  storeGroupeHabitation,
+  updateGroupeHabitation,
+  deleteGroupeHabitation,
   type CreateResidenceInput,
   type Lot,
   type Immeuble,
+  type GroupeHabitation,
 } from '@/services/gestionnaire.service'
 import { ResidenceOverviewTab } from '@/components/gestionnaire/ResidenceOverviewTab'
 import { ResidenceBankAccountsTab } from '@/components/gestionnaire/ResidenceBankAccountsTab'
@@ -64,6 +70,7 @@ type Tab =
   | 'lots'
   | 'coproprietaires'
   | 'exercices'
+  | 'tranches'
   | 'immeubles'
   | 'encaissement'
 
@@ -96,10 +103,22 @@ const EMPTY_FORM: LotForm = {
 
 type ImmeubleForm = {
   nom: string
+  groupe_habitation_id: string
 }
 
 const EMPTY_IMMEUBLE_FORM: ImmeubleForm = {
   nom: '',
+  groupe_habitation_id: '',
+}
+
+type TrancheForm = {
+  nom: string
+  code: string
+}
+
+const EMPTY_TRANCHE_FORM: TrancheForm = {
+  nom: '',
+  code: '',
 }
 
 export function ResidencePage() {
@@ -125,6 +144,16 @@ export function ResidencePage() {
   )
   const [immeubleForm, setImmeubleForm] =
     useState<ImmeubleForm>(EMPTY_IMMEUBLE_FORM)
+
+  // Tranche (Groupe Habitation) dialog state
+  const [trancheDialogOpen, setTrancheDialogOpen] = useState(false)
+  const [editingTranche, setEditingTranche] = useState<GroupeHabitation | null>(
+    null,
+  )
+  const [deletingTranche, setDeletingTranche] =
+    useState<GroupeHabitation | null>(null)
+  const [trancheForm, setTrancheForm] =
+    useState<TrancheForm>(EMPTY_TRANCHE_FORM)
 
   // Generate lots modal state
   const [generateOpen, setGenerateOpen] = useState(false)
@@ -189,6 +218,14 @@ export function ResidencePage() {
   })
   const immeubles = immeublesQuery.data ?? []
 
+  const tranchesQuery = useQuery({
+    queryKey: ['gestionnaire', 'groupes-habitations', residenceId],
+    queryFn: () => getGroupesHabitations(residenceId),
+    enabled: !!residenceId,
+  })
+  const tranches = tranchesQuery.data ?? []
+  const hasTranches = tranches.length > 0
+
   // ── Lot Mutations ─────────────────────────────────────────────────────────────
 
   const storeMutation = useMutation({
@@ -234,7 +271,8 @@ export function ResidencePage() {
   // ── Immeuble Mutations ────────────────────────────────────────────────────────
 
   const storeImmeubleMutation = useMutation({
-    mutationFn: (data: { nom: string }) => storeImmeuble(residenceId, data),
+    mutationFn: (data: { nom: string; groupe_habitation_id?: number }) =>
+      storeImmeuble(residenceId, data),
     onSuccess: () => {
       void qc.invalidateQueries({
         queryKey: ['gestionnaire', 'immeubles', residenceId],
@@ -261,7 +299,7 @@ export function ResidencePage() {
       data,
     }: {
       immeubleId: number
-      data: { nom: string }
+      data: { nom: string; groupe_habitation_id?: number }
     }) => updateImmeuble(residenceId, immeubleId, data),
     onSuccess: () => {
       void qc.invalidateQueries({
@@ -303,6 +341,58 @@ export function ResidencePage() {
           defaultValue: "Erreur lors de la suppression de l'immeuble",
         }),
       ),
+  })
+
+  // ── Tranche (Groupe Habitation) Mutations ────────────────────────────────
+
+  const invalidateTranches = () => {
+    void qc.invalidateQueries({
+      queryKey: ['gestionnaire', 'groupes-habitations', residenceId],
+    })
+    // Refresh AppelsFondsPage's GH dropdown if open
+    void qc.invalidateQueries({ queryKey: ['gestionnaire', 'immeubles'] })
+  }
+
+  const storeTrancheMutation = useMutation({
+    mutationFn: (data: { nom: string; code?: string }) =>
+      storeGroupeHabitation(residenceId, data),
+    onSuccess: () => {
+      invalidateTranches()
+      setTrancheDialogOpen(false)
+      setTrancheForm(EMPTY_TRANCHE_FORM)
+      toast.success(t('gestionnaire.residence.tranches.added'))
+    },
+    onError: () => toast.error(t('gestionnaire.residence.tranches.addError')),
+  })
+
+  const updateTrancheMutation = useMutation({
+    mutationFn: ({
+      ghId,
+      data,
+    }: {
+      ghId: number
+      data: { nom?: string; code?: string }
+    }) => updateGroupeHabitation(residenceId, ghId, data),
+    onSuccess: () => {
+      invalidateTranches()
+      setTrancheDialogOpen(false)
+      setEditingTranche(null)
+      setTrancheForm(EMPTY_TRANCHE_FORM)
+      toast.success(t('gestionnaire.residence.tranches.updated'))
+    },
+    onError: () =>
+      toast.error(t('gestionnaire.residence.tranches.updateError')),
+  })
+
+  const deleteTrancheMutation = useMutation({
+    mutationFn: (ghId: number) => deleteGroupeHabitation(residenceId, ghId),
+    onSuccess: () => {
+      invalidateTranches()
+      setDeletingTranche(null)
+      toast.success(t('gestionnaire.residence.tranches.deleted'))
+    },
+    onError: () =>
+      toast.error(t('gestionnaire.residence.tranches.deleteError')),
   })
 
   // ── Lot Handlers ─────────────────────────────────────────────────────────────
@@ -357,20 +447,55 @@ export function ResidencePage() {
     setImmeubleDialogOpen(true)
   }
 
+  function openCreateTranche() {
+    setEditingTranche(null)
+    setTrancheForm(EMPTY_TRANCHE_FORM)
+    setTrancheDialogOpen(true)
+  }
+
   function openEditImmeuble(imm: Immeuble) {
     setEditingImmeuble(imm)
-    setImmeubleForm({ nom: imm.nom })
+    setImmeubleForm({
+      nom: imm.nom,
+      groupe_habitation_id: imm.groupe_habitation_id
+        ? String(imm.groupe_habitation_id)
+        : '',
+    })
     setImmeubleDialogOpen(true)
   }
 
   function handleSubmitImmeuble() {
+    const ghId = immeubleForm.groupe_habitation_id
+      ? Number(immeubleForm.groupe_habitation_id)
+      : undefined
+    const data: { nom: string; groupe_habitation_id?: number } = {
+      nom: immeubleForm.nom,
+    }
+    if (ghId !== undefined) data.groupe_habitation_id = ghId
+
     if (editingImmeuble) {
       updateImmeubleMutation.mutate({
         immeubleId: editingImmeuble.id,
-        data: { nom: immeubleForm.nom },
+        data,
       })
     } else {
-      storeImmeubleMutation.mutate({ nom: immeubleForm.nom })
+      storeImmeubleMutation.mutate(data)
+    }
+  }
+
+  function openEditTranche(gh: GroupeHabitation) {
+    setEditingTranche(gh)
+    setTrancheForm({ nom: gh.nom, code: gh.code ?? '' })
+    setTrancheDialogOpen(true)
+  }
+
+  function handleSubmitTranche() {
+    const data: { nom: string; code?: string } = { nom: trancheForm.nom }
+    if (trancheForm.code.trim()) data.code = trancheForm.code.trim()
+    if (editingTranche) {
+      updateTrancheMutation.mutate({ ghId: editingTranche.id, data })
+    } else {
+      storeTrancheMutation.mutate(data)
     }
   }
 
@@ -539,11 +664,19 @@ export function ResidencePage() {
     },
   ]
 
-  type ImmeubleRow = { id: number; nom: string; nb_lots: number }
+  type ImmeubleRow = {
+    id: number
+    nom: string
+    nb_lots: number
+    tranche_nom: string
+  }
   const immeubleRows: ImmeubleRow[] = immeubles.map((imm) => ({
     id: imm.id,
     nom: imm.nom,
     nb_lots: imm.nb_lots ?? 0,
+    tranche_nom: imm.groupe_habitation_id
+      ? (tranches.find((g) => g.id === imm.groupe_habitation_id)?.nom ?? '—')
+      : '—',
   }))
 
   const immeubleColumns: Column<ImmeubleRow>[] = [
@@ -554,6 +687,20 @@ export function ResidencePage() {
       }),
       sortable: true,
     },
+    ...(hasTranches
+      ? [
+          {
+            key: 'tranche_nom' as const,
+            header: t('gestionnaire.residence.tranches.colTranche'),
+            sortable: true,
+            renderCell: (r: ImmeubleRow) => (
+              <span className="text-sm text-muted-foreground">
+                {r.tranche_nom}
+              </span>
+            ),
+          },
+        ]
+      : []),
     {
       key: 'nb_lots',
       header: t('gestionnaire.residence.immeubles.colNbLots', {
@@ -596,6 +743,58 @@ export function ResidencePage() {
     },
   ]
 
+  const trancheColumns: Column<GroupeHabitation>[] = [
+    {
+      key: 'nom',
+      header: t('gestionnaire.residence.tranches.colNom'),
+      sortable: true,
+    },
+    {
+      key: 'code',
+      header: t('gestionnaire.residence.tranches.colCode'),
+      sortable: true,
+      renderCell: (r) => (
+        <span className="font-mono text-xs text-muted-foreground">
+          {r.code ?? '—'}
+        </span>
+      ),
+    },
+    {
+      key: 'nb_immeubles',
+      header: t('gestionnaire.residence.tranches.colNbImmeubles'),
+      sortable: true,
+      renderCell: (r) => (
+        <span className="tabular-nums">{r.nb_immeubles ?? 0}</span>
+      ),
+    },
+    {
+      key: 'id',
+      header: '',
+      className: 'w-20 text-right',
+      renderCell: (r) => (
+        <div className="flex justify-end gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => openEditTranche(r)}
+            aria-label={t('actions.edit')}
+          >
+            <Pencil className="size-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setDeletingTranche(r)}
+            className="text-destructive hover:text-destructive"
+            aria-label={t('actions.delete')}
+          >
+            <Trash2 className="size-3.5" />
+          </Button>
+        </div>
+      ),
+    },
+  ]
+
   // ── Render ────────────────────────────────────────────────────────────────────
 
   const TABS: { key: Tab; label: string }[] = [
@@ -606,6 +805,10 @@ export function ResidencePage() {
       label: t('gestionnaire.residence.tabCoproprietaires'),
     },
     { key: 'exercices', label: t('gestionnaire.residence.tabExercices') },
+    {
+      key: 'tranches',
+      label: t('gestionnaire.residence.tabTranches'),
+    },
     {
       key: 'immeubles',
       label: t('gestionnaire.residence.tabImmeubles', {
@@ -660,6 +863,12 @@ export function ResidencePage() {
                 {t('gestionnaire.residence.immeubles.add', {
                   defaultValue: 'Ajouter un immeuble',
                 })}
+              </Button>
+            )}
+            {activeTab === 'tranches' && (
+              <Button onClick={openCreateTranche} size="sm">
+                <Plus className="me-1.5 size-4" />
+                {t('gestionnaire.residence.tranches.add')}
               </Button>
             )}
             <Button
@@ -820,6 +1029,38 @@ export function ResidencePage() {
           isLoading={immeublesQuery.isLoading}
           searchable
         />
+      )}
+
+      {activeTab === 'tranches' && (
+        <>
+          {!tranchesQuery.isLoading && tranches.length === 0 ? (
+            <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed py-16 text-center">
+              <div className="bg-gradient-imaro flex size-12 items-center justify-center rounded-xl text-white shadow-sm">
+                <Layers className="size-6" />
+              </div>
+              <div className="max-w-md">
+                <p className="font-display text-lg text-foreground">
+                  {t('gestionnaire.residence.tranches.emptyTitle')}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {t('gestionnaire.residence.tranches.emptyDesc')}
+                </p>
+              </div>
+              <Button onClick={openCreateTranche}>
+                <Plus className="me-1.5 size-4" />
+                {t('gestionnaire.residence.tranches.add')}
+              </Button>
+            </div>
+          ) : (
+            <DataTable
+              data={tranches}
+              columns={trancheColumns}
+              rowKey="id"
+              isLoading={tranchesQuery.isLoading}
+              searchable
+            />
+          )}
+        </>
       )}
 
       {activeTab === 'encaissement' && (
@@ -995,6 +1236,37 @@ export function ResidencePage() {
                 )}
               />
             </div>
+
+            {/* Optional GH dropdown — only shown when residence has ≥1 tranche */}
+            {hasTranches && (
+              <div className="space-y-1">
+                <Label>{t('gestionnaire.residence.tranches.colTranche')}</Label>
+                <Select
+                  value={immeubleForm.groupe_habitation_id || 'none'}
+                  onValueChange={(v) =>
+                    setImmeubleForm((f) => ({
+                      ...f,
+                      groupe_habitation_id: v === 'none' ? '' : v,
+                    }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">
+                      {t('gestionnaire.residence.tranches.noneOption')}
+                    </SelectItem>
+                    {tranches.map((g) => (
+                      <SelectItem key={g.id} value={String(g.id)}>
+                        {g.nom}
+                        {g.code ? ` (${g.code})` : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           <DialogFooter>
@@ -1030,6 +1302,91 @@ export function ResidencePage() {
           deletingImmeuble && deleteImmeubleMutation.mutate(deletingImmeuble.id)
         }
         isLoading={deleteImmeubleMutation.isPending}
+      />
+
+      {/* Tranche form dialog */}
+      <Dialog open={trancheDialogOpen} onOpenChange={setTrancheDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>
+              {editingTranche
+                ? t('gestionnaire.residence.tranches.edit')
+                : t('gestionnaire.residence.tranches.add')}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-1">
+              <Label>{t('gestionnaire.residence.tranches.colNom')}</Label>
+              <Input
+                value={trancheForm.nom}
+                onChange={(e) =>
+                  setTrancheForm((f) => ({ ...f, nom: e.target.value }))
+                }
+                placeholder={t(
+                  'gestionnaire.residence.tranches.nomPlaceholder',
+                )}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>
+                {t('gestionnaire.residence.tranches.colCode')}
+                <span className="ms-1 text-xs font-normal text-muted-foreground">
+                  ({t('gestionnaire.residence.tranches.codeOptional')})
+                </span>
+              </Label>
+              <Input
+                value={trancheForm.code}
+                onChange={(e) =>
+                  setTrancheForm((f) => ({ ...f, code: e.target.value }))
+                }
+                placeholder={t(
+                  'gestionnaire.residence.tranches.codePlaceholder',
+                )}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setTrancheDialogOpen(false)}
+              disabled={
+                storeTrancheMutation.isPending ||
+                updateTrancheMutation.isPending
+              }
+            >
+              {t('actions.cancel')}
+            </Button>
+            <Button
+              onClick={handleSubmitTranche}
+              disabled={
+                storeTrancheMutation.isPending ||
+                updateTrancheMutation.isPending ||
+                !trancheForm.nom.trim()
+              }
+            >
+              {storeTrancheMutation.isPending || updateTrancheMutation.isPending
+                ? t('actions.loading')
+                : t('actions.save')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete tranche confirmation */}
+      <ConfirmModal
+        open={!!deletingTranche}
+        onOpenChange={(open) => !open && setDeletingTranche(null)}
+        title={t('gestionnaire.residence.tranches.delete')}
+        description={t('gestionnaire.residence.tranches.deleteDesc', {
+          nom: deletingTranche?.nom ?? '',
+        })}
+        variant="destructive"
+        onConfirm={() =>
+          deletingTranche && deleteTrancheMutation.mutate(deletingTranche.id)
+        }
+        isLoading={deleteTrancheMutation.isPending}
       />
 
       {/* Residence edit dialog */}
