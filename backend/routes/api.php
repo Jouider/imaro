@@ -67,14 +67,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/paiements/{paiement}/mise-en-demeure', [$ns.'\\PenaltyController', 'miseEnDemeure']);
 
         // Alias — equipe.service.ts calls /equipe/* without /gestionnaire/ prefix
-        Route::get('/equipe/utilisateurs', [$ns.'\\EquipeUtilisateurController', 'index']);
-        Route::post('/equipe/utilisateurs', [$ns.'\\EquipeUtilisateurController', 'store']);
-        Route::put('/equipe/utilisateurs/{id}', [$ns.'\\EquipeUtilisateurController', 'update']);
-        Route::delete('/equipe/utilisateurs/{id}', [$ns.'\\EquipeUtilisateurController', 'destroy']);
-        Route::get('/equipe/personnel', [$ns.'\\EquipePersonnelController', 'index']);
-        Route::post('/equipe/personnel', [$ns.'\\EquipePersonnelController', 'store']);
-        Route::put('/equipe/personnel/{id}', [$ns.'\\EquipePersonnelController', 'update']);
-        Route::delete('/equipe/personnel/{id}', [$ns.'\\EquipePersonnelController', 'destroy']);
+        Route::middleware('app.permission:personnel')->group(function () use ($ns) {
+            Route::get('/equipe/utilisateurs', [$ns.'\\EquipeUtilisateurController', 'index']);
+            Route::post('/equipe/utilisateurs', [$ns.'\\EquipeUtilisateurController', 'store']);
+            Route::put('/equipe/utilisateurs/{id}', [$ns.'\\EquipeUtilisateurController', 'update']);
+            Route::delete('/equipe/utilisateurs/{id}', [$ns.'\\EquipeUtilisateurController', 'destroy']);
+            Route::get('/equipe/personnel', [$ns.'\\EquipePersonnelController', 'index']);
+            Route::post('/equipe/personnel', [$ns.'\\EquipePersonnelController', 'store']);
+            Route::put('/equipe/personnel/{id}', [$ns.'\\EquipePersonnelController', 'update']);
+            Route::delete('/equipe/personnel/{id}', [$ns.'\\EquipePersonnelController', 'destroy']);
+        });
     });
 
     // Agent recouvrement
