@@ -238,8 +238,8 @@ export function LoginPage() {
 
   return (
     <div className="flex min-h-svh bg-[#f4f7fa]">
-      {/* ── Left brand panel (desktop) ── */}
-      <div className="w-[400px] shrink-0 shadow-xl shadow-black/10">
+      {/* ── Left brand panel (desktop only) ── */}
+      <div className="hidden w-[400px] shrink-0 shadow-xl shadow-black/10 lg:block">
         <BrandPanel />
       </div>
 
@@ -249,7 +249,7 @@ export function LoginPage() {
         <div className="flex h-14 shrink-0 items-center justify-between border-b px-6">
           {/* Logo (mobile only — hidden on desktop since brand panel shows) */}
           <div className="lg:hidden">
-            <Wordmark className="h-8 w-auto" />
+            <Wordmark className="h-10 w-32" />
           </div>
           <div className="ms-auto flex items-center gap-2">
             <LanguageSwitcher />

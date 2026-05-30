@@ -422,7 +422,7 @@ function NotificationCenter() {
         ref={panelRef}
         align="end"
         sideOffset={8}
-        className="w-[360px] p-0"
+        className="w-[min(360px,calc(100vw-2rem))] p-0"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b px-4 py-3">
