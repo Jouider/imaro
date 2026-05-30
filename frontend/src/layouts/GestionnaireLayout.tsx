@@ -422,7 +422,7 @@ function NotificationCenter() {
         ref={panelRef}
         align="end"
         sideOffset={8}
-        className="w-[360px] p-0"
+        className="w-[min(360px,calc(100vw-2rem))] p-0"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b px-4 py-3">
@@ -714,7 +714,7 @@ export function GestionnaireLayout() {
       {/* Main area */}
       <div className="flex min-h-svh flex-1 flex-col lg:ms-[240px]">
         {/* ── Topbar ── */}
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-white/95 px-4 backdrop-blur-sm dark:border-border dark:bg-card/95">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-white/95 px-3 backdrop-blur-sm dark:border-border dark:bg-card/95 sm:gap-3 sm:px-4">
           {/* Mobile hamburger */}
           <Button
             variant="ghost"
@@ -740,14 +740,17 @@ export function GestionnaireLayout() {
             {/* Notification center */}
             <NotificationCenter />
 
-            {/* Divider */}
-            <div className="mx-1.5 h-5 w-px bg-border" />
+            {/* Divider — desktop only */}
+            <div className="mx-1.5 hidden h-5 w-px bg-border sm:block" />
 
-            <ThemeToggle />
+            {/* Theme toggle — desktop only (saves mobile real estate) */}
+            <div className="hidden sm:block">
+              <ThemeToggle />
+            </div>
             <LanguageSwitcher />
 
-            {/* Divider */}
-            <div className="mx-1.5 h-5 w-px bg-border" />
+            {/* Divider — desktop only */}
+            <div className="mx-1.5 hidden h-5 w-px bg-border sm:block" />
 
             {/* User avatar dropdown */}
             <UserMenu />

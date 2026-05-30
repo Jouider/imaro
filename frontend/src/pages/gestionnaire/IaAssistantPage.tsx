@@ -97,9 +97,9 @@ export function IaAssistantPage() {
   const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 p-6">
+    <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
       {/* Header — gradient AI badge */}
-      <div className="rounded-2xl border-2 border-[var(--color-imaro-primary)]/20 bg-gradient-to-br from-[var(--color-imaro-primary)]/10 via-[#E67E22]/5 to-purple-100/30 p-6 dark:from-[var(--color-imaro-primary)]/20 dark:via-[#E67E22]/10 dark:to-purple-900/10">
+      <div className="rounded-2xl border-2 border-[var(--color-imaro-primary)]/20 bg-gradient-to-br from-[var(--color-imaro-primary)]/10 via-[#E67E22]/5 to-purple-100/30 p-4 sm:p-6 dark:from-[var(--color-imaro-primary)]/20 dark:via-[#E67E22]/10 dark:to-purple-900/10">
         <div className="flex items-start gap-4">
           <div className="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--color-imaro-primary)] to-purple-600 text-white shadow-lg">
             <Sparkles className="size-6" />
@@ -255,7 +255,7 @@ function AuditTool({ residenceId }: { residenceId: number | null }) {
   return (
     <div className="space-y-6">
       {/* Score header */}
-      <div className="rounded-2xl border bg-card p-6">
+      <div className="rounded-2xl border bg-card p-4 sm:p-6">
         <div className="flex items-start justify-between gap-6">
           <div className="flex-1">
             <div className="flex items-center gap-2">

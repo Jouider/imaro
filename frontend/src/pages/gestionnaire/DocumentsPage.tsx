@@ -275,7 +275,7 @@ export function DocumentsPage() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         title={t('gestionnaire.documents.title', { defaultValue: 'Documents' })}
         subtitle={t('gestionnaire.documents.subtitle', {

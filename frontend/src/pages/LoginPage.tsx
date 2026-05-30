@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { isAxiosError } from 'axios'
 import {
@@ -36,25 +37,26 @@ type Step = 'role' | 'phone' | 'code' | 'activate'
 
 // ─── Error helper ─────────────────────────────────────────────────────────────
 
-function extractError(err: unknown): string {
+function extractError(err: unknown, fallback: string): string {
   if (isAxiosError(err)) {
     const d = err.response?.data as
       | { message?: string; errors?: Record<string, string[]> }
       | undefined
     if (d?.message) return d.message
   }
-  return 'Erreur réseau'
+  return fallback
 }
 
 // ─── Left brand panel ─────────────────────────────────────────────────────────
 
-const FEATURES = [
-  { icon: MessageCircle, text: 'Connexion instantanée par WhatsApp' },
-  { icon: Shield, text: 'Conforme à la loi 18-00 sur la copropriété' },
-  { icon: Globe, text: 'Interface disponible en français et arabe' },
-]
-
 function BrandPanel() {
+  const { t } = useTranslation()
+  const features = [
+    { icon: MessageCircle, text: t('auth.brand.feature1') },
+    { icon: Shield, text: t('auth.brand.feature2') },
+    { icon: Globe, text: t('auth.brand.feature3') },
+  ]
+
   return (
     <div
       className="hidden lg:flex flex-col justify-between p-10 h-full"
@@ -70,20 +72,19 @@ function BrandPanel() {
       <div className="space-y-8">
         <div>
           <h2 className="text-[2rem] font-bold leading-tight text-white">
-            La gestion de
+            {t('auth.brand.taglineLine1')}
             <br />
-            copropriété
+            {t('auth.brand.taglineLine2')}
             <br />
-            simplifiée.
+            {t('auth.brand.taglineLine3')}
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-white/55">
-            Syndics, charges, assemblées et documents —<br />
-            tout en un seul endroit.
+            {t('auth.brand.subtitle')}
           </p>
         </div>
 
         <div className="space-y-3">
-          {FEATURES.map(({ icon: Icon, text }) => (
+          {features.map(({ icon: Icon, text }) => (
             <div key={text} className="flex items-center gap-3">
               <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/10">
                 <Icon className="size-4 text-[#E67E22]" />
@@ -95,31 +96,31 @@ function BrandPanel() {
       </div>
 
       <p className="text-xs text-white/25">
-        © {new Date().getFullYear()} Imaro · Gestion de Syndic au Maroc
+        {t('auth.brand.footer', { year: new Date().getFullYear() })}
       </p>
     </div>
   )
 }
 
-// ─── Role cards ───────────────────────────────────────────────────────────────
+// ─── Role cards (config — labels via t() at render) ──────────────────────────
 
 const ROLE_CARDS: {
   id: Role
   icon: typeof Building2
-  title: string
-  desc: string
+  titleKey: string
+  descKey: string
 }[] = [
   {
     id: 'gestionnaire',
     icon: Building2,
-    title: 'Syndic / Gestionnaire',
-    desc: 'Gérez vos résidences, budgets, travaux et copropriétaires',
+    titleKey: 'auth.role.gestionnaireTitle',
+    descKey: 'auth.role.gestionnaireDesc',
   },
   {
     id: 'resident',
     icon: Users,
-    title: 'Copropriétaire',
-    desc: 'Consultez vos charges, signalez des incidents et suivez vos paiements',
+    titleKey: 'auth.role.residentTitle',
+    descKey: 'auth.role.residentDesc',
   },
 ]
 
@@ -131,6 +132,7 @@ const inputCls =
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export function LoginPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const setSession = useAuthStore((s) => s.setSession)
@@ -163,7 +165,7 @@ export function LoginPage() {
       setSession({ token, user, tenant })
       void navigate('/gestionnaire/dashboard', { replace: true })
     },
-    onError: (err) => toast.error(extractError(err)),
+    onError: (err) => toast.error(extractError(err, t('auth.networkError'))),
   })
 
   // ── Resident — phone + code ──
@@ -179,7 +181,7 @@ export function LoginPage() {
         setStep('activate')
       }
     },
-    onError: (err) => toast.error(extractError(err)),
+    onError: (err) => toast.error(extractError(err, t('auth.networkError'))),
   })
 
   // ── Resident — first-login activation ──
@@ -190,7 +192,7 @@ export function LoginPage() {
       setSession({ token, user, tenant })
       void navigate('/portail', { replace: true })
     },
-    onError: (err) => toast.error(extractError(err)),
+    onError: (err) => toast.error(extractError(err, t('auth.networkError'))),
   })
 
   function pickRole(r: Role) {
@@ -216,30 +218,30 @@ export function LoginPage() {
   // ── Titles per step ──
   const title =
     step === 'role'
-      ? 'Bienvenue sur Imaro'
+      ? t('auth.role.welcomeTitle')
       : step === 'activate'
-        ? 'Créez votre code personnel'
+        ? t('auth.resident.activateTitle')
         : step === 'code'
-          ? "Code d'accès"
+          ? t('auth.resident.codeTitle')
           : role === 'gestionnaire'
-            ? 'Espace Syndic'
-            : 'Espace Copropriétaire'
+            ? t('auth.gestionnaire.title')
+            : t('auth.resident.title')
 
   const subtitle =
     step === 'role'
-      ? 'Choisissez votre espace pour continuer'
+      ? t('auth.role.welcomeSubtitle')
       : step === 'activate'
-        ? 'Définissez un code personnel de 6 caractères minimum'
+        ? t('auth.resident.activateSubtitle')
         : step === 'code'
-          ? `Entrez le code fourni par votre syndic pour +212 ${digits}`
+          ? t('auth.resident.codeSubtitle', { digits })
           : role === 'gestionnaire'
-            ? 'Connectez-vous avec vos identifiants'
-            : 'Entrez votre numéro de téléphone marocain'
+            ? t('auth.gestionnaire.subtitle')
+            : t('auth.resident.subtitle')
 
   return (
     <div className="flex min-h-svh bg-[#f4f7fa]">
-      {/* ── Left brand panel (desktop) ── */}
-      <div className="w-[400px] shrink-0 shadow-xl shadow-black/10">
+      {/* ── Left brand panel (desktop only) ── */}
+      <div className="hidden w-[400px] shrink-0 shadow-xl shadow-black/10 lg:block">
         <BrandPanel />
       </div>
 
@@ -249,7 +251,7 @@ export function LoginPage() {
         <div className="flex h-14 shrink-0 items-center justify-between border-b px-6">
           {/* Logo (mobile only — hidden on desktop since brand panel shows) */}
           <div className="lg:hidden">
-            <Wordmark className="h-8 w-auto" />
+            <Wordmark className="h-10 w-32" />
           </div>
           <div className="ms-auto flex items-center gap-2">
             <LanguageSwitcher />
@@ -267,7 +269,7 @@ export function LoginPage() {
                 className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
                 <ArrowLeft className="size-4" />
-                Retour
+                {t('auth.back')}
               </button>
             )}
 
@@ -311,10 +313,10 @@ export function LoginPage() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold text-foreground">
-                          {card.title}
+                          {t(card.titleKey)}
                         </p>
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          {card.desc}
+                          {t(card.descKey)}
                         </p>
                       </div>
                       <ChevronRight
@@ -328,8 +330,7 @@ export function LoginPage() {
                 ))}
 
                 <p className="pt-3 text-center text-xs text-muted-foreground">
-                  Connexion sécurisée — syndics par email, copropriétaires par
-                  code d'accès
+                  {t('auth.role.footnote')}
                 </p>
               </div>
             )}
@@ -347,18 +348,18 @@ export function LoginPage() {
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 rounded-full border bg-[var(--color-imaro-primary)]/5 px-3 py-1 text-xs font-medium text-[var(--color-imaro-primary)]">
                     <Building2 className="size-3.5" />
-                    Syndic / Gestionnaire
+                    {t('auth.role.gestionnaireTitle')}
                   </span>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Adresse email</Label>
+                  <Label htmlFor="email">{t('auth.gestionnaire.email')}</Label>
                   <div className="relative">
                     <Mail className="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <input
                       id="email"
                       type="email"
-                      placeholder="votre@email.com"
+                      placeholder={t('auth.gestionnaire.emailPlaceholder')}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -368,7 +369,9 @@ export function LoginPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Mot de passe</Label>
+                  <Label htmlFor="password">
+                    {t('auth.gestionnaire.password')}
+                  </Label>
                   <div className="relative">
                     <Lock className="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <input
@@ -382,7 +385,7 @@ export function LoginPage() {
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Identifiants fournis par l'équipe Imaro
+                    {t('auth.gestionnaire.passwordHint')}
                   </p>
                 </div>
 
@@ -391,7 +394,9 @@ export function LoginPage() {
                   className="h-12 w-full bg-gradient-imaro text-base text-white shadow-sm hover:brightness-110"
                   disabled={loginEmailMutation.isPending || !email || !password}
                 >
-                  {loginEmailMutation.isPending ? 'Connexion…' : 'Se connecter'}
+                  {loginEmailMutation.isPending
+                    ? t('auth.gestionnaire.submitting')
+                    : t('auth.gestionnaire.submit')}
                 </Button>
               </form>
             )}
@@ -408,12 +413,12 @@ export function LoginPage() {
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 rounded-full border bg-[var(--color-imaro-primary)]/5 px-3 py-1 text-xs font-medium text-[var(--color-imaro-primary)]">
                     <Users className="size-3.5" />
-                    Copropriétaire
+                    {t('auth.role.residentTitle')}
                   </span>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Numéro de téléphone</Label>
+                  <Label htmlFor="phone">{t('auth.resident.phoneLabel')}</Label>
                   <div className="flex overflow-hidden rounded-xl border-2 border-border transition-all focus-within:border-[var(--color-imaro-primary)] focus-within:ring-4 focus-within:ring-[var(--color-imaro-primary)]/10">
                     <span className="flex items-center border-e bg-[#f4f7fa] px-4 text-sm font-bold text-[var(--color-imaro-primary)]">
                       +212
@@ -422,7 +427,7 @@ export function LoginPage() {
                       id="phone"
                       type="tel"
                       inputMode="numeric"
-                      placeholder="6XX XX XX XX"
+                      placeholder={t('auth.resident.phonePlaceholder')}
                       value={digits}
                       onChange={(e) =>
                         setDigits(e.target.value.replace(/\D/g, '').slice(0, 9))
@@ -433,7 +438,7 @@ export function LoginPage() {
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Ex : 6XX XX XX XX ou 7XX XX XX XX
+                    {t('auth.resident.phoneHint')}
                   </p>
                 </div>
 
@@ -442,7 +447,7 @@ export function LoginPage() {
                   className="h-12 w-full bg-[#E67E22] text-base text-white hover:bg-[#d35400]"
                   disabled={!phoneValid}
                 >
-                  Continuer
+                  {t('auth.resident.continue')}
                 </Button>
               </form>
             )}
@@ -459,19 +464,21 @@ export function LoginPage() {
                 <div className="rounded-xl bg-[var(--color-imaro-primary)]/5 px-4 py-3 text-sm text-[var(--color-imaro-primary)]">
                   <span className="font-semibold">+212 {digits}</span>
                   <span className="text-[var(--color-imaro-primary)]/60">
-                    {' '}
-                    · Copropriétaire
+                    {' · '}
+                    {t('auth.role.residentTitle')}
                   </span>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="access-code">Code d'accès</Label>
+                  <Label htmlFor="access-code">
+                    {t('auth.resident.codeLabel')}
+                  </Label>
                   <div className="relative">
                     <KeyRound className="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <input
                       id="access-code"
                       type="text"
-                      placeholder="Code fourni par votre syndic"
+                      placeholder={t('auth.resident.codePlaceholder')}
                       value={accessCode}
                       onChange={(e) => setAccessCode(e.target.value.trim())}
                       required
@@ -483,8 +490,7 @@ export function LoginPage() {
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Ce code vous a été communiqué par votre gestionnaire via
-                    WhatsApp.
+                    {t('auth.resident.codeHint')}
                   </p>
                 </div>
 
@@ -496,8 +502,8 @@ export function LoginPage() {
                   }
                 >
                   {residentLoginMutation.isPending
-                    ? 'Vérification…'
-                    : 'Accéder à mon espace'}
+                    ? t('auth.resident.codeVerifying')
+                    : t('auth.resident.codeSubmit')}
                 </Button>
               </form>
             )}
@@ -509,11 +515,11 @@ export function LoginPage() {
                 onSubmit={(e) => {
                   e.preventDefault()
                   if (newCode !== newCodeConfirm) {
-                    toast.error('Les codes ne correspondent pas')
+                    toast.error(t('auth.resident.codesMismatch'))
                     return
                   }
                   if (newCode.length < 6) {
-                    toast.error('Code trop court (6 caractères minimum)')
+                    toast.error(t('auth.resident.codeTooShort'))
                     return
                   }
                   activateMutation.mutate()
@@ -521,16 +527,15 @@ export function LoginPage() {
               >
                 <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
                   <MessageCircle className="mb-1 size-4 inline-block me-1.5 text-amber-600" />
-                  Première connexion — choisissez un code personnel que vous
-                  utiliserez à chaque connexion.
+                  {t('auth.resident.activateHint')}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="new-code">Nouveau code</Label>
+                  <Label htmlFor="new-code">{t('auth.resident.newCode')}</Label>
                   <input
                     id="new-code"
                     type="password"
-                    placeholder="6 caractères minimum"
+                    placeholder={t('auth.resident.newCodePlaceholder')}
                     value={newCode}
                     onChange={(e) => setNewCode(e.target.value)}
                     required
@@ -539,11 +544,13 @@ export function LoginPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirm-code">Confirmer le code</Label>
+                  <Label htmlFor="confirm-code">
+                    {t('auth.resident.confirmCode')}
+                  </Label>
                   <input
                     id="confirm-code"
                     type="password"
-                    placeholder="Répétez votre code"
+                    placeholder={t('auth.resident.confirmCodePlaceholder')}
                     value={newCodeConfirm}
                     onChange={(e) => setNewCodeConfirm(e.target.value)}
                     required
@@ -562,8 +569,8 @@ export function LoginPage() {
                   disabled={activateMutation.isPending || newCode.length < 6}
                 >
                   {activateMutation.isPending
-                    ? 'Activation…'
-                    : 'Confirmer et se connecter'}
+                    ? t('auth.resident.activating')
+                    : t('auth.resident.activateSubmit')}
                 </Button>
               </form>
             )}
@@ -574,7 +581,7 @@ export function LoginPage() {
         {(import.meta.env.DEV || !!import.meta.env.VITE_SHOW_DEV_BYPASS) && (
           <div className="shrink-0 border-t border-dashed border-amber-300 bg-amber-50 px-6 py-4">
             <p className="mb-3 text-center text-xs font-semibold text-amber-700">
-              ⚙️ Dev mode — accès direct
+              ⚙️ {t('auth.devBypass')}
             </p>
             <div className="flex gap-2">
               <Button

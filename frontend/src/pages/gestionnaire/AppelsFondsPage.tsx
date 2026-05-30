@@ -353,7 +353,7 @@ export function AppelsFondsPage() {
     form.date_echeance
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         title={t('gestionnaire.appelsFonds.title')}
         subtitle={t('gestionnaire.appelsFonds.subtitle')}
