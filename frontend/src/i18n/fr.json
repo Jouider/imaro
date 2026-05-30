@@ -372,6 +372,7 @@
     "nav": {
       "features": "Fonctionnalités",
       "ia": "IA",
+      "conformite": "Conformité",
       "pricing": "Tarifs",
       "faq": "FAQ",
       "login": "Connexion",
@@ -425,6 +426,111 @@
       "ia": {
         "title": "Assistant IA",
         "desc": "Audit de conformité automatisé, OCR des factures, suggestions de budget basées sur l'inflation HCP."
+      }
+    },
+    "modules": {
+      "eyebrow": "La plateforme complète",
+      "title": "Tout le métier de syndic, réuni",
+      "subtitle": "De la première cotisation à la clôture annuelle — chaque opération d'un syndic professionnel marocain, dans une seule plateforme.",
+      "badges": {
+        "new": "Nouveau",
+        "killer": "Populaire",
+        "mobile": "Mobile"
+      },
+      "items": {
+        "comptabilite": {
+          "title": "Comptabilité en partie double",
+          "desc": "Journal, grand-livre, balance, bilan et compte de gestion aux normes CGNC. Clôture d'exercice guidée en 4 étapes.",
+          "tag1": "Plan comptable marocain",
+          "tag2": "Clôture annuelle",
+          "tag3": "Bilan & balance"
+        },
+        "pointage": {
+          "title": "Pointage bancaire",
+          "desc": "Importez le relevé de 10 banques marocaines. L'auto-matching réconcilie paiements et dépenses en secondes.",
+          "tag1": "10 banques",
+          "tag2": "Auto-matching"
+        },
+        "recouvrement": {
+          "title": "Recouvrement & relances",
+          "desc": "Impayés, pénalités de retard, relances multicanal et alerte de prescription quinquennale.",
+          "tag1": "Pénalités auto",
+          "tag2": "Prescription"
+        },
+        "appels": {
+          "title": "Appels de fonds & budgets",
+          "desc": "Génération mensuelle automatique, répartition par tantième, budgets prévisionnels et fonds de réserve.",
+          "tag1": "Par tantième",
+          "tag2": "Génération auto"
+        },
+        "patrimoine": {
+          "title": "Patrimoine & contrats",
+          "desc": "Immeubles, lots, tranches, équipements amortis, prestataires et contrats — tout le patrimoine tracé.",
+          "tag1": "Équipements",
+          "tag2": "Prestataires"
+        },
+        "assemblees": {
+          "title": "Assemblées Générales",
+          "desc": "Convocations conformes à la Loi 18-00, ordre du jour, vote pondéré par tantième et procès-verbaux archivés.",
+          "tag1": "Convocations légales",
+          "tag2": "Vote pondéré"
+        },
+        "portail": {
+          "title": "Portail résident mobile",
+          "desc": "Application installable (PWA) : charges, paiement en ligne, réclamations et notifications push.",
+          "tag1": "PWA installable",
+          "tag2": "Paiement en ligne"
+        },
+        "conformite": {
+          "title": "Conformité Décret 2.23.700",
+          "desc": "12 annexes réglementaires générées en un clic et calendrier de conformité annuel.",
+          "tag1": "12 annexes",
+          "tag2": "Calendrier"
+        },
+        "documents": {
+          "title": "Documents & communication",
+          "desc": "GED centralisée, annonces aux résidents et historique partagé — chaque pièce à portée de lien.",
+          "tag1": "GED",
+          "tag2": "Annonces"
+        },
+        "imports": {
+          "title": "Import intelligent",
+          "desc": "Reprenez vos données existantes : 5 types de fichiers, mapping automatique et validation croisée.",
+          "tag1": "Excel & CSV",
+          "tag2": "Mapping auto"
+        }
+      }
+    },
+    "conformite": {
+      "eyebrow": "Conformité légale",
+      "title": "Conforme au Décret 2.23.700",
+      "subtitle": "Imaro est construit autour du cadre légal marocain : Loi 18-00 et Décret 2.23.700. La conformité n'est pas une option, c'est le socle.",
+      "points": {
+        "regime": {
+          "title": "Régime simplifié ou normal",
+          "desc": "Imaro adapte automatiquement vos obligations selon le seuil de 200 000 MAD de charges annuelles."
+        },
+        "annexes": {
+          "title": "12 annexes générées",
+          "desc": "Toutes les annexes réglementaires (3 à 13-2) produites en PDF, prêtes pour l'assemblée et l'archivage."
+        },
+        "calendrier": {
+          "title": "Calendrier de conformité",
+          "desc": "Opérations mensuelles, clôture, AG, archivage : chaque échéance légale suivie et rappelée."
+        }
+      },
+      "card": {
+        "title": "Dossier conforme",
+        "subtitle": "Décret 2.23.700 · Loi 18-00",
+        "cycleLabel": "Cycle annuel",
+        "annexesLabel": "Annexes générées",
+        "annexePrefix": "Annexe"
+      },
+      "phases": {
+        "operations": "Opérations mensuelles",
+        "cloture": "Clôture d'exercice",
+        "ag": "Assemblée Générale",
+        "archivage": "Archivage légal"
       }
     },
     "ia": {
@@ -1042,37 +1148,95 @@
       "emptyDesc": "Créez votre premier appel de fonds."
     },
     "paiements": {
-      "title": "Paiements",
-      "tabHistorique": "Historique",
-      "tabImpayes": "Impayés",
-      "newPaiement": "Enregistrer un paiement",
-      "colDate": "Date",
-      "colReference": "Référence",
-      "colCoproprietaire": "Copropriétaire",
-      "colLot": "Lot",
-      "colAppel": "Appel de fonds",
-      "colMontant": "Montant",
-      "colMode": "Mode",
-      "colStatut": "Statut",
-      "colMontantDu": "Montant dû",
-      "colRestant": "Restant",
-      "colJoursRetard": "Jours retard",
-      "modes": {
-        "especes": "Espèces",
-        "virement": "Virement",
-        "cheque": "Chèque",
-        "mobile": "Mobile"
+      "title": "Suivi des paiements",
+      "tabs": {
+        "creances": "Créances",
+        "appels": "Appels de fonds",
+        "historique": "Historique",
+        "decomptes": "Décomptes",
+        "virements": "Virements"
       },
-      "form": {
-        "appelLigne": "Lot / Appel de fonds",
-        "montant": "Montant (DH)",
-        "date": "Date du paiement",
-        "mode": "Mode de paiement",
-        "reference": "Référence (optionnel)",
-        "notes": "Notes (optionnel)"
+      "creances": {
+        "enRetard": "en retard",
+        "aPayer": "à payer",
+        "tauxRecouvrement": "Taux recouvrement",
+        "relancerTout": "Relancer tous les impayés",
+        "relanceSuccess": "Relance envoyée",
+        "statuts": {
+          "a_payer": "À payer",
+          "en_retard": "En retard",
+          "paye": "Payé",
+          "partiellement_paye": "Partiel",
+          "annulee": "Annulée"
+        },
+        "colCreance": "Copropriétaire",
+        "colSolde": "Solde",
+        "colEcheance": "Échéance",
+        "colAnciennete": "Ancienneté",
+        "colRelance": "Dernière relance",
+        "jourRetard": "j de retard"
       },
-      "emptyHistorique": "Aucun paiement enregistré",
-      "emptyImpayes": "Aucun impayé"
+      "encaisser": {
+        "title": "Encaisser un paiement",
+        "step1": "Sélectionner une créance",
+        "step2": "Saisir le paiement",
+        "montant": "Montant (MAD)",
+        "date": "Date de paiement",
+        "methode": "Méthode",
+        "compte": "Compte de destination",
+        "refCheque": "Référence chèque",
+        "success": "Paiement enregistré",
+        "methodes": {
+          "especes": "Espèces",
+          "virement": "Virement bancaire",
+          "cheque": "Chèque",
+          "cb": "Carte bancaire",
+          "mobile_money": "Mobile Money"
+        },
+        "comptes": {
+          "5121": "Banque principale (5121)",
+          "5122": "Compte chèques (5122)",
+          "5161": "Caisse (5161)"
+        }
+      },
+      "avance": {
+        "title": "Paiement en avance",
+        "info": "Ce paiement sera affecté automatiquement aux prochains appels de fonds",
+        "success": "Paiement en avance enregistré"
+      },
+      "virements": {
+        "title": "Virements déclarés",
+        "valider": "Valider",
+        "rejeter": "Rejeter",
+        "motif": "Motif du rejet",
+        "valideSuccess": "Virement validé",
+        "rejeteSuccess": "Virement rejeté",
+        "methode": "Méthode",
+        "justificatif": "Justificatif",
+        "voir": "Voir",
+        "openProof": "Ouvrir",
+        "previewUnavailable": "Aperçu non disponible",
+        "methodes": {
+          "virement": "Virement",
+          "versement": "Versement",
+          "cheque": "Chèque",
+          "especes": "Espèces"
+        },
+        "statuts": {
+          "en_attente": "En attente",
+          "valide": "Validé",
+          "rejete": "Rejeté"
+        }
+      },
+      "decompte": {
+        "title": "Décompte individuel",
+        "recherche": "Rechercher un copropriétaire",
+        "generer": "Générer",
+        "exporter": "Exporter PDF",
+        "totalAppele": "Total appelé",
+        "totalPaye": "Total payé",
+        "solde": "Solde"
+      }
     },
     "tickets": {
       "title": "Tickets",
@@ -1519,97 +1683,6 @@
         "moins200": "≤ 200 000 MAD — Régime simplifié (Annexes 10, 13)",
         "entre200et500": "200–500 k MAD — Régime normal (Annexes 10-12)",
         "plus500": "≥ 500 000 MAD — Régime complet (Annexes 3-10)"
-      }
-    },
-    "paiements": {
-      "title": "Suivi des paiements",
-      "tabs": {
-        "creances": "Créances",
-        "appels": "Appels de fonds",
-        "historique": "Historique",
-        "decomptes": "Décomptes",
-        "virements": "Virements"
-      },
-      "creances": {
-        "enRetard": "en retard",
-        "aPayer": "à payer",
-        "tauxRecouvrement": "Taux recouvrement",
-        "relancerTout": "Relancer tous les impayés",
-        "relanceSuccess": "Relance envoyée",
-        "statuts": {
-          "a_payer": "À payer",
-          "en_retard": "En retard",
-          "paye": "Payé",
-          "partiellement_paye": "Partiel",
-          "annulee": "Annulée"
-        },
-        "colCreance": "Copropriétaire",
-        "colSolde": "Solde",
-        "colEcheance": "Échéance",
-        "colAnciennete": "Ancienneté",
-        "colRelance": "Dernière relance",
-        "jourRetard": "j de retard"
-      },
-      "encaisser": {
-        "title": "Encaisser un paiement",
-        "step1": "Sélectionner une créance",
-        "step2": "Saisir le paiement",
-        "montant": "Montant (MAD)",
-        "date": "Date de paiement",
-        "methode": "Méthode",
-        "compte": "Compte de destination",
-        "refCheque": "Référence chèque",
-        "success": "Paiement enregistré",
-        "methodes": {
-          "especes": "Espèces",
-          "virement": "Virement bancaire",
-          "cheque": "Chèque",
-          "cb": "Carte bancaire",
-          "mobile_money": "Mobile Money"
-        },
-        "comptes": {
-          "5121": "Banque principale (5121)",
-          "5122": "Compte chèques (5122)",
-          "5161": "Caisse (5161)"
-        }
-      },
-      "avance": {
-        "title": "Paiement en avance",
-        "info": "Ce paiement sera affecté automatiquement aux prochains appels de fonds",
-        "success": "Paiement en avance enregistré"
-      },
-      "virements": {
-        "title": "Virements déclarés",
-        "valider": "Valider",
-        "rejeter": "Rejeter",
-        "motif": "Motif du rejet",
-        "valideSuccess": "Virement validé",
-        "rejeteSuccess": "Virement rejeté",
-        "methode": "Méthode",
-        "justificatif": "Justificatif",
-        "voir": "Voir",
-        "openProof": "Ouvrir",
-        "previewUnavailable": "Aperçu non disponible",
-        "methodes": {
-          "virement": "Virement",
-          "versement": "Versement",
-          "cheque": "Chèque",
-          "especes": "Espèces"
-        },
-        "statuts": {
-          "en_attente": "En attente",
-          "valide": "Validé",
-          "rejete": "Rejeté"
-        }
-      },
-      "decompte": {
-        "title": "Décompte individuel",
-        "recherche": "Rechercher un copropriétaire",
-        "generer": "Générer",
-        "exporter": "Exporter PDF",
-        "totalAppele": "Total appelé",
-        "totalPaye": "Total payé",
-        "solde": "Solde"
       }
     },
     "depenses": {
