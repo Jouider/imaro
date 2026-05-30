@@ -19,6 +19,7 @@ class User extends Authenticatable
         'access_code', 'must_change_code',
         'role', 'otp_code', 'otp_expires_at', 'lang',
         'avatar', 'status', 'last_login_at', 'notification_prefs',
+        'app_role', 'app_permissions', 'equipe_residence_ids',
     ];
 
     protected $hidden = [
@@ -28,10 +29,12 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'otp_expires_at'    => 'datetime',
-            'last_login_at'     => 'datetime',
-            'must_change_code'  => 'boolean',
-            'notification_prefs' => 'array',
+            'otp_expires_at'       => 'datetime',
+            'last_login_at'        => 'datetime',
+            'must_change_code'     => 'boolean',
+            'notification_prefs'   => 'array',
+            'app_permissions'      => 'array',
+            'equipe_residence_ids' => 'array',
         ];
     }
 
