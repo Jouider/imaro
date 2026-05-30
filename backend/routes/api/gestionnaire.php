@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\Gestionnaire\AnnonceController;
+use App\Http\Controllers\Api\Gestionnaire\EquipePersonnelController;
+use App\Http\Controllers\Api\Gestionnaire\EquipeUtilisateurController;
 use App\Http\Controllers\Api\Gestionnaire\AnnexeController;
 use App\Http\Controllers\Api\Gestionnaire\AuditLogController;
 use App\Http\Controllers\Api\Gestionnaire\AutreRecetteController;
@@ -334,3 +336,17 @@ Route::delete('/comptabilite/depenses/{depense}', [ComptabiliteController::class
 
 // Import IA comptabilite
 Route::post('/comptabilite/exercices/{exercice}/import-ia', [ComptabiliteController::class, 'importIa']);
+
+// ========================================
+// Équipe — utilisateurs app + personnel terrain
+// ========================================
+
+Route::get('/equipe/utilisateurs', [EquipeUtilisateurController::class, 'index']);
+Route::post('/equipe/utilisateurs', [EquipeUtilisateurController::class, 'store']);
+Route::put('/equipe/utilisateurs/{id}', [EquipeUtilisateurController::class, 'update']);
+Route::delete('/equipe/utilisateurs/{id}', [EquipeUtilisateurController::class, 'destroy']);
+
+Route::get('/equipe/personnel', [EquipePersonnelController::class, 'index']);
+Route::post('/equipe/personnel', [EquipePersonnelController::class, 'store']);
+Route::put('/equipe/personnel/{id}', [EquipePersonnelController::class, 'update']);
+Route::delete('/equipe/personnel/{id}', [EquipePersonnelController::class, 'destroy']);
