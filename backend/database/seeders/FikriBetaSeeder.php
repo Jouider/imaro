@@ -35,13 +35,13 @@ class FikriBetaSeeder extends Seeder
             ]
         );
 
-        $fikri = User::firstOrCreate(
+        $fikri = User::updateOrCreate(
             ['phone' => '+212600000099'],
             [
                 'tenant_id' => $tenant->id,
                 'name'      => 'Mohammed Fikri',
-                'email'     => 'fikri-beta@blancasyndic.ma',
-                'password'  => Hash::make('imaro2026'),
+                'email'     => 'fikri@blancasyndic-test.ma',
+                'password'  => Hash::make('Imaro2026!'),
                 'role'      => 'manager',
                 'status'    => 'active',
                 'lang'      => 'fr',
@@ -59,10 +59,10 @@ class FikriBetaSeeder extends Seeder
         $this->command->info("║  Tenant     : BlancaSyndic Beta (id={$tenant->id})");
         $this->command->info('║  Subdomain  : blancasyndic-test');
         $this->command->info("║  Manager    : Mohammed Fikri (id={$fikri->id})");
-        $this->command->info('║  Phone      : +212600000099    (OTP WhatsApp)');
-        $this->command->info('║  Email      : fikri-beta@blancasyndic.ma');
-        $this->command->info('║  Password   : imaro2026         (fallback si OTP KO)');
+        $this->command->info('║  Email      : fikri@blancasyndic-test.ma');
+        $this->command->info('║  Password   : Imaro2026!');
         $this->command->info('║  Login URL  : https://staging.imaro.ma');
+        $this->command->info('║  Auth flow  : email + password (POST /api/auth/login)');
         $this->command->info('╚════════════════════════════════════════════════════════════╝');
         $this->command->info('');
     }

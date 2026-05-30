@@ -168,16 +168,22 @@ Error format:
 }
 ```
 
-## Auth flow (OTP WhatsApp — our differentiator vs SyndicConnect)
-Admin users (manager, gestionnaire):
-1. POST /api/auth/request-otp → {phone} → generate 6-digit OTP, store hashed, 5min TTL, send WhatsApp
-2. POST /api/auth/verify-otp → {phone, otp} → verify → return Sanctum token + user + role
+## Auth flow (implémentation réelle)
+Admin users (manager, gestionnaire, conseil, agent_recouvrement, super_admin):
+1. POST /api/auth/login → {email, password} → vérifie Hash::check → Sanctum token + user + tenant
+2. Rate limit : 5 essais / 10 min par email (RateLimiter Laravel)
 3. All protected routes: middleware(['auth:sanctum', 'role:X'])
 4. GET /api/auth/me → returns user + permissions + tenant info
+5. POST /api/auth/logout → révoque le token courant
 
-Resident (mobile app — sprint 3):
-- Invite by email with temporary token (passwords NEVER shown in plain text)
-- OTP email as 2FA option
+Resident (portail mobile):
+1. POST /api/auth/resident/login → {phone, code} → code d'accès hashé en BDD
+2. Première connexion → status "first_login" → POST /api/auth/resident/activate pour set le mot de passe perso
+3. Rate limit identique aux admins
+
+Note : le flow OTP WhatsApp envisagé initialement n'a PAS été implémenté pour les admins.
+Email + password est le standard. WhatsApp/SMS reste utilisé pour les notifications métier
+(appels de fonds, relances, annonces) via WhatsAppService + Jobs async.
 
 ## Legal compliance (MANDATORY)
 Every new feature, endpoint, or module MUST comply with:

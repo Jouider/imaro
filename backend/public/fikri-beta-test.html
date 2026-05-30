@@ -391,24 +391,25 @@ const phasesData = [
     note: "Cette phase est réalisée côté Abdellah. Tu peux la cocher pour suivre l'avancée.",
     steps: [
       "Créer le tenant blancasyndic (subdomain, plan business, status active)",
-      "Créer le compte manager Mohammed Fikri avec son vrai numéro WhatsApp",
-      "Vérifier que WhatsApp OTP fonctionne",
-      "Envoyer URL staging.imaro.ma + numéro enregistré + ce cahier à Fikri",
+      "Créer le compte manager Mohammed Fikri (email + password)",
+      "Vérifier que la connexion email+password fonctionne",
+      "Envoyer URL staging.imaro.ma + email + password + ce cahier à Fikri",
       "Vérifier que la base est vide (aucune résidence pré-créée)"
     ]},
   { num: 1, title: "Première connexion & découverte", obj: "Fikri arrive sur staging.imaro.ma et se connecte pour la première fois.",
+    note: "<strong>Tes identifiants :</strong> Email <code>fikri@blancasyndic-test.ma</code> · Mot de passe <code>Imaro2026!</code>",
     steps: [
       "Ouvre https://staging.imaro.ma dans Chrome (desktop)",
       "La landing page s'affiche correctement (logo, textes lisibles)",
       "Clique sur 'Se connecter'",
-      "Tape ton numéro WhatsApp (+212600000001 ou 0600000001)",
-      "Clique 'Recevoir le code'",
-      "Tu reçois un message WhatsApp avec un code à 6 chiffres (≤ 30 secondes)",
-      "Tape le code reçu dans l'écran",
-      "Tu arrives sur un dashboard / page d'accueil",
+      "Tape l'email : fikri@blancasyndic-test.ma",
+      "Tape le mot de passe : Imaro2026!",
+      "Clique 'Se connecter'",
+      "Tu arrives sur un dashboard / page d'accueil (pas d'OTP, accès direct)",
       "Ton nom 'Mohammed Fikri' s'affiche en haut à droite",
-      "Le nom de ton cabinet 'BlancaSyndic' est visible",
-      "Déconnecte-toi → reconnecte-toi → tout fonctionne pareil"
+      "Le nom de ton cabinet 'BlancaSyndic Beta' est visible",
+      "Déconnecte-toi → reconnecte-toi avec les mêmes identifiants → OK",
+      "[Bonus] Essaie de te connecter avec un mauvais mot de passe → message d'erreur clair"
     ]},
   { num: 2, title: "Architecture du cabinet (Équipe)", obj: "Créer ton équipe de gestionnaires.",
     steps: [
@@ -687,8 +688,8 @@ const phasesData = [
     ]},
   { num: 23, title: "Cas limites & sécurité", obj: "Essayer de 'casser' l'app pour trouver les bugs cachés.",
     steps: [
-      "Tente de te connecter avec un mauvais OTP 5 fois → blocage temporaire",
-      "Demande 10 OTP en 2 minutes → rate limiting",
+      "Tente de te connecter avec un mauvais mot de passe 5 fois → blocage temporaire (rate limit)",
+      "Attends le délai → tu peux te reconnecter normalement",
       "Ouvre l'app en arabe / RTL — pas d'élément cassé",
       "Tente d'uploader un fichier de 100 Mo → message d'erreur clair (pas 500)",
       "Tente d'uploader un .exe ou .sh → refusé",
