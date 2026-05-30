@@ -639,8 +639,8 @@
     },
     "pricing": {
       "eyebrow": "Tarifs",
-      "title": "Un plan pour chaque cabinet",
-      "subtitle": "Tarification par lots gérés. Sans engagement, support inclus.",
+      "title": "Chaque copropriété est unique",
+      "subtitle": "Pas de grille rigide. Votre tarif dépend du nombre de résidences, de lots et des modules activés — on construit l'offre avec vous.",
       "popular": "Le plus choisi",
       "from": "à partir de",
       "currency": "DH",
@@ -667,7 +667,20 @@
       "enterprise": {
         "name": "Enterprise",
         "tagline": "Pour les grands portefeuilles et groupes immobiliers"
-      }
+      },
+      "cardEyebrow": "Offre sur mesure",
+      "cardPrice": "Sur devis",
+      "cardDesc": "Un seul plan : le vôtre. Toutes les fonctionnalités, ajustées à la taille de votre cabinet.",
+      "includedTitle": "Inclus dans chaque offre",
+      "included1": "Tous les modules métier & comptables",
+      "included2": "Conformité Décret 2.23.700 complète",
+      "included3": "Assistant IA — audit, OCR, budget",
+      "included4": "Portail résident illimité (FR + AR)",
+      "included5": "Onboarding & reprise de vos données",
+      "included6": "Support dédié par WhatsApp",
+      "ctaQuote": "Demander un devis",
+      "ctaExpert": "Parler à un expert",
+      "note": "Sans engagement · 14 jours d'essai gratuit"
     },
     "faq": {
       "eyebrow": "FAQ",
