@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckAppPermission;
 use App\Http\Middleware\SetTenant;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -19,9 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'role' => RoleMiddleware::class,
-            'permission' => PermissionMiddleware::class,
-            'set.tenant' => SetTenant::class,
+            'role'           => RoleMiddleware::class,
+            'permission'     => PermissionMiddleware::class,
+            'set.tenant'     => SetTenant::class,
+            'app.permission' => CheckAppPermission::class,
         ]);
 
         $middleware->api([
