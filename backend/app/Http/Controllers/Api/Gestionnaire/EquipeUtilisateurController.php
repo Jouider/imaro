@@ -44,13 +44,13 @@ class EquipeUtilisateurController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'name'           => 'required|string|max:255',
-            'email'          => 'required|email|unique:users,email',
-            'password'       => 'required|string|min:8',
-            'role'           => ['required', Rule::in(['administrateur', 'gestionnaire', 'assistant', 'comptable'])],
-            'permissions'    => 'nullable|array',
-            'permissions.*'  => 'string',
-            'residence_ids'  => 'nullable|array',
+            'name'            => 'required|string|max:255',
+            'email'           => ['required', 'email', Rule::unique('users', 'email')->whereNull('deleted_at')],
+            'password'        => 'required|string|min:8',
+            'role'            => ['required', Rule::in(['administrateur', 'gestionnaire', 'assistant', 'comptable'])],
+            'permissions'     => 'nullable|array',
+            'permissions.*'   => 'string',
+            'residence_ids'   => 'nullable|array',
             'residence_ids.*' => 'integer|exists:residences,id',
         ]);
 
@@ -82,7 +82,7 @@ class EquipeUtilisateurController extends Controller
 
         $validated = $request->validate([
             'name'            => 'sometimes|string|max:255',
-            'email'           => ['sometimes', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+            'email'           => ['sometimes', 'email', Rule::unique('users', 'email')->ignore($user->id)->whereNull('deleted_at')],
             'password'        => 'sometimes|string|min:8',
             'role'            => ['sometimes', Rule::in(['administrateur', 'gestionnaire', 'assistant', 'comptable'])],
             'permissions'     => 'sometimes|array',
