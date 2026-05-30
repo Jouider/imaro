@@ -25,12 +25,18 @@ class ResidenceController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Residence::when(
-                ! $request->user()->hasRole('manager'),
-                fn ($q) => $q->where('gestionnaire_id', $request->user()->id)
-            )
-            ->with(['gestionnaire', 'exercices'])
-            ->withCount('lots');
+        $user  = $request->user();
+        $query = Residence::query();
+
+        if (! $user->hasRole('manager')) {
+            if (! empty($user->equipe_residence_ids)) {
+                $query->whereIn('id', $user->equipe_residence_ids);
+            } else {
+                $query->where('gestionnaire_id', $user->id);
+            }
+        }
+
+        $query->with(['gestionnaire', 'exercices'])->withCount('lots');
 
         if ($search = $request->search) {
             $query->where(function ($q) use ($search) {

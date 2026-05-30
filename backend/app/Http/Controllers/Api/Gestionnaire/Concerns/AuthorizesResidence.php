@@ -9,15 +9,22 @@ trait AuthorizesResidence
 {
     /**
      * Returns true if the authenticated user can access the given residence.
-     * Manager sees all residences; gestionnaire sees only assigned ones.
+     * Manager sees all. Equipe gestionnaire scoped by equipe_residence_ids.
+     * Legacy gestionnaire scoped by residences.gestionnaire_id.
      */
     protected function canAccessResidence(Request $request, Residence $residence): bool
     {
-        if ($request->user()->hasRole('manager')) {
+        $user = $request->user();
+
+        if ($user->hasRole('manager')) {
             return true;
         }
 
-        return $residence->gestionnaire_id === $request->user()->id;
+        if (! empty($user->equipe_residence_ids)) {
+            return in_array($residence->id, $user->equipe_residence_ids);
+        }
+
+        return $residence->gestionnaire_id === $user->id;
     }
 
     protected function authorizeResidence(Request $request, Residence $residence): void
@@ -34,11 +41,17 @@ trait AuthorizesResidence
      */
     protected function residenceScope(Request $request): \Closure
     {
-        if ($request->user()->hasRole('manager')) {
+        $user = $request->user();
+
+        if ($user->hasRole('manager')) {
             return fn ($q) => $q;
         }
 
-        return fn ($q) => $q->where('gestionnaire_id', $request->user()->id);
+        if (! empty($user->equipe_residence_ids)) {
+            return fn ($q) => $q->whereIn('id', $user->equipe_residence_ids);
+        }
+
+        return fn ($q) => $q->where('gestionnaire_id', $user->id);
     }
 
     /**
@@ -46,12 +59,16 @@ trait AuthorizesResidence
      */
     protected function accessibleResidenceIds(Request $request): \Illuminate\Support\Collection
     {
-        $query = Residence::query();
+        $user = $request->user();
 
-        if (! $request->user()->hasRole('manager')) {
-            $query->where('gestionnaire_id', $request->user()->id);
+        if ($user->hasRole('manager')) {
+            return Residence::pluck('id');
         }
 
-        return $query->pluck('id');
+        if (! empty($user->equipe_residence_ids)) {
+            return collect($user->equipe_residence_ids);
+        }
+
+        return Residence::where('gestionnaire_id', $user->id)->pluck('id');
     }
 }
