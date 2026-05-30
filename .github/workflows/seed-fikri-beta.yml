@@ -1,0 +1,27 @@
+name: Seed Fikri Beta Tenant (Staging)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  seed:
+    name: Provision BlancaSyndic Beta tenant + Fikri account
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Run FikriBetaSeeder via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            set -e
+            cd /var/www/imaro-staging/backend
+
+            echo "🌱 Seed BlancaSyndic Beta tenant + Fikri manager account..."
+            sudo -u www-data php artisan db:seed --class=FikriBetaSeeder --force
+
+            echo "✅ Done."
