@@ -17,7 +17,11 @@ export const ROUTE_PERMISSIONS: Record<string, AppPermission[]> = {
   'autres-recettes': ['finances'],
   budgets: ['finances'],
   comptabilite: ['finances'],
-  depenses: ['finances', 'depenses'], // depenses is an alternative to finances
+  pointage: ['finances'],
+  remboursements: ['finances'],
+  emprunts: ['finances'],
+  'travaux-exceptionnels': ['finances'],
+  depenses: ['finances', 'depenses'],
   // Recouvrement group
   recouvrement: ['recouvrement'],
   // Copropriété group
@@ -31,6 +35,8 @@ export const ROUTE_PERMISSIONS: Record<string, AppPermission[]> = {
   // Équipe group
   utilisateurs: ['personnel'],
   personnel: ['personnel'],
+  // Patrimoine (Annexe 9) — always visible, no permission needed
+  // equipements: not gated
 }
 
 /** Permission slug for a route = its last path segment. */
