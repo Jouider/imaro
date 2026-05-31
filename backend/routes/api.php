@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
     // Admin (manager, gestionnaire, conseil, super_admin) — email + password
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login',    [AuthController::class, 'login']);
+    Route::post('/activate', [AuthController::class, 'activate']);
 
     // Résident (portail mobile) — téléphone + code
     Route::post('/resident/login',    [AuthController::class, 'residentLogin']);

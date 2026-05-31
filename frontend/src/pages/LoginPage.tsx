@@ -23,6 +23,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { Wordmark } from '@/components/Wordmark'
 import {
   loginWithEmail,
+  adminActivate,
   residentLogin,
   residentActivate,
 } from '@/services/auth.service'
@@ -33,7 +34,7 @@ import { cn } from '@/lib/utils'
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Role = 'gestionnaire' | 'resident'
-type Step = 'role' | 'phone' | 'code' | 'activate'
+type Step = 'role' | 'phone' | 'code' | 'activate' | 'admin-activate'
 
 // ─── Error helper ─────────────────────────────────────────────────────────────
 
@@ -147,6 +148,9 @@ export function LoginPage() {
   // gestionnaire fields
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  // admin first-login — personal password
+  const [adminPwd, setAdminPwd] = useState('')
+  const [adminPwdConfirm, setAdminPwdConfirm] = useState('')
 
   // resident fields
   const [digits, setDigits] = useState('')
@@ -157,9 +161,25 @@ export function LoginPage() {
   const fullPhone = `+212${digits}`
   const phoneValid = /^[67]\d{8}$/.test(digits)
 
-  // ── Gestionnaire — email + password ──
+  // ── Gestionnaire / Admin — email + password ──
   const loginEmailMutation = useMutation({
     mutationFn: () => loginWithEmail(email, password),
+    onSuccess: (res) => {
+      if (res.status === 'success') {
+        setStoredToken(res.data.token)
+        setSession(res.data)
+        void navigate('/gestionnaire/dashboard', { replace: true })
+      } else if (res.status === 'first_login') {
+        // Manager-created admin must set their own password
+        setStep('admin-activate')
+      }
+    },
+    onError: (err) => toast.error(extractError(err, t('auth.networkError'))),
+  })
+
+  // ── Admin — first-login activation ──
+  const adminActivateMutation = useMutation({
+    mutationFn: () => adminActivate(email, password, adminPwd),
     onSuccess: ({ token, user, tenant }) => {
       setStoredToken(token)
       setSession({ token, user, tenant })
@@ -208,6 +228,11 @@ export function LoginPage() {
       setStep('code')
       setNewCode('')
       setNewCodeConfirm('')
+    } else if (step === 'admin-activate') {
+      setStep('phone')
+      setPassword('')
+      setAdminPwd('')
+      setAdminPwdConfirm('')
     } else {
       setStep('role')
       setRole(null)
@@ -219,24 +244,28 @@ export function LoginPage() {
   const title =
     step === 'role'
       ? t('auth.role.welcomeTitle')
-      : step === 'activate'
-        ? t('auth.resident.activateTitle')
-        : step === 'code'
-          ? t('auth.resident.codeTitle')
-          : role === 'gestionnaire'
-            ? t('auth.gestionnaire.title')
-            : t('auth.resident.title')
+      : step === 'admin-activate'
+        ? t('auth.admin.activateTitle')
+        : step === 'activate'
+          ? t('auth.resident.activateTitle')
+          : step === 'code'
+            ? t('auth.resident.codeTitle')
+            : role === 'gestionnaire'
+              ? t('auth.gestionnaire.title')
+              : t('auth.resident.title')
 
   const subtitle =
     step === 'role'
       ? t('auth.role.welcomeSubtitle')
-      : step === 'activate'
-        ? t('auth.resident.activateSubtitle')
-        : step === 'code'
-          ? t('auth.resident.codeSubtitle', { digits })
-          : role === 'gestionnaire'
-            ? t('auth.gestionnaire.subtitle')
-            : t('auth.resident.subtitle')
+      : step === 'admin-activate'
+        ? t('auth.admin.activateSubtitle')
+        : step === 'activate'
+          ? t('auth.resident.activateSubtitle')
+          : step === 'code'
+            ? t('auth.resident.codeSubtitle', { digits })
+            : role === 'gestionnaire'
+              ? t('auth.gestionnaire.subtitle')
+              : t('auth.resident.subtitle')
 
   return (
     <div className="flex min-h-svh bg-[#f4f7fa]">
@@ -571,6 +600,84 @@ export function LoginPage() {
                   {activateMutation.isPending
                     ? t('auth.resident.activating')
                     : t('auth.resident.activateSubmit')}
+                </Button>
+              </form>
+            )}
+
+            {/* ── Admin: first-login — set personal password ── */}
+            {step === 'admin-activate' && (
+              <form
+                className="space-y-5"
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  if (adminPwd !== adminPwdConfirm) {
+                    toast.error(t('auth.admin.mismatch'))
+                    return
+                  }
+                  if (adminPwd.length < 8) {
+                    toast.error(t('auth.admin.tooShort'))
+                    return
+                  }
+                  adminActivateMutation.mutate()
+                }}
+              >
+                <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+                  <Shield className="mb-1 size-4 inline-block me-1.5 text-amber-600" />
+                  {t('auth.admin.activateHint')}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="admin-new-pwd">
+                    {t('auth.admin.newPassword')}
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                    <input
+                      id="admin-new-pwd"
+                      type="password"
+                      placeholder={t('auth.admin.newPasswordPlaceholder')}
+                      value={adminPwd}
+                      onChange={(e) => setAdminPwd(e.target.value)}
+                      required
+                      className={cn(inputCls, 'ps-10 pe-4')}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="admin-confirm-pwd">
+                    {t('auth.admin.confirmPassword')}
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                    <input
+                      id="admin-confirm-pwd"
+                      type="password"
+                      placeholder={t('auth.admin.confirmPasswordPlaceholder')}
+                      value={adminPwdConfirm}
+                      onChange={(e) => setAdminPwdConfirm(e.target.value)}
+                      required
+                      className={cn(
+                        inputCls,
+                        'ps-10 pe-4',
+                        adminPwdConfirm &&
+                          adminPwd !== adminPwdConfirm &&
+                          'border-red-400 focus:border-red-400 focus:ring-red-100',
+                      )}
+                    />
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  className="h-12 w-full bg-gradient-imaro text-base text-white shadow-sm hover:brightness-110"
+                  disabled={
+                    adminActivateMutation.isPending || adminPwd.length < 8
+                  }
+                >
+                  {adminActivateMutation.isPending
+                    ? t('auth.admin.activating')
+                    : t('auth.admin.activateSubmit')}
                 </Button>
               </form>
             )}

@@ -253,15 +253,137 @@ it('newly created equipe user can login (soft-deleted predecessor does not inter
         'permissions' => ['residences'],
     ])->assertStatus(201);
 
-    // Login with the NEW password must succeed
+    // Login with the NEW temp password — must return first_login flow (new behavior)
     $loginResponse = $this->postJson('/api/auth/login', [
         'email'    => 'salma@test.ma',
         'password' => 'newpass456',
     ]);
 
     $loginResponse->assertStatus(200);
-    $loginResponse->assertJsonPath('status', 'success');
-    expect($loginResponse->json('data.user.name'))->toBe('Salma Nouvelle');
+    $loginResponse->assertJsonPath('status', 'first_login');
+});
+
+it('newly created equipe user has must_change_password = true', function () {
+    $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
+        'name'        => 'Salma',
+        'email'       => 'salma@test.ma',
+        'password'    => 'temppass123',
+        'role'        => 'assistant',
+        'permissions' => ['residences'],
+    ])->assertStatus(201);
+
+    $user = User::where('email', 'salma@test.ma')->first();
+    expect($user->must_change_password)->toBeTrue();
+});
+
+it('first login of equipe user returns status=first_login (no token)', function () {
+    $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
+        'name'        => 'Salma',
+        'email'       => 'salma@test.ma',
+        'password'    => 'temppass123',
+        'role'        => 'assistant',
+        'permissions' => ['residences'],
+    ])->assertStatus(201);
+
+    $response = $this->postJson('/api/auth/login', [
+        'email'    => 'salma@test.ma',
+        'password' => 'temppass123',
+    ]);
+
+    $response->assertStatus(200);
+    $response->assertJsonPath('status', 'first_login');
+    $response->assertJsonPath('data.email', 'salma@test.ma');
+    expect($response->json('data.token'))->toBeNull();
+});
+
+it('activate endpoint sets new password and returns token', function () {
+    $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
+        'name'        => 'Salma',
+        'email'       => 'salma@test.ma',
+        'password'    => 'temppass123',
+        'role'        => 'assistant',
+        'permissions' => ['residences'],
+    ])->assertStatus(201);
+
+    $response = $this->postJson('/api/auth/activate', [
+        'email'                      => 'salma@test.ma',
+        'current_password'           => 'temppass123',
+        'new_password'               => 'mynewsecret456',
+        'new_password_confirmation'  => 'mynewsecret456',
+    ]);
+
+    $response->assertStatus(200);
+    $response->assertJsonPath('status', 'success');
+    expect($response->json('data.token'))->not->toBeNull();
+
+    $user = User::where('email', 'salma@test.ma')->first();
+    expect($user->must_change_password)->toBeFalse();
+    expect(\Illuminate\Support\Facades\Hash::check('mynewsecret456', $user->password))->toBeTrue();
+});
+
+it('login with new password works after activation', function () {
+    $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
+        'name'        => 'Salma',
+        'email'       => 'salma@test.ma',
+        'password'    => 'temppass123',
+        'role'        => 'assistant',
+        'permissions' => ['residences'],
+    ])->assertStatus(201);
+
+    $this->postJson('/api/auth/activate', [
+        'email'                     => 'salma@test.ma',
+        'current_password'          => 'temppass123',
+        'new_password'              => 'mynewsecret456',
+        'new_password_confirmation' => 'mynewsecret456',
+    ])->assertStatus(200);
+
+    // Now a normal login with the new password
+    $response = $this->postJson('/api/auth/login', [
+        'email'    => 'salma@test.ma',
+        'password' => 'mynewsecret456',
+    ]);
+
+    $response->assertStatus(200);
+    $response->assertJsonPath('status', 'success');
+    expect($response->json('data.token'))->not->toBeNull();
+});
+
+it('activate rejects an already-activated account', function () {
+    $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
+        'name'        => 'Salma',
+        'email'       => 'salma@test.ma',
+        'password'    => 'temppass123',
+        'role'        => 'assistant',
+        'permissions' => ['residences'],
+    ])->assertStatus(201);
+
+    $this->postJson('/api/auth/activate', [
+        'email'                     => 'salma@test.ma',
+        'current_password'          => 'temppass123',
+        'new_password'              => 'mynewsecret456',
+        'new_password_confirmation' => 'mynewsecret456',
+    ])->assertStatus(200);
+
+    // Try to activate again — should reject
+    $response = $this->postJson('/api/auth/activate', [
+        'email'                     => 'salma@test.ma',
+        'current_password'          => 'mynewsecret456',
+        'new_password'              => 'another789',
+        'new_password_confirmation' => 'another789',
+    ]);
+
+    $response->assertStatus(422);
+});
+
+it('manager login (without must_change_password) returns token directly', function () {
+    $response = $this->postJson('/api/auth/login', [
+        'email'    => 'manager@test.ma',
+        'password' => 'test1234',
+    ]);
+
+    $response->assertStatus(200);
+    $response->assertJsonPath('status', 'success');
+    expect($response->json('data.token'))->not->toBeNull();
 });
 
 it('UserResource returns permissions and residence_ids in /api/auth/me', function () {
