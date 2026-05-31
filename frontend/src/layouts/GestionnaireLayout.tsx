@@ -61,6 +61,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useMutation } from '@tanstack/react-query'
 import { CommandPalette } from '@/components/gestionnaire/CommandPalette'
+import { canAccessRoute } from '@/lib/navAccess'
 import { cn } from '@/lib/utils'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -251,6 +252,28 @@ const NAV_SECTIONS: NavSection[] = [
   },
 ]
 
+// ─── Permission filtering ──────────────────────────────────────────────────────
+// Gestionnaires created via Équipe → Utilisateurs receive an `app_permissions`
+// array on their user at login (issue #119). We hide nav items they can't reach.
+// The backend already enforces 403s on the API; this is the visual layer.
+// The route → permission mapping lives in @/lib/navAccess (shared with Cmd+K).
+
+/**
+ * Filter nav sections by the user's app_permissions; drop empty sections.
+ * Fail-open semantics live in {@link canAccessRoute}.
+ */
+function visibleSections(
+  role: string | undefined,
+  appPermissions: string[] | undefined,
+): NavSection[] {
+  return NAV_SECTIONS.map((section) => ({
+    ...section,
+    items: section.items.filter((item) =>
+      canAccessRoute(item.to, role, appPermissions),
+    ),
+  })).filter((section) => section.items.length > 0)
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getInitials(name: string): string {
@@ -314,6 +337,8 @@ type SidebarNavProps = { onNavClick?: () => void }
 
 function SidebarNav({ onNavClick }: SidebarNavProps) {
   const { t } = useTranslation()
+  const user = useAuthStore((s) => s.user)
+  const sections = visibleSections(user?.role, user?.app_permissions)
 
   return (
     <div
@@ -330,7 +355,7 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
 
       {/* Navigation */}
       <nav className="no-scrollbar flex-1 overflow-y-auto px-3 py-4 space-y-5">
-        {NAV_SECTIONS.map((section, si) => (
+        {sections.map((section, si) => (
           <div key={si}>
             {section.labelKey && (
               <div className="flex items-center gap-2 px-2 mb-1.5">

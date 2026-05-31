@@ -53,6 +53,19 @@
       "submit": "Se connecter",
       "submitting": "Connexion…"
     },
+    "admin": {
+      "activateTitle": "Créez votre mot de passe",
+      "activateSubtitle": "Définissez un mot de passe personnel de 8 caractères minimum",
+      "activateHint": "Première connexion — votre compte a été créé par votre cabinet. Choisissez un mot de passe personnel pour sécuriser votre accès.",
+      "newPassword": "Nouveau mot de passe",
+      "newPasswordPlaceholder": "8 caractères minimum",
+      "confirmPassword": "Confirmer le mot de passe",
+      "confirmPasswordPlaceholder": "Répétez votre mot de passe",
+      "activateSubmit": "Confirmer et accéder",
+      "activating": "Activation…",
+      "mismatch": "Les mots de passe ne correspondent pas",
+      "tooShort": "Mot de passe trop court (8 caractères minimum)"
+    },
     "resident": {
       "title": "Espace Copropriétaire",
       "subtitle": "Entrez votre numéro de téléphone marocain",

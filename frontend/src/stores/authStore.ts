@@ -14,7 +14,12 @@ export type AuthUser = {
   name: string
   phone: string
   role: UserRole
-  permissions?: string[]
+  /**
+   * Grouped feature permissions for manager-created gestionnaires
+   * (backend `app_permissions`, issue #119). Absent for managers / owners /
+   * super-admins, who have unrestricted access.
+   */
+  app_permissions?: string[]
 }
 
 export type AuthTenant = {

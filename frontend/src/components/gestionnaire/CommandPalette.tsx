@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useAuthStore } from '@/stores/authStore'
+import { canAccessRoute } from '@/lib/navAccess'
 import {
   LayoutDashboard,
   Sparkles,
@@ -67,6 +69,7 @@ type Entry = {
 export function CommandPalette() {
   const navigate = useNavigate()
   const { t } = useTranslation()
+  const user = useAuthStore((s) => s.user)
   const [open, setOpen] = useState(false)
 
   // Bind Cmd+K / Ctrl+K globally
@@ -315,8 +318,14 @@ export function CommandPalette() {
     else if (entry.to) navigate(entry.to)
   }
 
-  const navEntries = ENTRIES.filter((e) => e.group === 'nav')
-  const actionEntries = ENTRIES.filter((e) => e.group === 'actions')
+  // Hide entries the gestionnaire can't reach (same permission rules as the
+  // sidebar). Entries without a route are always shown.
+  const canShow = (e: Entry) =>
+    !e.to || canAccessRoute(e.to, user?.role, user?.app_permissions)
+  const navEntries = ENTRIES.filter((e) => e.group === 'nav' && canShow(e))
+  const actionEntries = ENTRIES.filter(
+    (e) => e.group === 'actions' && canShow(e),
+  )
 
   return (
     <CommandDialog

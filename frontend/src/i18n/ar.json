@@ -53,6 +53,19 @@
       "submit": "تسجيل الدخول",
       "submitting": "جارٍ الاتصال…"
     },
+    "admin": {
+      "activateTitle": "أنشئ كلمة المرور الخاصة بك",
+      "activateSubtitle": "حدد كلمة مرور شخصية من 8 أحرف على الأقل",
+      "activateHint": "أول اتصال — تم إنشاء حسابك من قبل مكتبك. اختر كلمة مرور شخصية لتأمين وصولك.",
+      "newPassword": "كلمة مرور جديدة",
+      "newPasswordPlaceholder": "8 أحرف على الأقل",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "confirmPasswordPlaceholder": "كرر كلمة المرور",
+      "activateSubmit": "تأكيد والدخول",
+      "activating": "جارٍ التفعيل…",
+      "mismatch": "كلمتا المرور غير متطابقتين",
+      "tooShort": "كلمة المرور قصيرة جدًا (8 أحرف كحد أدنى)"
+    },
     "resident": {
       "title": "فضاء المالك",
       "subtitle": "أدخل رقم هاتفك المغربي",

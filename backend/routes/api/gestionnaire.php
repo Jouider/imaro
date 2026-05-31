@@ -244,45 +244,45 @@ Route::post('/paiements/{paiement}/mise-en-demeure', [PenaltyController::class, 
 // Sprint 7 — Patrimoine + Recettes/Remboursements
 // ========================================
 
+// Équipements (Annexe 9) — patrimoine, non sensible, pas de gate
 Route::prefix('residences/{residence}')->group(function () {
-    // Équipements (Annexe 9)
     Route::get('/equipements', [EquipementController::class, 'index']);
     Route::post('/equipements', [EquipementController::class, 'store']);
-
-    // Emprunts (Annexe 8)
-    Route::get('/emprunts', [EmpruntController::class, 'index']);
-    Route::post('/emprunts', [EmpruntController::class, 'store']);
-
-    // Travaux exceptionnels (Annexe 6)
-    Route::get('/travaux-exceptionnels', [TravauxExceptionnelController::class, 'index']);
-    Route::post('/travaux-exceptionnels', [TravauxExceptionnelController::class, 'store']);
-
-    // Autres recettes
-    Route::get('/autres-recettes', [AutreRecetteController::class, 'index']);
-    Route::post('/autres-recettes', [AutreRecetteController::class, 'store']);
-
-    // Remboursements
-    Route::get('/remboursements', [RemboursementController::class, 'index']);
-    Route::post('/remboursements', [RemboursementController::class, 'store']);
 });
-
-// Flat routes for update/delete (Sprint 7)
 Route::put('/equipements/{equipement}', [EquipementController::class, 'update']);
 Route::delete('/equipements/{equipement}', [EquipementController::class, 'destroy']);
-Route::put('/emprunts/{emprunt}', [EmpruntController::class, 'update']);
-Route::delete('/emprunts/{emprunt}', [EmpruntController::class, 'destroy']);
-Route::put('/travaux-exceptionnels/{travauxExceptionnel}', [TravauxExceptionnelController::class, 'update']);
-Route::delete('/travaux-exceptionnels/{travauxExceptionnel}', [TravauxExceptionnelController::class, 'destroy']);
-Route::put('/autres-recettes/{autreRecette}', [AutreRecetteController::class, 'update']);
-Route::delete('/autres-recettes/{autreRecette}', [AutreRecetteController::class, 'destroy']);
-Route::put('/remboursements/{remboursement}', [RemboursementController::class, 'update']);
-Route::delete('/remboursements/{remboursement}', [RemboursementController::class, 'destroy']);
+
+// Finances — emprunts, travaux exceptionnels, autres recettes, remboursements
+Route::middleware(['app.permission:finances'])->group(function () {
+    Route::prefix('residences/{residence}')->group(function () {
+        Route::get('/emprunts', [EmpruntController::class, 'index']);
+        Route::post('/emprunts', [EmpruntController::class, 'store']);
+
+        Route::get('/travaux-exceptionnels', [TravauxExceptionnelController::class, 'index']);
+        Route::post('/travaux-exceptionnels', [TravauxExceptionnelController::class, 'store']);
+
+        Route::get('/autres-recettes', [AutreRecetteController::class, 'index']);
+        Route::post('/autres-recettes', [AutreRecetteController::class, 'store']);
+
+        Route::get('/remboursements', [RemboursementController::class, 'index']);
+        Route::post('/remboursements', [RemboursementController::class, 'store']);
+    });
+
+    Route::put('/emprunts/{emprunt}', [EmpruntController::class, 'update']);
+    Route::delete('/emprunts/{emprunt}', [EmpruntController::class, 'destroy']);
+    Route::put('/travaux-exceptionnels/{travauxExceptionnel}', [TravauxExceptionnelController::class, 'update']);
+    Route::delete('/travaux-exceptionnels/{travauxExceptionnel}', [TravauxExceptionnelController::class, 'destroy']);
+    Route::put('/autres-recettes/{autreRecette}', [AutreRecetteController::class, 'update']);
+    Route::delete('/autres-recettes/{autreRecette}', [AutreRecetteController::class, 'destroy']);
+    Route::put('/remboursements/{remboursement}', [RemboursementController::class, 'update']);
+    Route::delete('/remboursements/{remboursement}', [RemboursementController::class, 'destroy']);
+});
 
 // ========================================
-// Sprint 6 — Pointage bancaire
+// Sprint 6 — Pointage bancaire (gated: finances)
 // ========================================
 
-Route::prefix('residences/{residence}/pointage')->group(function () {
+Route::middleware(['app.permission:finances'])->prefix('residences/{residence}/pointage')->group(function () {
     Route::post('/sessions', [PointageController::class, 'createSession']);
     Route::get('/sessions/{session}/candidates', [PointageController::class, 'candidates']);
     Route::post('/sessions/{session}/matches/confirm', [PointageController::class, 'confirmMatches']);
