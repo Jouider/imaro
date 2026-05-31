@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -48,7 +48,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { useNotifStore, type NotifType } from '@/stores/notifStore'
 import { setStoredToken } from '@/lib/axios'
-import { logout } from '@/services/auth.service'
+import { logout, me } from '@/services/auth.service'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -702,6 +702,18 @@ function ContextPill() {
 
 export function GestionnaireLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const refreshIdentity = useAuthStore((s) => s.refreshIdentity)
+
+  // Refresh user (app_permissions, app_role, residence_ids) on every layout
+  // mount so a manager-side permission change shows up on the next page reload
+  // without forcing the gestionnaire to log out.
+  useEffect(() => {
+    void me()
+      .then((data) => refreshIdentity(data))
+      .catch(() => {
+        /* axios 401 interceptor handles auth failure */
+      })
+  }, [refreshIdentity])
 
   return (
     <div className="flex min-h-svh">
