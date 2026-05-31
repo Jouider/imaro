@@ -61,6 +61,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useMutation } from '@tanstack/react-query'
 import { CommandPalette } from '@/components/gestionnaire/CommandPalette'
+import { canAccessRoute } from '@/lib/navAccess'
 import { cn } from '@/lib/utils'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -252,44 +253,24 @@ const NAV_SECTIONS: NavSection[] = [
 ]
 
 // ─── Permission filtering ──────────────────────────────────────────────────────
-// Gestionnaires created via Équipe → Utilisateurs receive a `permissions` array
-// on their user at login (issue #119). We hide nav items they can't access.
+// Gestionnaires created via Équipe → Utilisateurs receive an `app_permissions`
+// array on their user at login (issue #119). We hide nav items they can't reach.
 // The backend already enforces 403s on the API; this is the visual layer.
-//
-// Convention: a nav item's permission slug is the last segment of its route
-// (e.g. /gestionnaire/paiements → "paiements"). Adjust ROUTE_PERMISSION below if
-// the backend permission names diverge from the route slugs.
-
-/** Routes every gestionnaire keeps, whatever their permissions (need a home). */
-const ALWAYS_VISIBLE = new Set(['dashboard'])
-
-/** Permission slug for a nav route — last path segment by default. */
-function navPermission(to: string): string {
-  return to.split('/').filter(Boolean).pop() ?? ''
-}
+// The route → permission mapping lives in @/lib/navAccess (shared with Cmd+K).
 
 /**
- * Filter nav sections by the user's permissions.
- * Fail-open: only restricts when role === 'gestionnaire' AND a permissions
- * array is present. Managers / owners / super-admins (no permissions array)
- * always see the full sidebar. Empty sections are dropped.
+ * Filter nav sections by the user's app_permissions; drop empty sections.
+ * Fail-open semantics live in {@link canAccessRoute}.
  */
 function visibleSections(
   role: string | undefined,
-  permissions: string[] | undefined,
+  appPermissions: string[] | undefined,
 ): NavSection[] {
-  const gated = role === 'gestionnaire' && Array.isArray(permissions)
-  if (!gated) return NAV_SECTIONS
-
-  const allowed = permissions ?? []
-  const canSee = (item: NavItem) => {
-    const slug = navPermission(item.to)
-    return ALWAYS_VISIBLE.has(slug) || allowed.includes(slug)
-  }
-
   return NAV_SECTIONS.map((section) => ({
     ...section,
-    items: section.items.filter(canSee),
+    items: section.items.filter((item) =>
+      canAccessRoute(item.to, role, appPermissions),
+    ),
   })).filter((section) => section.items.length > 0)
 }
 
@@ -357,7 +338,7 @@ type SidebarNavProps = { onNavClick?: () => void }
 function SidebarNav({ onNavClick }: SidebarNavProps) {
   const { t } = useTranslation()
   const user = useAuthStore((s) => s.user)
-  const sections = visibleSections(user?.role, user?.permissions)
+  const sections = visibleSections(user?.role, user?.app_permissions)
 
   return (
     <div
