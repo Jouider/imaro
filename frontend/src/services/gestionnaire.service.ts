@@ -142,6 +142,10 @@ export type GroupeHabitation = {
   nom: string
   code?: string
   residence_id: number
+  description?: string | null
+  /** Total des tantièmes de la tranche (défaut 1000 côté backend). */
+  total_tantieme?: number
+  /** Dénormalisé via withCount côté backend. */
   nb_immeubles?: number
 }
 
@@ -618,12 +622,6 @@ const MOCK_ASSEMBLEES_AG: AG[] = MOCK_ASSEMBLEES.map((a) => ({
   date: a.date,
   lieu: a.lieu,
 }))
-
-const MOCK_GROUPES_HABITATIONS: GroupeHabitation[] = [
-  { id: 1, nom: 'Tranche A', code: 'TA', residence_id: 1, nb_immeubles: 2 },
-  { id: 2, nom: 'Tranche B', code: 'TB', residence_id: 1, nb_immeubles: 1 },
-  { id: 3, nom: 'Tranche Nord', code: 'TN', residence_id: 2, nb_immeubles: 1 },
-]
 
 const MOCK_IMMEUBLES: Immeuble[] = [
   {
@@ -1231,71 +1229,52 @@ export async function getAssembleesAvenir(): Promise<AG[]> {
 
 // ─── Groupes d'habitation (Tranches) ─────────────────────────────────────────
 
+type GroupeHabitationInput = {
+  nom?: string
+  code?: string
+  description?: string | null
+  total_tantieme?: number
+}
+
 export async function getGroupesHabitations(
   residenceId: number,
 ): Promise<GroupeHabitation[]> {
-  return withMock(
-    async () => {
-      const res = await api.get<
-        ApiEnvelope<{ groupes_habitations: GroupeHabitation[] }>
-      >(`/gestionnaire/residences/${residenceId}/groupes-habitations`)
-      return res.data.data.groupes_habitations
-    },
-    MOCK_GROUPES_HABITATIONS.filter((gh) => gh.residence_id === residenceId),
-  )
+  const res = await api.get<
+    ApiEnvelope<{ groupes_habitations: GroupeHabitation[] }>
+  >(`/gestionnaire/residences/${residenceId}/groupes-habitations`)
+  return res.data.data.groupes_habitations
 }
 
 export async function storeGroupeHabitation(
   residenceId: number,
-  data: { nom: string; code?: string },
+  data: GroupeHabitationInput & { nom: string },
 ): Promise<GroupeHabitation> {
-  const mockGH: GroupeHabitation = {
-    id: Date.now(),
-    nom: data.nom,
-    code: data.code,
-    residence_id: residenceId,
-    nb_immeubles: 0,
-  }
-  return withMock(async () => {
-    const res = await api.post<ApiEnvelope<GroupeHabitation>>(
-      `/gestionnaire/residences/${residenceId}/groupes-habitations`,
-      data,
-    )
-    return res.data.data
-  }, mockGH)
+  const res = await api.post<ApiEnvelope<GroupeHabitation>>(
+    `/gestionnaire/residences/${residenceId}/groupes-habitations`,
+    data,
+  )
+  return res.data.data
 }
 
 export async function updateGroupeHabitation(
   residenceId: number,
   ghId: number,
-  data: { nom?: string; code?: string },
+  data: GroupeHabitationInput,
 ): Promise<GroupeHabitation> {
-  const existing = MOCK_GROUPES_HABITATIONS.find((gh) => gh.id === ghId) ?? {
-    id: ghId,
-    nom: data.nom ?? '',
-    residence_id: residenceId,
-  }
-  return withMock(
-    async () => {
-      const res = await api.put<ApiEnvelope<GroupeHabitation>>(
-        `/gestionnaire/residences/${residenceId}/groupes-habitations/${ghId}`,
-        data,
-      )
-      return res.data.data
-    },
-    { ...existing, ...data } as GroupeHabitation,
+  const res = await api.put<ApiEnvelope<GroupeHabitation>>(
+    `/gestionnaire/residences/${residenceId}/groupes-habitations/${ghId}`,
+    data,
   )
+  return res.data.data
 }
 
 export async function deleteGroupeHabitation(
   residenceId: number,
   ghId: number,
 ): Promise<void> {
-  return withMock(async () => {
-    await api.delete(
-      `/gestionnaire/residences/${residenceId}/groupes-habitations/${ghId}`,
-    )
-  }, undefined)
+  await api.delete(
+    `/gestionnaire/residences/${residenceId}/groupes-habitations/${ghId}`,
+  )
 }
 
 // ─── Immeubles ───────────────────────────────────────────────────────────────
