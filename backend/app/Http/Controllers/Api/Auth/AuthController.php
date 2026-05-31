@@ -63,6 +63,18 @@ class AuthController extends Controller
         }
 
         RateLimiter::clear($key);
+
+        // Première connexion — l'utilisateur doit créer son propre mot de passe
+        if ($user->must_change_password) {
+            return response()->json([
+                'status'  => 'first_login',
+                'message' => 'Première connexion. Veuillez créer votre mot de passe personnel.',
+                'data'    => [
+                    'email' => $user->email,
+                ],
+            ]);
+        }
+
         $user->update(['last_login_at' => Carbon::now()]);
 
         $token = $user->createToken(
@@ -78,6 +90,92 @@ class AuthController extends Controller
                 'token_type' => 'Bearer',
                 'expires_in' => 30 * 24 * 60 * 60,
                 'user'       => new UserResource($user),
+                'tenant'     => $this->tenantData($user),
+            ],
+        ]);
+    }
+
+    /**
+     * POST /api/auth/activate
+     * Première connexion admin : email + mot de passe temporaire + nouveau mot de passe.
+     * Retourne le token directement.
+     */
+    public function activate(Request $request): JsonResponse
+    {
+        $key = 'activate:'.$request->email;
+
+        if (RateLimiter::tooManyAttempts($key, maxAttempts: 5)) {
+            $seconds = RateLimiter::availableIn($key);
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => "Trop de tentatives. Réessayez dans {$seconds} secondes.",
+            ], 429);
+        }
+
+        $validated = $request->validate([
+            'email'            => 'required|email',
+            'current_password' => 'required|string',
+            'new_password'     => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::withoutGlobalScopes()
+            ->with('tenant')
+            ->where('email', $validated['email'])
+            ->whereNull('deleted_at')
+            ->first();
+
+        if (! $user || ! Hash::check($validated['current_password'], $user->password)) {
+            RateLimiter::hit($key, 600);
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Email ou mot de passe temporaire incorrect.',
+            ], 401);
+        }
+
+        if ($user->role === 'resident') {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Les résidents utilisent le portail mobile.',
+            ], 403);
+        }
+
+        if ($user->status === 'inactive') {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Compte désactivé. Contactez votre administrateur.',
+            ], 403);
+        }
+
+        if (! $user->must_change_password) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Ce compte est déjà activé. Connectez-vous normalement.',
+            ], 422);
+        }
+
+        $user->update([
+            'password'             => Hash::make($validated['new_password']),
+            'must_change_password' => false,
+            'last_login_at'        => Carbon::now(),
+        ]);
+
+        RateLimiter::clear($key);
+
+        $token = $user->createToken(
+            name: 'syndikpro-app',
+            expiresAt: Carbon::now()->addDays(30)
+        )->plainTextToken;
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Mot de passe créé. Bienvenue sur imaro !',
+            'data'    => [
+                'token'      => $token,
+                'token_type' => 'Bearer',
+                'expires_in' => 30 * 24 * 60 * 60,
+                'user'       => new UserResource($user->fresh('tenant')),
                 'tenant'     => $this->tenantData($user),
             ],
         ]);

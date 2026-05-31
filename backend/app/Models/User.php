@@ -16,7 +16,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'tenant_id', 'name', 'phone', 'email', 'password',
-        'access_code', 'must_change_code',
+        'access_code', 'must_change_code', 'must_change_password',
         'role', 'otp_code', 'otp_expires_at', 'lang',
         'avatar', 'status', 'last_login_at', 'notification_prefs',
         'app_role', 'app_permissions', 'equipe_residence_ids',
@@ -32,6 +32,7 @@ class User extends Authenticatable
             'otp_expires_at'       => 'datetime',
             'last_login_at'        => 'datetime',
             'must_change_code'     => 'boolean',
+            'must_change_password' => 'boolean',
             'notification_prefs'   => 'array',
             'app_permissions'      => 'array',
             'equipe_residence_ids' => 'array',

@@ -65,6 +65,7 @@ class EquipeUtilisateurController extends Controller
             'app_permissions'      => $validated['permissions'] ?? [],
             'equipe_residence_ids' => $validated['residence_ids'] ?? [],
             'status'               => 'active',
+            'must_change_password' => true,
         ]);
 
         $user->assignRole('gestionnaire');
