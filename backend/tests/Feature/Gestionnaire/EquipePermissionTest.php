@@ -386,7 +386,7 @@ it('manager login (without must_change_password) returns token directly', functi
     expect($response->json('data.token'))->not->toBeNull();
 });
 
-it('UserResource returns permissions and residence_ids in /api/auth/me', function () {
+it('UserResource returns app_permissions and residence_ids in /api/auth/me', function () {
     $gestionnaire = User::create([
         'tenant_id'            => $this->tenant->id,
         'name'                 => 'Salma',
@@ -403,7 +403,7 @@ it('UserResource returns permissions and residence_ids in /api/auth/me', functio
     $response = $this->actingAs($gestionnaire)->getJson('/api/auth/me');
 
     $response->assertStatus(200);
-    $response->assertJsonPath('data.user.permissions', ['residences', 'finances']);
+    $response->assertJsonPath('data.user.app_permissions', ['residences', 'finances']);
     $response->assertJsonPath('data.user.residence_ids', [$this->residence1->id, $this->residence2->id]);
     $response->assertJsonPath('data.user.app_role', 'assistant');
 });

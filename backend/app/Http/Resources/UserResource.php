@@ -14,11 +14,11 @@ class UserResource extends JsonResource
             'name'          => $this->name,
             'email'         => $this->email,
             'phone'         => $this->phone,
-            'role'          => $this->role,
-            'app_role'      => $this->app_role,
-            'permissions'   => $this->app_permissions ?? [],
-            'residence_ids' => $this->equipe_residence_ids ?? [],
-            'lang'          => $this->lang,
+            'role'             => $this->role,
+            'app_role'         => $this->app_role,
+            'app_permissions'  => $this->app_permissions ?? [],
+            'residence_ids'    => $this->equipe_residence_ids ?? [],
+            'lang'             => $this->lang,
         ];
     }
 }
