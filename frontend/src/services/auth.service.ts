@@ -7,12 +7,41 @@ type SessionData = { token: string; user: AuthUser; tenant: AuthTenant }
 
 // ─── Gestionnaire / Admin login (email + password) ────────────────────────────
 
-export type LoginEmailResponse = ApiEnvelope<SessionData>
+/**
+ * Backend returns either a session (success) or, for a manager-created admin
+ * logging in for the first time, a `first_login` signal — they must then set
+ * their own password via {@link adminActivate} (mirrors the resident flow).
+ */
+export type LoginEmailResponse =
+  | { status: 'success'; data: SessionData }
+  | { status: 'first_login'; data: { email: string } }
+  | { status: 'error'; message: string }
 
-export async function loginWithEmail(email: string, password: string) {
+export async function loginWithEmail(
+  email: string,
+  password: string,
+): Promise<LoginEmailResponse> {
   const { data } = await api.post<LoginEmailResponse>('/auth/login', {
     email,
     password,
+  })
+  return data
+}
+
+/**
+ * Called on an admin's first login — they replace their temporary password
+ * (the one their manager handed them) with a personal one.
+ */
+export async function adminActivate(
+  email: string,
+  currentPassword: string,
+  newPassword: string,
+): Promise<SessionData> {
+  const { data } = await api.post<ApiEnvelope<SessionData>>('/auth/activate', {
+    email,
+    current_password: currentPassword,
+    new_password: newPassword,
+    new_password_confirmation: newPassword,
   })
   return data.data
 }
