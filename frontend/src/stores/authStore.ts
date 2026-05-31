@@ -34,6 +34,8 @@ type AuthState = {
   user: AuthUser | null
   tenant: AuthTenant | null
   setSession: (s: { token: string; user: AuthUser; tenant: AuthTenant }) => void
+  /** Refresh user + tenant from /auth/me without rotating the token. */
+  refreshIdentity: (s: { user: AuthUser; tenant: AuthTenant }) => void
   clear: () => void
 }
 
@@ -44,6 +46,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       tenant: null,
       setSession: ({ token, user, tenant }) => set({ token, user, tenant }),
+      refreshIdentity: ({ user, tenant }) => set({ user, tenant }),
       clear: () => set({ token: null, user: null, tenant: null }),
     }),
     { name: 'imaro.auth' },
