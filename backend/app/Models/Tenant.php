@@ -14,13 +14,16 @@ class Tenant extends Model
     protected $fillable = [
         'name', 'email', 'phone', 'logo', 'plan', 'max_logins',
         'rc', 'if_number', 'rib', 'subdomain', 'status', 'trial_ends_at',
+        'onboarding_completed_at', 'onboarding_step',
     ];
 
     protected function casts(): array
     {
         return [
-            'trial_ends_at' => 'datetime',
-            'max_logins' => 'integer',
+            'trial_ends_at'           => 'datetime',
+            'max_logins'              => 'integer',
+            'onboarding_completed_at' => 'datetime',
+            'onboarding_step'         => 'integer',
         ];
     }
 

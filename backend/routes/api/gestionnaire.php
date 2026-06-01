@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\Gestionnaire\ExerciceController;
 use App\Http\Controllers\Api\Gestionnaire\ImpayeController;
 use App\Http\Controllers\Api\Gestionnaire\LotController;
 use App\Http\Controllers\Api\Gestionnaire\NotificationController;
+use App\Http\Controllers\Api\Gestionnaire\OnboardingController;
 use App\Http\Controllers\Api\Gestionnaire\OccupantController;
 use App\Http\Controllers\Api\Gestionnaire\PaiementController;
 use App\Http\Controllers\Api\Gestionnaire\PenaltyController;
@@ -354,6 +355,13 @@ Route::delete('/comptabilite/depenses/{depense}', [ComptabiliteController::class
 
 // Import IA comptabilite
 Route::post('/comptabilite/exercices/{exercice}/import-ia', [ComptabiliteController::class, 'importIa']);
+
+// ========================================
+// Onboarding wizard (manager-only — enforced in controller)
+// ========================================
+
+Route::patch('/onboarding', [OnboardingController::class, 'update']);
+Route::post('/onboarding/complete', [OnboardingController::class, 'complete']);
 
 // ========================================
 // Équipe — utilisateurs app + personnel terrain
