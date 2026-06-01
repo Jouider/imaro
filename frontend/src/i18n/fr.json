@@ -1889,5 +1889,85 @@
       },
       "order": "Ordre recommandé : Lots → Copropriétaires → Soldes → Paiements → Prestataires"
     }
+  },
+  "onboarding": {
+    "eyebrow": "Configuration",
+    "welcomeTitle": "Bienvenue, {{name}} 👋",
+    "continue": "Continuer",
+    "back": "Retour",
+    "later": "Plus tard",
+    "team": {
+      "title": "Votre équipe",
+      "intro": "Gérez-vous seul votre syndic, ou souhaitez-vous ajouter un gestionnaire à votre équipe ?",
+      "selfTitle": "Je gère moi-même",
+      "selfDesc": "Vous serez le seul à accéder à l'espace pour l'instant.",
+      "addTitle": "Ajouter un gestionnaire",
+      "addDesc": "Invitez un collaborateur avec un accès dédié.",
+      "name": "Nom complet",
+      "namePlaceholder": "Karim Idrissi",
+      "email": "Email",
+      "hint": "Un mot de passe temporaire lui sera envoyé ; il le changera à sa première connexion.",
+      "required": "Renseignez le nom et l'email du gestionnaire.",
+      "created": "Gestionnaire créé",
+      "error": "Impossible de créer le gestionnaire.",
+      "credentialsTitle": "Gestionnaire créé",
+      "copy": "Copier les identifiants",
+      "copied": "Identifiants copiés",
+      "credentialsHint": "Communiquez ces identifiants au gestionnaire. Il changera son mot de passe à sa première connexion."
+    },
+    "residence": {
+      "title": "Votre première résidence",
+      "intro": "Créons la résidence que vous gérez. Vous pourrez en ajouter d'autres ensuite.",
+      "name": "Nom de la résidence",
+      "namePlaceholder": "Résidence Al Majd",
+      "address": "Adresse",
+      "city": "Ville",
+      "echeance": "Jour d'échéance",
+      "required": "Nom, adresse et ville sont requis.",
+      "error": "Impossible de créer la résidence."
+    },
+    "lots": {
+      "title": "Les lots de la résidence",
+      "intro": "Générez les lots en une fois. Vous pourrez les modifier individuellement après.",
+      "count": "Nombre de lots",
+      "start": "Numéro de départ",
+      "type": "Type de lot",
+      "types": {
+        "appartement": "Appartement",
+        "commerce": "Commerce",
+        "bureau": "Bureau",
+        "parking": "Parking",
+        "villa": "Villa"
+      },
+      "preview": "Aperçu ({{count}} lots)",
+      "advancedHint": "Besoin d'ailes, d'étages ou de tranches ? Configurez-les ensuite sur la fiche résidence.",
+      "generate": "Générer {{count}} lots",
+      "required": "Indiquez au moins un lot à générer.",
+      "error": "Impossible de générer les lots.",
+      "defaultBuilding": "Bâtiment principal"
+    },
+    "done": {
+      "title": "Tout est prêt",
+      "heading": "{{name}} est configurée 🎉",
+      "body": "{{count}} lots créés. Voici les prochaines étapes pour compléter votre dossier :",
+      "next": {
+        "copros": "Ajouter les copropriétaires et leurs lots",
+        "banque": "Renseigner le RIB d'encaissement",
+        "budget": "Définir le budget et les appels de fonds"
+      },
+      "cta": "Continuer vers la résidence"
+    },
+    "checklist": {
+      "title": "Terminez votre configuration",
+      "subtitle": "Quelques étapes pour rendre votre espace pleinement opérationnel.",
+      "progress": "{{done}} sur {{total}} étapes",
+      "step": {
+        "residence": "Créer une résidence",
+        "lots": "Ajouter des lots",
+        "copros": "Inviter les copropriétaires"
+      },
+      "resume": "Reprendre la configuration",
+      "start": "Démarrer la configuration"
+    }
   }
 }
