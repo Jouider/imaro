@@ -344,10 +344,12 @@ class AuthController extends Controller
         }
 
         return [
-            'id'        => $user->tenant->id,
-            'name'      => $user->tenant->name,
-            'subdomain' => $user->tenant->subdomain,
-            'plan'      => $user->tenant->plan,
+            'id'                      => $user->tenant->id,
+            'name'                    => $user->tenant->name,
+            'subdomain'               => $user->tenant->subdomain,
+            'plan'                    => $user->tenant->plan,
+            'onboarding_completed_at' => $user->tenant->onboarding_completed_at?->toIso8601String(),
+            'onboarding_step'         => $user->tenant->onboarding_step,
         ];
     }
 
