@@ -27,6 +27,13 @@ export type AuthTenant = {
   name: string
   subdomain: string
   plan: string
+  /**
+   * First-run onboarding state (issue: onboarding wizard). `null` while the
+   * setup wizard has not been completed; ISO timestamp once finished.
+   */
+  onboarding_completed_at?: string | null
+  /** Resume point for the wizard (0-based step index). */
+  onboarding_step?: number | null
 }
 
 type AuthState = {

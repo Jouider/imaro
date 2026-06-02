@@ -15,6 +15,9 @@ import {
   Mail,
   Lock,
   KeyRound,
+  Phone,
+  MailCheck,
+  Sparkles,
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -26,7 +29,11 @@ import {
   adminActivate,
   residentLogin,
   residentActivate,
+  requestPasswordResetEmail,
+  requestPasswordResetOtp,
+  resetPasswordWithOtp,
 } from '@/services/auth.service'
+import { DemoRequestDialog } from '@/components/auth/DemoRequestDialog'
 import { setStoredToken } from '@/lib/axios'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
@@ -34,7 +41,14 @@ import { cn } from '@/lib/utils'
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Role = 'gestionnaire' | 'resident'
-type Step = 'role' | 'phone' | 'code' | 'activate' | 'admin-activate'
+type Step =
+  | 'role'
+  | 'phone'
+  | 'code'
+  | 'activate'
+  | 'admin-activate'
+  | 'forgot'
+  | 'forgot-otp'
 
 // ─── Error helper ─────────────────────────────────────────────────────────────
 
@@ -60,17 +74,42 @@ function BrandPanel() {
 
   return (
     <div
-      className="hidden lg:flex flex-col justify-between p-10 h-full"
+      className="relative hidden h-full flex-col justify-between overflow-hidden p-10 lg:flex"
       style={{
         background:
           'linear-gradient(160deg, var(--color-imaro-primary) 0%, var(--color-imaro-primary-dark) 100%)',
       }}
     >
+      {/* Atmospheric grid (masked) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.10]"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgb(255 255 255 / 0.8) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 0.8) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+          maskImage:
+            'radial-gradient(ellipse 70% 60% at 40% 30%, black, transparent)',
+          WebkitMaskImage:
+            'radial-gradient(ellipse 70% 60% at 40% 30%, black, transparent)',
+        }}
+      />
+      {/* Breathing aurora blobs */}
+      <div
+        aria-hidden
+        className="animate-aurora pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-[#3b62d4]/40 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="animate-aurora pointer-events-none absolute -left-20 bottom-10 size-64 rounded-full bg-[var(--accent)]/25 blur-3xl"
+        style={{ animationDelay: '4s' }}
+      />
+
       {/* Logo */}
-      <Wordmark inverted className="h-11 w-auto" />
+      <Wordmark inverted className="relative h-11 w-auto" />
 
       {/* Tagline + features */}
-      <div className="space-y-8">
+      <div className="relative space-y-8">
         <div>
           <h2 className="text-[2rem] font-bold leading-tight text-white">
             {t('auth.brand.taglineLine1')}
@@ -96,7 +135,7 @@ function BrandPanel() {
         </div>
       </div>
 
-      <p className="text-xs text-white/25">
+      <p className="relative text-xs text-white/25">
         {t('auth.brand.footer', { year: new Date().getFullYear() })}
       </p>
     </div>
@@ -151,6 +190,18 @@ export function LoginPage() {
   // admin first-login — personal password
   const [adminPwd, setAdminPwd] = useState('')
   const [adminPwdConfirm, setAdminPwdConfirm] = useState('')
+
+  // forgot password
+  const [forgotMethod, setForgotMethod] = useState<'email' | 'otp'>('email')
+  const [forgotEmail, setForgotEmail] = useState('')
+  const [forgotPhone, setForgotPhone] = useState('')
+  const [forgotSent, setForgotSent] = useState(false)
+  const [resetCode, setResetCode] = useState('')
+  const [resetPwd, setResetPwd] = useState('')
+  const [resetPwdConfirm, setResetPwdConfirm] = useState('')
+
+  // demo request ("create account" → sales-led)
+  const [demoOpen, setDemoOpen] = useState(false)
 
   // resident fields
   const [digits, setDigits] = useState('')
@@ -215,6 +266,37 @@ export function LoginPage() {
     onError: (err) => toast.error(extractError(err, t('auth.networkError'))),
   })
 
+  // ── Forgot password — request reset (email link or phone OTP) ──
+  const forgotMutation = useMutation({
+    mutationFn: async () => {
+      if (forgotMethod === 'email') {
+        await requestPasswordResetEmail(forgotEmail.trim())
+      } else {
+        await requestPasswordResetOtp(`+212${forgotPhone}`)
+      }
+    },
+    onSuccess: () => {
+      if (forgotMethod === 'email') setForgotSent(true)
+      else setStep('forgot-otp')
+    },
+    onError: (err) => toast.error(extractError(err, t('auth.networkError'))),
+  })
+
+  // ── Forgot password — verify OTP + set new password ──
+  const resetOtpMutation = useMutation({
+    mutationFn: () =>
+      resetPasswordWithOtp(`+212${forgotPhone}`, resetCode, resetPwd),
+    onSuccess: () => {
+      toast.success(t('auth.forgot.resetDone'))
+      setResetCode('')
+      setResetPwd('')
+      setResetPwdConfirm('')
+      setForgotSent(false)
+      setStep('phone')
+    },
+    onError: (err) => toast.error(extractError(err, t('auth.networkError'))),
+  })
+
   function pickRole(r: Role) {
     setRole(r)
     setStep('phone')
@@ -233,6 +315,14 @@ export function LoginPage() {
       setPassword('')
       setAdminPwd('')
       setAdminPwdConfirm('')
+    } else if (step === 'forgot') {
+      setStep('phone')
+      setForgotSent(false)
+    } else if (step === 'forgot-otp') {
+      setStep('forgot')
+      setResetCode('')
+      setResetPwd('')
+      setResetPwdConfirm('')
     } else {
       setStep('role')
       setRole(null)
@@ -244,28 +334,36 @@ export function LoginPage() {
   const title =
     step === 'role'
       ? t('auth.role.welcomeTitle')
-      : step === 'admin-activate'
-        ? t('auth.admin.activateTitle')
-        : step === 'activate'
-          ? t('auth.resident.activateTitle')
-          : step === 'code'
-            ? t('auth.resident.codeTitle')
-            : role === 'gestionnaire'
-              ? t('auth.gestionnaire.title')
-              : t('auth.resident.title')
+      : step === 'forgot'
+        ? t('auth.forgot.title')
+        : step === 'forgot-otp'
+          ? t('auth.forgot.otpTitle')
+          : step === 'admin-activate'
+            ? t('auth.admin.activateTitle')
+            : step === 'activate'
+              ? t('auth.resident.activateTitle')
+              : step === 'code'
+                ? t('auth.resident.codeTitle')
+                : role === 'gestionnaire'
+                  ? t('auth.gestionnaire.title')
+                  : t('auth.resident.title')
 
   const subtitle =
     step === 'role'
       ? t('auth.role.welcomeSubtitle')
-      : step === 'admin-activate'
-        ? t('auth.admin.activateSubtitle')
-        : step === 'activate'
-          ? t('auth.resident.activateSubtitle')
-          : step === 'code'
-            ? t('auth.resident.codeSubtitle', { digits })
-            : role === 'gestionnaire'
-              ? t('auth.gestionnaire.subtitle')
-              : t('auth.resident.subtitle')
+      : step === 'forgot'
+        ? t('auth.forgot.subtitle')
+        : step === 'forgot-otp'
+          ? t('auth.forgot.otpSubtitle', { phone: forgotPhone })
+          : step === 'admin-activate'
+            ? t('auth.admin.activateSubtitle')
+            : step === 'activate'
+              ? t('auth.resident.activateSubtitle')
+              : step === 'code'
+                ? t('auth.resident.codeSubtitle', { digits })
+                : role === 'gestionnaire'
+                  ? t('auth.gestionnaire.subtitle')
+                  : t('auth.resident.subtitle')
 
   return (
     <div className="flex min-h-svh bg-[#f4f7fa]">
@@ -275,39 +373,44 @@ export function LoginPage() {
       </div>
 
       {/* ── Right form panel ── */}
-      <div className="flex min-h-svh flex-1 flex-col bg-white">
+      <div className="flex min-h-svh flex-1 flex-col bg-white dark:bg-background">
         {/* Top bar */}
-        <div className="flex h-14 shrink-0 items-center justify-between border-b px-6">
-          {/* Logo (mobile only — hidden on desktop since brand panel shows) */}
-          <div className="lg:hidden">
-            <Wordmark className="h-10 w-32" />
-          </div>
-          <div className="ms-auto flex items-center gap-2">
-            <LanguageSwitcher />
-          </div>
+        <div className="flex h-16 shrink-0 items-center justify-between px-6 sm:px-10">
+          {/* Mobile: logo · Desktop: back-to-site link */}
+          <Wordmark className="h-9 w-28 lg:hidden" />
+          <a
+            href="/"
+            className="hidden items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-[var(--color-imaro-primary)] lg:inline-flex"
+          >
+            <ArrowLeft className="size-4 rtl:rotate-180" />
+            {t('auth.backToSite')}
+          </a>
+          <LanguageSwitcher />
         </div>
 
         {/* Form area */}
-        <div className="flex flex-1 items-center justify-center px-6 py-12">
-          <div className="w-full max-w-sm">
+        <div className="flex flex-1 items-center justify-center px-6 pb-16 pt-4 sm:px-10">
+          <div className="w-full max-w-[400px]">
             {/* Back button */}
             {step !== 'role' && (
               <button
                 type="button"
                 onClick={goBack}
-                className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className="mb-7 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
-                <ArrowLeft className="size-4" />
+                <ArrowLeft className="size-4 rtl:rotate-180" />
                 {t('auth.back')}
               </button>
             )}
 
             {/* Heading */}
-            <div className="mb-8">
-              <h1 className="text-2xl font-bold text-[var(--color-imaro-primary)]">
+            <div className="mb-8 text-center">
+              <h1 className="font-display text-[2rem] leading-[1.15] tracking-tight text-[var(--color-imaro-primary)]">
                 {title}
               </h1>
-              <p className="mt-1.5 text-sm text-muted-foreground">{subtitle}</p>
+              <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">
+                {subtitle}
+              </p>
             </div>
 
             {/* ── Step: Role selection ── */}
@@ -319,41 +422,25 @@ export function LoginPage() {
                     type="button"
                     onClick={() => pickRole(card.id)}
                     className={cn(
-                      'group w-full rounded-xl border-2 p-5 text-left',
-                      'transition-all duration-150',
-                      'border-transparent bg-[#f4f7fa]',
-                      'hover:border-[var(--color-imaro-primary)] hover:bg-white hover:shadow-md',
+                      'group w-full rounded-2xl border border-slate-200/80 bg-white p-5 text-start',
+                      'transition-all duration-200',
+                      'hover:-translate-y-0.5 hover:border-[var(--color-imaro-primary)]/30 hover:shadow-[0_12px_28px_-12px_rgb(0_18_68_/_0.25)]',
+                      'dark:border-border dark:bg-card',
                     )}
                   >
                     <div className="flex items-center gap-4">
-                      <div
-                        className={cn(
-                          'flex size-12 shrink-0 items-center justify-center rounded-xl',
-                          'bg-[var(--color-imaro-primary)]/8 transition-colors',
-                          'group-hover:bg-[var(--color-imaro-primary)]',
-                        )}
-                      >
-                        <card.icon
-                          className={cn(
-                            'size-6 transition-colors',
-                            'text-[var(--color-imaro-primary)] group-hover:text-white',
-                          )}
-                        />
+                      <div className="bg-gradient-imaro flex size-12 shrink-0 items-center justify-center rounded-xl text-white shadow-sm ring-1 ring-inset ring-[var(--color-imaro-primary)]/20 transition-transform group-hover:scale-105">
+                        <card.icon className="size-6" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold text-foreground">
                           {t(card.titleKey)}
                         </p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">
+                        <p className="mt-0.5 text-[13px] leading-snug text-muted-foreground">
                           {t(card.descKey)}
                         </p>
                       </div>
-                      <ChevronRight
-                        className={cn(
-                          'size-5 shrink-0 transition-colors',
-                          'text-muted-foreground/30 group-hover:text-[var(--color-imaro-primary)]',
-                        )}
-                      />
+                      <ChevronRight className="size-5 shrink-0 text-muted-foreground/30 transition-all group-hover:translate-x-0.5 group-hover:text-[var(--color-imaro-primary)] rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
                     </div>
                   </button>
                 ))}
@@ -361,6 +448,21 @@ export function LoginPage() {
                 <p className="pt-3 text-center text-xs text-muted-foreground">
                   {t('auth.role.footnote')}
                 </p>
+
+                {/* Create account → sales-led demo request */}
+                <div className="mt-2 rounded-xl border border-dashed border-[var(--color-imaro-primary)]/20 bg-[var(--color-imaro-primary)]/[0.03] px-4 py-3 text-center">
+                  <p className="text-xs text-muted-foreground">
+                    {t('auth.demo.noAccount')}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setDemoOpen(true)}
+                    className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-imaro-primary)] hover:underline"
+                  >
+                    <Sparkles className="size-3.5 text-[var(--accent)]" />
+                    {t('auth.demo.cta')}
+                  </button>
+                </div>
               </div>
             )}
 
@@ -413,9 +515,23 @@ export function LoginPage() {
                       className={cn(inputCls, 'ps-10 pe-4')}
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {t('auth.gestionnaire.passwordHint')}
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">
+                      {t('auth.gestionnaire.passwordHint')}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForgotMethod('email')
+                        setForgotEmail(email)
+                        setForgotSent(false)
+                        setStep('forgot')
+                      }}
+                      className="shrink-0 text-xs font-medium text-[var(--color-imaro-primary-light)] hover:underline"
+                    >
+                      {t('auth.forgot.link')}
+                    </button>
+                  </div>
                 </div>
 
                 <Button
@@ -681,8 +797,222 @@ export function LoginPage() {
                 </Button>
               </form>
             )}
+
+            {/* ── Forgot password: request reset (email link or OTP) ── */}
+            {step === 'forgot' &&
+              (forgotSent ? (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-6 text-center dark:border-emerald-900/40 dark:bg-emerald-950/20">
+                  <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                    <MailCheck className="size-6" />
+                  </div>
+                  <h2 className="mt-4 font-semibold text-foreground">
+                    {t('auth.forgot.emailSentTitle')}
+                  </h2>
+                  <p className="mt-1.5 text-sm text-muted-foreground">
+                    {t('auth.forgot.emailSentBody', { email: forgotEmail })}
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="mt-5"
+                    onClick={() => {
+                      setForgotSent(false)
+                      setStep('phone')
+                    }}
+                  >
+                    {t('auth.forgot.backToLogin')}
+                  </Button>
+                </div>
+              ) : (
+                <form
+                  className="space-y-5"
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    forgotMutation.mutate()
+                  }}
+                >
+                  {/* Method toggle */}
+                  <div className="grid grid-cols-2 gap-2 rounded-xl bg-[#f4f7fa] p-1 dark:bg-muted">
+                    {(['email', 'otp'] as const).map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setForgotMethod(m)}
+                        className={cn(
+                          'flex items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-medium transition-colors',
+                          forgotMethod === m
+                            ? 'bg-white text-[var(--color-imaro-primary)] shadow-sm dark:bg-card'
+                            : 'text-muted-foreground hover:text-foreground',
+                        )}
+                      >
+                        {m === 'email' ? (
+                          <Mail className="size-4" />
+                        ) : (
+                          <Phone className="size-4" />
+                        )}
+                        {t(`auth.forgot.method.${m}`)}
+                      </button>
+                    ))}
+                  </div>
+
+                  {forgotMethod === 'email' ? (
+                    <div className="space-y-2">
+                      <Label htmlFor="forgot-email">
+                        {t('auth.gestionnaire.email')}
+                      </Label>
+                      <div className="relative">
+                        <Mail className="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                        <input
+                          id="forgot-email"
+                          type="email"
+                          placeholder={t('auth.gestionnaire.emailPlaceholder')}
+                          value={forgotEmail}
+                          onChange={(e) => setForgotEmail(e.target.value)}
+                          required
+                          className={cn(inputCls, 'ps-10 pe-4')}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Label htmlFor="forgot-phone">
+                        {t('auth.resident.phoneLabel')}
+                      </Label>
+                      <div className="flex overflow-hidden rounded-xl border-2 border-border transition-all focus-within:border-[var(--color-imaro-primary)] focus-within:ring-4 focus-within:ring-[var(--color-imaro-primary)]/10">
+                        <span className="flex items-center border-e bg-[#f4f7fa] px-4 text-sm font-bold text-[var(--color-imaro-primary)]">
+                          +212
+                        </span>
+                        <input
+                          id="forgot-phone"
+                          type="tel"
+                          inputMode="numeric"
+                          placeholder="6XX XX XX XX"
+                          value={forgotPhone}
+                          onChange={(e) =>
+                            setForgotPhone(
+                              e.target.value.replace(/\D/g, '').slice(0, 9),
+                            )
+                          }
+                          required
+                          dir="ltr"
+                          className="min-h-[52px] flex-1 bg-white px-4 text-base text-[var(--color-imaro-primary)] placeholder:text-muted-foreground/50 focus:outline-none dark:bg-card"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <Button
+                    type="submit"
+                    className="h-12 w-full bg-gradient-imaro text-base text-white shadow-sm hover:brightness-110"
+                    disabled={
+                      forgotMutation.isPending ||
+                      (forgotMethod === 'email'
+                        ? !forgotEmail
+                        : forgotPhone.length < 9)
+                    }
+                  >
+                    {forgotMutation.isPending
+                      ? t('auth.forgot.sending')
+                      : t('auth.forgot.submit')}
+                  </Button>
+                </form>
+              ))}
+
+            {/* ── Forgot password: verify OTP + set new password ── */}
+            {step === 'forgot-otp' && (
+              <form
+                className="space-y-5"
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  if (resetPwd !== resetPwdConfirm) {
+                    toast.error(t('auth.admin.mismatch'))
+                    return
+                  }
+                  if (resetPwd.length < 8) {
+                    toast.error(t('auth.admin.tooShort'))
+                    return
+                  }
+                  resetOtpMutation.mutate()
+                }}
+              >
+                <div className="space-y-2">
+                  <Label htmlFor="reset-code">{t('auth.forgot.code')}</Label>
+                  <div className="relative">
+                    <KeyRound className="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                    <input
+                      id="reset-code"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="123456"
+                      value={resetCode}
+                      onChange={(e) =>
+                        setResetCode(
+                          e.target.value.replace(/\D/g, '').slice(0, 6),
+                        )
+                      }
+                      required
+                      className={cn(
+                        inputCls,
+                        'ps-10 pe-4 font-mono tracking-widest',
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reset-pwd">
+                    {t('auth.admin.newPassword')}
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                    <input
+                      id="reset-pwd"
+                      type="password"
+                      placeholder={t('auth.admin.newPasswordPlaceholder')}
+                      value={resetPwd}
+                      onChange={(e) => setResetPwd(e.target.value)}
+                      required
+                      className={cn(inputCls, 'ps-10 pe-4')}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reset-pwd-confirm">
+                    {t('auth.admin.confirmPassword')}
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute start-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                    <input
+                      id="reset-pwd-confirm"
+                      type="password"
+                      placeholder={t('auth.admin.confirmPasswordPlaceholder')}
+                      value={resetPwdConfirm}
+                      onChange={(e) => setResetPwdConfirm(e.target.value)}
+                      required
+                      className={cn(
+                        inputCls,
+                        'ps-10 pe-4',
+                        resetPwdConfirm &&
+                          resetPwd !== resetPwdConfirm &&
+                          'border-red-400 focus:border-red-400 focus:ring-red-100',
+                      )}
+                    />
+                  </div>
+                </div>
+                <Button
+                  type="submit"
+                  className="h-12 w-full bg-gradient-imaro text-base text-white shadow-sm hover:brightness-110"
+                  disabled={resetOtpMutation.isPending || resetPwd.length < 8}
+                >
+                  {resetOtpMutation.isPending
+                    ? t('auth.forgot.resetting')
+                    : t('auth.forgot.resetSubmit')}
+                </Button>
+              </form>
+            )}
           </div>
         </div>
+
+        {/* Demo request ("create account" → sales-led) */}
+        <DemoRequestDialog open={demoOpen} onOpenChange={setDemoOpen} />
 
         {/* ── Dev bypass ── */}
         {(import.meta.env.DEV || !!import.meta.env.VITE_SHOW_DEV_BYPASS) && (
