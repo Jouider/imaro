@@ -373,39 +373,44 @@ export function LoginPage() {
       </div>
 
       {/* ── Right form panel ── */}
-      <div className="flex min-h-svh flex-1 flex-col bg-white">
+      <div className="flex min-h-svh flex-1 flex-col bg-white dark:bg-background">
         {/* Top bar */}
-        <div className="flex h-14 shrink-0 items-center justify-between border-b px-6">
-          {/* Logo (mobile only — hidden on desktop since brand panel shows) */}
-          <div className="lg:hidden">
-            <Wordmark className="h-10 w-32" />
-          </div>
-          <div className="ms-auto flex items-center gap-2">
-            <LanguageSwitcher />
-          </div>
+        <div className="flex h-16 shrink-0 items-center justify-between px-6 sm:px-10">
+          {/* Mobile: logo · Desktop: back-to-site link */}
+          <Wordmark className="h-9 w-28 lg:hidden" />
+          <a
+            href="/"
+            className="hidden items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-[var(--color-imaro-primary)] lg:inline-flex"
+          >
+            <ArrowLeft className="size-4 rtl:rotate-180" />
+            {t('auth.backToSite')}
+          </a>
+          <LanguageSwitcher />
         </div>
 
         {/* Form area */}
-        <div className="flex flex-1 items-center justify-center px-6 py-12">
-          <div className="w-full max-w-sm">
+        <div className="flex flex-1 items-center justify-center px-6 pb-16 pt-4 sm:px-10">
+          <div className="w-full max-w-[400px]">
             {/* Back button */}
             {step !== 'role' && (
               <button
                 type="button"
                 onClick={goBack}
-                className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className="mb-7 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
-                <ArrowLeft className="size-4" />
+                <ArrowLeft className="size-4 rtl:rotate-180" />
                 {t('auth.back')}
               </button>
             )}
 
             {/* Heading */}
             <div className="mb-8">
-              <h1 className="text-2xl font-bold text-[var(--color-imaro-primary)]">
+              <h1 className="font-display text-[2rem] leading-[1.15] tracking-tight text-[var(--color-imaro-primary)]">
                 {title}
               </h1>
-              <p className="mt-1.5 text-sm text-muted-foreground">{subtitle}</p>
+              <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">
+                {subtitle}
+              </p>
             </div>
 
             {/* ── Step: Role selection ── */}
@@ -417,41 +422,25 @@ export function LoginPage() {
                     type="button"
                     onClick={() => pickRole(card.id)}
                     className={cn(
-                      'group w-full rounded-xl border-2 p-5 text-left',
-                      'transition-all duration-150',
-                      'border-transparent bg-[#f4f7fa]',
-                      'hover:border-[var(--color-imaro-primary)] hover:bg-white hover:shadow-md',
+                      'group w-full rounded-2xl border border-slate-200/80 bg-white p-5 text-start',
+                      'transition-all duration-200',
+                      'hover:-translate-y-0.5 hover:border-[var(--color-imaro-primary)]/30 hover:shadow-[0_12px_28px_-12px_rgb(0_18_68_/_0.25)]',
+                      'dark:border-border dark:bg-card',
                     )}
                   >
                     <div className="flex items-center gap-4">
-                      <div
-                        className={cn(
-                          'flex size-12 shrink-0 items-center justify-center rounded-xl',
-                          'bg-[var(--color-imaro-primary)]/8 transition-colors',
-                          'group-hover:bg-[var(--color-imaro-primary)]',
-                        )}
-                      >
-                        <card.icon
-                          className={cn(
-                            'size-6 transition-colors',
-                            'text-[var(--color-imaro-primary)] group-hover:text-white',
-                          )}
-                        />
+                      <div className="bg-gradient-imaro flex size-12 shrink-0 items-center justify-center rounded-xl text-white shadow-sm ring-1 ring-inset ring-[var(--color-imaro-primary)]/20 transition-transform group-hover:scale-105">
+                        <card.icon className="size-6" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold text-foreground">
                           {t(card.titleKey)}
                         </p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">
+                        <p className="mt-0.5 text-[13px] leading-snug text-muted-foreground">
                           {t(card.descKey)}
                         </p>
                       </div>
-                      <ChevronRight
-                        className={cn(
-                          'size-5 shrink-0 transition-colors',
-                          'text-muted-foreground/30 group-hover:text-[var(--color-imaro-primary)]',
-                        )}
-                      />
+                      <ChevronRight className="size-5 shrink-0 text-muted-foreground/30 transition-all group-hover:translate-x-0.5 group-hover:text-[var(--color-imaro-primary)] rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
                     </div>
                   </button>
                 ))}
