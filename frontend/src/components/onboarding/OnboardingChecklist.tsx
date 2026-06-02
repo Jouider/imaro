@@ -25,9 +25,9 @@ export function OnboardingChecklist() {
     queryFn: () => getResidences(),
   })
 
-  // Only the owner sees setup, and only until it's marked complete.
-  const isOwner = user?.role === 'manager' || user?.role === 'super_admin'
-  if (!isOwner || tenant?.onboarding_completed_at) return null
+  // Only the syndic owner (manager) sees setup, until it's marked complete.
+  // super_admin is Digitoyou staff, not a real cabinet — excluded (backend 403s).
+  if (user?.role !== 'manager' || tenant?.onboarding_completed_at) return null
 
   const hasResidence = residences.length > 0
   const hasLots = residences.some((r) => (r.nb_lots ?? 0) > 0)

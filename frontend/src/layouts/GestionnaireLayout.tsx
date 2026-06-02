@@ -722,11 +722,16 @@ export function GestionnaireLayout() {
       })
   }, [refreshIdentity])
 
-  // First-run: auto-open the setup wizard for the syndic owner once per session
-  // until onboarding is marked complete on the tenant.
+  // First-run: auto-open the setup wizard for the syndic owner (manager) once
+  // per session until onboarding is marked complete on the tenant. super_admin
+  // is Digitoyou staff (not a cabinet) — excluded; the endpoints 403 anyway.
   useEffect(() => {
-    const isOwner = role === 'manager' || role === 'super_admin'
-    if (isOwner && !onboardingDone && !wizardDismissed && !wizardOpen) {
+    if (
+      role === 'manager' &&
+      !onboardingDone &&
+      !wizardDismissed &&
+      !wizardOpen
+    ) {
       openWizard()
     }
   }, [role, onboardingDone, wizardDismissed, wizardOpen, openWizard])

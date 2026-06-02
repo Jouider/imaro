@@ -47,6 +47,7 @@ import {
   setOnboardingStep,
   completeOnboarding,
 } from '@/services/onboarding.service'
+import { me } from '@/services/auth.service'
 import { generateLots, type SimpleSequentialConfig } from '@/utils/lotGenerator'
 import { cn } from '@/lib/utils'
 
@@ -73,6 +74,7 @@ export function OnboardingWizard() {
   const open = useOnboardingStore((s) => s.open)
   const closeWizard = useOnboardingStore((s) => s.closeWizard)
   const user = useAuthStore((s) => s.user)
+  const refreshIdentity = useAuthStore((s) => s.refreshIdentity)
 
   const [step, setStep] = useState(0)
   const [busy, setBusy] = useState(false)
@@ -230,8 +232,12 @@ export function OnboardingWizard() {
     setBusy(true)
     try {
       await completeOnboarding()
+      // Refresh the tenant so onboarding_completed_at lands in the store and
+      // the dashboard checklist disappears without a manual reload.
+      const data = await me()
+      refreshIdentity(data)
     } catch {
-      /* non-blocking — checklist will still reflect real data */
+      /* non-blocking — checklist still reflects real data on next /me */
     }
     setBusy(false)
     handleClose()
