@@ -191,6 +191,33 @@
     animation: imaro-shimmer 1.6s ease-in-out infinite;
   }
 
+  /* Ambient aurora blob — breathing glow for auth surfaces / dialogs.
+     Globally available (unlike the landing-only l-aurora). */
+  @keyframes imaro-aurora {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+      opacity: 0.55;
+    }
+    33% {
+      transform: translate3d(6%, -4%, 0) scale(1.12);
+      opacity: 0.8;
+    }
+    66% {
+      transform: translate3d(-5%, 5%, 0) scale(0.95);
+      opacity: 0.65;
+    }
+  }
+  .animate-aurora {
+    animation: imaro-aurora 14s ease-in-out infinite;
+    will-change: transform, opacity;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-aurora {
+      animation: none !important;
+    }
+  }
+
   /* Navy gradient utilities derived from --color-imaro-primary (#001244)
      Use on primary CTAs, icon chips, sidebar, hero surfaces to lift the
      deep navy palette. Avoid hand-editing src/components/ui/** — apply
