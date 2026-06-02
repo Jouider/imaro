@@ -404,7 +404,7 @@ export function LoginPage() {
             )}
 
             {/* Heading */}
-            <div className="mb-8">
+            <div className="mb-8 text-center">
               <h1 className="font-display text-[2rem] leading-[1.15] tracking-tight text-[var(--color-imaro-primary)]">
                 {title}
               </h1>
