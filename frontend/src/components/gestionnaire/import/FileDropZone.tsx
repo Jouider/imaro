@@ -80,7 +80,7 @@ export function FileDropZone({
           accept={accept}
           onChange={handleChange}
           className="hidden"
-          aria-label="Sélectionner un fichier"
+          aria-label={t('gestionnaire.imports.selectFile')}
         />
 
         {selectedFile ? (

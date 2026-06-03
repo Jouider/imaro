@@ -235,7 +235,7 @@ export function ResidencePage() {
       void qc.invalidateQueries({ queryKey: ['lots', residenceId] })
       setLotDialogOpen(false)
       setForm(EMPTY_FORM)
-      toast.success('Lot ajouté')
+      toast.success(t('gestionnaire.residences.toastLotAdded'))
     },
     onError: () => toast.error("Erreur lors de l'ajout du lot"),
   })
@@ -253,7 +253,7 @@ export function ResidencePage() {
       setLotDialogOpen(false)
       setEditingLot(null)
       setForm(EMPTY_FORM)
-      toast.success('Lot modifié')
+      toast.success(t('gestionnaire.residences.toastLotUpdated'))
     },
     onError: () => toast.error('Erreur lors de la modification'),
   })
@@ -263,7 +263,7 @@ export function ResidencePage() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['lots', residenceId] })
       setDeletingLot(null)
-      toast.success('Lot supprimé')
+      toast.success(t('gestionnaire.residences.toastLotDeleted'))
     },
     onError: () => toast.error('Erreur lors de la suppression'),
   })

@@ -289,7 +289,9 @@
       "addPhoto": "إضافة صورة",
       "removePhoto": "حذف الصورة",
       "photoHint": "JPEG أو PNG أو WebP · الحد الأقصى 5 صور · 5 ميغابايت/صورة",
-      "photoSizeError": "الملف كبير جدًا (الحد الأقصى 5 ميغابايت للصورة)"
+      "photoSizeError": "الملف كبير جدًا (الحد الأقصى 5 ميغابايت للصورة)",
+      "empty": "لا توجد شكاية",
+      "emptyHint": "ستظهر شكاياتك المقدمة هنا."
     },
     "profil": {
       "title": "ملفي الشخصي",
@@ -1054,7 +1056,10 @@
         "modeFixe": "مبلغ ثابت",
         "montantFixe": "المبلغ الثابت (د.م)",
         "createSubmit": "إنشاء الإقامة"
-      }
+      },
+      "toastLotAdded": "تمت إضافة الشقة",
+      "toastLotUpdated": "تم تعديل الشقة",
+      "toastLotDeleted": "تم حذف الشقة"
     },
     "residence": {
       "tabOverview": "نظرة عامة",
@@ -1365,7 +1370,8 @@
       "empty": "لا توجد تذاكر",
       "emptyDesc": "لا توجد تذاكر تطابق الفلاتر المحددة.",
       "viewKanban": "كانبان",
-      "viewTable": "جدول"
+      "viewTable": "جدول",
+      "toastClotureError": "خطأ أثناء الإغلاق"
     },
     "documents": {
       "title": "الوثائق",
@@ -1479,7 +1485,8 @@
         "residence": "الإقامة (اتركه فارغًا = جميع الإقامات)"
       },
       "empty": "لا توجد إعلانات",
-      "emptyDesc": "أنشئ أول إعلان لإعلام الملاك."
+      "emptyDesc": "أنشئ أول إعلان لإعلام الملاك.",
+      "toastCreated": "تم إنشاء الإعلان"
     },
     "prestataires": {
       "title": "المزودون والعقود",
@@ -1541,7 +1548,9 @@
       "emptyPrestataires": "لا يوجد مزودون",
       "emptyPrestatairesDesc": "أضف أول مزود.",
       "emptyContrats": "لا توجد عقود",
-      "emptyContratsDesc": "أنشئ أول عقد صيانة."
+      "emptyContratsDesc": "أنشئ أول عقد صيانة.",
+      "toastCreated": "تم إنشاء المزود",
+      "toastContratCreated": "تم إنشاء العقد"
     },
     "budgets": {
       "title": "الميزانية",
@@ -1930,7 +1939,8 @@
         "failed": "فشل {count} سطر",
         "done": "تم"
       },
-      "order": "الترتيب الموصى: الشقق ← الملاك ← الأرصدة ← المدفوعات ← المزودون"
+      "order": "الترتيب الموصى: الشقق ← الملاك ← الأرصدة ← المدفوعات ← المزودون",
+      "selectFile": "اختر ملفًا"
     }
   },
   "onboarding": {
@@ -2012,5 +2022,34 @@
       "resume": "استئناف الإعداد",
       "start": "بدء الإعداد"
     }
+  },
+  "common": {
+    "residence": "الإقامة",
+    "selectResidence": "اختر إقامة",
+    "select": "اختر",
+    "coproprietaire": "المالك",
+    "selectCopro": "اختر مالكًا",
+    "tantieme": "النصيب",
+    "libelle": "البيان",
+    "categorie": "الفئة",
+    "reference": "المرجع",
+    "phone": "الهاتف",
+    "periode": "الفترة",
+    "startDate": "تاريخ البداية",
+    "endDate": "تاريخ النهاية",
+    "paye": "مدفوع",
+    "societe": "الشركة",
+    "methode": "الطريقة",
+    "amount": "المبلغ",
+    "designation": "التسمية",
+    "createError": "خطأ أثناء الإنشاء",
+    "updateError": "خطأ أثناء التحديث",
+    "deleteError": "خطأ أثناء الحذف",
+    "saved": "تم الحفظ",
+    "created": "تم الإنشاء",
+    "updated": "تم التحديث",
+    "deleted": "تم الحذف",
+    "copied": "تم النسخ!",
+    "error": "خطأ"
   }
 }

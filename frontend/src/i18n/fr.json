@@ -289,7 +289,9 @@
       "addPhoto": "Ajouter une photo",
       "removePhoto": "Supprimer la photo",
       "photoHint": "JPEG, PNG ou WebP · max 5 photos · 5 Mo/photo",
-      "photoSizeError": "Fichier trop grand (max 5 Mo par photo)"
+      "photoSizeError": "Fichier trop grand (max 5 Mo par photo)",
+      "empty": "Aucune réclamation",
+      "emptyHint": "Vos réclamations soumises apparaîtront ici."
     },
     "profil": {
       "title": "Mon profil",
@@ -1054,7 +1056,10 @@
         "modeFixe": "Montant fixe",
         "montantFixe": "Montant fixe (DH)",
         "createSubmit": "Créer la résidence"
-      }
+      },
+      "toastLotAdded": "Lot ajouté",
+      "toastLotUpdated": "Lot modifié",
+      "toastLotDeleted": "Lot supprimé"
     },
     "residence": {
       "tabOverview": "Vue d'ensemble",
@@ -1365,7 +1370,8 @@
       "empty": "Aucun ticket",
       "emptyDesc": "Aucun ticket ne correspond aux filtres sélectionnés.",
       "viewKanban": "Kanban",
-      "viewTable": "Tableau"
+      "viewTable": "Tableau",
+      "toastClotureError": "Erreur lors de la clôture"
     },
     "dashboard": {
       "title": "Tableau de bord",
@@ -1490,7 +1496,8 @@
         "residence": "Résidence (laisser vide = toutes)"
       },
       "empty": "Aucune annonce",
-      "emptyDesc": "Créez votre première annonce pour informer les copropriétaires."
+      "emptyDesc": "Créez votre première annonce pour informer les copropriétaires.",
+      "toastCreated": "Annonce créée"
     },
     "prestataires": {
       "title": "Prestataires & Contrats",
@@ -1552,7 +1559,9 @@
       "emptyPrestataires": "Aucun prestataire",
       "emptyPrestatairesDesc": "Ajoutez votre premier prestataire.",
       "emptyContrats": "Aucun contrat",
-      "emptyContratsDesc": "Créez votre premier contrat de maintenance."
+      "emptyContratsDesc": "Créez votre premier contrat de maintenance.",
+      "toastCreated": "Prestataire créé",
+      "toastContratCreated": "Contrat créé"
     },
     "budgets": {
       "title": "Budgets",
@@ -1930,7 +1939,8 @@
         "failed": "{count} lignes échouées",
         "done": "Terminé"
       },
-      "order": "Ordre recommandé : Lots → Copropriétaires → Soldes → Paiements → Prestataires"
+      "order": "Ordre recommandé : Lots → Copropriétaires → Soldes → Paiements → Prestataires",
+      "selectFile": "Sélectionner un fichier"
     }
   },
   "onboarding": {
@@ -2012,5 +2022,34 @@
       "resume": "Reprendre la configuration",
       "start": "Démarrer la configuration"
     }
+  },
+  "common": {
+    "residence": "Résidence",
+    "selectResidence": "Sélectionner une résidence",
+    "select": "Sélectionner",
+    "coproprietaire": "Copropriétaire",
+    "selectCopro": "Choisir un copropriétaire",
+    "tantieme": "Tantième",
+    "libelle": "Libellé",
+    "categorie": "Catégorie",
+    "reference": "Référence",
+    "phone": "Téléphone",
+    "periode": "Période",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "paye": "Payé",
+    "societe": "Société",
+    "methode": "Méthode",
+    "amount": "Montant",
+    "designation": "Désignation",
+    "createError": "Erreur lors de la création",
+    "updateError": "Erreur lors de la mise à jour",
+    "deleteError": "Erreur lors de la suppression",
+    "saved": "Enregistré",
+    "created": "Créé",
+    "updated": "Mis à jour",
+    "deleted": "Supprimé",
+    "copied": "Copié !",
+    "error": "Erreur"
   }
 }
