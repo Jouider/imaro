@@ -27,8 +27,10 @@ class SetTenant
         }
 
         // 2. Fallback : résoudre le tenant depuis l'utilisateur authentifié
-        //    (nécessaire sur api.imaro.ma / staging.imaro.ma où le subdomain est système)
-        $user = $request->user();
+        //    (nécessaire sur api.imaro.ma / staging.imaro.ma où le subdomain est système).
+        //    On force le guard sanctum car le default guard "web" est session-based
+        //    et retourne null sur les requêtes API par Bearer token.
+        $user = $request->user('sanctum') ?? $request->user();
         if ($user && $user->tenant_id) {
             $tenant = Tenant::find($user->tenant_id);
             if ($tenant) {
