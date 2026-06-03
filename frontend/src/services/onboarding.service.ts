@@ -18,17 +18,16 @@ export type OnboardingState = {
 export async function setOnboardingStep(
   step: number,
 ): Promise<OnboardingState> {
-  const res = await api.patch<ApiEnvelope<OnboardingState>>(
-    '/gestionnaire/onboarding',
-    { step },
-  )
+  const res = await api.patch<ApiEnvelope<OnboardingState>>('/onboarding', {
+    step,
+  })
   return res.data.data
 }
 
 /** Mark onboarding finished (stamps onboarding_completed_at on the tenant). */
 export async function completeOnboarding(): Promise<OnboardingState> {
   const res = await api.post<ApiEnvelope<OnboardingState>>(
-    '/gestionnaire/onboarding/complete',
+    '/onboarding/complete',
     {},
   )
   return res.data.data

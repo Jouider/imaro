@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 import {
   Building2,
   Users,
@@ -409,9 +408,6 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
-      {/* First-run setup checklist (owner only, until onboarding complete) */}
-      <OnboardingChecklist />
-
       {/* Page heading — DM Serif greeting + contextual subtitle */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>

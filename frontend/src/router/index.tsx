@@ -11,6 +11,7 @@ import { PortailActualitesPage } from '@/pages/portail/PortailActualitesPage'
 import { PortailGuard } from './PortailGuard'
 import { GestionnaireGuard } from './GestionnaireGuard'
 import { GestionnaireLayout } from '@/layouts/GestionnaireLayout'
+import { OnboardingPage } from '@/pages/gestionnaire/OnboardingPage'
 import { DashboardPage as GestDashboardPage } from '@/pages/gestionnaire/DashboardPage'
 import { ResidencesPage } from '@/pages/gestionnaire/residences/ResidencesPage'
 import { ResidencePage } from '@/pages/gestionnaire/residences/ResidencePage'
@@ -63,6 +64,16 @@ export const router = createBrowserRouter([
       { path: 'reclamations', element: <PortailReclamationsPage /> },
       { path: 'profil', element: <PortailProfilPage /> },
     ],
+  },
+
+  // ── Onboarding première connexion (plein écran, sans sidebar) ──
+  {
+    path: '/gestionnaire/onboarding',
+    element: (
+      <GestionnaireGuard>
+        <OnboardingPage />
+      </GestionnaireGuard>
+    ),
   },
 
   // ── Espace gestionnaire / manager ───────────────────────

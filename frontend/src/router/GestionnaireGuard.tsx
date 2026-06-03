@@ -1,27 +1,47 @@
 import { type ReactNode, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 
 type Props = { children: ReactNode }
 
+const ONBOARDING_PATH = '/gestionnaire/onboarding'
+
 /**
  * Protects routes at `/gestionnaire/*`.
- * Redirects to /login when there is no token or the role is not gestionnaire / manager.
+ * - Redirects to /login when there is no token or the role is not
+ *   gestionnaire / manager.
+ * - Redirects a manager whose tenant has not finished onboarding to the
+ *   onboarding flow (issue #150): first-run setup is mandatory before the app
+ *   is usable. Applies after login, on refresh, and on deep links.
  */
 export function GestionnaireGuard({ children }: Props) {
-  const { token, user } = useAuthStore()
+  const { token, user, tenant } = useAuthStore()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
 
   const isAuthorised =
     Boolean(token) &&
     (user?.role === 'gestionnaire' || user?.role === 'manager')
 
+  // The syndic owner must complete onboarding first. Gestionnaire employees
+  // are exempt (the endpoints are manager-only — they'd just 403).
+  const needsOnboarding =
+    user?.role === 'manager' &&
+    tenant != null &&
+    !tenant.onboarding_completed_at
+
   useEffect(() => {
     if (!isAuthorised) {
       void navigate('/login', { replace: true })
+      return
     }
-  }, [isAuthorised, navigate])
+    if (needsOnboarding && pathname !== ONBOARDING_PATH) {
+      void navigate(ONBOARDING_PATH, { replace: true })
+    }
+  }, [isAuthorised, needsOnboarding, pathname, navigate])
 
   if (!isAuthorised) return null
+  // Avoid flashing the requested page before the onboarding redirect lands.
+  if (needsOnboarding && pathname !== ONBOARDING_PATH) return null
   return <>{children}</>
 }
