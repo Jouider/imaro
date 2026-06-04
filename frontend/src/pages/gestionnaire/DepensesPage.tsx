@@ -152,7 +152,7 @@ function NouvelleDepenseModal({
       setIaResult(null)
       onOpenChange(false)
     },
-    onError: () => toast.error("Erreur lors de l'enregistrement"),
+    onError: () => toast.error(t('common.saveError')),
   })
 
   const handleAnalyseIa = async () => {
@@ -162,7 +162,7 @@ function NouvelleDepenseModal({
       const result = await importFactureIa(iaFile)
       setIaResult(result)
     } catch {
-      toast.error("Erreur lors de l'analyse")
+      toast.error(t('gestionnaire.depenses.analyzeError'))
     } finally {
       setIaLoading(false)
     }
@@ -501,7 +501,7 @@ function ModelesRecurrentsModal({
       setNewModeleOpen(false)
       toast.success(t('gestionnaire.depenses.toastModelCreated'))
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const FREQ_LABELS: Record<string, string> = {
@@ -591,7 +591,7 @@ function ModelesRecurrentsModal({
             ))}
             {modeles.length === 0 && (
               <p className="py-8 text-center text-sm text-muted-foreground">
-                Aucun modèle récurrent
+                {t('gestionnaire.depenses.noModele')}
               </p>
             )}
           </div>
@@ -633,7 +633,9 @@ function ModelesRecurrentsModal({
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Compte de charge" />
+                  <SelectValue
+                    placeholder={t('gestionnaire.depenses.compteCharge')}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {compteClasse6.map((c) => (
@@ -701,7 +703,7 @@ function ModelesRecurrentsModal({
                 />
               </div>
               <div className="space-y-1">
-                <Label>Date fin (optionnel)</Label>
+                <Label>{t('gestionnaire.depenses.dateFinOptional')}</Label>
                 <Input
                   type="date"
                   value={form.date_fin}
@@ -788,7 +790,7 @@ export function DepensesPage() {
       setDeleteTarget(null)
       toast.success(t('gestionnaire.depenses.toastDeleted'))
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const approuverMutation = useMutation({
@@ -797,7 +799,7 @@ export function DepensesPage() {
       void qc.invalidateQueries({ queryKey: ['depenses-finance'] })
       toast.success(t('gestionnaire.depenses.toastApproved'))
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const rejeterMutation = useMutation({
@@ -809,7 +811,7 @@ export function DepensesPage() {
       setRejetMotif('')
       toast.success(t('gestionnaire.depenses.toastRejected'))
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   // ── Filters ────────────────────────────────────────────────────────────────
@@ -973,7 +975,7 @@ export function DepensesPage() {
               variant="outline"
               size="sm"
               onClick={() => {
-                toast.info('Import IA...')
+                toast.info(t('gestionnaire.depenses.importIa'))
                 setAddOpen(true)
               }}
             >
@@ -1043,7 +1045,9 @@ export function DepensesPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Bar chart: évolution mensuelle */}
           <div className="rounded-xl border bg-card p-4">
-            <p className="mb-3 text-sm font-medium">Évolution mensuelle</p>
+            <p className="mb-3 text-sm font-medium">
+              {t('gestionnaire.depenses.evolutionMensuelle')}
+            </p>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={stats.evolution_mensuelle} margin={{ left: -10 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -1064,7 +1068,7 @@ export function DepensesPage() {
           {/* Pie chart: répartition par compte PCG */}
           <div className="rounded-xl border bg-card p-4">
             <p className="mb-3 text-sm font-medium">
-              Répartition par compte PCG
+              {t('gestionnaire.depenses.repartitionPcg')}
             </p>
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
@@ -1107,7 +1111,9 @@ export function DepensesPage() {
             <thead>
               <tr className="border-b text-xs text-muted-foreground">
                 <th className="py-2 text-left font-medium">Prestataire</th>
-                <th className="py-2 text-right font-medium">Total MAD</th>
+                <th className="py-2 text-right font-medium">
+                  {t('gestionnaire.depenses.totalMad')}
+                </th>
                 <th className="py-2 text-right font-medium">Factures</th>
               </tr>
             </thead>
@@ -1132,17 +1138,21 @@ export function DepensesPage() {
       <div className="space-y-4">
         <div className="flex flex-wrap gap-3">
           <Input
-            placeholder="Rechercher titre ou prestataire..."
+            placeholder={t('gestionnaire.depenses.searchTitle')}
             value={filterSearch}
             onChange={(e) => setFilterSearch(e.target.value)}
             className="max-w-xs"
           />
           <Select value={filterCompte} onValueChange={setFilterCompte}>
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="Tous comptes" />
+              <SelectValue
+                placeholder={t('gestionnaire.depenses.allAccounts')}
+              />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="tous">Tous comptes</SelectItem>
+              <SelectItem value="tous">
+                {t('gestionnaire.depenses.allAccounts')}
+              </SelectItem>
               {compteClasse6.map((c) => (
                 <SelectItem key={c.numero} value={c.numero}>
                   {c.numero} — {c.libelle}
@@ -1158,7 +1168,9 @@ export function DepensesPage() {
               <SelectValue placeholder="Approbation" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="tous">Tous statuts</SelectItem>
+              <SelectItem value="tous">
+                {t('gestionnaire.depenses.allStatuses')}
+              </SelectItem>
               <SelectItem value="approuve">
                 {t('gestionnaire.depenses.approbation.approuve', {
                   defaultValue: 'Approuvé',
@@ -1231,7 +1243,7 @@ export function DepensesPage() {
             <DialogTitle>{t('gestionnaire.depenses.rejectTitle')}</DialogTitle>
           </DialogHeader>
           <div className="py-2 space-y-2">
-            <Label>Motif du rejet</Label>
+            <Label>{t('gestionnaire.depenses.motifRejet')}</Label>
             <Input
               value={rejetMotif}
               onChange={(e) => setRejetMotif(e.target.value)}

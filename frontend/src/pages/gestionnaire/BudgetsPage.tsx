@@ -228,7 +228,7 @@ function SimulationModal({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => toast.info('Export en cours...')}
+                onClick={() => toast.info(t('common.exportInProgress'))}
               >
                 <Download className="me-1.5 size-4" />
                 {t('gestionnaire.budget.simulation.exporter', {
@@ -636,7 +636,7 @@ export function BudgetsPage() {
       void qc.invalidateQueries({
         queryKey: ['budget-annexe5', residenceId, exerciceId],
       }),
-    onError: () => toast.error('Erreur lors de la sauvegarde'),
+    onError: () => toast.error(t('gestionnaire.budgets.saveError')),
   })
 
   const resetAddLigneDialog = () => {
@@ -662,7 +662,7 @@ export function BudgetsPage() {
       resetAddLigneDialog()
       toast.success(t('gestionnaire.budgets.toastLineAdded'))
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const supprimerLigneMutation = useMutation({
@@ -674,7 +674,7 @@ export function BudgetsPage() {
       setDeleteLigneTarget(null)
       toast.success(t('gestionnaire.budgets.toastLineDeleted'))
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const soumettreMutation = useMutation({
@@ -690,7 +690,7 @@ export function BudgetsPage() {
         }),
       )
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const verrouillerMutation = useMutation({
@@ -706,7 +706,7 @@ export function BudgetsPage() {
         }),
       )
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   // ── Computed ───────────────────────────────────────────────────────────────
@@ -751,7 +751,7 @@ export function BudgetsPage() {
     void qc.invalidateQueries({
       queryKey: ['budget-annexe5', residenceId, exerciceId],
     })
-    toast.success(`${selected.length} ligne(s) mise(s) à jour`)
+    toast.success(t('gestionnaire.budgets.bulkUpdated', { n: selected.length }))
   }
 
   return (
@@ -822,7 +822,7 @@ export function BudgetsPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => toast.info('Export en cours...')}
+                onClick={() => toast.info(t('common.exportInProgress'))}
               >
                 <Download className="me-1.5 size-4" />
                 {t('gestionnaire.budget.exporter', {
@@ -1161,7 +1161,9 @@ export function BudgetsPage() {
 
             {/* Bar chart (1/3) */}
             <div className="rounded-xl border bg-card p-4">
-              <p className="mb-3 text-sm font-medium">Consommation par poste</p>
+              <p className="mb-3 text-sm font-medium">
+                {t('gestionnaire.budgets.consommationPoste')}
+              </p>
               {chartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={360}>
                   <BarChart
@@ -1195,7 +1197,7 @@ export function BudgetsPage() {
                 </ResponsiveContainer>
               ) : (
                 <p className="py-10 text-center text-sm text-muted-foreground">
-                  Aucune donnée
+                  {t('gestionnaire.budgets.noData')}
                 </p>
               )}
             </div>
@@ -1226,7 +1228,7 @@ export function BudgetsPage() {
         title={t('gestionnaire.budget.soumettre', {
           defaultValue: "Soumettre à l'AG",
         })}
-        description="Le budget sera soumis pour approbation lors de la prochaine Assemblée Générale."
+        description={t('gestionnaire.budgets.submitApprovalDesc')}
         confirmLabel="Soumettre"
         variant="default"
         onConfirm={() => soumettreMutation.mutate()}
@@ -1239,7 +1241,7 @@ export function BudgetsPage() {
         title={t('gestionnaire.budget.verrouiller', {
           defaultValue: 'Verrouiller le budget',
         })}
-        description="Le budget sera verrouillé et ne pourra plus être modifié."
+        description={t('gestionnaire.budgets.lockDesc')}
         confirmLabel="Verrouiller"
         variant="destructive"
         onConfirm={() => verrouillerMutation.mutate()}
@@ -1249,8 +1251,8 @@ export function BudgetsPage() {
       <ConfirmModal
         open={deleteLigneTarget !== null}
         onOpenChange={(o) => !o && setDeleteLigneTarget(null)}
-        title="Supprimer la ligne"
-        description="Cette ligne budgétaire sera supprimée définitivement."
+        title={t('gestionnaire.budgets.deleteLineTitle')}
+        description={t('gestionnaire.budgets.deleteLineDesc')}
         onConfirm={() =>
           deleteLigneTarget !== null &&
           supprimerLigneMutation.mutate(deleteLigneTarget)
@@ -1265,7 +1267,7 @@ export function BudgetsPage() {
       >
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Ajouter une ligne</DialogTitle>
+            <DialogTitle>{t('gestionnaire.budgets.addLineTitle')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1">
@@ -1302,7 +1304,7 @@ export function BudgetsPage() {
                 onChange={(e) =>
                   setAddLigneForm((f) => ({ ...f, libelle: e.target.value }))
                 }
-                placeholder="Description de la ligne"
+                placeholder={t('gestionnaire.budgets.lineDescPlaceholder')}
               />
             </div>
             <div className="space-y-1">
@@ -1323,7 +1325,7 @@ export function BudgetsPage() {
                 className="flex w-full items-center justify-between px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setPrestataireOpen((o) => !o)}
               >
-                <span>Lier un prestataire (optionnel)</span>
+                <span>{t('gestionnaire.budgets.linkPrestataire')}</span>
                 {prestataireOpen ? (
                   <ChevronUp className="size-4" />
                 ) : (
@@ -1465,7 +1467,7 @@ export function BudgetsPage() {
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label>Date fin</Label>
+                      <Label>{t('gestionnaire.budgets.dateFin')}</Label>
                       <Input
                         type="date"
                         value={prestataireForm.date_fin}

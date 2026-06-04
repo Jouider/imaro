@@ -148,7 +148,7 @@ export function RecouvrementPage() {
         queryKey: ['penalty-config', residenceId],
       })
     },
-    onError: () => toast.error("Échec de l'enregistrement"),
+    onError: () => toast.error(t('gestionnaire.recouvrement.saveError')),
   })
 
   const recalcMut = useMutation({
@@ -229,7 +229,7 @@ export function RecouvrementPage() {
             <Sparkles
               className={cn('size-3.5', recalcMut.isPending && 'animate-pulse')}
             />
-            Recalculer pénalités
+            {t('gestionnaire.recouvrement.recalcPenalites')}
           </Button>
           <Button
             variant="outline"
@@ -251,7 +251,7 @@ export function RecouvrementPage() {
           <div className="mb-4 flex items-center gap-2">
             <Settings className="size-4 text-[var(--color-imaro-primary)]" />
             <h2 className="text-sm font-bold text-[var(--color-imaro-primary)]">
-              Configuration des pénalités de retard
+              {t('gestionnaire.recouvrement.configTitle')}
             </h2>
             <Badge
               variant="outline"
@@ -269,10 +269,10 @@ export function RecouvrementPage() {
                   htmlFor="penalty-enabled"
                   className="text-sm font-medium"
                 >
-                  Pénalités activées
+                  {t('gestionnaire.recouvrement.penalitesActivees')}
                 </Label>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  Calcul automatique sur tout impayé après période de grâce
+                  {t('gestionnaire.recouvrement.penalitesAutoDesc')}
                 </p>
               </div>
               <Switch
@@ -287,10 +287,10 @@ export function RecouvrementPage() {
             {/* Grace period */}
             <div className="rounded-lg border bg-card p-3">
               <Label htmlFor="grace-days" className="text-sm font-medium">
-                Période de grâce (jours)
+                {t('gestionnaire.recouvrement.graceDays')}
               </Label>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Délai avant application des pénalités
+                {t('gestionnaire.recouvrement.graceHint')}
               </p>
               <Input
                 id="grace-days"
@@ -381,7 +381,7 @@ export function RecouvrementPage() {
                 Plafond maximum (DH, optionnel)
               </Label>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Pénalité plafonnée. Laisser vide pour aucun plafond.
+                {t('gestionnaire.recouvrement.plafondHint')}
               </p>
               <Input
                 id="cap-max"
@@ -425,7 +425,7 @@ export function RecouvrementPage() {
                 saveConfigMut.isPending || Object.keys(configEdits).length === 0
               }
             >
-              Annuler
+              {t('actions.cancel')}
             </Button>
             <Button
               size="sm"
@@ -439,7 +439,7 @@ export function RecouvrementPage() {
                   saveConfigMut.isPending && 'animate-spin',
                 )}
               />
-              Enregistrer
+              {t('actions.save')}
             </Button>
           </div>
         </div>
@@ -448,13 +448,13 @@ export function RecouvrementPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <Kpi
-          label="Total impayé"
+          label={t('gestionnaire.recouvrement.totalImpaye')}
           value={data ? `${fmt.format(data.total_impaye)} DH` : '—'}
           icon={<TrendingUp className="size-4" />}
           tone="danger"
         />
         <Kpi
-          label="Pénalités"
+          label={t('gestionnaire.recouvrement.penalites')}
           value={data ? `${fmt.format(data.total_penalites)} DH` : '—'}
           icon={<FileWarning className="size-4" />}
           tone="warning"
@@ -483,13 +483,13 @@ export function RecouvrementPage() {
         <div className="mb-4 flex items-center gap-2">
           <ShieldAlert className="size-5 text-red-600" />
           <h2 className="text-base font-bold text-red-800 dark:text-red-200">
-            Risque de prescription
+            {t('gestionnaire.recouvrement.prescriptionRisk')}
           </h2>
           <Badge
             variant="outline"
             className="ml-2 border-red-300 bg-white text-[10px] text-red-700"
           >
-            Loi 18-00 · Prescription quinquennale
+            {t('gestionnaire.recouvrement.prescriptionBadge')}
           </Badge>
         </div>
         <p className="mb-4 text-xs text-red-700/80 dark:text-red-300/80">
@@ -508,8 +508,10 @@ export function RecouvrementPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('common.coproprietaire')}</TableHead>
-                  <TableHead>Lot</TableHead>
-                  <TableHead className="text-right">Montant</TableHead>
+                  <TableHead>{t('common.lot')}</TableHead>
+                  <TableHead className="text-right">
+                    {t('common.amount')}
+                  </TableHead>
                   <TableHead>Origine</TableHead>
                   <TableHead className="text-right">Jours restants</TableHead>
                   <TableHead>{t('common.severity')}</TableHead>
@@ -567,13 +569,13 @@ export function RecouvrementPage() {
       {/* Lots en retard */}
       <section className="space-y-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Tous les lots en retard
+          {t('gestionnaire.recouvrement.allLateLots')}
         </h2>
         <div className="overflow-hidden rounded-xl border bg-card">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Lot</TableHead>
+                <TableHead>{t('common.lot')}</TableHead>
                 <TableHead>{t('common.coproprietaire')}</TableHead>
                 <TableHead className="text-right">
                   {t('common.amountDue')}
@@ -584,7 +586,7 @@ export function RecouvrementPage() {
                 <TableHead className="text-right">
                   {t('gestionnaire.recouvrement.age')}
                 </TableHead>
-                <TableHead>Statut</TableHead>
+                <TableHead>{t('common.status')}</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
