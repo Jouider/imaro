@@ -296,7 +296,7 @@ export function ImportsPage() {
                     <div className="flex flex-col items-center gap-3 rounded-xl border border-green-200 bg-green-50 py-10 dark:border-green-900/30 dark:bg-green-950/20">
                       <CheckCircle2 className="size-10 text-green-500" />
                       <p className="text-sm font-medium text-green-700 dark:text-green-300">
-                        Import terminé
+                        {t('gestionnaire.imports.importDone')}
                       </p>
                       <button
                         onClick={() =>
@@ -308,7 +308,7 @@ export function ImportsPage() {
                         }
                         className="text-xs text-muted-foreground underline hover:text-foreground"
                       >
-                        Ré-importer
+                        {t('gestionnaire.imports.reimport')}
                       </button>
                     </div>
                   ) : (

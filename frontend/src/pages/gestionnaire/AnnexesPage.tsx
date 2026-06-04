@@ -376,7 +376,7 @@ export function AnnexesPage() {
       {/* Optional annexes */}
       <section className="space-y-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Annexes complémentaires
+          {t('gestionnaire.annexes.complementaires')}
         </h2>
         <div className="space-y-2">
           {optional.map((a) => (
@@ -415,6 +415,7 @@ function AnnexeCard({
   onDownload: () => void
   loading: boolean
 }) {
+  const { t } = useTranslation()
   return (
     <div
       className={cn(
@@ -463,7 +464,7 @@ function AnnexeCard({
           onClick={onRegenerate}
         >
           <RefreshCw className={cn('size-3.5', loading && 'animate-spin')} />
-          Régénérer
+          {t('gestionnaire.annexes.regenerate')}
         </Button>
         <Button
           variant="default"

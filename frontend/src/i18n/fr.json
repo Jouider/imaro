@@ -445,7 +445,10 @@
       "ctaSecondary": "Voir le produit",
       "trust1": "OTP WhatsApp natif",
       "trust2": "Plan Comptable Marocain",
-      "trust3": "Conforme Loi 18-00"
+      "trust3": "Conforme Loi 18-00",
+      "impayes": "Impayés",
+      "tresorerie": "Trésorerie",
+      "pointageDone": "Pointage Attijariwafa terminé"
     },
     "logoBar": {
       "title": "Ils nous font confiance"
@@ -1078,7 +1081,12 @@
       },
       "toastLotAdded": "Lot ajouté",
       "toastLotUpdated": "Lot modifié",
-      "toastLotDeleted": "Lot supprimé"
+      "toastLotDeleted": "Lot supprimé",
+      "noLotInImmeuble": "Aucun lot dans cet immeuble",
+      "addLotsHint": "Ajoutez des lots un par un ou générez-en plusieurs",
+      "generateLots": "Générer des lots",
+      "addLotError": "Erreur lors de l'ajout du lot",
+      "modifyError": "Erreur lors de la modification"
     },
     "residence": {
       "tabOverview": "Vue d'ensemble",
@@ -1298,7 +1306,10 @@
       "emptyDesc": "Créez votre premier appel de fonds.",
       "toastCreated": "Appel de fonds créé",
       "toastSent": "Appel de fonds envoyé",
-      "createTitle": "Créer un appel de fonds"
+      "createTitle": "Créer un appel de fonds",
+      "allTranches": "Toutes les tranches",
+      "calcRepartition": "Calcul de la répartition…",
+      "sendError": "Erreur lors de l'envoi"
     },
     "paiements": {
       "title": "Suivi des paiements",
@@ -1488,7 +1499,10 @@
         "ticket": "Nouveau ticket",
         "ag": "Convoquer une AG",
         "soon": "Bientôt disponible"
-      }
+      },
+      "iaSubtitle": "Audit conformité · OCR factures · Suggestions budget",
+      "conformite": "Conformité",
+      "conformiteCycle": "Cycle Décret 2.23.700 · Régime simplifié"
     },
     "assemblees": {
       "title": "Assemblées générales",
@@ -2074,18 +2088,28 @@
         "done": "Terminé"
       },
       "order": "Ordre recommandé : Lots → Copropriétaires → Soldes → Paiements → Prestataires",
-      "selectFile": "Sélectionner un fichier"
+      "selectFile": "Sélectionner un fichier",
+      "importDone": "Import terminé",
+      "reimport": "Ré-importer"
     },
     "autresRecettes": {
       "toastAdded": "Recette ajoutée",
       "toastUpdated": "Recette mise à jour",
-      "toastDeleted": "Recette supprimée"
+      "toastDeleted": "Recette supprimée",
+      "emptyRow": "Aucune recette pour cet exercice."
     },
     "remboursements": {
       "toastCreated": "Remboursement créé",
       "toastUpdated": "Remboursement mis à jour",
       "toastDeleted": "Remboursement supprimé",
-      "totalRequested": "Total demandé"
+      "totalRequested": "Total demandé",
+      "subtitle": "Trop-perçus, indemnités et restitutions aux copropriétaires",
+      "newRemboursement": "Nouveau remboursement",
+      "colPaiement": "Paiement",
+      "emptyRow": "Aucun remboursement enregistré.",
+      "dateDemande": "Date de demande",
+      "datePaiement": "Date paiement",
+      "modalEdit": "Modifier le remboursement"
     },
     "emprunts": {
       "toastCreated": "Emprunt enregistré",
@@ -2098,7 +2122,15 @@
       "duree": "Durée (mois)",
       "mensualiteDh": "Mensualité (DH)",
       "bannerTitle": "Annexe 8 — Décret 2.23.700",
-      "bannerBody": "· Tout emprunt collectif doit être voté en AG (Loi 18-00 art. 17). Le tableau d'amortissement est fourni par l'organisme prêteur."
+      "bannerBody": "· Tout emprunt collectif doit être voté en AG (Loi 18-00 art. 17). Le tableau d'amortissement est fourni par l'organisme prêteur.",
+      "emptyRow": "Aucun emprunt enregistré.",
+      "dateFin": "Date de fin",
+      "totalEmprunte": "Total emprunté",
+      "payeCumul": "Payé cumul",
+      "payeExercice": "Payé cet exercice",
+      "resteAPayer": "Reste à payer",
+      "montantInitialDh": "Montant initial (DH)",
+      "amountInitialPositive": "Montant initial > 0"
     },
     "recouvrement": {
       "toastConfigSaved": "Configuration enregistrée",
@@ -2189,7 +2221,10 @@
     "audit": {
       "allCategories": "Toutes catégories",
       "colBy": "Effectué par",
-      "colDetails": "Détails"
+      "colDetails": "Détails",
+      "empty": "Aucun événement pour cette période ou ce filtre.",
+      "totalEvents": "Total événements",
+      "searchPlaceholder": "Rechercher action, utilisateur, cible..."
     },
     "generateLots": {
       "genError": "Erreur lors de la génération des lots",
@@ -2400,6 +2435,15 @@
       "regenerate": "Régénérer",
       "applyBudget": "Appliquer au budget {{n}}",
       "budgetMeta": "{{model}} · {{ms}}ms · {{tokens}} tokens"
+    },
+    "annexes": {
+      "complementaires": "Annexes complémentaires",
+      "regenerate": "Régénérer"
+    },
+    "layout": {
+      "deleteNotif": "Supprimer cette notification",
+      "closeMenu": "Fermer le menu",
+      "openMenu": "Ouvrir le menu"
     }
   },
   "onboarding": {
@@ -2542,6 +2586,8 @@
     "montantMad": "Montant (MAD)",
     "du": "Dû",
     "exportInProgress": "Export en cours...",
-    "saveError": "Erreur lors de l'enregistrement"
+    "saveError": "Erreur lors de l'enregistrement",
+    "nouveau": "Nouveau",
+    "amountPositive": "Montant > 0"
   }
 }

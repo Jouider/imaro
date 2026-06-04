@@ -181,7 +181,7 @@ function KanbanColumn({
         ))}
         {tickets.length === 0 && (
           <p className="py-6 text-center text-xs text-muted-foreground">
-            Aucun ticket
+            {t('gestionnaire.tickets.empty')}
           </p>
         )}
       </div>
@@ -483,17 +483,21 @@ export function TicketsPage() {
                   <p>{detailTicket.residence.name}</p>
                 </div>
                 <div>
-                  <p className="font-medium text-muted-foreground">Lot</p>
+                  <p className="font-medium text-muted-foreground">
+                    {t('common.lot')}
+                  </p>
                   <p className="font-mono">{detailTicket.lot.numero}</p>
                 </div>
                 <div>
                   <p className="font-medium text-muted-foreground">
-                    Copropriétaire
+                    {t('common.coproprietaire')}
                   </p>
                   <p>{detailTicket.user.name}</p>
                 </div>
                 <div>
-                  <p className="font-medium text-muted-foreground">Date</p>
+                  <p className="font-medium text-muted-foreground">
+                    {t('common.date')}
+                  </p>
                   <p>{detailTicket.created_at.slice(0, 10)}</p>
                 </div>
               </div>

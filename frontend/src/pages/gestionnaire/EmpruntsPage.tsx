@@ -171,7 +171,7 @@ export function EmpruntsPage() {
       return
     }
     if (draft.montant_initial <= 0) {
-      toast.error('Montant initial > 0')
+      toast.error(t('gestionnaire.emprunts.amountInitialPositive'))
       return
     }
     if (editing) updateMut.mutate({ id: editing.id, patch: draft })
@@ -236,22 +236,22 @@ export function EmpruntsPage() {
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <Kpi
-          label="Total emprunté"
+          label={t('gestionnaire.emprunts.totalEmprunte')}
           value={`${fmt.format(totals.emprunte)} DH`}
           tone="primary"
         />
         <Kpi
-          label="Payé cumul"
+          label={t('gestionnaire.emprunts.payeCumul')}
           value={`${fmt.format(totals.payeCumul)} DH`}
           tone="muted"
         />
         <Kpi
-          label="Payé cet exercice"
+          label={t('gestionnaire.emprunts.payeExercice')}
           value={`${fmt.format(totals.payeExercice)} DH`}
           tone="success"
         />
         <Kpi
-          label="Reste à payer"
+          label={t('gestionnaire.emprunts.resteAPayer')}
           value={`${fmt.format(totals.reste)} DH`}
           tone="danger"
         />
@@ -279,7 +279,7 @@ export function EmpruntsPage() {
               <TableHead className="text-right">
                 {t('gestionnaire.emprunts.colResteDu')}
               </TableHead>
-              <TableHead>Statut</TableHead>
+              <TableHead>{t('common.status')}</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -299,7 +299,7 @@ export function EmpruntsPage() {
                   colSpan={8}
                   className="py-12 text-center text-sm text-muted-foreground"
                 >
-                  Aucun emprunt enregistré.
+                  {t('gestionnaire.emprunts.emptyRow')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -409,7 +409,7 @@ export function EmpruntsPage() {
                 />
               </div>
               <div>
-                <Label>Date de fin</Label>
+                <Label>{t('gestionnaire.emprunts.dateFin')}</Label>
                 <Input
                   type="date"
                   value={draft.date_fin}
@@ -421,7 +421,7 @@ export function EmpruntsPage() {
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <Label>Montant initial (DH) *</Label>
+                <Label>{t('gestionnaire.emprunts.montantInitialDh')} *</Label>
                 <Input
                   type="number"
                   min="0"

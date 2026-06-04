@@ -237,7 +237,7 @@ export function ResidencePage() {
       setForm(EMPTY_FORM)
       toast.success(t('gestionnaire.residences.toastLotAdded'))
     },
-    onError: () => toast.error("Erreur lors de l'ajout du lot"),
+    onError: () => toast.error(t('gestionnaire.residences.addLotError')),
   })
 
   const updateMutation = useMutation({
@@ -255,7 +255,7 @@ export function ResidencePage() {
       setForm(EMPTY_FORM)
       toast.success(t('gestionnaire.residences.toastLotUpdated'))
     },
-    onError: () => toast.error('Erreur lors de la modification'),
+    onError: () => toast.error(t('gestionnaire.residences.modifyError')),
   })
 
   const deleteMutation = useMutation({
@@ -265,7 +265,7 @@ export function ResidencePage() {
       setDeletingLot(null)
       toast.success(t('gestionnaire.residences.toastLotDeleted'))
     },
-    onError: () => toast.error('Erreur lors de la suppression'),
+    onError: () => toast.error(t('common.deleteError')),
   })
 
   // ── Immeuble Mutations ────────────────────────────────────────────────────────
@@ -972,10 +972,10 @@ export function ResidencePage() {
               <Building2 className="size-12 text-muted-foreground/40" />
               <div>
                 <p className="font-medium text-muted-foreground">
-                  Aucun lot dans cet immeuble
+                  {t('gestionnaire.residences.noLotInImmeuble')}
                 </p>
                 <p className="text-sm text-muted-foreground/70">
-                  Ajoutez des lots un par un ou générez-en plusieurs
+                  {t('gestionnaire.residences.addLotsHint')}
                 </p>
               </div>
               <Button
@@ -985,7 +985,7 @@ export function ResidencePage() {
                 }}
               >
                 <Zap className="size-4 mr-2" />
-                Générer des lots
+                {t('gestionnaire.residences.generateLots')}
               </Button>
             </div>
           ) : (

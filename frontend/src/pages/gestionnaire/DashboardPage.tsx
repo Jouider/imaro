@@ -501,7 +501,7 @@ export function DashboardPage() {
             </div>
             <p className="mt-3 text-sm font-bold">Assistant IA</p>
             <p className="mt-0.5 text-xs text-white/80">
-              Audit conformité · OCR factures · Suggestions budget
+              {t('gestionnaire.dashboard.iaSubtitle')}
             </p>
             <ArrowRight className="absolute bottom-3 right-3 size-4 text-white/60 transition-transform group-hover:translate-x-1" />
           </button>
@@ -511,9 +511,9 @@ export function DashboardPage() {
             onClick={() => void navigate('/gestionnaire/conformite')}
             icon={<CalendarCheck className="size-4" />}
             iconBg="bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
-            label="Conformité"
+            label={t('gestionnaire.dashboard.conformite')}
             value="14%"
-            sublabel="Cycle Décret 2.23.700 · Régime simplifié"
+            sublabel={t('gestionnaire.dashboard.conformiteCycle')}
             tone="info"
           />
 

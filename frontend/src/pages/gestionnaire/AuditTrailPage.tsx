@@ -137,7 +137,7 @@ export function AuditTrailPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <Kpi
-          label="Total événements"
+          label={t('gestionnaire.audit.totalEvents')}
           value={stats.total}
           icon={<Activity className="size-4" />}
           tone="primary"
@@ -166,7 +166,7 @@ export function AuditTrailPage() {
       <div className="flex flex-wrap items-center gap-2 rounded-xl border bg-card p-4">
         <Filter className="size-4 text-muted-foreground" />
         <Input
-          placeholder="Rechercher action, utilisateur, cible..."
+          placeholder={t('gestionnaire.audit.searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-xs"
@@ -243,7 +243,7 @@ export function AuditTrailPage() {
                   colSpan={7}
                   className="text-center text-sm text-muted-foreground py-12"
                 >
-                  Aucun événement pour cette période ou ce filtre.
+                  {t('gestionnaire.audit.empty')}
                 </TableCell>
               </TableRow>
             ) : (

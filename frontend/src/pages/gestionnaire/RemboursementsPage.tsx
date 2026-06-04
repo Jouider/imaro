@@ -169,7 +169,7 @@ export function RemboursementsPage() {
       return
     }
     if (draft.montant <= 0) {
-      toast.error('Montant > 0')
+      toast.error(t('common.amountPositive'))
       return
     }
     if (editing) updateMut.mutate({ id: editing.id, patch: draft })
@@ -203,7 +203,7 @@ export function RemboursementsPage() {
             })}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Trop-perçus, indemnités et restitutions aux copropriétaires
+            {t('gestionnaire.remboursements.subtitle')}
           </p>
         </div>
         <Button
@@ -213,7 +213,7 @@ export function RemboursementsPage() {
           disabled={!residenceId}
         >
           <Plus className="size-4" />
-          Nouveau remboursement
+          {t('gestionnaire.remboursements.newRemboursement')}
         </Button>
       </div>
 
@@ -267,10 +267,12 @@ export function RemboursementsPage() {
             <TableRow>
               <TableHead>{t('common.coproprietaire')}</TableHead>
               <TableHead>Motif</TableHead>
-              <TableHead className="text-right">Montant</TableHead>
+              <TableHead className="text-right">{t('common.amount')}</TableHead>
               <TableHead>Demande</TableHead>
-              <TableHead>Paiement</TableHead>
-              <TableHead>Statut</TableHead>
+              <TableHead>
+                {t('gestionnaire.remboursements.colPaiement')}
+              </TableHead>
+              <TableHead>{t('common.status')}</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -290,7 +292,7 @@ export function RemboursementsPage() {
                   colSpan={7}
                   className="py-12 text-center text-sm text-muted-foreground"
                 >
-                  Aucun remboursement enregistré.
+                  {t('gestionnaire.remboursements.emptyRow')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -379,7 +381,9 @@ export function RemboursementsPage() {
         <DialogContent className="sm:max-w-[520px]">
           <DialogHeader>
             <DialogTitle>
-              {editing ? 'Modifier le remboursement' : 'Nouveau remboursement'}
+              {editing
+                ? t('gestionnaire.remboursements.modalEdit')
+                : t('gestionnaire.remboursements.newRemboursement')}
             </DialogTitle>
           </DialogHeader>
           <div className="grid gap-3">
@@ -461,7 +465,7 @@ export function RemboursementsPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Date de demande</Label>
+                <Label>{t('gestionnaire.remboursements.dateDemande')}</Label>
                 <Input
                   type="date"
                   value={draft.date_demande}
@@ -471,7 +475,7 @@ export function RemboursementsPage() {
                 />
               </div>
               <div>
-                <Label>Statut</Label>
+                <Label>{t('common.status')}</Label>
                 <Select
                   value={draft.statut}
                   onValueChange={(v) =>
@@ -496,7 +500,7 @@ export function RemboursementsPage() {
             {draft.statut === 'paye' && (
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label>Date paiement</Label>
+                  <Label>{t('gestionnaire.remboursements.datePaiement')}</Label>
                   <Input
                     type="date"
                     value={draft.date_paiement ?? ''}

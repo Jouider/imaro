@@ -137,7 +137,7 @@ export function AutresRecettesPage() {
       return
     }
     if (draft.montant <= 0) {
-      toast.error('Montant > 0')
+      toast.error(t('common.amountPositive'))
       return
     }
     if (editing) updateMut.mutate({ id: editing.id, patch: draft })
@@ -258,11 +258,11 @@ export function AutresRecettesPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
+              <TableHead>{t('common.date')}</TableHead>
               <TableHead>{t('common.libelle')}</TableHead>
               <TableHead>{t('common.categorie')}</TableHead>
               <TableHead>Payeur</TableHead>
-              <TableHead className="text-right">Montant</TableHead>
+              <TableHead className="text-right">{t('common.amount')}</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -282,7 +282,7 @@ export function AutresRecettesPage() {
                   colSpan={6}
                   className="py-12 text-center text-sm text-muted-foreground"
                 >
-                  Aucune recette pour cet exercice.
+                  {t('gestionnaire.autresRecettes.emptyRow')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -366,7 +366,7 @@ export function AutresRecettesPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Date</Label>
+                <Label>{t('common.date')}</Label>
                 <Input
                   type="date"
                   value={draft.date}
@@ -387,7 +387,7 @@ export function AutresRecettesPage() {
               </div>
             </div>
             <div>
-              <Label>Catégorie</Label>
+              <Label>{t('common.categorie')}</Label>
               <Select
                 value={draft.categorie}
                 onValueChange={(v) =>

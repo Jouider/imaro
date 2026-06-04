@@ -445,7 +445,10 @@
       "ctaSecondary": "اكتشف المنتج",
       "trust1": "OTP عبر واتساب",
       "trust2": "المخطط المحاسبي المغربي",
-      "trust3": "مطابق للقانون 18-00"
+      "trust3": "مطابق للقانون 18-00",
+      "impayes": "غير المدفوع",
+      "tresorerie": "الخزينة",
+      "pointageDone": "تم تدقيق Attijariwafa"
     },
     "logoBar": {
       "title": "يثقون بنا"
@@ -1078,7 +1081,12 @@
       },
       "toastLotAdded": "تمت إضافة الشقة",
       "toastLotUpdated": "تم تعديل الشقة",
-      "toastLotDeleted": "تم حذف الشقة"
+      "toastLotDeleted": "تم حذف الشقة",
+      "noLotInImmeuble": "لا توجد وحدات في هذه العمارة",
+      "addLotsHint": "أضف الوحدات واحدة تلو الأخرى أو ولّد عدة وحدات",
+      "generateLots": "توليد وحدات",
+      "addLotError": "خطأ أثناء إضافة الوحدة",
+      "modifyError": "خطأ أثناء التعديل"
     },
     "residence": {
       "tabOverview": "نظرة عامة",
@@ -1298,7 +1306,10 @@
       "emptyDesc": "أنشئ أول استدعاء للأموال.",
       "toastCreated": "تم إنشاء طلب الأموال",
       "toastSent": "تم إرسال طلب الأموال",
-      "createTitle": "إنشاء طلب أموال"
+      "createTitle": "إنشاء طلب أموال",
+      "allTranches": "كل الأقساط",
+      "calcRepartition": "جارٍ حساب التوزيع…",
+      "sendError": "خطأ أثناء الإرسال"
     },
     "paiements": {
       "title": "متابعة المدفوعات",
@@ -1437,7 +1448,7 @@
       "updateSuccess": "تم تحديث التذكرة",
       "images": "الصور",
       "noImages": "لا توجد صور",
-      "empty": "لا توجد تذاكر",
+      "empty": "لا توجد تذكرة",
       "emptyDesc": "لا توجد تذاكر تطابق الفلاتر المحددة.",
       "viewKanban": "كانبان",
       "viewTable": "جدول",
@@ -1736,7 +1747,10 @@
         "ticket": "تذكرة جديدة",
         "ag": "دعوة جمعية عامة",
         "soon": "قريبًا"
-      }
+      },
+      "iaSubtitle": "تدقيق المطابقة · OCR الفواتير · اقتراحات الميزانية",
+      "conformite": "المطابقة",
+      "conformiteCycle": "دورة المرسوم 2.23.700 · النظام المبسّط"
     },
     "comptabilite": {
       "title": "المحاسبة",
@@ -2074,18 +2088,28 @@
         "done": "تم"
       },
       "order": "الترتيب الموصى: الشقق ← الملاك ← الأرصدة ← المدفوعات ← المزودون",
-      "selectFile": "اختر ملفًا"
+      "selectFile": "اختر ملفًا",
+      "importDone": "انتهى الاستيراد",
+      "reimport": "إعادة الاستيراد"
     },
     "autresRecettes": {
       "toastAdded": "تمت إضافة الإيراد",
       "toastUpdated": "تم تحديث الإيراد",
-      "toastDeleted": "تم حذف الإيراد"
+      "toastDeleted": "تم حذف الإيراد",
+      "emptyRow": "لا توجد مداخيل لهذه السنة المالية."
     },
     "remboursements": {
       "toastCreated": "تم إنشاء الاسترجاع",
       "toastUpdated": "تم تحديث الاسترجاع",
       "toastDeleted": "تم حذف الاسترجاع",
-      "totalRequested": "المجموع المطلوب"
+      "totalRequested": "المجموع المطلوب",
+      "subtitle": "الفوائض، التعويضات والاستردادات للمُلّاك",
+      "newRemboursement": "استرداد جديد",
+      "colPaiement": "الدفع",
+      "emptyRow": "لا يوجد استرداد مسجل.",
+      "dateDemande": "تاريخ الطلب",
+      "datePaiement": "تاريخ الدفع",
+      "modalEdit": "تعديل الاسترداد"
     },
     "emprunts": {
       "toastCreated": "تم تسجيل القرض",
@@ -2098,7 +2122,15 @@
       "duree": "المدة (أشهر)",
       "mensualiteDh": "القسط الشهري (د.م.)",
       "bannerTitle": "الملحق 8 — المرسوم 2.23.700",
-      "bannerBody": "· كل قرض جماعي يجب التصويت عليه في الجمع العام (قانون 18-00 المادة 17). جدول الإهلاك تقدمه الجهة المقرِضة."
+      "bannerBody": "· كل قرض جماعي يجب التصويت عليه في الجمع العام (قانون 18-00 المادة 17). جدول الإهلاك تقدمه الجهة المقرِضة.",
+      "emptyRow": "لا يوجد قرض مسجل.",
+      "dateFin": "تاريخ النهاية",
+      "totalEmprunte": "إجمالي المقترض",
+      "payeCumul": "المدفوع التراكمي",
+      "payeExercice": "المدفوع هذه السنة",
+      "resteAPayer": "المتبقي للدفع",
+      "montantInitialDh": "المبلغ الأولي (د.م.)",
+      "amountInitialPositive": "المبلغ الأولي > 0"
     },
     "recouvrement": {
       "toastConfigSaved": "تم حفظ الإعداد",
@@ -2189,7 +2221,10 @@
     "audit": {
       "allCategories": "كل الفئات",
       "colBy": "نُفِّذ بواسطة",
-      "colDetails": "التفاصيل"
+      "colDetails": "التفاصيل",
+      "empty": "لا يوجد حدث لهذه الفترة أو هذا الفلتر.",
+      "totalEvents": "إجمالي الأحداث",
+      "searchPlaceholder": "البحث عن إجراء، مستخدم، هدف..."
     },
     "generateLots": {
       "genError": "خطأ أثناء توليد الوحدات",
@@ -2400,6 +2435,15 @@
       "regenerate": "إعادة التوليد",
       "applyBudget": "تطبيق على ميزانية {{n}}",
       "budgetMeta": "{{model}} · {{ms}}ms · {{tokens}} رمز"
+    },
+    "annexes": {
+      "complementaires": "ملاحق تكميلية",
+      "regenerate": "إعادة التوليد"
+    },
+    "layout": {
+      "deleteNotif": "حذف هذا الإشعار",
+      "closeMenu": "إغلاق القائمة",
+      "openMenu": "فتح القائمة"
     }
   },
   "onboarding": {
@@ -2542,6 +2586,8 @@
     "montantMad": "المبلغ (د.م.)",
     "du": "المستحق",
     "exportInProgress": "جارٍ التصدير...",
-    "saveError": "خطأ أثناء الحفظ"
+    "saveError": "خطأ أثناء الحفظ",
+    "nouveau": "جديد",
+    "amountPositive": "المبلغ > 0"
   }
 }
