@@ -2126,7 +2126,56 @@
       "entries": "Entrées",
       "unitTypes": "Types d'unités",
       "quantity": "Quantité",
-      "generateTitle": "Générer des lots"
+      "generateTitle": "Générer des lots",
+      "typeLot": "Type de lot",
+      "totalLots": "Total lots",
+      "addWing": "Ajouter une aile",
+      "wingsBlocks": "Ailes / Blocs",
+      "removeWingAria": "Supprimer l'aile {{wing}}",
+      "startFloor": "Étage de départ",
+      "startFloorHint": "(négatif pour sous-sols)",
+      "totalVillas": "Total villas",
+      "phase": "Phase",
+      "phasePlaceholder": "Phase 1 (optionnel)",
+      "nbLots": "Nb lots",
+      "removeEntryAria": "Supprimer l'entrée",
+      "addEntry": "Ajouter une entrée",
+      "removeTypeAria": "Supprimer le type",
+      "addType": "Ajouter un type",
+      "quickTemplates": "Modèles rapides",
+      "configuration": "Configuration",
+      "previewTitle": "Aperçu — premiers {{shown}} lots sur {{total}}",
+      "emptyPreview": "Aucun lot à générer avec cette configuration.",
+      "previewTantieme": "• Tantième : {{n}}",
+      "moreLots": "… et {{n}} lots supplémentaires",
+      "generating": "Génération en cours...",
+      "generateN": "Générer {{n}} lots",
+      "templates": {
+        "residence_ensemble": {
+          "title": "Résidence / Ensemble immobilier",
+          "subtitle": "Définir des entrées avec des comptages différents (Ex: E1=12, Bloc B=8)"
+        },
+        "simple_sequential": {
+          "title": "Numérotation simple",
+          "subtitle": "Exemple : 1, 2, 3, 4, 5"
+        },
+        "wings_floors": {
+          "title": "Immeuble (Ailes + Étages)",
+          "subtitle": "Exemple : A101, A102, B201, B202"
+        },
+        "floor_based": {
+          "title": "Par étage (sans aile)",
+          "subtitle": "Exemple : 101, 102, 201, 202"
+        },
+        "villa_townhouse": {
+          "title": "Villa / Maison",
+          "subtitle": "Exemple : Villa 1, Villa 2, Phase 1-Villa 1"
+        },
+        "commercial_mixed": {
+          "title": "Commercial / Usage mixte",
+          "subtitle": "Exemple : Boutique 1, Bureau A"
+        }
+      }
     },
     "profil": {
       "title": "Mon Profil",

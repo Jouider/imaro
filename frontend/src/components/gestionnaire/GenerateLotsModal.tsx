@@ -352,7 +352,7 @@ export function GenerateLotsModal({
   }) {
     return (
       <div className="flex flex-col gap-1">
-        <Label>Type de lot</Label>
+        <Label>{t('gestionnaire.generateLots.typeLot')}</Label>
         <Select value={value} onValueChange={onChange}>
           <SelectTrigger className="w-full">
             <SelectValue />
@@ -397,7 +397,7 @@ export function GenerateLotsModal({
         return (
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
-              <Label>Total lots</Label>
+              <Label>{t('gestionnaire.generateLots.totalLots')}</Label>
               <Input
                 type="number"
                 min={1}
@@ -432,7 +432,7 @@ export function GenerateLotsModal({
         return (
           <div className="space-y-4">
             <div className="flex flex-col gap-2">
-              <Label>Ailes / Blocs</Label>
+              <Label>{t('gestionnaire.generateLots.wingsBlocks')}</Label>
               <div className="flex flex-wrap gap-2">
                 {wingsState.wings.map((wing, idx) => (
                   <Badge
@@ -445,7 +445,10 @@ export function GenerateLotsModal({
                       type="button"
                       onClick={() => removeWing(idx)}
                       className="ml-1 rounded-full hover:text-destructive"
-                      aria-label={`Supprimer l'aile ${wing}`}
+                      aria-label={t(
+                        'gestionnaire.generateLots.removeWingAria',
+                        { wing },
+                      )}
                     >
                       <X className="size-3" />
                     </button>
@@ -459,7 +462,7 @@ export function GenerateLotsModal({
                     onClick={addWing}
                   >
                     <Plus className="size-3.5 mr-1" />
-                    Ajouter une aile
+                    {t('gestionnaire.generateLots.addWing')}
                   </Button>
                 )}
               </div>
@@ -481,9 +484,9 @@ export function GenerateLotsModal({
               </div>
               <div className="flex flex-col gap-1">
                 <Label>
-                  Étage de départ
+                  {t('gestionnaire.generateLots.startFloor')}
                   <span className="ml-1 text-xs text-muted-foreground">
-                    (négatif pour sous-sols)
+                    {t('gestionnaire.generateLots.startFloorHint')}
                   </span>
                 </Label>
                 <Input
@@ -549,9 +552,9 @@ export function GenerateLotsModal({
             </div>
             <div className="flex flex-col gap-1">
               <Label>
-                Étage de départ
+                {t('gestionnaire.generateLots.startFloor')}
                 <span className="ml-1 text-xs text-muted-foreground">
-                  (négatif pour sous-sols)
+                  {t('gestionnaire.generateLots.startFloorHint')}
                 </span>
               </Label>
               <Input
@@ -601,7 +604,7 @@ export function GenerateLotsModal({
         return (
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
-              <Label>Total villas</Label>
+              <Label>{t('gestionnaire.generateLots.totalVillas')}</Label>
               <Input
                 type="number"
                 min={1}
@@ -638,13 +641,13 @@ export function GenerateLotsModal({
               />
             </div>
             <div className="flex flex-col gap-1">
-              <Label>Phase</Label>
+              <Label>{t('gestionnaire.generateLots.phase')}</Label>
               <Input
                 value={villaState.phase}
                 onChange={(e) =>
                   setVillaState((s) => ({ ...s, phase: e.target.value }))
                 }
-                placeholder="Phase 1 (optionnel)"
+                placeholder={t('gestionnaire.generateLots.phasePlaceholder')}
               />
             </div>
             <TypeSelect value={type} onChange={setType} />
@@ -673,7 +676,7 @@ export function GenerateLotsModal({
                       type="number"
                       className="w-24"
                       min={0}
-                      placeholder="Nb lots"
+                      placeholder={t('gestionnaire.generateLots.nbLots')}
                       value={entrance.count === 0 ? '' : entrance.count}
                       onChange={(e) =>
                         updateEntrance(idx, { count: Number(e.target.value) })
@@ -685,7 +688,9 @@ export function GenerateLotsModal({
                       size="sm"
                       onClick={() => removeEntrance(idx)}
                       className="text-destructive hover:text-destructive"
-                      aria-label="Supprimer l'entrée"
+                      aria-label={t(
+                        'gestionnaire.generateLots.removeEntryAria',
+                      )}
                     >
                       <X className="size-4" />
                     </Button>
@@ -700,7 +705,7 @@ export function GenerateLotsModal({
                 onClick={addEntrance}
               >
                 <Plus className="size-3.5 mr-1" />
-                Ajouter une entrée
+                {t('gestionnaire.generateLots.addEntry')}
               </Button>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -742,7 +747,7 @@ export function GenerateLotsModal({
                       size="sm"
                       onClick={() => removeUnitType(idx)}
                       className="text-destructive hover:text-destructive"
-                      aria-label="Supprimer le type"
+                      aria-label={t('gestionnaire.generateLots.removeTypeAria')}
                     >
                       <X className="size-4" />
                     </Button>
@@ -757,7 +762,7 @@ export function GenerateLotsModal({
                 onClick={addUnitType}
               >
                 <Plus className="size-3.5 mr-1" />
-                Ajouter un type
+                {t('gestionnaire.generateLots.addType')}
               </Button>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -789,7 +794,7 @@ export function GenerateLotsModal({
           {/* Template cards */}
           <section>
             <h3 className="text-sm font-semibold mb-3 text-foreground">
-              Modèles rapides
+              {t('gestionnaire.generateLots.quickTemplates')}
             </h3>
             <div className="grid grid-cols-2 gap-2">
               {TEMPLATE_CARDS.map((card) => (
@@ -818,10 +823,14 @@ export function GenerateLotsModal({
                   </span>
                   <div className="min-w-0">
                     <p className="text-sm font-medium leading-snug">
-                      {card.title}
+                      {t(
+                        `gestionnaire.generateLots.templates.${card.template}.title`,
+                      )}
                     </p>
                     <p className="mt-0.5 text-xs text-muted-foreground leading-snug">
-                      {card.subtitle}
+                      {t(
+                        `gestionnaire.generateLots.templates.${card.template}.subtitle`,
+                      )}
                     </p>
                   </div>
                 </button>
@@ -832,7 +841,7 @@ export function GenerateLotsModal({
           {/* Configuration */}
           <section>
             <h3 className="text-sm font-semibold mb-3 text-foreground">
-              Configuration
+              {t('gestionnaire.generateLots.configuration')}
             </h3>
             {renderConfigFields()}
           </section>
@@ -845,11 +854,10 @@ export function GenerateLotsModal({
               className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/30 transition-colors"
             >
               <span>
-                Aperçu — premiers{' '}
-                <span className="font-semibold">
-                  {Math.min(10, totalCount)}
-                </span>{' '}
-                lots sur <span className="font-semibold">{totalCount}</span>
+                {t('gestionnaire.generateLots.previewTitle', {
+                  shown: Math.min(10, totalCount),
+                  total: totalCount,
+                })}
               </span>
               {previewOpen ? (
                 <ChevronUp className="size-4 text-muted-foreground" />
@@ -862,7 +870,7 @@ export function GenerateLotsModal({
               <div className="border-t divide-y">
                 {totalCount === 0 ? (
                   <p className="px-4 py-3 text-sm text-muted-foreground">
-                    Aucun lot à générer avec cette configuration.
+                    {t('gestionnaire.generateLots.emptyPreview')}
                   </p>
                 ) : (
                   previewLots.map((lot, idx) => (
@@ -873,14 +881,18 @@ export function GenerateLotsModal({
                       <Home className="size-3.5 shrink-0 text-muted-foreground" />
                       <span className="font-medium">{lot.numero}</span>
                       <span className="text-muted-foreground">
-                        • Tantième : {lot.tantieme}
+                        {t('gestionnaire.generateLots.previewTantieme', {
+                          n: lot.tantieme,
+                        })}
                       </span>
                     </div>
                   ))
                 )}
                 {totalCount > 10 && (
                   <p className="px-4 py-2 text-xs text-muted-foreground italic">
-                    … et {totalCount - 10} lots supplémentaires
+                    {t('gestionnaire.generateLots.moreLots', {
+                      n: totalCount - 10,
+                    })}
                   </p>
                 )}
               </div>
@@ -896,7 +908,7 @@ export function GenerateLotsModal({
             onClick={() => onOpenChange(false)}
             disabled={isGenerating}
           >
-            Annuler
+            {t('actions.cancel')}
           </Button>
           <Button
             type="button"
@@ -908,12 +920,12 @@ export function GenerateLotsModal({
             {isGenerating ? (
               <>
                 <span className="mr-2 size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                Génération en cours...
+                {t('gestionnaire.generateLots.generating')}
               </>
             ) : (
               <>
                 <Zap className="mr-1.5 size-4" />
-                Générer {totalCount} lots
+                {t('gestionnaire.generateLots.generateN', { n: totalCount })}
               </>
             )}
           </Button>

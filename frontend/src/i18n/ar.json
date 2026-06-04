@@ -2126,7 +2126,56 @@
       "entries": "المداخل",
       "unitTypes": "أنواع الوحدات",
       "quantity": "الكمية",
-      "generateTitle": "توليد وحدات"
+      "generateTitle": "توليد وحدات",
+      "typeLot": "نوع الوحدة",
+      "totalLots": "إجمالي الوحدات",
+      "addWing": "إضافة جناح",
+      "wingsBlocks": "الأجنحة / الكتل",
+      "removeWingAria": "حذف الجناح {{wing}}",
+      "startFloor": "طابق البداية",
+      "startFloorHint": "(سالب للطوابق السفلية)",
+      "totalVillas": "إجمالي الفيلات",
+      "phase": "المرحلة",
+      "phasePlaceholder": "المرحلة 1 (اختياري)",
+      "nbLots": "عدد الوحدات",
+      "removeEntryAria": "حذف المدخل",
+      "addEntry": "إضافة مدخل",
+      "removeTypeAria": "حذف النوع",
+      "addType": "إضافة نوع",
+      "quickTemplates": "قوالب سريعة",
+      "configuration": "الإعداد",
+      "previewTitle": "معاينة — أول {{shown}} وحدة من أصل {{total}}",
+      "emptyPreview": "لا توجد وحدات للتوليد بهذا الإعداد.",
+      "previewTantieme": "• النصيب: {{n}}",
+      "moreLots": "… و {{n}} وحدة إضافية",
+      "generating": "جارٍ التوليد...",
+      "generateN": "توليد {{n}} وحدة",
+      "templates": {
+        "residence_ensemble": {
+          "title": "إقامة / مجمع عقاري",
+          "subtitle": "تحديد مداخل بأعداد مختلفة (مثال: E1=12، الكتلة B=8)"
+        },
+        "simple_sequential": {
+          "title": "ترقيم بسيط",
+          "subtitle": "مثال: 1، 2، 3، 4، 5"
+        },
+        "wings_floors": {
+          "title": "عمارة (أجنحة + طوابق)",
+          "subtitle": "مثال: A101، A102، B201، B202"
+        },
+        "floor_based": {
+          "title": "حسب الطابق (دون جناح)",
+          "subtitle": "مثال: 101، 102، 201، 202"
+        },
+        "villa_townhouse": {
+          "title": "فيلا / منزل",
+          "subtitle": "مثال: فيلا 1، فيلا 2، المرحلة 1-فيلا 1"
+        },
+        "commercial_mixed": {
+          "title": "تجاري / استعمال مختلط",
+          "subtitle": "مثال: محل 1، مكتب A"
+        }
+      }
     },
     "profil": {
       "title": "ملفي الشخصي",
