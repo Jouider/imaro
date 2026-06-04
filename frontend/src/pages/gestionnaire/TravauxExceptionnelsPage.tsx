@@ -188,13 +188,10 @@ export function TravauxExceptionnelsPage() {
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-foreground">
-            {t('gestionnaire.travaux.title', {
-              defaultValue: 'Travaux exceptionnels',
-            })}
+            {t('gestionnaire.travaux.title')}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Suivi des travaux non courants votés en AG — Annexe 6 du Décret
-            2.23.700
+            {t('gestionnaire.travaux.subtitle')}
           </p>
         </div>
         <Button
@@ -204,7 +201,7 @@ export function TravauxExceptionnelsPage() {
           disabled={!residenceId}
         >
           <Plus className="size-4" />
-          Nouveaux travaux
+          {t('gestionnaire.travaux.newTravaux')}
         </Button>
       </div>
 
@@ -275,8 +272,8 @@ export function TravauxExceptionnelsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>{t('common.libelle')}</TableHead>
-              <TableHead>Vote AG</TableHead>
-              <TableHead>Prestataire</TableHead>
+              <TableHead>{t('gestionnaire.travaux.colVoteAg')}</TableHead>
+              <TableHead>{t('common.prestataire')}</TableHead>
               <TableHead className="text-right">
                 {t('gestionnaire.travaux.colVote')}
               </TableHead>
@@ -286,8 +283,10 @@ export function TravauxExceptionnelsPage() {
               <TableHead className="text-right">
                 {t('gestionnaire.travaux.colRegle')}
               </TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t('common.status')}</TableHead>
+              <TableHead className="text-right">
+                {t('common.actions')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -297,7 +296,7 @@ export function TravauxExceptionnelsPage() {
                   colSpan={8}
                   className="py-8 text-center text-sm text-muted-foreground"
                 >
-                  Chargement…
+                  {t('actions.loading')}
                 </TableCell>
               </TableRow>
             ) : travaux.length === 0 ? (
@@ -306,7 +305,7 @@ export function TravauxExceptionnelsPage() {
                   colSpan={8}
                   className="py-12 text-center text-sm text-muted-foreground"
                 >
-                  Aucun travaux exceptionnel pour cet exercice.
+                  {t('gestionnaire.travaux.emptyRow')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -338,7 +337,7 @@ export function TravauxExceptionnelsPage() {
                       variant="outline"
                       className={cn('text-[10px]', STATUT_META[tr.statut].cls)}
                     >
-                      {STATUT_META[tr.statut].label}
+                      {t(`gestionnaire.travaux.statut.${tr.statut}`)}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -356,7 +355,13 @@ export function TravauxExceptionnelsPage() {
                         size="icon"
                         className="size-7"
                         onClick={() => {
-                          if (confirm(`Supprimer « ${tr.libelle} » ?`))
+                          if (
+                            confirm(
+                              t('gestionnaire.travaux.confirmDelete', {
+                                libelle: tr.libelle,
+                              }),
+                            )
+                          )
                             deleteMut.mutate(tr.id)
                         }}
                       >
@@ -377,8 +382,8 @@ export function TravauxExceptionnelsPage() {
           <DialogHeader>
             <DialogTitle>
               {editing
-                ? 'Modifier les travaux'
-                : 'Nouveaux travaux exceptionnels'}
+                ? t('gestionnaire.travaux.modalEdit')
+                : t('gestionnaire.travaux.modalNew')}
             </DialogTitle>
           </DialogHeader>
           <div className="grid gap-3">
@@ -393,7 +398,7 @@ export function TravauxExceptionnelsPage() {
               />
             </div>
             <div>
-              <Label>Description</Label>
+              <Label>{t('common.description')}</Label>
               <Input
                 value={draft.description ?? ''}
                 onChange={(e) =>
@@ -403,7 +408,7 @@ export function TravauxExceptionnelsPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Date vote AG</Label>
+                <Label>{t('gestionnaire.travaux.dateVoteAg')}</Label>
                 <Input
                   type="date"
                   value={draft.date_vote_ag}
@@ -413,7 +418,7 @@ export function TravauxExceptionnelsPage() {
                 />
               </div>
               <div>
-                <Label>Prestataire</Label>
+                <Label>{t('common.prestataire')}</Label>
                 <Input
                   value={draft.prestataire ?? ''}
                   onChange={(e) =>
@@ -488,7 +493,7 @@ export function TravauxExceptionnelsPage() {
                 />
               </div>
               <div>
-                <Label>Statut</Label>
+                <Label>{t('common.status')}</Label>
                 <Select
                   value={draft.statut}
                   onValueChange={(v) =>
@@ -501,7 +506,7 @@ export function TravauxExceptionnelsPage() {
                   <SelectContent>
                     {(Object.keys(STATUT_META) as TravauxStatus[]).map((k) => (
                       <SelectItem key={k} value={k}>
-                        {STATUT_META[k].label}
+                        {t(`gestionnaire.travaux.statut.${k}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -511,13 +516,13 @@ export function TravauxExceptionnelsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setModalOpen(false)}>
-              Annuler
+              {t('actions.cancel')}
             </Button>
             <Button
               onClick={save}
               disabled={createMut.isPending || updateMut.isPending}
             >
-              {editing ? 'Mettre à jour' : 'Créer'}
+              {editing ? t('common.update') : t('common.create')}
             </Button>
           </DialogFooter>
         </DialogContent>

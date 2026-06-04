@@ -194,15 +194,10 @@ export function EquipementsPage() {
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-foreground">
-            {t('gestionnaire.equipements.title', {
-              defaultValue: 'Équipements',
-            })}
+            {t('gestionnaire.equipements.title')}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {t('gestionnaire.equipements.subtitle', {
-              defaultValue:
-                'Registre des équipements et immobilisations — Annexe 9 du Décret 2.23.700',
-            })}
+            {t('gestionnaire.equipements.subtitle')}
           </p>
         </div>
         <Button
@@ -212,7 +207,7 @@ export function EquipementsPage() {
           disabled={!residenceId}
         >
           <Plus className="size-4" />
-          Ajouter
+          {t('actions.add')}
         </Button>
       </div>
 
@@ -241,7 +236,7 @@ export function EquipementsPage() {
           <div className="mb-2 flex items-center gap-2">
             <Hash className="size-4 text-[var(--color-imaro-primary)]" />
             <p className="text-xs text-muted-foreground">
-              Nombre d&apos;articles
+              {t('gestionnaire.equipements.nbArticles')}
             </p>
           </div>
           <p className="text-2xl font-bold tracking-tight">{totals.nb}</p>
@@ -250,7 +245,7 @@ export function EquipementsPage() {
           <div className="mb-2 flex items-center gap-2">
             <Wrench className="size-4 text-amber-600" />
             <p className="text-xs text-muted-foreground">
-              Valeur d&apos;acquisition
+              {t('gestionnaire.equipements.valeurAcquisition')}
             </p>
           </div>
           <p className="text-2xl font-bold tracking-tight">
@@ -261,7 +256,9 @@ export function EquipementsPage() {
           <div className="mb-2 flex items-center gap-2">
             <TrendingDown className="size-4 text-green-600" />
             <p className="text-xs text-muted-foreground">
-              Valeur nette (après amort. {amortissementPct.toFixed(0)}%)
+              {t('gestionnaire.equipements.valeurNette', {
+                pct: amortissementPct.toFixed(0),
+              })}
             </p>
           </div>
           <p className="text-2xl font-bold tracking-tight text-green-600">
@@ -286,11 +283,17 @@ export function EquipementsPage() {
             <TableRow>
               <TableHead>{t('common.designation')}</TableHead>
               <TableHead>{t('common.categorie')}</TableHead>
-              <TableHead>Acquis le</TableHead>
-              <TableHead className="text-right">V. acquisition</TableHead>
-              <TableHead className="text-right">V. nette</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t('gestionnaire.equipements.colAcquisLe')}</TableHead>
+              <TableHead className="text-right">
+                {t('gestionnaire.equipements.colVAcq')}
+              </TableHead>
+              <TableHead className="text-right">
+                {t('gestionnaire.equipements.colVNette')}
+              </TableHead>
+              <TableHead>{t('common.status')}</TableHead>
+              <TableHead className="text-right">
+                {t('common.actions')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -300,7 +303,7 @@ export function EquipementsPage() {
                   colSpan={7}
                   className="py-8 text-center text-sm text-muted-foreground"
                 >
-                  Chargement…
+                  {t('actions.loading')}
                 </TableCell>
               </TableRow>
             ) : equipements.length === 0 ? (
@@ -309,7 +312,7 @@ export function EquipementsPage() {
                   colSpan={7}
                   className="py-12 text-center text-sm text-muted-foreground"
                 >
-                  Aucun équipement enregistré.
+                  {t('gestionnaire.equipements.emptyRow')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -344,7 +347,9 @@ export function EquipementsPage() {
                             : 'border-gray-300 bg-gray-50 text-gray-600',
                         )}
                       >
-                        {e.actif ? 'Actif' : 'Hors service'}
+                        {e.actif
+                          ? t('gestionnaire.equipements.statutActif')
+                          : t('gestionnaire.equipements.statutHorsService')}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -354,7 +359,7 @@ export function EquipementsPage() {
                           size="icon"
                           className="size-7"
                           onClick={() => openEdit(e)}
-                          title="Modifier"
+                          title={t('actions.edit')}
                         >
                           <Pencil className="size-3.5" />
                         </Button>
@@ -365,12 +370,14 @@ export function EquipementsPage() {
                           onClick={() => {
                             if (
                               confirm(
-                                `Supprimer l'équipement « ${e.designation} » ?`,
+                                t('gestionnaire.equipements.confirmDelete', {
+                                  designation: e.designation,
+                                }),
                               )
                             )
                               deleteMut.mutate(e.id)
                           }}
-                          title="Supprimer"
+                          title={t('actions.delete')}
                         >
                           <Trash2 className="size-3.5 text-red-600" />
                         </Button>
@@ -389,7 +396,9 @@ export function EquipementsPage() {
         <DialogContent className="sm:max-w-[520px]">
           <DialogHeader>
             <DialogTitle>
-              {editing ? 'Modifier un équipement' : 'Ajouter un équipement'}
+              {editing
+                ? t('gestionnaire.equipements.modalEdit')
+                : t('gestionnaire.equipements.modalNew')}
             </DialogTitle>
           </DialogHeader>
           <div className="grid gap-3">
@@ -401,12 +410,14 @@ export function EquipementsPage() {
                 onChange={(e) =>
                   setDraft({ ...draft, designation: e.target.value })
                 }
-                placeholder="ex: Ascenseur principal Otis"
+                placeholder={t(
+                  'gestionnaire.equipements.designationPlaceholder',
+                )}
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="cat">Catégorie</Label>
+                <Label htmlFor="cat">{t('common.categorie')}</Label>
                 <Select
                   value={draft.categorie}
                   onValueChange={(v) =>
@@ -426,7 +437,9 @@ export function EquipementsPage() {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="date">Date d&apos;acquisition</Label>
+                <Label htmlFor="date">
+                  {t('gestionnaire.equipements.dateAcquisition')}
+                </Label>
                 <Input
                   id="date"
                   type="date"
@@ -439,7 +452,9 @@ export function EquipementsPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="valeur">Valeur d&apos;acquisition (DH) *</Label>
+                <Label htmlFor="valeur">
+                  {t('gestionnaire.equipements.valeurAcquisitionDh')} *
+                </Label>
                 <Input
                   id="valeur"
                   type="number"
@@ -474,9 +489,11 @@ export function EquipementsPage() {
             </div>
             <div className="flex items-center justify-between rounded-lg border p-3">
               <div>
-                <Label className="text-sm">Équipement en service</Label>
+                <Label className="text-sm">
+                  {t('gestionnaire.equipements.enService')}
+                </Label>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  Décocher si hors service / déclassé
+                  {t('gestionnaire.equipements.enServiceHint')}
                 </p>
               </div>
               <Switch
@@ -485,7 +502,9 @@ export function EquipementsPage() {
               />
             </div>
             <div>
-              <Label htmlFor="notes">Notes (optionnel)</Label>
+              <Label htmlFor="notes">
+                {t('gestionnaire.equipements.notesOptional')}
+              </Label>
               <Input
                 id="notes"
                 value={draft.notes ?? ''}
@@ -495,13 +514,13 @@ export function EquipementsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setModalOpen(false)}>
-              Annuler
+              {t('actions.cancel')}
             </Button>
             <Button
               onClick={save}
               disabled={createMut.isPending || updateMut.isPending}
             >
-              {editing ? 'Mettre à jour' : 'Ajouter'}
+              {editing ? t('common.update') : t('actions.add')}
             </Button>
           </DialogFooter>
         </DialogContent>
