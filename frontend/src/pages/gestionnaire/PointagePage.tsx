@@ -149,7 +149,7 @@ export function PointagePage() {
 
   const handleReject = (lineId: string) => {
     setMatches((prev) => ({ ...prev, [lineId]: null }))
-    toast.info('Match rejeté — ligne marquée non rapprochée')
+    toast.info(t('gestionnaire.pointage.toastMatchRejected'))
   }
 
   const handleReset = () => {
@@ -408,9 +408,15 @@ export function PointagePage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-24">Date</TableHead>
-                  <TableHead>Libellé bancaire</TableHead>
-                  <TableHead className="text-right">Débit</TableHead>
-                  <TableHead className="text-right">Crédit</TableHead>
+                  <TableHead>
+                    {t('gestionnaire.pointage.colLibelleBancaire')}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t('common.debit')}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t('common.credit')}
+                  </TableHead>
                   <TableHead>Rapprochement Imaro</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>

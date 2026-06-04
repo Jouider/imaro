@@ -626,7 +626,7 @@ export function BudgetsPage() {
       void qc.invalidateQueries({
         queryKey: ['budget-annexe5', residenceId, exerciceId],
       }),
-    onError: () => toast.error('Erreur lors de la création'),
+    onError: () => toast.error(t('common.createError')),
   })
 
   const updateLigneMutation = useMutation({
@@ -660,7 +660,7 @@ export function BudgetsPage() {
         queryKey: ['budget-annexe5', residenceId, exerciceId],
       })
       resetAddLigneDialog()
-      toast.success('Ligne ajoutée')
+      toast.success(t('gestionnaire.budgets.toastLineAdded'))
     },
     onError: () => toast.error('Erreur'),
   })
@@ -672,7 +672,7 @@ export function BudgetsPage() {
         queryKey: ['budget-annexe5', residenceId, exerciceId],
       })
       setDeleteLigneTarget(null)
-      toast.success('Ligne supprimée')
+      toast.success(t('gestionnaire.budgets.toastLineDeleted'))
     },
     onError: () => toast.error('Erreur'),
   })
@@ -919,7 +919,7 @@ export function BudgetsPage() {
       {residenceId && exerciceId && !isLoading && !budget && (
         <div className="flex flex-col items-center gap-4 py-20 text-center">
           <PiggyBank className="size-12 text-muted-foreground" />
-          <p className="font-medium">Aucun budget pour cette sélection</p>
+          <p className="font-medium">{t('gestionnaire.budgets.empty')}</p>
           <Button
             onClick={() => createBudgetMutation.mutate()}
             disabled={createBudgetMutation.isPending}
@@ -1277,7 +1277,7 @@ export function BudgetsPage() {
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Sélectionner" />
+                  <SelectValue placeholder={t('common.select')} />
                 </SelectTrigger>
                 <SelectContent>
                   {comptes
@@ -1296,7 +1296,7 @@ export function BudgetsPage() {
               </Select>
             </div>
             <div className="space-y-1">
-              <Label>Libellé</Label>
+              <Label>{t('common.libelle')}</Label>
               <Input
                 value={addLigneForm.libelle}
                 onChange={(e) =>
@@ -1346,7 +1346,11 @@ export function BudgetsPage() {
                       }
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Sélectionner un prestataire" />
+                        <SelectValue
+                          placeholder={t(
+                            'gestionnaire.budgets.selectPrestataire',
+                          )}
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {prestataires.map((p) => (
@@ -1448,7 +1452,7 @@ export function BudgetsPage() {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <Label>Date début</Label>
+                      <Label>{t('common.startDate')}</Label>
                       <Input
                         type="date"
                         value={prestataireForm.date_debut}

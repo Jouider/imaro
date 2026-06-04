@@ -957,7 +957,9 @@
       "matchConfirmed": "Rapprochement confirmé",
       "declaredConfirmed": "Paiement du résident validé — argent confirmé reçu",
       "declaredError": "Impossible de valider le paiement déclaré",
-      "allConfirmed": "{{count}} rapprochements confirmés"
+      "allConfirmed": "{{count}} rapprochements confirmés",
+      "toastMatchRejected": "Match rejeté — ligne marquée non rapprochée",
+      "colLibelleBancaire": "Libellé bancaire"
     },
     "cmdk": {
       "title": "Recherche rapide",
@@ -1242,7 +1244,10 @@
         "description": "Description (optionnel)"
       },
       "empty": "Aucun appel de fonds",
-      "emptyDesc": "Créez votre premier appel de fonds."
+      "emptyDesc": "Créez votre premier appel de fonds.",
+      "toastCreated": "Appel de fonds créé",
+      "toastSent": "Appel de fonds envoyé",
+      "createTitle": "Créer un appel de fonds"
     },
     "paiements": {
       "title": "Suivi des paiements",
@@ -1333,7 +1338,13 @@
         "totalAppele": "Total appelé",
         "totalPaye": "Total payé",
         "solde": "Solde"
-      }
+      },
+      "repartitionTantieme": "Répartition par tantième",
+      "notePlaceholder": "Ex : Référence incorrecte...",
+      "searchPlaceholder": "Rechercher copropriétaire ou lot...",
+      "allMethods": "Toutes méthodes",
+      "relanceAll": "Relancer tous les impayés",
+      "dueDate": "Date d'échéance"
     },
     "tickets": {
       "title": "Tickets",
@@ -1606,9 +1617,12 @@
         "montantPrevu": "Montant prévu (DH)",
         "montantRealise": "Montant réalisé (DH)"
       },
-      "empty": "Aucun budget créé",
+      "empty": "Aucun budget pour cette sélection",
       "emptyDesc": "Sélectionnez une résidence et un exercice pour afficher ou créer le budget.",
-      "noExercice": "Aucun exercice actif"
+      "noExercice": "Aucun exercice actif",
+      "toastLineAdded": "Ligne ajoutée",
+      "toastLineDeleted": "Ligne supprimée",
+      "selectPrestataire": "Sélectionner un prestataire"
     },
     "documents": {
       "title": "Documents",
@@ -1784,7 +1798,12 @@
         "moins200": "≤ 200 000 MAD — Régime simplifié (Annexes 10, 13)",
         "entre200et500": "200–500 k MAD — Régime normal (Annexes 10-12)",
         "plus500": "≥ 500 000 MAD — Régime complet (Annexes 3-10)"
-      }
+      },
+      "suggestedAccount": "Compte suggéré :",
+      "selectAccount": "Sélectionner un compte...",
+      "noEntries": "Aucune écriture comptable",
+      "toastClosed": "Exercice clôturé avec succès",
+      "toastCloseError": "Erreur lors de la clôture"
     },
     "depenses": {
       "title": "Dépenses",
@@ -1836,7 +1855,18 @@
         },
         "jourEmission": "Jour d'émission",
         "prochaine": "Prochaine émission"
-      }
+      },
+      "selectAccount": "Sélectionner un compte",
+      "beneficiaryPlaceholder": "Sécurité Atlas SARL",
+      "toastModelCreated": "Modèle créé",
+      "newModel": "Nouveau modèle",
+      "frequency": "Fréquence",
+      "toastDeleted": "Dépense supprimée",
+      "toastApproved": "Dépense approuvée",
+      "toastRejected": "Dépense rejetée",
+      "downloading": "Téléchargement...",
+      "deleteTitle": "Supprimer la dépense",
+      "rejectTitle": "Rejeter la dépense"
     },
     "budget": {
       "title": "Budget Prévisionnel",
@@ -2050,6 +2080,8 @@
     "updated": "Mis à jour",
     "deleted": "Supprimé",
     "copied": "Copié !",
-    "error": "Erreur"
+    "error": "Erreur",
+    "debit": "Débit",
+    "credit": "Crédit"
   }
 }

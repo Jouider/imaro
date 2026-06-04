@@ -257,7 +257,7 @@ function NouvelleDepenseModal({
         }),
       )
     },
-    onError: () => toast.error('Erreur lors de la création'),
+    onError: () => toast.error(t('common.createError')),
   })
 
   async function handleAnalyseIa() {
@@ -361,7 +361,9 @@ function NouvelleDepenseModal({
                     <strong>Montant:</strong> {fmt.format(iaResult.montant)} DH
                   </p>
                   <p>
-                    <strong>Compte suggéré:</strong>{' '}
+                    <strong>
+                      {t('gestionnaire.comptabilite.suggestedAccount')}
+                    </strong>{' '}
                     {iaResult.compte_charge_suggere}
                   </p>
                   <p>
@@ -466,7 +468,9 @@ function NouvelleDepenseModal({
               }
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Sélectionner un compte..." />
+                <SelectValue
+                  placeholder={t('gestionnaire.comptabilite.selectAccount')}
+                />
               </SelectTrigger>
               <SelectContent>
                 {compteClasse6.map((c) => (
@@ -1770,7 +1774,7 @@ function TabBalance({
       {balance.length === 0 ? (
         <EmptyState
           icon={<BookOpen className="size-12" />}
-          title="Aucune écriture comptable"
+          title={t('gestionnaire.comptabilite.noEntries')}
           description="La balance se construira automatiquement à partir des écritures de l'exercice."
         />
       ) : (
@@ -1918,7 +1922,7 @@ function TabDepenses({
       void qc.invalidateQueries({ queryKey: ['depenses', exerciceId] })
       void qc.invalidateQueries({ queryKey: ['journal', exerciceId] })
       setDeleteTarget(null)
-      toast.success('Dépense supprimée')
+      toast.success(t('gestionnaire.depenses.toastDeleted'))
     },
     onError: () => toast.error('Erreur lors de la suppression'),
   })
@@ -2043,7 +2047,7 @@ function TabDepenses({
       <ConfirmModal
         open={!!deleteTarget}
         onOpenChange={(o) => !o && setDeleteTarget(null)}
-        title="Supprimer la dépense"
+        title={t('gestionnaire.depenses.deleteTitle')}
         description={`La dépense "${deleteTarget?.titre ?? ''}" sera supprimée définitivement.`}
         onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
         isLoading={deleteMutation.isPending}
@@ -2102,9 +2106,9 @@ function TabCloture({
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['exercices-comptabilite'] })
       setConfirmOpen(false)
-      toast.success('Exercice clôturé avec succès')
+      toast.success(t('gestionnaire.comptabilite.toastClosed'))
     },
-    onError: () => toast.error('Erreur lors de la clôture'),
+    onError: () => toast.error(t('gestionnaire.comptabilite.toastCloseError')),
   })
 
   const totalDebit = ecritures.reduce((s, e) => s + e.debit, 0)

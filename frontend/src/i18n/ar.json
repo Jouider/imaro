@@ -957,7 +957,9 @@
       "matchConfirmed": "تم تأكيد المطابقة",
       "declaredConfirmed": "تم اعتماد دفعة الساكن — تأكيد استلام المبلغ",
       "declaredError": "تعذّر اعتماد الدفعة المصرَّح بها",
-      "allConfirmed": "تم تأكيد {{count}} مطابقات"
+      "allConfirmed": "تم تأكيد {{count}} مطابقات",
+      "toastMatchRejected": "تم رفض المطابقة — تم تعليم السطر كغير مُسوّى",
+      "colLibelleBancaire": "البيان البنكي"
     },
     "cmdk": {
       "title": "بحث سريع",
@@ -1242,7 +1244,10 @@
         "description": "الوصف (اختياري)"
       },
       "empty": "لا توجد استدعاءات",
-      "emptyDesc": "أنشئ أول استدعاء للأموال."
+      "emptyDesc": "أنشئ أول استدعاء للأموال.",
+      "toastCreated": "تم إنشاء طلب الأموال",
+      "toastSent": "تم إرسال طلب الأموال",
+      "createTitle": "إنشاء طلب أموال"
     },
     "paiements": {
       "title": "متابعة المدفوعات",
@@ -1333,7 +1338,13 @@
         "totalAppele": "إجمالي المطلوب",
         "totalPaye": "إجمالي المدفوع",
         "solde": "الرصيد"
-      }
+      },
+      "repartitionTantieme": "التوزيع حسب الأنصبة",
+      "notePlaceholder": "مثال: مرجع غير صحيح...",
+      "searchPlaceholder": "ابحث عن مالك أو شقة...",
+      "allMethods": "كل الطرق",
+      "relanceAll": "تذكير جميع المتأخرات",
+      "dueDate": "تاريخ الاستحقاق"
     },
     "tickets": {
       "title": "التذاكر",
@@ -1595,9 +1606,12 @@
         "montantPrevu": "المبلغ المخطط (درهم)",
         "montantRealise": "المبلغ المنجز (درهم)"
       },
-      "empty": "لم يتم إنشاء ميزانية بعد",
+      "empty": "لا توجد ميزانية لهذا التحديد",
       "emptyDesc": "اختر إقامة وسنة مالية لعرض الميزانية أو إنشائها.",
-      "noExercice": "لا توجد سنة مالية نشطة"
+      "noExercice": "لا توجد سنة مالية نشطة",
+      "toastLineAdded": "تمت إضافة السطر",
+      "toastLineDeleted": "تم حذف السطر",
+      "selectPrestataire": "اختر مزودًا"
     },
     "dashboard": {
       "title": "لوحة التحكم",
@@ -1784,7 +1798,12 @@
         "moins200": "≤ 200,000 درهم — نظام مبسط",
         "entre200et500": "200–500 ألف درهم — النظام العادي",
         "plus500": "≥ 500,000 درهم — النظام الشامل"
-      }
+      },
+      "suggestedAccount": "الحساب المقترح:",
+      "selectAccount": "اختر حسابًا...",
+      "noEntries": "لا توجد قيود محاسبية",
+      "toastClosed": "تم إقفال السنة بنجاح",
+      "toastCloseError": "خطأ أثناء الإقفال"
     },
     "depenses": {
       "title": "المصاريف",
@@ -1836,7 +1855,18 @@
         },
         "jourEmission": "يوم الإصدار",
         "prochaine": "الإصدار القادم"
-      }
+      },
+      "selectAccount": "اختر حسابًا",
+      "beneficiaryPlaceholder": "الأمن أطلس ش.م.م",
+      "toastModelCreated": "تم إنشاء النموذج",
+      "newModel": "نموذج جديد",
+      "frequency": "التكرار",
+      "toastDeleted": "تم حذف المصروف",
+      "toastApproved": "تمت الموافقة على المصروف",
+      "toastRejected": "تم رفض المصروف",
+      "downloading": "جارٍ التحميل...",
+      "deleteTitle": "حذف المصروف",
+      "rejectTitle": "رفض المصروف"
     },
     "budget": {
       "title": "الميزانية التقديرية",
@@ -2050,6 +2080,8 @@
     "updated": "تم التحديث",
     "deleted": "تم الحذف",
     "copied": "تم النسخ!",
-    "error": "خطأ"
+    "error": "خطأ",
+    "debit": "مدين",
+    "credit": "دائن"
   }
 }

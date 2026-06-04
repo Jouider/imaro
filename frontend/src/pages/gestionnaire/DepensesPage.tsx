@@ -335,7 +335,9 @@ function NouvelleDepenseModal({
               }
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Sélectionner un compte" />
+                <SelectValue
+                  placeholder={t('gestionnaire.depenses.selectAccount')}
+                />
               </SelectTrigger>
               <SelectContent>
                 {compteClasse6.map((c) => (
@@ -392,7 +394,7 @@ function NouvelleDepenseModal({
               onChange={(e) =>
                 setForm((f) => ({ ...f, prestataire: e.target.value }))
               }
-              placeholder="Sécurité Atlas SARL"
+              placeholder={t('gestionnaire.depenses.beneficiaryPlaceholder')}
             />
           </div>
 
@@ -497,7 +499,7 @@ function ModelesRecurrentsModal({
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['modeles-recurrents'] })
       setNewModeleOpen(false)
-      toast.success('Modèle créé')
+      toast.success(t('gestionnaire.depenses.toastModelCreated'))
     },
     onError: () => toast.error('Erreur'),
   })
@@ -598,7 +600,9 @@ function ModelesRecurrentsModal({
         {/* New modele sub-form */}
         {newModeleOpen && (
           <div className="rounded-lg border border-dashed p-4 space-y-3 mt-4">
-            <p className="text-sm font-medium">Nouveau modèle</p>
+            <p className="text-sm font-medium">
+              {t('gestionnaire.depenses.newModel')}
+            </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label>Titre</Label>
@@ -658,7 +662,7 @@ function ModelesRecurrentsModal({
                 />
               </div>
               <div className="space-y-1">
-                <Label>Fréquence</Label>
+                <Label>{t('gestionnaire.depenses.frequency')}</Label>
                 <Select
                   value={form.frequence}
                   onValueChange={(v) =>
@@ -687,7 +691,7 @@ function ModelesRecurrentsModal({
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label>Date début</Label>
+                <Label>{t('common.startDate')}</Label>
                 <Input
                   type="date"
                   value={form.date_debut}
@@ -782,7 +786,7 @@ export function DepensesPage() {
       void qc.invalidateQueries({ queryKey: ['depenses-finance'] })
       void qc.invalidateQueries({ queryKey: ['depenses-stats'] })
       setDeleteTarget(null)
-      toast.success('Dépense supprimée')
+      toast.success(t('gestionnaire.depenses.toastDeleted'))
     },
     onError: () => toast.error('Erreur'),
   })
@@ -791,7 +795,7 @@ export function DepensesPage() {
     mutationFn: (id: number) => approuverDepense(id),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['depenses-finance'] })
-      toast.success('Dépense approuvée')
+      toast.success(t('gestionnaire.depenses.toastApproved'))
     },
     onError: () => toast.error('Erreur'),
   })
@@ -803,7 +807,7 @@ export function DepensesPage() {
       void qc.invalidateQueries({ queryKey: ['depenses-finance'] })
       setRejetTarget(null)
       setRejetMotif('')
-      toast.success('Dépense rejetée')
+      toast.success(t('gestionnaire.depenses.toastRejected'))
     },
     onError: () => toast.error('Erreur'),
   })
@@ -888,7 +892,7 @@ export function DepensesPage() {
             variant="ghost"
             size="sm"
             className="h-6 px-2"
-            onClick={() => toast.info('Téléchargement...')}
+            onClick={() => toast.info(t('gestionnaire.depenses.downloading'))}
           >
             <Download className="size-3.5" />
           </Button>
@@ -1208,7 +1212,7 @@ export function DepensesPage() {
       <ConfirmModal
         open={!!deleteTarget}
         onOpenChange={(o) => !o && setDeleteTarget(null)}
-        title="Supprimer la dépense"
+        title={t('gestionnaire.depenses.deleteTitle')}
         description={
           deleteTarget
             ? `La dépense "${deleteTarget.titre}" sera supprimée définitivement.`
@@ -1224,7 +1228,7 @@ export function DepensesPage() {
       >
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Rejeter la dépense</DialogTitle>
+            <DialogTitle>{t('gestionnaire.depenses.rejectTitle')}</DialogTitle>
           </DialogHeader>
           <div className="py-2 space-y-2">
             <Label>Motif du rejet</Label>

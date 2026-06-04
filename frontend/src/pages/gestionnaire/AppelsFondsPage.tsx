@@ -91,6 +91,7 @@ function RepartitionPreview({
   mode,
   montantFixe,
 }: RepartitionPreviewProps) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(true)
   const isFixe = mode === 'fixe'
 
@@ -121,7 +122,9 @@ function RepartitionPreview({
                   <th className="py-1 text-right font-medium">Montant</th>
                 ) : (
                   <>
-                    <th className="py-1 text-right font-medium">Tantième</th>
+                    <th className="py-1 text-right font-medium">
+                      {t('common.tantieme')}
+                    </th>
                     <th className="py-1 text-right font-medium">%</th>
                     <th className="py-1 text-right font-medium">Montant</th>
                   </>
@@ -260,9 +263,9 @@ export function AppelsFondsPage() {
       void qc.invalidateQueries({ queryKey: ['appels-fonds'] })
       setCreateOpen(false)
       setForm(EMPTY_FORM)
-      toast.success('Appel de fonds créé')
+      toast.success(t('gestionnaire.appelsFonds.toastCreated'))
     },
-    onError: () => toast.error('Erreur lors de la création'),
+    onError: () => toast.error(t('common.createError')),
   })
 
   const envoyerMutation = useMutation({
@@ -409,7 +412,7 @@ export function AppelsFondsPage() {
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Choisir une résidence" />
+                  <SelectValue placeholder={t('common.selectResidence')} />
                 </SelectTrigger>
                 <SelectContent>
                   {residences.map((r) => (

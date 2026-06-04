@@ -211,6 +211,7 @@ function RepartitionPreview({
   totalTantieme: number
   montantTotal: number
 }) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(true)
   return (
     <div className="rounded-lg border bg-muted/30 p-3">
@@ -219,7 +220,7 @@ function RepartitionPreview({
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center justify-between text-sm font-medium"
       >
-        <span>Répartition par tantième</span>
+        <span>{t('gestionnaire.paiements.repartitionTantieme')}</span>
         {open ? (
           <ChevronUp className="size-4 text-muted-foreground" />
         ) : (
@@ -232,7 +233,9 @@ function RepartitionPreview({
             <thead>
               <tr className="border-b text-muted-foreground">
                 <th className="py-1 text-left font-medium">Lot</th>
-                <th className="py-1 text-right font-medium">Tantième</th>
+                <th className="py-1 text-right font-medium">
+                  {t('common.tantieme')}
+                </th>
                 <th className="py-1 text-right font-medium">%</th>
                 <th className="py-1 text-right font-medium">Montant</th>
               </tr>
@@ -614,7 +617,7 @@ function PaiementAvanceModal({
           </div>
 
           <div className="space-y-1">
-            <Label>Copropriétaire</Label>
+            <Label>{t('common.coproprietaire')}</Label>
             <Input
               placeholder="Rechercher..."
               value={search}
@@ -666,7 +669,7 @@ function PaiementAvanceModal({
           </div>
 
           <div className="space-y-1">
-            <Label>Méthode</Label>
+            <Label>{t('common.methode')}</Label>
             <Select value={methode} onValueChange={setMethode}>
               <SelectTrigger className="w-full">
                 <SelectValue />
@@ -734,7 +737,7 @@ function RejeterVirementModal({
             className="mt-1"
             value={motif}
             onChange={(e) => setMotif(e.target.value)}
-            placeholder="Ex: Référence incorrecte..."
+            placeholder={t('gestionnaire.paiements.notePlaceholder')}
           />
         </div>
         <DialogFooter>
@@ -916,9 +919,9 @@ export function PaiementsPage() {
         montant_total: '',
         date_echeance: '',
       })
-      toast.success('Appel de fonds créé')
+      toast.success(t('gestionnaire.appelsFonds.toastCreated'))
     },
-    onError: () => toast.error('Erreur lors de la création'),
+    onError: () => toast.error(t('common.createError')),
   })
 
   const envoyerMutation = useMutation({
@@ -926,7 +929,7 @@ export function PaiementsPage() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['appels-fonds'] })
       setEnvoyerTarget(null)
-      toast.success('Appel de fonds envoyé')
+      toast.success(t('gestionnaire.appelsFonds.toastSent'))
     },
     onError: () => toast.error('Erreur'),
   })
@@ -1500,7 +1503,7 @@ export function PaiementsPage() {
           {/* Filters */}
           <div className="flex flex-wrap gap-3">
             <Input
-              placeholder="Rechercher copropriétaire ou lot..."
+              placeholder={t('gestionnaire.paiements.searchPlaceholder')}
               value={creanceSearch}
               onChange={(e) => setCreanceSearch(e.target.value)}
               className="max-w-xs"
@@ -1605,10 +1608,14 @@ export function PaiementsPage() {
             />
             <Select value={histMethode} onValueChange={setHistMethode}>
               <SelectTrigger className="w-44">
-                <SelectValue placeholder="Toutes méthodes" />
+                <SelectValue
+                  placeholder={t('gestionnaire.paiements.allMethods')}
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="tous">Toutes méthodes</SelectItem>
+                <SelectItem value="tous">
+                  {t('gestionnaire.paiements.allMethods')}
+                </SelectItem>
                 {(
                   [
                     'especes',
@@ -1778,7 +1785,9 @@ export function PaiementsPage() {
                         Échéance
                       </th>
                       <th className="px-4 py-3 text-right font-medium">Dû</th>
-                      <th className="px-4 py-3 text-right font-medium">Payé</th>
+                      <th className="px-4 py-3 text-right font-medium">
+                        {t('common.paye')}
+                      </th>
                       <th className="px-4 py-3 font-medium">Statut</th>
                     </tr>
                   </thead>
@@ -1878,7 +1887,7 @@ export function PaiementsPage() {
       <ConfirmModal
         open={relancerAllOpen}
         onOpenChange={setRelancerAllOpen}
-        title="Relancer tous les impayés"
+        title={t('gestionnaire.paiements.relanceAll')}
         description={`Envoyer une relance WhatsApp à ${nbImpayes} copropriétaire(s) avec des créances impayées ?`}
         confirmLabel="Envoyer les relances"
         variant="default"
@@ -1890,7 +1899,9 @@ export function PaiementsPage() {
       <Dialog open={createAppelOpen} onOpenChange={setCreateAppelOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Créer un appel de fonds</DialogTitle>
+            <DialogTitle>
+              {t('gestionnaire.appelsFonds.createTitle')}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1">
@@ -1904,7 +1915,7 @@ export function PaiementsPage() {
               />
             </div>
             <div className="space-y-1">
-              <Label>Résidence</Label>
+              <Label>{t('common.residence')}</Label>
               <Select
                 value={appelForm.residence_id}
                 onValueChange={(v) =>
@@ -1912,7 +1923,7 @@ export function PaiementsPage() {
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Choisir une résidence" />
+                  <SelectValue placeholder={t('common.selectResidence')} />
                 </SelectTrigger>
                 <SelectContent>
                   {residences.map((r) => (
@@ -1938,7 +1949,7 @@ export function PaiementsPage() {
                 />
               </div>
               <div className="space-y-1">
-                <Label>Date d'échéance</Label>
+                <Label>{t('gestionnaire.paiements.dueDate')}</Label>
                 <Input
                   type="date"
                   value={appelForm.date_echeance}
