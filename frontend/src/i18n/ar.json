@@ -1971,6 +1971,39 @@
       },
       "order": "الترتيب الموصى: الشقق ← الملاك ← الأرصدة ← المدفوعات ← المزودون",
       "selectFile": "اختر ملفًا"
+    },
+    "autresRecettes": {
+      "toastAdded": "تمت إضافة الإيراد",
+      "toastUpdated": "تم تحديث الإيراد",
+      "toastDeleted": "تم حذف الإيراد"
+    },
+    "remboursements": {
+      "toastCreated": "تم إنشاء الاسترجاع",
+      "toastUpdated": "تم تحديث الاسترجاع",
+      "toastDeleted": "تم حذف الاسترجاع",
+      "totalRequested": "المجموع المطلوب"
+    },
+    "emprunts": {
+      "toastCreated": "تم تسجيل القرض",
+      "toastUpdated": "تم تحديث القرض",
+      "toastDeleted": "تم حذف القرض",
+      "colMensualite": "القسط الشهري",
+      "colResteDu": "المتبقي",
+      "libellePlaceholder": "مثال: ترميم السطح 2023",
+      "organisme": "الجهة المقرِضة",
+      "duree": "المدة (أشهر)",
+      "mensualiteDh": "القسط الشهري (د.م.)",
+      "bannerTitle": "الملحق 8 — المرسوم 2.23.700",
+      "bannerBody": "· كل قرض جماعي يجب التصويت عليه في الجمع العام (قانون 18-00 المادة 17). جدول الإهلاك تقدمه الجهة المقرِضة."
+    },
+    "recouvrement": {
+      "toastConfigSaved": "تم حفظ الإعداد",
+      "recalcError": "فشل إعادة الحساب",
+      "penaltyType": "نوع الغرامة",
+      "penalties": "الغرامات",
+      "age": "الأقدمية",
+      "bannerTitle": "قرار الجمع العام مطلوب",
+      "bannerBody": "— يجب التصويت على الغرامات في الجمع العام قبل أن تصبح قابلة للتطبيق قانونيًا (قانون 18-00 المادة 25)."
     }
   },
   "onboarding": {
@@ -2082,6 +2115,11 @@
     "copied": "تم النسخ!",
     "error": "خطأ",
     "debit": "مدين",
-    "credit": "دائن"
+    "credit": "دائن",
+    "libelleRequired": "البيان مطلوب",
+    "cheque": "شيك",
+    "especes": "نقدًا",
+    "severity": "الخطورة",
+    "amountDue": "المبلغ المستحق"
   }
 }

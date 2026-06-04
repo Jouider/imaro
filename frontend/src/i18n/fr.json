@@ -1971,6 +1971,39 @@
       },
       "order": "Ordre recommandé : Lots → Copropriétaires → Soldes → Paiements → Prestataires",
       "selectFile": "Sélectionner un fichier"
+    },
+    "autresRecettes": {
+      "toastAdded": "Recette ajoutée",
+      "toastUpdated": "Recette mise à jour",
+      "toastDeleted": "Recette supprimée"
+    },
+    "remboursements": {
+      "toastCreated": "Remboursement créé",
+      "toastUpdated": "Remboursement mis à jour",
+      "toastDeleted": "Remboursement supprimé",
+      "totalRequested": "Total demandé"
+    },
+    "emprunts": {
+      "toastCreated": "Emprunt enregistré",
+      "toastUpdated": "Emprunt mis à jour",
+      "toastDeleted": "Emprunt supprimé",
+      "colMensualite": "Mensualité",
+      "colResteDu": "Reste dû",
+      "libellePlaceholder": "ex : Réfection toiture 2023",
+      "organisme": "Organisme prêteur",
+      "duree": "Durée (mois)",
+      "mensualiteDh": "Mensualité (DH)",
+      "bannerTitle": "Annexe 8 — Décret 2.23.700",
+      "bannerBody": "· Tout emprunt collectif doit être voté en AG (Loi 18-00 art. 17). Le tableau d'amortissement est fourni par l'organisme prêteur."
+    },
+    "recouvrement": {
+      "toastConfigSaved": "Configuration enregistrée",
+      "recalcError": "Échec du recalcul",
+      "penaltyType": "Type de pénalité",
+      "penalties": "Pénalités",
+      "age": "Ancienneté",
+      "bannerTitle": "Décision d'AG requise",
+      "bannerBody": "— Les pénalités doivent être votées en assemblée générale avant d'être légalement applicables (Loi 18-00 art. 25)."
     }
   },
   "onboarding": {
@@ -2082,6 +2115,11 @@
     "copied": "Copié !",
     "error": "Erreur",
     "debit": "Débit",
-    "credit": "Crédit"
+    "credit": "Crédit",
+    "libelleRequired": "Libellé requis",
+    "cheque": "Chèque",
+    "especes": "Espèces",
+    "severity": "Sévérité",
+    "amountDue": "Montant dû"
   }
 }

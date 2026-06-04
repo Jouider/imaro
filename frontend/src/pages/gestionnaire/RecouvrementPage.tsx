@@ -142,7 +142,7 @@ export function RecouvrementPage() {
   const saveConfigMut = useMutation({
     mutationFn: (cfg: PenaltyConfig) => updatePenaltyConfig(residenceId!, cfg),
     onSuccess: () => {
-      toast.success('Configuration enregistrée')
+      toast.success(t('gestionnaire.recouvrement.toastConfigSaved'))
       setConfigEdits({})
       void queryClient.invalidateQueries({
         queryKey: ['penalty-config', residenceId],
@@ -161,7 +161,7 @@ export function RecouvrementPage() {
         queryKey: ['recouvrement', residenceId],
       })
     },
-    onError: () => toast.error('Échec du recalcul'),
+    onError: () => toast.error(t('gestionnaire.recouvrement.recalcError')),
   })
 
   const data = recQ.data
@@ -194,13 +194,13 @@ export function RecouvrementPage() {
 
       {/* Residence selector + action buttons */}
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium">Résidence</label>
+        <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
           onValueChange={(v) => setPickedResidenceId(Number(v))}
         >
           <SelectTrigger className="w-72">
-            <SelectValue placeholder="Sélectionner" />
+            <SelectValue placeholder={t('common.select')} />
           </SelectTrigger>
           <SelectContent>
             {(residencesQ.data ?? []).map((r) => (
@@ -310,7 +310,9 @@ export function RecouvrementPage() {
 
             {/* Rate type */}
             <div className="rounded-lg border bg-card p-3">
-              <Label className="text-sm font-medium">Type de pénalité</Label>
+              <Label className="text-sm font-medium">
+                {t('gestionnaire.recouvrement.penaltyType')}
+              </Label>
               <div className="mt-2 grid grid-cols-3 gap-1.5">
                 {(['fixed', 'percentage', 'daily'] as const).map((type) => (
                   <button
@@ -407,9 +409,8 @@ export function RecouvrementPage() {
             <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-900/30 dark:bg-amber-950/20">
               <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-600" />
               <p className="text-xs text-amber-700 dark:text-amber-300">
-                <strong>Décision d&apos;AG requise</strong> — Les pénalités
-                doivent être votées en assemblée générale avant d&apos;être
-                légalement applicables (Loi 18-00 art. 25).
+                <strong>{t('gestionnaire.recouvrement.bannerTitle')}</strong>{' '}
+                {t('gestionnaire.recouvrement.bannerBody')}
               </p>
             </div>
           )}
@@ -506,12 +507,12 @@ export function RecouvrementPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Copropriétaire</TableHead>
+                  <TableHead>{t('common.coproprietaire')}</TableHead>
                   <TableHead>Lot</TableHead>
                   <TableHead className="text-right">Montant</TableHead>
                   <TableHead>Origine</TableHead>
                   <TableHead className="text-right">Jours restants</TableHead>
-                  <TableHead>Sévérité</TableHead>
+                  <TableHead>{t('common.severity')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -573,10 +574,16 @@ export function RecouvrementPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Lot</TableHead>
-                <TableHead>Copropriétaire</TableHead>
-                <TableHead className="text-right">Montant dû</TableHead>
-                <TableHead className="text-right">Pénalités</TableHead>
-                <TableHead className="text-right">Ancienneté</TableHead>
+                <TableHead>{t('common.coproprietaire')}</TableHead>
+                <TableHead className="text-right">
+                  {t('common.amountDue')}
+                </TableHead>
+                <TableHead className="text-right">
+                  {t('gestionnaire.recouvrement.penalties')}
+                </TableHead>
+                <TableHead className="text-right">
+                  {t('gestionnaire.recouvrement.age')}
+                </TableHead>
                 <TableHead>Statut</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>

@@ -120,7 +120,7 @@ export function RemboursementsPage() {
     mutationFn: (input: CreateRemboursementInput) =>
       createRemboursement(residenceId!, input),
     onSuccess: () => {
-      toast.success('Remboursement créé')
+      toast.success(t('gestionnaire.remboursements.toastCreated'))
       setModalOpen(false)
       void queryClient.invalidateQueries({
         queryKey: ['remboursements', residenceId],
@@ -136,7 +136,7 @@ export function RemboursementsPage() {
       patch: Partial<CreateRemboursementInput>
     }) => updateRemboursement(id, patch),
     onSuccess: () => {
-      toast.success('Remboursement mis à jour')
+      toast.success(t('gestionnaire.remboursements.toastUpdated'))
       setModalOpen(false)
       void queryClient.invalidateQueries({
         queryKey: ['remboursements', residenceId],
@@ -146,7 +146,7 @@ export function RemboursementsPage() {
   const deleteMut = useMutation({
     mutationFn: (id: number) => deleteRemboursement(id),
     onSuccess: () => {
-      toast.success('Remboursement supprimé')
+      toast.success(t('gestionnaire.remboursements.toastDeleted'))
       void queryClient.invalidateQueries({
         queryKey: ['remboursements', residenceId],
       })
@@ -165,7 +165,7 @@ export function RemboursementsPage() {
   }
   const save = () => {
     if (!draft.coproprietaire_id) {
-      toast.error('Choisir un copropriétaire')
+      toast.error(t('common.selectCopro'))
       return
     }
     if (draft.montant <= 0) {
@@ -218,13 +218,13 @@ export function RemboursementsPage() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium">Résidence</label>
+        <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
           onValueChange={(v) => setPickedResidenceId(Number(v))}
         >
           <SelectTrigger className="w-72">
-            <SelectValue placeholder="Sélectionner" />
+            <SelectValue placeholder={t('common.select')} />
           </SelectTrigger>
           <SelectContent>
             {(residencesQ.data ?? []).map((r) => (
@@ -238,7 +238,9 @@ export function RemboursementsPage() {
 
       <div className="grid grid-cols-3 gap-4">
         <div className="rounded-xl border bg-card p-4">
-          <p className="mb-1 text-xs text-muted-foreground">Total demandé</p>
+          <p className="mb-1 text-xs text-muted-foreground">
+            {t('gestionnaire.remboursements.totalRequested')}
+          </p>
           <p className="text-2xl font-bold tracking-tight">
             {fmt.format(totals.total)} DH
           </p>
@@ -250,7 +252,9 @@ export function RemboursementsPage() {
           </p>
         </div>
         <div className="rounded-xl border bg-card p-4">
-          <p className="mb-1 text-xs text-muted-foreground">Payé</p>
+          <p className="mb-1 text-xs text-muted-foreground">
+            {t('common.paye')}
+          </p>
           <p className="text-2xl font-bold tracking-tight text-green-600">
             {fmt.format(totals.paye)} DH
           </p>
@@ -261,7 +265,7 @@ export function RemboursementsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Copropriétaire</TableHead>
+              <TableHead>{t('common.coproprietaire')}</TableHead>
               <TableHead>Motif</TableHead>
               <TableHead className="text-right">Montant</TableHead>
               <TableHead>Demande</TableHead>
@@ -380,7 +384,7 @@ export function RemboursementsPage() {
           </DialogHeader>
           <div className="grid gap-3">
             <div>
-              <Label>Copropriétaire *</Label>
+              <Label>{t('common.coproprietaire')} *</Label>
               <Select
                 value={
                   draft.coproprietaire_id ? String(draft.coproprietaire_id) : ''
@@ -398,7 +402,7 @@ export function RemboursementsPage() {
                 }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Choisir un copropriétaire" />
+                  <SelectValue placeholder={t('common.selectCopro')} />
                 </SelectTrigger>
                 <SelectContent>
                   {coprops.map((c) => (
@@ -517,8 +521,12 @@ export function RemboursementsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="virement">Virement</SelectItem>
-                      <SelectItem value="cheque">Chèque</SelectItem>
-                      <SelectItem value="especes">Espèces</SelectItem>
+                      <SelectItem value="cheque">
+                        {t('common.cheque')}
+                      </SelectItem>
+                      <SelectItem value="especes">
+                        {t('common.especes')}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
