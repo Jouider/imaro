@@ -474,7 +474,7 @@ export function EmpruntsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setModalOpen(false)}>
-              Annuler
+              {t('actions.cancel')}
             </Button>
             <Button
               onClick={save}

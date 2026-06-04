@@ -614,7 +614,7 @@ function ModelesRecurrentsModal({
                 />
               </div>
               <div className="space-y-1">
-                <Label>Montant (MAD)</Label>
+                <Label>{t('common.montantMad')}</Label>
                 <Input
                   type="number"
                   value={form.montant}

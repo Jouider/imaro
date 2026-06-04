@@ -220,7 +220,9 @@
       "ordinaire": "Ordinaire",
       "extraordinaire": "Extraordinaire",
       "calendarHint": "Cliquez sur un jour marqué pour voir les événements",
-      "calendarEmpty": "Aucun événement ce mois"
+      "calendarEmpty": "Aucun événement ce mois",
+      "aVenir": "À venir",
+      "passees": "Passées"
     },
     "finances": {
       "title": "Mes finances",
@@ -279,7 +281,7 @@
       }
     },
     "reclamations": {
-      "title": "Signaler un problème",
+      "title": "Mes réclamations",
       "categorie": "Catégorie",
       "sujet": "Sujet",
       "description": "Description",
@@ -291,7 +293,8 @@
       "photoHint": "JPEG, PNG ou WebP · max 5 photos · 5 Mo/photo",
       "photoSizeError": "Fichier trop grand (max 5 Mo par photo)",
       "empty": "Aucune réclamation",
-      "emptyHint": "Vos réclamations soumises apparaîtront ici."
+      "emptyHint": "Vos réclamations soumises apparaîtront ici.",
+      "sendError": "Erreur lors de l'envoi"
     },
     "profil": {
       "title": "Mon profil",
@@ -637,7 +640,8 @@
       "benefit2": "Auto-matching sur montant, date et libellé avec fuzzy matching",
       "benefit3": "Confirmation en masse en un clic — fini les heures sur Excel",
       "summary": "Auto-matché",
-      "timeGain": "de gain par mois sur le pointage"
+      "timeGain": "de gain par mois sur le pointage",
+      "suggested": "Suggéré"
     },
     "comparison": {
       "eyebrow": "Pourquoi changer",
@@ -979,7 +983,8 @@
       "autoMatchedCount": "Auto-matchées ({{n}})",
       "parseError": "Erreur de parsing",
       "importedMsg": "{{total}} lignes importées. {{auto}} auto-matchées.",
-      "demoLoaded": "Démo chargée: {{n}} lignes Attijariwafa"
+      "demoLoaded": "Démo chargée: {{n}} lignes Attijariwafa",
+      "demo": "Démo"
     },
     "cmdk": {
       "title": "Recherche rapide",
@@ -1588,7 +1593,9 @@
       },
       "empty": "Aucune annonce",
       "emptyDesc": "Créez votre première annonce pour informer les copropriétaires.",
-      "toastCreated": "Annonce créée"
+      "toastCreated": "Annonce créée",
+      "titlePlaceholder": "Travaux ascenseur — interruption de service",
+      "descPlaceholder": "Décrivez l'annonce…"
     },
     "prestataires": {
       "title": "Prestataires & Contrats",
@@ -2090,7 +2097,8 @@
       "order": "Ordre recommandé : Lots → Copropriétaires → Soldes → Paiements → Prestataires",
       "selectFile": "Sélectionner un fichier",
       "importDone": "Import terminé",
-      "reimport": "Ré-importer"
+      "reimport": "Ré-importer",
+      "removeFile": "Retirer le fichier"
     },
     "autresRecettes": {
       "toastAdded": "Recette ajoutée",
@@ -2181,7 +2189,9 @@
       "valeurAcquisitionDh": "Valeur d'acquisition (DH)",
       "enService": "Équipement en service",
       "enServiceHint": "Décocher si hors service / déclassé",
-      "notesOptional": "Notes (optionnel)"
+      "notesOptional": "Notes (optionnel)",
+      "addError": "Échec de l'ajout",
+      "valeurPositive": "Valeur d'acquisition doit être > 0"
     },
     "travaux": {
       "toastCreated": "Travaux enregistrés",
@@ -2588,6 +2598,10 @@
     "exportInProgress": "Export en cours...",
     "saveError": "Erreur lors de l'enregistrement",
     "nouveau": "Nouveau",
-    "amountPositive": "Montant > 0"
+    "amountPositive": "Montant > 0",
+    "searchPlaceholder": "Rechercher...",
+    "echeance": "Échéance",
+    "appelDeFonds": "Appel de fonds",
+    "chooseLanguage": "Choisir la langue"
   }
 }

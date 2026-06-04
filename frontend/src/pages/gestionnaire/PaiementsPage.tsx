@@ -623,7 +623,7 @@ function PaiementAvanceModal({
           <div className="space-y-1">
             <Label>{t('common.coproprietaire')}</Label>
             <Input
-              placeholder="Rechercher..."
+              placeholder={t('common.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -1008,7 +1008,7 @@ export function PaiementsPage() {
     },
     {
       key: 'appel_fonds_titre',
-      header: 'Appel de fonds',
+      header: t('common.appelDeFonds'),
       renderCell: (r) => (
         <span className="text-sm text-muted-foreground">
           {r.appel_fonds_titre}
@@ -1144,7 +1144,7 @@ export function PaiementsPage() {
     },
     {
       key: 'date_echeance',
-      header: 'Échéance',
+      header: t('common.echeance'),
       sortable: true,
       renderCell: (r) => r.date_echeance?.slice(0, 10) ?? '—',
     },
@@ -1181,7 +1181,11 @@ export function PaiementsPage() {
       sortable: true,
       renderCell: (r) => r.date_paiement.slice(0, 10),
     },
-    { key: 'coproprietaire_nom', header: 'Copropriétaire', sortable: true },
+    {
+      key: 'coproprietaire_nom',
+      header: t('common.coproprietaire'),
+      sortable: true,
+    },
     {
       key: 'lot_numero',
       header: 'Lot',
@@ -1249,7 +1253,11 @@ export function PaiementsPage() {
       sortable: true,
       renderCell: (r) => r.date_declaration.slice(0, 10),
     },
-    { key: 'coproprietaire_nom', header: 'Copropriétaire', sortable: true },
+    {
+      key: 'coproprietaire_nom',
+      header: t('common.coproprietaire'),
+      sortable: true,
+    },
     {
       key: 'lot_numero',
       header: 'Lot',
@@ -1611,7 +1619,7 @@ export function PaiementsPage() {
         <div className="space-y-4">
           <div className="flex flex-wrap gap-3">
             <Input
-              placeholder="Rechercher..."
+              placeholder={t('common.searchPlaceholder')}
               value={histSearch}
               onChange={(e) => setHistSearch(e.target.value)}
               className="max-w-xs"
@@ -1722,7 +1730,7 @@ export function PaiementsPage() {
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                   <div>
                     <p className="text-xs text-muted-foreground">
-                      Copropriétaire
+                      {t('common.coproprietaire')}
                     </p>
                     <p className="font-semibold">
                       {decompte.coproprietaire_nom}
@@ -1793,10 +1801,10 @@ export function PaiementsPage() {
                   <thead>
                     <tr className="border-b bg-muted/40 text-xs text-muted-foreground">
                       <th className="px-4 py-3 text-left font-medium">
-                        Appel de fonds
+                        {t('common.appelDeFonds')}
                       </th>
                       <th className="px-4 py-3 text-left font-medium">
-                        Échéance
+                        {t('common.echeance')}
                       </th>
                       <th className="px-4 py-3 text-right font-medium">
                         {t('common.du')}

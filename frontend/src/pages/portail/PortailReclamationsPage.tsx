@@ -81,7 +81,7 @@ export function PortailReclamationsPage() {
           active={activeTab === 'history'}
           onClick={() => setActiveTab('history')}
         >
-          Mes réclamations
+          {t('portail.reclamations.title')}
         </TabBtn>
       </div>
 
@@ -142,7 +142,7 @@ function SubmitForm({
       setPreviews([])
       void qc.invalidateQueries({ queryKey: ['portail-reclamations'] })
     },
-    onError: () => toast.error("Erreur lors de l'envoi"),
+    onError: () => toast.error(t('portail.reclamations.sendError')),
   })
 
   function validate(): boolean {

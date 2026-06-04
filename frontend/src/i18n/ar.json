@@ -220,7 +220,9 @@
       "ordinaire": "عادية",
       "extraordinaire": "غير عادية",
       "calendarHint": "انقر على يوم محدد لعرض الأحداث",
-      "calendarEmpty": "لا توجد أحداث هذا الشهر"
+      "calendarEmpty": "لا توجد أحداث هذا الشهر",
+      "aVenir": "قادمة",
+      "passees": "سابقة"
     },
     "finances": {
       "title": "ماليتي",
@@ -279,7 +281,7 @@
       }
     },
     "reclamations": {
-      "title": "الإبلاغ عن مشكلة",
+      "title": "شكاياتي",
       "categorie": "الفئة",
       "sujet": "الموضوع",
       "description": "الوصف",
@@ -291,7 +293,8 @@
       "photoHint": "JPEG أو PNG أو WebP · الحد الأقصى 5 صور · 5 ميغابايت/صورة",
       "photoSizeError": "الملف كبير جدًا (الحد الأقصى 5 ميغابايت للصورة)",
       "empty": "لا توجد شكاية",
-      "emptyHint": "ستظهر شكاياتك المقدمة هنا."
+      "emptyHint": "ستظهر شكاياتك المقدمة هنا.",
+      "sendError": "خطأ أثناء الإرسال"
     },
     "profil": {
       "title": "ملفي الشخصي",
@@ -637,7 +640,8 @@
       "benefit2": "مطابقة تلقائية على المبلغ والتاريخ والمسمى بخوارزمية ضبابية",
       "benefit3": "تأكيد جماعي بنقرة واحدة — انتهى زمن Excel",
       "summary": "مطابقة تلقائية",
-      "timeGain": "ربح شهري في التسوية"
+      "timeGain": "ربح شهري في التسوية",
+      "suggested": "مقترح"
     },
     "comparison": {
       "eyebrow": "لماذا التغيير",
@@ -979,7 +983,8 @@
       "autoMatchedCount": "مطابَقة آليًا ({{n}})",
       "parseError": "خطأ في التحليل",
       "importedMsg": "تم استيراد {{total}} سطر. {{auto}} مطابَقة آليًا.",
-      "demoLoaded": "تم تحميل عرض توضيحي: {{n}} سطر Attijariwafa"
+      "demoLoaded": "تم تحميل عرض توضيحي: {{n}} سطر Attijariwafa",
+      "demo": "عرض توضيحي"
     },
     "cmdk": {
       "title": "بحث سريع",
@@ -1574,7 +1579,9 @@
       },
       "empty": "لا توجد إعلانات",
       "emptyDesc": "أنشئ أول إعلان لإعلام الملاك.",
-      "toastCreated": "تم إنشاء الإعلان"
+      "toastCreated": "تم إنشاء الإعلان",
+      "titlePlaceholder": "أشغال المصعد — انقطاع الخدمة",
+      "descPlaceholder": "صف الإعلان…"
     },
     "prestataires": {
       "title": "المزودون والعقود",
@@ -2090,7 +2097,8 @@
       "order": "الترتيب الموصى: الشقق ← الملاك ← الأرصدة ← المدفوعات ← المزودون",
       "selectFile": "اختر ملفًا",
       "importDone": "انتهى الاستيراد",
-      "reimport": "إعادة الاستيراد"
+      "reimport": "إعادة الاستيراد",
+      "removeFile": "إزالة الملف"
     },
     "autresRecettes": {
       "toastAdded": "تمت إضافة الإيراد",
@@ -2181,7 +2189,9 @@
       "valeurAcquisitionDh": "قيمة الاقتناء (د.م.)",
       "enService": "المعدة قيد الخدمة",
       "enServiceHint": "ألغِ التحديد إذا كانت خارج الخدمة / مُلغاة",
-      "notesOptional": "ملاحظات (اختياري)"
+      "notesOptional": "ملاحظات (اختياري)",
+      "addError": "فشل الإضافة",
+      "valeurPositive": "يجب أن تكون قيمة الاقتناء > 0"
     },
     "travaux": {
       "toastCreated": "تم تسجيل الأشغال",
@@ -2588,6 +2598,10 @@
     "exportInProgress": "جارٍ التصدير...",
     "saveError": "خطأ أثناء الحفظ",
     "nouveau": "جديد",
-    "amountPositive": "المبلغ > 0"
+    "amountPositive": "المبلغ > 0",
+    "searchPlaceholder": "بحث...",
+    "echeance": "الاستحقاق",
+    "appelDeFonds": "نداء أموال",
+    "chooseLanguage": "اختر اللغة"
   }
 }

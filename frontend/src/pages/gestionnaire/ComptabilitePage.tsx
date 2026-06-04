@@ -1379,7 +1379,7 @@ function TabJournal({ exerciceId }: { exerciceId: number }) {
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Rechercher..."
+          placeholder={t('common.searchPlaceholder')}
           className="w-48"
         />
       </div>

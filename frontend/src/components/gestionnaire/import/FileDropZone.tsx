@@ -96,7 +96,7 @@ export function FileDropZone({
                   clearFile()
                 }}
                 className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                aria-label="Retirer le fichier"
+                aria-label={t('gestionnaire.imports.removeFile')}
               >
                 <X className="size-3.5" />
               </button>

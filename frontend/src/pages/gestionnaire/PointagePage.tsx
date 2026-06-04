@@ -297,7 +297,7 @@ export function PointagePage() {
                 Attijariwafa avec 10 lignes pour résidence Atlas).
               </p>
               <Button variant="outline" size="sm" onClick={handleLoadDemo}>
-                Démo
+                {t('gestionnaire.pointage.demo')}
               </Button>
             </div>
           </div>

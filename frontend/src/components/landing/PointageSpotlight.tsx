@@ -102,7 +102,7 @@ export function PointageSpotlight() {
                       </span>
                     ) : (
                       <span className="rounded-full bg-amber-500 px-1.5 py-0.5 text-[9px] font-bold uppercase text-white">
-                        Suggéré
+                        {t('landing.pointage.suggested')}
                       </span>
                     )}
                   </span>

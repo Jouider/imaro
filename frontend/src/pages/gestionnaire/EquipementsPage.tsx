@@ -105,7 +105,7 @@ export function EquipementsPage() {
         queryKey: ['equipements', residenceId],
       })
     },
-    onError: () => toast.error("Échec de l'ajout"),
+    onError: () => toast.error(t('gestionnaire.equipements.addError')),
   })
 
   const updateMut = useMutation({
@@ -164,7 +164,7 @@ export function EquipementsPage() {
       return
     }
     if (draft.valeur_acquisition <= 0) {
-      toast.error("Valeur d'acquisition doit être > 0")
+      toast.error(t('gestionnaire.equipements.valeurPositive'))
       return
     }
     if (editing) updateMut.mutate({ id: editing.id, patch: draft })

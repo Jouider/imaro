@@ -240,7 +240,7 @@ export function AnnoncesPage() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, titre: e.target.value }))
                 }
-                placeholder="Travaux ascenseur — interruption de service"
+                placeholder={t('gestionnaire.annonces.titlePlaceholder')}
               />
             </div>
 
@@ -306,7 +306,7 @@ export function AnnoncesPage() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, contenu: e.target.value }))
                 }
-                placeholder="Décrivez l'annonce…"
+                placeholder={t('gestionnaire.annonces.descPlaceholder')}
                 className="w-full min-h-[120px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </div>
