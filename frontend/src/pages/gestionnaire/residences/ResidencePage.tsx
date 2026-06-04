@@ -567,7 +567,7 @@ export function ResidencePage() {
             variant="ghost"
             size="sm"
             onClick={() => openEdit(r)}
-            aria-label="Modifier"
+            aria-label={t('actions.edit')}
           >
             <Pencil className="size-3.5" />
           </Button>
@@ -576,7 +576,7 @@ export function ResidencePage() {
             size="sm"
             onClick={() => setDeletingLot(r)}
             className="text-destructive hover:text-destructive"
-            aria-label="Supprimer"
+            aria-label={t('actions.delete')}
           >
             <Trash2 className="size-3.5" />
           </Button>
@@ -722,7 +722,7 @@ export function ResidencePage() {
               const imm = immeubles.find((i) => i.id === r.id)
               if (imm) openEditImmeuble(imm)
             }}
-            aria-label="Modifier"
+            aria-label={t('actions.edit')}
           >
             <Pencil className="size-3.5" />
           </Button>
@@ -734,7 +734,7 @@ export function ResidencePage() {
               if (imm) setDeletingImmeuble(imm)
             }}
             className="text-destructive hover:text-destructive"
-            aria-label="Supprimer"
+            aria-label={t('actions.delete')}
           >
             <Trash2 className="size-3.5" />
           </Button>

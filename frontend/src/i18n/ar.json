@@ -199,7 +199,8 @@
       "assemblees": "الجمعيات القادمة",
       "noAssemblees": "لا توجد جمعيات مبرمجة",
       "prochainPaiement": "الدفعة القادمة",
-      "payer": "الدفع ←"
+      "payer": "الدفع ←",
+      "convoquee": "مُستدعى"
     },
     "actualites": {
       "title": "الأخبار",
@@ -2454,6 +2455,9 @@
       "deleteNotif": "حذف هذا الإشعار",
       "closeMenu": "إغلاق القائمة",
       "openMenu": "فتح القائمة"
+    },
+    "conformite": {
+      "timeline": "التسلسل الزمني للمراحل"
     }
   },
   "onboarding": {

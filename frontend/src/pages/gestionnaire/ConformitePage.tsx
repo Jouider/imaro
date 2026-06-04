@@ -228,7 +228,7 @@ export function ConformitePage() {
       {calendar && (
         <div className="rounded-xl border bg-card p-6">
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Chronologie des phases
+            {t('gestionnaire.conformite.timeline')}
           </h3>
           <div className="flex items-center gap-1">
             {phases.map((p, i) => {

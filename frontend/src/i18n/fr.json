@@ -199,7 +199,8 @@
       "assemblees": "Prochaines assemblées",
       "noAssemblees": "Aucune assemblée prévue",
       "prochainPaiement": "Prochain paiement",
-      "payer": "Payer →"
+      "payer": "Payer →",
+      "convoquee": "Convoquée"
     },
     "actualites": {
       "title": "Actualités",
@@ -2454,6 +2455,9 @@
       "deleteNotif": "Supprimer cette notification",
       "closeMenu": "Fermer le menu",
       "openMenu": "Ouvrir le menu"
+    },
+    "conformite": {
+      "timeline": "Chronologie des phases"
     }
   },
   "onboarding": {
