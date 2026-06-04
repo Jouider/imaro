@@ -99,7 +99,7 @@ export function EquipementsPage() {
     mutationFn: (input: CreateEquipementInput) =>
       createEquipement(residenceId!, input),
     onSuccess: () => {
-      toast.success('Équipement ajouté')
+      toast.success(t('gestionnaire.equipements.toastAdded'))
       setModalOpen(false)
       void queryClient.invalidateQueries({
         queryKey: ['equipements', residenceId],
@@ -117,24 +117,24 @@ export function EquipementsPage() {
       patch: Partial<CreateEquipementInput>
     }) => updateEquipement(id, patch),
     onSuccess: () => {
-      toast.success('Équipement mis à jour')
+      toast.success(t('gestionnaire.equipements.toastUpdated'))
       setModalOpen(false)
       void queryClient.invalidateQueries({
         queryKey: ['equipements', residenceId],
       })
     },
-    onError: () => toast.error('Échec de la mise à jour'),
+    onError: () => toast.error(t('common.updateError')),
   })
 
   const deleteMut = useMutation({
     mutationFn: (id: number) => deleteEquipement(id),
     onSuccess: () => {
-      toast.success('Équipement supprimé')
+      toast.success(t('gestionnaire.equipements.toastDeleted'))
       void queryClient.invalidateQueries({
         queryKey: ['equipements', residenceId],
       })
     },
-    onError: () => toast.error('Échec de la suppression'),
+    onError: () => toast.error(t('common.deleteError')),
   })
 
   const openCreate = () => {
@@ -160,7 +160,7 @@ export function EquipementsPage() {
 
   const save = () => {
     if (!draft.designation.trim()) {
-      toast.error('Désignation requise')
+      toast.error(t('gestionnaire.equipements.designationRequired'))
       return
     }
     if (draft.valeur_acquisition <= 0) {
@@ -218,13 +218,13 @@ export function EquipementsPage() {
 
       {/* Residence + KPIs */}
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium">Résidence</label>
+        <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
           onValueChange={(v) => setPickedResidenceId(Number(v))}
         >
           <SelectTrigger className="w-72">
-            <SelectValue placeholder="Sélectionner" />
+            <SelectValue placeholder={t('common.select')} />
           </SelectTrigger>
           <SelectContent>
             {(residencesQ.data ?? []).map((r) => (
@@ -274,10 +274,8 @@ export function EquipementsPage() {
       <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900/30 dark:bg-blue-950/20">
         <AlertCircle className="mt-0.5 size-4 shrink-0 text-blue-600" />
         <p className="text-xs text-blue-700 dark:text-blue-300">
-          <strong>Annexe 9 — Décret 2.23.700</strong> · Le registre des
-          équipements communs doit être à jour pour la convocation d&apos;AG et
-          le bilan annuel. L&apos;amortissement linéaire est calculé sur la
-          durée renseignée.
+          <strong>{t('gestionnaire.equipements.bannerTitle')}</strong>{' '}
+          {t('gestionnaire.equipements.bannerBody')}
         </p>
       </div>
 
@@ -286,8 +284,8 @@ export function EquipementsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Désignation</TableHead>
-              <TableHead>Catégorie</TableHead>
+              <TableHead>{t('common.designation')}</TableHead>
+              <TableHead>{t('common.categorie')}</TableHead>
               <TableHead>Acquis le</TableHead>
               <TableHead className="text-right">V. acquisition</TableHead>
               <TableHead className="text-right">V. nette</TableHead>
@@ -396,7 +394,7 @@ export function EquipementsPage() {
           </DialogHeader>
           <div className="grid gap-3">
             <div>
-              <Label htmlFor="desig">Désignation *</Label>
+              <Label htmlFor="desig">{t('common.designation')} *</Label>
               <Input
                 id="desig"
                 value={draft.designation}
@@ -457,7 +455,9 @@ export function EquipementsPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="duree">Durée amortissement (mois)</Label>
+                <Label htmlFor="duree">
+                  {t('gestionnaire.equipements.dureeAmort')}
+                </Label>
                 <Input
                   id="duree"
                   type="number"

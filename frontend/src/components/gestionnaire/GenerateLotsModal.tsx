@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Zap, Home, Plus, X, ChevronDown, ChevronUp } from 'lucide-react'
 import {
@@ -184,6 +185,7 @@ export function GenerateLotsModal({
   immeubleName,
   onSuccess,
 }: GenerateLotsModalProps) {
+  const { t } = useTranslation()
   // Template selection
   const [template, setTemplate] = useState<LotTemplate>('simple_sequential')
 
@@ -277,7 +279,7 @@ export function GenerateLotsModal({
       onSuccess(lots.length)
       onOpenChange(false)
     } catch {
-      toast.error('Erreur lors de la génération des lots')
+      toast.error(t('gestionnaire.generateLots.genError'))
     } finally {
       setIsGenerating(false)
     }
@@ -376,7 +378,7 @@ export function GenerateLotsModal({
   }) {
     return (
       <div className="flex flex-col gap-1">
-        <Label>Tantième par lot</Label>
+        <Label>{t('gestionnaire.generateLots.tantiemePerLot')}</Label>
         <Input
           type="number"
           min={0}
@@ -409,7 +411,7 @@ export function GenerateLotsModal({
               />
             </div>
             <div className="flex flex-col gap-1">
-              <Label>Numéro de départ</Label>
+              <Label>{t('gestionnaire.generateLots.startNumber')}</Label>
               <Input
                 type="number"
                 value={simpleState.startingNumber}
@@ -464,7 +466,7 @@ export function GenerateLotsModal({
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
-                <Label>Nombre d'étages</Label>
+                <Label>{t('gestionnaire.generateLots.floorsCount')}</Label>
                 <Input
                   type="number"
                   min={1}
@@ -496,7 +498,7 @@ export function GenerateLotsModal({
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <Label>Lots par étage / aile</Label>
+                <Label>{t('gestionnaire.generateLots.lotsPerFloorWing')}</Label>
                 <Input
                   type="number"
                   min={1}
@@ -510,7 +512,7 @@ export function GenerateLotsModal({
                 />
               </div>
               <div className="flex flex-col gap-1">
-                <Label>Numéro de départ</Label>
+                <Label>{t('gestionnaire.generateLots.startNumber')}</Label>
                 <Input
                   type="number"
                   value={wingsState.startingNumber}
@@ -532,7 +534,7 @@ export function GenerateLotsModal({
         return (
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
-              <Label>Nombre d'étages</Label>
+              <Label>{t('gestionnaire.generateLots.floorsCount')}</Label>
               <Input
                 type="number"
                 min={1}
@@ -564,7 +566,7 @@ export function GenerateLotsModal({
               />
             </div>
             <div className="flex flex-col gap-1">
-              <Label>Lots par étage</Label>
+              <Label>{t('gestionnaire.generateLots.lotsPerFloor')}</Label>
               <Input
                 type="number"
                 min={1}
@@ -578,7 +580,7 @@ export function GenerateLotsModal({
               />
             </div>
             <div className="flex flex-col gap-1">
-              <Label>Numéro de départ</Label>
+              <Label>{t('gestionnaire.generateLots.startNumber')}</Label>
               <Input
                 type="number"
                 value={floorState.startingNumber}
@@ -613,7 +615,7 @@ export function GenerateLotsModal({
               />
             </div>
             <div className="flex flex-col gap-1">
-              <Label>Numéro de départ</Label>
+              <Label>{t('gestionnaire.generateLots.startNumber')}</Label>
               <Input
                 type="number"
                 value={villaState.startingNumber}
@@ -626,7 +628,7 @@ export function GenerateLotsModal({
               />
             </div>
             <div className="flex flex-col gap-1">
-              <Label>Préfixe</Label>
+              <Label>{t('gestionnaire.generateLots.prefix')}</Label>
               <Input
                 value={villaState.prefix}
                 onChange={(e) =>
@@ -654,7 +656,7 @@ export function GenerateLotsModal({
         return (
           <div className="space-y-4">
             <div className="flex flex-col gap-2">
-              <Label>Entrées</Label>
+              <Label>{t('gestionnaire.generateLots.entries')}</Label>
               <div className="space-y-2">
                 {ensembleState.entrances.map((entrance, idx) => (
                   <div key={idx} className="flex items-center gap-2">
@@ -712,7 +714,7 @@ export function GenerateLotsModal({
         return (
           <div className="space-y-4">
             <div className="flex flex-col gap-2">
-              <Label>Types d'unités</Label>
+              <Label>{t('gestionnaire.generateLots.unitTypes')}</Label>
               <div className="space-y-2">
                 {commercialState.unitTypes.map((unitType, idx) => (
                   <div key={idx} className="flex items-center gap-2">
@@ -728,7 +730,7 @@ export function GenerateLotsModal({
                       type="number"
                       className="w-24"
                       min={0}
-                      placeholder="Quantité"
+                      placeholder={t('gestionnaire.generateLots.quantity')}
                       value={unitType.count === 0 ? '' : unitType.count}
                       onChange={(e) =>
                         updateUnitType(idx, { count: Number(e.target.value) })
@@ -775,7 +777,9 @@ export function GenerateLotsModal({
         <DialogHeader className="px-6 pt-6 pb-4 border-b">
           <div className="flex items-center gap-2">
             <Zap className="size-5 text-[var(--color-imaro-primary)]" />
-            <DialogTitle>Générer des lots</DialogTitle>
+            <DialogTitle>
+              {t('gestionnaire.generateLots.generateTitle')}
+            </DialogTitle>
           </div>
           <p className="text-sm text-muted-foreground mt-1">{immeubleName}</p>
         </DialogHeader>

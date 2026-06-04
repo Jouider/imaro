@@ -103,7 +103,7 @@ export function TravauxExceptionnelsPage() {
     mutationFn: (input: CreateTravauxInput) =>
       createTravaux(residenceId!, input),
     onSuccess: () => {
-      toast.success('Travaux enregistrés')
+      toast.success(t('gestionnaire.travaux.toastCreated'))
       setModalOpen(false)
       void queryClient.invalidateQueries({
         queryKey: ['travaux-exceptionnels', residenceId],
@@ -119,7 +119,7 @@ export function TravauxExceptionnelsPage() {
       patch: Partial<CreateTravauxInput>
     }) => updateTravaux(id, patch),
     onSuccess: () => {
-      toast.success('Travaux mis à jour')
+      toast.success(t('gestionnaire.travaux.toastUpdated'))
       setModalOpen(false)
       void queryClient.invalidateQueries({
         queryKey: ['travaux-exceptionnels', residenceId],
@@ -129,7 +129,7 @@ export function TravauxExceptionnelsPage() {
   const deleteMut = useMutation({
     mutationFn: (id: number) => deleteTravaux(id),
     onSuccess: () => {
-      toast.success('Travaux supprimés')
+      toast.success(t('gestionnaire.travaux.toastDeleted'))
       void queryClient.invalidateQueries({
         queryKey: ['travaux-exceptionnels', residenceId],
       })
@@ -162,7 +162,7 @@ export function TravauxExceptionnelsPage() {
   }
   const save = () => {
     if (!draft.libelle.trim()) {
-      toast.error('Libellé requis')
+      toast.error(t('common.libelleRequired'))
       return
     }
     if (editing) updateMut.mutate({ id: editing.id, patch: draft })
@@ -209,13 +209,13 @@ export function TravauxExceptionnelsPage() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium">Résidence</label>
+        <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
           onValueChange={(v) => setPickedResidenceId(Number(v))}
         >
           <SelectTrigger className="w-72">
-            <SelectValue placeholder="Sélectionner" />
+            <SelectValue placeholder={t('common.select')} />
           </SelectTrigger>
           <SelectContent>
             {(residencesQ.data ?? []).map((r) => (
@@ -229,25 +229,33 @@ export function TravauxExceptionnelsPage() {
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <div className="rounded-xl border bg-card p-4">
-          <p className="mb-1 text-xs text-muted-foreground">Montant voté</p>
+          <p className="mb-1 text-xs text-muted-foreground">
+            {t('gestionnaire.travaux.montantVote')}
+          </p>
           <p className="text-xl font-bold tracking-tight text-[var(--color-imaro-primary)]">
             {fmt.format(totals.vote)} DH
           </p>
         </div>
         <div className="rounded-xl border bg-card p-4">
-          <p className="mb-1 text-xs text-muted-foreground">Montant engagé</p>
+          <p className="mb-1 text-xs text-muted-foreground">
+            {t('gestionnaire.travaux.montantEngage')}
+          </p>
           <p className="text-xl font-bold tracking-tight text-amber-600">
             {fmt.format(totals.engage)} DH
           </p>
         </div>
         <div className="rounded-xl border bg-card p-4">
-          <p className="mb-1 text-xs text-muted-foreground">Montant réglé</p>
+          <p className="mb-1 text-xs text-muted-foreground">
+            {t('gestionnaire.travaux.montantRegle')}
+          </p>
           <p className="text-xl font-bold tracking-tight text-green-600">
             {fmt.format(totals.regle)} DH
           </p>
         </div>
         <div className="rounded-xl border bg-card p-4">
-          <p className="mb-1 text-xs text-muted-foreground">Reste à régler</p>
+          <p className="mb-1 text-xs text-muted-foreground">
+            {t('gestionnaire.travaux.resteARegler')}
+          </p>
           <p className="text-xl font-bold tracking-tight text-orange-600">
             {fmt.format(totals.reste)} DH
           </p>
@@ -257,9 +265,8 @@ export function TravauxExceptionnelsPage() {
       <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900/30 dark:bg-blue-950/20">
         <AlertCircle className="mt-0.5 size-4 shrink-0 text-blue-600" />
         <p className="text-xs text-blue-700 dark:text-blue-300">
-          <strong>Annexe 6 — Décret 2.23.700</strong> · Les travaux non courants
-          (gros entretien, transformation, amélioration) doivent être votés en
-          AG (Loi 18-00 art. 17) à la majorité requise selon le type de travaux.
+          <strong>{t('gestionnaire.travaux.bannerTitle')}</strong>{' '}
+          {t('gestionnaire.travaux.bannerBody')}
         </p>
       </div>
 
@@ -267,12 +274,18 @@ export function TravauxExceptionnelsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Libellé</TableHead>
+              <TableHead>{t('common.libelle')}</TableHead>
               <TableHead>Vote AG</TableHead>
               <TableHead>Prestataire</TableHead>
-              <TableHead className="text-right">Voté</TableHead>
-              <TableHead className="text-right">Engagé</TableHead>
-              <TableHead className="text-right">Réglé</TableHead>
+              <TableHead className="text-right">
+                {t('gestionnaire.travaux.colVote')}
+              </TableHead>
+              <TableHead className="text-right">
+                {t('gestionnaire.travaux.colEngage')}
+              </TableHead>
+              <TableHead className="text-right">
+                {t('gestionnaire.travaux.colRegle')}
+              </TableHead>
               <TableHead>Statut</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -370,13 +383,13 @@ export function TravauxExceptionnelsPage() {
           </DialogHeader>
           <div className="grid gap-3">
             <div>
-              <Label>Libellé *</Label>
+              <Label>{t('common.libelle')} *</Label>
               <Input
                 value={draft.libelle}
                 onChange={(e) =>
                   setDraft({ ...draft, libelle: e.target.value })
                 }
-                placeholder="ex: Ravalement façade nord"
+                placeholder={t('gestionnaire.travaux.libellePlaceholder')}
               />
             </div>
             <div>
@@ -411,7 +424,7 @@ export function TravauxExceptionnelsPage() {
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <Label>Montant voté (DH)</Label>
+                <Label>{t('gestionnaire.travaux.montantVoteDh')}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -423,7 +436,7 @@ export function TravauxExceptionnelsPage() {
                 />
               </div>
               <div>
-                <Label>Engagé (DH)</Label>
+                <Label>{t('gestionnaire.travaux.engageDh')}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -438,7 +451,7 @@ export function TravauxExceptionnelsPage() {
                 />
               </div>
               <div>
-                <Label>Réglé (DH)</Label>
+                <Label>{t('gestionnaire.travaux.regleDh')}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -455,7 +468,7 @@ export function TravauxExceptionnelsPage() {
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <Label>Début</Label>
+                <Label>{t('gestionnaire.travaux.debut')}</Label>
                 <Input
                   type="date"
                   value={draft.date_debut ?? ''}
@@ -465,7 +478,7 @@ export function TravauxExceptionnelsPage() {
                 />
               </div>
               <div>
-                <Label>Fin prévue</Label>
+                <Label>{t('gestionnaire.travaux.finPrevue')}</Label>
                 <Input
                   type="date"
                   value={draft.date_fin_prevue ?? ''}

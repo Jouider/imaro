@@ -2004,6 +2004,53 @@
       "age": "Ancienneté",
       "bannerTitle": "Décision d'AG requise",
       "bannerBody": "— Les pénalités doivent être votées en assemblée générale avant d'être légalement applicables (Loi 18-00 art. 25)."
+    },
+    "equipements": {
+      "toastAdded": "Équipement ajouté",
+      "toastUpdated": "Équipement mis à jour",
+      "toastDeleted": "Équipement supprimé",
+      "designationRequired": "Désignation requise",
+      "dureeAmort": "Durée amortissement (mois)",
+      "bannerTitle": "Annexe 9 — Décret 2.23.700",
+      "bannerBody": "· Le registre des équipements communs doit être à jour pour la convocation d'AG et le bilan annuel. L'amortissement linéaire est calculé sur la durée renseignée."
+    },
+    "travaux": {
+      "toastCreated": "Travaux enregistrés",
+      "toastUpdated": "Travaux mis à jour",
+      "toastDeleted": "Travaux supprimés",
+      "montantVote": "Montant voté",
+      "montantEngage": "Montant engagé",
+      "montantRegle": "Montant réglé",
+      "resteARegler": "Reste à régler",
+      "colVote": "Voté",
+      "colEngage": "Engagé",
+      "colRegle": "Réglé",
+      "libellePlaceholder": "ex : Ravalement façade nord",
+      "montantVoteDh": "Montant voté (DH)",
+      "engageDh": "Engagé (DH)",
+      "regleDh": "Réglé (DH)",
+      "debut": "Début",
+      "finPrevue": "Fin prévue",
+      "bannerTitle": "Annexe 6 — Décret 2.23.700",
+      "bannerBody": "· Les travaux non courants (gros entretien, transformation, amélioration) doivent être votés en AG (Loi 18-00 art. 17) à la majorité requise selon le type de travaux."
+    },
+    "audit": {
+      "allCategories": "Toutes catégories",
+      "colBy": "Effectué par",
+      "colDetails": "Détails"
+    },
+    "generateLots": {
+      "genError": "Erreur lors de la génération des lots",
+      "tantiemePerLot": "Tantième par lot",
+      "startNumber": "Numéro de départ",
+      "floorsCount": "Nombre d'étages",
+      "lotsPerFloorWing": "Lots par étage / aile",
+      "lotsPerFloor": "Lots par étage",
+      "prefix": "Préfixe",
+      "entries": "Entrées",
+      "unitTypes": "Types d'unités",
+      "quantity": "Quantité",
+      "generateTitle": "Générer des lots"
     }
   },
   "onboarding": {

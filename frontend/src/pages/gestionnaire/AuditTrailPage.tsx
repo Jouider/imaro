@@ -178,10 +178,12 @@ export function AuditTrailPage() {
           }
         >
           <SelectTrigger className="w-44">
-            <SelectValue placeholder="Catégorie" />
+            <SelectValue placeholder={t('common.categorie')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">Toutes catégories</SelectItem>
+            <SelectItem value="__all__">
+              {t('gestionnaire.audit.allCategories')}
+            </SelectItem>
             {CATEGORIES.map((c) => (
               <SelectItem key={c.value} value={c.value}>
                 {c.label}
@@ -196,7 +198,7 @@ export function AuditTrailPage() {
           }
         >
           <SelectTrigger className="w-44">
-            <SelectValue placeholder="Sévérité" />
+            <SelectValue placeholder={t('common.severity')} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__all__">Toutes</SelectItem>
@@ -215,12 +217,14 @@ export function AuditTrailPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Horodatage</TableHead>
-              <TableHead>Sévérité</TableHead>
-              <TableHead>Catégorie</TableHead>
+              <TableHead>{t('common.severity')}</TableHead>
+              <TableHead>{t('common.categorie')}</TableHead>
               <TableHead>Action</TableHead>
-              <TableHead>Effectué par</TableHead>
+              <TableHead>{t('gestionnaire.audit.colBy')}</TableHead>
               <TableHead>Cible</TableHead>
-              <TableHead className="text-right">Détails</TableHead>
+              <TableHead className="text-right">
+                {t('gestionnaire.audit.colDetails')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
