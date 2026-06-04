@@ -1378,7 +1378,15 @@
       "searchPlaceholder": "ابحث عن مالك أو شقة...",
       "allMethods": "كل الطرق",
       "relanceAll": "تذكير جميع المتأخرات",
-      "dueDate": "تاريخ الاستحقاق"
+      "dueDate": "تاريخ الاستحقاق",
+      "createAppel": "إنشاء نداء أموال",
+      "noCreance": "لا توجد ديون للتحصيل",
+      "allStatuses": "كل الحالات",
+      "calcRepartition": "جارٍ حساب التوزيع…",
+      "sendAppelTitle": "إرسال نداء الأموال",
+      "sendAppelDesc": "سيرسل هذا الإجراء إشعار واتساب إلى جميع المُلّاك.",
+      "saveError": "خطأ أثناء الحفظ",
+      "relancesSent": "تم إرسال {{n}} تذكير"
     },
     "tickets": {
       "title": "التذاكر",
@@ -1844,7 +1852,22 @@
       "selectAccount": "اختر حسابًا...",
       "noEntries": "لا توجد قيود محاسبية",
       "toastClosed": "تم إقفال السنة بنجاح",
-      "toastCloseError": "خطأ أثناء الإقفال"
+      "toastCloseError": "خطأ أثناء الإقفال",
+      "montantColon": "المبلغ:",
+      "noCreance": "لا توجد ديون",
+      "entree": "مدخول",
+      "sortie": "مصروف",
+      "searchAccount": "البحث عن حساب...",
+      "prestataireNamePlaceholder": "اسم المزود",
+      "filterAccounts": "تصفية الحسابات...",
+      "balanceAutoHint": "تُبنى الموازنة تلقائيًا انطلاقًا من قيود السنة المالية.",
+      "legalDocsTitle": "الوثائق القانونية والرسمية",
+      "annexesRegTitle": "الملاحق التنظيمية (المرسوم 2.23.700)",
+      "annexesRegDesc": "الملاحق 10، 13-1، 13-2 ووثائق قانونية إلزامية أخرى",
+      "viewAnnexes": "عرض الملاحق",
+      "iaError": "خطأ في تحليل الذكاء الاصطناعي",
+      "balanceEq": "إجمالي المدين = إجمالي الدائن = {{debit}} د.م. · فارق الأرصدة: {{ecart}} د.م.",
+      "balanceNeq": "فارق المدين/الدائن: {{ecart}} د.م. — تحقق من القيود"
     },
     "depenses": {
       "title": "المصاريف",
@@ -2460,6 +2483,12 @@
     "updateFailed": "فشل التحديث",
     "deleteFailed": "فشل الحذف",
     "nameRequired": "الاسم مطلوب",
-    "lotRequired": "الوحدة مطلوبة"
+    "lotRequired": "الوحدة مطلوبة",
+    "lot": "الوحدة",
+    "total": "المجموع",
+    "montantMad": "المبلغ (د.م.)",
+    "du": "المستحق",
+    "exportInProgress": "جارٍ التصدير...",
+    "saveError": "خطأ أثناء الحفظ"
   }
 }

@@ -232,12 +232,16 @@ function RepartitionPreview({
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b text-muted-foreground">
-                <th className="py-1 text-left font-medium">Lot</th>
+                <th className="py-1 text-left font-medium">
+                  {t('common.lot')}
+                </th>
                 <th className="py-1 text-right font-medium">
                   {t('common.tantieme')}
                 </th>
                 <th className="py-1 text-right font-medium">%</th>
-                <th className="py-1 text-right font-medium">Montant</th>
+                <th className="py-1 text-right font-medium">
+                  {t('common.amount')}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -269,7 +273,7 @@ function RepartitionPreview({
             </tbody>
             <tfoot>
               <tr className="border-t font-bold">
-                <td className="py-1">Total</td>
+                <td className="py-1">{t('common.total')}</td>
                 <td className="py-1 text-right tabular-nums">
                   {totalTantieme}
                 </td>
@@ -343,7 +347,7 @@ function EncaisserModal({
       )
       onOpenChange(false)
     },
-    onError: () => toast.error("Erreur lors de l'enregistrement"),
+    onError: () => toast.error(t('gestionnaire.paiements.saveError')),
   })
 
   const handleSelectCreance = (c: Creance) => {
@@ -416,7 +420,7 @@ function EncaisserModal({
                 ))}
                 {payables.length === 0 && (
                   <p className="p-6 text-center text-sm text-muted-foreground">
-                    Aucune créance à encaisser
+                    {t('gestionnaire.paiements.noCreance')}
                   </p>
                 )}
               </div>
@@ -651,7 +655,7 @@ function PaiementAvanceModal({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label>Montant (MAD)</Label>
+              <Label>{t('common.montantMad')}</Label>
               <Input
                 type="number"
                 value={montant}
@@ -659,7 +663,7 @@ function PaiementAvanceModal({
               />
             </div>
             <div className="space-y-1">
-              <Label>Date</Label>
+              <Label>{t('common.date')}</Label>
               <Input
                 type="date"
                 value={date}
@@ -861,7 +865,7 @@ export function PaiementsPage() {
         }),
       )
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const relancerToutMutation = useMutation({
@@ -869,9 +873,11 @@ export function PaiementsPage() {
     onSuccess: (res) => {
       void qc.invalidateQueries({ queryKey: ['creances'] })
       setRelancerAllOpen(false)
-      toast.success(`${res.nb_envoye} relance(s) envoyée(s)`)
+      toast.success(
+        t('gestionnaire.paiements.relancesSent', { n: res.nb_envoye }),
+      )
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const validerVirementMutation = useMutation({
@@ -884,7 +890,7 @@ export function PaiementsPage() {
         }),
       )
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const rejeterVirementMutation = useMutation({
@@ -899,7 +905,7 @@ export function PaiementsPage() {
         }),
       )
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const createAppelMutation = useMutation({
@@ -931,7 +937,7 @@ export function PaiementsPage() {
       setEnvoyerTarget(null)
       toast.success(t('gestionnaire.appelsFonds.toastSent'))
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   // ── Computed stats ─────────────────────────────────────────────────────────
@@ -1510,10 +1516,14 @@ export function PaiementsPage() {
             />
             <Select value={creanceStatut} onValueChange={setCreanceStatut}>
               <SelectTrigger className="w-44">
-                <SelectValue placeholder="Tous les statuts" />
+                <SelectValue
+                  placeholder={t('gestionnaire.paiements.allStatuses')}
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="tous">Tous les statuts</SelectItem>
+                <SelectItem value="tous">
+                  {t('gestionnaire.paiements.allStatuses')}
+                </SelectItem>
                 {(
                   [
                     'a_payer',
@@ -1581,7 +1591,7 @@ export function PaiementsPage() {
         <div className="space-y-4">
           <div className="flex justify-end">
             <Button size="sm" onClick={() => setCreateAppelOpen(true)}>
-              Créer appel de fonds
+              {t('gestionnaire.paiements.createAppel')}
             </Button>
           </div>
           <DataTable
@@ -1719,13 +1729,17 @@ export function PaiementsPage() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Lot</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t('common.lot')}
+                    </p>
                     <p className="font-mono font-semibold">
                       {decompte.lot_numero}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Tantième</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t('common.tantieme')}
+                    </p>
                     <p className="font-semibold">{decompte.tantieme} / 1000</p>
                   </div>
                   <div>
@@ -1784,11 +1798,15 @@ export function PaiementsPage() {
                       <th className="px-4 py-3 text-left font-medium">
                         Échéance
                       </th>
-                      <th className="px-4 py-3 text-right font-medium">Dû</th>
+                      <th className="px-4 py-3 text-right font-medium">
+                        {t('common.du')}
+                      </th>
                       <th className="px-4 py-3 text-right font-medium">
                         {t('common.paye')}
                       </th>
-                      <th className="px-4 py-3 font-medium">Statut</th>
+                      <th className="px-4 py-3 font-medium">
+                        {t('common.status')}
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
@@ -1825,7 +1843,7 @@ export function PaiementsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => toast.info('Export en cours...')}
+                  onClick={() => toast.info(t('common.exportInProgress'))}
                 >
                   <Download className="me-1.5 size-4" />
                   {t('gestionnaire.paiements.decompte.exporter', {
@@ -1967,7 +1985,7 @@ export function PaiementsPage() {
               (lotsLoading ? (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Loader2 className="size-3.5 animate-spin" />
-                  Calcul de la répartition…
+                  {t('gestionnaire.paiements.calcRepartition')}
                 </div>
               ) : lotsArr.length > 0 ? (
                 <RepartitionPreview
@@ -2006,8 +2024,8 @@ export function PaiementsPage() {
       <ConfirmModal
         open={!!envoyerTarget}
         onOpenChange={(o) => !o && setEnvoyerTarget(null)}
-        title="Envoyer l'appel de fonds"
-        description="Cette action enverra une notification WhatsApp à tous les copropriétaires."
+        title={t('gestionnaire.paiements.sendAppelTitle')}
+        description={t('gestionnaire.paiements.sendAppelDesc')}
         confirmLabel="Envoyer"
         variant="default"
         onConfirm={() =>

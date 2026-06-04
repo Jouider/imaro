@@ -1378,7 +1378,15 @@
       "searchPlaceholder": "Rechercher copropriétaire ou lot...",
       "allMethods": "Toutes méthodes",
       "relanceAll": "Relancer tous les impayés",
-      "dueDate": "Date d'échéance"
+      "dueDate": "Date d'échéance",
+      "createAppel": "Créer appel de fonds",
+      "noCreance": "Aucune créance à encaisser",
+      "allStatuses": "Tous les statuts",
+      "calcRepartition": "Calcul de la répartition…",
+      "sendAppelTitle": "Envoyer l'appel de fonds",
+      "sendAppelDesc": "Cette action enverra une notification WhatsApp à tous les copropriétaires.",
+      "saveError": "Erreur lors de l'enregistrement",
+      "relancesSent": "{{n}} relance(s) envoyée(s)"
     },
     "tickets": {
       "title": "Tickets",
@@ -1844,7 +1852,22 @@
       "selectAccount": "Sélectionner un compte...",
       "noEntries": "Aucune écriture comptable",
       "toastClosed": "Exercice clôturé avec succès",
-      "toastCloseError": "Erreur lors de la clôture"
+      "toastCloseError": "Erreur lors de la clôture",
+      "montantColon": "Montant:",
+      "noCreance": "Aucune créance",
+      "entree": "Entrée",
+      "sortie": "Sortie",
+      "searchAccount": "Rechercher un compte...",
+      "prestataireNamePlaceholder": "Nom du prestataire",
+      "filterAccounts": "Filtrer les comptes...",
+      "balanceAutoHint": "La balance se construira automatiquement à partir des écritures de l'exercice.",
+      "legalDocsTitle": "Documents Légaux et Officiels",
+      "annexesRegTitle": "Annexes réglementaires (Décret 2.23.700)",
+      "annexesRegDesc": "Annexes 10, 13-1, 13-2 et autres documents légaux obligatoires",
+      "viewAnnexes": "Voir les annexes",
+      "iaError": "Erreur analyse IA",
+      "balanceEq": "Total Débit = Total Crédit = {{debit}} DH · Écart soldes : {{ecart}} DH",
+      "balanceNeq": "Écart débits/crédits : {{ecart}} DH — vérifier les écritures"
     },
     "depenses": {
       "title": "Dépenses",
@@ -2460,6 +2483,12 @@
     "updateFailed": "Échec de la mise à jour",
     "deleteFailed": "Échec de la suppression",
     "nameRequired": "Nom requis",
-    "lotRequired": "Lot requis"
+    "lotRequired": "Lot requis",
+    "lot": "Lot",
+    "total": "Total",
+    "montantMad": "Montant (MAD)",
+    "du": "Dû",
+    "exportInProgress": "Export en cours...",
+    "saveError": "Erreur lors de l'enregistrement"
   }
 }
