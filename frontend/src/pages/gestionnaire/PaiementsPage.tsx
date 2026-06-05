@@ -211,6 +211,7 @@ function RepartitionPreview({
   totalTantieme: number
   montantTotal: number
 }) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(true)
   return (
     <div className="rounded-lg border bg-muted/30 p-3">
@@ -219,7 +220,7 @@ function RepartitionPreview({
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center justify-between text-sm font-medium"
       >
-        <span>Répartition par tantième</span>
+        <span>{t('gestionnaire.paiements.repartitionTantieme')}</span>
         {open ? (
           <ChevronUp className="size-4 text-muted-foreground" />
         ) : (
@@ -231,10 +232,16 @@ function RepartitionPreview({
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b text-muted-foreground">
-                <th className="py-1 text-left font-medium">Lot</th>
-                <th className="py-1 text-right font-medium">Tantième</th>
+                <th className="py-1 text-left font-medium">
+                  {t('common.lot')}
+                </th>
+                <th className="py-1 text-right font-medium">
+                  {t('common.tantieme')}
+                </th>
                 <th className="py-1 text-right font-medium">%</th>
-                <th className="py-1 text-right font-medium">Montant</th>
+                <th className="py-1 text-right font-medium">
+                  {t('common.amount')}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -266,7 +273,7 @@ function RepartitionPreview({
             </tbody>
             <tfoot>
               <tr className="border-t font-bold">
-                <td className="py-1">Total</td>
+                <td className="py-1">{t('common.total')}</td>
                 <td className="py-1 text-right tabular-nums">
                   {totalTantieme}
                 </td>
@@ -340,7 +347,7 @@ function EncaisserModal({
       )
       onOpenChange(false)
     },
-    onError: () => toast.error("Erreur lors de l'enregistrement"),
+    onError: () => toast.error(t('gestionnaire.paiements.saveError')),
   })
 
   const handleSelectCreance = (c: Creance) => {
@@ -413,7 +420,7 @@ function EncaisserModal({
                 ))}
                 {payables.length === 0 && (
                   <p className="p-6 text-center text-sm text-muted-foreground">
-                    Aucune créance à encaisser
+                    {t('gestionnaire.paiements.noCreance')}
                   </p>
                 )}
               </div>
@@ -614,9 +621,9 @@ function PaiementAvanceModal({
           </div>
 
           <div className="space-y-1">
-            <Label>Copropriétaire</Label>
+            <Label>{t('common.coproprietaire')}</Label>
             <Input
-              placeholder="Rechercher..."
+              placeholder={t('common.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -648,7 +655,7 @@ function PaiementAvanceModal({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label>Montant (MAD)</Label>
+              <Label>{t('common.montantMad')}</Label>
               <Input
                 type="number"
                 value={montant}
@@ -656,7 +663,7 @@ function PaiementAvanceModal({
               />
             </div>
             <div className="space-y-1">
-              <Label>Date</Label>
+              <Label>{t('common.date')}</Label>
               <Input
                 type="date"
                 value={date}
@@ -666,7 +673,7 @@ function PaiementAvanceModal({
           </div>
 
           <div className="space-y-1">
-            <Label>Méthode</Label>
+            <Label>{t('common.methode')}</Label>
             <Select value={methode} onValueChange={setMethode}>
               <SelectTrigger className="w-full">
                 <SelectValue />
@@ -734,7 +741,7 @@ function RejeterVirementModal({
             className="mt-1"
             value={motif}
             onChange={(e) => setMotif(e.target.value)}
-            placeholder="Ex: Référence incorrecte..."
+            placeholder={t('gestionnaire.paiements.notePlaceholder')}
           />
         </div>
         <DialogFooter>
@@ -858,7 +865,7 @@ export function PaiementsPage() {
         }),
       )
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const relancerToutMutation = useMutation({
@@ -866,9 +873,11 @@ export function PaiementsPage() {
     onSuccess: (res) => {
       void qc.invalidateQueries({ queryKey: ['creances'] })
       setRelancerAllOpen(false)
-      toast.success(`${res.nb_envoye} relance(s) envoyée(s)`)
+      toast.success(
+        t('gestionnaire.paiements.relancesSent', { n: res.nb_envoye }),
+      )
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const validerVirementMutation = useMutation({
@@ -881,7 +890,7 @@ export function PaiementsPage() {
         }),
       )
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const rejeterVirementMutation = useMutation({
@@ -896,7 +905,7 @@ export function PaiementsPage() {
         }),
       )
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const createAppelMutation = useMutation({
@@ -916,9 +925,9 @@ export function PaiementsPage() {
         montant_total: '',
         date_echeance: '',
       })
-      toast.success('Appel de fonds créé')
+      toast.success(t('gestionnaire.appelsFonds.toastCreated'))
     },
-    onError: () => toast.error('Erreur lors de la création'),
+    onError: () => toast.error(t('common.createError')),
   })
 
   const envoyerMutation = useMutation({
@@ -926,9 +935,9 @@ export function PaiementsPage() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['appels-fonds'] })
       setEnvoyerTarget(null)
-      toast.success('Appel de fonds envoyé')
+      toast.success(t('gestionnaire.appelsFonds.toastSent'))
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   // ── Computed stats ─────────────────────────────────────────────────────────
@@ -999,7 +1008,7 @@ export function PaiementsPage() {
     },
     {
       key: 'appel_fonds_titre',
-      header: 'Appel de fonds',
+      header: t('common.appelDeFonds'),
       renderCell: (r) => (
         <span className="text-sm text-muted-foreground">
           {r.appel_fonds_titre}
@@ -1135,7 +1144,7 @@ export function PaiementsPage() {
     },
     {
       key: 'date_echeance',
-      header: 'Échéance',
+      header: t('common.echeance'),
       sortable: true,
       renderCell: (r) => r.date_echeance?.slice(0, 10) ?? '—',
     },
@@ -1172,7 +1181,11 @@ export function PaiementsPage() {
       sortable: true,
       renderCell: (r) => r.date_paiement.slice(0, 10),
     },
-    { key: 'coproprietaire_nom', header: 'Copropriétaire', sortable: true },
+    {
+      key: 'coproprietaire_nom',
+      header: t('common.coproprietaire'),
+      sortable: true,
+    },
     {
       key: 'lot_numero',
       header: 'Lot',
@@ -1240,7 +1253,11 @@ export function PaiementsPage() {
       sortable: true,
       renderCell: (r) => r.date_declaration.slice(0, 10),
     },
-    { key: 'coproprietaire_nom', header: 'Copropriétaire', sortable: true },
+    {
+      key: 'coproprietaire_nom',
+      header: t('common.coproprietaire'),
+      sortable: true,
+    },
     {
       key: 'lot_numero',
       header: 'Lot',
@@ -1500,17 +1517,21 @@ export function PaiementsPage() {
           {/* Filters */}
           <div className="flex flex-wrap gap-3">
             <Input
-              placeholder="Rechercher copropriétaire ou lot..."
+              placeholder={t('gestionnaire.paiements.searchPlaceholder')}
               value={creanceSearch}
               onChange={(e) => setCreanceSearch(e.target.value)}
               className="max-w-xs"
             />
             <Select value={creanceStatut} onValueChange={setCreanceStatut}>
               <SelectTrigger className="w-44">
-                <SelectValue placeholder="Tous les statuts" />
+                <SelectValue
+                  placeholder={t('gestionnaire.paiements.allStatuses')}
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="tous">Tous les statuts</SelectItem>
+                <SelectItem value="tous">
+                  {t('gestionnaire.paiements.allStatuses')}
+                </SelectItem>
                 {(
                   [
                     'a_payer',
@@ -1578,7 +1599,7 @@ export function PaiementsPage() {
         <div className="space-y-4">
           <div className="flex justify-end">
             <Button size="sm" onClick={() => setCreateAppelOpen(true)}>
-              Créer appel de fonds
+              {t('gestionnaire.paiements.createAppel')}
             </Button>
           </div>
           <DataTable
@@ -1598,17 +1619,21 @@ export function PaiementsPage() {
         <div className="space-y-4">
           <div className="flex flex-wrap gap-3">
             <Input
-              placeholder="Rechercher..."
+              placeholder={t('common.searchPlaceholder')}
               value={histSearch}
               onChange={(e) => setHistSearch(e.target.value)}
               className="max-w-xs"
             />
             <Select value={histMethode} onValueChange={setHistMethode}>
               <SelectTrigger className="w-44">
-                <SelectValue placeholder="Toutes méthodes" />
+                <SelectValue
+                  placeholder={t('gestionnaire.paiements.allMethods')}
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="tous">Toutes méthodes</SelectItem>
+                <SelectItem value="tous">
+                  {t('gestionnaire.paiements.allMethods')}
+                </SelectItem>
                 {(
                   [
                     'especes',
@@ -1705,20 +1730,24 @@ export function PaiementsPage() {
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                   <div>
                     <p className="text-xs text-muted-foreground">
-                      Copropriétaire
+                      {t('common.coproprietaire')}
                     </p>
                     <p className="font-semibold">
                       {decompte.coproprietaire_nom}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Lot</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t('common.lot')}
+                    </p>
                     <p className="font-mono font-semibold">
                       {decompte.lot_numero}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Tantième</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t('common.tantieme')}
+                    </p>
                     <p className="font-semibold">{decompte.tantieme} / 1000</p>
                   </div>
                   <div>
@@ -1772,14 +1801,20 @@ export function PaiementsPage() {
                   <thead>
                     <tr className="border-b bg-muted/40 text-xs text-muted-foreground">
                       <th className="px-4 py-3 text-left font-medium">
-                        Appel de fonds
+                        {t('common.appelDeFonds')}
                       </th>
                       <th className="px-4 py-3 text-left font-medium">
-                        Échéance
+                        {t('common.echeance')}
                       </th>
-                      <th className="px-4 py-3 text-right font-medium">Dû</th>
-                      <th className="px-4 py-3 text-right font-medium">Payé</th>
-                      <th className="px-4 py-3 font-medium">Statut</th>
+                      <th className="px-4 py-3 text-right font-medium">
+                        {t('common.du')}
+                      </th>
+                      <th className="px-4 py-3 text-right font-medium">
+                        {t('common.paye')}
+                      </th>
+                      <th className="px-4 py-3 font-medium">
+                        {t('common.status')}
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
@@ -1816,7 +1851,7 @@ export function PaiementsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => toast.info('Export en cours...')}
+                  onClick={() => toast.info(t('common.exportInProgress'))}
                 >
                   <Download className="me-1.5 size-4" />
                   {t('gestionnaire.paiements.decompte.exporter', {
@@ -1878,7 +1913,7 @@ export function PaiementsPage() {
       <ConfirmModal
         open={relancerAllOpen}
         onOpenChange={setRelancerAllOpen}
-        title="Relancer tous les impayés"
+        title={t('gestionnaire.paiements.relanceAll')}
         description={`Envoyer une relance WhatsApp à ${nbImpayes} copropriétaire(s) avec des créances impayées ?`}
         confirmLabel="Envoyer les relances"
         variant="default"
@@ -1890,7 +1925,9 @@ export function PaiementsPage() {
       <Dialog open={createAppelOpen} onOpenChange={setCreateAppelOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Créer un appel de fonds</DialogTitle>
+            <DialogTitle>
+              {t('gestionnaire.appelsFonds.createTitle')}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1">
@@ -1904,7 +1941,7 @@ export function PaiementsPage() {
               />
             </div>
             <div className="space-y-1">
-              <Label>Résidence</Label>
+              <Label>{t('common.residence')}</Label>
               <Select
                 value={appelForm.residence_id}
                 onValueChange={(v) =>
@@ -1912,7 +1949,7 @@ export function PaiementsPage() {
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Choisir une résidence" />
+                  <SelectValue placeholder={t('common.selectResidence')} />
                 </SelectTrigger>
                 <SelectContent>
                   {residences.map((r) => (
@@ -1938,7 +1975,7 @@ export function PaiementsPage() {
                 />
               </div>
               <div className="space-y-1">
-                <Label>Date d'échéance</Label>
+                <Label>{t('gestionnaire.paiements.dueDate')}</Label>
                 <Input
                   type="date"
                   value={appelForm.date_echeance}
@@ -1956,7 +1993,7 @@ export function PaiementsPage() {
               (lotsLoading ? (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Loader2 className="size-3.5 animate-spin" />
-                  Calcul de la répartition…
+                  {t('gestionnaire.paiements.calcRepartition')}
                 </div>
               ) : lotsArr.length > 0 ? (
                 <RepartitionPreview
@@ -1995,8 +2032,8 @@ export function PaiementsPage() {
       <ConfirmModal
         open={!!envoyerTarget}
         onOpenChange={(o) => !o && setEnvoyerTarget(null)}
-        title="Envoyer l'appel de fonds"
-        description="Cette action enverra une notification WhatsApp à tous les copropriétaires."
+        title={t('gestionnaire.paiements.sendAppelTitle')}
+        description={t('gestionnaire.paiements.sendAppelDesc')}
         confirmLabel="Envoyer"
         variant="default"
         onConfirm={() =>

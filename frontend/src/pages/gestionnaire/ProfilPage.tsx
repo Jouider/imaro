@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import {
   Building2,
@@ -39,6 +40,7 @@ function getInitials(name: string): string {
 // ─── ProfilPage ───────────────────────────────────────────────────────────────
 
 export function ProfilPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { user, tenant, clear } = useAuthStore()
   const { logoUrl, setLogoUrl } = useSettingsStore()
@@ -50,7 +52,7 @@ export function ProfilPage() {
   const [editPhone, setEditPhone] = useState(user?.phone ?? '')
 
   const handleSaveProfile = () => {
-    toast.success('Profil mis à jour avec succès')
+    toast.success(t('gestionnaire.profil.toastSaved'))
     setEditMode(false)
   }
 
@@ -65,20 +67,20 @@ export function ProfilPage() {
     const file = e.target.files?.[0]
     if (!file) return
     if (file.size > 2 * 1024 * 1024) {
-      toast.error('Le logo ne doit pas dépasser 2 Mo')
+      toast.error(t('gestionnaire.profil.logoTooBig'))
       return
     }
     const reader = new FileReader()
     reader.onload = () => {
       setLogoUrl(reader.result as string)
-      toast.success('Logo mis à jour — visible dans la barre de navigation')
+      toast.success(t('gestionnaire.profil.logoUpdated'))
     }
     reader.readAsDataURL(file)
   }
 
   const handleRemoveLogo = () => {
     setLogoUrl(null)
-    toast.success('Logo supprimé')
+    toast.success(t('gestionnaire.profil.logoRemoved'))
   }
 
   // ── Notification toggles ──
@@ -110,7 +112,7 @@ export function ProfilPage() {
         className="text-2xl font-bold"
         style={{ color: 'var(--color-imaro-primary)' }}
       >
-        Mon Profil
+        {t('gestionnaire.profil.title')}
       </h1>
 
       {/* ── 2. Hero card ── */}
@@ -129,7 +131,7 @@ export function ProfilPage() {
             </div>
             <button
               onClick={() => setEditMode((prev) => !prev)}
-              aria-label="Modifier le profil"
+              aria-label={t('gestionnaire.profil.editAria')}
               className={cn(
                 'absolute bottom-0 end-0 flex size-6 items-center justify-center rounded-full border bg-white shadow-sm transition-colors hover:bg-gray-50 dark:bg-card dark:border-border dark:hover:bg-muted',
                 editMode && 'border-[var(--color-imaro-primary)]',
@@ -149,7 +151,9 @@ export function ProfilPage() {
                 className="text-xs font-semibold text-white"
                 style={{ background: 'var(--color-imaro-primary)' }}
               >
-                {user?.role === 'manager' ? 'Manager' : 'Gestionnaire'}
+                {user?.role === 'manager'
+                  ? t('gestionnaire.profil.roleManager')
+                  : t('gestionnaire.profil.roleGestionnaire')}
               </Badge>
             </div>
             <p className="mt-1.5 text-sm text-muted-foreground">
@@ -166,16 +170,18 @@ export function ProfilPage() {
           <div className="mt-5 space-y-4 border-t pt-5 dark:border-border">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="edit-name">Nom complet</Label>
+                <Label htmlFor="edit-name">
+                  {t('gestionnaire.profil.fullName')}
+                </Label>
                 <Input
                   id="edit-name"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  placeholder="Votre nom"
+                  placeholder={t('gestionnaire.profil.namePlaceholder')}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="edit-phone">Téléphone</Label>
+                <Label htmlFor="edit-phone">{t('common.phone')}</Label>
                 <Input
                   id="edit-phone"
                   value={editPhone}
@@ -187,11 +193,11 @@ export function ProfilPage() {
             <div className="flex gap-2">
               <Button size="sm" onClick={handleSaveProfile}>
                 <Check className="me-1.5 size-3.5" />
-                Enregistrer
+                {t('actions.save')}
               </Button>
               <Button size="sm" variant="outline" onClick={handleCancelEdit}>
                 <X className="me-1.5 size-3.5" />
-                Annuler
+                {t('actions.cancel')}
               </Button>
             </div>
           </div>
@@ -206,11 +212,11 @@ export function ProfilPage() {
             style={{ color: 'var(--color-imaro-primary)' }}
           />
           <h2 className="text-base font-semibold text-foreground">
-            Logo du Syndic
+            {t('gestionnaire.profil.logoSection')}
           </h2>
         </div>
         <p className="text-sm text-muted-foreground mb-5">
-          Affiché dans la barre de navigation. PNG ou JPG, 2 Mo max.
+          {t('gestionnaire.profil.logoHint')}
         </p>
 
         <div className="flex items-center gap-5">
@@ -224,7 +230,7 @@ export function ProfilPage() {
             {logoUrl ? (
               <img
                 src={logoUrl}
-                alt="Logo syndic"
+                alt={t('gestionnaire.profil.logoAlt')}
                 className="size-full rounded-xl object-contain"
               />
             ) : (
@@ -247,7 +253,9 @@ export function ProfilPage() {
               onClick={() => logoInputRef.current?.click()}
             >
               <ImagePlus className="me-1.5 size-3.5" />
-              {logoUrl ? 'Changer le logo' : 'Importer un logo'}
+              {logoUrl
+                ? t('gestionnaire.profil.changeLogo')
+                : t('gestionnaire.profil.importLogo')}
             </Button>
             {logoUrl && (
               <Button
@@ -257,7 +265,7 @@ export function ProfilPage() {
                 onClick={handleRemoveLogo}
               >
                 <Trash2 className="me-1.5 size-3.5" />
-                Supprimer
+                {t('actions.delete')}
               </Button>
             )}
           </div>
@@ -272,20 +280,24 @@ export function ProfilPage() {
             style={{ color: 'var(--color-imaro-primary)' }}
           />
           <h2 className="text-base font-semibold text-foreground">
-            Syndic & Abonnement
+            {t('gestionnaire.profil.subSection')}
           </h2>
         </div>
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Plan</span>
+            <span className="text-sm text-muted-foreground">
+              {t('gestionnaire.profil.plan')}
+            </span>
             <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-semibold">
               {planLabel}
             </Badge>
           </div>
           <Separator />
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Société</span>
+            <span className="text-sm text-muted-foreground">
+              {t('common.societe')}
+            </span>
             <span className="text-sm font-medium text-foreground">
               {tenant?.name ?? '—'}
             </span>
@@ -299,10 +311,10 @@ export function ProfilPage() {
             style={{ color: '#E67E22' }}
             onClick={(e) => {
               e.preventDefault()
-              toast.info('Fonctionnalité bientôt disponible')
+              toast.info(t('gestionnaire.profil.comingSoon'))
             }}
           >
-            Passer au Pro →
+            {t('gestionnaire.profil.upgradePro')}
           </a>
         </div>
       </div>
@@ -315,24 +327,24 @@ export function ProfilPage() {
             style={{ color: 'var(--color-imaro-primary)' }}
           />
           <h2 className="text-base font-semibold text-foreground">
-            Préférences de Notification
+            {t('gestionnaire.profil.notifSection')}
           </h2>
         </div>
         <p className="text-sm text-muted-foreground mb-5">
-          Choisissez les alertes WhatsApp que vous souhaitez recevoir
+          {t('gestionnaire.profil.notifHint')}
         </p>
 
         {/* Master toggle */}
         <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-muted/40 mb-4">
           <div>
             <p className="text-sm font-semibold text-foreground">
-              Activer les notifications WhatsApp
+              {t('gestionnaire.profil.notifMaster')}
             </p>
           </div>
           <Switch
             checked={notifMaster}
             onCheckedChange={setNotifMaster}
-            aria-label="Activer les notifications WhatsApp"
+            aria-label={t('gestionnaire.profil.notifMaster')}
           />
         </div>
 
@@ -341,29 +353,29 @@ export function ProfilPage() {
           {[
             {
               id: 'notif-paiement',
-              label: 'Nouveau paiement reçu',
-              description: 'Un copropriétaire effectue un paiement',
+              label: t('gestionnaire.profil.notifPaiementLabel'),
+              description: t('gestionnaire.profil.notifPaiementDesc'),
               checked: notifPaiement,
               onChange: setNotifPaiement,
             },
             {
               id: 'notif-ticket',
-              label: "Nouveau ticket d'incident",
-              description: 'Un résident signale un incident',
+              label: t('gestionnaire.profil.notifTicketLabel'),
+              description: t('gestionnaire.profil.notifTicketDesc'),
               checked: notifTicket,
               onChange: setNotifTicket,
             },
             {
               id: 'notif-assemblee',
-              label: 'Assemblée programmée',
-              description: 'Une assemblée générale est planifiée',
+              label: t('gestionnaire.profil.notifAssembleeLabel'),
+              description: t('gestionnaire.profil.notifAssembleeDesc'),
               checked: notifAssemblee,
               onChange: setNotifAssemblee,
             },
             {
               id: 'notif-retard',
-              label: 'Retard de paiement',
-              description: "Un copropriétaire dépasse la date d'échéance",
+              label: t('gestionnaire.profil.notifRetardLabel'),
+              description: t('gestionnaire.profil.notifRetardDesc'),
               checked: notifRetard,
               onChange: setNotifRetard,
             },
@@ -406,10 +418,12 @@ export function ProfilPage() {
       {/* ── 5. Apparence ── */}
       <div className="rounded-2xl bg-white shadow-sm p-6 dark:bg-card">
         <h2 className="text-base font-semibold text-foreground mb-4">
-          Apparence
+          {t('gestionnaire.profil.appearance')}
         </h2>
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Mode sombre</span>
+          <span className="text-sm text-muted-foreground">
+            {t('gestionnaire.profil.darkMode')}
+          </span>
           <ThemeToggle />
         </div>
       </div>
@@ -422,13 +436,13 @@ export function ProfilPage() {
             style={{ color: 'var(--color-imaro-primary)' }}
           />
           <h2 className="text-base font-semibold text-foreground">
-            Mes Données Personnelles
+            {t('gestionnaire.profil.dataSection')}
           </h2>
         </div>
         <p className="text-sm text-muted-foreground mb-5">
-          Vos droits conformément à la{' '}
+          {t('gestionnaire.profil.dataRightsPre')}
           <span className="font-medium">
-            loi 09-08 relative à la protection des données personnelles
+            {t('gestionnaire.profil.dataLaw')}
           </span>
         </p>
 
@@ -436,22 +450,19 @@ export function ProfilPage() {
           {/* Droit d'accès */}
           <div className="rounded-lg bg-gray-50 p-4 dark:bg-muted/40">
             <p className="text-sm font-semibold text-foreground mb-0.5">
-              Droit d'accès (Article 7)
+              {t('gestionnaire.profil.accessTitle')}
             </p>
             <p className="text-xs text-muted-foreground mb-3">
-              Demandez une copie de toutes vos données. L'export sera disponible
-              sous 48h.
+              {t('gestionnaire.profil.accessDesc')}
             </p>
             <Button
               size="sm"
               variant="outline"
               onClick={() =>
-                toast.info(
-                  'Demande enregistrée. Vous recevrez votre export sous 48h.',
-                )
+                toast.info(t('gestionnaire.profil.exportRequested'))
               }
             >
-              Demander l'export
+              {t('gestionnaire.profil.requestExport')}
             </Button>
           </div>
 
@@ -460,11 +471,10 @@ export function ProfilPage() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-foreground mb-0.5">
-                  Droit de rectification (Article 8)
+                  {t('gestionnaire.profil.rectifTitle')}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Modifiez vos informations personnelles dans la section
-                  ci-dessus.
+                  {t('gestionnaire.profil.rectifDesc')}
                 </p>
               </div>
               <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
@@ -476,29 +486,23 @@ export function ProfilPage() {
           {/* Droit de suppression */}
           <div className="rounded-lg bg-gray-50 p-4 dark:bg-muted/40">
             <p className="text-sm font-semibold text-red-600 dark:text-red-400 mb-0.5">
-              Droit de suppression (Article 8)
+              {t('gestionnaire.profil.deleteTitle')}
             </p>
             <p className="text-xs text-muted-foreground mb-3">
-              Demandez la suppression de votre compte. Un administrateur
-              examinera votre demande.
+              {t('gestionnaire.profil.deleteDesc')}
             </p>
             <Button
               size="sm"
               variant="destructive"
-              onClick={() =>
-                toast.error(
-                  'Cette action est irréversible. Contactez support@imaro.ma',
-                )
-              }
+              onClick={() => toast.error(t('gestionnaire.profil.deleteWarn'))}
             >
-              Supprimer mon compte
+              {t('gestionnaire.profil.deleteAccount')}
             </Button>
           </div>
         </div>
 
         <p className="mt-4 text-xs text-muted-foreground border-t pt-4 dark:border-border">
-          Certaines données comptables peuvent être conservées 10 ans
-          conformément aux obligations légales marocaines.
+          {t('gestionnaire.profil.retentionNote')}
         </p>
       </div>
 
@@ -510,7 +514,9 @@ export function ProfilPage() {
         disabled={logoutMutation.isPending}
       >
         <LogOut className="me-2 size-4" />
-        {logoutMutation.isPending ? 'Déconnexion…' : 'Se déconnecter'}
+        {logoutMutation.isPending
+          ? t('gestionnaire.profil.loggingOut')
+          : t('gestionnaire.profil.logout')}
       </Button>
     </div>
   )

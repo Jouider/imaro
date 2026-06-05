@@ -566,7 +566,7 @@ function AssembleesTab({
       {upcoming.length > 0 && (
         <section className="space-y-3">
           <h2 className="text-sm font-semibold text-[var(--color-imaro-primary)] uppercase tracking-wide">
-            À venir
+            {t('portail.actualites.aVenir')}
           </h2>
           {upcoming.map((ag) => (
             <AGCard
@@ -585,7 +585,7 @@ function AssembleesTab({
       {past.length > 0 && (
         <section className="space-y-3">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Passées
+            {t('portail.actualites.passees')}
           </h2>
           {past.map((ag) => (
             <AGCard

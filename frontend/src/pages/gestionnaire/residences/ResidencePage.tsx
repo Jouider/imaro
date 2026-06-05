@@ -235,9 +235,9 @@ export function ResidencePage() {
       void qc.invalidateQueries({ queryKey: ['lots', residenceId] })
       setLotDialogOpen(false)
       setForm(EMPTY_FORM)
-      toast.success('Lot ajouté')
+      toast.success(t('gestionnaire.residences.toastLotAdded'))
     },
-    onError: () => toast.error("Erreur lors de l'ajout du lot"),
+    onError: () => toast.error(t('gestionnaire.residences.addLotError')),
   })
 
   const updateMutation = useMutation({
@@ -253,9 +253,9 @@ export function ResidencePage() {
       setLotDialogOpen(false)
       setEditingLot(null)
       setForm(EMPTY_FORM)
-      toast.success('Lot modifié')
+      toast.success(t('gestionnaire.residences.toastLotUpdated'))
     },
-    onError: () => toast.error('Erreur lors de la modification'),
+    onError: () => toast.error(t('gestionnaire.residences.modifyError')),
   })
 
   const deleteMutation = useMutation({
@@ -263,9 +263,9 @@ export function ResidencePage() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['lots', residenceId] })
       setDeletingLot(null)
-      toast.success('Lot supprimé')
+      toast.success(t('gestionnaire.residences.toastLotDeleted'))
     },
-    onError: () => toast.error('Erreur lors de la suppression'),
+    onError: () => toast.error(t('common.deleteError')),
   })
 
   // ── Immeuble Mutations ────────────────────────────────────────────────────────
@@ -567,7 +567,7 @@ export function ResidencePage() {
             variant="ghost"
             size="sm"
             onClick={() => openEdit(r)}
-            aria-label="Modifier"
+            aria-label={t('actions.edit')}
           >
             <Pencil className="size-3.5" />
           </Button>
@@ -576,7 +576,7 @@ export function ResidencePage() {
             size="sm"
             onClick={() => setDeletingLot(r)}
             className="text-destructive hover:text-destructive"
-            aria-label="Supprimer"
+            aria-label={t('actions.delete')}
           >
             <Trash2 className="size-3.5" />
           </Button>
@@ -722,7 +722,7 @@ export function ResidencePage() {
               const imm = immeubles.find((i) => i.id === r.id)
               if (imm) openEditImmeuble(imm)
             }}
-            aria-label="Modifier"
+            aria-label={t('actions.edit')}
           >
             <Pencil className="size-3.5" />
           </Button>
@@ -734,7 +734,7 @@ export function ResidencePage() {
               if (imm) setDeletingImmeuble(imm)
             }}
             className="text-destructive hover:text-destructive"
-            aria-label="Supprimer"
+            aria-label={t('actions.delete')}
           >
             <Trash2 className="size-3.5" />
           </Button>
@@ -972,10 +972,10 @@ export function ResidencePage() {
               <Building2 className="size-12 text-muted-foreground/40" />
               <div>
                 <p className="font-medium text-muted-foreground">
-                  Aucun lot dans cet immeuble
+                  {t('gestionnaire.residences.noLotInImmeuble')}
                 </p>
                 <p className="text-sm text-muted-foreground/70">
-                  Ajoutez des lots un par un ou générez-en plusieurs
+                  {t('gestionnaire.residences.addLotsHint')}
                 </p>
               </div>
               <Button
@@ -985,7 +985,7 @@ export function ResidencePage() {
                 }}
               >
                 <Zap className="size-4 mr-2" />
-                Générer des lots
+                {t('gestionnaire.residences.generateLots')}
               </Button>
             </div>
           ) : (

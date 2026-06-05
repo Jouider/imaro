@@ -152,7 +152,7 @@ function NouvelleDepenseModal({
       setIaResult(null)
       onOpenChange(false)
     },
-    onError: () => toast.error("Erreur lors de l'enregistrement"),
+    onError: () => toast.error(t('common.saveError')),
   })
 
   const handleAnalyseIa = async () => {
@@ -162,7 +162,7 @@ function NouvelleDepenseModal({
       const result = await importFactureIa(iaFile)
       setIaResult(result)
     } catch {
-      toast.error("Erreur lors de l'analyse")
+      toast.error(t('gestionnaire.depenses.analyzeError'))
     } finally {
       setIaLoading(false)
     }
@@ -335,7 +335,9 @@ function NouvelleDepenseModal({
               }
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Sélectionner un compte" />
+                <SelectValue
+                  placeholder={t('gestionnaire.depenses.selectAccount')}
+                />
               </SelectTrigger>
               <SelectContent>
                 {compteClasse6.map((c) => (
@@ -392,7 +394,7 @@ function NouvelleDepenseModal({
               onChange={(e) =>
                 setForm((f) => ({ ...f, prestataire: e.target.value }))
               }
-              placeholder="Sécurité Atlas SARL"
+              placeholder={t('gestionnaire.depenses.beneficiaryPlaceholder')}
             />
           </div>
 
@@ -497,9 +499,9 @@ function ModelesRecurrentsModal({
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['modeles-recurrents'] })
       setNewModeleOpen(false)
-      toast.success('Modèle créé')
+      toast.success(t('gestionnaire.depenses.toastModelCreated'))
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const FREQ_LABELS: Record<string, string> = {
@@ -589,7 +591,7 @@ function ModelesRecurrentsModal({
             ))}
             {modeles.length === 0 && (
               <p className="py-8 text-center text-sm text-muted-foreground">
-                Aucun modèle récurrent
+                {t('gestionnaire.depenses.noModele')}
               </p>
             )}
           </div>
@@ -598,7 +600,9 @@ function ModelesRecurrentsModal({
         {/* New modele sub-form */}
         {newModeleOpen && (
           <div className="rounded-lg border border-dashed p-4 space-y-3 mt-4">
-            <p className="text-sm font-medium">Nouveau modèle</p>
+            <p className="text-sm font-medium">
+              {t('gestionnaire.depenses.newModel')}
+            </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label>Titre</Label>
@@ -610,7 +614,7 @@ function ModelesRecurrentsModal({
                 />
               </div>
               <div className="space-y-1">
-                <Label>Montant (MAD)</Label>
+                <Label>{t('common.montantMad')}</Label>
                 <Input
                   type="number"
                   value={form.montant}
@@ -629,7 +633,9 @@ function ModelesRecurrentsModal({
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Compte de charge" />
+                  <SelectValue
+                    placeholder={t('gestionnaire.depenses.compteCharge')}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {compteClasse6.map((c) => (
@@ -658,7 +664,7 @@ function ModelesRecurrentsModal({
                 />
               </div>
               <div className="space-y-1">
-                <Label>Fréquence</Label>
+                <Label>{t('gestionnaire.depenses.frequency')}</Label>
                 <Select
                   value={form.frequence}
                   onValueChange={(v) =>
@@ -687,7 +693,7 @@ function ModelesRecurrentsModal({
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label>Date début</Label>
+                <Label>{t('common.startDate')}</Label>
                 <Input
                   type="date"
                   value={form.date_debut}
@@ -697,7 +703,7 @@ function ModelesRecurrentsModal({
                 />
               </div>
               <div className="space-y-1">
-                <Label>Date fin (optionnel)</Label>
+                <Label>{t('gestionnaire.depenses.dateFinOptional')}</Label>
                 <Input
                   type="date"
                   value={form.date_fin}
@@ -782,18 +788,18 @@ export function DepensesPage() {
       void qc.invalidateQueries({ queryKey: ['depenses-finance'] })
       void qc.invalidateQueries({ queryKey: ['depenses-stats'] })
       setDeleteTarget(null)
-      toast.success('Dépense supprimée')
+      toast.success(t('gestionnaire.depenses.toastDeleted'))
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const approuverMutation = useMutation({
     mutationFn: (id: number) => approuverDepense(id),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['depenses-finance'] })
-      toast.success('Dépense approuvée')
+      toast.success(t('gestionnaire.depenses.toastApproved'))
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const rejeterMutation = useMutation({
@@ -803,9 +809,9 @@ export function DepensesPage() {
       void qc.invalidateQueries({ queryKey: ['depenses-finance'] })
       setRejetTarget(null)
       setRejetMotif('')
-      toast.success('Dépense rejetée')
+      toast.success(t('gestionnaire.depenses.toastRejected'))
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   // ── Filters ────────────────────────────────────────────────────────────────
@@ -888,7 +894,7 @@ export function DepensesPage() {
             variant="ghost"
             size="sm"
             className="h-6 px-2"
-            onClick={() => toast.info('Téléchargement...')}
+            onClick={() => toast.info(t('gestionnaire.depenses.downloading'))}
           >
             <Download className="size-3.5" />
           </Button>
@@ -969,7 +975,7 @@ export function DepensesPage() {
               variant="outline"
               size="sm"
               onClick={() => {
-                toast.info('Import IA...')
+                toast.info(t('gestionnaire.depenses.importIa'))
                 setAddOpen(true)
               }}
             >
@@ -1039,7 +1045,9 @@ export function DepensesPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Bar chart: évolution mensuelle */}
           <div className="rounded-xl border bg-card p-4">
-            <p className="mb-3 text-sm font-medium">Évolution mensuelle</p>
+            <p className="mb-3 text-sm font-medium">
+              {t('gestionnaire.depenses.evolutionMensuelle')}
+            </p>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={stats.evolution_mensuelle} margin={{ left: -10 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -1060,7 +1068,7 @@ export function DepensesPage() {
           {/* Pie chart: répartition par compte PCG */}
           <div className="rounded-xl border bg-card p-4">
             <p className="mb-3 text-sm font-medium">
-              Répartition par compte PCG
+              {t('gestionnaire.depenses.repartitionPcg')}
             </p>
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
@@ -1103,7 +1111,9 @@ export function DepensesPage() {
             <thead>
               <tr className="border-b text-xs text-muted-foreground">
                 <th className="py-2 text-left font-medium">Prestataire</th>
-                <th className="py-2 text-right font-medium">Total MAD</th>
+                <th className="py-2 text-right font-medium">
+                  {t('gestionnaire.depenses.totalMad')}
+                </th>
                 <th className="py-2 text-right font-medium">Factures</th>
               </tr>
             </thead>
@@ -1128,17 +1138,21 @@ export function DepensesPage() {
       <div className="space-y-4">
         <div className="flex flex-wrap gap-3">
           <Input
-            placeholder="Rechercher titre ou prestataire..."
+            placeholder={t('gestionnaire.depenses.searchTitle')}
             value={filterSearch}
             onChange={(e) => setFilterSearch(e.target.value)}
             className="max-w-xs"
           />
           <Select value={filterCompte} onValueChange={setFilterCompte}>
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="Tous comptes" />
+              <SelectValue
+                placeholder={t('gestionnaire.depenses.allAccounts')}
+              />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="tous">Tous comptes</SelectItem>
+              <SelectItem value="tous">
+                {t('gestionnaire.depenses.allAccounts')}
+              </SelectItem>
               {compteClasse6.map((c) => (
                 <SelectItem key={c.numero} value={c.numero}>
                   {c.numero} — {c.libelle}
@@ -1154,7 +1168,9 @@ export function DepensesPage() {
               <SelectValue placeholder="Approbation" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="tous">Tous statuts</SelectItem>
+              <SelectItem value="tous">
+                {t('gestionnaire.depenses.allStatuses')}
+              </SelectItem>
               <SelectItem value="approuve">
                 {t('gestionnaire.depenses.approbation.approuve', {
                   defaultValue: 'Approuvé',
@@ -1208,7 +1224,7 @@ export function DepensesPage() {
       <ConfirmModal
         open={!!deleteTarget}
         onOpenChange={(o) => !o && setDeleteTarget(null)}
-        title="Supprimer la dépense"
+        title={t('gestionnaire.depenses.deleteTitle')}
         description={
           deleteTarget
             ? `La dépense "${deleteTarget.titre}" sera supprimée définitivement.`
@@ -1224,10 +1240,10 @@ export function DepensesPage() {
       >
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Rejeter la dépense</DialogTitle>
+            <DialogTitle>{t('gestionnaire.depenses.rejectTitle')}</DialogTitle>
           </DialogHeader>
           <div className="py-2 space-y-2">
-            <Label>Motif du rejet</Label>
+            <Label>{t('gestionnaire.depenses.motifRejet')}</Label>
             <Input
               value={rejetMotif}
               onChange={(e) => setRejetMotif(e.target.value)}

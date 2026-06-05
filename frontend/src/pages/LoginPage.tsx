@@ -1073,7 +1073,7 @@ export function LoginPage() {
                   void navigate('/portail', { replace: true })
                 }}
               >
-                Copropriétaire
+                {t('common.coproprietaire')}
               </Button>
             </div>
           </div>

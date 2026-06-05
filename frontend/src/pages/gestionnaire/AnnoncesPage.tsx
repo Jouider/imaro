@@ -96,9 +96,9 @@ export function AnnoncesPage() {
       void qc.invalidateQueries({ queryKey: ['annonces'] })
       setCreateOpen(false)
       setForm(EMPTY_FORM)
-      toast.success('Annonce créée')
+      toast.success(t('gestionnaire.annonces.toastCreated'))
     },
-    onError: () => toast.error('Erreur lors de la création'),
+    onError: () => toast.error(t('common.createError')),
   })
 
   const publishMutation = useMutation({
@@ -108,7 +108,7 @@ export function AnnoncesPage() {
       setConfirmAction(null)
       toast.success(t('gestionnaire.annonces.publishSuccess'))
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const archiveMutation = useMutation({
@@ -118,7 +118,7 @@ export function AnnoncesPage() {
       setConfirmAction(null)
       toast.success(t('gestionnaire.annonces.archiveSuccess'))
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const deleteMutation = useMutation({
@@ -128,7 +128,7 @@ export function AnnoncesPage() {
       setConfirmAction(null)
       toast.success(t('gestionnaire.annonces.deleteSuccess'))
     },
-    onError: () => toast.error('Erreur'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const handleConfirm = () => {
@@ -240,7 +240,7 @@ export function AnnoncesPage() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, titre: e.target.value }))
                 }
-                placeholder="Travaux ascenseur — interruption de service"
+                placeholder={t('gestionnaire.annonces.titlePlaceholder')}
               />
             </div>
 
@@ -306,7 +306,7 @@ export function AnnoncesPage() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, contenu: e.target.value }))
                 }
-                placeholder="Décrivez l'annonce…"
+                placeholder={t('gestionnaire.annonces.descPlaceholder')}
                 className="w-full min-h-[120px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </div>

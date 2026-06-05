@@ -257,7 +257,7 @@ function NouvelleDepenseModal({
         }),
       )
     },
-    onError: () => toast.error('Erreur lors de la création'),
+    onError: () => toast.error(t('common.createError')),
   })
 
   async function handleAnalyseIa() {
@@ -267,7 +267,7 @@ function NouvelleDepenseModal({
       const result = await importFactureIa(exerciceId, iaFile)
       setIaResult(result)
     } catch {
-      toast.error('Erreur analyse IA')
+      toast.error(t('gestionnaire.comptabilite.iaError'))
     } finally {
       setIaLoading(false)
     }
@@ -358,10 +358,15 @@ function NouvelleDepenseModal({
                     {iaResult.titre}
                   </p>
                   <p>
-                    <strong>Montant:</strong> {fmt.format(iaResult.montant)} DH
+                    <strong>
+                      {t('gestionnaire.comptabilite.montantColon')}
+                    </strong>{' '}
+                    {fmt.format(iaResult.montant)} DH
                   </p>
                   <p>
-                    <strong>Compte suggéré:</strong>{' '}
+                    <strong>
+                      {t('gestionnaire.comptabilite.suggestedAccount')}
+                    </strong>{' '}
                     {iaResult.compte_charge_suggere}
                   </p>
                   <p>
@@ -456,7 +461,7 @@ function NouvelleDepenseModal({
             <Input
               value={compteSearch}
               onChange={(e) => setCompteSearch(e.target.value)}
-              placeholder="Rechercher un compte..."
+              placeholder={t('gestionnaire.comptabilite.searchAccount')}
               className="mb-1"
             />
             <Select
@@ -466,7 +471,9 @@ function NouvelleDepenseModal({
               }
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Sélectionner un compte..." />
+                <SelectValue
+                  placeholder={t('gestionnaire.comptabilite.selectAccount')}
+                />
               </SelectTrigger>
               <SelectContent>
                 {compteClasse6.map((c) => (
@@ -525,7 +532,9 @@ function NouvelleDepenseModal({
               onChange={(e) =>
                 setForm((f) => ({ ...f, prestataire: e.target.value }))
               }
-              placeholder="Nom du prestataire"
+              placeholder={t(
+                'gestionnaire.comptabilite.prestataireNamePlaceholder',
+              )}
             />
           </div>
 
@@ -614,7 +623,7 @@ function EncaisserModal({
         }),
       )
     },
-    onError: () => toast.error("Erreur lors de l'enregistrement"),
+    onError: () => toast.error(t('common.saveError')),
   })
 
   function selectCreance(c: (typeof MOCK_CREANCES)[number]) {
@@ -662,7 +671,7 @@ function EncaisserModal({
             <div className="max-h-60 overflow-y-auto rounded-lg border">
               {filteredCreances.length === 0 ? (
                 <p className="p-4 text-center text-sm text-muted-foreground">
-                  Aucune créance
+                  {t('gestionnaire.comptabilite.noCreance')}
                 </p>
               ) : (
                 filteredCreances.map((c) => (
@@ -926,7 +935,7 @@ function ExportDropdown() {
                 type="button"
                 onClick={() => {
                   setOpen(false)
-                  toast.success('Export en cours...')
+                  toast.success(t('common.exportInProgress'))
                 }}
                 className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-muted"
               >
@@ -1171,10 +1180,10 @@ function TabDashboard({ exerciceId }: { exerciceId: number }) {
               </div>
               <div className="flex gap-1">
                 <Button variant="outline" size="sm" className="text-xs">
-                  Entrée
+                  {t('gestionnaire.comptabilite.entree')}
                 </Button>
                 <Button variant="outline" size="sm" className="text-xs">
-                  Sortie
+                  {t('gestionnaire.comptabilite.sortie')}
                 </Button>
               </div>
             </div>
@@ -1370,7 +1379,7 @@ function TabJournal({ exerciceId }: { exerciceId: number }) {
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Rechercher..."
+          placeholder={t('common.searchPlaceholder')}
           className="w-48"
         />
       </div>
@@ -1497,7 +1506,7 @@ function TabGrandLivre({ exerciceId }: { exerciceId: number }) {
           <Input
             value={compteSearch}
             onChange={(e) => setCompteSearch(e.target.value)}
-            placeholder="Filtrer les comptes..."
+            placeholder={t('gestionnaire.comptabilite.filterAccounts')}
             className="mb-1 w-52"
           />
           <Select value={selectedCompte} onValueChange={setSelectedCompte}>
@@ -1746,8 +1755,13 @@ function TabBalance({
             )}
           >
             {equilibre
-              ? `Total Débit = Total Crédit = ${fmt.format(totals.debit)} DH · Écart soldes : ${fmt.format(ecartSolde)} DH`
-              : `Écart débits/crédits : ${fmt.format(Math.abs(totals.debit - totals.credit))} DH — vérifier les écritures`}
+              ? t('gestionnaire.comptabilite.balanceEq', {
+                  debit: fmt.format(totals.debit),
+                  ecart: fmt.format(ecartSolde),
+                })
+              : t('gestionnaire.comptabilite.balanceNeq', {
+                  ecart: fmt.format(Math.abs(totals.debit - totals.credit)),
+                })}
           </p>
         </div>
         <Button
@@ -1770,8 +1784,8 @@ function TabBalance({
       {balance.length === 0 ? (
         <EmptyState
           icon={<BookOpen className="size-12" />}
-          title="Aucune écriture comptable"
-          description="La balance se construira automatiquement à partir des écritures de l'exercice."
+          title={t('gestionnaire.comptabilite.noEntries')}
+          description={t('gestionnaire.comptabilite.balanceAutoHint')}
         />
       ) : (
         Object.keys(byClasse)
@@ -1815,13 +1829,13 @@ function TabBalance({
                         Compte
                       </th>
                       <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">
-                        Libellé
+                        {t('common.libelle')}
                       </th>
                       <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">
-                        Débit
+                        {t('common.debit')}
                       </th>
                       <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">
-                        Crédit
+                        {t('common.credit')}
                       </th>
                       <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">
                         Solde D
@@ -1918,9 +1932,9 @@ function TabDepenses({
       void qc.invalidateQueries({ queryKey: ['depenses', exerciceId] })
       void qc.invalidateQueries({ queryKey: ['journal', exerciceId] })
       setDeleteTarget(null)
-      toast.success('Dépense supprimée')
+      toast.success(t('gestionnaire.depenses.toastDeleted'))
     },
-    onError: () => toast.error('Erreur lors de la suppression'),
+    onError: () => toast.error(t('common.deleteError')),
   })
 
   const columns: Column<Depense>[] = [
@@ -2043,7 +2057,7 @@ function TabDepenses({
       <ConfirmModal
         open={!!deleteTarget}
         onOpenChange={(o) => !o && setDeleteTarget(null)}
-        title="Supprimer la dépense"
+        title={t('gestionnaire.depenses.deleteTitle')}
         description={`La dépense "${deleteTarget?.titre ?? ''}" sera supprimée définitivement.`}
         onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
         isLoading={deleteMutation.isPending}
@@ -2102,9 +2116,9 @@ function TabCloture({
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['exercices-comptabilite'] })
       setConfirmOpen(false)
-      toast.success('Exercice clôturé avec succès')
+      toast.success(t('gestionnaire.comptabilite.toastClosed'))
     },
-    onError: () => toast.error('Erreur lors de la clôture'),
+    onError: () => toast.error(t('gestionnaire.comptabilite.toastCloseError')),
   })
 
   const totalDebit = ecritures.reduce((s, e) => s + e.debit, 0)
@@ -2257,6 +2271,7 @@ function TabRapports({
   city,
   companyName,
 }: TabRapportsProps) {
+  const { t } = useTranslation()
   const { data: dashboard } = useQuery({
     queryKey: ['dashboard-compta', exerciceId],
     queryFn: () => getComptaDashboard(exerciceId),
@@ -2352,7 +2367,7 @@ function TabRapports({
       <Card>
         <CardHeader>
           <CardTitle className="text-base">
-            Documents Légaux et Officiels
+            {t('gestionnaire.comptabilite.legalDocsTitle')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -2438,15 +2453,15 @@ function TabRapports({
           <ClipboardCheck className="size-5 text-[var(--color-imaro-primary)]" />
           <div className="flex-1">
             <p className="text-sm font-medium text-foreground">
-              Annexes réglementaires (Décret 2.23.700)
+              {t('gestionnaire.comptabilite.annexesRegTitle')}
             </p>
             <p className="text-xs text-muted-foreground">
-              Annexes 10, 13-1, 13-2 et autres documents légaux obligatoires
+              {t('gestionnaire.comptabilite.annexesRegDesc')}
             </p>
           </div>
           <a href="/gestionnaire/annexes">
             <Button variant="outline" size="sm" className="gap-1.5">
-              Voir les annexes
+              {t('gestionnaire.comptabilite.viewAnnexes')}
               <ChevronRight className="size-3.5" />
             </Button>
           </a>

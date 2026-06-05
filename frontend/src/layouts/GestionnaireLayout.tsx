@@ -61,8 +61,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useMutation } from '@tanstack/react-query'
 import { CommandPalette } from '@/components/gestionnaire/CommandPalette'
-import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard'
-import { useOnboardingStore } from '@/stores/onboardingStore'
 import { canAccessRoute } from '@/lib/navAccess'
 import { cn } from '@/lib/utils'
 
@@ -422,6 +420,7 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
 // ─── NotificationCenter ───────────────────────────────────────────────────────
 
 function NotificationCenter() {
+  const { t } = useTranslation()
   const { notifs, markRead, markAllRead, dismiss } = useNotifStore()
   const unreadCount = notifs.filter((n) => !n.read).length
   const panelRef = useRef<HTMLDivElement>(null)
@@ -535,7 +534,7 @@ function NotificationCenter() {
                     e.stopPropagation()
                     dismiss(n.id)
                   }}
-                  aria-label="Supprimer cette notification"
+                  aria-label={t('gestionnaire.layout.deleteNotif')}
                   className="mt-0.5 hidden shrink-0 rounded p-0.5 text-muted-foreground/40 hover:bg-muted hover:text-muted-foreground group-hover:flex"
                 >
                   <X className="size-3.5" />
@@ -703,17 +702,14 @@ function ContextPill() {
 // ─── GestionnaireLayout ───────────────────────────────────────────────────────
 
 export function GestionnaireLayout() {
+  const { t } = useTranslation()
   const [mobileOpen, setMobileOpen] = useState(false)
   const refreshIdentity = useAuthStore((s) => s.refreshIdentity)
-  const role = useAuthStore((s) => s.user?.role)
-  const onboardingDone = useAuthStore((s) => s.tenant?.onboarding_completed_at)
-  const wizardOpen = useOnboardingStore((s) => s.open)
-  const wizardDismissed = useOnboardingStore((s) => s.dismissed)
-  const openWizard = useOnboardingStore((s) => s.openWizard)
 
   // Refresh user (app_permissions, app_role, residence_ids) on every layout
   // mount so a manager-side permission change shows up on the next page reload
-  // without forcing the gestionnaire to log out.
+  // without forcing the gestionnaire to log out. (Onboarding is now enforced by
+  // GestionnaireGuard, which redirects to /gestionnaire/onboarding — issue #150.)
   useEffect(() => {
     void me()
       .then((data) => refreshIdentity(data))
@@ -722,27 +718,10 @@ export function GestionnaireLayout() {
       })
   }, [refreshIdentity])
 
-  // First-run: auto-open the setup wizard for the syndic owner (manager) once
-  // per session until onboarding is marked complete on the tenant. super_admin
-  // is Digitoyou staff (not a cabinet) — excluded; the endpoints 403 anyway.
-  useEffect(() => {
-    if (
-      role === 'manager' &&
-      !onboardingDone &&
-      !wizardDismissed &&
-      !wizardOpen
-    ) {
-      openWizard()
-    }
-  }, [role, onboardingDone, wizardDismissed, wizardOpen, openWizard])
-
   return (
     <div className="flex min-h-svh">
       {/* Global Command Palette (Cmd+K) */}
       <CommandPalette />
-
-      {/* First-run setup wizard */}
-      <OnboardingWizard />
 
       {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 start-0 hidden w-[240px] lg:block shadow-xl shadow-black/10">
@@ -762,7 +741,7 @@ export function GestionnaireLayout() {
               <button
                 onClick={() => setMobileOpen(false)}
                 className="absolute end-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-md text-white/60 transition-colors hover:bg-white/10 hover:text-white"
-                aria-label="Fermer le menu"
+                aria-label={t('gestionnaire.layout.closeMenu')}
               >
                 <X className="size-5" />
               </button>
@@ -782,7 +761,7 @@ export function GestionnaireLayout() {
             size="sm"
             className="shrink-0 lg:hidden"
             onClick={() => setMobileOpen(true)}
-            aria-label="Ouvrir le menu"
+            aria-label={t('gestionnaire.layout.openMenu')}
           >
             <Menu className="size-5" />
           </Button>

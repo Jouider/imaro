@@ -130,13 +130,13 @@ export function OccupantsPage() {
       input: CreateOccupantInput
     }) => createOccupant(lotId, input),
     onSuccess: () => {
-      toast.success('Occupant ajouté')
+      toast.success(t('gestionnaire.occupants.toastAdded'))
       setModalOpen(false)
       void queryClient.invalidateQueries({
         queryKey: ['occupants', residenceId],
       })
     },
-    onError: () => toast.error('Échec de la création'),
+    onError: () => toast.error(t('common.createFailed')),
   })
 
   const updateMut = useMutation({
@@ -148,24 +148,24 @@ export function OccupantsPage() {
       patch: Partial<CreateOccupantInput>
     }) => updateOccupant(id, patch),
     onSuccess: () => {
-      toast.success('Occupant mis à jour')
+      toast.success(t('gestionnaire.occupants.toastUpdated'))
       setModalOpen(false)
       void queryClient.invalidateQueries({
         queryKey: ['occupants', residenceId],
       })
     },
-    onError: () => toast.error('Échec de la mise à jour'),
+    onError: () => toast.error(t('common.updateFailed')),
   })
 
   const deleteMut = useMutation({
     mutationFn: (id: number) => deleteOccupant(id),
     onSuccess: () => {
-      toast.success('Occupant supprimé')
+      toast.success(t('gestionnaire.occupants.toastDeleted'))
       void queryClient.invalidateQueries({
         queryKey: ['occupants', residenceId],
       })
     },
-    onError: () => toast.error('Échec de la suppression'),
+    onError: () => toast.error(t('common.deleteFailed')),
   })
 
   const openCreateModal = () => {
@@ -199,11 +199,11 @@ export function OccupantsPage() {
 
   const handleSave = () => {
     if (!draft.nom.trim()) {
-      toast.error('Nom requis')
+      toast.error(t('common.nameRequired'))
       return
     }
     if (!draft.lot_id) {
-      toast.error('Lot requis')
+      toast.error(t('common.lotRequired'))
       return
     }
     // Strip empty date_fin
@@ -232,13 +232,10 @@ export function OccupantsPage() {
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-foreground">
-            {t('gestionnaire.occupants.title', { defaultValue: 'Occupants' })}
+            {t('gestionnaire.occupants.title')}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {t('gestionnaire.occupants.subtitle', {
-              defaultValue:
-                'Registre des occupants par lot — propriétaires, locataires, usufruitiers',
-            })}
+            {t('gestionnaire.occupants.subtitle')}
           </p>
         </div>
         <Button
@@ -248,19 +245,19 @@ export function OccupantsPage() {
           disabled={lots.length === 0}
         >
           <Plus className="size-4" />
-          Ajouter
+          {t('actions.add')}
         </Button>
       </div>
 
       {/* Residence selector */}
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium">Résidence</label>
+        <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
           onValueChange={(v) => setPickedResidenceId(Number(v))}
         >
           <SelectTrigger className="w-72">
-            <SelectValue placeholder="Sélectionner" />
+            <SelectValue placeholder={t('common.select')} />
           </SelectTrigger>
           <SelectContent>
             {(residencesQ.data ?? []).map((r) => (
@@ -278,7 +275,7 @@ export function OccupantsPage() {
           <div className="mb-2 flex items-center gap-2">
             <Home className="size-4 text-[var(--color-imaro-primary)]" />
             <p className="text-xs text-muted-foreground">
-              Propriétaires occupants
+              {t('gestionnaire.occupants.kpiOwners')}
             </p>
           </div>
           <p className="text-2xl font-bold tracking-tight">
@@ -288,7 +285,9 @@ export function OccupantsPage() {
         <div className="rounded-xl border bg-card p-4">
           <div className="mb-2 flex items-center gap-2">
             <KeyRound className="size-4 text-amber-600" />
-            <p className="text-xs text-muted-foreground">Locataires</p>
+            <p className="text-xs text-muted-foreground">
+              {t('gestionnaire.occupants.kpiTenants')}
+            </p>
           </div>
           <p className="text-2xl font-bold tracking-tight">
             {byType.locataire}
@@ -298,7 +297,7 @@ export function OccupantsPage() {
           <div className="mb-2 flex items-center gap-2">
             <UserCheck className="size-4 text-purple-600" />
             <p className="text-xs text-muted-foreground">
-              Usufruitiers / autres
+              {t('gestionnaire.occupants.kpiOthers')}
             </p>
           </div>
           <p className="text-2xl font-bold tracking-tight">{byType.other}</p>
@@ -309,9 +308,8 @@ export function OccupantsPage() {
       <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900/30 dark:bg-blue-950/20">
         <AlertCircle className="mt-0.5 size-4 shrink-0 text-blue-600" />
         <p className="text-xs text-blue-700 dark:text-blue-300">
-          <strong>Art. 11 Loi 18-00</strong> — Le registre des occupants doit
-          être à jour pour la convocation des AG et la communication des
-          charges. Un seul «propriétaire occupant» actif par lot à la fois.
+          <strong>{t('gestionnaire.occupants.bannerTitle')}</strong>{' '}
+          {t('gestionnaire.occupants.bannerBody')}
         </p>
       </div>
 
@@ -320,12 +318,14 @@ export function OccupantsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Lot</TableHead>
-              <TableHead>Nom complet</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Téléphone</TableHead>
-              <TableHead>Période</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t('gestionnaire.occupants.colLot')}</TableHead>
+              <TableHead>{t('gestionnaire.occupants.colNom')}</TableHead>
+              <TableHead>{t('common.type')}</TableHead>
+              <TableHead>{t('common.phone')}</TableHead>
+              <TableHead>{t('common.periode')}</TableHead>
+              <TableHead className="text-right">
+                {t('common.actions')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -335,7 +335,7 @@ export function OccupantsPage() {
                   colSpan={6}
                   className="py-8 text-center text-sm text-muted-foreground"
                 >
-                  Chargement…
+                  {t('actions.loading')}
                 </TableCell>
               </TableRow>
             ) : occupants.length === 0 ? (
@@ -344,7 +344,7 @@ export function OccupantsPage() {
                   colSpan={6}
                   className="py-12 text-center text-sm text-muted-foreground"
                 >
-                  Aucun occupant enregistré.
+                  {t('gestionnaire.occupants.emptyRow')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -366,7 +366,7 @@ export function OccupantsPage() {
                         className={cn('text-[10px] gap-1', meta.cls)}
                       >
                         <Icon className="size-3" />
-                        {meta.label}
+                        {t(`gestionnaire.occupants.type.${o.type}`)}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground tabular-nums">
@@ -383,7 +383,7 @@ export function OccupantsPage() {
                           size="icon"
                           className="size-7"
                           onClick={() => openEditModal(o)}
-                          title="Modifier"
+                          title={t('actions.edit')}
                         >
                           <Pencil className="size-3.5" />
                         </Button>
@@ -392,10 +392,16 @@ export function OccupantsPage() {
                           size="icon"
                           className="size-7"
                           onClick={() => {
-                            if (confirm(`Supprimer l'occupant « ${o.nom} » ?`))
+                            if (
+                              confirm(
+                                t('gestionnaire.occupants.confirmDelete', {
+                                  nom: o.nom,
+                                }),
+                              )
+                            )
                               deleteMut.mutate(o.id)
                           }}
-                          title="Supprimer"
+                          title={t('actions.delete')}
                         >
                           <Trash2 className="size-3.5 text-red-600" />
                         </Button>
@@ -414,18 +420,22 @@ export function OccupantsPage() {
         <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
             <DialogTitle>
-              {editing ? 'Modifier un occupant' : 'Ajouter un occupant'}
+              {editing
+                ? t('gestionnaire.occupants.modalEdit')
+                : t('gestionnaire.occupants.modalNew')}
             </DialogTitle>
           </DialogHeader>
           <div className="grid gap-3">
             <div>
-              <Label htmlFor="lot">Lot</Label>
+              <Label htmlFor="lot">{t('gestionnaire.occupants.colLot')}</Label>
               <Select
                 value={String(draft.lot_id || '')}
                 onValueChange={(v) => setDraft({ ...draft, lot_id: Number(v) })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Choisir un lot" />
+                  <SelectValue
+                    placeholder={t('gestionnaire.occupants.chooseLot')}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {lots.map((l) => (
@@ -437,7 +447,9 @@ export function OccupantsPage() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="nom">Nom complet *</Label>
+              <Label htmlFor="nom">
+                {t('gestionnaire.occupants.colNom')} *
+              </Label>
               <Input
                 id="nom"
                 value={draft.nom}
@@ -446,7 +458,7 @@ export function OccupantsPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="tel">Téléphone</Label>
+                <Label htmlFor="tel">{t('common.phone')}</Label>
                 <Input
                   id="tel"
                   value={draft.telephone}
@@ -456,7 +468,7 @@ export function OccupantsPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('common.email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -468,7 +480,7 @@ export function OccupantsPage() {
               </div>
             </div>
             <div>
-              <Label htmlFor="type">Type</Label>
+              <Label htmlFor="type">{t('common.type')}</Label>
               <Select
                 value={draft.type}
                 onValueChange={(v) =>
@@ -481,7 +493,7 @@ export function OccupantsPage() {
                 <SelectContent>
                   {(Object.keys(TYPE_META) as OccupantType[]).map((k) => (
                     <SelectItem key={k} value={k}>
-                      {TYPE_META[k].label}
+                      {t(`gestionnaire.occupants.type.${k}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -489,7 +501,7 @@ export function OccupantsPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="debut">Date de début</Label>
+                <Label htmlFor="debut">{t('common.startDate')}</Label>
                 <Input
                   id="debut"
                   type="date"
@@ -500,7 +512,9 @@ export function OccupantsPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="fin">Date de fin (optionnelle)</Label>
+                <Label htmlFor="fin">
+                  {t('gestionnaire.occupants.dateFinOptional')}
+                </Label>
                 <Input
                   id="fin"
                   type="date"
@@ -514,13 +528,13 @@ export function OccupantsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setModalOpen(false)}>
-              Annuler
+              {t('actions.cancel')}
             </Button>
             <Button
               onClick={handleSave}
               disabled={createMut.isPending || updateMut.isPending}
             >
-              {editing ? 'Mettre à jour' : 'Ajouter'}
+              {editing ? t('common.update') : t('actions.add')}
             </Button>
           </DialogFooter>
         </DialogContent>

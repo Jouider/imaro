@@ -125,13 +125,13 @@ export function ConformitePage() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium">Résidence</label>
+        <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
           onValueChange={(v) => setPickedResidenceId(Number(v))}
         >
           <SelectTrigger className="w-64">
-            <SelectValue placeholder="Sélectionner" />
+            <SelectValue placeholder={t('common.select')} />
           </SelectTrigger>
           <SelectContent>
             {(residencesQ.data ?? []).map((r) => (
@@ -228,7 +228,7 @@ export function ConformitePage() {
       {calendar && (
         <div className="rounded-xl border bg-card p-6">
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Chronologie des phases
+            {t('gestionnaire.conformite.timeline')}
           </h3>
           <div className="flex items-center gap-1">
             {phases.map((p, i) => {

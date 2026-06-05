@@ -107,7 +107,7 @@ export function IaAssistantPage() {
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-bold text-foreground">
-                {t('gestionnaire.ia.title', { defaultValue: 'Assistant IA' })}
+                {t('gestionnaire.ia.title')}
               </h1>
               <Badge
                 variant="outline"
@@ -117,11 +117,10 @@ export function IaAssistantPage() {
               </Badge>
             </div>
             <p className="mt-1 text-sm text-muted-foreground">
-              Audit conformité automatisé · Extraction de factures · Suggestions
-              budgétaires intelligentes
+              {t('gestionnaire.ia.subtitle')}
             </p>
             <p className="mt-2 text-xs text-muted-foreground">
-              Propulsé par Claude — vos données restent privées et chiffrées.
+              {t('gestionnaire.ia.poweredBy')}
             </p>
           </div>
         </div>
@@ -132,24 +131,24 @@ export function IaAssistantPage() {
         <ToolCard
           active={tool === 'audit'}
           icon={<Shield className="size-5" />}
-          title="Audit conformité"
-          description="Scan complet · risque légal · recommandations"
+          title={t('gestionnaire.ia.toolAuditTitle')}
+          description={t('gestionnaire.ia.toolAuditDesc')}
           onClick={() => setTool('audit')}
           accent="navy"
         />
         <ToolCard
           active={tool === 'invoice'}
           icon={<FileSearch className="size-5" />}
-          title="Extraction facture"
-          description="OCR · classification comptable · pré-remplissage"
+          title={t('gestionnaire.ia.toolInvoiceTitle')}
+          description={t('gestionnaire.ia.toolInvoiceDesc')}
           onClick={() => setTool('invoice')}
           accent="orange"
         />
         <ToolCard
           active={tool === 'budget'}
           icon={<Lightbulb className="size-5" />}
-          title="Suggestions budget"
-          description="Historique · inflation · prévisions par poste"
+          title={t('gestionnaire.ia.toolBudgetTitle')}
+          description={t('gestionnaire.ia.toolBudgetDesc')}
           onClick={() => setTool('budget')}
           accent="purple"
         />
@@ -157,13 +156,13 @@ export function IaAssistantPage() {
 
       {/* Residence selector */}
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium">Résidence</label>
+        <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
           onValueChange={(v) => setPickedResidenceId(Number(v))}
         >
           <SelectTrigger className="w-72">
-            <SelectValue placeholder="Sélectionner" />
+            <SelectValue placeholder={t('common.select')} />
           </SelectTrigger>
           <SelectContent>
             {(residencesQ.data ?? []).map((r) => (
@@ -186,6 +185,7 @@ export function IaAssistantPage() {
 // ─── Tool 1: Audit conformité ─────────────────────────────────────────────────
 
 function AuditTool({ residenceId }: { residenceId: number | null }) {
+  const { t } = useTranslation()
   const [exercice] = useState(2026)
   const [audit, setAudit] = useState<ComplianceAudit | null>(null)
 
@@ -193,9 +193,11 @@ function AuditTool({ residenceId }: { residenceId: number | null }) {
     mutationFn: () => runComplianceAudit(residenceId!, exercice),
     onSuccess: (data) => {
       setAudit(data)
-      toast.success(`Audit terminé — score ${data.overall_score}/100`)
+      toast.success(
+        t('gestionnaire.ia.auditDone', { score: data.overall_score }),
+      )
     },
-    onError: () => toast.error("Échec de l'audit"),
+    onError: () => toast.error(t('gestionnaire.ia.auditError')),
   })
 
   if (!audit) {
@@ -204,11 +206,11 @@ function AuditTool({ residenceId }: { residenceId: number | null }) {
         <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--color-imaro-primary)] to-purple-600 text-white shadow-lg">
           <Shield className="size-8" />
         </div>
-        <h2 className="text-lg font-bold">Audit conformité IA</h2>
+        <h2 className="text-lg font-bold">
+          {t('gestionnaire.ia.auditEmptyTitle')}
+        </h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          Lancez une analyse complète de votre dossier copropriété : charges
-          manquantes, créances proches de prescription, annexes non générées,
-          conformité Décret 2.23.700, etc.
+          {t('gestionnaire.ia.auditEmptyDesc')}
         </p>
         <Button
           size="lg"
@@ -219,17 +221,17 @@ function AuditTool({ residenceId }: { residenceId: number | null }) {
           {runMut.isPending ? (
             <>
               <RefreshCw className="size-4 animate-spin" />
-              Analyse en cours...
+              {t('gestionnaire.ia.analyzing')}
             </>
           ) : (
             <>
               <Sparkles className="size-4" />
-              Lancer l&apos;audit IA
+              {t('gestionnaire.ia.runAudit')}
             </>
           )}
         </Button>
         <p className="mt-3 text-xs text-muted-foreground">
-          ~ 30 secondes · Le résultat reste privé sur votre tenant.
+          {t('gestionnaire.ia.auditHint')}
         </p>
       </div>
     )
@@ -260,13 +262,15 @@ function AuditTool({ residenceId }: { residenceId: number | null }) {
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <h2 className="text-base font-bold">
-                Rapport d&apos;audit · {audit.residence_name}
+                {t('gestionnaire.ia.auditReport', {
+                  name: audit.residence_name,
+                })}
               </h2>
               <Badge
                 variant="outline"
                 className="border-purple-300 bg-purple-50 text-[10px] text-purple-700"
               >
-                Exercice {audit.exercice}
+                {t('gestionnaire.ia.exerciceBadge', { n: audit.exercice })}
               </Badge>
             </div>
             <p className="mt-3 text-sm text-muted-foreground">
@@ -284,7 +288,7 @@ function AuditTool({ residenceId }: { residenceId: number | null }) {
                     variant="outline"
                     className={cn('text-xs gap-1', SEVERITY_META[sev].cls)}
                   >
-                    {SEVERITY_META[sev].label} · {count}
+                    {t(`gestionnaire.ia.severity.${sev}`)} · {count}
                   </Badge>
                 )
               })}
@@ -340,7 +344,7 @@ function AuditTool({ residenceId }: { residenceId: number | null }) {
           <RefreshCw
             className={cn('size-3.5', runMut.isPending && 'animate-spin')}
           />
-          Relancer l&apos;audit
+          {t('gestionnaire.ia.rerunAudit')}
         </Button>
       </div>
 
@@ -349,7 +353,7 @@ function AuditTool({ residenceId }: { residenceId: number | null }) {
         <div className="mb-2 flex items-center gap-2">
           <CheckCircle2 className="size-4 text-green-600" />
           <h3 className="text-sm font-semibold text-green-800 dark:text-green-200">
-            Points forts détectés
+            {t('gestionnaire.ia.strengths')}
           </h3>
         </div>
         <ul className="space-y-1.5 text-sm text-green-700 dark:text-green-300">
@@ -365,7 +369,7 @@ function AuditTool({ residenceId }: { residenceId: number | null }) {
       {/* Findings */}
       <section className="space-y-3">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Points d&apos;attention ({audit.findings.length})
+          {t('gestionnaire.ia.attentionPoints', { n: audit.findings.length })}
         </h3>
         <div className="space-y-3">
           {audit.findings.map((f) => {
@@ -395,7 +399,7 @@ function AuditTool({ residenceId }: { residenceId: number | null }) {
                         variant="outline"
                         className={cn('text-[10px]', meta.cls)}
                       >
-                        {meta.label}
+                        {t(`gestionnaire.ia.severity.${f.severity}`)}
                       </Badge>
                       {f.reference && (
                         <Badge
@@ -411,7 +415,7 @@ function AuditTool({ residenceId }: { residenceId: number | null }) {
                     </p>
                     <div className="mt-3 rounded-lg bg-card p-3">
                       <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-imaro-primary)] mb-1">
-                        Action recommandée
+                        {t('gestionnaire.ia.recommendedAction')}
                       </p>
                       <p className="text-sm">{f.recommendation}</p>
                     </div>
@@ -430,9 +434,12 @@ function AuditTool({ residenceId }: { residenceId: number | null }) {
 
       {/* Metadata */}
       <div className="rounded-lg border border-muted bg-muted/30 p-3 text-[10px] text-muted-foreground">
-        Analyse · {audit.metadata.model} · {audit.metadata.duration_ms}ms ·{' '}
-        {audit.metadata.tokens_used.toLocaleString()} tokens · généré le{' '}
-        {new Date(audit.generated_at).toLocaleString('fr-MA')}
+        {t('gestionnaire.ia.auditMeta', {
+          model: audit.metadata.model,
+          ms: audit.metadata.duration_ms,
+          tokens: audit.metadata.tokens_used.toLocaleString(),
+          date: new Date(audit.generated_at).toLocaleString('fr-MA'),
+        })}
       </div>
     </div>
   )
@@ -441,6 +448,7 @@ function AuditTool({ residenceId }: { residenceId: number | null }) {
 // ─── Tool 2: Extraction facture ───────────────────────────────────────────────
 
 function InvoiceTool() {
+  const { t } = useTranslation()
   const [extraction, setExtraction] = useState<InvoiceExtraction | null>(null)
   const [fileName, setFileName] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -450,10 +458,12 @@ function InvoiceTool() {
     onSuccess: (data) => {
       setExtraction(data)
       toast.success(
-        `Facture extraite — confiance ${(data.confidence * 100).toFixed(0)}%`,
+        t('gestionnaire.ia.invoiceDone', {
+          pct: (data.confidence * 100).toFixed(0),
+        }),
       )
     },
-    onError: () => toast.error("Échec de l'extraction"),
+    onError: () => toast.error(t('gestionnaire.ia.invoiceError')),
   })
 
   const onFile = (file: File | undefined) => {
@@ -469,11 +479,11 @@ function InvoiceTool() {
         <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#E67E22] to-amber-600 text-white shadow-lg">
           <FileSearch className="size-8" />
         </div>
-        <h2 className="text-lg font-bold">Extraction de facture IA</h2>
+        <h2 className="text-lg font-bold">
+          {t('gestionnaire.ia.invoiceEmptyTitle')}
+        </h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          Glissez une facture (PDF ou image). L&apos;IA extrait fournisseur,
-          ICE, montant, TVA, date, et suggère automatiquement la catégorie + le
-          compte comptable.
+          {t('gestionnaire.ia.invoiceEmptyDesc')}
         </p>
         <input
           ref={fileInputRef}
@@ -488,10 +498,10 @@ function InvoiceTool() {
           onClick={() => fileInputRef.current?.click()}
         >
           <Upload className="size-4" />
-          Choisir une facture
+          {t('gestionnaire.ia.chooseInvoice')}
         </Button>
         <p className="mt-3 text-xs text-muted-foreground">
-          Formats acceptés : PDF · JPG · PNG · taille max 10 Mo
+          {t('gestionnaire.ia.acceptedFormats')}
         </p>
       </div>
     )
@@ -503,9 +513,9 @@ function InvoiceTool() {
         <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#E67E22] to-amber-600 text-white shadow-lg">
           <Sparkles className="size-8 animate-pulse" />
         </div>
-        <h2 className="text-lg font-bold">Analyse en cours...</h2>
+        <h2 className="text-lg font-bold">{t('gestionnaire.ia.analyzing')}</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          {fileName} · vision IA + classification comptable
+          {t('gestionnaire.ia.analyzingInvoice', { fileName })}
         </p>
         <div className="mx-auto mt-6 h-2 max-w-xs overflow-hidden rounded-full bg-muted">
           <div className="h-full w-1/2 animate-pulse rounded-full bg-gradient-to-r from-[#E67E22] to-amber-500" />
@@ -537,7 +547,9 @@ function InvoiceTool() {
             )}
           >
             <Sparkles className="size-3" />
-            Confiance {(extraction.confidence * 100).toFixed(0)}%
+            {t('gestionnaire.ia.confidence', {
+              pct: (extraction.confidence * 100).toFixed(0),
+            })}
           </Badge>
         </div>
         <Button
@@ -547,7 +559,7 @@ function InvoiceTool() {
           onClick={() => fileInputRef.current?.click()}
         >
           <Upload className="size-3.5" />
-          Nouvelle facture
+          {t('gestionnaire.ia.newInvoice')}
         </Button>
         <input
           ref={fileInputRef}
@@ -560,14 +572,17 @@ function InvoiceTool() {
 
       {/* Extracted fields */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <Field label="Fournisseur" value={extraction.fournisseur} />
+        <Field
+          label={t('gestionnaire.ia.fournisseur')}
+          value={extraction.fournisseur}
+        />
         <Field label="ICE" value={extraction.fournisseur_ice ?? '—'} mono />
         <Field
-          label="Date"
+          label={t('common.date')}
           value={new Date(extraction.date).toLocaleDateString('fr-MA')}
         />
         <Field
-          label="N° facture"
+          label={t('gestionnaire.ia.numeroFacture')}
           value={extraction.numero_facture ?? '—'}
           mono
         />
@@ -600,7 +615,7 @@ function InvoiceTool() {
       {/* Description */}
       <div className="rounded-xl border bg-card p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-          Description
+          {t('common.description')}
         </p>
         <p className="text-sm">{extraction.description}</p>
       </div>
@@ -610,14 +625,16 @@ function InvoiceTool() {
         <div className="rounded-xl border bg-card">
           <div className="border-b p-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Lignes détectées
+              {t('gestionnaire.ia.detectedLines')}
             </p>
           </div>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Libellé</TableHead>
-                <TableHead className="text-right">Montant</TableHead>
+                <TableHead>{t('common.libelle')}</TableHead>
+                <TableHead className="text-right">
+                  {t('common.amount')}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -639,16 +656,16 @@ function InvoiceTool() {
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="size-4 text-[var(--color-imaro-primary)]" />
           <p className="text-sm font-semibold text-[var(--color-imaro-primary)]">
-            Classification IA suggérée
+            {t('gestionnaire.ia.classification')}
           </p>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Field
-            label="Catégorie"
+            label={t('common.categorie')}
             value={extraction.categorie_suggeree.replace(/_/g, ' ')}
           />
           <Field
-            label="Compte comptable"
+            label={t('gestionnaire.ia.compteComptable')}
             value={extraction.compte_comptable_suggere}
             mono
           />
@@ -677,18 +694,20 @@ function InvoiceTool() {
             setFileName('')
           }}
         >
-          Annuler
+          {t('actions.cancel')}
         </Button>
         <Button size="sm" className="gap-1.5">
           <CheckCircle2 className="size-4" />
-          Créer la dépense
+          {t('gestionnaire.ia.createExpense')}
         </Button>
       </div>
 
       <p className="text-center text-[10px] text-muted-foreground">
-        {extraction.metadata.model} · {extraction.metadata.duration_ms}ms ·{' '}
-        {extraction.metadata.page_count} page
-        {extraction.metadata.page_count > 1 ? 's' : ''}
+        {t('gestionnaire.ia.invoiceMeta', {
+          model: extraction.metadata.model,
+          ms: extraction.metadata.duration_ms,
+          count: extraction.metadata.page_count,
+        })}
       </p>
     </div>
   )
@@ -697,6 +716,7 @@ function InvoiceTool() {
 // ─── Tool 3: Suggestions budget ───────────────────────────────────────────────
 
 function BudgetTool({ residenceId }: { residenceId: number | null }) {
+  const { t } = useTranslation()
   const [exerciceCible, setExerciceCible] = useState(2027)
   const [suggestion, setSuggestion] = useState<BudgetSuggestion | null>(null)
 
@@ -705,10 +725,12 @@ function BudgetTool({ residenceId }: { residenceId: number | null }) {
     onSuccess: (data) => {
       setSuggestion(data)
       toast.success(
-        `Suggestions générées · variation globale ${data.variation_globale_pct >= 0 ? '+' : ''}${data.variation_globale_pct.toFixed(1)}%`,
+        t('gestionnaire.ia.budgetDone', {
+          variation: `${data.variation_globale_pct >= 0 ? '+' : ''}${data.variation_globale_pct.toFixed(1)}%`,
+        }),
       )
     },
-    onError: () => toast.error('Échec de la suggestion'),
+    onError: () => toast.error(t('gestionnaire.ia.budgetError')),
   })
 
   if (!suggestion) {
@@ -717,14 +739,16 @@ function BudgetTool({ residenceId }: { residenceId: number | null }) {
         <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-lg">
           <Lightbulb className="size-8" />
         </div>
-        <h2 className="text-lg font-bold">Suggestions de budget IA</h2>
+        <h2 className="text-lg font-bold">
+          {t('gestionnaire.ia.budgetEmptyTitle')}
+        </h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          L&apos;IA analyse vos dépenses des 2 derniers exercices,
-          l&apos;inflation marocaine et vos contrats en cours pour proposer un
-          budget prévisionnel ligne par ligne avec justification.
+          {t('gestionnaire.ia.budgetEmptyDesc')}
         </p>
         <div className="mt-6 flex items-center justify-center gap-3">
-          <label className="text-sm font-medium">Exercice cible</label>
+          <label className="text-sm font-medium">
+            {t('gestionnaire.ia.exerciceCible')}
+          </label>
           <Select
             value={String(exerciceCible)}
             onValueChange={(v) => setExerciceCible(Number(v))}
@@ -750,12 +774,12 @@ function BudgetTool({ residenceId }: { residenceId: number | null }) {
           {mut.isPending ? (
             <>
               <RefreshCw className="size-4 animate-spin" />
-              Analyse en cours...
+              {t('gestionnaire.ia.analyzing')}
             </>
           ) : (
             <>
               <Sparkles className="size-4" />
-              Générer les suggestions
+              {t('gestionnaire.ia.generateSuggestions')}
             </>
           )}
         </Button>
@@ -768,15 +792,19 @@ function BudgetTool({ residenceId }: { residenceId: number | null }) {
       {/* Header KPIs */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="rounded-xl border bg-card p-4">
-          <p className="text-xs text-muted-foreground mb-1">Budget N-1</p>
+          <p className="text-xs text-muted-foreground mb-1">
+            {t('gestionnaire.ia.budgetNMinus1')}
+          </p>
           <p className="text-xl font-bold tracking-tight">
             {fmt.format(suggestion.total_charges_n_minus_1)} DH
           </p>
         </div>
         <div className="rounded-xl border-2 border-purple-300 bg-purple-50 p-4 dark:bg-purple-950/20">
           <p className="text-xs text-purple-600 mb-1 flex items-center gap-1">
-            <Sparkles className="size-3" /> Suggestion IA — Budget{' '}
-            {suggestion.exercice_cible}
+            <Sparkles className="size-3" />{' '}
+            {t('gestionnaire.ia.suggestionBudget', {
+              n: suggestion.exercice_cible,
+            })}
           </p>
           <p className="text-xl font-bold tracking-tight text-purple-700">
             {fmt.format(suggestion.total_charges_suggere)} DH
@@ -784,7 +812,8 @@ function BudgetTool({ residenceId }: { residenceId: number | null }) {
         </div>
         <div className="rounded-xl border bg-card p-4">
           <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
-            <TrendingUp className="size-3" /> Variation globale
+            <TrendingUp className="size-3" />{' '}
+            {t('gestionnaire.ia.variationGlobale')}
           </p>
           <p
             className={cn(
@@ -803,7 +832,7 @@ function BudgetTool({ residenceId }: { residenceId: number | null }) {
       {/* Hypothèses */}
       <div className="rounded-xl border bg-card p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-          Hypothèses retenues par l&apos;IA
+          {t('gestionnaire.ia.hypotheses')}
         </p>
         <ul className="space-y-1.5 text-sm">
           {suggestion.hypotheses.map((h, i) => (
@@ -820,14 +849,18 @@ function BudgetTool({ residenceId }: { residenceId: number | null }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Compte</TableHead>
-              <TableHead className="text-right">Réalisé N-1</TableHead>
+              <TableHead>{t('gestionnaire.ia.colCompte')}</TableHead>
               <TableHead className="text-right">
-                Suggéré {suggestion.exercice_cible}
+                {t('gestionnaire.ia.colRealise')}
+              </TableHead>
+              <TableHead className="text-right">
+                {t('gestionnaire.ia.colSuggere', {
+                  n: suggestion.exercice_cible,
+                })}
               </TableHead>
               <TableHead className="text-right">Δ</TableHead>
-              <TableHead>Justification IA</TableHead>
-              <TableHead>Conf.</TableHead>
+              <TableHead>{t('gestionnaire.ia.colJustif')}</TableHead>
+              <TableHead>{t('gestionnaire.ia.colConf')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -875,11 +908,7 @@ function BudgetTool({ residenceId }: { residenceId: number | null }) {
                       variant="outline"
                       className={cn('text-[10px]', confColor)}
                     >
-                      {l.confidence === 'high'
-                        ? 'Élevée'
-                        : l.confidence === 'medium'
-                          ? 'Moyenne'
-                          : 'Faible'}
+                      {t(`gestionnaire.ia.conf.${l.confidence}`)}
                     </Badge>
                   </TableCell>
                 </TableRow>
@@ -900,17 +929,20 @@ function BudgetTool({ residenceId }: { residenceId: number | null }) {
           <RefreshCw
             className={cn('size-3.5 me-1.5', mut.isPending && 'animate-spin')}
           />
-          Régénérer
+          {t('gestionnaire.ia.regenerate')}
         </Button>
         <Button size="sm" className="gap-1.5">
           <CheckCircle2 className="size-4" />
-          Appliquer au budget {suggestion.exercice_cible}
+          {t('gestionnaire.ia.applyBudget', { n: suggestion.exercice_cible })}
         </Button>
       </div>
 
       <p className="text-center text-[10px] text-muted-foreground">
-        {suggestion.metadata.model} · {suggestion.metadata.duration_ms}ms ·{' '}
-        {suggestion.metadata.tokens_used.toLocaleString()} tokens
+        {t('gestionnaire.ia.budgetMeta', {
+          model: suggestion.metadata.model,
+          ms: suggestion.metadata.duration_ms,
+          tokens: suggestion.metadata.tokens_used.toLocaleString(),
+        })}
       </p>
     </div>
   )
