@@ -92,6 +92,19 @@ class ResidenceController extends Controller
         ]);
 
         $residence = Residence::create($payload);
+
+        // Bootstrap the current-year exercice so the residence is immediately
+        // usable for appels de fonds / paiements / dépenses (Décret 2.23.700
+        // requires every financial op to belong to an exercice).
+        $year = (int) Carbon::now()->year;
+        $residence->exercices()->create([
+            'tenant_id'  => $residence->tenant_id,
+            'annee'      => $year,
+            'date_debut' => Carbon::create($year, 1, 1)->toDateString(),
+            'date_fin'   => Carbon::create($year, 12, 31)->toDateString(),
+            'statut'     => 'actif',
+        ]);
+
         $residence->load('gestionnaire');
 
         return response()->json([
