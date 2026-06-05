@@ -161,28 +161,34 @@ export function RappelsPage() {
     queryKey: ['residences'],
     queryFn: () => getResidences(),
   })
-  const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
+  // In dev with no real residences, fall back to a synthetic id so the
+  // mock-backed queries still fire and the page renders with sample data.
+  // In prod, residenceId stays null → page shows an empty state below.
+  const realResidenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
+  const residenceId = realResidenceId ?? (import.meta.env.DEV ? 0 : null)
   const residence = residencesQ.data?.find((r) => r.id === residenceId)
+
+  const queryReady = residenceId !== null
 
   const configQ = useQuery({
     queryKey: ['rappels-config', residenceId],
-    queryFn: () => getRappelsConfig(residenceId!),
-    enabled: !!residenceId,
+    queryFn: () => getRappelsConfig(residenceId as number),
+    enabled: queryReady,
   })
   const statsQ = useQuery({
     queryKey: ['rappels-stats', residenceId],
-    queryFn: () => getRappelsStats(residenceId!),
-    enabled: !!residenceId,
+    queryFn: () => getRappelsStats(residenceId as number),
+    enabled: queryReady,
   })
   const recentQ = useQuery({
     queryKey: ['rappels-recent', residenceId],
-    queryFn: () => getRecentRappels(residenceId!),
-    enabled: !!residenceId,
+    queryFn: () => getRecentRappels(residenceId as number),
+    enabled: queryReady,
   })
   const templatesQ = useQuery({
     queryKey: ['rappels-templates', residenceId],
-    queryFn: () => getRappelsTemplates(residenceId!),
-    enabled: !!residenceId,
+    queryFn: () => getRappelsTemplates(residenceId as number),
+    enabled: queryReady,
   })
 
   // Config is read straight from the query cache; toggles patch it
@@ -220,24 +226,9 @@ export function RappelsPage() {
     },
   })
 
-  if (!cfg) {
-    return (
-      <div className="p-4 sm:p-6">
-        <PageHeader
-          title={t('gestionnaire.rappels.title')}
-          subtitle={t('gestionnaire.rappels.subtitle')}
-        />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-28 animate-pulse rounded-xl bg-muted" />
-          ))}
-        </div>
-      </div>
-    )
-  }
-
   // ── Mutators ──
   const toggleAuto = (v: boolean) => {
+    if (!cfg) return
     patchConfig((c) => ({ ...c, auto_enabled: v }))
     saveMut.mutate({ auto_enabled: v })
     toast.success(
@@ -248,12 +239,14 @@ export function RappelsPage() {
   }
 
   const toggleStage = (id: ReminderStageId, enabled: boolean) => {
+    if (!cfg) return
     const stages = cfg.stages.map((s) => (s.id === id ? { ...s, enabled } : s))
     patchConfig((c) => ({ ...c, stages }))
     saveMut.mutate({ stages })
   }
 
   const toggleChannel = (id: ReminderStageId, ch: ExtraChannel) => {
+    if (!cfg) return
     const stages = cfg.stages.map((s) =>
       s.id === id
         ? { ...s, channels: { ...s.channels, [ch]: !s.channels[ch] } }
@@ -263,12 +256,59 @@ export function RappelsPage() {
     saveMut.mutate({ stages })
   }
 
-  const nextRunLabel = cfg.next_run_at
-    ? dtFmt.format(new Date(cfg.next_run_at))
+  // Safe fallback when config hasn't resolved yet — keeps the page rendering
+  // its full shell so users immediately see the structure instead of a
+  // 4-card skeleton. All stages start disabled in the fallback.
+  const fallbackCfg: RappelsConfig = {
+    residence_id: residenceId ?? 0,
+    auto_enabled: false,
+    next_run_at: null,
+    daily_limit: 3,
+    used_today: 0,
+    max_overdue_days: 7,
+    run_hour: 9,
+    stages: [
+      {
+        id: 'j3',
+        enabled: false,
+        channels: { whatsapp: false, email: false, sms: false },
+        pending: 0,
+      },
+      {
+        id: 'j2',
+        enabled: false,
+        channels: { whatsapp: false, email: false, sms: false },
+        pending: 0,
+      },
+      {
+        id: 'j1',
+        enabled: false,
+        channels: { whatsapp: false, email: false, sms: false },
+        pending: 0,
+      },
+      {
+        id: 'jour_j',
+        enabled: false,
+        channels: { whatsapp: false, email: false, sms: false },
+        pending: 0,
+      },
+      {
+        id: 'retard',
+        enabled: false,
+        channels: { whatsapp: false, email: false, sms: false },
+        pending: 0,
+      },
+    ],
+    languages: ['fr', 'ar'],
+  }
+  const view = cfg ?? fallbackCfg
+
+  const nextRunLabel = view.next_run_at
+    ? dtFmt.format(new Date(view.next_run_at))
     : t('gestionnaire.rappels.never')
 
-  const pendingTotal = cfg.stages.reduce((sum, s) => sum + s.pending, 0)
-  const remainingManual = Math.max(0, cfg.daily_limit - cfg.used_today)
+  const pendingTotal = view.stages.reduce((sum, s) => sum + s.pending, 0)
+  const remainingManual = Math.max(0, view.daily_limit - view.used_today)
 
   const stats = statsQ.data
 
@@ -321,7 +361,7 @@ export function RappelsPage() {
       <div
         className={cn(
           'overflow-hidden rounded-2xl border bg-card',
-          cfg.auto_enabled &&
+          view.auto_enabled &&
             'ring-1 ring-inset ring-[var(--color-imaro-primary)]/15',
         )}
       >
@@ -345,7 +385,7 @@ export function RappelsPage() {
               <span
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold',
-                  cfg.auto_enabled
+                  view.auto_enabled
                     ? 'bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400'
                     : 'bg-muted text-muted-foreground',
                 )}
@@ -353,16 +393,16 @@ export function RappelsPage() {
                 <span
                   className={cn(
                     'size-1.5 rounded-full',
-                    cfg.auto_enabled
+                    view.auto_enabled
                       ? 'bg-green-500'
                       : 'bg-muted-foreground/50',
                   )}
                 />
-                {cfg.auto_enabled
+                {view.auto_enabled
                   ? t('gestionnaire.rappels.enabled')
                   : t('gestionnaire.rappels.disabled')}
               </span>
-              {cfg.auto_enabled && (
+              {view.auto_enabled && (
                 <span className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex">
                   <CalendarClock className="size-3.5" />
                   {t('gestionnaire.rappels.nextRun')} : {nextRunLabel}
@@ -371,14 +411,14 @@ export function RappelsPage() {
             </div>
             <div className="flex items-center gap-3">
               <Switch
-                checked={cfg.auto_enabled}
+                checked={view.auto_enabled}
                 onCheckedChange={toggleAuto}
                 aria-label={t('gestionnaire.rappels.autoTitle')}
               />
               <Button
                 size="sm"
                 className="gap-1.5 bg-[var(--accent)] text-white hover:brightness-110"
-                disabled={sendAllMut.isPending || !cfg.auto_enabled}
+                disabled={sendAllMut.isPending || !view.auto_enabled}
                 onClick={() => sendAllMut.mutate()}
               >
                 {sendAllMut.isPending ? (
@@ -436,7 +476,7 @@ export function RappelsPage() {
           <span className="text-xs font-medium text-muted-foreground">
             {t('gestionnaire.rappels.remaining', {
               n: remainingManual,
-              max: cfg.daily_limit,
+              max: view.daily_limit,
             })}
           </span>
         </div>
@@ -447,7 +487,7 @@ export function RappelsPage() {
 
         {/* Progress rail */}
         <div className="mb-3 hidden items-center gap-1 md:flex">
-          {cfg.stages.map((s, i) => (
+          {view.stages.map((s, i) => (
             <div key={s.id} className="flex flex-1 items-center">
               <span
                 className={cn(
@@ -455,7 +495,7 @@ export function RappelsPage() {
                   s.enabled ? STAGE_META[s.id].dot : 'bg-muted-foreground/30',
                 )}
               />
-              {i < cfg.stages.length - 1 && (
+              {i < view.stages.length - 1 && (
                 <span className="h-0.5 flex-1 bg-gradient-to-r from-[var(--color-imaro-primary)]/40 to-[var(--color-imaro-primary)]/10" />
               )}
             </div>
@@ -463,7 +503,7 @@ export function RappelsPage() {
         </div>
 
         <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-5">
-          {cfg.stages.map((stage) => {
+          {view.stages.map((stage) => {
             const meta = STAGE_META[stage.id]
             return (
               <div
@@ -655,7 +695,7 @@ export function RappelsPage() {
                 {t('gestionnaire.rappels.langDesc')}
               </p>
               <div className="flex flex-wrap gap-1.5">
-                {cfg.languages.map((code) => (
+                {view.languages.map((code) => (
                   <span
                     key={code}
                     className="rounded-md border bg-background px-2 py-0.5 text-[11px] font-semibold uppercase text-muted-foreground"
@@ -680,28 +720,28 @@ export function RappelsPage() {
                 icon={Clock}
                 title={t('gestionnaire.rappels.howDaily')}
                 desc={t('gestionnaire.rappels.howDailyDesc', {
-                  hour: String(cfg.run_hour).padStart(2, '0'),
+                  hour: String(view.run_hour).padStart(2, '0'),
                 })}
               />
               <HowItem
                 icon={RefreshCw}
                 title={t('gestionnaire.rappels.howOverdue')}
                 desc={t('gestionnaire.rappels.howOverdueDesc', {
-                  n: cfg.max_overdue_days,
+                  n: view.max_overdue_days,
                 })}
               />
               <HowItem
                 icon={Gauge}
                 title={t('gestionnaire.rappels.howLimits')}
                 desc={t('gestionnaire.rappels.howLimitsDesc', {
-                  max: cfg.daily_limit,
+                  max: view.daily_limit,
                 })}
               />
               <HowItem
                 icon={Globe}
                 title={t('gestionnaire.rappels.howMultilang')}
                 desc={t('gestionnaire.rappels.howMultilangDesc', {
-                  n: cfg.languages.length,
+                  n: view.languages.length,
                 })}
               />
             </div>
