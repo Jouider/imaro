@@ -174,19 +174,33 @@ Première connexion résident — crée le code personnel et retourne le token d
 
 Retourne l'utilisateur courant, ses rôles et permissions.
 
-**Response 200**
+**Auto-refresh** : si le token expire dans moins de 7 jours, la réponse
+inclut un nouveau token (30j de TTL) dans `data.token` et l'ancien est
+révoqué. Le client doit alors swap le token stocké. Détectable via
+`data.refreshed === true`.
+
+**Response 200 — token frais (pas de refresh)**
 ```json
 {
   "status": "success",
   "data": {
-    "user": {
-      "id": 1,
-      "name": "Mohammed Fikri",
-      "role": "manager",
-      "tenant": { "id": 1, "name": "Blanca Syndic", "subdomain": "blanca" }
-    },
-    "roles": ["manager"],
-    "permissions": []
+    "user":   { "id": 1, "name": "Mohammed Fikri", "role": "manager" },
+    "tenant": { "id": 1, "name": "Blanca Syndic", "subdomain": "blanca" }
+  }
+}
+```
+
+**Response 200 — token bientôt expiré (refresh émis)**
+```json
+{
+  "status": "success",
+  "data": {
+    "user":       { "id": 1, "name": "Mohammed Fikri", "role": "manager" },
+    "tenant":     { "id": 1, "name": "Blanca Syndic", "subdomain": "blanca" },
+    "token":      "12|abcdef...",
+    "token_type": "Bearer",
+    "expires_in": 2592000,
+    "refreshed":  true
   }
 }
 ```

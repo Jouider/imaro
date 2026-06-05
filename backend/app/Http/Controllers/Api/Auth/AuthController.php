@@ -16,6 +16,11 @@ use Illuminate\Support\Facades\RateLimiter;
 
 class AuthController extends Controller
 {
+    private const TOKEN_TTL_DAYS = 30;
+
+    /** When /me sees a token with less than this left, it auto-rotates to a fresh one. */
+    private const TOKEN_REFRESH_THRESHOLD_DAYS = 7;
+
     /**
      * POST /api/auth/login
      * Email + mot de passe pour : manager, gestionnaire, conseil, super_admin.
@@ -79,7 +84,7 @@ class AuthController extends Controller
 
         $token = $user->createToken(
             name: 'syndikpro-app',
-            expiresAt: Carbon::now()->addDays(30)
+            expiresAt: Carbon::now()->addDays(self::TOKEN_TTL_DAYS)
         )->plainTextToken;
 
         return response()->json([
@@ -88,7 +93,7 @@ class AuthController extends Controller
             'data'    => [
                 'token'      => $token,
                 'token_type' => 'Bearer',
-                'expires_in' => 30 * 24 * 60 * 60,
+                'expires_in' => self::TOKEN_TTL_DAYS * 86400,
                 'user'       => new UserResource($user),
                 'tenant'     => $this->tenantData($user),
             ],
@@ -165,7 +170,7 @@ class AuthController extends Controller
 
         $token = $user->createToken(
             name: 'syndikpro-app',
-            expiresAt: Carbon::now()->addDays(30)
+            expiresAt: Carbon::now()->addDays(self::TOKEN_TTL_DAYS)
         )->plainTextToken;
 
         return response()->json([
@@ -174,7 +179,7 @@ class AuthController extends Controller
             'data'    => [
                 'token'      => $token,
                 'token_type' => 'Bearer',
-                'expires_in' => 30 * 24 * 60 * 60,
+                'expires_in' => self::TOKEN_TTL_DAYS * 86400,
                 'user'       => new UserResource($user->fresh('tenant')),
                 'tenant'     => $this->tenantData($user),
             ],
@@ -238,7 +243,7 @@ class AuthController extends Controller
 
         $token = $user->createToken(
             name: 'syndikpro-portail',
-            expiresAt: Carbon::now()->addDays(30)
+            expiresAt: Carbon::now()->addDays(self::TOKEN_TTL_DAYS)
         )->plainTextToken;
 
         return response()->json([
@@ -247,7 +252,7 @@ class AuthController extends Controller
             'data'    => [
                 'token'      => $token,
                 'token_type' => 'Bearer',
-                'expires_in' => 30 * 24 * 60 * 60,
+                'expires_in' => self::TOKEN_TTL_DAYS * 86400,
                 'user'       => new UserResource($user),
                 'tenant'     => $this->tenantData($user),
             ],
@@ -305,7 +310,7 @@ class AuthController extends Controller
 
         $token = $user->createToken(
             name: 'syndikpro-portail',
-            expiresAt: Carbon::now()->addDays(30)
+            expiresAt: Carbon::now()->addDays(self::TOKEN_TTL_DAYS)
         )->plainTextToken;
 
         return response()->json([
@@ -314,7 +319,7 @@ class AuthController extends Controller
             'data'    => [
                 'token'      => $token,
                 'token_type' => 'Bearer',
-                'expires_in' => 30 * 24 * 60 * 60,
+                'expires_in' => self::TOKEN_TTL_DAYS * 86400,
                 'user'       => new UserResource($user),
                 'tenant'     => $this->tenantData($user),
             ],
@@ -323,18 +328,51 @@ class AuthController extends Controller
 
     /**
      * GET /api/auth/me
+     *
+     * Renvoie le profil courant. Bonus : si le token expire bientôt (< 7j),
+     * on en émet un nouveau de 30j et on le renvoie dans `data.token` pour
+     * que le client puisse le swap. Permet aux sessions mobiles longues
+     * (resident) de rester valides sans forcer de reconnexion.
      */
     public function me(Request $request): JsonResponse
     {
         $user = $request->user()->load('tenant');
+        $current = $request->user()->currentAccessToken();
+
+        $data = [
+            'user'   => new UserResource($user),
+            'tenant' => $this->tenantData($user),
+        ];
+
+        if ($this->shouldRefresh($current)) {
+            $newToken = $user->createToken(
+                name:      $current->name,
+                expiresAt: Carbon::now()->addDays(self::TOKEN_TTL_DAYS),
+            )->plainTextToken;
+
+            // Drop the soon-to-expire token so the client can't reuse it.
+            $current->delete();
+
+            $data['token']      = $newToken;
+            $data['token_type'] = 'Bearer';
+            $data['expires_in'] = self::TOKEN_TTL_DAYS * 86400;
+            $data['refreshed']  = true;
+        }
 
         return response()->json([
             'status' => 'success',
-            'data'   => [
-                'user'   => new UserResource($user),
-                'tenant' => $this->tenantData($user),
-            ],
+            'data'   => $data,
         ]);
+    }
+
+    private function shouldRefresh(?object $token): bool
+    {
+        if (! $token || ! $token->expires_at) {
+            return false;
+        }
+
+        return Carbon::parse($token->expires_at)
+            ->lt(Carbon::now()->addDays(self::TOKEN_REFRESH_THRESHOLD_DAYS));
     }
 
     private function tenantData(User $user): ?array
