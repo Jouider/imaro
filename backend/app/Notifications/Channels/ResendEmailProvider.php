@@ -15,8 +15,25 @@ class ResendEmailProvider implements NotificationProvider
 {
     public function __construct(
         private readonly ?string $apiKey,
-        private readonly ?string $from,
+        private readonly string $domain,
+        private readonly ?string $fallbackFrom,
     ) {}
+
+    /**
+     * From-address per tenant: `{tenant.subdomain}@{domain}` (e.g. blanca@imaro.ma).
+     * One Resend domain verification (imaro.ma) covers every tenant — no per-client setup.
+     * Falls back to the configured global address if the user has no tenant.
+     */
+    private function resolveFrom(NotificationMessage $message): string
+    {
+        $subdomain = $message->to->tenant?->subdomain;
+
+        if ($subdomain) {
+            return $subdomain.'@'.$this->domain;
+        }
+
+        return $this->fallbackFrom ?? 'no-reply@'.$this->domain;
+    }
 
     public function name(): string
     {
@@ -30,8 +47,11 @@ class ResendEmailProvider implements NotificationProvider
 
     public function send(NotificationMessage $message): NotificationResult
     {
-        if (! $this->apiKey || ! $this->from) {
+        $from = $this->resolveFrom($message);
+
+        if (! $this->apiKey) {
             Log::channel('stack')->info('[RESEND SIMULATED]', [
+                'from'    => $from,
                 'to'      => $message->to->email,
                 'subject' => $message->subject,
                 'body'    => $message->body,
@@ -43,7 +63,7 @@ class ResendEmailProvider implements NotificationProvider
         try {
             $client = Resend::client($this->apiKey);
             $sent = $client->emails->send([
-                'from'    => $this->from,
+                'from'    => $from,
                 'to'      => [$message->to->email],
                 'subject' => $message->subject ?? '(no subject)',
                 'html'    => nl2br(e($message->body)),

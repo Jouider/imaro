@@ -32,8 +32,10 @@ return [
             'device_id' => env('SMS8_DEVICE_ID'),
         ],
         'resend' => [
-            'api_key' => env('RESEND_API_KEY'),
-            'from'    => env('RESEND_FROM', 'no-reply@imaro.ma'),
+            'api_key'       => env('RESEND_API_KEY'),
+            'domain'        => env('RESEND_DOMAIN', 'imaro.ma'),
+            // Used when the recipient has no tenant (e.g. super_admin emails).
+            'fallback_from' => env('RESEND_FALLBACK_FROM', 'no-reply@imaro.ma'),
         ],
     ],
 ];

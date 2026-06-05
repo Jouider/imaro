@@ -33,7 +33,8 @@ class NotificationServiceProvider extends ServiceProvider
                 ),
                 new ResendEmailProvider(
                     $cfg['providers']['resend']['api_key'] ?? null,
-                    $cfg['providers']['resend']['from'] ?? null,
+                    $cfg['providers']['resend']['domain'] ?? 'imaro.ma',
+                    $cfg['providers']['resend']['fallback_from'] ?? null,
                 ),
             ];
 
