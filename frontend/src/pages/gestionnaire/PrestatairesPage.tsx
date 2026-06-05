@@ -124,9 +124,9 @@ export function PrestatairesPage() {
       void qc.invalidateQueries({ queryKey: ['prestataires'] })
       setCreatePrestaOpen(false)
       setPrestaForm(EMPTY_PRESTA_FORM)
-      toast.success('Prestataire créé')
+      toast.success(t('gestionnaire.prestataires.toastCreated'))
     },
-    onError: () => toast.error('Erreur lors de la création'),
+    onError: () => toast.error(t('common.createError')),
   })
 
   const createContratMutation = useMutation({
@@ -145,9 +145,9 @@ export function PrestatairesPage() {
       void qc.invalidateQueries({ queryKey: ['contrats'] })
       setCreateContratOpen(false)
       setContratForm(EMPTY_CONTRAT_FORM)
-      toast.success('Contrat créé')
+      toast.success(t('gestionnaire.prestataires.toastContratCreated'))
     },
-    onError: () => toast.error('Erreur lors de la création'),
+    onError: () => toast.error(t('common.createError')),
   })
 
   const isPrestaFormValid = prestaForm.name.trim() && prestaForm.phone.trim()

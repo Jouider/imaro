@@ -181,7 +181,7 @@ function KanbanColumn({
         ))}
         {tickets.length === 0 && (
           <p className="py-6 text-center text-xs text-muted-foreground">
-            Aucun ticket
+            {t('gestionnaire.tickets.empty')}
           </p>
         )}
       </div>
@@ -272,7 +272,7 @@ export function TicketsPage() {
       setDetailTicket(null)
       toast.success(t('gestionnaire.tickets.updateSuccess'))
     },
-    onError: () => toast.error('Erreur lors de la mise à jour'),
+    onError: () => toast.error(t('common.updateError')),
   })
 
   const closeMutation = useMutation({
@@ -283,7 +283,7 @@ export function TicketsPage() {
       setDetailTicket(null)
       toast.success(t('gestionnaire.tickets.closeSuccess'))
     },
-    onError: () => toast.error('Erreur lors de la clôture'),
+    onError: () => toast.error(t('gestionnaire.tickets.toastClotureError')),
   })
 
   function openDetail(ticket: Ticket) {
@@ -477,21 +477,27 @@ export function TicketsPage() {
               {/* Meta */}
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <p className="font-medium text-muted-foreground">Résidence</p>
+                  <p className="font-medium text-muted-foreground">
+                    {t('common.residence')}
+                  </p>
                   <p>{detailTicket.residence.name}</p>
                 </div>
                 <div>
-                  <p className="font-medium text-muted-foreground">Lot</p>
+                  <p className="font-medium text-muted-foreground">
+                    {t('common.lot')}
+                  </p>
                   <p className="font-mono">{detailTicket.lot.numero}</p>
                 </div>
                 <div>
                   <p className="font-medium text-muted-foreground">
-                    Copropriétaire
+                    {t('common.coproprietaire')}
                   </p>
                   <p>{detailTicket.user.name}</p>
                 </div>
                 <div>
-                  <p className="font-medium text-muted-foreground">Date</p>
+                  <p className="font-medium text-muted-foreground">
+                    {t('common.date')}
+                  </p>
                   <p>{detailTicket.created_at.slice(0, 10)}</p>
                 </div>
               </div>

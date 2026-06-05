@@ -108,13 +108,13 @@ export function EmpruntsPage() {
     mutationFn: (input: CreateEmpruntInput) =>
       createEmprunt(residenceId!, input),
     onSuccess: () => {
-      toast.success('Emprunt enregistré')
+      toast.success(t('gestionnaire.emprunts.toastCreated'))
       setModalOpen(false)
       void queryClient.invalidateQueries({
         queryKey: ['emprunts', residenceId],
       })
     },
-    onError: () => toast.error('Échec'),
+    onError: () => toast.error(t('common.error')),
   })
   const updateMut = useMutation({
     mutationFn: ({
@@ -125,23 +125,23 @@ export function EmpruntsPage() {
       patch: Partial<CreateEmpruntInput>
     }) => updateEmprunt(id, patch),
     onSuccess: () => {
-      toast.success('Emprunt mis à jour')
+      toast.success(t('gestionnaire.emprunts.toastUpdated'))
       setModalOpen(false)
       void queryClient.invalidateQueries({
         queryKey: ['emprunts', residenceId],
       })
     },
-    onError: () => toast.error('Échec'),
+    onError: () => toast.error(t('common.error')),
   })
   const deleteMut = useMutation({
     mutationFn: (id: number) => deleteEmprunt(id),
     onSuccess: () => {
-      toast.success('Emprunt supprimé')
+      toast.success(t('gestionnaire.emprunts.toastDeleted'))
       void queryClient.invalidateQueries({
         queryKey: ['emprunts', residenceId],
       })
     },
-    onError: () => toast.error('Échec'),
+    onError: () => toast.error(t('common.error')),
   })
 
   const openCreate = () => {
@@ -167,11 +167,11 @@ export function EmpruntsPage() {
   }
   const save = () => {
     if (!draft.libelle.trim()) {
-      toast.error('Libellé requis')
+      toast.error(t('common.libelleRequired'))
       return
     }
     if (draft.montant_initial <= 0) {
-      toast.error('Montant initial > 0')
+      toast.error(t('gestionnaire.emprunts.amountInitialPositive'))
       return
     }
     if (editing) updateMut.mutate({ id: editing.id, patch: draft })
@@ -216,13 +216,13 @@ export function EmpruntsPage() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium">Résidence</label>
+        <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
           onValueChange={(v) => setPickedResidenceId(Number(v))}
         >
           <SelectTrigger className="w-72">
-            <SelectValue placeholder="Sélectionner" />
+            <SelectValue placeholder={t('common.select')} />
           </SelectTrigger>
           <SelectContent>
             {(residencesQ.data ?? []).map((r) => (
@@ -236,22 +236,22 @@ export function EmpruntsPage() {
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <Kpi
-          label="Total emprunté"
+          label={t('gestionnaire.emprunts.totalEmprunte')}
           value={`${fmt.format(totals.emprunte)} DH`}
           tone="primary"
         />
         <Kpi
-          label="Payé cumul"
+          label={t('gestionnaire.emprunts.payeCumul')}
           value={`${fmt.format(totals.payeCumul)} DH`}
           tone="muted"
         />
         <Kpi
-          label="Payé cet exercice"
+          label={t('gestionnaire.emprunts.payeExercice')}
           value={`${fmt.format(totals.payeExercice)} DH`}
           tone="success"
         />
         <Kpi
-          label="Reste à payer"
+          label={t('gestionnaire.emprunts.resteAPayer')}
           value={`${fmt.format(totals.reste)} DH`}
           tone="danger"
         />
@@ -260,9 +260,8 @@ export function EmpruntsPage() {
       <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900/30 dark:bg-blue-950/20">
         <AlertCircle className="mt-0.5 size-4 shrink-0 text-blue-600" />
         <p className="text-xs text-blue-700 dark:text-blue-300">
-          <strong>Annexe 8 — Décret 2.23.700</strong> · Tout emprunt collectif
-          doit être voté en AG (Loi 18-00 art. 17). Le tableau
-          d&apos;amortissement est fourni par l&apos;organisme prêteur.
+          <strong>{t('gestionnaire.emprunts.bannerTitle')}</strong>{' '}
+          {t('gestionnaire.emprunts.bannerBody')}
         </p>
       </div>
 
@@ -270,13 +269,17 @@ export function EmpruntsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Libellé</TableHead>
+              <TableHead>{t('common.libelle')}</TableHead>
               <TableHead>Organisme</TableHead>
-              <TableHead>Période</TableHead>
+              <TableHead>{t('common.periode')}</TableHead>
               <TableHead className="text-right">Initial</TableHead>
-              <TableHead className="text-right">Mensualité</TableHead>
-              <TableHead className="text-right">Reste dû</TableHead>
-              <TableHead>Statut</TableHead>
+              <TableHead className="text-right">
+                {t('gestionnaire.emprunts.colMensualite')}
+              </TableHead>
+              <TableHead className="text-right">
+                {t('gestionnaire.emprunts.colResteDu')}
+              </TableHead>
+              <TableHead>{t('common.status')}</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -296,7 +299,7 @@ export function EmpruntsPage() {
                   colSpan={8}
                   className="py-12 text-center text-sm text-muted-foreground"
                 >
-                  Aucun emprunt enregistré.
+                  {t('gestionnaire.emprunts.emptyRow')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -375,17 +378,17 @@ export function EmpruntsPage() {
           </DialogHeader>
           <div className="grid gap-3">
             <div>
-              <Label>Libellé *</Label>
+              <Label>{t('common.libelle')} *</Label>
               <Input
                 value={draft.libelle}
                 onChange={(e) =>
                   setDraft({ ...draft, libelle: e.target.value })
                 }
-                placeholder="ex: Réfection toiture 2023"
+                placeholder={t('gestionnaire.emprunts.libellePlaceholder')}
               />
             </div>
             <div>
-              <Label>Organisme prêteur</Label>
+              <Label>{t('gestionnaire.emprunts.organisme')}</Label>
               <Input
                 value={draft.organisme}
                 onChange={(e) =>
@@ -396,7 +399,7 @@ export function EmpruntsPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Date de début</Label>
+                <Label>{t('common.startDate')}</Label>
                 <Input
                   type="date"
                   value={draft.date_debut}
@@ -406,7 +409,7 @@ export function EmpruntsPage() {
                 />
               </div>
               <div>
-                <Label>Date de fin</Label>
+                <Label>{t('gestionnaire.emprunts.dateFin')}</Label>
                 <Input
                   type="date"
                   value={draft.date_fin}
@@ -418,7 +421,7 @@ export function EmpruntsPage() {
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <Label>Montant initial (DH) *</Label>
+                <Label>{t('gestionnaire.emprunts.montantInitialDh')} *</Label>
                 <Input
                   type="number"
                   min="0"
@@ -445,7 +448,7 @@ export function EmpruntsPage() {
                 />
               </div>
               <div>
-                <Label>Durée (mois)</Label>
+                <Label>{t('gestionnaire.emprunts.duree')}</Label>
                 <Input
                   type="number"
                   min="1"
@@ -457,7 +460,7 @@ export function EmpruntsPage() {
               </div>
             </div>
             <div>
-              <Label>Mensualité (DH)</Label>
+              <Label>{t('gestionnaire.emprunts.mensualiteDh')}</Label>
               <Input
                 type="number"
                 min="0"
@@ -471,7 +474,7 @@ export function EmpruntsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setModalOpen(false)}>
-              Annuler
+              {t('actions.cancel')}
             </Button>
             <Button
               onClick={save}

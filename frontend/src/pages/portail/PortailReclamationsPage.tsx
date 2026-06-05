@@ -81,7 +81,7 @@ export function PortailReclamationsPage() {
           active={activeTab === 'history'}
           onClick={() => setActiveTab('history')}
         >
-          Mes réclamations
+          {t('portail.reclamations.title')}
         </TabBtn>
       </div>
 
@@ -142,7 +142,7 @@ function SubmitForm({
       setPreviews([])
       void qc.invalidateQueries({ queryKey: ['portail-reclamations'] })
     },
-    onError: () => toast.error("Erreur lors de l'envoi"),
+    onError: () => toast.error(t('portail.reclamations.sendError')),
   })
 
   function validate(): boolean {
@@ -323,6 +323,7 @@ function SubmitForm({
 // ─── HistoryTab ───────────────────────────────────────────────────────────────
 
 function HistoryTab() {
+  const { t } = useTranslation()
   const { data: reclamations, isLoading } = useQuery({
     queryKey: ['portail-reclamations'],
     queryFn: getMyReclamations,
@@ -342,9 +343,9 @@ function HistoryTab() {
     return (
       <div className="flex flex-col items-center gap-3 py-16 text-center">
         <FileText className="size-12 text-muted-foreground" />
-        <p className="font-medium text-sm">Aucune réclamation</p>
+        <p className="font-medium text-sm">{t('portail.reclamations.empty')}</p>
         <p className="text-xs text-muted-foreground">
-          Vos réclamations soumises apparaîtront ici.
+          {t('portail.reclamations.emptyHint')}
         </p>
       </div>
     )

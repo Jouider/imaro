@@ -88,7 +88,7 @@ export function AutresRecettesPage() {
     mutationFn: (input: CreateRecetteInput) =>
       createAutreRecette(residenceId!, input),
     onSuccess: () => {
-      toast.success('Recette ajoutée')
+      toast.success(t('gestionnaire.autresRecettes.toastAdded'))
       setModalOpen(false)
       void queryClient.invalidateQueries({
         queryKey: ['autres-recettes', residenceId, exercice],
@@ -104,7 +104,7 @@ export function AutresRecettesPage() {
       patch: Partial<CreateRecetteInput>
     }) => updateAutreRecette(id, patch),
     onSuccess: () => {
-      toast.success('Recette mise à jour')
+      toast.success(t('gestionnaire.autresRecettes.toastUpdated'))
       setModalOpen(false)
       void queryClient.invalidateQueries({
         queryKey: ['autres-recettes', residenceId, exercice],
@@ -114,7 +114,7 @@ export function AutresRecettesPage() {
   const deleteMut = useMutation({
     mutationFn: (id: number) => deleteAutreRecette(id),
     onSuccess: () => {
-      toast.success('Recette supprimée')
+      toast.success(t('gestionnaire.autresRecettes.toastDeleted'))
       void queryClient.invalidateQueries({
         queryKey: ['autres-recettes', residenceId, exercice],
       })
@@ -133,11 +133,11 @@ export function AutresRecettesPage() {
   }
   const save = () => {
     if (!draft.libelle.trim()) {
-      toast.error('Libellé requis')
+      toast.error(t('common.libelleRequired'))
       return
     }
     if (draft.montant <= 0) {
-      toast.error('Montant > 0')
+      toast.error(t('common.amountPositive'))
       return
     }
     if (editing) updateMut.mutate({ id: editing.id, patch: draft })
@@ -186,13 +186,13 @@ export function AutresRecettesPage() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium">Résidence</label>
+        <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
           onValueChange={(v) => setPickedResidenceId(Number(v))}
         >
           <SelectTrigger className="w-60">
-            <SelectValue placeholder="Sélectionner" />
+            <SelectValue placeholder={t('common.select')} />
           </SelectTrigger>
           <SelectContent>
             {(residencesQ.data ?? []).map((r) => (
@@ -258,11 +258,11 @@ export function AutresRecettesPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Libellé</TableHead>
-              <TableHead>Catégorie</TableHead>
+              <TableHead>{t('common.date')}</TableHead>
+              <TableHead>{t('common.libelle')}</TableHead>
+              <TableHead>{t('common.categorie')}</TableHead>
               <TableHead>Payeur</TableHead>
-              <TableHead className="text-right">Montant</TableHead>
+              <TableHead className="text-right">{t('common.amount')}</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -282,7 +282,7 @@ export function AutresRecettesPage() {
                   colSpan={6}
                   className="py-12 text-center text-sm text-muted-foreground"
                 >
-                  Aucune recette pour cet exercice.
+                  {t('gestionnaire.autresRecettes.emptyRow')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -355,7 +355,7 @@ export function AutresRecettesPage() {
           </DialogHeader>
           <div className="grid gap-3">
             <div>
-              <Label>Libellé *</Label>
+              <Label>{t('common.libelle')} *</Label>
               <Input
                 value={draft.libelle}
                 onChange={(e) =>
@@ -366,7 +366,7 @@ export function AutresRecettesPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Date</Label>
+                <Label>{t('common.date')}</Label>
                 <Input
                   type="date"
                   value={draft.date}
@@ -387,7 +387,7 @@ export function AutresRecettesPage() {
               </div>
             </div>
             <div>
-              <Label>Catégorie</Label>
+              <Label>{t('common.categorie')}</Label>
               <Select
                 value={draft.categorie}
                 onValueChange={(v) =>
@@ -417,7 +417,7 @@ export function AutresRecettesPage() {
                 />
               </div>
               <div>
-                <Label>Référence</Label>
+                <Label>{t('common.reference')}</Label>
                 <Input
                   value={draft.reference ?? ''}
                   onChange={(e) =>
@@ -430,7 +430,7 @@ export function AutresRecettesPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setModalOpen(false)}>
-              Annuler
+              {t('actions.cancel')}
             </Button>
             <Button
               onClick={save}

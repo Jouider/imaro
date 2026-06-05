@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 import {
   Building2,
   Users,
@@ -409,9 +408,6 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6 p-4 sm:p-6">
-      {/* First-run setup checklist (owner only, until onboarding complete) */}
-      <OnboardingChecklist />
-
       {/* Page heading — DM Serif greeting + contextual subtitle */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -501,7 +497,7 @@ export function DashboardPage() {
             </div>
             <p className="mt-3 text-sm font-bold">Assistant IA</p>
             <p className="mt-0.5 text-xs text-white/80">
-              Audit conformité · OCR factures · Suggestions budget
+              {t('gestionnaire.dashboard.iaSubtitle')}
             </p>
             <ArrowRight className="absolute bottom-3 right-3 size-4 text-white/60 transition-transform group-hover:translate-x-1" />
           </button>
@@ -511,9 +507,9 @@ export function DashboardPage() {
             onClick={() => void navigate('/gestionnaire/conformite')}
             icon={<CalendarCheck className="size-4" />}
             iconBg="bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
-            label="Conformité"
+            label={t('gestionnaire.dashboard.conformite')}
             value="14%"
-            sublabel="Cycle Décret 2.23.700 · Régime simplifié"
+            sublabel={t('gestionnaire.dashboard.conformiteCycle')}
             tone="info"
           />
 

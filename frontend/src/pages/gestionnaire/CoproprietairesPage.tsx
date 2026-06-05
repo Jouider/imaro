@@ -62,6 +62,7 @@ function CreateCoproprietaireDialog({
   defaultResidenceId,
   onSuccess,
 }: CreateDialogProps) {
+  const { t } = useTranslation()
   const [residenceId, setResidenceId] = useState(defaultResidenceId)
   const [lotId, setLotId] = useState('')
   const [name, setName] = useState('')
@@ -93,7 +94,8 @@ function CreateCoproprietaireDialog({
       setPhoneDigits('')
       setLotId('')
     },
-    onError: () => toast.error('Erreur lors de la création du compte'),
+    onError: () =>
+      toast.error(t('gestionnaire.coproprietaires.createAccountError')),
   })
 
   function handleSubmit(e: React.FormEvent) {
@@ -112,17 +114,18 @@ function CreateCoproprietaireDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Ajouter un copropriétaire</DialogTitle>
+          <DialogTitle>
+            {t('gestionnaire.coproprietaires.addCopro')}
+          </DialogTitle>
           <DialogDescription>
-            Ceci créera un nouveau copropriétaire et lui générera un compte pour
-            accéder à son espace.
+            {t('gestionnaire.coproprietaires.dialogDesc')}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5 pt-2">
           {/* Residence */}
           <div className="space-y-2">
-            <Label htmlFor="dialog-residence">Résidence *</Label>
+            <Label htmlFor="dialog-residence">{t('common.residence')} *</Label>
             <Select
               value={residenceId}
               onValueChange={(v) => {
@@ -131,7 +134,11 @@ function CreateCoproprietaireDialog({
               }}
             >
               <SelectTrigger id="dialog-residence">
-                <SelectValue placeholder="Sélectionner une résidence..." />
+                <SelectValue
+                  placeholder={t(
+                    'gestionnaire.coproprietaires.selectResidencePlaceholder',
+                  )}
+                />
               </SelectTrigger>
               <SelectContent>
                 {residences.map((r) => (
@@ -145,7 +152,9 @@ function CreateCoproprietaireDialog({
 
           {/* Lot */}
           <div className="space-y-2">
-            <Label htmlFor="dialog-lot">Lot *</Label>
+            <Label htmlFor="dialog-lot">
+              {t('gestionnaire.coproprietaires.colLot')} *
+            </Label>
             <Select
               value={lotId}
               onValueChange={setLotId}
@@ -155,12 +164,12 @@ function CreateCoproprietaireDialog({
                 <SelectValue
                   placeholder={
                     !residenceId
-                      ? "Sélectionnez d'abord une résidence"
+                      ? t('gestionnaire.coproprietaires.lotSelectFirst')
                       : loadingLots
-                        ? 'Chargement…'
+                        ? t('actions.loading')
                         : availableLots.length === 0
-                          ? 'Aucun lot disponible'
-                          : 'Sélectionner un lot...'
+                          ? t('gestionnaire.coproprietaires.noLotAvailable')
+                          : t('gestionnaire.coproprietaires.selectLot')
                   }
                 />
               </SelectTrigger>
@@ -176,11 +185,13 @@ function CreateCoproprietaireDialog({
 
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="dialog-name">Nom *</Label>
+            <Label htmlFor="dialog-name">{t('common.name')} *</Label>
             <input
               id="dialog-name"
               type="text"
-              placeholder="Nom complet"
+              placeholder={t(
+                'gestionnaire.coproprietaires.fullNamePlaceholder',
+              )}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -190,7 +201,7 @@ function CreateCoproprietaireDialog({
 
           {/* Phone (required) */}
           <div className="space-y-2">
-            <Label htmlFor="dialog-phone">Téléphone *</Label>
+            <Label htmlFor="dialog-phone">{t('common.phone')} *</Label>
             <div className="flex overflow-hidden rounded-lg border border-border transition-all focus-within:border-[var(--color-imaro-primary)] focus-within:ring-2 focus-within:ring-[var(--color-imaro-primary)]/10">
               <span className="flex items-center border-e bg-muted px-3 text-sm font-bold text-[var(--color-imaro-primary)]">
                 +212
@@ -213,7 +224,9 @@ function CreateCoproprietaireDialog({
 
           {/* Email (optional) */}
           <div className="space-y-2">
-            <Label htmlFor="dialog-email">Email (optionnel)</Label>
+            <Label htmlFor="dialog-email">
+              {t('gestionnaire.coproprietaires.emailOptional')}
+            </Label>
             <input
               id="dialog-email"
               type="email"
@@ -230,8 +243,8 @@ function CreateCoproprietaireDialog({
             disabled={!canSubmit}
           >
             {mutation.isPending
-              ? 'Création en cours…'
-              : 'Créer le copropriétaire'}
+              ? t('gestionnaire.coproprietaires.creating')
+              : t('gestionnaire.coproprietaires.createCopro')}
           </Button>
         </form>
       </DialogContent>
@@ -256,6 +269,7 @@ function CreateLotDialog({
   coproprietaireId,
   coproprietaireName,
 }: CreateLotDialogProps) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [numero, setNumero] = useState('')
   const [type, setType] = useState<
@@ -277,12 +291,18 @@ function CreateLotDialog({
         ...({ coproprietaire_id: coproprietaireId } as object),
       } as Parameters<typeof storeLot>[1]),
     onSuccess: () => {
-      toast.success(`Lot ${numero} créé et assigné à ${coproprietaireName}`)
+      toast.success(
+        t('gestionnaire.coproprietaires.lotCreatedAssigned', {
+          numero,
+          name: coproprietaireName,
+        }),
+      )
       void queryClient.invalidateQueries({ queryKey: ['coproprietaires'] })
       void queryClient.invalidateQueries({ queryKey: ['lots'] })
       onOpenChange(false)
     },
-    onError: () => toast.error('Erreur lors de la création du lot'),
+    onError: () =>
+      toast.error(t('gestionnaire.coproprietaires.createLotError')),
   })
 
   const canSubmit =
@@ -301,10 +321,10 @@ function CreateLotDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Building2 className="size-5 text-[var(--color-imaro-primary)]" />
-            Créer un lot
+            {t('gestionnaire.coproprietaires.createLotTitle')}
           </DialogTitle>
           <DialogDescription>
-            Ce lot sera automatiquement assigné à{' '}
+            {t('gestionnaire.coproprietaires.lotAssignDescPre')}
             <span className="font-semibold text-foreground">
               {coproprietaireName}
             </span>
@@ -322,7 +342,7 @@ function CreateLotDialog({
           {/* Numéro + Type */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="lot-numero">Numéro *</Label>
+              <Label htmlFor="lot-numero">{t('common.numero')} *</Label>
               <input
                 id="lot-numero"
                 placeholder="A-01"
@@ -333,7 +353,7 @@ function CreateLotDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="lot-type">Type *</Label>
+              <Label htmlFor="lot-type">{t('common.type')} *</Label>
               <Select
                 value={type}
                 onValueChange={(v) => setType(v as typeof type)}
@@ -342,10 +362,18 @@ function CreateLotDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="appartement">Appartement</SelectItem>
-                  <SelectItem value="commerce">Commerce</SelectItem>
-                  <SelectItem value="parking">Parking</SelectItem>
-                  <SelectItem value="cave">Cave</SelectItem>
+                  <SelectItem value="appartement">
+                    {t('gestionnaire.coproprietaires.lotType.appartement')}
+                  </SelectItem>
+                  <SelectItem value="commerce">
+                    {t('gestionnaire.coproprietaires.lotType.commerce')}
+                  </SelectItem>
+                  <SelectItem value="parking">
+                    {t('gestionnaire.coproprietaires.lotType.parking')}
+                  </SelectItem>
+                  <SelectItem value="cave">
+                    {t('gestionnaire.coproprietaires.lotType.cave')}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -354,7 +382,7 @@ function CreateLotDialog({
           {/* Étage + Superficie + Tantième */}
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="lot-etage">Étage *</Label>
+              <Label htmlFor="lot-etage">{t('common.etage')} *</Label>
               <input
                 id="lot-etage"
                 type="number"
@@ -366,7 +394,7 @@ function CreateLotDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="lot-superficie">Superficie (m²) *</Label>
+              <Label htmlFor="lot-superficie">{t('common.superficie')} *</Label>
               <input
                 id="lot-superficie"
                 type="number"
@@ -378,7 +406,7 @@ function CreateLotDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="lot-tantieme">Tantième *</Label>
+              <Label htmlFor="lot-tantieme">{t('common.tantieme')} *</Label>
               <input
                 id="lot-tantieme"
                 type="number"
@@ -396,7 +424,9 @@ function CreateLotDialog({
             className="h-11 w-full bg-gradient-imaro text-white shadow-sm hover:brightness-110"
             disabled={!canSubmit}
           >
-            {mutation.isPending ? 'Création…' : 'Créer et assigner le lot'}
+            {mutation.isPending
+              ? t('gestionnaire.coproprietaires.creatingShort')
+              : t('gestionnaire.coproprietaires.createAssignLot')}
           </Button>
         </form>
       </DialogContent>
@@ -421,6 +451,7 @@ function SuccessDialog({
   result,
   phone,
 }: SuccessDialogProps) {
+  const { t } = useTranslation()
   if (!result) return null
 
   const phoneDigits = phone.replace(/^\+212/, '')
@@ -428,14 +459,17 @@ function SuccessDialog({
   function copyCode() {
     if (result?.temp_password) {
       void navigator.clipboard.writeText(result.temp_password)
-      toast.success('Code copié !')
+      toast.success(t('gestionnaire.coproprietaires.codeCopied'))
     }
   }
 
   function sendWhatsApp() {
     const code = result?.temp_password ?? ''
     const msg = encodeURIComponent(
-      `Bonjour ${result?.coproprietaire.name} 👋\n\nVotre code d'accès Imaro est : *${code}*\n\nConnectez-vous sur l'application et entrez ce code pour accéder à votre espace copropriétaire.`,
+      t('gestionnaire.coproprietaires.waMessage', {
+        name: result?.coproprietaire.name,
+        code,
+      }),
     )
     window.open(`https://wa.me/${phone.replace('+', '')}?text=${msg}`, '_blank')
   }
@@ -449,7 +483,9 @@ function SuccessDialog({
     >
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl">Propriétaire créé !</DialogTitle>
+          <DialogTitle className="text-xl">
+            {t('gestionnaire.coproprietaires.ownerCreated')}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 pt-1">
@@ -459,7 +495,7 @@ function SuccessDialog({
             <div className="flex items-center gap-2 mb-3">
               <CheckCircle2 className="size-4 shrink-0 text-green-600" />
               <p className="text-sm font-medium text-green-800 dark:text-green-300">
-                Le copropriétaire a été créé avec succès.
+                {t('gestionnaire.coproprietaires.createdSuccess')}
               </p>
             </div>
 
@@ -467,7 +503,7 @@ function SuccessDialog({
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-green-900 dark:text-green-200 min-w-[100px]">
-                  Téléphone :
+                  {t('common.phone')} :
                 </span>
                 <span className="text-green-800 dark:text-green-300 font-mono">
                   {phoneDigits}
@@ -475,7 +511,7 @@ function SuccessDialog({
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-green-900 dark:text-green-200 min-w-[100px]">
-                  Code d'accès :
+                  {t('gestionnaire.coproprietaires.accessCode')}
                 </span>
                 <span className="rounded-md bg-green-200 dark:bg-green-800 px-3 py-1 font-mono text-base font-bold tracking-widest text-green-900 dark:text-green-100">
                   {result.temp_password}
@@ -483,7 +519,7 @@ function SuccessDialog({
                 <button
                   onClick={copyCode}
                   className="text-green-700 hover:text-green-900 dark:text-green-400"
-                  aria-label="Copier le code"
+                  aria-label={t('gestionnaire.coproprietaires.copyCodeAria')}
                 >
                   <Copy className="size-3.5" />
                 </button>
@@ -493,14 +529,14 @@ function SuccessDialog({
             {/* WhatsApp */}
             <div className="mt-3 space-y-2">
               <p className="text-xs text-green-700 dark:text-green-400">
-                Partagez ce code avec le copropriétaire via WhatsApp.
+                {t('gestionnaire.coproprietaires.shareCode')}
               </p>
               <button
                 onClick={sendWhatsApp}
                 className="flex items-center gap-2 rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
                 <MessageCircle className="size-4" />
-                Envoyer par WhatsApp
+                {t('gestionnaire.coproprietaires.sendWhatsApp')}
               </button>
             </div>
           </div>
@@ -508,7 +544,7 @@ function SuccessDialog({
           {/* ── Create lot prompt ── */}
           <div className="rounded-xl border border-border bg-muted/30 p-4">
             <p className="text-sm text-foreground mb-3">
-              Souhaitez-vous créer un lot pour ce nouveau propriétaire ?
+              {t('gestionnaire.coproprietaires.createLotPrompt')}
             </p>
             <div className="flex gap-2">
               <Button
@@ -516,10 +552,10 @@ function SuccessDialog({
                 onClick={onCreateLot}
               >
                 <Building2 className="size-4" />
-                Oui, créer un lot
+                {t('gestionnaire.coproprietaires.yesCreateLot')}
               </Button>
               <Button variant="outline" className="flex-1" onClick={onClose}>
-                Non, terminer
+                {t('gestionnaire.coproprietaires.noFinish')}
               </Button>
             </div>
           </div>
@@ -631,7 +667,7 @@ export function CoproprietairesPage() {
             className="gap-2 bg-gradient-imaro text-white shadow-sm hover:brightness-110"
           >
             <UserPlus className="size-4" />
-            Ajouter un copropriétaire
+            {t('gestionnaire.coproprietaires.addCopro')}
           </Button>
         }
       />

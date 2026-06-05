@@ -91,6 +91,7 @@ function RepartitionPreview({
   mode,
   montantFixe,
 }: RepartitionPreviewProps) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(true)
   const isFixe = mode === 'fixe'
 
@@ -116,14 +117,22 @@ function RepartitionPreview({
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b text-muted-foreground">
-                <th className="py-1 text-left font-medium">Lot</th>
+                <th className="py-1 text-left font-medium">
+                  {t('common.lot')}
+                </th>
                 {isFixe ? (
-                  <th className="py-1 text-right font-medium">Montant</th>
+                  <th className="py-1 text-right font-medium">
+                    {t('common.amount')}
+                  </th>
                 ) : (
                   <>
-                    <th className="py-1 text-right font-medium">Tantième</th>
+                    <th className="py-1 text-right font-medium">
+                      {t('common.tantieme')}
+                    </th>
                     <th className="py-1 text-right font-medium">%</th>
-                    <th className="py-1 text-right font-medium">Montant</th>
+                    <th className="py-1 text-right font-medium">
+                      {t('common.amount')}
+                    </th>
                   </>
                 )}
               </tr>
@@ -170,7 +179,7 @@ function RepartitionPreview({
             </tbody>
             <tfoot>
               <tr className="border-t font-bold">
-                <td className="py-1">Total</td>
+                <td className="py-1">{t('common.total')}</td>
                 {isFixe ? (
                   <td className="py-1 text-right tabular-nums">
                     {fmt.format(lots.length * (montantFixe ?? 0))}
@@ -260,9 +269,9 @@ export function AppelsFondsPage() {
       void qc.invalidateQueries({ queryKey: ['appels-fonds'] })
       setCreateOpen(false)
       setForm(EMPTY_FORM)
-      toast.success('Appel de fonds créé')
+      toast.success(t('gestionnaire.appelsFonds.toastCreated'))
     },
-    onError: () => toast.error('Erreur lors de la création'),
+    onError: () => toast.error(t('common.createError')),
   })
 
   const envoyerMutation = useMutation({
@@ -272,7 +281,7 @@ export function AppelsFondsPage() {
       setEnvoyerTarget(null)
       toast.success(t('gestionnaire.appelsFonds.envoyerSuccess'))
     },
-    onError: () => toast.error("Erreur lors de l'envoi"),
+    onError: () => toast.error(t('gestionnaire.appelsFonds.sendError')),
   })
 
   const columns: Column<AppelFonds>[] = [
@@ -409,7 +418,7 @@ export function AppelsFondsPage() {
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Choisir une résidence" />
+                  <SelectValue placeholder={t('common.selectResidence')} />
                 </SelectTrigger>
                 <SelectContent>
                   {residences.map((r) => (
@@ -431,10 +440,14 @@ export function AppelsFondsPage() {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Toutes les tranches" />
+                    <SelectValue
+                      placeholder={t('gestionnaire.appelsFonds.allTranches')}
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Toutes les tranches</SelectItem>
+                    <SelectItem value="">
+                      {t('gestionnaire.appelsFonds.allTranches')}
+                    </SelectItem>
                     {groupesHabitations.map((gh) => (
                       <SelectItem key={gh.id} value={String(gh.id)}>
                         {gh.nom}
@@ -474,7 +487,7 @@ export function AppelsFondsPage() {
               (lotsLoading ? (
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Loader2 className="size-3.5 animate-spin" />
-                  Calcul de la répartition…
+                  {t('gestionnaire.appelsFonds.calcRepartition')}
                 </div>
               ) : showRepartition ? (
                 <RepartitionPreview

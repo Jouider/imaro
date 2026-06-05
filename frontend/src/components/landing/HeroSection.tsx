@@ -181,6 +181,7 @@ export function HeroSection() {
  * mock data: 3 KPIs + chart + module grid + impayé alert + recent activity.
  */
 function HeroMockup() {
+  const { t } = useTranslation()
   return (
     <div className="l-float relative w-full max-w-md rounded-2xl border border-white/10 bg-white p-3.5 shadow-2xl shadow-blue-950/50 backdrop-blur-sm dark:bg-card">
       {/* Window chrome */}
@@ -245,7 +246,7 @@ function HeroMockup() {
         </div>
         <div className="rounded-lg border border-[var(--color-imaro-primary)]/10 bg-gradient-to-br from-white to-orange-50 p-2">
           <p className="text-[8px] font-medium uppercase tracking-wide text-slate-500">
-            Impayés
+            {t('landing.hero.impayes')}
           </p>
           <p className="font-display text-base leading-none tracking-tight text-[var(--primary)]">
             18,2K
@@ -256,7 +257,7 @@ function HeroMockup() {
         </div>
         <div className="rounded-lg border border-[var(--color-imaro-primary)]/10 bg-gradient-to-br from-white to-emerald-50/60 p-2">
           <p className="text-[8px] font-medium uppercase tracking-wide text-slate-500">
-            Trésorerie
+            {t('landing.hero.tresorerie')}
           </p>
           <p className="font-display text-base leading-none tracking-tight text-[var(--primary)]">
             312K
@@ -426,7 +427,7 @@ function HeroMockup() {
             ✓
           </span>
           <p className="flex-1 text-[9px] text-slate-700">
-            Pointage Attijariwafa terminé
+            {t('landing.hero.pointageDone')}
           </p>
           <span className="text-[8px] text-slate-400">il y a 2 min</span>
         </div>
