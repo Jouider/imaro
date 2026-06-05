@@ -24,6 +24,7 @@ export const ROUTE_PERMISSIONS: Record<string, AppPermission[]> = {
   depenses: ['finances', 'depenses'],
   // Recouvrement group
   recouvrement: ['recouvrement'],
+  rappels: ['recouvrement', 'finances'],
   // Copropriété group
   coproprietaires: ['coproprietaires'],
   occupants: ['coproprietaires'],
