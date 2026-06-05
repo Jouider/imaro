@@ -382,6 +382,7 @@ function ProchainPaiementCard({
 // ─── AssembleePreviewCard ─────────────────────────────────────────────────────
 
 function AssembleePreviewCard({ ag }: { ag: AssembleePortail }) {
+  const { t } = useTranslation()
   const dateObj = new Date(ag.date)
   const day = dateObj.toLocaleDateString('fr-FR', { day: '2-digit' })
   const month = dateObj.toLocaleDateString('fr-FR', { month: 'short' })
@@ -428,7 +429,7 @@ function AssembleePreviewCard({ ag }: { ag: AssembleePortail }) {
         </div>
 
         <Badge className="shrink-0 bg-blue-100 text-blue-800 border-0 text-xs">
-          Convoquée
+          {t('portail.home.convoquee')}
         </Badge>
       </div>
     </Link>

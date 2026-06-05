@@ -104,9 +104,9 @@ export function AssembleesPage() {
       void qc.invalidateQueries({ queryKey: ['assemblees'] })
       setCreateOpen(false)
       setForm(EMPTY_FORM)
-      toast.success('Assemblée créée')
+      toast.success(t('gestionnaire.assemblees.toastCreated'))
     },
-    onError: () => toast.error('Erreur lors de la création'),
+    onError: () => toast.error(t('common.createError')),
   })
 
   const columns: Column<Assemblee>[] = [
@@ -184,7 +184,7 @@ export function AssembleesPage() {
       className: 'w-20 text-right',
       renderCell: (r) => (
         <Button variant="ghost" size="sm" onClick={() => setDetailAG(r)}>
-          Voir
+          {t('common.view')}
         </Button>
       ),
     },
@@ -264,7 +264,7 @@ export function AssembleesPage() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, titre: e.target.value }))
                 }
-                placeholder="AG Ordinaire 2026"
+                placeholder={t('gestionnaire.assemblees.form.titrePlaceholder')}
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -296,7 +296,7 @@ export function AssembleesPage() {
                   }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Choisir" />
+                    <SelectValue placeholder={t('common.choose')} />
                   </SelectTrigger>
                   <SelectContent>
                     {residences.map((r) => (
@@ -338,7 +338,9 @@ export function AssembleesPage() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, lieu: e.target.value }))
                   }
-                  placeholder="Salle de réunion, RDC"
+                  placeholder={t(
+                    'gestionnaire.assemblees.form.lieuPlaceholder',
+                  )}
                 />
               </div>
               <div className="space-y-1">
@@ -366,7 +368,7 @@ export function AssembleesPage() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, ordre_du_jour: e.target.value }))
                 }
-                placeholder="1. Approbation des comptes&#10;2. Budget prévisionnel&#10;3. Questions diverses"
+                placeholder={t('gestionnaire.assemblees.form.ordrePlaceholder')}
                 className="w-full min-h-[100px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </div>
@@ -409,15 +411,21 @@ export function AssembleesPage() {
             <div className="space-y-4 py-2">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="font-medium text-muted-foreground">Résidence</p>
+                  <p className="font-medium text-muted-foreground">
+                    {t('common.residence')}
+                  </p>
                   <p>{detailAG.residence.name}</p>
                 </div>
                 <div>
-                  <p className="font-medium text-muted-foreground">Type</p>
+                  <p className="font-medium text-muted-foreground">
+                    {t('common.type')}
+                  </p>
                   <p className="capitalize">{detailAG.type}</p>
                 </div>
                 <div>
-                  <p className="font-medium text-muted-foreground">Date</p>
+                  <p className="font-medium text-muted-foreground">
+                    {t('common.date')}
+                  </p>
                   <p>
                     {new Date(detailAG.date).toLocaleDateString('fr-FR', {
                       weekday: 'long',
@@ -433,7 +441,9 @@ export function AssembleesPage() {
                   </p>
                 </div>
                 <div>
-                  <p className="font-medium text-muted-foreground">Lieu</p>
+                  <p className="font-medium text-muted-foreground">
+                    {t('gestionnaire.assemblees.colLieu')}
+                  </p>
                   <p>{detailAG.lieu}</p>
                 </div>
               </div>
@@ -443,14 +453,20 @@ export function AssembleesPage() {
                 <Users className="size-5 shrink-0 text-muted-foreground" />
                 <div className="flex-1 text-sm">
                   <p className="font-medium">
-                    Quorum requis : {detailAG.quorum_requis} %
+                    {t('gestionnaire.assemblees.detailQuorum', {
+                      n: detailAG.quorum_requis,
+                    })}
                   </p>
                   {detailAG.participants_count !== null ? (
                     <p className="text-muted-foreground">
-                      {detailAG.participants_count} participants présents
+                      {t('gestionnaire.assemblees.detailParticipants', {
+                        n: detailAG.participants_count,
+                      })}
                     </p>
                   ) : (
-                    <p className="text-muted-foreground">AG non encore tenue</p>
+                    <p className="text-muted-foreground">
+                      {t('gestionnaire.assemblees.detailNotHeld')}
+                    </p>
                   )}
                 </div>
                 <Badge

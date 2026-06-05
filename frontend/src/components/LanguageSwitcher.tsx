@@ -11,14 +11,14 @@ const LANGS = [
  * Active segment: navy bg + white text. Inactive: muted, clickable.
  */
 export function LanguageSwitcher() {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const current = i18n.resolvedLanguage ?? 'fr'
 
   return (
     <div
       className="flex items-center rounded-lg border border-border bg-muted/30 p-0.5"
       role="group"
-      aria-label="Choisir la langue"
+      aria-label={t('common.chooseLanguage')}
     >
       {LANGS.map(({ code, label }) => (
         <button

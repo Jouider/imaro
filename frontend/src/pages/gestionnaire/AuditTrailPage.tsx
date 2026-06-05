@@ -137,7 +137,7 @@ export function AuditTrailPage() {
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <Kpi
-          label="Total événements"
+          label={t('gestionnaire.audit.totalEvents')}
           value={stats.total}
           icon={<Activity className="size-4" />}
           tone="primary"
@@ -166,7 +166,7 @@ export function AuditTrailPage() {
       <div className="flex flex-wrap items-center gap-2 rounded-xl border bg-card p-4">
         <Filter className="size-4 text-muted-foreground" />
         <Input
-          placeholder="Rechercher action, utilisateur, cible..."
+          placeholder={t('gestionnaire.audit.searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-xs"
@@ -178,10 +178,12 @@ export function AuditTrailPage() {
           }
         >
           <SelectTrigger className="w-44">
-            <SelectValue placeholder="Catégorie" />
+            <SelectValue placeholder={t('common.categorie')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">Toutes catégories</SelectItem>
+            <SelectItem value="__all__">
+              {t('gestionnaire.audit.allCategories')}
+            </SelectItem>
             {CATEGORIES.map((c) => (
               <SelectItem key={c.value} value={c.value}>
                 {c.label}
@@ -196,7 +198,7 @@ export function AuditTrailPage() {
           }
         >
           <SelectTrigger className="w-44">
-            <SelectValue placeholder="Sévérité" />
+            <SelectValue placeholder={t('common.severity')} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__all__">Toutes</SelectItem>
@@ -215,12 +217,14 @@ export function AuditTrailPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Horodatage</TableHead>
-              <TableHead>Sévérité</TableHead>
-              <TableHead>Catégorie</TableHead>
+              <TableHead>{t('common.severity')}</TableHead>
+              <TableHead>{t('common.categorie')}</TableHead>
               <TableHead>Action</TableHead>
-              <TableHead>Effectué par</TableHead>
+              <TableHead>{t('gestionnaire.audit.colBy')}</TableHead>
               <TableHead>Cible</TableHead>
-              <TableHead className="text-right">Détails</TableHead>
+              <TableHead className="text-right">
+                {t('gestionnaire.audit.colDetails')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -239,7 +243,7 @@ export function AuditTrailPage() {
                   colSpan={7}
                   className="text-center text-sm text-muted-foreground py-12"
                 >
-                  Aucun événement pour cette période ou ce filtre.
+                  {t('gestionnaire.audit.empty')}
                 </TableCell>
               </TableRow>
             ) : (

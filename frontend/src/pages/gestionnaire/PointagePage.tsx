@@ -107,11 +107,19 @@ export function PointagePage() {
       const newMatches = autoMatchAll(result.lines, targets)
       setMatches(newMatches)
       toast.success(
-        `${result.totalLines} lignes importées. ` +
-          `${Object.values(newMatches).filter((m) => m?.confidence === 'auto').length} auto-matchées.`,
+        t('gestionnaire.pointage.importedMsg', {
+          total: result.totalLines,
+          auto: Object.values(newMatches).filter(
+            (m) => m?.confidence === 'auto',
+          ).length,
+        }),
       )
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erreur de parsing')
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : t('gestionnaire.pointage.parseError'),
+      )
     } finally {
       setParsing(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -123,7 +131,7 @@ export function PointagePage() {
     setParsed(demo)
     const newMatches = autoMatchAll(demo.lines, targets)
     setMatches(newMatches)
-    toast.success(`Démo chargée: ${demo.totalLines} lignes Attijariwafa`)
+    toast.success(t('gestionnaire.pointage.demoLoaded', { n: demo.totalLines }))
   }
 
   const handleConfirm = (lineId: string) => {
@@ -149,7 +157,7 @@ export function PointagePage() {
 
   const handleReject = (lineId: string) => {
     setMatches((prev) => ({ ...prev, [lineId]: null }))
-    toast.info('Match rejeté — ligne marquée non rapprochée')
+    toast.info(t('gestionnaire.pointage.toastMatchRejected'))
   }
 
   const handleReset = () => {
@@ -201,7 +209,7 @@ export function PointagePage() {
             onClick={handleReset}
           >
             <RefreshCw className="size-4" />
-            Nouveau pointage
+            {t('gestionnaire.pointage.newPointage')}
           </Button>
         )}
       </div>
@@ -252,10 +260,10 @@ export function PointagePage() {
               </div>
               <div className="space-y-1">
                 <p className="text-sm font-medium text-foreground">
-                  Glissez votre relevé ici, ou cliquez pour parcourir
+                  {t('gestionnaire.pointage.dropHint')}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Formats acceptés : .csv, .xlsx, .xls — taille max 10 Mo
+                  {t('gestionnaire.pointage.formatsHint')}
                 </p>
               </div>
               <input
@@ -289,7 +297,7 @@ export function PointagePage() {
                 Attijariwafa avec 10 lignes pour résidence Atlas).
               </p>
               <Button variant="outline" size="sm" onClick={handleLoadDemo}>
-                Démo
+                {t('gestionnaire.pointage.demo')}
               </Button>
             </div>
           </div>
@@ -297,7 +305,7 @@ export function PointagePage() {
           {/* Supported banks */}
           <div className="rounded-xl border bg-card p-5">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Banques supportées
+              {t('gestionnaire.pointage.supportedBanks')}
             </p>
             <div className="flex flex-wrap gap-2">
               {BANQUES.filter((b) => b.code !== 'autre').map((b) => (
@@ -344,26 +352,26 @@ export function PointagePage() {
           {/* KPIs */}
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             <Kpi
-              label="Crédits"
+              label={t('gestionnaire.pointage.credits')}
               value={`${fmt.format(stats.total_credit)} DH`}
               icon={<ArrowDownToLine className="size-4" />}
               tone="success"
             />
             <Kpi
-              label="Débits"
+              label={t('gestionnaire.pointage.debits')}
               value={`${fmt.format(stats.total_debit)} DH`}
               icon={<ArrowUpFromLine className="size-4" />}
               tone="warning"
             />
             <Kpi
-              label="Auto-matchées"
+              label={t('gestionnaire.pointage.autoMatched')}
               value={`${stats.auto_matched} / ${stats.total_lines}`}
               icon={<Sparkles className="size-4" />}
               tone="primary"
               subtitle={`${Math.round((stats.auto_matched / stats.total_lines) * 100)}%`}
             />
             <Kpi
-              label="À vérifier"
+              label={t('gestionnaire.pointage.toCheck')}
               value={`${stats.suggested + stats.unmatched}`}
               icon={<AlertTriangle className="size-4" />}
               tone={stats.suggested + stats.unmatched > 0 ? 'warning' : 'muted'}
@@ -384,7 +392,9 @@ export function PointagePage() {
               onClick={() => setFilter('auto')}
             >
               <CheckCircle2 className="me-1.5 size-3.5" />
-              Auto-matchées ({stats.auto_matched})
+              {t('gestionnaire.pointage.autoMatchedCount', {
+                n: stats.auto_matched,
+              })}
             </FilterChip>
             <FilterChip
               active={filter === 'suggested'}
@@ -407,10 +417,16 @@ export function PointagePage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-24">Date</TableHead>
-                  <TableHead>Libellé bancaire</TableHead>
-                  <TableHead className="text-right">Débit</TableHead>
-                  <TableHead className="text-right">Crédit</TableHead>
+                  <TableHead className="w-24">{t('common.date')}</TableHead>
+                  <TableHead>
+                    {t('gestionnaire.pointage.colLibelleBancaire')}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t('common.debit')}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t('common.credit')}
+                  </TableHead>
                   <TableHead>Rapprochement Imaro</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -422,7 +438,7 @@ export function PointagePage() {
                       colSpan={6}
                       className="text-center text-sm text-muted-foreground py-10"
                     >
-                      Aucune ligne pour ce filtre.
+                      {t('gestionnaire.pointage.noLineFilter')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -477,7 +493,7 @@ export function PointagePage() {
                                 variant="ghost"
                                 className="size-7"
                                 onClick={() => handleConfirm(line.id)}
-                                title="Confirmer le match"
+                                title={t('gestionnaire.pointage.confirmMatch')}
                               >
                                 <CheckCircle2 className="size-4 text-green-600" />
                               </Button>
@@ -486,7 +502,7 @@ export function PointagePage() {
                                 variant="ghost"
                                 className="size-7"
                                 onClick={() => handleReject(line.id)}
-                                title="Rejeter le match"
+                                title={t('gestionnaire.pointage.rejectMatch')}
                               >
                                 <XCircle className="size-4 text-red-600" />
                               </Button>
@@ -497,7 +513,7 @@ export function PointagePage() {
                               variant="outline"
                               className="border-green-300 bg-green-50 text-[10px] text-green-700"
                             >
-                              Confirmé
+                              {t('gestionnaire.pointage.confirmed')}
                             </Badge>
                           )}
                           {!m && (
@@ -652,7 +668,7 @@ function MatchCell({ match }: { match: Match | null | undefined }) {
     return (
       <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
         <XCircle className="size-3.5" />
-        Sans rapprochement
+        {t('gestionnaire.pointage.noMatch')}
       </span>
     )
   }

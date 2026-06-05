@@ -420,6 +420,7 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
 // ─── NotificationCenter ───────────────────────────────────────────────────────
 
 function NotificationCenter() {
+  const { t } = useTranslation()
   const { notifs, markRead, markAllRead, dismiss } = useNotifStore()
   const unreadCount = notifs.filter((n) => !n.read).length
   const panelRef = useRef<HTMLDivElement>(null)
@@ -533,7 +534,7 @@ function NotificationCenter() {
                     e.stopPropagation()
                     dismiss(n.id)
                   }}
-                  aria-label="Supprimer cette notification"
+                  aria-label={t('gestionnaire.layout.deleteNotif')}
                   className="mt-0.5 hidden shrink-0 rounded p-0.5 text-muted-foreground/40 hover:bg-muted hover:text-muted-foreground group-hover:flex"
                 >
                   <X className="size-3.5" />
@@ -701,6 +702,7 @@ function ContextPill() {
 // ─── GestionnaireLayout ───────────────────────────────────────────────────────
 
 export function GestionnaireLayout() {
+  const { t } = useTranslation()
   const [mobileOpen, setMobileOpen] = useState(false)
   const refreshIdentity = useAuthStore((s) => s.refreshIdentity)
 
@@ -739,7 +741,7 @@ export function GestionnaireLayout() {
               <button
                 onClick={() => setMobileOpen(false)}
                 className="absolute end-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-md text-white/60 transition-colors hover:bg-white/10 hover:text-white"
-                aria-label="Fermer le menu"
+                aria-label={t('gestionnaire.layout.closeMenu')}
               >
                 <X className="size-5" />
               </button>
@@ -759,7 +761,7 @@ export function GestionnaireLayout() {
             size="sm"
             className="shrink-0 lg:hidden"
             onClick={() => setMobileOpen(true)}
-            aria-label="Ouvrir le menu"
+            aria-label={t('gestionnaire.layout.openMenu')}
           >
             <Menu className="size-5" />
           </Button>
