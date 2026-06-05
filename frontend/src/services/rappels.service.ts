@@ -10,8 +10,10 @@
 import { api, type ApiEnvelope } from '@/lib/axios'
 
 async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
-  if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS)
-    return call()
+  // Endpoints pending backend (Abdellah) — skip the API call in dev so the
+  // page renders immediately from mock data rather than waiting for a 404.
+  // Remove this early-return once the rappels routes are deployed.
+  if (import.meta.env.DEV) return mock
   try {
     return await call()
   } catch {
