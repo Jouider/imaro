@@ -2,18 +2,22 @@
 
 namespace App\Services;
 
+use App\Contracts\Notifications\NotificationChannel;
+use App\Contracts\Notifications\NotificationMessage;
 use App\Models\User;
+use App\Notifications\NotificationManager;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class OtpService
 {
     private const OTP_TTL_MINUTES = 5;
     private const OTP_LENGTH = 6;
 
+    public function __construct(private readonly NotificationManager $notifier) {}
+
     /**
-     * Génère un OTP, le stocke hashé en DB, et simule l'envoi WhatsApp via log.
-     * Retourne l'OTP en clair (dev uniquement — jamais exposé en prod).
+     * Génère un OTP, le stocke hashé en DB, et l'envoie via WhatsApp (avec
+     * fallback SMS automatique géré par le NotificationManager).
      */
     public function generate(User $user): string
     {
@@ -29,12 +33,12 @@ class OtpService
             'otp_expires_at' => Carbon::now()->addMinutes(self::OTP_TTL_MINUTES),
         ]);
 
-        Log::channel('stack')->info('[OTP SIMULÉ]', [
-            'phone'      => $user->phone,
-            'otp'        => $otp,
-            'expires_at' => $user->otp_expires_at,
-            'message'    => "Votre code SyndikPro est : {$otp}. Valable ".self::OTP_TTL_MINUTES.' minutes.',
-        ]);
+        $this->notifier->send(new NotificationMessage(
+            to:           $user,
+            channel:      NotificationChannel::Whatsapp,
+            templateName: 'otp_login',
+            body:         "Votre code Imaro est : {$otp}. Valable ".self::OTP_TTL_MINUTES.' minutes.',
+        ));
 
         return $otp;
     }
