@@ -14,12 +14,14 @@ use Throwable;
  * SMS8.io — economical Morocco SMS gateway (Phase 1 primary).
  * Migration trigger: > 3000 SMS/mois or any blocked SIM → swap for Mediatel.
  *
- * Endpoint: POST https://sms8.io/api/send
- *   key, sim, type=sms, phone, message
+ * Endpoint: POST https://app.sms8.io/services/send.php (form-encoded)
+ *   key, number, message  [+ devices to pin a specific device]
+ *
+ * Docs: https://sms8.io/sms8-api-documentation
  */
 class Sms8Provider implements NotificationProvider
 {
-    private const ENDPOINT = 'https://sms8.io/api/send';
+    private const ENDPOINT = 'https://app.sms8.io/services/send.php';
     private const TIMEOUT_SECONDS = 10;
 
     public function __construct(
@@ -39,7 +41,7 @@ class Sms8Provider implements NotificationProvider
 
     public function send(NotificationMessage $message): NotificationResult
     {
-        if (! $this->apiKey || ! $this->deviceId) {
+        if (! $this->apiKey) {
             Log::channel('stack')->info('[SMS8 SIMULATED]', [
                 'to'   => $message->to->phone,
                 'body' => $message->body,
@@ -48,16 +50,20 @@ class Sms8Provider implements NotificationProvider
             return NotificationResult::ok($this->name(), 'simulated:'.uniqid());
         }
 
+        $payload = [
+            'key'     => $this->apiKey,
+            'number'  => $message->to->phone,
+            'message' => $message->body,
+        ];
+
+        if ($this->deviceId) {
+            $payload['devices'] = $this->deviceId;
+        }
+
         try {
             $resp = Http::timeout(self::TIMEOUT_SECONDS)
                 ->asForm()
-                ->post(self::ENDPOINT, [
-                    'key'     => $this->apiKey,
-                    'sim'     => $this->deviceId,
-                    'type'    => 'sms',
-                    'phone'   => $message->to->phone,
-                    'message' => $message->body,
-                ]);
+                ->post(self::ENDPOINT, $payload);
 
             $body = $resp->json();
             $success = $resp->successful() && (($body['success'] ?? false) === true);
