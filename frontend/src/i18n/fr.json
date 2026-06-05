@@ -1036,7 +1036,8 @@
       "audit": "Journal d'audit",
       "sectionAdministration": "Administration",
       "utilisateurs": "Utilisateurs",
-      "personnel": "Personnel"
+      "personnel": "Personnel",
+      "rappels": "Rappels"
     },
     "residences": {
       "title": "Résidences",

@@ -16,6 +16,7 @@ import {
   PiggyBank,
   AlertTriangle,
   Landmark,
+  BellRing,
   TrendingUp,
   Undo2,
   Calculator,
@@ -163,6 +164,13 @@ export function CommandPalette() {
       label: t('gestionnaire.nav.recouvrement'),
       icon: AlertTriangle,
       to: '/gestionnaire/recouvrement',
+    },
+    {
+      key: 'nav-rappels',
+      group: 'nav',
+      label: t('gestionnaire.nav.rappels'),
+      icon: BellRing,
+      to: '/gestionnaire/rappels',
     },
     {
       key: 'nav-pointage',

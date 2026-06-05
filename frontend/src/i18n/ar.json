@@ -1036,7 +1036,8 @@
       "audit": "سجل التدقيق",
       "sectionAdministration": "الإدارة",
       "utilisateurs": "المستخدمون",
-      "personnel": "الموظفون"
+      "personnel": "الموظفون",
+      "rappels": "التذكيرات"
     },
     "residences": {
       "title": "الإقامات",

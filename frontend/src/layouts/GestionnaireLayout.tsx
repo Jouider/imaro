@@ -26,6 +26,7 @@ import {
   CalendarCheck,
   ClipboardCheck,
   Activity,
+  BellRing,
   ShieldCheck,
   LogOut,
   Menu,
@@ -152,6 +153,11 @@ const NAV_SECTIONS: NavSection[] = [
         to: '/gestionnaire/recouvrement',
         icon: <Scale className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.recouvrement',
+      },
+      {
+        to: '/gestionnaire/rappels',
+        icon: <BellRing className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.rappels',
       },
       {
         to: '/gestionnaire/pointage',
