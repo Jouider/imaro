@@ -17,7 +17,7 @@ class StoreLotRequest extends FormRequest
             'numero' => ['required', 'string', 'max:20'],
             'type' => ['required', 'in:appartement,local_commercial,commerce,parking,cave,bureau,autre'],
             'etage' => ['required', 'integer', 'min:-5', 'max:50'],
-            'superficie' => ['nullable', 'numeric', 'min:1', 'max:9999'],
+            'superficie' => ['nullable', 'numeric', 'min:0', 'max:9999'],
             'tantieme' => ['required', 'numeric', 'min:0.01', 'max:1000'],
         ];
     }
