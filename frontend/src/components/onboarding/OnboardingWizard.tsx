@@ -15,12 +15,6 @@ import {
   Loader2,
   Copy,
 } from 'lucide-react'
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -32,7 +26,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useAuthStore } from '@/stores/authStore'
-import { useOnboardingStore } from '@/stores/onboardingStore'
 import {
   storeResidence,
   storeImmeuble,
@@ -68,11 +61,16 @@ const LOT_TYPES = ['appartement', 'commerce', 'bureau', 'parking', 'villa']
  * Skippable at any point (a dashboard checklist tracks remaining steps). Each
  * step commits to the API as you go, so progress survives a mid-way exit.
  */
+/**
+ * First-run setup flow card for the syndic. Rendered full-page at
+ * /gestionnaire/onboarding (the GestionnaireGuard redirects a manager here
+ * while tenant.onboarding_completed_at is null — issue #150). Walks the owner
+ * from zero to a configured residence: (optional) gestionnaire → résidence →
+ * lots → finish, then lands on the residence page to continue.
+ */
 export function OnboardingWizard() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const open = useOnboardingStore((s) => s.open)
-  const closeWizard = useOnboardingStore((s) => s.closeWizard)
   const user = useAuthStore((s) => s.user)
   const refreshIdentity = useAuthStore((s) => s.refreshIdentity)
 
@@ -101,29 +99,6 @@ export function OnboardingWizard() {
   const [immeubleId, setImmeubleId] = useState<number | null>(null)
 
   const firstName = user?.name?.split(' ')[0] ?? ''
-
-  function reset() {
-    setStep(0)
-    setBusy(false)
-    setTeamMode('self')
-    setGestName('')
-    setGestEmail('')
-    setResName('')
-    setResAddress('')
-    setResCity('')
-    setResEcheance('1')
-    setLotCount('10')
-    setLotStart('1')
-    setLotType('appartement')
-    setResidenceId(null)
-    setImmeubleId(null)
-  }
-
-  function handleClose() {
-    closeWizard()
-    // keep entered progress on the backend, but reset local form for next open
-    setTimeout(reset, 250)
-  }
 
   // ── Step 0 — optionally create a gestionnaire ──
   async function submitTeam() {
@@ -240,23 +215,16 @@ export function OnboardingWizard() {
       /* non-blocking — checklist still reflects real data on next /me */
     }
     setBusy(false)
-    handleClose()
-    if (residenceId != null) {
-      void navigate(`/gestionnaire/residences/${residenceId}`)
-    }
+    void navigate(
+      residenceId != null
+        ? `/gestionnaire/residences/${residenceId}`
+        : '/gestionnaire/dashboard',
+    )
   }
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
-      <DialogContent
-        showCloseButton={false}
-        className="max-w-lg gap-0 overflow-hidden p-0 sm:max-w-xl"
-      >
-        <DialogTitle className="sr-only">{t('onboarding.eyebrow')}</DialogTitle>
-        <DialogDescription className="sr-only">
-          {t('onboarding.team.intro')}
-        </DialogDescription>
-
+    <div className="w-full max-w-xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
+      <div>
         {/* Header — navy gradient + progress */}
         <div className="bg-gradient-imaro-dark relative overflow-hidden px-6 pb-5 pt-6 text-white">
           <div
@@ -525,15 +493,7 @@ export function OnboardingWizard() {
 
         {/* Footer */}
         <div className="flex items-center justify-between gap-3 border-t border-border px-6 py-4">
-          {step === 0 ? (
-            <Button
-              variant="ghost"
-              onClick={handleClose}
-              className="text-muted-foreground"
-            >
-              {t('onboarding.later')}
-            </Button>
-          ) : step < 3 ? (
+          {step > 0 && step < 3 ? (
             <Button
               variant="ghost"
               onClick={() => setStep((s) => s - 1)}
@@ -590,8 +550,8 @@ export function OnboardingWizard() {
             </Button>
           )}
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   )
 }
 
