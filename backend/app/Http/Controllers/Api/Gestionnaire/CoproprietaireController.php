@@ -9,11 +9,11 @@ use App\Models\Coproprietaire;
 use App\Models\Lot;
 use App\Models\Residence;
 use App\Models\User;
+use App\Services\Notifications\CoproprietaireWelcomeNotifier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class CoproprietaireController extends Controller
@@ -60,11 +60,8 @@ class CoproprietaireController extends Controller
             ]);
         });
 
-        Log::info('[CODE ACCÈS RÉSIDENT - SIMULÉ]', [
-            'destinataire' => $request->name,
-            'phone'        => $request->phone,
-            'code'         => $tempCode,
-        ]);
+        app(CoproprietaireWelcomeNotifier::class)
+            ->send($coproprietaire->user, $tempCode, $lot->residence);
 
         return response()->json([
             'status'  => 'success',
@@ -98,15 +95,7 @@ class CoproprietaireController extends Controller
             'must_change_code' => true,
         ]);
 
-        // Simulé — sera remplacé par WhatsApp quand Twilio est configuré
-        Log::info('[CODE ACCÈS RÉSIDENT - SIMULÉ]', [
-            'destinataire' => $user->name,
-            'phone'        => $user->phone,
-            'residence'    => $residence->name,
-            'lot'          => $coproprietaire->lot->numero,
-            'code'         => $code,
-            'message'      => "Bonjour {$user->name}, bienvenue sur imaro ! Votre code d'accès est : {$code}. Connectez-vous sur l'application avec votre numéro {$user->phone}.",
-        ]);
+        app(CoproprietaireWelcomeNotifier::class)->send($user, $code, $residence);
 
         return response()->json([
             'status'  => 'success',
@@ -180,7 +169,7 @@ class CoproprietaireController extends Controller
 
                 $tempCode = strtoupper(\Illuminate\Support\Str::random(8));
 
-                DB::transaction(function () use ($data, $lot, $tempCode, $request) {
+                $createdUser = DB::transaction(function () use ($data, $lot, $tempCode, $request) {
                     $user = \App\Models\User::create([
                         'tenant_id'        => $request->user()->tenant_id,
                         'name'             => $data['name'],
@@ -201,7 +190,12 @@ class CoproprietaireController extends Controller
                         'date_entree' => now()->toDateString(),
                         'solde_actuel'=> 0,
                     ]);
+
+                    return $user;
                 });
+
+                app(CoproprietaireWelcomeNotifier::class)
+                    ->send($createdUser, $tempCode, $lot->residence);
 
                 $created++;
             } catch (\Throwable $e) {
