@@ -1808,8 +1808,24 @@
       "recouvrement": "Taux de recouvrement",
       "couverture": "Couverture trésorerie",
       "mois": "mois",
-      "journal": "Journal",
-      "grandLivre": "Grand Livre",
+      "journal": {
+        "date": "Date",
+        "compte": "Compte",
+        "description": "Description",
+        "type": "Type",
+        "debit": "Débit",
+        "credit": "Crédit",
+        "piece": "Pièce",
+        "types": {
+          "depense": "Dépense",
+          "encaissement": "Encaissement"
+        }
+      },
+      "grandLivre": {
+        "title": "Compte PCG",
+        "selectCompte": "Sélectionner un compte...",
+        "hint": "Sélectionnez un compte PCG pour afficher le détail des écritures."
+      },
       "depenses": {
         "title": "Dépenses",
         "add": "Nouvelle dépense",
@@ -1933,7 +1949,8 @@
       "syntheseFinanciere": "Synthèse financière, répartition des charges, analyse des impayés — 3 pages",
       "registresObligatoires": "Registres obligatoires (Art. 8 & 10)",
       "balanceLabel": "Balance",
-      "legalNote": "Ce rapport est établi conformément à la Loi 18-00 (Dahir n° 1-02-298 du 3 octobre 2002) relative au statut de la copropriété des immeubles bâtis. Tout copropriétaire peut en demander copie au syndic selon l'article 8 de ladite loi. Les documents générés ont valeur informative et sont certifiés par le gestionnaire de la copropriété."
+      "legalNote": "Ce rapport est établi conformément à la Loi 18-00 (Dahir n° 1-02-298 du 3 octobre 2002) relative au statut de la copropriété des immeubles bâtis. Tout copropriétaire peut en demander copie au syndic selon l'article 8 de ladite loi. Les documents générés ont valeur informative et sont certifiés par le gestionnaire de la copropriété.",
+      "filterTo": "Au"
     },
     "depenses": {
       "title": "Dépenses",

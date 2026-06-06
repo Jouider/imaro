@@ -1370,7 +1370,9 @@ function TabJournal({ exerciceId }: { exerciceId: number }) {
           />
         </div>
         <div className="flex items-center gap-2">
-          <Label className="text-xs text-muted-foreground">Au</Label>
+          <Label className="text-xs text-muted-foreground">
+            {t('gestionnaire.comptabilite.filterTo')}
+          </Label>
           <Input
             type="date"
             value={to}
