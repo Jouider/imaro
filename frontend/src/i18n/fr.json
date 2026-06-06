@@ -985,7 +985,12 @@
       "parseError": "Erreur de parsing",
       "importedMsg": "{{total}} lignes importées. {{auto}} auto-matchées.",
       "demoLoaded": "Démo chargée: {{n}} lignes Attijariwafa",
-      "demo": "Démo"
+      "demo": "Démo",
+      "bankSource": "Banque source",
+      "confirmAll": "Tout confirmer",
+      "uploadHint": "Importez le relevé bancaire au format CSV ou Excel exporté depuis votre espace bancaire en ligne. Imaro détecte automatiquement les colonnes (date, libellé, débit, crédit).",
+      "chooseFile": "Choisir un fichier",
+      "demoBanner": "Pas de fichier sous la main ? Chargez le jeu de démo (relevé Attijariwafa avec 10 lignes pour résidence Atlas)"
     },
     "cmdk": {
       "title": "Recherche rapide",
@@ -1347,29 +1352,7 @@
         "colRelance": "Dernière relance",
         "jourRetard": "j de retard"
       },
-      "encaisser": {
-        "title": "Encaisser un paiement",
-        "step1": "Sélectionner une créance",
-        "step2": "Saisir le paiement",
-        "montant": "Montant (MAD)",
-        "date": "Date de paiement",
-        "methode": "Méthode",
-        "compte": "Compte de destination",
-        "refCheque": "Référence chèque",
-        "success": "Paiement enregistré",
-        "methodes": {
-          "especes": "Espèces",
-          "virement": "Virement bancaire",
-          "cheque": "Chèque",
-          "cb": "Carte bancaire",
-          "mobile_money": "Mobile Money"
-        },
-        "comptes": {
-          "5121": "Banque principale (5121)",
-          "5122": "Compte chèques (5122)",
-          "5161": "Caisse (5161)"
-        }
-      },
+      "encaisser": "Encaisser",
       "avance": {
         "title": "Paiement en avance",
         "info": "Ce paiement sera affecté automatiquement aux prochains appels de fonds",
@@ -1421,7 +1404,16 @@
       "sendAppelTitle": "Envoyer l'appel de fonds",
       "sendAppelDesc": "Cette action enverra une notification WhatsApp à tous les copropriétaires.",
       "saveError": "Erreur lors de l'enregistrement",
-      "relancesSent": "{{n}} relance(s) envoyée(s)"
+      "relancesSent": "{{n}} relance(s) envoyée(s)",
+      "noAppel": "Aucun appel de fonds",
+      "noEncaissement": "Aucun encaissement",
+      "titrePlaceholder": "Charges Q2 2026",
+      "justificatifPlaceholder": "justificatif",
+      "envoyer": "Envoyer",
+      "colLot": "Lot",
+      "encaisserPaiement": "Encaisser un paiement",
+      "envoyerRappels": "Envoyer rappels",
+      "decompteEmpty": "Saisissez un nom et cliquez sur Générer pour afficher le décompte individuel"
     },
     "tickets": {
       "title": "Tickets",
@@ -1739,7 +1731,9 @@
       "colTaille": "Taille",
       "download": "Télécharger",
       "delete": "Supprimer",
-      "deleteConfirm": "Supprimer ce document ?",
+      "deleteConfirm": {
+        "title": "Supprimer le document ?"
+      },
       "deleteDesc": "Ce document sera supprimé définitivement.",
       "toutes": "Toutes les résidences",
       "empty": "Aucun document",
@@ -1751,7 +1745,8 @@
         "type": "Type",
         "residence": "Résidence (optionnel)",
         "date": "Date",
-        "file": "Fichier"
+        "file": "Fichier",
+        "nomPlaceholder": "Ex: Règlement de copropriété 2026"
       },
       "types": {
         "reglement": "Règlement",
@@ -1759,6 +1754,23 @@
         "contrat": "Contrat",
         "facture": "Facture",
         "autre": "Autre"
+      },
+      "addError": "Erreur lors de l'ajout",
+      "deleteError": "Erreur lors de la suppression",
+      "col": {
+        "nom": "Nom",
+        "type": "Type",
+        "residence": "Résidence",
+        "date": "Date",
+        "taille": "Taille"
+      },
+      "allResidences": "Toutes",
+      "filterAllTypes": "Tous les types",
+      "filterAllResidences": "Toutes les résidences",
+      "searchPlaceholder": "Rechercher un document…",
+      "emptyTitle": "Aucun document",
+      "addDialog": {
+        "title": "Ajouter un document"
       }
     },
     "comptabilite": {
@@ -1797,7 +1809,6 @@
       "couverture": "Couverture trésorerie",
       "mois": "mois",
       "journal": {
-        "titre": "Journal des écritures",
         "date": "Date",
         "compte": "Compte",
         "description": "Description",
@@ -1805,21 +1816,14 @@
         "debit": "Débit",
         "credit": "Crédit",
         "piece": "Pièce",
-        "totalDebit": "Total débit",
-        "totalCredit": "Total crédit",
         "types": {
           "depense": "Dépense",
-          "encaissement": "Encaissement",
-          "virement": "Virement",
-          "cloture": "Clôture",
-          "report": "Report"
+          "encaissement": "Encaissement"
         }
       },
       "grandLivre": {
-        "title": "Grand-Livre",
+        "title": "Compte PCG",
         "selectCompte": "Sélectionner un compte...",
-        "soldeOuverture": "Solde d'ouverture",
-        "soldeFinal": "Solde final",
         "hint": "Sélectionnez un compte PCG pour afficher le détail des écritures."
       },
       "depenses": {
@@ -1919,7 +1923,34 @@
       "viewAnnexes": "Voir les annexes",
       "iaError": "Erreur analyse IA",
       "balanceEq": "Total Débit = Total Crédit = {{debit}} DH · Écart soldes : {{ecart}} DH",
-      "balanceNeq": "Écart débits/crédits : {{ecart}} DH — vérifier les écritures"
+      "balanceNeq": "Écart débits/crédits : {{ecart}} DH — vérifier les écritures",
+      "noEcritureCompte": "Aucune écriture pour ce compte",
+      "classes": {
+        "1": "Classe 1 — Capitaux propres",
+        "2": "Classe 2 — Immobilisations",
+        "3": "Classe 3 — Créances actif circulant",
+        "4": "Classe 4 — Dettes passif circulant",
+        "5": "Classe 5 — Trésorerie",
+        "6": "Classe 6 — Charges",
+        "7": "Classe 7 — Produits"
+      },
+      "balance": {
+        "totalDebit": "Total Débit",
+        "totalCredit": "Total Crédit",
+        "soldeDebiteur": "Soldes débiteurs",
+        "soldeCrediteur": "Soldes créditeurs"
+      },
+      "balanceEquilibree": "Balance équilibrée",
+      "balanceDesequilibree": "Balance déséquilibrée",
+      "exportPdf": "Export PDF",
+      "rapportsFinanciers": "Rapports financiers",
+      "rapportFinancierAnnuel": "Rapport Financier Annuel",
+      "rapportFinancier": "Rapport Financier",
+      "syntheseFinanciere": "Synthèse financière, répartition des charges, analyse des impayés — 3 pages",
+      "registresObligatoires": "Registres obligatoires (Art. 8 & 10)",
+      "balanceLabel": "Balance",
+      "legalNote": "Ce rapport est établi conformément à la Loi 18-00 (Dahir n° 1-02-298 du 3 octobre 2002) relative au statut de la copropriété des immeubles bâtis. Tout copropriétaire peut en demander copie au syndic selon l'article 8 de ladite loi. Les documents générés ont valeur informative et sont certifiés par le gestionnaire de la copropriété.",
+      "filterTo": "Au"
     },
     "depenses": {
       "title": "Dépenses",
@@ -2106,7 +2137,12 @@
       "toastAdded": "Recette ajoutée",
       "toastUpdated": "Recette mise à jour",
       "toastDeleted": "Recette supprimée",
-      "emptyRow": "Aucune recette pour cet exercice."
+      "emptyRow": "Aucune recette pour cet exercice.",
+      "title": "Autres recettes",
+      "subtitle": "Recettes hors appels de fonds — locations, subventions, indemnités, produits financiers",
+      "totalRecettes": "Total recettes {{year}}",
+      "operations": "{{n}} opérations",
+      "colPayeur": "Payeur"
     },
     "remboursements": {
       "toastCreated": "Remboursement créé",
@@ -2119,7 +2155,19 @@
       "emptyRow": "Aucun remboursement enregistré.",
       "dateDemande": "Date de demande",
       "datePaiement": "Date paiement",
-      "modalEdit": "Modifier le remboursement"
+      "modalEdit": "Modifier le remboursement",
+      "descPlaceholder": "ex: Double versement appel Q1 2026",
+      "statut": {
+        "demande": "Demandé",
+        "approuve": "Approuvé",
+        "paye": "Payé",
+        "rejete": "Rejeté"
+      },
+      "title": "Remboursements",
+      "kpiEnAttente": "En attente",
+      "kpiPayes": "Payés",
+      "colMotif": "Motif",
+      "colDemande": "Demande"
     },
     "emprunts": {
       "toastCreated": "Emprunt enregistré",
@@ -2140,7 +2188,14 @@
       "payeExercice": "Payé cet exercice",
       "resteAPayer": "Reste à payer",
       "montantInitialDh": "Montant initial (DH)",
-      "amountInitialPositive": "Montant initial > 0"
+      "amountInitialPositive": "Montant initial > 0",
+      "newEmprunt": "Nouvel emprunt",
+      "editEmprunt": "Modifier l'emprunt",
+      "bankPlaceholder": "ex: Banque Populaire",
+      "title": "Emprunts",
+      "subtitle": "Suivi des emprunts contractés par la copropriété — Annexe 8 du Décret 2.23.700",
+      "colInitial": "Initial",
+      "colOrganisme": "Organisme"
     },
     "recouvrement": {
       "toastConfigSaved": "Configuration enregistrée",
@@ -2162,7 +2217,23 @@
       "prescriptionRisk": "Risque de prescription",
       "prescriptionBadge": "Loi 18-00 · Prescription quinquennale",
       "allLateLots": "Tous les lots en retard",
-      "saveError": "Échec de l'enregistrement"
+      "saveError": "Échec de l'enregistrement",
+      "severity": {
+        "low": "Faible",
+        "medium": "Modéré",
+        "high": "Élevé",
+        "critical": "Critique"
+      },
+      "riskPrescription": "Risque prescription",
+      "penaltiesRecalc": "{{n}} pénalités recalculées ({{amount}} DH)",
+      "title": "Recouvrement",
+      "subtitle": "Suivi des impayés, pénalités et mises en demeure",
+      "configPenalites": "Configuration pénalités",
+      "lotsEnRetard": "Lots en retard",
+      "prescriptionBanner": "Les créances de charges de copropriété sont prescrites après 5 ans sans interruption. Une action légale immédiate est requise pour les créances à statut critique.",
+      "colEcheance": "Échéance",
+      "colJoursRestants": "Jours restants",
+      "colOrigine": "Origine"
     },
     "equipements": {
       "toastAdded": "Équipement ajouté",
@@ -2236,7 +2307,30 @@
       "colDetails": "Détails",
       "empty": "Aucun événement pour cette période ou ce filtre.",
       "totalEvents": "Total événements",
-      "searchPlaceholder": "Rechercher action, utilisateur, cible..."
+      "searchPlaceholder": "Rechercher action, utilisateur, cible...",
+      "exportCsv": "Exporter CSV",
+      "sensitiveActions": "Actions sensibles",
+      "errorRate": "Taux d'erreur",
+      "categoryLabels": {
+        "immeuble": "Immeuble",
+        "lot": "Lot",
+        "coproprietaire": "Copropriétaire",
+        "paiement": "Paiement",
+        "depense": "Dépense",
+        "budget": "Budget",
+        "ag": "Assemblée",
+        "document": "Document",
+        "user": "Utilisateur",
+        "auth": "Authentification",
+        "system": "Système"
+      },
+      "title": "Journal d'audit",
+      "subtitle": "Traçabilité complète des actions sur la plateforme",
+      "refresh": "Actualiser",
+      "errors": "Erreurs",
+      "colHorodatage": "Horodatage",
+      "colCible": "Cible",
+      "allFilter": "Toutes"
     },
     "generateLots": {
       "genError": "Erreur lors de la génération des lots",
@@ -2450,7 +2544,14 @@
     },
     "annexes": {
       "complementaires": "Annexes complémentaires",
-      "regenerate": "Régénérer"
+      "regenerate": "Régénérer",
+      "downloaded": "Annexe {{num}} téléchargée",
+      "obligatoires": "Annexes obligatoires",
+      "exerciceClos": "Exercice clos le 31 décembre {{year}}",
+      "title": "Annexes Comptables",
+      "subtitle": "Annexes réglementaires selon le Décret 2.23.700",
+      "regimeSimplifie": "Régime simplifié (≤ 200 000 MAD/an)",
+      "regimeNormal": "Régime normal"
     },
     "layout": {
       "deleteNotif": "Supprimer cette notification",
@@ -2458,7 +2559,107 @@
       "openMenu": "Ouvrir le menu"
     },
     "conformite": {
-      "timeline": "Chronologie des phases"
+      "timeline": "Chronologie des phases",
+      "exerciceLabel": "Exercice {{n}}",
+      "phaseLabel": {
+        "ops": "Opérations mensuelles",
+        "cloture": "Clôture d'exercice",
+        "prepAg": "Préparation de l'AG"
+      },
+      "phaseStatut": {
+        "todo": "À faire",
+        "in_progress": "En cours",
+        "done": "Terminé",
+        "skipped": "Ignoré"
+      },
+      "title": "Calendrier de conformité",
+      "subtitle": "Cycle annuel de conformité — Décret 2.23.700"
+    },
+    "autres": {
+      "newRecette": "Nouvelle recette"
+    },
+    "rappels": {
+      "title": "Rappels",
+      "subtitle": "Configurez les rappels automatiques de paiement. Chaque message suit la langue préférée du résident.",
+      "lots": "lots",
+      "residents": "résidents",
+      "totalDu": "total dû",
+      "autoTitle": "Rappels automatiques",
+      "autoDesc": "Envoyez automatiquement les rappels programmés. Les notifications push sont toujours utilisées ; les autres canaux suivent votre configuration.",
+      "enabled": "Activé",
+      "disabled": "Désactivé",
+      "nextRun": "Prochaine exécution",
+      "never": "—",
+      "sendAll": "Tout envoyer maintenant",
+      "toastEnabled": "Rappels automatiques activés",
+      "toastDisabled": "Rappels automatiques désactivés",
+      "toastSentAll": "{{n}} rappel(s) mis en file d'envoi",
+      "toastConfigSaved": "Configuration enregistrée",
+      "toastStageSent": "Rappel « {{stage}} » envoyé à {{n}} résident(s)",
+      "toastTest": "Message de test envoyé",
+      "kpiDeliveryRate": "Taux de livraison",
+      "kpiDelivered": "Livré avec succès",
+      "kpiFailed": "Non livré",
+      "kpiSentMonth": "Envoyés ce mois",
+      "timelineTitle": "Chronologie des rappels",
+      "timelineSubtitle": "Configurez le calendrier des relances",
+      "globalSettings": "Paramètres globaux",
+      "pushNote": "Tous les rappels partent toujours en notification push. Les canaux externes sont optionnels.",
+      "appliesAll": "Les paramètres de rappel s'appliquent à tous vos immeubles",
+      "remaining": "{{n}}/{{max}} envois manuels restants",
+      "stageJ3": "3 jours avant l'échéance",
+      "stageJ2": "2 jours avant l'échéance",
+      "stageJ1": "1 jour avant l'échéance",
+      "stageJourJ": "Le jour de l'échéance",
+      "stageRetard": "En retard (rappels quotidiens)",
+      "stageDescJ3": "Rappel doux envoyé aux résidents qui n'ont pas encore réglé.",
+      "stageDescJ2": "Rappel de suivi pour les résidents toujours en attente.",
+      "stageDescJ1": "Rappel urgent la veille de l'échéance.",
+      "stageDescJourJ": "Rappel final le jour de l'échéance.",
+      "stageDescRetard": "Rappels quotidiens jusqu'à réception du paiement.",
+      "pushAlways": "Notification push",
+      "pushAlwaysHint": "Toujours envoyée via l'application",
+      "extraChannels": "Canaux supplémentaires",
+      "send": "Envoyer",
+      "pendingCount": "{{n}} en attente",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "sms": "SMS",
+      "free": "Gratuit",
+      "previewTitle": "Aperçu",
+      "active": "Actif",
+      "activeDesc": "Les rappels sont actifs. Les messages partent automatiquement selon le planning.",
+      "alwaysActive": "Toujours actif",
+      "test": "Test",
+      "emailSubject": "Sujet",
+      "langTitle": "Langue personnalisée",
+      "langDesc": "Chaque rappel est envoyé dans la langue préférée du résident.",
+      "recentTitle": "Rappels récents",
+      "recentSubtitle": "Historique des rappels envoyés aux résidents",
+      "recentEmpty": "Aucun rappel envoyé pour le moment",
+      "recentEmptyDesc": "L'historique des rappels apparaîtra ici.",
+      "colResident": "Résident",
+      "colChannel": "Canal",
+      "colTrigger": "Déclencheur",
+      "statusDelivered": "Livré",
+      "statusFailed": "Échec",
+      "statusPending": "En attente",
+      "statusSent": "Envoyé",
+      "triggerAuto": "Automatique",
+      "triggerManual": "Manuel",
+      "howTitle": "Comment fonctionnent les rappels",
+      "howDaily": "Programme quotidien",
+      "howDailyDesc": "Rappels automatiques envoyés à {{hour}}h00 chaque jour.",
+      "howOverdue": "Fréquence des retards",
+      "howOverdueDesc": "Envoyés quotidiennement jusqu'à réception du paiement (max {{n}} jours).",
+      "howLimits": "Limites quotidiennes",
+      "howLimitsDesc": "{{max}} envois manuels par jour — automatiques illimités.",
+      "howMultilang": "Multi-langue",
+      "howMultilangDesc": "{{n}} langues prises en charge.",
+      "selectResidence": "Sélectionner une résidence",
+      "colDate": "Date",
+      "colType": "Type",
+      "colStatus": "Statut"
     }
   },
   "onboarding": {
@@ -2599,7 +2800,7 @@
     "lot": "Lot",
     "total": "Total",
     "montantMad": "Montant (MAD)",
-    "du": "Dû",
+    "du": "Du",
     "exportInProgress": "Export en cours...",
     "saveError": "Erreur lors de l'enregistrement",
     "nouveau": "Nouveau",
@@ -2607,6 +2808,37 @@
     "searchPlaceholder": "Rechercher...",
     "echeance": "Échéance",
     "appelDeFonds": "Appel de fonds",
-    "chooseLanguage": "Choisir la langue"
+    "chooseLanguage": "Choisir la langue",
+    "exercice": "Exercice",
+    "titre": "Titre",
+    "virement": "Virement",
+    "compte": "Compte",
+    "recouvre": "Recouvré",
+    "restant": "Restant",
+    "rapproche": "Rapproché",
+    "recu": "Reçu",
+    "dateDeclaration": "Date déclaration",
+    "justificatif": "Justificatif",
+    "montantTotal": "Montant total",
+    "solde": "Solde",
+    "soldeD": "Solde D",
+    "soldeC": "Solde C",
+    "piece": "Pièce",
+    "action": "Action",
+    "chargement": "Chargement…",
+    "loi1800Art25": "Loi 18-00 · Art. 25",
+    "lotsEnRetard": "Lots en retard",
+    "origine": "Origine",
+    "horodatage": "Horodatage",
+    "cible": "Cible",
+    "erreurs": "Erreurs",
+    "actualiser": "Actualiser",
+    "toutes": "Toutes",
+    "payeur": "Payeur",
+    "motif": "Motif",
+    "demande": "Demande",
+    "initial": "Initial",
+    "organisme": "Organisme",
+    "mensualite": "Mensualité"
   }
 }

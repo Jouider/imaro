@@ -59,15 +59,15 @@ const dt = new Intl.DateTimeFormat('fr-MA', {
 const STATUT_META: Record<RemboursementStatus, { label: string; cls: string }> =
   {
     demande: {
-      label: 'Demandé',
+      label: 'demande',
       cls: 'border-amber-200 bg-amber-50 text-amber-700',
     },
     approuve: {
-      label: 'Approuvé',
+      label: 'approuve',
       cls: 'border-blue-200 bg-blue-50 text-blue-700',
     },
-    paye: { label: 'Payé', cls: 'border-green-200 bg-green-50 text-green-700' },
-    rejete: { label: 'Rejeté', cls: 'border-red-200 bg-red-50 text-red-700' },
+    paye: { label: 'paye', cls: 'border-green-200 bg-green-50 text-green-700' },
+    rejete: { label: 'rejete', cls: 'border-red-200 bg-red-50 text-red-700' },
   }
 
 const MOTIF_LABEL: Record<RemboursementMotif, string> = {
@@ -246,7 +246,9 @@ export function RemboursementsPage() {
           </p>
         </div>
         <div className="rounded-xl border bg-card p-4">
-          <p className="mb-1 text-xs text-muted-foreground">En attente</p>
+          <p className="mb-1 text-xs text-muted-foreground">
+            {t('gestionnaire.remboursements.kpiEnAttente')}
+          </p>
           <p className="text-2xl font-bold tracking-tight text-amber-600">
             {fmt.format(totals.enAttente)} DH
           </p>
@@ -266,14 +268,18 @@ export function RemboursementsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>{t('common.coproprietaire')}</TableHead>
-              <TableHead>Motif</TableHead>
+              <TableHead>{t('gestionnaire.remboursements.colMotif')}</TableHead>
               <TableHead className="text-right">{t('common.amount')}</TableHead>
-              <TableHead>Demande</TableHead>
+              <TableHead>
+                {t('gestionnaire.remboursements.colDemande')}
+              </TableHead>
               <TableHead>
                 {t('gestionnaire.remboursements.colPaiement')}
               </TableHead>
               <TableHead>{t('common.status')}</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-right">
+                {t('common.actions')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -283,7 +289,7 @@ export function RemboursementsPage() {
                   colSpan={7}
                   className="py-8 text-center text-sm text-muted-foreground"
                 >
-                  Chargement…
+                  {t('common.chargement')}
                 </TableCell>
               </TableRow>
             ) : remboursements.length === 0 ? (
@@ -340,7 +346,7 @@ export function RemboursementsPage() {
                       variant="outline"
                       className={cn('text-[10px]', STATUT_META[r.statut].cls)}
                     >
-                      {STATUT_META[r.statut].label}
+                      {t(`gestionnaire.remboursements.statut.${r.statut}`)}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -419,7 +425,7 @@ export function RemboursementsPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Motif</Label>
+                <Label>{t('gestionnaire.remboursements.colMotif')}</Label>
                 <Select
                   value={draft.motif}
                   onValueChange={(v) =>
@@ -454,13 +460,13 @@ export function RemboursementsPage() {
               </div>
             </div>
             <div>
-              <Label>Description</Label>
+              <Label>{t('common.description')}</Label>
               <Input
                 value={draft.description ?? ''}
                 onChange={(e) =>
                   setDraft({ ...draft, description: e.target.value })
                 }
-                placeholder="ex: Double versement appel Q1 2026"
+                placeholder={t('gestionnaire.remboursements.descPlaceholder')}
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -489,7 +495,7 @@ export function RemboursementsPage() {
                     {(Object.keys(STATUT_META) as RemboursementStatus[]).map(
                       (k) => (
                         <SelectItem key={k} value={k}>
-                          {STATUT_META[k].label}
+                          {t(`gestionnaire.remboursements.statut.${k}`)}
                         </SelectItem>
                       ),
                     )}
@@ -524,7 +530,9 @@ export function RemboursementsPage() {
                       <SelectValue placeholder="Mode" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="virement">Virement</SelectItem>
+                      <SelectItem value="virement">
+                        {t('common.virement')}
+                      </SelectItem>
                       <SelectItem value="cheque">
                         {t('common.cheque')}
                       </SelectItem>

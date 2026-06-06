@@ -200,8 +200,7 @@ export function EmpruntsPage() {
             {t('gestionnaire.emprunts.title', { defaultValue: 'Emprunts' })}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Suivi des emprunts contractés par la copropriété — Annexe 8 du
-            Décret 2.23.700
+            {t('gestionnaire.emprunts.subtitle')}
           </p>
         </div>
         <Button
@@ -211,7 +210,7 @@ export function EmpruntsPage() {
           disabled={!residenceId}
         >
           <Plus className="size-4" />
-          Nouvel emprunt
+          {t('gestionnaire.emprunts.newEmprunt')}
         </Button>
       </div>
 
@@ -270,9 +269,11 @@ export function EmpruntsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>{t('common.libelle')}</TableHead>
-              <TableHead>Organisme</TableHead>
+              <TableHead>{t('gestionnaire.emprunts.colOrganisme')}</TableHead>
               <TableHead>{t('common.periode')}</TableHead>
-              <TableHead className="text-right">Initial</TableHead>
+              <TableHead className="text-right">
+                {t('gestionnaire.emprunts.colInitial')}
+              </TableHead>
               <TableHead className="text-right">
                 {t('gestionnaire.emprunts.colMensualite')}
               </TableHead>
@@ -280,7 +281,9 @@ export function EmpruntsPage() {
                 {t('gestionnaire.emprunts.colResteDu')}
               </TableHead>
               <TableHead>{t('common.status')}</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-right">
+                {t('common.actions')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -290,7 +293,7 @@ export function EmpruntsPage() {
                   colSpan={8}
                   className="py-8 text-center text-sm text-muted-foreground"
                 >
-                  Chargement…
+                  {t('common.chargement')}
                 </TableCell>
               </TableRow>
             ) : emprunts.length === 0 ? (
@@ -373,7 +376,9 @@ export function EmpruntsPage() {
         <DialogContent className="sm:max-w-[520px]">
           <DialogHeader>
             <DialogTitle>
-              {editing ? "Modifier l'emprunt" : 'Nouvel emprunt'}
+              {editing
+                ? t('gestionnaire.emprunts.editEmprunt')
+                : t('gestionnaire.emprunts.newEmprunt')}
             </DialogTitle>
           </DialogHeader>
           <div className="grid gap-3">
@@ -394,7 +399,7 @@ export function EmpruntsPage() {
                 onChange={(e) =>
                   setDraft({ ...draft, organisme: e.target.value })
                 }
-                placeholder="ex: Banque Populaire"
+                placeholder={t('gestionnaire.emprunts.bankPlaceholder')}
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
