@@ -246,7 +246,9 @@ export function RemboursementsPage() {
           </p>
         </div>
         <div className="rounded-xl border bg-card p-4">
-          <p className="mb-1 text-xs text-muted-foreground">En attente</p>
+          <p className="mb-1 text-xs text-muted-foreground">
+            {t('gestionnaire.remboursements.kpiEnAttente')}
+          </p>
           <p className="text-2xl font-bold tracking-tight text-amber-600">
             {fmt.format(totals.enAttente)} DH
           </p>
@@ -266,9 +268,11 @@ export function RemboursementsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>{t('common.coproprietaire')}</TableHead>
-              <TableHead>Motif</TableHead>
+              <TableHead>{t('gestionnaire.remboursements.colMotif')}</TableHead>
               <TableHead className="text-right">{t('common.amount')}</TableHead>
-              <TableHead>Demande</TableHead>
+              <TableHead>
+                {t('gestionnaire.remboursements.colDemande')}
+              </TableHead>
               <TableHead>
                 {t('gestionnaire.remboursements.colPaiement')}
               </TableHead>
@@ -421,7 +425,7 @@ export function RemboursementsPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Motif</Label>
+                <Label>{t('gestionnaire.remboursements.colMotif')}</Label>
                 <Select
                   value={draft.motif}
                   onValueChange={(v) =>

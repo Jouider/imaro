@@ -241,9 +241,7 @@ export function PointagePage() {
                 </Select>
               </div>
               <p className="text-xs text-muted-foreground max-w-md">
-                Importez le relevé bancaire au format CSV ou Excel exporté
-                depuis votre espace bancaire en ligne. Imaro détecte
-                automatiquement les colonnes (date, libellé, débit, crédit).
+                {t('gestionnaire.pointage.uploadHint')}
               </p>
             </div>
 
@@ -285,7 +283,7 @@ export function PointagePage() {
                 ) : (
                   <Upload className="size-4" />
                 )}
-                Choisir un fichier
+                {t('gestionnaire.pointage.chooseFile')}
               </Button>
             </div>
 
@@ -293,8 +291,7 @@ export function PointagePage() {
             <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-900/30 dark:bg-amber-950/20">
               <Sparkles className="size-4 text-amber-600" />
               <p className="flex-1 text-xs text-amber-700 dark:text-amber-300">
-                Pas de fichier sous la main ? Chargez le jeu de démo (relevé
-                Attijariwafa avec 10 lignes pour résidence Atlas).
+                {t('gestionnaire.pointage.demoBanner')}
               </p>
               <Button variant="outline" size="sm" onClick={handleLoadDemo}>
                 {t('gestionnaire.pointage.demo')}

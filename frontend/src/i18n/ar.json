@@ -987,7 +987,10 @@
       "demoLoaded": "تم تحميل عرض توضيحي: {{n}} سطر Attijariwafa",
       "demo": "عرض توضيحي",
       "bankSource": "البنك المصدر",
-      "confirmAll": "تأكيد الكل"
+      "confirmAll": "تأكيد الكل",
+      "uploadHint": "استورِد كشف البنك بصيغة CSV أو Excel المُصدَّر من فضائك البنكي على الإنترنت. يكتشف Imaro الأعمدة تلقائيًا (التاريخ، الوصف، المدين، الدائن).",
+      "chooseFile": "اختر ملفًا",
+      "demoBanner": "لا تتوفر على ملف؟ حمّل العرض التوضيحي (كشف Attijariwafa مع 10 أسطر لإقامة Atlas)"
     },
     "cmdk": {
       "title": "بحث سريع",
@@ -1349,29 +1352,7 @@
         "colRelance": "آخر تذكير",
         "jourRetard": "يوم تأخر"
       },
-      "encaisser": {
-        "title": "تحصيل دفعة",
-        "step1": "اختيار دين",
-        "step2": "إدخال الدفعة",
-        "montant": "المبلغ (درهم)",
-        "date": "تاريخ الدفع",
-        "methode": "طريقة الدفع",
-        "compte": "الحساب المستهدف",
-        "refCheque": "مرجع الشيك",
-        "success": "تم تسجيل الدفعة",
-        "methodes": {
-          "especes": "نقداً",
-          "virement": "تحويل بنكي",
-          "cheque": "شيك",
-          "cb": "بطاقة بنكية",
-          "mobile_money": "موبايل موني"
-        },
-        "comptes": {
-          "5121": "البنك الرئيسي (5121)",
-          "5122": "حساب الشيكات (5122)",
-          "5161": "الصندوق (5161)"
-        }
-      },
+      "encaisser": "تحصيل",
       "avance": {
         "title": "دفعة مسبقة",
         "info": "ستُخصَّص هذه الدفعة تلقائياً لطلبات الاشتراك القادمة",
@@ -1428,7 +1409,11 @@
       "noEncaissement": "لا يوجد تحصيل",
       "titrePlaceholder": "تكاليف الربع الثاني 2026",
       "justificatifPlaceholder": "مستند",
-      "envoyer": "إرسال"
+      "envoyer": "إرسال",
+      "colLot": "الوحدة",
+      "encaisserPaiement": "تحصيل أداء",
+      "envoyerRappels": "إرسال التذكيرات",
+      "decompteEmpty": "أدخل اسمًا وانقر على \"توليد\" لعرض الكشف الفردي"
     },
     "tickets": {
       "title": "التذاكر",
@@ -1482,7 +1467,9 @@
       "colTaille": "الحجم",
       "download": "تحميل",
       "delete": "حذف",
-      "deleteConfirm": "حذف هذه الوثيقة؟",
+      "deleteConfirm": {
+        "title": "حذف الوثيقة؟"
+      },
       "deleteDesc": "ستُحذف هذه الوثيقة نهائيًا.",
       "toutes": "جميع الإقامات",
       "empty": "لا توجد وثائق",
@@ -1494,7 +1481,8 @@
         "type": "النوع",
         "residence": "الإقامة (اختياري)",
         "date": "التاريخ",
-        "file": "الملف"
+        "file": "الملف",
+        "nomPlaceholder": "مثال: نظام الملكية المشتركة 2026"
       },
       "types": {
         "reglement": "النظام الداخلي",
@@ -1502,6 +1490,23 @@
         "contrat": "عقد",
         "facture": "فاتورة",
         "autre": "أخرى"
+      },
+      "addError": "خطأ أثناء الإضافة",
+      "deleteError": "خطأ أثناء الحذف",
+      "col": {
+        "nom": "الاسم",
+        "type": "النوع",
+        "residence": "الإقامة",
+        "date": "التاريخ",
+        "taille": "الحجم"
+      },
+      "allResidences": "الكل",
+      "filterAllTypes": "كل الأنواع",
+      "filterAllResidences": "كل الإقامات",
+      "searchPlaceholder": "البحث عن وثيقة…",
+      "emptyTitle": "لا توجد وثيقة",
+      "addDialog": {
+        "title": "إضافة وثيقة"
       }
     },
     "assemblees": {
@@ -1803,32 +1808,8 @@
       "recouvrement": "نسبة التحصيل",
       "couverture": "تغطية الخزينة",
       "mois": "أشهر",
-      "journal": {
-        "titre": "يومية القيود",
-        "date": "التاريخ",
-        "compte": "الحساب",
-        "description": "البيان",
-        "type": "النوع",
-        "debit": "مدين",
-        "credit": "دائن",
-        "piece": "الوثيقة",
-        "totalDebit": "إجمالي المدين",
-        "totalCredit": "إجمالي الدائن",
-        "types": {
-          "depense": "مصروف",
-          "encaissement": "تحصيل",
-          "virement": "تحويل",
-          "cloture": "إقفال",
-          "report": "ترحيل"
-        }
-      },
-      "grandLivre": {
-        "title": "الأستاذ العام",
-        "selectCompte": "اختر حسابًا...",
-        "soldeOuverture": "رصيد الافتتاح",
-        "soldeFinal": "الرصيد النهائي",
-        "hint": "اختر حساب المخطط المحاسبي لعرض تفاصيل القيود."
-      },
+      "journal": "اليومية",
+      "grandLivre": "دفتر الأستاذ",
       "depenses": {
         "title": "المصاريف",
         "add": "مصروف جديد",
@@ -1936,7 +1917,23 @@
         "5": "الفئة 5 — الخزينة",
         "6": "الفئة 6 — الأعباء",
         "7": "الفئة 7 — المنتجات"
-      }
+      },
+      "balance": {
+        "totalDebit": "إجمالي المدين",
+        "totalCredit": "إجمالي الدائن",
+        "soldeDebiteur": "الأرصدة المدينة",
+        "soldeCrediteur": "الأرصدة الدائنة"
+      },
+      "balanceEquilibree": "الموازنة متوازنة",
+      "balanceDesequilibree": "الموازنة غير متوازنة",
+      "exportPdf": "تصدير PDF",
+      "rapportsFinanciers": "التقارير المالية",
+      "rapportFinancierAnnuel": "التقرير المالي السنوي",
+      "rapportFinancier": "التقرير المالي",
+      "syntheseFinanciere": "خلاصة مالية، توزيع التكاليف، تحليل غير المدفوع — 3 صفحات",
+      "registresObligatoires": "السجلات الإلزامية (المادة 8 و 10)",
+      "balanceLabel": "الموازنة",
+      "legalNote": "هذا التقرير معدّ وفقًا للقانون 18-00 (ظهير شريف رقم 1-02-298 الصادر في 3 أكتوبر 2002) المتعلق بنظام الملكية المشتركة للعقارات المبنية. يحق لكل مالك مشترك طلب نسخة منه لدى النقابة وفقًا للمادة 8 من القانون المذكور. الوثائق المُولَّدة لها قيمة معلوماتية وموثقة من طرف مُسيّر الملكية المشتركة."
     },
     "depenses": {
       "title": "المصاريف",
@@ -2123,7 +2120,12 @@
       "toastAdded": "تمت إضافة الإيراد",
       "toastUpdated": "تم تحديث الإيراد",
       "toastDeleted": "تم حذف الإيراد",
-      "emptyRow": "لا توجد مداخيل لهذه السنة المالية."
+      "emptyRow": "لا توجد مداخيل لهذه السنة المالية.",
+      "title": "مداخيل أخرى",
+      "subtitle": "مداخيل خارج نداءات الأموال — كراء، إعانات، تعويضات، نواتج مالية",
+      "totalRecettes": "إجمالي المداخيل {{year}}",
+      "operations": "{{n}} عملية",
+      "colPayeur": "الدافع"
     },
     "remboursements": {
       "toastCreated": "تم إنشاء الاسترجاع",
@@ -2143,7 +2145,12 @@
         "approuve": "موافق عليه",
         "paye": "مدفوع",
         "rejete": "مرفوض"
-      }
+      },
+      "title": "الاستردادات",
+      "kpiEnAttente": "في الانتظار",
+      "kpiPayes": "مدفوعة",
+      "colMotif": "السبب",
+      "colDemande": "الطلب"
     },
     "emprunts": {
       "toastCreated": "تم تسجيل القرض",
@@ -2167,7 +2174,11 @@
       "amountInitialPositive": "المبلغ الأولي > 0",
       "newEmprunt": "قرض جديد",
       "editEmprunt": "تعديل القرض",
-      "bankPlaceholder": "مثال: البنك الشعبي"
+      "bankPlaceholder": "مثال: البنك الشعبي",
+      "title": "القروض",
+      "subtitle": "متابعة القروض المُبرَمة من طرف الملكية المشتركة — الملحق 8 من المرسوم 2.23.700",
+      "colInitial": "المبلغ الأولي",
+      "colOrganisme": "الجهة"
     },
     "recouvrement": {
       "toastConfigSaved": "تم حفظ الإعداد",
@@ -2197,7 +2208,15 @@
         "critical": "حرج"
       },
       "riskPrescription": "خطر التقادم",
-      "penaltiesRecalc": "تمت إعادة احتساب {{n}} غرامة ({{amount}} د.م.)"
+      "penaltiesRecalc": "تمت إعادة احتساب {{n}} غرامة ({{amount}} د.م.)",
+      "title": "التحصيل",
+      "subtitle": "متابعة غير المدفوع، الغرامات والإنذارات",
+      "configPenalites": "إعداد الغرامات",
+      "lotsEnRetard": "الوحدات المتأخرة",
+      "prescriptionBanner": "تتقادم ديون رسوم الملكية المشتركة بعد 5 سنوات دون انقطاع. يُطلب إجراء قانوني فوري للديون ذات الوضعية الحرجة.",
+      "colEcheance": "الاستحقاق",
+      "colJoursRestants": "الأيام المتبقية",
+      "colOrigine": "المصدر"
     },
     "equipements": {
       "toastAdded": "تمت إضافة المعدة",
@@ -2287,7 +2306,14 @@
         "user": "مستخدم",
         "auth": "المصادقة",
         "system": "النظام"
-      }
+      },
+      "title": "سجل التدقيق",
+      "subtitle": "التتبع الكامل للإجراءات على المنصة",
+      "refresh": "تحديث",
+      "errors": "أخطاء",
+      "colHorodatage": "الطابع الزمني",
+      "colCible": "الهدف",
+      "allFilter": "الكل"
     },
     "generateLots": {
       "genError": "خطأ أثناء توليد الوحدات",
@@ -2504,7 +2530,11 @@
       "regenerate": "إعادة التوليد",
       "downloaded": "تم تحميل الملحق {{num}}",
       "obligatoires": "الملاحق الإلزامية",
-      "exerciceClos": "السنة المالية المنتهية في 31 ديسمبر {{year}}"
+      "exerciceClos": "السنة المالية المنتهية في 31 ديسمبر {{year}}",
+      "title": "الملاحق المحاسبية",
+      "subtitle": "الملاحق التنظيمية وفق المرسوم 2.23.700",
+      "regimeSimplifie": "النظام المبسّط (≤ 200 000 د.م./سنة)",
+      "regimeNormal": "النظام العادي"
     },
     "layout": {
       "deleteNotif": "حذف هذا الإشعار",
@@ -2524,10 +2554,95 @@
         "in_progress": "قيد التنفيذ",
         "done": "منتهٍ",
         "skipped": "متجاهَل"
-      }
+      },
+      "title": "تقويم المطابقة",
+      "subtitle": "الدورة السنوية للمطابقة — المرسوم 2.23.700"
     },
     "autres": {
       "newRecette": "مدخول جديد"
+    },
+    "rappels": {
+      "title": "التذكيرات",
+      "subtitle": "اضبط تذكيرات الأداء التلقائية. كل رسالة تتبع اللغة المفضّلة للساكن.",
+      "lots": "وحدات",
+      "residents": "سكان",
+      "totalDu": "المجموع المستحق",
+      "autoTitle": "تذكيرات تلقائية",
+      "autoDesc": "أرسِل تلقائيًا التذكيرات المبرمجة. تُستعمل إشعارات الدفع دائمًا؛ أما القنوات الأخرى فتتبع إعداداتك.",
+      "enabled": "مُفعّل",
+      "disabled": "مُعطّل",
+      "nextRun": "التنفيذ القادم",
+      "never": "—",
+      "sendAll": "إرسال الكل الآن",
+      "toastEnabled": "تم تفعيل التذكيرات التلقائية",
+      "toastDisabled": "تم تعطيل التذكيرات التلقائية",
+      "toastSentAll": "تمت جدولة {{n}} تذكير للإرسال",
+      "toastConfigSaved": "تم حفظ الإعداد",
+      "toastStageSent": "تم إرسال تذكير « {{stage}} » إلى {{n}} ساكن",
+      "toastTest": "تم إرسال رسالة تجريبية",
+      "kpiDeliveryRate": "معدل التسليم",
+      "kpiDelivered": "تم التسليم بنجاح",
+      "kpiFailed": "لم يُسلَّم",
+      "kpiSentMonth": "المُرسَل هذا الشهر",
+      "timelineTitle": "التسلسل الزمني للتذكيرات",
+      "timelineSubtitle": "اضبط جدول التذكيرات",
+      "globalSettings": "إعدادات عامة",
+      "pushNote": "تُرسَل كل التذكيرات دائمًا عبر إشعار الدفع. القنوات الخارجية اختيارية.",
+      "appliesAll": "تنطبق إعدادات التذكير على جميع عماراتك",
+      "remaining": "{{n}}/{{max}} إرسال يدوي متبقٍّ",
+      "stageJ3": "3 أيام قبل الاستحقاق",
+      "stageJ2": "يومان قبل الاستحقاق",
+      "stageJ1": "يوم واحد قبل الاستحقاق",
+      "stageJourJ": "يوم الاستحقاق",
+      "stageRetard": "متأخر (تذكيرات يومية)",
+      "stageDescJ3": "تذكير لطيف يُرسَل للسكان الذين لم يؤدّوا بعد.",
+      "stageDescJ2": "تذكير متابعة للسكان الذين ما زالوا في الانتظار.",
+      "stageDescJ1": "تذكير عاجل عشية الاستحقاق.",
+      "stageDescJourJ": "تذكير نهائي يوم الاستحقاق.",
+      "stageDescRetard": "تذكيرات يومية إلى حين استلام الأداء.",
+      "pushAlways": "إشعار الدفع",
+      "pushAlwaysHint": "يُرسَل دائمًا عبر التطبيق",
+      "extraChannels": "قنوات إضافية",
+      "send": "إرسال",
+      "pendingCount": "{{n}} في الانتظار",
+      "whatsapp": "واتساب",
+      "email": "البريد الإلكتروني",
+      "sms": "رسالة قصيرة",
+      "free": "مجاني",
+      "previewTitle": "معاينة",
+      "active": "نشط",
+      "activeDesc": "التذكيرات نشطة. تُرسَل الرسائل تلقائيًا حسب الجدول.",
+      "alwaysActive": "نشط دائمًا",
+      "test": "تجربة",
+      "emailSubject": "الموضوع",
+      "langTitle": "لغة مخصّصة",
+      "langDesc": "يُرسَل كل تذكير باللغة المفضّلة للساكن.",
+      "recentTitle": "التذكيرات الأخيرة",
+      "recentSubtitle": "سجل التذكيرات المُرسَلة للسكان",
+      "recentEmpty": "لا يوجد تذكير مُرسَل بعد",
+      "recentEmptyDesc": "سيظهر سجل التذكيرات هنا.",
+      "colResident": "الساكن",
+      "colChannel": "القناة",
+      "colTrigger": "المُطلِق",
+      "statusDelivered": "مُسلَّم",
+      "statusFailed": "فشل",
+      "statusPending": "في الانتظار",
+      "statusSent": "مُرسَل",
+      "triggerAuto": "تلقائي",
+      "triggerManual": "يدوي",
+      "howTitle": "كيف تعمل التذكيرات",
+      "howDaily": "برنامج يومي",
+      "howDailyDesc": "تُرسَل التذكيرات التلقائية على الساعة {{hour}}:00 كل يوم.",
+      "howOverdue": "تواتر المتأخرات",
+      "howOverdueDesc": "تُرسَل يوميًا إلى حين استلام الأداء (بحد أقصى {{n}} أيام).",
+      "howLimits": "حدود يومية",
+      "howLimitsDesc": "{{max}} إرسال يدوي في اليوم — التلقائية غير محدودة.",
+      "howMultilang": "متعدد اللغات",
+      "howMultilangDesc": "{{n}} لغات مدعومة.",
+      "selectResidence": "اختر إقامة",
+      "colDate": "التاريخ",
+      "colType": "النوع",
+      "colStatus": "الحالة"
     }
   },
   "onboarding": {
@@ -2694,6 +2809,19 @@
     "piece": "المستند",
     "action": "الإجراء",
     "chargement": "جارٍ التحميل…",
-    "loi1800Art25": "قانون 18-00 · المادة 25"
+    "loi1800Art25": "قانون 18-00 · المادة 25",
+    "lotsEnRetard": "الوحدات المتأخرة",
+    "origine": "المصدر",
+    "horodatage": "الطابع الزمني",
+    "cible": "الهدف",
+    "erreurs": "الأخطاء",
+    "actualiser": "تحديث",
+    "toutes": "الكل",
+    "payeur": "الدافع",
+    "motif": "السبب",
+    "demande": "الطلب",
+    "initial": "الأولي",
+    "organisme": "الجهة",
+    "mensualite": "القسط الشهري"
   }
 }

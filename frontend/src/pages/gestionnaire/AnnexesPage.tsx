@@ -346,8 +346,8 @@ export function AnnexesPage() {
           )}
         >
           {regime === 'simplifie'
-            ? 'Régime simplifié (≤ 200 000 MAD/an)'
-            : 'Régime normal'}
+            ? t('gestionnaire.annexes.regimeSimplifie')
+            : t('gestionnaire.annexes.regimeNormal')}
         </Badge>
       </div>
 

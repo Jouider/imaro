@@ -200,8 +200,7 @@ export function EmpruntsPage() {
             {t('gestionnaire.emprunts.title', { defaultValue: 'Emprunts' })}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Suivi des emprunts contractés par la copropriété — Annexe 8 du
-            Décret 2.23.700
+            {t('gestionnaire.emprunts.subtitle')}
           </p>
         </div>
         <Button
@@ -270,9 +269,11 @@ export function EmpruntsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>{t('common.libelle')}</TableHead>
-              <TableHead>Organisme</TableHead>
+              <TableHead>{t('gestionnaire.emprunts.colOrganisme')}</TableHead>
               <TableHead>{t('common.periode')}</TableHead>
-              <TableHead className="text-right">Initial</TableHead>
+              <TableHead className="text-right">
+                {t('gestionnaire.emprunts.colInitial')}
+              </TableHead>
               <TableHead className="text-right">
                 {t('gestionnaire.emprunts.colMensualite')}
               </TableHead>

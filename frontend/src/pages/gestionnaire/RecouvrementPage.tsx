@@ -463,7 +463,7 @@ export function RecouvrementPage() {
           tone="warning"
         />
         <Kpi
-          label="Lots en retard"
+          label={t('gestionnaire.recouvrement.lotsEnRetard')}
           value={data?.nb_lots_en_retard ?? 0}
           icon={<AlertTriangle className="size-4" />}
           tone="warning"
@@ -496,9 +496,7 @@ export function RecouvrementPage() {
           </Badge>
         </div>
         <p className="mb-4 text-xs text-red-700/80 dark:text-red-300/80">
-          Les créances de charges de copropriété sont prescrites après 5 ans
-          sans interruption. Une action légale immédiate est requise pour les
-          créances à statut critique.
+          {t('gestionnaire.recouvrement.prescriptionBanner')}
         </p>
 
         {data?.prescription_risks.length === 0 ? (
@@ -515,8 +513,12 @@ export function RecouvrementPage() {
                   <TableHead className="text-right">
                     {t('common.amount')}
                   </TableHead>
-                  <TableHead>Origine</TableHead>
-                  <TableHead className="text-right">Jours restants</TableHead>
+                  <TableHead>
+                    {t('gestionnaire.recouvrement.colOrigine')}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t('gestionnaire.recouvrement.colJoursRestants')}
+                  </TableHead>
                   <TableHead>{t('common.severity')}</TableHead>
                 </TableRow>
               </TableHeader>

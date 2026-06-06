@@ -130,7 +130,7 @@ export function AuditTrailPage() {
           <RefreshCw
             className={cn('size-4', auditQ.isFetching && 'animate-spin')}
           />
-          Actualiser
+          {t('gestionnaire.audit.refresh')}
         </Button>
       </div>
 
@@ -143,7 +143,7 @@ export function AuditTrailPage() {
           tone="primary"
         />
         <Kpi
-          label="Erreurs"
+          label={t('gestionnaire.audit.errors')}
           value={stats.errors}
           icon={<AlertCircle className="size-4" />}
           tone="danger"
@@ -201,7 +201,9 @@ export function AuditTrailPage() {
             <SelectValue placeholder={t('common.severity')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">Toutes</SelectItem>
+            <SelectItem value="__all__">
+              {t('gestionnaire.audit.allFilter')}
+            </SelectItem>
             {(['info', 'warning', 'sensitive', 'error'] as const).map((s) => (
               <SelectItem key={s} value={s}>
                 {SEVERITY_LABELS[s]}
@@ -216,12 +218,12 @@ export function AuditTrailPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Horodatage</TableHead>
+              <TableHead>{t('gestionnaire.audit.colHorodatage')}</TableHead>
               <TableHead>{t('common.severity')}</TableHead>
               <TableHead>{t('common.categorie')}</TableHead>
               <TableHead>{t('common.action')}</TableHead>
               <TableHead>{t('gestionnaire.audit.colBy')}</TableHead>
-              <TableHead>Cible</TableHead>
+              <TableHead>{t('gestionnaire.audit.colCible')}</TableHead>
               <TableHead className="text-right">
                 {t('gestionnaire.audit.colDetails')}
               </TableHead>

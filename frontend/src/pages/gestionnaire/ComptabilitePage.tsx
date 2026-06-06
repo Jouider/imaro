@@ -1746,7 +1746,9 @@ function TabBalance({
                 : 'text-red-800 dark:text-red-200',
             )}
           >
-            {equilibre ? 'Balance équilibrée' : 'Balance déséquilibrée'}
+            {equilibre
+              ? t('gestionnaire.comptabilite.balanceEquilibree')
+              : t('gestionnaire.comptabilite.balanceDesequilibree')}
           </p>
           <p
             className={cn(
@@ -1778,7 +1780,7 @@ function TabBalance({
           ) : (
             <Printer className="size-3.5" />
           )}
-          Export PDF
+          {t('gestionnaire.comptabilite.exportPdf')}
         </Button>
       </div>
 
@@ -2363,7 +2365,7 @@ function TabRapports({
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-semibold text-foreground">
-        Rapports financiers
+        {t('gestionnaire.comptabilite.rapportsFinanciers')}
       </h2>
 
       <Card>
@@ -2376,10 +2378,11 @@ function TabRapports({
           {/* Rapport financier */}
           <div className="flex items-center justify-between rounded-lg bg-muted/40 px-4 py-3">
             <div>
-              <p className="font-medium text-sm">Rapport Financier Annuel</p>
+              <p className="font-medium text-sm">
+                {t('gestionnaire.comptabilite.rapportFinancierAnnuel')}
+              </p>
               <p className="text-xs text-muted-foreground">
-                Synthèse financière, répartition des charges, analyse des
-                impayés — 3 pages
+                {t('gestionnaire.comptabilite.syntheseFinanciere')}
               </p>
             </div>
             <Button
@@ -2393,14 +2396,14 @@ function TabRapports({
               ) : (
                 <Printer className="me-1.5 size-4" />
               )}
-              Rapport Financier
+              {t('gestionnaire.comptabilite.rapportFinancier')}
             </Button>
           </div>
 
           {/* Séparateur + registres obligatoires */}
           <div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Registres obligatoires (Art. 8 &amp; 10)
+              {t('gestionnaire.comptabilite.registresObligatoires')}
             </p>
             <div className="flex flex-wrap gap-3">
               <Button
@@ -2414,7 +2417,7 @@ function TabRapports({
                 ) : (
                   <Printer className="me-1.5 size-4" />
                 )}
-                Journal
+                {t('gestionnaire.comptabilite.journal')}
               </Button>
 
               <Button
@@ -2428,7 +2431,7 @@ function TabRapports({
                 ) : (
                   <Printer className="me-1.5 size-4" />
                 )}
-                Grand Livre
+                {t('gestionnaire.comptabilite.grandLivre')}
               </Button>
 
               <Button
@@ -2442,7 +2445,7 @@ function TabRapports({
                 ) : (
                   <Printer className="me-1.5 size-4" />
                 )}
-                Balance
+                {t('gestionnaire.comptabilite.balanceLabel')}
               </Button>
             </div>
           </div>
@@ -2474,12 +2477,7 @@ function TabRapports({
       <Card className="border-blue-100 bg-blue-50/50 dark:border-blue-900 dark:bg-blue-950/20">
         <CardContent className="pt-4">
           <p className="text-xs leading-relaxed text-blue-800 dark:text-blue-300">
-            Ce rapport est établi conformément à la Loi 18-00 (Dahir n° 1-02-298
-            du 3 octobre 2002) relative au statut de la copropriété des
-            immeubles bâtis. Tout copropriétaire peut en demander copie au
-            syndic selon l&apos;article 8 de ladite loi. Les documents générés
-            ont valeur informative et sont certifiés par le gestionnaire de la
-            copropriété.
+            {t('gestionnaire.comptabilite.legalNote')}
           </p>
         </CardContent>
       </Card>

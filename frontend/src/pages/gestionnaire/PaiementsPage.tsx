@@ -1088,7 +1088,7 @@ export function PaiementsPage() {
               }}
             >
               <CreditCard className="me-1 size-3" />
-              Encaisser
+              {t('gestionnaire.paiements.encaisser')}
             </Button>
           )}
           {r.statut !== 'paye' && r.statut !== 'annulee' && (
@@ -1433,7 +1433,7 @@ export function PaiementsPage() {
               }}
             >
               <CreditCard className="me-1.5 size-4" />
-              Encaisser
+              {t('gestionnaire.paiements.encaisser')}
             </Button>
             <Button
               variant="outline"
@@ -1441,7 +1441,7 @@ export function PaiementsPage() {
               onClick={() => setRelancerAllOpen(true)}
             >
               <Bell className="me-1.5 size-4" />
-              Envoyer rappels
+              {t('gestionnaire.paiements.envoyerRappels')}
               {nbImpayes > 0 && (
                 <Badge className="ms-1.5 border-0 bg-red-100 text-red-800 text-xs px-1.5">
                   {nbImpayes}
@@ -1712,7 +1712,7 @@ export function PaiementsPage() {
             <div className="flex flex-col items-center gap-3 py-20 text-center text-muted-foreground">
               <FileText className="size-12" />
               <p>
-                Saisissez un nom et cliquez sur Générer pour afficher le
+                {t('gestionnaire.paiements.decompteEmpty').split('. ')[0]}
                 décompte individuel
               </p>
             </div>
