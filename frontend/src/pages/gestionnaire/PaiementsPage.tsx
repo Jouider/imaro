@@ -1062,7 +1062,7 @@ export function PaiementsPage() {
     },
     {
       key: 'statut',
-      header: 'Statut',
+      header: t('common.status'),
       renderCell: (r) => (
         <Badge className={cn(CREANCE_STATUT_CLS[r.statut], 'border-0 text-xs')}>
           {t(`gestionnaire.paiements.creances.statuts.${r.statut}`, {
@@ -1108,21 +1108,21 @@ export function PaiementsPage() {
   ]
 
   const appelsColumns: Column<AppelFonds>[] = [
-    { key: 'titre', header: 'Titre', sortable: true },
+    { key: 'titre', header: t('common.titre'), sortable: true },
     {
       key: 'residence',
-      header: 'Résidence',
+      header: t('common.residence'),
       renderCell: (r) => r.residence.name,
     },
     {
       key: 'montant_total',
-      header: 'Montant total',
+      header: t('common.montantTotal'),
       sortable: true,
       renderCell: (r) => <MontantDisplay value={r.montant_total} />,
     },
     {
       key: 'montant_recouvre',
-      header: 'Recouvré',
+      header: t('common.recouvre'),
       renderCell: (r) => (
         <div className="flex items-center gap-2">
           <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
@@ -1139,7 +1139,7 @@ export function PaiementsPage() {
     },
     {
       key: 'montant_restant',
-      header: 'Restant',
+      header: t('common.restant'),
       renderCell: (r) => <MontantDisplay value={r.montant_restant} colorize />,
     },
     {
@@ -1150,7 +1150,7 @@ export function PaiementsPage() {
     },
     {
       key: 'statut',
-      header: 'Statut',
+      header: t('common.status'),
       renderCell: (r) => {
         const cls = APPEL_STATUT_CLS[r.statut] ?? 'bg-gray-100 text-gray-700'
         return <Badge className={cn(cls, 'border-0 text-xs')}>{r.statut}</Badge>
@@ -1168,7 +1168,7 @@ export function PaiementsPage() {
             onClick={() => setEnvoyerTarget(r)}
           >
             <Send className="me-1.5 size-3.5" />
-            Envoyer
+            {t('gestionnaire.paiements.envoyer')}
           </Button>
         ) : null,
     },
@@ -1177,7 +1177,7 @@ export function PaiementsPage() {
   const historiqueColumns: Column<Encaissement>[] = [
     {
       key: 'date_paiement',
-      header: 'Date',
+      header: t('common.date'),
       sortable: true,
       renderCell: (r) => r.date_paiement.slice(0, 10),
     },
@@ -1188,20 +1188,20 @@ export function PaiementsPage() {
     },
     {
       key: 'lot_numero',
-      header: 'Lot',
+      header: t('common.lot'),
       renderCell: (r) => (
         <span className="font-mono text-sm">{r.lot_numero}</span>
       ),
     },
     {
       key: 'montant',
-      header: 'Montant',
+      header: t('common.amount'),
       sortable: true,
       renderCell: (r) => <MontantDisplay value={r.montant} />,
     },
     {
       key: 'methode',
-      header: 'Méthode',
+      header: t('common.methode'),
       renderCell: (r) => (
         <Badge
           className={cn(
@@ -1217,14 +1217,14 @@ export function PaiementsPage() {
     },
     {
       key: 'compte_destination',
-      header: 'Compte',
+      header: t('common.compte'),
       renderCell: (r) => (
         <span className="font-mono text-xs">{r.compte_destination}</span>
       ),
     },
     {
       key: 'est_rapproche',
-      header: 'Rapproché',
+      header: t('common.rapproche'),
       renderCell: (r) =>
         r.est_rapproche ? (
           <CheckCircle className="size-4 text-green-500" />
@@ -1234,7 +1234,7 @@ export function PaiementsPage() {
     },
     {
       key: 'recu_path',
-      header: 'Reçu',
+      header: t('common.recu'),
       renderCell: (r) =>
         r.recu_path ? (
           <Button variant="ghost" size="sm" className="h-6 px-2">
@@ -1249,7 +1249,7 @@ export function PaiementsPage() {
   const virementsColumns: Column<VirementDeclare>[] = [
     {
       key: 'date_declaration',
-      header: 'Date déclaration',
+      header: t('common.dateDeclaration'),
       sortable: true,
       renderCell: (r) => r.date_declaration.slice(0, 10),
     },
@@ -1260,14 +1260,14 @@ export function PaiementsPage() {
     },
     {
       key: 'lot_numero',
-      header: 'Lot',
+      header: t('common.lot'),
       renderCell: (r) => (
         <span className="font-mono text-sm">{r.lot_numero}</span>
       ),
     },
     {
       key: 'montant',
-      header: 'Montant',
+      header: t('common.amount'),
       sortable: true,
       renderCell: (r) => <MontantDisplay value={r.montant} />,
     },
@@ -1291,14 +1291,14 @@ export function PaiementsPage() {
     },
     {
       key: 'reference',
-      header: 'Référence',
+      header: t('common.reference'),
       renderCell: (r) => (
         <span className="font-mono text-xs">{r.reference}</span>
       ),
     },
     {
       key: 'justificatif_path',
-      header: 'Justificatif',
+      header: t('common.justificatif'),
       renderCell: (r) =>
         r.justificatif_path ? (
           <Button
@@ -1318,7 +1318,7 @@ export function PaiementsPage() {
     },
     {
       key: 'statut',
-      header: 'Statut',
+      header: t('common.status'),
       renderCell: (r) => (
         <Badge
           className={cn(VIREMENT_STATUT_CLS[r.statut], 'border-0 text-xs')}
@@ -1570,7 +1570,7 @@ export function PaiementsPage() {
             isLoading={loadingCreances}
             pageSize={10}
             emptyIcon={<CreditCard className="size-12 text-muted-foreground" />}
-            emptyTitle="Aucune créance"
+            emptyTitle={t('gestionnaire.paiements.noCreance')}
           />
 
           <div className="flex justify-end">
@@ -1609,7 +1609,7 @@ export function PaiementsPage() {
             isLoading={loadingAppels}
             searchable
             emptyIcon={<FileText className="size-12 text-muted-foreground" />}
-            emptyTitle="Aucun appel de fonds"
+            emptyTitle={t('gestionnaire.paiements.noAppel')}
           />
         </div>
       )}
@@ -1672,7 +1672,7 @@ export function PaiementsPage() {
             isLoading={loadingEnc}
             pageSize={10}
             emptyIcon={<CreditCard className="size-12 text-muted-foreground" />}
-            emptyTitle="Aucun encaissement"
+            emptyTitle={t('gestionnaire.paiements.noEncaissement')}
           />
 
           {filteredEnc.length > 0 && (
@@ -1751,7 +1751,9 @@ export function PaiementsPage() {
                     <p className="font-semibold">{decompte.tantieme} / 1000</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Exercice</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t('common.exercice')}
+                    </p>
                     <p className="font-semibold">{decompte.exercice_annee}</p>
                   </div>
                 </div>
@@ -1931,13 +1933,13 @@ export function PaiementsPage() {
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1">
-              <Label>Titre</Label>
+              <Label>{t('common.titre')}</Label>
               <Input
                 value={appelForm.titre}
                 onChange={(e) =>
                   setAppelForm((f) => ({ ...f, titre: e.target.value }))
                 }
-                placeholder="Charges Q2 2026"
+                placeholder={t('gestionnaire.paiements.titrePlaceholder')}
               />
             </div>
             <div className="space-y-1">

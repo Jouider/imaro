@@ -222,7 +222,7 @@ export function PointagePage() {
             <div className="flex flex-wrap items-end gap-4">
               <div className="flex-1 min-w-[240px] space-y-1.5">
                 <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Banque source
+                  {t('gestionnaire.pointage.bankSource')}
                 </label>
                 <Select
                   value={banque}
@@ -428,7 +428,9 @@ export function PointagePage() {
                     {t('common.credit')}
                   </TableHead>
                   <TableHead>Rapprochement Imaro</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-right">
+                    {t('common.actions')}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -583,7 +585,7 @@ export function PointagePage() {
                 }}
               >
                 <CheckCircle2 className="size-4" />
-                Tout confirmer
+                {t('gestionnaire.pointage.confirmAll')}
               </Button>
             </div>
           )}

@@ -985,7 +985,9 @@
       "parseError": "Erreur de parsing",
       "importedMsg": "{{total}} lignes importées. {{auto}} auto-matchées.",
       "demoLoaded": "Démo chargée: {{n}} lignes Attijariwafa",
-      "demo": "Démo"
+      "demo": "Démo",
+      "bankSource": "Banque source",
+      "confirmAll": "Tout confirmer"
     },
     "cmdk": {
       "title": "Recherche rapide",
@@ -1421,7 +1423,12 @@
       "sendAppelTitle": "Envoyer l'appel de fonds",
       "sendAppelDesc": "Cette action enverra une notification WhatsApp à tous les copropriétaires.",
       "saveError": "Erreur lors de l'enregistrement",
-      "relancesSent": "{{n}} relance(s) envoyée(s)"
+      "relancesSent": "{{n}} relance(s) envoyée(s)",
+      "noAppel": "Aucun appel de fonds",
+      "noEncaissement": "Aucun encaissement",
+      "titrePlaceholder": "Charges Q2 2026",
+      "justificatifPlaceholder": "justificatif",
+      "envoyer": "Envoyer"
     },
     "tickets": {
       "title": "Tickets",
@@ -1919,7 +1926,17 @@
       "viewAnnexes": "Voir les annexes",
       "iaError": "Erreur analyse IA",
       "balanceEq": "Total Débit = Total Crédit = {{debit}} DH · Écart soldes : {{ecart}} DH",
-      "balanceNeq": "Écart débits/crédits : {{ecart}} DH — vérifier les écritures"
+      "balanceNeq": "Écart débits/crédits : {{ecart}} DH — vérifier les écritures",
+      "noEcritureCompte": "Aucune écriture pour ce compte",
+      "classes": {
+        "1": "Classe 1 — Capitaux propres",
+        "2": "Classe 2 — Immobilisations",
+        "3": "Classe 3 — Créances actif circulant",
+        "4": "Classe 4 — Dettes passif circulant",
+        "5": "Classe 5 — Trésorerie",
+        "6": "Classe 6 — Charges",
+        "7": "Classe 7 — Produits"
+      }
     },
     "depenses": {
       "title": "Dépenses",
@@ -2119,7 +2136,14 @@
       "emptyRow": "Aucun remboursement enregistré.",
       "dateDemande": "Date de demande",
       "datePaiement": "Date paiement",
-      "modalEdit": "Modifier le remboursement"
+      "modalEdit": "Modifier le remboursement",
+      "descPlaceholder": "ex: Double versement appel Q1 2026",
+      "statut": {
+        "demande": "Demandé",
+        "approuve": "Approuvé",
+        "paye": "Payé",
+        "rejete": "Rejeté"
+      }
     },
     "emprunts": {
       "toastCreated": "Emprunt enregistré",
@@ -2140,7 +2164,10 @@
       "payeExercice": "Payé cet exercice",
       "resteAPayer": "Reste à payer",
       "montantInitialDh": "Montant initial (DH)",
-      "amountInitialPositive": "Montant initial > 0"
+      "amountInitialPositive": "Montant initial > 0",
+      "newEmprunt": "Nouvel emprunt",
+      "editEmprunt": "Modifier l'emprunt",
+      "bankPlaceholder": "ex: Banque Populaire"
     },
     "recouvrement": {
       "toastConfigSaved": "Configuration enregistrée",
@@ -2162,7 +2189,15 @@
       "prescriptionRisk": "Risque de prescription",
       "prescriptionBadge": "Loi 18-00 · Prescription quinquennale",
       "allLateLots": "Tous les lots en retard",
-      "saveError": "Échec de l'enregistrement"
+      "saveError": "Échec de l'enregistrement",
+      "severity": {
+        "low": "Faible",
+        "medium": "Modéré",
+        "high": "Élevé",
+        "critical": "Critique"
+      },
+      "riskPrescription": "Risque prescription",
+      "penaltiesRecalc": "{{n}} pénalités recalculées ({{amount}} DH)"
     },
     "equipements": {
       "toastAdded": "Équipement ajouté",
@@ -2236,7 +2271,23 @@
       "colDetails": "Détails",
       "empty": "Aucun événement pour cette période ou ce filtre.",
       "totalEvents": "Total événements",
-      "searchPlaceholder": "Rechercher action, utilisateur, cible..."
+      "searchPlaceholder": "Rechercher action, utilisateur, cible...",
+      "exportCsv": "Exporter CSV",
+      "sensitiveActions": "Actions sensibles",
+      "errorRate": "Taux d'erreur",
+      "categoryLabels": {
+        "immeuble": "Immeuble",
+        "lot": "Lot",
+        "coproprietaire": "Copropriétaire",
+        "paiement": "Paiement",
+        "depense": "Dépense",
+        "budget": "Budget",
+        "ag": "Assemblée",
+        "document": "Document",
+        "user": "Utilisateur",
+        "auth": "Authentification",
+        "system": "Système"
+      }
     },
     "generateLots": {
       "genError": "Erreur lors de la génération des lots",
@@ -2450,7 +2501,10 @@
     },
     "annexes": {
       "complementaires": "Annexes complémentaires",
-      "regenerate": "Régénérer"
+      "regenerate": "Régénérer",
+      "downloaded": "Annexe {{num}} téléchargée",
+      "obligatoires": "Annexes obligatoires",
+      "exerciceClos": "Exercice clos le 31 décembre {{year}}"
     },
     "layout": {
       "deleteNotif": "Supprimer cette notification",
@@ -2458,7 +2512,22 @@
       "openMenu": "Ouvrir le menu"
     },
     "conformite": {
-      "timeline": "Chronologie des phases"
+      "timeline": "Chronologie des phases",
+      "exerciceLabel": "Exercice {{n}}",
+      "phaseLabel": {
+        "ops": "Opérations mensuelles",
+        "cloture": "Clôture d'exercice",
+        "prepAg": "Préparation de l'AG"
+      },
+      "phaseStatut": {
+        "todo": "À faire",
+        "in_progress": "En cours",
+        "done": "Terminé",
+        "skipped": "Ignoré"
+      }
+    },
+    "autres": {
+      "newRecette": "Nouvelle recette"
     }
   },
   "onboarding": {
@@ -2599,7 +2668,7 @@
     "lot": "Lot",
     "total": "Total",
     "montantMad": "Montant (MAD)",
-    "du": "Dû",
+    "du": "Du",
     "exportInProgress": "Export en cours...",
     "saveError": "Erreur lors de l'enregistrement",
     "nouveau": "Nouveau",
@@ -2607,6 +2676,24 @@
     "searchPlaceholder": "Rechercher...",
     "echeance": "Échéance",
     "appelDeFonds": "Appel de fonds",
-    "chooseLanguage": "Choisir la langue"
+    "chooseLanguage": "Choisir la langue",
+    "exercice": "Exercice",
+    "titre": "Titre",
+    "virement": "Virement",
+    "compte": "Compte",
+    "recouvre": "Recouvré",
+    "restant": "Restant",
+    "rapproche": "Rapproché",
+    "recu": "Reçu",
+    "dateDeclaration": "Date déclaration",
+    "justificatif": "Justificatif",
+    "montantTotal": "Montant total",
+    "solde": "Solde",
+    "soldeD": "Solde D",
+    "soldeC": "Solde C",
+    "piece": "Pièce",
+    "action": "Action",
+    "chargement": "Chargement…",
+    "loi1800Art25": "Loi 18-00 · Art. 25"
   }
 }

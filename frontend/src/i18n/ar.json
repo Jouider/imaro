@@ -985,7 +985,9 @@
       "parseError": "خطأ في التحليل",
       "importedMsg": "تم استيراد {{total}} سطر. {{auto}} مطابَقة آليًا.",
       "demoLoaded": "تم تحميل عرض توضيحي: {{n}} سطر Attijariwafa",
-      "demo": "عرض توضيحي"
+      "demo": "عرض توضيحي",
+      "bankSource": "البنك المصدر",
+      "confirmAll": "تأكيد الكل"
     },
     "cmdk": {
       "title": "بحث سريع",
@@ -1421,7 +1423,12 @@
       "sendAppelTitle": "إرسال نداء الأموال",
       "sendAppelDesc": "سيرسل هذا الإجراء إشعار واتساب إلى جميع المُلّاك.",
       "saveError": "خطأ أثناء الحفظ",
-      "relancesSent": "تم إرسال {{n}} تذكير"
+      "relancesSent": "تم إرسال {{n}} تذكير",
+      "noAppel": "لا يوجد نداء أموال",
+      "noEncaissement": "لا يوجد تحصيل",
+      "titrePlaceholder": "تكاليف الربع الثاني 2026",
+      "justificatifPlaceholder": "مستند",
+      "envoyer": "إرسال"
     },
     "tickets": {
       "title": "التذاكر",
@@ -1919,7 +1926,17 @@
       "viewAnnexes": "عرض الملاحق",
       "iaError": "خطأ في تحليل الذكاء الاصطناعي",
       "balanceEq": "إجمالي المدين = إجمالي الدائن = {{debit}} د.م. · فارق الأرصدة: {{ecart}} د.م.",
-      "balanceNeq": "فارق المدين/الدائن: {{ecart}} د.م. — تحقق من القيود"
+      "balanceNeq": "فارق المدين/الدائن: {{ecart}} د.م. — تحقق من القيود",
+      "noEcritureCompte": "لا يوجد قيد لهذا الحساب",
+      "classes": {
+        "1": "الفئة 1 — الأموال الخاصة",
+        "2": "الفئة 2 — التثبيتات",
+        "3": "الفئة 3 — الديون المتداولة الأصول",
+        "4": "الفئة 4 — الديون المتداولة الخصوم",
+        "5": "الفئة 5 — الخزينة",
+        "6": "الفئة 6 — الأعباء",
+        "7": "الفئة 7 — المنتجات"
+      }
     },
     "depenses": {
       "title": "المصاريف",
@@ -2119,7 +2136,14 @@
       "emptyRow": "لا يوجد استرداد مسجل.",
       "dateDemande": "تاريخ الطلب",
       "datePaiement": "تاريخ الدفع",
-      "modalEdit": "تعديل الاسترداد"
+      "modalEdit": "تعديل الاسترداد",
+      "descPlaceholder": "مثال: دفع مزدوج لنداء الربع الأول 2026",
+      "statut": {
+        "demande": "مطلوب",
+        "approuve": "موافق عليه",
+        "paye": "مدفوع",
+        "rejete": "مرفوض"
+      }
     },
     "emprunts": {
       "toastCreated": "تم تسجيل القرض",
@@ -2140,7 +2164,10 @@
       "payeExercice": "المدفوع هذه السنة",
       "resteAPayer": "المتبقي للدفع",
       "montantInitialDh": "المبلغ الأولي (د.م.)",
-      "amountInitialPositive": "المبلغ الأولي > 0"
+      "amountInitialPositive": "المبلغ الأولي > 0",
+      "newEmprunt": "قرض جديد",
+      "editEmprunt": "تعديل القرض",
+      "bankPlaceholder": "مثال: البنك الشعبي"
     },
     "recouvrement": {
       "toastConfigSaved": "تم حفظ الإعداد",
@@ -2162,7 +2189,15 @@
       "prescriptionRisk": "خطر التقادم",
       "prescriptionBadge": "قانون 18-00 · التقادم الخماسي",
       "allLateLots": "كل الوحدات المتأخرة",
-      "saveError": "فشل الحفظ"
+      "saveError": "فشل الحفظ",
+      "severity": {
+        "low": "منخفض",
+        "medium": "متوسط",
+        "high": "مرتفع",
+        "critical": "حرج"
+      },
+      "riskPrescription": "خطر التقادم",
+      "penaltiesRecalc": "تمت إعادة احتساب {{n}} غرامة ({{amount}} د.م.)"
     },
     "equipements": {
       "toastAdded": "تمت إضافة المعدة",
@@ -2236,7 +2271,23 @@
       "colDetails": "التفاصيل",
       "empty": "لا يوجد حدث لهذه الفترة أو هذا الفلتر.",
       "totalEvents": "إجمالي الأحداث",
-      "searchPlaceholder": "البحث عن إجراء، مستخدم، هدف..."
+      "searchPlaceholder": "البحث عن إجراء، مستخدم، هدف...",
+      "exportCsv": "تصدير CSV",
+      "sensitiveActions": "الإجراءات الحساسة",
+      "errorRate": "معدل الأخطاء",
+      "categoryLabels": {
+        "immeuble": "عمارة",
+        "lot": "وحدة",
+        "coproprietaire": "مالك",
+        "paiement": "أداء",
+        "depense": "مصروف",
+        "budget": "ميزانية",
+        "ag": "جمع عام",
+        "document": "وثيقة",
+        "user": "مستخدم",
+        "auth": "المصادقة",
+        "system": "النظام"
+      }
     },
     "generateLots": {
       "genError": "خطأ أثناء توليد الوحدات",
@@ -2450,7 +2501,10 @@
     },
     "annexes": {
       "complementaires": "ملاحق تكميلية",
-      "regenerate": "إعادة التوليد"
+      "regenerate": "إعادة التوليد",
+      "downloaded": "تم تحميل الملحق {{num}}",
+      "obligatoires": "الملاحق الإلزامية",
+      "exerciceClos": "السنة المالية المنتهية في 31 ديسمبر {{year}}"
     },
     "layout": {
       "deleteNotif": "حذف هذا الإشعار",
@@ -2458,7 +2512,22 @@
       "openMenu": "فتح القائمة"
     },
     "conformite": {
-      "timeline": "التسلسل الزمني للمراحل"
+      "timeline": "التسلسل الزمني للمراحل",
+      "exerciceLabel": "السنة المالية {{n}}",
+      "phaseLabel": {
+        "ops": "العمليات الشهرية",
+        "cloture": "إقفال السنة المالية",
+        "prepAg": "التحضير للجمع العام"
+      },
+      "phaseStatut": {
+        "todo": "للقيام به",
+        "in_progress": "قيد التنفيذ",
+        "done": "منتهٍ",
+        "skipped": "متجاهَل"
+      }
+    },
+    "autres": {
+      "newRecette": "مدخول جديد"
     }
   },
   "onboarding": {
@@ -2599,7 +2668,7 @@
     "lot": "الوحدة",
     "total": "المجموع",
     "montantMad": "المبلغ (د.م.)",
-    "du": "المستحق",
+    "du": "من",
     "exportInProgress": "جارٍ التصدير...",
     "saveError": "خطأ أثناء الحفظ",
     "nouveau": "جديد",
@@ -2607,6 +2676,24 @@
     "searchPlaceholder": "بحث...",
     "echeance": "الاستحقاق",
     "appelDeFonds": "نداء أموال",
-    "chooseLanguage": "اختر اللغة"
+    "chooseLanguage": "اختر اللغة",
+    "exercice": "السنة المالية",
+    "titre": "العنوان",
+    "virement": "تحويل",
+    "compte": "الحساب",
+    "recouvre": "المحصَّل",
+    "restant": "المتبقي",
+    "rapproche": "مُطابَق",
+    "recu": "الإيصال",
+    "dateDeclaration": "تاريخ التصريح",
+    "justificatif": "المستند",
+    "montantTotal": "المبلغ الإجمالي",
+    "solde": "الرصيد",
+    "soldeD": "رصيد مدين",
+    "soldeC": "رصيد دائن",
+    "piece": "المستند",
+    "action": "الإجراء",
+    "chargement": "جارٍ التحميل…",
+    "loi1800Art25": "قانون 18-00 · المادة 25"
   }
 }

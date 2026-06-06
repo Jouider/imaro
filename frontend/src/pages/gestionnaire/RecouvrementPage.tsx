@@ -54,16 +54,16 @@ const SEVERITY_META: Record<
   PrescriptionSeverity,
   { label: string; cls: string }
 > = {
-  low: { label: 'Faible', cls: 'border-green-200 bg-green-50 text-green-700' },
+  low: { label: 'low', cls: 'border-green-200 bg-green-50 text-green-700' },
   medium: {
-    label: 'Modéré',
+    label: 'medium',
     cls: 'border-amber-200 bg-amber-50 text-amber-700',
   },
   high: {
-    label: 'Élevé',
+    label: 'high',
     cls: 'border-orange-200 bg-orange-50 text-orange-700',
   },
-  critical: { label: 'Critique', cls: 'border-red-200 bg-red-50 text-red-700' },
+  critical: { label: 'critical', cls: 'border-red-200 bg-red-50 text-red-700' },
 }
 
 const STATUS_BADGES: Record<string, { label: string; cls: string }> = {
@@ -155,7 +155,10 @@ export function RecouvrementPage() {
     mutationFn: () => recalculatePenalties(residenceId!),
     onSuccess: (r) => {
       toast.success(
-        `${r.recalculated} pénalités recalculées (${r.total_penalty_amount.toFixed(2)} DH)`,
+        t('gestionnaire.recouvrement.penaltiesRecalc', {
+          n: r.recalculated,
+          amount: r.total_penalty_amount.toFixed(2),
+        }),
       )
       void queryClient.invalidateQueries({
         queryKey: ['recouvrement', residenceId],
@@ -257,7 +260,7 @@ export function RecouvrementPage() {
               variant="outline"
               className="ml-2 border-blue-200 bg-blue-50 text-[10px] text-blue-700"
             >
-              Loi 18-00 · Art. 25
+              {t('common.loi1800Art25')}
             </Badge>
           </div>
 
@@ -466,7 +469,7 @@ export function RecouvrementPage() {
           tone="warning"
         />
         <Kpi
-          label="Risque prescription"
+          label={t('gestionnaire.recouvrement.riskPrescription')}
           value={`${criticalCount + highCount}`}
           icon={<ShieldAlert className="size-4" />}
           tone="danger"
@@ -555,7 +558,7 @@ export function RecouvrementPage() {
                           SEVERITY_META[r.severite].cls,
                         )}
                       >
-                        {SEVERITY_META[r.severite].label}
+                        {t(`gestionnaire.recouvrement.severity.${r.severite}`)}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -587,7 +590,9 @@ export function RecouvrementPage() {
                   {t('gestionnaire.recouvrement.age')}
                 </TableHead>
                 <TableHead>{t('common.status')}</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-right">
+                  {t('common.actions')}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

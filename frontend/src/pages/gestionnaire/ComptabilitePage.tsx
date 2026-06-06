@@ -1359,7 +1359,9 @@ function TabJournal({ exerciceId }: { exerciceId: number }) {
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
-          <Label className="text-xs text-muted-foreground">Du</Label>
+          <Label className="text-xs text-muted-foreground">
+            {t('common.du')}
+          </Label>
           <Input
             type="date"
             value={from}
@@ -1487,7 +1489,7 @@ function TabGrandLivre({ exerciceId }: { exerciceId: number }) {
     },
     {
       key: 'solde',
-      header: 'Solde',
+      header: t('common.solde'),
       sortable: true,
       renderCell: (r) => <MontantDisplay value={r.solde} colorize />,
     },
@@ -1564,7 +1566,7 @@ function TabGrandLivre({ exerciceId }: { exerciceId: number }) {
             columns={glColumns}
             rowKey="id"
             pageSize={15}
-            emptyTitle="Aucune écriture pour ce compte"
+            emptyTitle={t('gestionnaire.comptabilite.noEcritureCompte')}
           />
 
           {/* Footer */}
@@ -1640,31 +1642,31 @@ function TabBalance({
 
   const CLASSE_LABELS: Record<number, { label: string; color: string }> = {
     1: {
-      label: 'Classe 1 — Capitaux propres',
+      label: t(`gestionnaire.comptabilite.classes.1`),
       color: 'bg-purple-50 text-purple-700 border-purple-200',
     },
     2: {
-      label: 'Classe 2 — Immobilisations',
+      label: t(`gestionnaire.comptabilite.classes.2`),
       color: 'bg-blue-50 text-blue-700 border-blue-200',
     },
     3: {
-      label: 'Classe 3 — Créances actif circulant',
+      label: t(`gestionnaire.comptabilite.classes.3`),
       color: 'bg-cyan-50 text-cyan-700 border-cyan-200',
     },
     4: {
-      label: 'Classe 4 — Dettes passif circulant',
+      label: t(`gestionnaire.comptabilite.classes.4`),
       color: 'bg-amber-50 text-amber-700 border-amber-200',
     },
     5: {
-      label: 'Classe 5 — Trésorerie',
+      label: t(`gestionnaire.comptabilite.classes.5`),
       color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     },
     6: {
-      label: 'Classe 6 — Charges',
+      label: t(`gestionnaire.comptabilite.classes.6`),
       color: 'bg-orange-50 text-orange-700 border-orange-200',
     },
     7: {
-      label: 'Classe 7 — Produits',
+      label: t(`gestionnaire.comptabilite.classes.7`),
       color: 'bg-green-50 text-green-700 border-green-200',
     },
   }
@@ -1826,7 +1828,7 @@ function TabBalance({
                   <thead>
                     <tr className="border-b bg-muted/30">
                       <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">
-                        Compte
+                        {t('common.compte')}
                       </th>
                       <th className="px-4 py-2 text-left text-xs font-semibold text-muted-foreground">
                         {t('common.libelle')}
@@ -1838,10 +1840,10 @@ function TabBalance({
                         {t('common.credit')}
                       </th>
                       <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">
-                        Solde D
+                        {t('common.soldeD')}
                       </th>
                       <th className="px-4 py-2 text-right text-xs font-semibold text-muted-foreground">
-                        Solde C
+                        {t('common.soldeC')}
                       </th>
                     </tr>
                   </thead>
@@ -1998,7 +2000,7 @@ function TabDepenses({
     },
     {
       key: 'justificatif_path',
-      header: 'Pièce',
+      header: t('common.piece'),
       renderCell: (r) =>
         r.justificatif_path ? (
           <a

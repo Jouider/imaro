@@ -36,17 +36,17 @@ import {
 } from '@/services/conformite.service'
 
 const CATEGORIES: { value: AuditLogCategory; label: string }[] = [
-  { value: 'immeuble', label: 'Immeuble' },
-  { value: 'lot', label: 'Lot' },
-  { value: 'coproprietaire', label: 'Copropriétaire' },
-  { value: 'paiement', label: 'Paiement' },
-  { value: 'depense', label: 'Dépense' },
-  { value: 'budget', label: 'Budget' },
-  { value: 'ag', label: 'Assemblée' },
-  { value: 'document', label: 'Document' },
-  { value: 'user', label: 'Utilisateur' },
-  { value: 'auth', label: 'Authentification' },
-  { value: 'system', label: 'Système' },
+  { value: 'immeuble', label: 'immeuble' },
+  { value: 'lot', label: 'lot' },
+  { value: 'coproprietaire', label: 'coproprietaire' },
+  { value: 'paiement', label: 'paiement' },
+  { value: 'depense', label: 'depense' },
+  { value: 'budget', label: 'budget' },
+  { value: 'ag', label: 'ag' },
+  { value: 'document', label: 'document' },
+  { value: 'user', label: 'user' },
+  { value: 'auth', label: 'auth' },
+  { value: 'system', label: 'system' },
 ]
 
 const SEVERITY_STYLES: Record<AuditLogSeverity, string> = {
@@ -119,7 +119,7 @@ export function AuditTrailPage() {
         </div>
         <Button variant="outline" size="sm" className="gap-2">
           <Download className="size-4" />
-          Exporter CSV
+          {t('gestionnaire.audit.exportCsv')}
         </Button>
         <Button
           variant="outline"
@@ -149,13 +149,13 @@ export function AuditTrailPage() {
           tone="danger"
         />
         <Kpi
-          label="Actions sensibles"
+          label={t('gestionnaire.audit.sensitiveActions')}
           value={stats.sensitive}
           icon={<ShieldAlert className="size-4" />}
           tone="warning"
         />
         <Kpi
-          label="Taux d'erreur"
+          label={t('gestionnaire.audit.errorRate')}
           value={`${stats.error_rate.toFixed(1)}%`}
           icon={<Activity className="size-4" />}
           tone="muted"
@@ -186,7 +186,7 @@ export function AuditTrailPage() {
             </SelectItem>
             {CATEGORIES.map((c) => (
               <SelectItem key={c.value} value={c.value}>
-                {c.label}
+                {t(`gestionnaire.audit.categoryLabels.${c.value}`)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -219,7 +219,7 @@ export function AuditTrailPage() {
               <TableHead>Horodatage</TableHead>
               <TableHead>{t('common.severity')}</TableHead>
               <TableHead>{t('common.categorie')}</TableHead>
-              <TableHead>Action</TableHead>
+              <TableHead>{t('common.action')}</TableHead>
               <TableHead>{t('gestionnaire.audit.colBy')}</TableHead>
               <TableHead>Cible</TableHead>
               <TableHead className="text-right">
@@ -234,7 +234,7 @@ export function AuditTrailPage() {
                   colSpan={7}
                   className="text-center text-sm text-muted-foreground py-8"
                 >
-                  Chargement...
+                  {t('common.chargement')}
                 </TableCell>
               </TableRow>
             ) : logs.length === 0 ? (

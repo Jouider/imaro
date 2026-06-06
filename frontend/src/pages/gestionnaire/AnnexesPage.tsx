@@ -96,7 +96,7 @@ export function AnnexesPage() {
 
   const commonCtx = {
     residenceName,
-    exerciceLabel: `Exercice clos le 31 décembre ${exercice}`,
+    exerciceLabel: t('gestionnaire.annexes.exerciceClos', { year: exercice }),
     exercice,
     generatedAtIso: new Date().toISOString(),
   }
@@ -264,7 +264,7 @@ export function AnnexesPage() {
         // Annexes 3, 4, 5, 6, 7, 8, 9, 11, 12 — backend not ready yet
         await generateAnnexePdf(annexeNum, commonCtx)
       }
-      toast.success(`Annexe ${annexeNum} téléchargée`)
+      toast.success(t('gestionnaire.annexes.downloaded', { num: annexeNum }))
     } catch (err) {
       toast.error(
         err instanceof Error
@@ -319,7 +319,7 @@ export function AnnexesPage() {
           </SelectContent>
         </Select>
 
-        <label className="text-sm font-medium">Exercice</label>
+        <label className="text-sm font-medium">{t('common.exercice')}</label>
         <Select
           value={String(exercice)}
           onValueChange={(v) => setExercice(Number(v))}
@@ -354,7 +354,7 @@ export function AnnexesPage() {
       {/* Required annexes */}
       <section className="space-y-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Annexes obligatoires
+          {t('gestionnaire.annexes.obligatoires')}
         </h2>
         <div className="space-y-2">
           {required.map((a) => (

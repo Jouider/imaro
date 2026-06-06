@@ -181,7 +181,7 @@ export function AutresRecettesPage() {
           disabled={!residenceId}
         >
           <Plus className="size-4" />
-          Nouvelle recette
+          {t('gestionnaire.autres.newRecette')}
         </Button>
       </div>
 
@@ -202,7 +202,7 @@ export function AutresRecettesPage() {
             ))}
           </SelectContent>
         </Select>
-        <label className="text-sm font-medium">Exercice</label>
+        <label className="text-sm font-medium">{t('common.exercice')}</label>
         <Select
           value={String(exercice)}
           onValueChange={(v) => setExercice(Number(v))}
@@ -263,7 +263,9 @@ export function AutresRecettesPage() {
               <TableHead>{t('common.categorie')}</TableHead>
               <TableHead>Payeur</TableHead>
               <TableHead className="text-right">{t('common.amount')}</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-right">
+                {t('common.actions')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -273,7 +275,7 @@ export function AutresRecettesPage() {
                   colSpan={6}
                   className="py-8 text-center text-sm text-muted-foreground"
                 >
-                  Chargement…
+                  {t('common.chargement')}
                 </TableCell>
               </TableRow>
             ) : recettes.length === 0 ? (
