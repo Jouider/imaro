@@ -315,6 +315,41 @@ Le front redirige automatiquement vers `/gardien` quand le login renvoie
 `user.role === 'gardien'`. Vérifie côté backend que le rôle est bien
 renvoyé dans le payload `verify-otp` / `loginEmail`.
 
+## Phase 3 additions (branch `feat/frontend-portail-visiteurs`)
+
+Flow résident : depuis le portail, le copropriétaire invite un visiteur,
+reçoit son QR, et le partage par WhatsApp/SMS.
+
+### 13. `GET /api/portail/visites`
+
+**Auth** : `resident`. Retourne les visites créées par le résident
+authentifié (lit `user_id` du token), plus récente d'abord. Même shape
+que `/visites` standard.
+
+### 14. `POST /api/portail/visites`
+
+**Auth** : `resident`. Crée une visite en tant qu'hôte. Backend infère :
+- `residence_id` ← `user.residence_id`
+- `host_lot_id` ← `user.lot_id` (le résident peut avoir plusieurs lots ;
+  prendre le principal ou retourner un picker — TBD si pertinent)
+- `created_by_id` ← `user.id`
+
+Corps réduit (pas de `host_lot_id` ni `residence_id`) :
+
+```jsonc
+{
+  "visitor_name": "Ahmed Ouazzani",
+  "visitor_phone": "+212600112233",
+  "type": "visitor",
+  "purpose": "Visite familiale",
+  "planned_at": "2026-06-07T16:00:00Z"
+}
+// réponse : la Visite créée (status='planned' ou 'arrived' si walk-in)
+```
+
+Limite suggérée : 10 visites actives concurrentes par résident
+(anti-abus). Si dépassé, retourne 422 avec un message clair.
+
 ---
 
 Ping-moi pour ajuster les shapes ; le front bascule tout seul dès que tes

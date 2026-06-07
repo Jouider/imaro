@@ -8,6 +8,7 @@ import { PortailFinancesPage } from '@/pages/portail/PortailFinancesPage'
 import { PortailReclamationsPage } from '@/pages/portail/PortailReclamationsPage'
 import { PortailProfilPage } from '@/pages/portail/PortailProfilPage'
 import { PortailActualitesPage } from '@/pages/portail/PortailActualitesPage'
+import { PortailVisiteursPage } from '@/pages/portail/PortailVisiteursPage'
 import { PortailGuard } from './PortailGuard'
 import { GestionnaireGuard } from './GestionnaireGuard'
 import { GestionnaireLayout } from '@/layouts/GestionnaireLayout'
@@ -81,6 +82,7 @@ export const router = createBrowserRouter([
       { path: 'actualites', element: <PortailActualitesPage /> },
       { path: 'finances', element: <PortailFinancesPage /> },
       { path: 'reclamations', element: <PortailReclamationsPage /> },
+      { path: 'visiteurs', element: <PortailVisiteursPage /> },
       { path: 'profil', element: <PortailProfilPage /> },
     ],
   },

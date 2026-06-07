@@ -329,6 +329,55 @@ export async function walkInVisite(input: CreateVisiteInput): Promise<Visite> {
   )
 }
 
+/**
+ * Visits invited by the currently-authenticated resident. Backend reads the
+ * user from the token (no userId arg). Returns recent first.
+ */
+export async function getMyVisites(): Promise<Visite[]> {
+  return withMock(
+    async () =>
+      (await api.get<ApiEnvelope<Visite[]>>(`/portail/visites`)).data.data,
+    // Resident dev fallback: a couple of MOCK_VISITES they'd "own"
+    MOCK_VISITES.slice(0, 3),
+  )
+}
+
+/**
+ * Resident invites a visitor from the portal. Backend infers `residence_id`
+ * and `host_lot_id` from the authenticated user.
+ */
+export async function createMyVisite(input: {
+  visitor_name: string
+  visitor_phone: string
+  type: VisiteType
+  purpose?: string
+  planned_at?: string
+}): Promise<Visite> {
+  return withMock(
+    async () =>
+      (await api.post<ApiEnvelope<Visite>>(`/portail/visites`, input)).data
+        .data,
+    {
+      id: Math.floor(Math.random() * 10_000) + 300,
+      residence_id: 1,
+      qr_token: `vst_${Math.random().toString(36).slice(2, 14)}`,
+      visitor_name: input.visitor_name,
+      visitor_phone: input.visitor_phone,
+      type: input.type,
+      purpose: input.purpose ?? null,
+      host_lot_id: 1,
+      host_lot_numero: 'A-12',
+      host_name: 'Vous',
+      planned_at: input.planned_at ?? null,
+      arrived_at: null,
+      left_at: null,
+      status: 'planned',
+      created_by_name: 'Vous',
+      created_at: new Date().toISOString(),
+    },
+  )
+}
+
 /** Currently-inside list (visits with status='arrived'). Used by gardien home. */
 export async function getActiveVisites(): Promise<Visite[]> {
   return withMock(

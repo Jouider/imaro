@@ -233,22 +233,28 @@ export function PortailHomePage() {
         <ProchainPaiementCard prochain_appel={dashboard.prochain_appel} t={t} />
       )}
 
-      {/* Invite a visitor — informational card (full self-service flow comes in phase 2) */}
-      <Card className="overflow-hidden border-[var(--color-imaro-primary)]/15 bg-gradient-to-br from-[var(--color-imaro-primary)]/5 to-transparent">
-        <CardContent className="flex items-center gap-3 pt-4">
-          <div className="bg-gradient-imaro flex size-10 shrink-0 items-center justify-center rounded-xl text-white shadow-sm">
-            <ScanLine className="size-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-foreground">
-              {t('portail.home.inviteVisitor')}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {t('portail.home.inviteVisitorDesc')}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Invite a visitor — links to the dedicated invite/share page */}
+      <Link
+        to="/portail/visiteurs"
+        className="block transition-transform active:scale-[0.99]"
+      >
+        <Card className="overflow-hidden border-[var(--color-imaro-primary)]/15 bg-gradient-to-br from-[var(--color-imaro-primary)]/5 to-transparent">
+          <CardContent className="flex items-center gap-3 pt-4">
+            <div className="bg-gradient-imaro flex size-10 shrink-0 items-center justify-center rounded-xl text-white shadow-sm">
+              <ScanLine className="size-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-foreground">
+                {t('portail.home.inviteVisitor')}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {t('portail.home.inviteVisitorDesc')}
+              </p>
+            </div>
+            <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
+          </CardContent>
+        </Card>
+      </Link>
 
       {/* Assemblées section */}
       {upcomingAssemblees.length > 0 && (
