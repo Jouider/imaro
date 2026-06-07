@@ -1234,7 +1234,30 @@ Types valides : `ordinaire` | `extraordinaire`
 | Annonce publiée | WhatsApp push | Résidents de la résidence |
 
 > WhatsApp = priorité 1. SMS = fallback. Les envois sont toujours asynchrones via Laravel Horizon.
-> Twilio BSP — en attente d'approbation Meta. Actuellement simulé via `Log::info`.
+> Twilio BSP — compte actif, sender `+212704768521` online. Templates Meta en cours d'approbation.
+
+### Couche notifications (architecture interne)
+
+`NotificationManager` route chaque message vers une chaîne de providers définie
+dans `config/notifications.php` (fallback automatique), et logge chaque tentative
+dans `notifications_log` (`statut`: `envoye` | `echec` | `skipped`).
+
+**Méthodes :**
+- `send(NotificationMessage)` — synchrone, 1 canal, avec fallback.
+- `sendMany(iterable<NotificationMessage>)` — fan-out multi-canal (1 message pré-rendu par canal, car le corps diffère : SMS court, WhatsApp = template, Email long).
+- `queue()` / `queueMany()` — versions asynchrones via `SendNotificationJob` (Horizon).
+
+**Préférences utilisateur (`users.notification_prefs`, opt-out, défaut activé) :**
+catégories `paiement` | `ticket` | `assemblee` | `retard`. Si une catégorie est
+désactivée, le message portant `category: <cat>` est ignoré (`statut: skipped`, pas d'envoi).
+
+**Toujours envoyés malgré les prefs :**
+- Messages sans catégorie (`category: null`) — transactionnels/sécurité (OTP, onboarding).
+- Messages légaux avec `force: true` — mise en demeure (Art. 25), convocation AG (Art. 16quinquies).
+
+**WhatsApp hors fenêtre 24h :** obligatoirement un template Meta approuvé. Le caller
+passe le Content SID + variables via `meta: ['content_sid' => ..., 'content_variables' => [...]]`.
+SIDs résolus depuis `config('notifications.whatsapp_templates.<name>')`.
 
 ---
 

@@ -2,10 +2,10 @@
 
 namespace App\Notifications;
 
-use App\Contracts\Notifications\NotificationChannel;
 use App\Contracts\Notifications\NotificationMessage;
 use App\Contracts\Notifications\NotificationProvider;
 use App\Contracts\Notifications\NotificationResult;
+use App\Jobs\SendNotificationJob;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -40,6 +40,13 @@ class NotificationManager
 
     public function send(NotificationMessage $message): NotificationResult
     {
+        if ($message->category !== null && ! $message->force && $this->isMuted($message)) {
+            $result = NotificationResult::skipped('muted by prefs: '.$message->category);
+            $this->log($message, $result);
+
+            return $result;
+        }
+
         $chain = $this->chains[$message->channel->value] ?? [];
 
         if ($chain === []) {
@@ -68,6 +75,59 @@ class NotificationManager
         return $last ?? NotificationResult::fail('none', 'all providers failed');
     }
 
+    /**
+     * Fan a logical notification out across several pre-rendered messages
+     * (one per channel — bodies differ per channel: SMS is terse, WhatsApp is
+     * template-bound, Email is long). Each goes through send() so prefs +
+     * fallback + logging apply per channel.
+     *
+     * @param  iterable<NotificationMessage>  $messages
+     * @return array<string, NotificationResult>  keyed by channel value
+     */
+    public function sendMany(iterable $messages): array
+    {
+        $results = [];
+        foreach ($messages as $m) {
+            $results[$m->channel->value] = $this->send($m);
+        }
+
+        return $results;
+    }
+
+    /**
+     * Dispatch one message to the queue (Horizon). Heavy sends (PDF, bulk
+     * relances) must never run in the request cycle.
+     */
+    public function queue(NotificationMessage $message): void
+    {
+        SendNotificationJob::dispatch(
+            $message->to,
+            $message->channel,
+            $message->templateName,
+            $message->body,
+            $message->subject,
+            $message->meta,
+            $message->category,
+            $message->force,
+        );
+    }
+
+    /** @param  iterable<NotificationMessage>  $messages */
+    public function queueMany(iterable $messages): void
+    {
+        foreach ($messages as $m) {
+            $this->queue($m);
+        }
+    }
+
+    /** Opt-out model: a category is muted only when explicitly set to false. */
+    private function isMuted(NotificationMessage $m): bool
+    {
+        $prefs = $m->to->notification_prefs ?? [];
+
+        return ($prefs[$m->category] ?? true) === false;
+    }
+
     private function log(NotificationMessage $m, NotificationResult $r): void
     {
         DB::table('notifications_log')->insert([
@@ -76,7 +136,7 @@ class NotificationManager
             'canal'           => $m->channel->value,
             'template_name'   => $m->templateName,
             'content_preview' => mb_substr($m->body, 0, 200),
-            'statut'          => $r->success ? 'envoye' : 'echec',
+            'statut'          => $r->skipped ? 'skipped' : ($r->success ? 'envoye' : 'echec'),
             'meta_message_id' => $r->providerMessageId,
             'error_message'   => $r->error,
             'sent_at'         => $r->success ? now() : null,
