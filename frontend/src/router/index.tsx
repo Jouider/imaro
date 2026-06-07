@@ -32,6 +32,8 @@ import { AnnexesPage } from '@/pages/gestionnaire/AnnexesPage'
 import { ConformitePage } from '@/pages/gestionnaire/ConformitePage'
 import { RecouvrementPage } from '@/pages/gestionnaire/RecouvrementPage'
 import { RappelsPage } from '@/pages/gestionnaire/RappelsPage'
+import { VisitesPage } from '@/pages/gestionnaire/VisitesPage'
+import { VisitorPassPage } from '@/pages/public/VisitorPassPage'
 import { PointagePage } from '@/pages/gestionnaire/PointagePage'
 import { OccupantsPage } from '@/pages/gestionnaire/OccupantsPage'
 import { EquipementsPage } from '@/pages/gestionnaire/EquipementsPage'
@@ -47,6 +49,9 @@ export const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
   { path: '/login', element: <LoginPage /> },
   { path: '/reset-password', element: <ResetPasswordPage /> },
+
+  // ── Public visitor pass (no auth, scanned at the lobby) ──
+  { path: '/v/:token', element: <VisitorPassPage /> },
 
   // ── Portail copropriétaire ──────────────────────────────
   // /portail/login now redirects to the unified /login page
@@ -110,6 +115,7 @@ export const router = createBrowserRouter([
       { path: 'imports', element: <ImportsPage /> },
       { path: 'recouvrement', element: <RecouvrementPage /> },
       { path: 'rappels', element: <RappelsPage /> },
+      { path: 'visites', element: <VisitesPage /> },
       { path: 'pointage', element: <PointagePage /> },
       { path: 'occupants', element: <OccupantsPage /> },
       { path: 'equipements', element: <EquipementsPage /> },

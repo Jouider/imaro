@@ -200,7 +200,9 @@
       "noAssemblees": "Aucune assemblée prévue",
       "prochainPaiement": "Prochain paiement",
       "payer": "Payer →",
-      "convoquee": "Convoquée"
+      "convoquee": "Convoquée",
+      "inviteVisitor": "Inviter un visiteur",
+      "inviteVisitorDesc": "Générez un QR à usage unique pour un proche, un livreur ou un intervenant."
     },
     "actualites": {
       "title": "Actualités",
@@ -1042,7 +1044,8 @@
       "sectionAdministration": "Administration",
       "utilisateurs": "Utilisateurs",
       "personnel": "Personnel",
-      "rappels": "Rappels"
+      "rappels": "Rappels",
+      "visites": "Visites"
     },
     "residences": {
       "title": "Résidences",
@@ -2660,6 +2663,98 @@
       "colDate": "Date",
       "colType": "Type",
       "colStatus": "Statut"
+    },
+    "visites": {
+      "title": "Visites",
+      "subtitle": "Suivi des visiteurs, livreurs et prestataires via QR code à usage unique",
+      "newVisite": "Nouvelle visite",
+      "scanQr": "Scanner un QR",
+      "kpiToday": "Visites aujourd'hui",
+      "kpiInside": "Actuellement à l'intérieur",
+      "kpiPlanned": "À venir",
+      "kpiExpired": "Expirées (24h)",
+      "selectResidence": "Sélectionner une résidence",
+      "allResidences": "Toutes les résidences",
+      "filterStatus": "Statut",
+      "filterType": "Type",
+      "filterAll": "Tous",
+      "type": {
+        "visitor": "Visiteur",
+        "delivery": "Livraison",
+        "contractor": "Intervenant",
+        "prestataire": "Prestataire"
+      },
+      "status": {
+        "planned": "Planifiée",
+        "arrived": "À l'intérieur",
+        "departed": "Sortie",
+        "expired": "Expirée",
+        "cancelled": "Annulée"
+      },
+      "colVisitor": "Visiteur",
+      "colType": "Type",
+      "colHost": "Hôte",
+      "colPlanned": "Prévue",
+      "colArrived": "Entrée",
+      "colLeft": "Sortie",
+      "colStatus": "Statut",
+      "colActions": "Actions",
+      "empty": "Aucune visite enregistrée",
+      "emptyDesc": "Créez une nouvelle visite pour générer un QR code à transmettre au visiteur.",
+      "form": {
+        "title": "Nouvelle visite",
+        "desc": "Génère un QR code à usage unique. Le visiteur reçoit un lien à scanner à l'entrée.",
+        "visitorName": "Nom du visiteur",
+        "visitorNamePlaceholder": "Ex: Ahmed Ouazzani",
+        "visitorPhone": "Téléphone",
+        "phonePlaceholder": "+212 6XX XX XX XX",
+        "type": "Type de visite",
+        "purpose": "Motif",
+        "purposePlaceholder": "Ex: Visite familiale, livraison Glovo, intervention plombier",
+        "host": "Lot hôte (optionnel)",
+        "hostPlaceholder": "Sélectionner un lot",
+        "plannedAt": "Date et heure prévues",
+        "plannedAtHint": "Laisser vide pour une visite immédiate (walk-in)",
+        "submit": "Créer & générer QR",
+        "submitting": "Création…",
+        "validationName": "Nom requis",
+        "validationPhone": "Téléphone requis"
+      },
+      "detail": {
+        "title": "Détail de la visite",
+        "qrLabel": "QR de la visite",
+        "qrHint": "À scanner par le gardien à l'entrée / sortie",
+        "linkLabel": "Lien public",
+        "linkCopied": "Lien copié",
+        "copyLink": "Copier le lien",
+        "shareWa": "Partager par WhatsApp",
+        "shareSms": "Partager par SMS",
+        "waMessage": "Bonjour {{name}}, votre laissez-passer Imaro est prêt : {{url}}",
+        "createdBy": "Créé par {{name}}",
+        "createdOn": "Créé le {{date}}",
+        "cancel": "Annuler la visite",
+        "cancelConfirm": "Annuler cette visite ?",
+        "cancelled": "Visite annulée",
+        "scanCheckIn": "Marquer entrée",
+        "scanCheckOut": "Marquer sortie",
+        "alreadyCheckedIn": "Entrée déjà enregistrée",
+        "alreadyCheckedOut": "Visite terminée"
+      },
+      "scan": {
+        "title": "Scanner le QR",
+        "desc": "Placez le QR du visiteur devant la caméra ou collez le token manuellement.",
+        "manualToken": "Token QR",
+        "manualPlaceholder": "vst_xxxxxxxxxxx",
+        "manualSubmit": "Valider le scan",
+        "cameraDenied": "Accès caméra refusé. Saisissez le token manuellement.",
+        "cameraNotSupported": "Caméra non disponible sur cet appareil.",
+        "successCheckIn": "{{name}} a été enregistré(e) à l'entrée",
+        "successCheckOut": "Sortie de {{name}} enregistrée",
+        "rejected": "QR invalide ou expiré"
+      },
+      "create": {
+        "success": "Visite créée — QR généré"
+      }
     }
   },
   "onboarding": {
@@ -2840,5 +2935,27 @@
     "initial": "Initial",
     "organisme": "Organisme",
     "mensualite": "Mensualité"
+  },
+  "public": {
+    "visitorPass": {
+      "title": "Laissez-passer visiteur",
+      "subtitle": "Imaro · accès copropriété",
+      "showAtEntrance": "Présentez ce QR à l'entrée",
+      "scanByGuardian": "Le gardien le scanne à votre arrivée et à votre départ",
+      "visitor": "Visiteur",
+      "host": "Hôte",
+      "scheduled": "Prévue",
+      "purpose": "Motif",
+      "expiresAfterScan": "Code à usage unique — expire après le scan de sortie",
+      "notFound": "Laissez-passer introuvable",
+      "notFoundDesc": "Ce lien est invalide, déjà utilisé ou expiré.",
+      "saveToPhone": "Enregistrer ce QR",
+      "contactHost": "Contacter l'hôte",
+      "statusPlanned": "En attente d'arrivée",
+      "statusArrived": "Entré · en cours de visite",
+      "statusDeparted": "Visite terminée",
+      "statusExpired": "Lien expiré",
+      "statusCancelled": "Visite annulée"
+    }
   }
 }

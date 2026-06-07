@@ -200,7 +200,9 @@
       "noAssemblees": "لا توجد جمعيات مبرمجة",
       "prochainPaiement": "الدفعة القادمة",
       "payer": "الدفع ←",
-      "convoquee": "مُستدعى"
+      "convoquee": "مُستدعى",
+      "inviteVisitor": "دعوة زائر",
+      "inviteVisitorDesc": "ولّد رمز QR لاستعمال واحد لشخص مُقرَّب، مُوصِّل أو مُتدخِّل."
     },
     "actualites": {
       "title": "الأخبار",
@@ -1042,7 +1044,8 @@
       "sectionAdministration": "الإدارة",
       "utilisateurs": "المستخدمون",
       "personnel": "الموظفون",
-      "rappels": "التذكيرات"
+      "rappels": "التذكيرات",
+      "visites": "الزيارات"
     },
     "residences": {
       "title": "الإقامات",
@@ -2660,6 +2663,98 @@
       "colDate": "التاريخ",
       "colType": "النوع",
       "colStatus": "الحالة"
+    },
+    "visites": {
+      "title": "الزيارات",
+      "subtitle": "متابعة الزوار، المُوصِّلين والمُقدِّمين عبر رمز QR لاستعمال واحد",
+      "newVisite": "زيارة جديدة",
+      "scanQr": "مسح رمز QR",
+      "kpiToday": "زيارات اليوم",
+      "kpiInside": "حاليًا بالداخل",
+      "kpiPlanned": "قادمة",
+      "kpiExpired": "منتهية (24س)",
+      "selectResidence": "اختر إقامة",
+      "allResidences": "كل الإقامات",
+      "filterStatus": "الحالة",
+      "filterType": "النوع",
+      "filterAll": "الكل",
+      "type": {
+        "visitor": "زائر",
+        "delivery": "توصيل",
+        "contractor": "مُتدخِّل",
+        "prestataire": "مُقدِّم خدمة"
+      },
+      "status": {
+        "planned": "مبرمجة",
+        "arrived": "بالداخل",
+        "departed": "خرج",
+        "expired": "منتهية",
+        "cancelled": "ملغاة"
+      },
+      "colVisitor": "الزائر",
+      "colType": "النوع",
+      "colHost": "المُضيف",
+      "colPlanned": "مُخطَّطة",
+      "colArrived": "الدخول",
+      "colLeft": "الخروج",
+      "colStatus": "الحالة",
+      "colActions": "الإجراءات",
+      "empty": "لا توجد زيارة مسجلة",
+      "emptyDesc": "أنشئ زيارة جديدة لتوليد رمز QR يُرسَل إلى الزائر.",
+      "form": {
+        "title": "زيارة جديدة",
+        "desc": "يُولِّد رمز QR لاستعمال واحد. يتلقى الزائر رابطًا لمسحه عند المدخل.",
+        "visitorName": "اسم الزائر",
+        "visitorNamePlaceholder": "مثال: أحمد الوزاني",
+        "visitorPhone": "الهاتف",
+        "phonePlaceholder": "+212 6XX XX XX XX",
+        "type": "نوع الزيارة",
+        "purpose": "السبب",
+        "purposePlaceholder": "مثال: زيارة عائلية، توصيل Glovo، تدخل سبّاك",
+        "host": "الوحدة المُضيفة (اختياري)",
+        "hostPlaceholder": "اختر وحدة",
+        "plannedAt": "التاريخ والوقت المتوقعان",
+        "plannedAtHint": "اتركه فارغًا لزيارة فورية (walk-in)",
+        "submit": "إنشاء وتوليد QR",
+        "submitting": "جارٍ الإنشاء…",
+        "validationName": "الاسم مطلوب",
+        "validationPhone": "الهاتف مطلوب"
+      },
+      "detail": {
+        "title": "تفاصيل الزيارة",
+        "qrLabel": "رمز QR للزيارة",
+        "qrHint": "يقوم الحارس بمسحه عند الدخول / الخروج",
+        "linkLabel": "الرابط العام",
+        "linkCopied": "تم نسخ الرابط",
+        "copyLink": "نسخ الرابط",
+        "shareWa": "المشاركة عبر واتساب",
+        "shareSms": "المشاركة عبر SMS",
+        "waMessage": "مرحبًا {{name}}، بطاقة دخول Imaro جاهزة: {{url}}",
+        "createdBy": "أنشئ من طرف {{name}}",
+        "createdOn": "أنشئ بتاريخ {{date}}",
+        "cancel": "إلغاء الزيارة",
+        "cancelConfirm": "إلغاء هذه الزيارة؟",
+        "cancelled": "تم إلغاء الزيارة",
+        "scanCheckIn": "تسجيل الدخول",
+        "scanCheckOut": "تسجيل الخروج",
+        "alreadyCheckedIn": "الدخول مسجل سلفًا",
+        "alreadyCheckedOut": "الزيارة منتهية"
+      },
+      "scan": {
+        "title": "مسح رمز QR",
+        "desc": "ضع رمز QR للزائر أمام الكاميرا أو الصق الرمز يدويًا.",
+        "manualToken": "رمز QR",
+        "manualPlaceholder": "vst_xxxxxxxxxxx",
+        "manualSubmit": "تأكيد المسح",
+        "cameraDenied": "تم رفض الوصول إلى الكاميرا. أدخل الرمز يدويًا.",
+        "cameraNotSupported": "الكاميرا غير متوفرة على هذا الجهاز.",
+        "successCheckIn": "تم تسجيل دخول {{name}}",
+        "successCheckOut": "تم تسجيل خروج {{name}}",
+        "rejected": "رمز QR غير صالح أو منتهي"
+      },
+      "create": {
+        "success": "تم إنشاء الزيارة — تم توليد QR"
+      }
     }
   },
   "onboarding": {
@@ -2840,5 +2935,27 @@
     "initial": "الأولي",
     "organisme": "الجهة",
     "mensualite": "القسط الشهري"
+  },
+  "public": {
+    "visitorPass": {
+      "title": "بطاقة دخول الزائر",
+      "subtitle": "Imaro · ولوج الملكية المشتركة",
+      "showAtEntrance": "اعرض هذا الرمز عند المدخل",
+      "scanByGuardian": "يقوم الحارس بمسحه عند الوصول والمغادرة",
+      "visitor": "الزائر",
+      "host": "المُضيف",
+      "scheduled": "المُخطَّطة",
+      "purpose": "السبب",
+      "expiresAfterScan": "رمز ذو استعمال واحد — ينتهي بعد مسح الخروج",
+      "notFound": "البطاقة غير موجودة",
+      "notFoundDesc": "هذا الرابط غير صالح، أو مُستعمَل سلفًا أو منتهي الصلاحية.",
+      "saveToPhone": "حفظ هذا الرمز",
+      "contactHost": "التواصل مع المُضيف",
+      "statusPlanned": "في انتظار الوصول",
+      "statusArrived": "داخل · زيارة جارية",
+      "statusDeparted": "الزيارة انتهت",
+      "statusExpired": "الرابط منتهي",
+      "statusCancelled": "الزيارة ملغاة"
+    }
   }
 }

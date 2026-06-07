@@ -27,6 +27,7 @@ import {
   ClipboardCheck,
   Activity,
   BellRing,
+  ScanLine,
   ShieldCheck,
   LogOut,
   Menu,
@@ -219,6 +220,11 @@ const NAV_SECTIONS: NavSection[] = [
   {
     labelKey: 'gestionnaire.nav.sectionOperations',
     items: [
+      {
+        to: '/gestionnaire/visites',
+        icon: <ScanLine className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.visites',
+      },
       {
         to: '/gestionnaire/tickets',
         icon: <Wrench className="size-[18px]" aria-hidden="true" />,
