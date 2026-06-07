@@ -2718,7 +2718,11 @@
         "submit": "إنشاء وتوليد QR",
         "submitting": "جارٍ الإنشاء…",
         "validationName": "الاسم مطلوب",
-        "validationPhone": "الهاتف مطلوب"
+        "validationPhone": "الهاتف مطلوب",
+        "recurring": "بطاقة متكررة (مزود منتظم)",
+        "recurringHint": "رمز QR قابل لإعادة الاستعمال — لمزود يعود بانتظام (تنظيف أسبوعي، بستاني، إلخ.)",
+        "recurrence": "الدورية",
+        "recurrencePlaceholder": "الثلاثاء والجمعة · 9ص-12ظ"
       },
       "detail": {
         "title": "تفاصيل الزيارة",
@@ -2738,7 +2742,10 @@
         "scanCheckIn": "تسجيل الدخول",
         "scanCheckOut": "تسجيل الخروج",
         "alreadyCheckedIn": "الدخول مسجل سلفًا",
-        "alreadyCheckedOut": "الزيارة منتهية"
+        "alreadyCheckedOut": "الزيارة منتهية",
+        "recurringBadge": "بطاقة متكررة",
+        "recurrenceLabel": "الدورية",
+        "photoCaptured": "تم التقاط صورة عند الدخول"
       },
       "scan": {
         "title": "مسح رمز QR",
@@ -2955,7 +2962,10 @@
       "statusArrived": "داخل · زيارة جارية",
       "statusDeparted": "الزيارة انتهت",
       "statusExpired": "الرابط منتهي",
-      "statusCancelled": "الزيارة ملغاة"
+      "statusCancelled": "الزيارة ملغاة",
+      "addToAppleWallet": "إضافة إلى Apple Wallet",
+      "addToGoogleWallet": "إضافة إلى Google Wallet",
+      "recurringPass": "بطاقة متكررة"
     }
   },
   "gardien": {
@@ -2998,6 +3008,24 @@
       "notLoggedIn": "سجّل الدخول للوصول إلى وضع الحارس",
       "goToLogin": "الانتقال إلى تسجيل الدخول",
       "wrongRole": "حسابك لا يملك دور الحارس. اتصل بالمُسيّر."
+    },
+    "photo": {
+      "title": "صورة الزائر",
+      "desc": "التقط صورة للتدقيق الأمني (موصى به).",
+      "capture": "التقاط الصورة",
+      "retake": "إعادة",
+      "skip": "تجاوز",
+      "confirm": "تأكيد الدخول",
+      "starting": "تشغيل الكاميرا…",
+      "permissionDenied": "رُفضت الكاميرا — تم تجاوز الصورة",
+      "uploaded": "تم حفظ الصورة",
+      "skipped": "تم تسجيل الدخول دون صورة"
+    },
+    "install": {
+      "title": "تثبيت Imaro الحارس",
+      "desc": "أضف إلى الشاشة الرئيسية للوصول السريع وحتى دون اتصال.",
+      "install": "تثبيت",
+      "later": "لاحقًا"
     }
   }
 }

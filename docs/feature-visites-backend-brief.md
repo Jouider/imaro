@@ -259,6 +259,62 @@ automatiquement les rôles `gardien` vers `/gardien` (à ajouter dans
 Le front peut suggérer "ajouter à l'écran d'accueil" sur `/gardien` —
 utile pour les tablettes de lobby. Pas de besoin d'endpoint.
 
+## Phase 2.B additions (branch `feat/frontend-visites-wallet-photo`)
+
+Trois nouveautés frontend qui s'appuient sur des endpoints / champs
+backend additionnels :
+
+### 10. `POST /api/visites/{id}/photo`
+
+**Auth** : `gardien`, `gestionnaire`, `manager`. Stocke une photo capturée
+au check-in (anti-spoofing). Corps :
+
+```jsonc
+{ "photo": "data:image/jpeg;base64,/9j/4AAQ..." }   // ~30-150 kB JPEG
+```
+
+Réponse : la `Visite` à jour avec `photo_url` rempli. Storage suggéré :
+disk S3-like avec URL publique courte (signed link 7 jours suffit).
+Limite payload côté backend (ex. 500 kB max).
+
+### 11. `GET /api/public/visites/{token}/wallet` ⚠️ **PUBLIC**
+
+Retourne deux URLs (Apple `.pkpass` + Google Wallet JWT) que le front
+ouvre depuis la page visiteur. Pas d'auth.
+
+```jsonc
+{
+  "apple_url":  "https://app.imaro.ma/api/public/visites/{token}/apple.pkpass",
+  "google_url": "https://pay.google.com/gp/v/save/<google-wallet-JWT>"
+}
+```
+
+Cèoté backend : besoin d'une cert Apple Wallet (Apple Developer Program,
+~$99/an, certs `pass.com.imaro.visit`) + un service account Google Wallet
++ classe wallet définie une fois pour toutes. Si pas prio MVP, retourner
+404 — le front n'affichera simplement pas les boutons.
+
+### 12. Nouveaux champs sur la table `visites`
+
+```
+visites
+  ...
+  photo_url     string nullable       -- public URL après upload
+  is_recurring  boolean default false  -- pass réutilisable (prestataire récurrent)
+  recurrence    string nullable        -- libellé humain (ex. "Mardi 9h-12h")
+```
+
+**Impact sur la logique scan** : si `is_recurring=true`, ne pas
+expirer après check-out. Le QR reste valide indéfiniment. Idéalement
+ajouter un champ `valid_until` (date d'expiration de contrat) — pas
+fait côté front pour l'instant.
+
+### Redirection login `gardien`
+
+Le front redirige automatiquement vers `/gardien` quand le login renvoie
+`user.role === 'gardien'`. Vérifie côté backend que le rôle est bien
+renvoyé dans le payload `verify-otp` / `loginEmail`.
+
 ---
 
 Ping-moi pour ajuster les shapes ; le front bascule tout seul dès que tes

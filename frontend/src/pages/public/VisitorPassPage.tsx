@@ -13,6 +13,8 @@ import {
   Calendar,
   MessageSquare,
   ShieldAlert,
+  Wallet,
+  Repeat2,
 } from 'lucide-react'
 import { Wordmark } from '@/components/Wordmark'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
@@ -21,6 +23,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import {
   getVisitePublic,
+  getWalletLinks,
   type Visite,
   type VisiteStatus,
 } from '@/services/visites.service'
@@ -120,6 +123,17 @@ function Pass({
   const status = STATUS_META[visit.status]
   const StatusIcon = status.icon
 
+  // Wallet links — lazy fetch only when the visit is still actionable
+  const walletQ = useQuery({
+    queryKey: ['wallet-links', visit.qr_token],
+    queryFn: () => getWalletLinks(visit.qr_token),
+    enabled:
+      visit.status === 'planned' ||
+      visit.status === 'arrived' ||
+      !!visit.is_recurring,
+    staleTime: 5 * 60_000,
+  })
+
   return (
     <div
       className="min-h-screen p-4 sm:p-6"
@@ -156,6 +170,17 @@ function Pass({
           <StatusIcon className="size-4" />
           {t(status.key)}
         </Badge>
+
+        {/* Recurring pass badge */}
+        {visit.is_recurring && (
+          <div className="flex items-center justify-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-medium text-white backdrop-blur">
+            <Repeat2 className="size-3.5" />
+            {t('public.visitorPass.recurringPass')}
+            {visit.recurrence && (
+              <span className="text-white/70">· {visit.recurrence}</span>
+            )}
+          </div>
+        )}
 
         {/* QR card */}
         <div className="rounded-2xl bg-white p-5 shadow-xl">
@@ -212,6 +237,36 @@ function Pass({
             />
           )}
         </div>
+
+        {/* Wallet buttons */}
+        {walletQ.data && (
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              asChild
+              variant="outline"
+              className="w-full bg-black text-white hover:bg-black/90 hover:text-white"
+            >
+              <a href={walletQ.data.apple_url} target="_blank" rel="noreferrer">
+                <Wallet className="me-1.5 size-4" />
+                {t('public.visitorPass.addToAppleWallet')}
+              </a>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="w-full bg-white/90 backdrop-blur hover:bg-white"
+            >
+              <a
+                href={walletQ.data.google_url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Wallet className="me-1.5 size-4" />
+                {t('public.visitorPass.addToGoogleWallet')}
+              </a>
+            </Button>
+          </div>
+        )}
 
         {/* Actions */}
         {visit.host_name && (

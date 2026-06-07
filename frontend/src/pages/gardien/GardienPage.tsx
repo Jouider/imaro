@@ -13,18 +13,23 @@ import {
   ArrowRight,
   Building2,
   Clock,
+  Download,
+  Camera,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Wordmark } from '@/components/Wordmark'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { QrScanner } from '@/components/shared/QrScanner'
+import { PhotoCapture } from '@/components/shared/PhotoCapture'
 import { useAuthStore } from '@/stores/authStore'
 import { setStoredToken } from '@/lib/axios'
 import { logout } from '@/services/auth.service'
+import { useInstallPromptGardien } from '@/hooks/useInstallPromptGardien'
 import {
   getActiveVisites,
   scanVisite,
+  uploadVisitePhoto,
   type ScanResult,
 } from '@/services/visites.service'
 import { cn } from '@/lib/utils'
@@ -36,6 +41,7 @@ type ViewState =
   | { kind: 'scan' }
   | { kind: 'walk-in' }
   | { kind: 'manual' }
+  | { kind: 'photo'; result: ScanResult }
   | { kind: 'result'; result: ScanResult }
 
 const sinceFmt = new Intl.RelativeTimeFormat('fr-MA', { numeric: 'auto' })
@@ -61,10 +67,25 @@ export function GardienPage() {
   })
   const active = activeQ.data ?? []
 
+  const install = useInstallPromptGardien()
+
+  const photoUploadMut = useMutation({
+    mutationFn: ({ id, dataUrl }: { id: number; dataUrl: string }) =>
+      uploadVisitePhoto(id, dataUrl),
+    onSuccess: () => {
+      toast.success(t('gardien.photo.uploaded'))
+    },
+  })
+
   const scanMut = useMutation({
     mutationFn: (token: string) => scanVisite(extractToken(token)),
     onSuccess: (res) => {
-      setView({ kind: 'result', result: res })
+      // On check-in we prompt for a photo; on check-out / rejected we skip.
+      if (res.action === 'check_in') {
+        setView({ kind: 'photo', result: res })
+      } else {
+        setView({ kind: 'result', result: res })
+      }
       void qc.invalidateQueries({ queryKey: ['gardien-active'] })
     },
     onError: () => {
@@ -257,12 +278,78 @@ export function GardienPage() {
           </div>
         )}
 
+        {view.kind === 'photo' && (
+          <div className="rounded-2xl bg-white/95 p-5 text-foreground shadow-2xl dark:bg-card">
+            <div className="mb-3 text-center">
+              <h2 className="font-display text-xl">
+                {t('gardien.photo.title')}
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {t('gardien.photo.desc')}
+              </p>
+              <p className="mt-2 text-sm font-semibold">
+                → {view.result.visit.visitor_name}
+              </p>
+            </div>
+            <PhotoCapture
+              onCapture={(dataUrl) => {
+                photoUploadMut.mutate({
+                  id: view.result.visit.id,
+                  dataUrl,
+                })
+                setView({ kind: 'result', result: view.result })
+              }}
+              onSkip={() => {
+                toast.info(t('gardien.photo.skipped'))
+                setView({ kind: 'result', result: view.result })
+              }}
+              onCancel={() => setView({ kind: 'home' })}
+            />
+          </div>
+        )}
+
         {view.kind === 'result' && (
           <ResultPanel
             result={view.result}
             onNewScan={() => setView({ kind: 'scan' })}
             onHome={() => setView({ kind: 'home' })}
           />
+        )}
+
+        {/* Install banner — only on Chrome/Edge/Samsung where the
+            beforeinstallprompt event fired, only on the home view. */}
+        {install.available && view.kind === 'home' && (
+          <div className="flex items-start gap-3 rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/20">
+              <Camera className="size-4" />
+            </div>
+            <div className="flex-1 text-xs">
+              <p className="font-semibold text-white">
+                {t('gardien.install.title')}
+              </p>
+              <p className="mt-0.5 text-white/70">
+                {t('gardien.install.desc')}
+              </p>
+              <div className="mt-2 flex gap-2">
+                <Button
+                  size="sm"
+                  className="h-8 gap-1.5 bg-white text-[var(--color-imaro-primary)] hover:bg-white/90"
+                  onClick={() => void install.promptInstall()}
+                >
+                  <Download className="size-3.5" />
+                  {t('gardien.install.install')}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 text-white/70 hover:bg-white/10 hover:text-white"
+                  onClick={install.dismiss}
+                >
+                  {t('gardien.install.later')}
+                </Button>
+              </div>
+            </div>
+          </div>
         )}
       </main>
 
