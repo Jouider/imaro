@@ -8,6 +8,7 @@ export type UserRole =
   | 'agent_recouvrement'
   | 'conseil'
   | 'resident'
+  | 'gardien'
 
 export type AuthUser = {
   id: number

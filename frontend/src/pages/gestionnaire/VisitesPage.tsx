@@ -24,6 +24,7 @@ import {
 import { PageHeader } from '@/components/shared/PageHeader'
 import { KpiCard } from '@/components/shared/KpiCard'
 import { DataTable, type Column } from '@/components/shared/DataTable'
+import { QrScanner } from '@/components/shared/QrScanner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -949,13 +950,19 @@ function ScanDialog({
         </DialogHeader>
 
         <div className="space-y-3 py-2">
-          {/* Camera placeholder (Phase 2 — real webcam) */}
-          <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed bg-muted/30 p-8 text-center">
-            <ScanLine className="size-10 text-muted-foreground/60" />
-            <p className="text-xs text-muted-foreground">
-              {t('gestionnaire.visites.scan.cameraNotSupported')}
-            </p>
-          </div>
+          {/* Real webcam scanner — falls back to manual entry on no-camera/deny */}
+          {open && (
+            <QrScanner
+              onDecode={(text) => {
+                if (mut.isPending) return
+                // Accept full URL or raw token
+                const m = text.trim().match(/\/v\/([\w-]+)$/)
+                mut.mutate(m?.[1] ?? text.trim())
+              }}
+              paused={mut.isPending}
+              className="max-h-[60vh]"
+            />
+          )}
 
           <div className="space-y-1.5">
             <Label htmlFor="manual-token">

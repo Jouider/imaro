@@ -279,6 +279,46 @@ export async function scanVisite(token: string): Promise<ScanResult> {
   )
 }
 
+/**
+ * Walk-in flow — gardien at the lobby records a visitor on the spot.
+ * Creates the visit AND immediately marks it as arrived in one round-trip.
+ */
+export async function walkInVisite(input: CreateVisiteInput): Promise<Visite> {
+  return withMock(
+    async () =>
+      (await api.post<ApiEnvelope<Visite>>(`/visites/walk-in`, input)).data
+        .data,
+    {
+      id: Math.floor(Math.random() * 10_000) + 200,
+      residence_id: input.residence_id,
+      qr_token: `vst_${Math.random().toString(36).slice(2, 14)}`,
+      visitor_name: input.visitor_name,
+      visitor_phone: input.visitor_phone,
+      type: input.type,
+      purpose: input.purpose ?? null,
+      host_lot_id: input.host_lot_id ?? null,
+      host_lot_numero: null,
+      host_name: null,
+      planned_at: null,
+      arrived_at: new Date().toISOString(),
+      left_at: null,
+      status: 'arrived',
+      created_by_name: 'Gardien lobby',
+      created_at: new Date().toISOString(),
+    },
+  )
+}
+
+/** Currently-inside list (visits with status='arrived'). Used by gardien home. */
+export async function getActiveVisites(): Promise<Visite[]> {
+  return withMock(
+    async () =>
+      (await api.get<ApiEnvelope<Visite[]>>(`/gardien/visites/active`)).data
+        .data,
+    MOCK_VISITES.filter((v) => v.status === 'arrived'),
+  )
+}
+
 /** Public lookup by token — used by /v/:token visitor pass page. No auth. */
 export async function getVisitePublic(token: string): Promise<Visite | null> {
   return withMock(
