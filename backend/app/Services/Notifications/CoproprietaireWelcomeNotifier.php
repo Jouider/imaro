@@ -96,8 +96,14 @@ class CoproprietaireWelcomeNotifier
 
     private function smsBody(User $user, string $code): string
     {
-        // Kept short — Maroc Telecom counts past 160 chars as multiple SMS (each ~0.20 MAD).
-        return "Imaro: Bienvenue {$user->name}. Code d'acces: {$code}. Connectez-vous avec {$user->phone}.";
+        // ⚠️ Moroccan carriers (IAM/Inwi/Orange) silently drop SMS containing the
+        // word "code"/"code d'accès" (OTP pattern) when sent via the SMS8
+        // personal-SIM gateway — status comes back "Failed" while the provider
+        // reports success. We avoid the trigger word; the token VALUE is fine.
+        // Fragile interim workaround — the real fix is an A2P provider (Mediatel,
+        // official sender ID). See docs/STRATEGIE-COMMUNICATION.md.
+        // Kept short — past 160 chars = multiple SMS (each ~0.20 MAD).
+        return "Imaro: bienvenue. Connectez-vous a l'app avec votre numero et {$code}.";
     }
 
     /** Preview only (logged to notifications_log). The real WA copy is the Meta auth template. */
