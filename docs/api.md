@@ -1240,12 +1240,21 @@ Types valides : `ordinaire` | `extraordinaire`
 
 `NotificationManager` route chaque message vers une chaîne de providers définie
 dans `config/notifications.php` (fallback automatique), et logge chaque tentative
-dans `notifications_log` (`statut`: `envoye` | `echec` | `skipped`).
+dans `notifications_log` (`statut`: `envoye` | `en_attente` | `livre` | `echec` | `skipped`).
+
+**Confirmation de livraison :** un envoi seulement *accepté* par la passerelle
+(ex. SMS8 SIM perso — l'opérateur peut le droper en silence) est loggé
+`en_attente` (pas `envoye`) ; un webhook de delivery le passera à `livre`/`echec`.
+Un succès **non confirmé n'arrête pas une cascade** (voir `sendCascade`).
 
 **Méthodes :**
 - `send(NotificationMessage)` — synchrone, 1 canal, avec fallback.
 - `sendMany(iterable<NotificationMessage>)` — fan-out multi-canal (1 message pré-rendu par canal, car le corps diffère : SMS court, WhatsApp = template, Email long).
+- `sendCascade(iterable<NotificationMessage>)` — priorité, **stop au 1er succès CONFIRMÉ** (onboarding : SMS → WhatsApp → Email).
 - `queue()` / `queueMany()` — versions asynchrones via `SendNotificationJob` (Horizon).
+
+**Templates WhatsApp :** créés/soumis à Meta de façon reproductible —
+`php artisan imaro:wa-auth-template` (template AUTHENTICATION code d'accès).
 
 **Préférences utilisateur (`users.notification_prefs`, opt-out, défaut activé) :**
 catégories `paiement` | `ticket` | `assemblee` | `retard`. Si une catégorie est

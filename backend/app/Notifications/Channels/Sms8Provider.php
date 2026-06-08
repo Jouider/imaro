@@ -79,7 +79,11 @@ class Sms8Provider implements NotificationProvider
                 ?? $body['data']['ID']
                 ?? null;
 
-            return NotificationResult::ok($this->name(), $id);
+            // SMS8 only confirms ACCEPTANCE here — the personal-SIM gateway may
+            // still hit a carrier "Failed" later (esp. Moroccan A2P filtering).
+            // Mark unconfirmed so the cascade doesn't stop on a false success;
+            // a delivery webhook flips notifications_log to livre/echec.
+            return NotificationResult::accepted($this->name(), $id);
         } catch (Throwable $e) {
             return NotificationResult::fail($this->name(), $e->getMessage());
         }
