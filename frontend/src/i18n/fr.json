@@ -1749,7 +1749,9 @@
         "residence": "Résidence (optionnel)",
         "date": "Date",
         "file": "Fichier",
-        "nomPlaceholder": "Ex: Règlement de copropriété 2026"
+        "nomPlaceholder": "Ex: Règlement de copropriété 2026",
+        "customCategory": "Catégorie personnalisée",
+        "customCategoryPlaceholder": "Ex: Manuel, Plan, Attestation…"
       },
       "types": {
         "reglement": "Règlement",
@@ -1758,6 +1760,12 @@
         "facture": "Facture",
         "autre": "Autre"
       },
+      "edit": "Renommer / modifier",
+      "editDialog": {
+        "title": "Modifier le document"
+      },
+      "updateSuccess": "Document modifié",
+      "updateError": "Erreur lors de la modification",
       "addError": "Erreur lors de l'ajout",
       "deleteError": "Erreur lors de la suppression",
       "col": {

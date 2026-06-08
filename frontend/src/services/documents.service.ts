@@ -20,10 +20,21 @@ export type GestDoc = {
   id: number
   nom: string
   type: 'reglement' | 'pv_ag' | 'contrat' | 'facture' | 'autre'
+  /** Free-text label when `type === 'autre'` (e.g. "Manuel"). */
+  categorie_libre?: string | null
   residence: { id: number; name: string } | null
   date: string // ISO date
   url: string
   taille_ko: number
+}
+
+/** Editable fields for renaming / re-categorising an existing document. */
+export type UpdateDocumentInput = {
+  nom: string
+  type: GestDoc['type']
+  categorie_libre?: string | null
+  residence_id?: number | null
+  date: string
 }
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
@@ -101,10 +112,36 @@ export async function storeDocument(data: FormData): Promise<GestDoc> {
       id: Math.floor(Math.random() * 1000) + 100,
       nom: (data.get('nom') as string | null) ?? 'Nouveau document',
       type: ((data.get('type') as string | null) ?? 'autre') as GestDoc['type'],
+      categorie_libre: (data.get('categorie_libre') as string | null) || null,
       residence: null,
       date:
         (data.get('date') as string | null) ??
         new Date().toISOString().slice(0, 10),
+      url: 'https://example.com/docs/nouveau.pdf',
+      taille_ko: 0,
+    },
+  )
+}
+
+export async function updateDocument(
+  id: number,
+  data: UpdateDocumentInput,
+): Promise<GestDoc> {
+  return withMock(
+    async () => {
+      const res = await api.patch<ApiEnvelope<{ document: GestDoc }>>(
+        `/gestionnaire/documents/${id}`,
+        data,
+      )
+      return res.data.data.document
+    },
+    {
+      id,
+      nom: data.nom,
+      type: data.type,
+      categorie_libre: data.categorie_libre ?? null,
+      residence: null,
+      date: data.date,
       url: 'https://example.com/docs/nouveau.pdf',
       taille_ko: 0,
     },

@@ -2,10 +2,11 @@ import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Plus, Download, Trash2, FileText } from 'lucide-react'
+import { Plus, Download, Trash2, FileText, Pencil } from 'lucide-react'
 import {
   getDocuments,
   storeDocument,
+  updateDocument,
   deleteDocument,
   type GestDoc,
 } from '@/services/documents.service'
@@ -72,6 +73,7 @@ function formatDate(iso: string): string {
 type AddForm = {
   nom: string
   type: DocType
+  categorie_libre: string
   residence_id: string
   date: string
   file: File | null
@@ -80,9 +82,163 @@ type AddForm = {
 const EMPTY_FORM: AddForm = {
   nom: '',
   type: 'autre',
+  categorie_libre: '',
   residence_id: '',
   date: '',
   file: null,
+}
+
+/** Label shown for a document's category — custom free-text when type=autre. */
+function categoryLabel(
+  doc: Pick<GestDoc, 'type' | 'categorie_libre'>,
+  t: (k: string, o?: Record<string, unknown>) => string,
+): string {
+  if (doc.type === 'autre' && doc.categorie_libre) return doc.categorie_libre
+  return t(`gestionnaire.documents.type.${doc.type}`, {
+    defaultValue: doc.type,
+  })
+}
+
+type TFn = (k: string, o?: Record<string, unknown>) => string
+
+// ─── Shared metadata fields (Add + Edit dialogs) ───────────────────────────────
+
+function DocFields({
+  form,
+  setForm,
+  residences,
+  t,
+}: {
+  form: AddForm
+  setForm: React.Dispatch<React.SetStateAction<AddForm>>
+  residences: Array<{ id: number; name: string }>
+  t: TFn
+}) {
+  return (
+    <>
+      {/* Nom */}
+      <div className="space-y-1">
+        <Label htmlFor="doc-nom">
+          {t('gestionnaire.documents.form.nom', {
+            defaultValue: 'Nom du document',
+          })}
+        </Label>
+        <Input
+          id="doc-nom"
+          value={form.nom}
+          onChange={(e) => setForm((f) => ({ ...f, nom: e.target.value }))}
+          placeholder={t('gestionnaire.documents.form.nomPlaceholder', {
+            defaultValue: 'Ex: Règlement de copropriété 2026',
+          })}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        {/* Type */}
+        <div className="space-y-1">
+          <Label>
+            {t('gestionnaire.documents.form.type', { defaultValue: 'Type' })}
+          </Label>
+          <Select
+            value={form.type}
+            onValueChange={(v) =>
+              setForm((f) => ({
+                ...f,
+                type: v as DocType,
+                // Drop the custom label when leaving "autre".
+                categorie_libre: v === 'autre' ? f.categorie_libre : '',
+              }))
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {DOC_TYPES.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {t(`gestionnaire.documents.type.${type}`, {
+                    defaultValue: type,
+                  })}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Date */}
+        <div className="space-y-1">
+          <Label htmlFor="doc-date">
+            {t('gestionnaire.documents.form.date', { defaultValue: 'Date' })}
+          </Label>
+          <Input
+            id="doc-date"
+            type="date"
+            value={form.date}
+            onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+          />
+        </div>
+      </div>
+
+      {/* Custom category — only when type = autre */}
+      {form.type === 'autre' && (
+        <div className="space-y-1">
+          <Label htmlFor="doc-cat">
+            {t('gestionnaire.documents.form.customCategory', {
+              defaultValue: 'Catégorie personnalisée',
+            })}
+          </Label>
+          <Input
+            id="doc-cat"
+            value={form.categorie_libre}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, categorie_libre: e.target.value }))
+            }
+            placeholder={t(
+              'gestionnaire.documents.form.customCategoryPlaceholder',
+              {
+                defaultValue: 'Ex: Manuel, Plan, Attestation…',
+              },
+            )}
+          />
+        </div>
+      )}
+
+      {/* Résidence (optional) */}
+      <div className="space-y-1">
+        <Label>
+          {t('gestionnaire.documents.form.residence', {
+            defaultValue: 'Résidence (optionnel)',
+          })}
+        </Label>
+        <Select
+          value={form.residence_id || '_all'}
+          onValueChange={(v) =>
+            setForm((f) => ({ ...f, residence_id: v === '_all' ? '' : v }))
+          }
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue
+              placeholder={t('gestionnaire.documents.allResidences', {
+                defaultValue: 'Toutes les résidences',
+              })}
+            />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="_all">
+              {t('gestionnaire.documents.allResidences', {
+                defaultValue: 'Toutes les résidences',
+              })}
+            </SelectItem>
+            {residences.map((r) => (
+              <SelectItem key={r.id} value={String(r.id)}>
+                {r.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </>
+  )
 }
 
 // ─── Page component ───────────────────────────────────────────────────────────
@@ -99,6 +255,21 @@ export function DocumentsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [deleteTarget, setDeleteTarget] = useState<GestDoc | null>(null)
+
+  const [editTarget, setEditTarget] = useState<GestDoc | null>(null)
+  const [editForm, setEditForm] = useState<AddForm>(EMPTY_FORM)
+
+  function openEdit(doc: GestDoc) {
+    setEditForm({
+      nom: doc.nom,
+      type: doc.type,
+      categorie_libre: doc.categorie_libre ?? '',
+      residence_id: doc.residence ? String(doc.residence.id) : '',
+      date: doc.date.slice(0, 10),
+      file: null,
+    })
+    setEditTarget(doc)
+  }
 
   // ── Queries ──────────────────────────────────────────────────────────────
 
@@ -132,6 +303,8 @@ export function DocumentsPage() {
       fd.append('nom', form.nom)
       fd.append('type', form.type)
       fd.append('date', form.date)
+      if (form.type === 'autre' && form.categorie_libre.trim())
+        fd.append('categorie_libre', form.categorie_libre.trim())
       if (form.residence_id) fd.append('residence_id', form.residence_id)
       if (form.file) fd.append('file', form.file)
       return storeDocument(fd)
@@ -150,6 +323,39 @@ export function DocumentsPage() {
       toast.error(
         t('gestionnaire.documents.addError', {
           defaultValue: "Erreur lors de l'ajout",
+        }),
+      ),
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: () => {
+      if (!editTarget) throw new Error('no edit target')
+      return updateDocument(editTarget.id, {
+        nom: editForm.nom.trim(),
+        type: editForm.type,
+        categorie_libre:
+          editForm.type === 'autre'
+            ? editForm.categorie_libre.trim() || null
+            : null,
+        residence_id: editForm.residence_id
+          ? Number(editForm.residence_id)
+          : null,
+        date: editForm.date,
+      })
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['documents'] })
+      setEditTarget(null)
+      toast.success(
+        t('gestionnaire.documents.updateSuccess', {
+          defaultValue: 'Document modifié',
+        }),
+      )
+    },
+    onError: () =>
+      toast.error(
+        t('gestionnaire.documents.updateError', {
+          defaultValue: 'Erreur lors de la modification',
         }),
       ),
   })
@@ -194,9 +400,7 @@ export function DocumentsPage() {
         <Badge
           className={`${TYPE_BADGE_STYLES[doc.type]} border-0 text-xs hover:opacity-80`}
         >
-          {t(`gestionnaire.documents.type.${doc.type}`, {
-            defaultValue: doc.type,
-          })}
+          {categoryLabel(doc, t)}
         </Badge>
       ),
     },
@@ -236,7 +440,7 @@ export function DocumentsPage() {
     {
       key: '_actions',
       header: '',
-      className: 'w-24 text-right',
+      className: 'w-32 text-right',
       renderCell: (doc) => (
         <div className="flex items-center justify-end gap-1">
           <Button
@@ -255,6 +459,16 @@ export function DocumentsPage() {
             >
               <Download className="size-4" />
             </a>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => openEdit(doc)}
+            title={t('gestionnaire.documents.edit', {
+              defaultValue: 'Renommer / modifier',
+            })}
+          >
+            <Pencil className="size-4" />
           </Button>
           <Button
             variant="ghost"
@@ -373,109 +587,12 @@ export function DocumentsPage() {
           </DialogHeader>
 
           <div className="space-y-4 py-2">
-            {/* Nom */}
-            <div className="space-y-1">
-              <Label htmlFor="doc-nom">
-                {t('gestionnaire.documents.form.nom', {
-                  defaultValue: 'Nom du document',
-                })}
-              </Label>
-              <Input
-                id="doc-nom"
-                value={form.nom}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, nom: e.target.value }))
-                }
-                placeholder={t('gestionnaire.documents.form.nomPlaceholder', {
-                  defaultValue: 'Ex: Règlement de copropriété 2026',
-                })}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              {/* Type */}
-              <div className="space-y-1">
-                <Label>
-                  {t('gestionnaire.documents.form.type', {
-                    defaultValue: 'Type',
-                  })}
-                </Label>
-                <Select
-                  value={form.type}
-                  onValueChange={(v) =>
-                    setForm((f) => ({ ...f, type: v as DocType }))
-                  }
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {DOC_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {t(`gestionnaire.documents.type.${type}`, {
-                          defaultValue: type,
-                        })}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Date */}
-              <div className="space-y-1">
-                <Label htmlFor="doc-date">
-                  {t('gestionnaire.documents.form.date', {
-                    defaultValue: 'Date',
-                  })}
-                </Label>
-                <Input
-                  id="doc-date"
-                  type="date"
-                  value={form.date}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, date: e.target.value }))
-                  }
-                />
-              </div>
-            </div>
-
-            {/* Résidence (optional) */}
-            <div className="space-y-1">
-              <Label>
-                {t('gestionnaire.documents.form.residence', {
-                  defaultValue: 'Résidence (optionnel)',
-                })}
-              </Label>
-              <Select
-                value={form.residence_id || '_all'}
-                onValueChange={(v) =>
-                  setForm((f) => ({
-                    ...f,
-                    residence_id: v === '_all' ? '' : v,
-                  }))
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue
-                    placeholder={t('gestionnaire.documents.allResidences', {
-                      defaultValue: 'Toutes les résidences',
-                    })}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_all">
-                    {t('gestionnaire.documents.allResidences', {
-                      defaultValue: 'Toutes les résidences',
-                    })}
-                  </SelectItem>
-                  {residences.map((r) => (
-                    <SelectItem key={r.id} value={String(r.id)}>
-                      {r.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <DocFields
+              form={form}
+              setForm={setForm}
+              residences={residences}
+              t={t}
+            />
 
             {/* File */}
             <div className="space-y-1">
@@ -519,6 +636,55 @@ export function DocumentsPage() {
               disabled={!isFormValid || addMutation.isPending}
             >
               {addMutation.isPending
+                ? t('actions.loading', { defaultValue: 'Chargement…' })
+                : t('actions.save', { defaultValue: 'Enregistrer' })}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit / rename dialog */}
+      <Dialog
+        open={editTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setEditTarget(null)
+        }}
+      >
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {t('gestionnaire.documents.editDialog.title', {
+                defaultValue: 'Modifier le document',
+              })}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <DocFields
+              form={editForm}
+              setForm={setEditForm}
+              residences={residences}
+              t={t}
+            />
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setEditTarget(null)}
+              disabled={updateMutation.isPending}
+            >
+              {t('actions.cancel', { defaultValue: 'Annuler' })}
+            </Button>
+            <Button
+              onClick={() => updateMutation.mutate()}
+              disabled={
+                editForm.nom.trim() === '' ||
+                editForm.date === '' ||
+                updateMutation.isPending
+              }
+            >
+              {updateMutation.isPending
                 ? t('actions.loading', { defaultValue: 'Chargement…' })
                 : t('actions.save', { defaultValue: 'Enregistrer' })}
             </Button>

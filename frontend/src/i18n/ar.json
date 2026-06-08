@@ -1485,7 +1485,9 @@
         "residence": "الإقامة (اختياري)",
         "date": "التاريخ",
         "file": "الملف",
-        "nomPlaceholder": "مثال: نظام الملكية المشتركة 2026"
+        "nomPlaceholder": "مثال: نظام الملكية المشتركة 2026",
+        "customCategory": "فئة مخصصة",
+        "customCategoryPlaceholder": "مثال: دليل، مخطط، شهادة…"
       },
       "types": {
         "reglement": "النظام الداخلي",
@@ -1494,6 +1496,12 @@
         "facture": "فاتورة",
         "autre": "أخرى"
       },
+      "edit": "إعادة التسمية / تعديل",
+      "editDialog": {
+        "title": "تعديل الوثيقة"
+      },
+      "updateSuccess": "تم تعديل الوثيقة",
+      "updateError": "خطأ أثناء التعديل",
       "addError": "خطأ أثناء الإضافة",
       "deleteError": "خطأ أثناء الحذف",
       "col": {
