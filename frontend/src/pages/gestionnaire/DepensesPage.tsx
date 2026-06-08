@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AxiosError } from 'axios'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -42,6 +43,11 @@ import {
   type ImportIaDepense,
 } from '@/services/depenses.service'
 import { getComptesPcg } from '@/services/comptabilite.service'
+import {
+  getResidences,
+  getExercices,
+  type Exercice,
+} from '@/services/gestionnaire.service'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { KpiCard } from '@/components/shared/KpiCard'
 import { DataTable, type Column } from '@/components/shared/DataTable'
@@ -87,6 +93,8 @@ const APPROBATION_CLS: Record<string, string> = {
 // ─── NouvelleDepenseModal ─────────────────────────────────────────────────────
 
 type DepenseFormState = {
+  residence_id: string
+  exercice_id: string
   titre: string
   montant: string
   date: string
@@ -97,6 +105,8 @@ type DepenseFormState = {
 }
 
 const EMPTY_FORM: DepenseFormState = {
+  residence_id: '',
+  exercice_id: '',
   titre: '',
   montant: '',
   date: new Date().toISOString().slice(0, 10),
@@ -104,6 +114,12 @@ const EMPTY_FORM: DepenseFormState = {
   mode_paiement: 'virement',
   prestataire: '',
   justificatif: null,
+}
+
+/** Surface the backend's real error message instead of a generic toast. */
+function apiErrorMessage(err: unknown, fallback: string): string {
+  const e = err as AxiosError<{ message?: string }>
+  return e?.response?.data?.message ?? fallback
 }
 
 function NouvelleDepenseModal({
@@ -128,9 +144,37 @@ function NouvelleDepenseModal({
   })
   const compteClasse6 = comptes.filter((c) => c.classe === 6)
 
+  // A dépense must be tied to a résidence + exercice (required by the API,
+  // POST /gestionnaire/depenses-finance). Without them the backend rejects the
+  // create with a 422 — the root cause of the "Erreur lors de la création".
+  const { data: residences = [] } = useQuery({
+    queryKey: ['residences'],
+    queryFn: () => getResidences(),
+    enabled: open,
+  })
+  // Effective résidence = explicit choice, else auto-pick when there's only
+  // one (derived, not stored — avoids set-state-in-effect).
+  const residenceId =
+    form.residence_id ||
+    (residences.length === 1 ? String(residences[0].id) : '')
+
+  const { data: exercices = [] } = useQuery({
+    queryKey: ['exercices', residenceId],
+    queryFn: () => getExercices(Number(residenceId)),
+    enabled: open && !!residenceId,
+  })
+
+  // Effective exercice = explicit choice, else the active one (or the first).
+  const activeExercice =
+    exercices.find((e: Exercice) => e.statut === 'actif') ?? exercices[0]
+  const exerciceId =
+    form.exercice_id || (activeExercice ? String(activeExercice.id) : '')
+
   const storeMutation = useMutation({
     mutationFn: () => {
       const fd = new FormData()
+      fd.append('residence_id', residenceId)
+      fd.append('exercice_id', exerciceId)
       fd.append('titre', form.titre)
       fd.append('montant', form.montant)
       fd.append('date', form.date)
@@ -152,7 +196,7 @@ function NouvelleDepenseModal({
       setIaResult(null)
       onOpenChange(false)
     },
-    onError: () => toast.error(t('common.saveError')),
+    onError: (err) => toast.error(apiErrorMessage(err, t('common.saveError'))),
   })
 
   const handleAnalyseIa = async () => {
@@ -279,6 +323,50 @@ function NouvelleDepenseModal({
               </span>
             </div>
           )}
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label>{t('common.residence')}</Label>
+              <Select
+                value={residenceId}
+                onValueChange={(v) =>
+                  setForm((f) => ({ ...f, residence_id: v, exercice_id: '' }))
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t('common.selectResidence')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {residences.map((r) => (
+                    <SelectItem key={r.id} value={String(r.id)}>
+                      {r.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label>{t('common.exercice')}</Label>
+              <Select
+                value={exerciceId}
+                onValueChange={(v) =>
+                  setForm((f) => ({ ...f, exercice_id: v }))
+                }
+                disabled={!residenceId || exercices.length === 0}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t('common.selectExercice')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {exercices.map((e: Exercice) => (
+                    <SelectItem key={e.id} value={String(e.id)}>
+                      {e.annee}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
           <div className="space-y-1">
             <Label>
@@ -428,6 +516,8 @@ function NouvelleDepenseModal({
           <Button
             onClick={() => storeMutation.mutate()}
             disabled={
+              !residenceId ||
+              !exerciceId ||
               !form.titre ||
               !form.montant ||
               !form.compte_charge ||

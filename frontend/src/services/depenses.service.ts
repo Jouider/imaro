@@ -345,8 +345,8 @@ export async function storeDepenseFinance(
     },
     {
       id: Math.floor(Math.random() * 1000) + 100,
-      exercice_id: 1,
-      residence_id: 1,
+      exercice_id: Number(data.get('exercice_id') ?? 1),
+      residence_id: Number(data.get('residence_id') ?? 1),
       residence_nom: 'Atlas Casablanca',
       titre: (data.get('titre') as string) ?? 'Nouvelle dépense',
       montant: Number(data.get('montant') ?? 0),
