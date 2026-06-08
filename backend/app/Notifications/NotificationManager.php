@@ -102,6 +102,10 @@ class NotificationManager
      * caller passes channels in priority order (e.g. SMS → WhatsApp → Email);
      * within a channel the provider chain (sms8 → twilio_sms) still applies.
      *
+     * Stops only on a CONFIRMED success. An accepted-but-unconfirmed send
+     * (SMS8 personal-SIM — carrier may silently drop it) does NOT terminate the
+     * cascade: we keep going to a reliable channel so the code actually arrives.
+     *
      * @param  iterable<NotificationMessage>  $messages  ordered by priority
      */
     public function sendCascade(iterable $messages): NotificationResult
@@ -109,7 +113,7 @@ class NotificationManager
         $last = null;
         foreach ($messages as $m) {
             $result = $this->send($m);
-            if ($result->success) {
+            if ($result->success && $result->confirmed) {
                 return $result;
             }
             $last = $result;
@@ -160,10 +164,17 @@ class NotificationManager
             'canal'           => $m->channel->value,
             'template_name'   => $m->templateName,
             'content_preview' => mb_substr($m->body, 0, 200),
-            'statut'          => $r->skipped ? 'skipped' : ($r->success ? 'envoye' : 'echec'),
+            // "envoye" only when delivery is confirmed; an accepted-but-unconfirmed
+            // send (SMS8) is "en_attente" until a delivery webhook resolves it.
+            'statut'          => match (true) {
+                $r->skipped              => 'skipped',
+                ! $r->success            => 'echec',
+                ! $r->confirmed          => 'en_attente',
+                default                  => 'envoye',
+            },
             'meta_message_id' => $r->providerMessageId,
             'error_message'   => $r->error,
-            'sent_at'         => $r->success ? now() : null,
+            'sent_at'         => ($r->success && $r->confirmed) ? now() : null,
             'created_at'      => now(),
             'updated_at'      => now(),
         ]);
