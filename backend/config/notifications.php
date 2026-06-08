@@ -30,6 +30,9 @@ return [
         'rappel_paiement'        => env('WA_TPL_RAPPEL_PAIEMENT'),
         'recu_paiement'          => env('WA_TPL_RECU_PAIEMENT'),
         'coproprietaire_welcome' => env('WA_TPL_WELCOME_COPRO'),
+        // AUTHENTICATION template (variable {{1}} = code) used by the onboarding
+        // cascade. Empty until Meta approves → WhatsApp step is skipped.
+        'acces_copro'            => env('WA_TPL_ACCES_COPRO'),
     ],
 
     'providers' => [

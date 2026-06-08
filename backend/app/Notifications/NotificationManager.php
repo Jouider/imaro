@@ -95,6 +95,30 @@ class NotificationManager
     }
 
     /**
+     * Priority cascade: try each message in order, STOP at the first success.
+     *
+     * For credential/onboarding delivery the recipient must get the message on
+     * exactly ONE channel — the most universal first — never all at once. The
+     * caller passes channels in priority order (e.g. SMS → WhatsApp → Email);
+     * within a channel the provider chain (sms8 → twilio_sms) still applies.
+     *
+     * @param  iterable<NotificationMessage>  $messages  ordered by priority
+     */
+    public function sendCascade(iterable $messages): NotificationResult
+    {
+        $last = null;
+        foreach ($messages as $m) {
+            $result = $this->send($m);
+            if ($result->success) {
+                return $result;
+            }
+            $last = $result;
+        }
+
+        return $last ?? NotificationResult::fail('none', 'no channel available for cascade');
+    }
+
+    /**
      * Dispatch one message to the queue (Horizon). Heavy sends (PDF, bulk
      * relances) must never run in the request cycle.
      */
