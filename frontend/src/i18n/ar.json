@@ -1571,7 +1571,23 @@
       "emptyDesc": "لا توجد تذاكر تطابق الفلاتر المحددة.",
       "viewKanban": "كانبان",
       "viewTable": "جدول",
-      "toastClotureError": "خطأ أثناء الإغلاق"
+      "toastClotureError": "خطأ أثناء الإغلاق",
+      "create": "تذكرة جديدة",
+      "createSuccess": "تم إنشاء التذكرة — {{ref}}",
+      "form": {
+        "lot": "الوحدة",
+        "selectLot": "الوحدة",
+        "categorie": "الفئة",
+        "descPlaceholder": "صف المشكلة…"
+      },
+      "audit": {
+        "tab": "تدقيق حسب الإقامة",
+        "title": "الشكايات حسب الإقامة",
+        "subtitle": "حجم التذاكر لكل عمارة — من الأكثر إلى الأقل طلبًا.",
+        "total": "المجموع",
+        "most": "الأكثر",
+        "least": "الأقل"
+      }
     },
     "documents": {
       "title": "الوثائق",
