@@ -1,6 +1,5 @@
 <?php
 
-use App\Contracts\Notifications\NotificationChannel;
 use App\Contracts\Notifications\NotificationMessage;
 use App\Contracts\Notifications\NotificationResult;
 use App\Models\Residence;
@@ -9,21 +8,35 @@ use App\Notifications\NotificationManager;
 use App\Services\Notifications\CoproprietaireWelcomeNotifier;
 
 /**
- * Welcome notifier MUST fan out to every available channel. A copro without
- * email shouldn't break; a copro without phone (rare) shouldn't break either.
+ * Onboarding delivery is a PRIORITY CASCADE — the access code must land on
+ * exactly ONE channel, most universal first: SMS → WhatsApp → Email. It stops
+ * at the first success; it never fans out to every channel.
  */
-class SpyManager extends NotificationManager
+class CascadeSpy extends NotificationManager
 {
-    /** @var list<NotificationMessage> */
-    public array $sent = [];
+    /** @var list<NotificationMessage> every message actually attempted, in order */
+    public array $attempted = [];
+
+    /** @var list<string> channel values that should be forced to fail */
+    public array $failChannels = [];
 
     public function __construct() {}
 
     public function send(NotificationMessage $message): NotificationResult
     {
-        $this->sent[] = $message;
+        $this->attempted[] = $message;
 
-        return NotificationResult::ok('spy', 'spy-'.count($this->sent));
+        if (in_array($message->channel->value, $this->failChannels, true)) {
+            return NotificationResult::fail('spy', 'forced fail '.$message->channel->value);
+        }
+
+        return NotificationResult::ok('spy', 'spy-'.count($this->attempted));
+    }
+
+    /** @return list<string> attempted channel values in order */
+    public function channels(): array
+    {
+        return array_map(fn ($m) => $m->channel->value, $this->attempted);
     }
 }
 
@@ -48,40 +61,70 @@ function welcomeResidence(string $name = 'Résidence Atlas'): Residence
     return $r;
 }
 
-it('fans out to SMS + WhatsApp + Email when all channels available', function () {
-    $spy = new SpyManager();
+beforeEach(function () {
+    // WhatsApp auth template approved by default in these tests.
+    config(['notifications.whatsapp_templates.acces_copro' => 'HXtest']);
+});
+
+it('delivers via SMS first and stops there when SMS succeeds', function () {
+    $spy = new CascadeSpy();
     (new CoproprietaireWelcomeNotifier($spy))->send(welcomeUser(), 'ABC12345', welcomeResidence());
 
-    $channels = array_map(fn ($m) => $m->channel->value, $spy->sent);
-
-    expect($channels)->toContain('sms', 'whatsapp', 'email')
-        ->and(count($spy->sent))->toBe(3);
+    // Only one attempt — the most universal channel — no fan-out.
+    expect($spy->channels())->toBe(['sms']);
 });
 
-it('skips email when the user has no email', function () {
-    $spy = new SpyManager();
-    (new CoproprietaireWelcomeNotifier($spy))->send(welcomeUser(['email' => null]), 'ABC12345');
+it('falls back to WhatsApp when SMS fails', function () {
+    $spy = new CascadeSpy();
+    $spy->failChannels = ['sms'];
+    (new CoproprietaireWelcomeNotifier($spy))->send(welcomeUser(), 'ABC12345', welcomeResidence());
 
-    $channels = array_map(fn ($m) => $m->channel->value, $spy->sent);
-
-    expect($channels)->toContain('sms', 'whatsapp')
-        ->and($channels)->not->toContain('email');
+    expect($spy->channels())->toBe(['sms', 'whatsapp']);
 });
 
-it('skips SMS + WhatsApp when the user has no phone', function () {
-    $spy = new SpyManager();
+it('falls back to Email when both SMS and WhatsApp fail', function () {
+    $spy = new CascadeSpy();
+    $spy->failChannels = ['sms', 'whatsapp'];
+    (new CoproprietaireWelcomeNotifier($spy))->send(welcomeUser(), 'ABC12345', welcomeResidence());
+
+    expect($spy->channels())->toBe(['sms', 'whatsapp', 'email']);
+});
+
+it('skips the WhatsApp step when no auth template is configured', function () {
+    config(['notifications.whatsapp_templates.acces_copro' => null]);
+    $spy = new CascadeSpy();
+    $spy->failChannels = ['sms'];
+    (new CoproprietaireWelcomeNotifier($spy))->send(welcomeUser(), 'ABC12345', welcomeResidence());
+
+    expect($spy->channels())->toBe(['sms', 'email']);
+});
+
+it('uses Email only when the user has no phone', function () {
+    $spy = new CascadeSpy();
     (new CoproprietaireWelcomeNotifier($spy))->send(welcomeUser(['phone' => null]), 'ABC12345');
 
-    $channels = array_map(fn ($m) => $m->channel->value, $spy->sent);
-
-    expect($channels)->toBe(['email']);
+    expect($spy->channels())->toBe(['email']);
 });
 
-it('includes the access code in every message body', function () {
-    $spy = new SpyManager();
+it('passes the code as the WhatsApp auth template variable {{1}}', function () {
+    $spy = new CascadeSpy();
+    $spy->failChannels = ['sms']; // force the cascade to reach WhatsApp
     (new CoproprietaireWelcomeNotifier($spy))->send(welcomeUser(), 'XYZ99999', welcomeResidence());
 
-    foreach ($spy->sent as $m) {
-        expect($m->body)->toContain('XYZ99999');
+    $wa = collect($spy->attempted)->firstWhere(fn ($m) => $m->channel->value === 'whatsapp');
+
+    expect($wa->meta['content_sid'])->toBe('HXtest')
+        ->and($wa->meta['content_variables'])->toBe(['1' => 'XYZ99999']);
+});
+
+it('includes the access code in the SMS + Email bodies', function () {
+    $spy = new CascadeSpy();
+    $spy->failChannels = ['sms', 'whatsapp']; // reach all channels
+    (new CoproprietaireWelcomeNotifier($spy))->send(welcomeUser(), 'XYZ99999', welcomeResidence());
+
+    foreach ($spy->attempted as $m) {
+        if (in_array($m->channel->value, ['sms', 'email'], true)) {
+            expect($m->body)->toContain('XYZ99999');
+        }
     }
 });

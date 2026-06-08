@@ -9,13 +9,18 @@ use App\Models\User;
 use App\Notifications\NotificationManager;
 
 /**
- * Sends the welcome / access-code message to a freshly created copropriétaire
- * over every available channel (SMS + WhatsApp if phone, Email if email).
+ * Delivers the access code to a freshly created copropriétaire via a PRIORITY
+ * CASCADE — the code must land on exactly ONE channel, most universal first:
  *
- * Each channel goes through the NotificationManager so fallbacks + logging
- * to notifications_log are applied automatically. Failures on one channel
- * never block another — the gestionnaire still sees the temp code in the
- * API response as a final fallback.
+ *     SMS (sms8 → twilio_sms)  →  WhatsApp  →  Email
+ *
+ * Stops at the first success. Email is last because it is optional at copro
+ * creation. The WhatsApp step uses a Meta-approved AUTHENTICATION template
+ * (variable {{1}} = code); it is only attempted when that template SID is
+ * configured — otherwise the cascade falls straight through to Email.
+ *
+ * If every channel fails, the gestionnaire still sees the temp code in the
+ * API response as the final fallback.
  */
 class CoproprietaireWelcomeNotifier
 {
@@ -25,32 +30,68 @@ class CoproprietaireWelcomeNotifier
 
     public function send(User $user, string $tempCode, ?Residence $residence = null): void
     {
-        $residenceName = $residence?->name;
+        $this->notifier->sendCascade($this->candidates($user, $tempCode, $residence?->name));
+    }
+
+    /**
+     * Ordered candidate messages (SMS → WhatsApp → Email), skipping channels the
+     * recipient can't receive on or that aren't configured.
+     *
+     * @return list<NotificationMessage>
+     */
+    private function candidates(User $user, string $code, ?string $residenceName): array
+    {
+        $candidates = [];
 
         if ($user->phone) {
-            $this->dispatch($user, NotificationChannel::Sms, $this->smsBody($user, $tempCode));
-            $this->dispatch($user, NotificationChannel::Whatsapp, $this->whatsappBody($user, $tempCode, $residenceName));
+            $candidates[] = $this->message(
+                $user,
+                NotificationChannel::Sms,
+                $this->smsBody($user, $code),
+            );
+
+            $waSid = config('notifications.whatsapp_templates.acces_copro');
+            if ($waSid) {
+                $candidates[] = $this->message(
+                    $user,
+                    NotificationChannel::Whatsapp,
+                    $this->whatsappPreview($code),
+                    meta: [
+                        'content_sid'       => $waSid,
+                        'content_variables' => ['1' => $code],
+                    ],
+                );
+            }
         }
 
         if ($user->email) {
-            $this->dispatch(
+            $candidates[] = $this->message(
                 $user,
                 NotificationChannel::Email,
-                $this->emailBody($user, $tempCode, $residenceName),
+                $this->emailBody($user, $code, $residenceName),
                 subject: 'Bienvenue sur Imaro — votre code d\'accès',
             );
         }
+
+        return $candidates;
     }
 
-    private function dispatch(User $user, NotificationChannel $channel, string $body, ?string $subject = null): void
-    {
-        $this->notifier->send(new NotificationMessage(
+    private function message(
+        User $user,
+        NotificationChannel $channel,
+        string $body,
+        ?string $subject = null,
+        array $meta = [],
+    ): NotificationMessage {
+        return new NotificationMessage(
             to:           $user,
             channel:      $channel,
             templateName: self::TEMPLATE,
             body:         $body,
             subject:      $subject,
-        ));
+            meta:         $meta,
+            // No category → transactional/security, never muted by prefs.
+        );
     }
 
     private function smsBody(User $user, string $code): string
@@ -59,15 +100,10 @@ class CoproprietaireWelcomeNotifier
         return "Imaro: Bienvenue {$user->name}. Code d'acces: {$code}. Connectez-vous avec {$user->phone}.";
     }
 
-    private function whatsappBody(User $user, string $code, ?string $residenceName): string
+    /** Preview only (logged to notifications_log). The real WA copy is the Meta auth template. */
+    private function whatsappPreview(string $code): string
     {
-        $where = $residenceName ? " ({$residenceName})" : '';
-
-        return "Bonjour {$user->name},\n\n"
-            ."Bienvenue sur Imaro{$where} — la plateforme de gestion de votre copropriété.\n\n"
-            ."Votre code d'accès : *{$code}*\n"
-            ."Numéro de connexion : {$user->phone}\n\n"
-            ."À votre première connexion, vous serez invité à créer votre propre mot de passe.";
+        return "Imaro: votre code d'acces est {$code}.";
     }
 
     private function emailBody(User $user, string $code, ?string $residenceName): string

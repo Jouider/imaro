@@ -16,6 +16,25 @@ return [
         'email'    => ['resend'],
     ],
 
+    /*
+     * WhatsApp message templates (Twilio Content API "HX..." SIDs).
+     *
+     * Keyed by a stable logical name used in code. SIDs differ per environment
+     * (each WhatsApp Business Account re-creates them on approval), so they live
+     * in env, never hardcoded. Resolve with config("notifications.whatsapp_templates.$name").
+     *
+     * A Meta-approved template MUST NOT start or end with a {{variable}}.
+     */
+    'whatsapp_templates' => [
+        'appel_fonds'            => env('WA_TPL_APPEL_FONDS'),
+        'rappel_paiement'        => env('WA_TPL_RAPPEL_PAIEMENT'),
+        'recu_paiement'          => env('WA_TPL_RECU_PAIEMENT'),
+        'coproprietaire_welcome' => env('WA_TPL_WELCOME_COPRO'),
+        // AUTHENTICATION template (variable {{1}} = code) used by the onboarding
+        // cascade. Empty until Meta approves → WhatsApp step is skipped.
+        'acces_copro'            => env('WA_TPL_ACCES_COPRO'),
+    ],
+
     'providers' => [
         'twilio_whatsapp' => [
             'sid'   => env('TWILIO_SID'),
