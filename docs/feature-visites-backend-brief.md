@@ -204,5 +204,118 @@ jamais.
 
 ---
 
+## Phase 2 additions (gardien PWA — branch `feat/frontend-gardien-pwa`)
+
+Frontend ajoute deux endpoints supplémentaires pour la PWA gardien :
+
+### 8. `POST /api/visites/walk-in`
+
+**Auth** : `gardien`, `gestionnaire`, `manager`. Crée une visite **et**
+marque l'arrivée dans la même requête (atomique). Idempotent par phone+nom
+sur ±5 min pour éviter les doubles-saisies de gardiens stressés.
+
+```jsonc
+// corps (mêmes champs que POST visites, sans planned_at)
+{
+  "residence_id": 11,
+  "visitor_name": "Yassine Berrada",
+  "visitor_phone": "+212611223344",
+  "type": "visitor",
+  "purpose": "Visite famille",
+  "host_lot_id": 12   // optionnel
+}
+// réponse : la visite avec status='arrived', arrived_at=now()
+```
+
+### 9. `GET /api/gardien/visites/active`
+
+Liste des visiteurs actuellement à l'intérieur (`status='arrived'`) pour
+la **résidence du gardien connecté** (le backend lit `user.residence_id`,
+le front n'envoie pas de `residence_id`). Trié par `arrived_at` desc.
+
+```jsonc
+[ /* même shape que /visites mais filtré sur status='arrived' */ ]
+```
+
+### Nouveau rôle `gardien`
+
+Ajouter à `RolesSeeder` côté backend :
+- Slug : `gardien`
+- Hérite : permission `visites:scan` + `visites:walk-in` uniquement
+- **Pas** d'accès admin (`/api/gestionnaire/*` → 403)
+- **A** accès à `/api/visites/scan`, `/api/visites/walk-in`, `/api/gardien/*`
+- Le manager peut créer un gardien depuis Utilisateurs (réutilise le flow
+  manager-creates-gestionnaire avec un picker de rôle).
+
+### Auth gardien
+
+Réutilise le login existant (`POST /api/auth/login`) — le backend décide
+de la redirection en renvoyant `user.role`. Le frontend redirige
+automatiquement les rôles `gardien` vers `/gardien` (à ajouter dans
+`LoginPage` après ce PR — pas encore fait pour éviter de bloquer le merge).
+
+### PWA install hint
+
+Le front peut suggérer "ajouter à l'écran d'accueil" sur `/gardien` —
+utile pour les tablettes de lobby. Pas de besoin d'endpoint.
+
+## Phase 2.B additions (branch `feat/frontend-visites-wallet-photo`)
+
+Trois nouveautés frontend qui s'appuient sur des endpoints / champs
+backend additionnels :
+
+### 10. `POST /api/visites/{id}/photo`
+
+**Auth** : `gardien`, `gestionnaire`, `manager`. Stocke une photo capturée
+au check-in (anti-spoofing). Corps :
+
+```jsonc
+{ "photo": "data:image/jpeg;base64,/9j/4AAQ..." }   // ~30-150 kB JPEG
+```
+
+Réponse : la `Visite` à jour avec `photo_url` rempli. Storage suggéré :
+disk S3-like avec URL publique courte (signed link 7 jours suffit).
+Limite payload côté backend (ex. 500 kB max).
+
+### 11. `GET /api/public/visites/{token}/wallet` ⚠️ **PUBLIC**
+
+Retourne deux URLs (Apple `.pkpass` + Google Wallet JWT) que le front
+ouvre depuis la page visiteur. Pas d'auth.
+
+```jsonc
+{
+  "apple_url":  "https://app.imaro.ma/api/public/visites/{token}/apple.pkpass",
+  "google_url": "https://pay.google.com/gp/v/save/<google-wallet-JWT>"
+}
+```
+
+Cèoté backend : besoin d'une cert Apple Wallet (Apple Developer Program,
+~$99/an, certs `pass.com.imaro.visit`) + un service account Google Wallet
++ classe wallet définie une fois pour toutes. Si pas prio MVP, retourner
+404 — le front n'affichera simplement pas les boutons.
+
+### 12. Nouveaux champs sur la table `visites`
+
+```
+visites
+  ...
+  photo_url     string nullable       -- public URL après upload
+  is_recurring  boolean default false  -- pass réutilisable (prestataire récurrent)
+  recurrence    string nullable        -- libellé humain (ex. "Mardi 9h-12h")
+```
+
+**Impact sur la logique scan** : si `is_recurring=true`, ne pas
+expirer après check-out. Le QR reste valide indéfiniment. Idéalement
+ajouter un champ `valid_until` (date d'expiration de contrat) — pas
+fait côté front pour l'instant.
+
+### Redirection login `gardien`
+
+Le front redirige automatiquement vers `/gardien` quand le login renvoie
+`user.role === 'gardien'`. Vérifie côté backend que le rôle est bien
+renvoyé dans le payload `verify-otp` / `loginEmail`.
+
+---
+
 Ping-moi pour ajuster les shapes ; le front bascule tout seul dès que tes
 routes répondent (le `withMock` ne sert de filet qu'en dev).

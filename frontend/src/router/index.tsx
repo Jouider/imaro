@@ -35,6 +35,8 @@ import { AssistanceRecouvrementPage } from '@/pages/gestionnaire/AssistanceRecou
 import { RappelsPage } from '@/pages/gestionnaire/RappelsPage'
 import { VisitesPage } from '@/pages/gestionnaire/VisitesPage'
 import { VisitorPassPage } from '@/pages/public/VisitorPassPage'
+import { GardienPage } from '@/pages/gardien/GardienPage'
+import { GardienGuard } from './GardienGuard'
 import { PointagePage } from '@/pages/gestionnaire/PointagePage'
 import { OccupantsPage } from '@/pages/gestionnaire/OccupantsPage'
 import { EquipementsPage } from '@/pages/gestionnaire/EquipementsPage'
@@ -53,6 +55,16 @@ export const router = createBrowserRouter([
 
   // ── Public visitor pass (no auth, scanned at the lobby) ──
   { path: '/v/:token', element: <VisitorPassPage /> },
+
+  // ── Gardien (lobby PWA — scan + walk-in) ──
+  {
+    path: '/gardien',
+    element: (
+      <GardienGuard>
+        <GardienPage />
+      </GardienGuard>
+    ),
+  },
 
   // ── Portail copropriétaire ──────────────────────────────
   // /portail/login now redirects to the unified /login page

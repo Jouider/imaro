@@ -219,7 +219,12 @@ export function LoginPage() {
       if (res.status === 'success') {
         setStoredToken(res.data.token)
         setSession(res.data)
-        void navigate('/gestionnaire/dashboard', { replace: true })
+        void navigate(
+          res.data.user.role === 'gardien'
+            ? '/gardien'
+            : '/gestionnaire/dashboard',
+          { replace: true },
+        )
       } else if (res.status === 'first_login') {
         // Manager-created admin must set their own password
         setStep('admin-activate')

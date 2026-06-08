@@ -2843,7 +2843,11 @@
         "submit": "Créer & générer QR",
         "submitting": "Création…",
         "validationName": "Nom requis",
-        "validationPhone": "Téléphone requis"
+        "validationPhone": "Téléphone requis",
+        "recurring": "Pass récurrent (prestataire régulier)",
+        "recurringHint": "QR réutilisable — pour un prestataire qui revient régulièrement (ménage hebdo, jardinier, etc.)",
+        "recurrence": "Périodicité",
+        "recurrencePlaceholder": "Mardi & vendredi · 9h-12h"
       },
       "detail": {
         "title": "Détail de la visite",
@@ -2863,7 +2867,10 @@
         "scanCheckIn": "Marquer entrée",
         "scanCheckOut": "Marquer sortie",
         "alreadyCheckedIn": "Entrée déjà enregistrée",
-        "alreadyCheckedOut": "Visite terminée"
+        "alreadyCheckedOut": "Visite terminée",
+        "recurringBadge": "Pass récurrent",
+        "recurrenceLabel": "Périodicité",
+        "photoCaptured": "Photo capturée à l'entrée"
       },
       "scan": {
         "title": "Scanner le QR",
@@ -3081,7 +3088,70 @@
       "statusArrived": "Entré · en cours de visite",
       "statusDeparted": "Visite terminée",
       "statusExpired": "Lien expiré",
-      "statusCancelled": "Visite annulée"
+      "statusCancelled": "Visite annulée",
+      "addToAppleWallet": "Ajouter à Apple Wallet",
+      "addToGoogleWallet": "Ajouter à Google Wallet",
+      "recurringPass": "Pass récurrent"
+    }
+  },
+  "gardien": {
+    "title": "Mode gardien",
+    "subtitle": "Scan QR à l'entrée · sortie · walk-in",
+    "hint": "Pointez la caméra vers le QR du visiteur",
+    "scanAction": "Scanner un QR",
+    "walkInAction": "Walk-in (visiteur sans QR)",
+    "activeCount": "{{n}} à l'intérieur",
+    "activeCountZero": "Personne à l'intérieur",
+    "activeListTitle": "Visiteurs actuellement à l'intérieur",
+    "since": "depuis {{time}}",
+    "logout": "Se déconnecter du mode gardien",
+    "scanResult": {
+      "checkInTitle": "Entrée enregistrée",
+      "checkOutTitle": "Sortie enregistrée",
+      "rejectedTitle": "QR refusé",
+      "newScan": "Nouveau scan",
+      "manualCheckOut": "Forcer la sortie"
+    },
+    "scanner": {
+      "starting": "Démarrage de la caméra…",
+      "permissionNeeded": "Autorisation caméra requise",
+      "permissionDesc": "Imaro a besoin d'accéder à la caméra pour scanner les QR codes.",
+      "permissionAllow": "Autoriser la caméra",
+      "noCamera": "Aucune caméra détectée sur cet appareil.",
+      "manualEntry": "Saisir manuellement",
+      "switchCamera": "Caméra alternative",
+      "scanFromImage": "Charger depuis une image",
+      "cancelScan": "Annuler"
+    },
+    "walkIn": {
+      "title": "Walk-in visiteur",
+      "desc": "Enregistrer immédiatement un visiteur sans QR pré-généré.",
+      "submit": "Enregistrer & marquer entrée",
+      "submitting": "Enregistrement…",
+      "success": "{{name}} enregistré(e) à l'entrée"
+    },
+    "guard": {
+      "notLoggedIn": "Connectez-vous pour accéder au mode gardien",
+      "goToLogin": "Aller au login",
+      "wrongRole": "Votre compte n'a pas le rôle gardien. Contactez le gestionnaire."
+    },
+    "photo": {
+      "title": "Photo du visiteur",
+      "desc": "Capturez une photo pour l'audit de sécurité (recommandé).",
+      "capture": "Prendre la photo",
+      "retake": "Reprendre",
+      "skip": "Ignorer",
+      "confirm": "Confirmer l'entrée",
+      "starting": "Activation caméra…",
+      "permissionDenied": "Caméra refusée — photo ignorée",
+      "uploaded": "Photo enregistrée",
+      "skipped": "Entrée enregistrée sans photo"
+    },
+    "install": {
+      "title": "Installer Imaro Gardien",
+      "desc": "Ajoutez à l'écran d'accueil pour un accès rapide hors-ligne.",
+      "install": "Installer",
+      "later": "Plus tard"
     }
   }
 }

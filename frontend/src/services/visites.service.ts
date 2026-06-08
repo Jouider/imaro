@@ -52,6 +52,15 @@ export type Visite = {
   arrived_at?: string | null
   left_at?: string | null
   status: VisiteStatus
+  /** Photo captured by gardien at check-in (data URL or remote URL). */
+  photo_url?: string | null
+  /**
+   * Recurring prestataire pass: when true the QR can be re-used across
+   * multiple visits (cleaning company that comes every week). `recurrence`
+   * holds a human-readable schedule for display.
+   */
+  is_recurring?: boolean
+  recurrence?: string | null
   created_by_name: string
   created_at: string
 }
@@ -64,6 +73,15 @@ export type CreateVisiteInput = {
   purpose?: string
   host_lot_id?: number
   planned_at?: string
+  /** Recurring prestataire pass — long-lived QR. */
+  is_recurring?: boolean
+  /** Human-readable schedule (e.g. "Mardi 9h-12h chaque semaine"). */
+  recurrence?: string
+}
+
+export type WalletLinks = {
+  apple_url: string
+  google_url: string
 }
 
 export type VisitesStats = {
@@ -140,6 +158,8 @@ const MOCK_VISITES: Visite[] = [
     arrived_at: isoOffset(-3),
     left_at: isoOffset(-1),
     status: 'departed',
+    is_recurring: true,
+    recurrence: 'Mardi & vendredi · 9h-12h',
     created_by_name: 'Mouad Smac',
     created_at: isoOffset(-24),
   },
@@ -276,6 +296,84 @@ export async function scanVisite(token: string): Promise<ScanResult> {
       },
       action: 'check_in',
     },
+  )
+}
+
+/**
+ * Walk-in flow — gardien at the lobby records a visitor on the spot.
+ * Creates the visit AND immediately marks it as arrived in one round-trip.
+ */
+export async function walkInVisite(input: CreateVisiteInput): Promise<Visite> {
+  return withMock(
+    async () =>
+      (await api.post<ApiEnvelope<Visite>>(`/visites/walk-in`, input)).data
+        .data,
+    {
+      id: Math.floor(Math.random() * 10_000) + 200,
+      residence_id: input.residence_id,
+      qr_token: `vst_${Math.random().toString(36).slice(2, 14)}`,
+      visitor_name: input.visitor_name,
+      visitor_phone: input.visitor_phone,
+      type: input.type,
+      purpose: input.purpose ?? null,
+      host_lot_id: input.host_lot_id ?? null,
+      host_lot_numero: null,
+      host_name: null,
+      planned_at: null,
+      arrived_at: new Date().toISOString(),
+      left_at: null,
+      status: 'arrived',
+      created_by_name: 'Gardien lobby',
+      created_at: new Date().toISOString(),
+    },
+  )
+}
+
+/** Currently-inside list (visits with status='arrived'). Used by gardien home. */
+export async function getActiveVisites(): Promise<Visite[]> {
+  return withMock(
+    async () =>
+      (await api.get<ApiEnvelope<Visite[]>>(`/gardien/visites/active`)).data
+        .data,
+    MOCK_VISITES.filter((v) => v.status === 'arrived'),
+  )
+}
+
+/**
+ * Wallet pass URLs. Backend signs an Apple `.pkpass` and generates a Google
+ * Wallet JWT URL; frontend just opens them. Token is the visit's qr_token.
+ */
+export async function getWalletLinks(token: string): Promise<WalletLinks> {
+  return withMock(
+    async () =>
+      (
+        await api.get<ApiEnvelope<WalletLinks>>(
+          `/public/visites/${token}/wallet`,
+        )
+      ).data.data,
+    {
+      apple_url: `${window.location.origin}/api/public/visites/${token}/apple.pkpass`,
+      google_url: `https://pay.google.com/gp/v/save/${token}-mock-jwt`,
+    },
+  )
+}
+
+/**
+ * Upload a visitor photo captured by the gardien at check-in. Accepts a base64
+ * data URL; backend stores and returns the public URL on the visit object.
+ */
+export async function uploadVisitePhoto(
+  visiteId: number,
+  photoDataUrl: string,
+): Promise<Visite> {
+  return withMock(
+    async () =>
+      (
+        await api.post<ApiEnvelope<Visite>>(`/visites/${visiteId}/photo`, {
+          photo: photoDataUrl,
+        })
+      ).data.data,
+    { ...MOCK_VISITES[0], id: visiteId, photo_url: photoDataUrl },
   )
 }
 

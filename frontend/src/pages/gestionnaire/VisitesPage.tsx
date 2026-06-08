@@ -20,14 +20,17 @@ import {
   Smartphone,
   Link as LinkIcon,
   Ban,
+  Repeat2,
 } from 'lucide-react'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { KpiCard } from '@/components/shared/KpiCard'
 import { DataTable, type Column } from '@/components/shared/DataTable'
+import { QrScanner } from '@/components/shared/QrScanner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import { Switch } from '@/components/ui/switch'
 import {
   Dialog,
   DialogContent,
@@ -474,6 +477,8 @@ function CreateVisiteDialog({
   const [purpose, setPurpose] = useState('')
   const [hostLotId, setHostLotId] = useState<string>('')
   const [plannedAt, setPlannedAt] = useState('')
+  const [isRecurring, setIsRecurring] = useState(false)
+  const [recurrence, setRecurrence] = useState('')
 
   const lotsQ = useQuery({
     queryKey: ['lots', residenceId],
@@ -493,6 +498,8 @@ function CreateVisiteDialog({
       setPurpose('')
       setHostLotId('')
       setPlannedAt('')
+      setIsRecurring(false)
+      setRecurrence('')
     },
   })
 
@@ -513,6 +520,9 @@ function CreateVisiteDialog({
       purpose: purpose.trim() || undefined,
       host_lot_id: hostLotId ? Number(hostLotId) : undefined,
       planned_at: plannedAt ? new Date(plannedAt).toISOString() : undefined,
+      is_recurring: isRecurring || undefined,
+      recurrence:
+        isRecurring && recurrence.trim() ? recurrence.trim() : undefined,
     })
   }
 
@@ -626,6 +636,40 @@ function CreateVisiteDialog({
             <p className="text-xs text-muted-foreground">
               {t('gestionnaire.visites.form.plannedAtHint')}
             </p>
+          </div>
+
+          {/* Recurring prestataire pass */}
+          <div className="rounded-xl border bg-muted/30 p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1">
+                <Label htmlFor="v-recurring" className="text-sm font-medium">
+                  {t('gestionnaire.visites.form.recurring')}
+                </Label>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {t('gestionnaire.visites.form.recurringHint')}
+                </p>
+              </div>
+              <Switch
+                id="v-recurring"
+                checked={isRecurring}
+                onCheckedChange={setIsRecurring}
+              />
+            </div>
+            {isRecurring && (
+              <div className="mt-3 space-y-1.5">
+                <Label htmlFor="v-recurrence" className="text-xs">
+                  {t('gestionnaire.visites.form.recurrence')}
+                </Label>
+                <Input
+                  id="v-recurrence"
+                  value={recurrence}
+                  onChange={(e) => setRecurrence(e.target.value)}
+                  placeholder={t(
+                    'gestionnaire.visites.form.recurrencePlaceholder',
+                  )}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -741,6 +785,15 @@ function DetailDialog({
               <TypeIcon className="size-3" />
               {t(`gestionnaire.visites.type.${visit.type}`)}
             </Badge>
+            {visit.is_recurring && (
+              <Badge
+                variant="outline"
+                className="gap-1 border-teal-200 bg-teal-50 text-[10px] text-teal-700 dark:border-teal-900/40 dark:bg-teal-950/20 dark:text-teal-400"
+              >
+                <Repeat2 className="size-3" />
+                {t('gestionnaire.visites.detail.recurringBadge')}
+              </Badge>
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -821,6 +874,23 @@ function DetailDialog({
                   {dtLongFmt.format(new Date(visit.left_at))}
                 </span>
               </Row>
+            )}
+            {visit.is_recurring && visit.recurrence && (
+              <Row label={t('gestionnaire.visites.detail.recurrenceLabel')}>
+                {visit.recurrence}
+              </Row>
+            )}
+            {visit.photo_url && (
+              <div className="mt-2 flex flex-col gap-1.5">
+                <span className="text-xs text-muted-foreground">
+                  {t('gestionnaire.visites.detail.photoCaptured')}
+                </span>
+                <img
+                  src={visit.photo_url}
+                  alt="visitor"
+                  className="max-h-40 w-full max-w-[200px] rounded-lg border object-cover"
+                />
+              </div>
             )}
             <p className="mt-1 text-[10px] text-muted-foreground">
               {t('gestionnaire.visites.detail.createdBy', {
@@ -949,13 +1019,19 @@ function ScanDialog({
         </DialogHeader>
 
         <div className="space-y-3 py-2">
-          {/* Camera placeholder (Phase 2 — real webcam) */}
-          <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed bg-muted/30 p-8 text-center">
-            <ScanLine className="size-10 text-muted-foreground/60" />
-            <p className="text-xs text-muted-foreground">
-              {t('gestionnaire.visites.scan.cameraNotSupported')}
-            </p>
-          </div>
+          {/* Real webcam scanner — falls back to manual entry on no-camera/deny */}
+          {open && (
+            <QrScanner
+              onDecode={(text) => {
+                if (mut.isPending) return
+                // Accept full URL or raw token
+                const m = text.trim().match(/\/v\/([\w-]+)$/)
+                mut.mutate(m?.[1] ?? text.trim())
+              }}
+              paused={mut.isPending}
+              className="max-h-[60vh]"
+            />
+          )}
 
           <div className="space-y-1.5">
             <Label htmlFor="manual-token">
