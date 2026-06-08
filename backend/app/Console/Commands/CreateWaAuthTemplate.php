@@ -41,6 +41,13 @@ class CreateWaAuthTemplate extends Command
             return self::FAILURE;
         }
 
+        // Twilio packs several model classes per file (ContentModels.php,
+        // ApprovalCreateModels.php), which PSR-4 can't autoload by class name and
+        // composer's classmap may miss → load them explicitly so the command
+        // works on any deploy.
+        require_once base_path('vendor/twilio/sdk/src/Twilio/Rest/Content/V1/ContentModels.php');
+        require_once base_path('vendor/twilio/sdk/src/Twilio/Rest/Content/V1/Content/ApprovalCreateModels.php');
+
         $name = (string) $this->option('name');
         $lang = (string) $this->option('lang');
         $expiry = (string) $this->option('expiry');
