@@ -58,6 +58,7 @@ import {
 } from '@/services/comptabilite.service'
 import { getResidences } from '@/services/gestionnaire.service'
 import { useAuthStore } from '@/stores/authStore'
+import { useResidenceStore } from '@/stores/residenceStore'
 import {
   generateRapportFinancier,
   generateJournalPdf,
@@ -2498,12 +2499,14 @@ export function ComptabilitePage() {
   const user = useAuthStore((s) => s.user)
   const companyName = user?.name ?? 'Imaro Syndic'
 
-  // Residence: default to 1 (Atlas Casablanca)
   const { data: residences = [] } = useQuery({
     queryKey: ['residences'],
     queryFn: () => getResidences(),
   })
-  const [residenceId] = useState(1)
+  // Global residence scope (KAN-47). Accounting books are per-residence, so a
+  // specific one is always needed: fall back to the first when scope is "all".
+  const globalResidenceId = useResidenceStore((s) => s.residenceId)
+  const residenceId = globalResidenceId ?? residences[0]?.id ?? 1
 
   const { data: exercices = [] } = useQuery({
     queryKey: ['exercices-comptabilite', residenceId],
@@ -2521,8 +2524,10 @@ export function ComptabilitePage() {
   const currentExercice = exercices.find((e) => e.id === exerciceId)
   const exerciceClos = currentExercice?.statut === 'clos'
 
-  const residenceName = residences[0]?.name ?? 'Résidence'
-  const city = residences[0]?.city ?? ''
+  const currentResidence = residences.find((r) => r.id === residenceId)
+  const residenceName =
+    currentResidence?.name ?? residences[0]?.name ?? 'Résidence'
+  const city = currentResidence?.city ?? residences[0]?.city ?? ''
 
   const TABS: { key: ActiveTab; label: string }[] = [
     {
@@ -2659,21 +2664,7 @@ export function ComptabilitePage() {
           </SelectContent>
         </Select>
 
-        {/* Residence selector (for future multi-residence) */}
-        {residences.length > 1 && (
-          <Select value={String(residenceId)} onValueChange={() => {}}>
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {residences.map((r) => (
-                <SelectItem key={r.id} value={String(r.id)}>
-                  {r.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
+        {/* Residence is scoped globally via the sidebar selector (KAN-47). */}
       </div>
 
       {/* Tabs */}

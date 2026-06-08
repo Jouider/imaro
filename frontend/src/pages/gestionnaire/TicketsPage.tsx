@@ -26,6 +26,7 @@ import {
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { ConfirmModal } from '@/components/shared/ConfirmModal'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
@@ -438,6 +439,8 @@ export function TicketsPage() {
     description: '',
   })
 
+  const residenceId = useResidenceStore((s) => s.residenceId)
+
   const { data: tickets = [], isLoading } = useQuery({
     queryKey: ['tickets', filterStatut, filterPriorite],
     queryFn: () =>
@@ -446,6 +449,12 @@ export function TicketsPage() {
         priorite: filterPriorite !== 'all' ? filterPriorite : undefined,
       }),
   })
+
+  // Global residence scope (KAN-47): null = all residences.
+  const scopedTickets =
+    residenceId === null
+      ? tickets
+      : tickets.filter((t) => t.residence.id === residenceId)
 
   const { data: residences = [] } = useQuery({
     queryKey: ['residences'],
@@ -459,7 +468,8 @@ export function TicketsPage() {
   })
   const lots: Lot[] = lotsData?.lots ?? []
 
-  const audit = buildAudit(tickets)
+  // Audit reflects the active residence scope (KAN-43 + KAN-47).
+  const audit = buildAudit(scopedTickets)
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -694,13 +704,13 @@ export function TicketsPage() {
         <TicketsAudit audit={audit} t={t} />
       ) : viewMode === 'kanban' ? (
         <KanbanBoard
-          tickets={tickets}
+          tickets={scopedTickets}
           onCardClick={openDetail}
           onMove={(id, statut) => updateMutation.mutate({ id, statut })}
         />
       ) : (
         <DataTable
-          data={tickets}
+          data={scopedTickets}
           columns={columns}
           rowKey="id"
           isLoading={isLoading}

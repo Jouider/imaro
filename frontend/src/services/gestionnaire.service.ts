@@ -713,13 +713,15 @@ export async function getRecouvrementMensuel(): Promise<RecouvrementMois[]> {
 // ─── Résidences ──────────────────────────────────────────────────────────────
 
 export async function getResidences(search?: string): Promise<Residence[]> {
-  const params: Record<string, string> = {}
-  if (search) params.search = search
-  const res = await api.get<ApiEnvelope<{ residences: Residence[] }>>(
-    '/gestionnaire/residences',
-    { params },
-  )
-  return res.data.data.residences
+  return withMock(async () => {
+    const params: Record<string, string> = {}
+    if (search) params.search = search
+    const res = await api.get<ApiEnvelope<{ residences: Residence[] }>>(
+      '/gestionnaire/residences',
+      { params },
+    )
+    return res.data.data.residences
+  }, MOCK_RESIDENCES)
 }
 
 export async function getResidence(id: number): Promise<Residence> {
