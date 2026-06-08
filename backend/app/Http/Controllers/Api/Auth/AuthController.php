@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends Controller
 {
@@ -367,7 +368,13 @@ class AuthController extends Controller
 
     private function shouldRefresh(?object $token): bool
     {
-        if (! $token || ! $token->expires_at) {
+        // TransientToken (e.g. actingAs in tests, or session-based guards) carries
+        // no expiry metadata, so there is nothing to refresh.
+        if (! $token instanceof PersonalAccessToken) {
+            return false;
+        }
+
+        if (! $token->expires_at) {
             return false;
         }
 
