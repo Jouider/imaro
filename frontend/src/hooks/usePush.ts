@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { api } from '@/lib/axios'
 
 type PermissionState = 'default' | 'granted' | 'denied' | 'unsupported'
 
@@ -24,9 +25,9 @@ const VAPID_PUBLIC_KEY =
  * Returns null/false when push API isn't supported (e.g. iOS Safari < 16.4
  * without Add to Home Screen). The opt-in toggle is rendered conditionally.
  *
- * Backend endpoint to POST subscription (Mouad → Abdellah ticket) :
- *   POST /api/portail/push/subscribe  { endpoint, keys: { p256dh, auth } }
- *   DELETE /api/portail/push/subscribe  (current user)
+ * Backend contract (aligned with backend/routes/api/resident.php, issue #170) :
+ *   POST   /api/portail/push/subscribe    { endpoint, keys: { p256dh, auth } }
+ *   DELETE /api/portail/push/unsubscribe  (current user)
  */
 export function usePush(): Result {
   // Initial state derived synchronously to avoid set-state-in-effect lint
@@ -74,10 +75,12 @@ export function usePush(): Result {
           VAPID_PUBLIC_KEY,
         ).buffer as ArrayBuffer
       }
-      await reg.pushManager.subscribe(subscribeOpts)
+      const sub = await reg.pushManager.subscribe(subscribeOpts)
 
-      // TODO: POST `sub.toJSON()` to backend (Abdellah endpoint).
-      // For now we just mark as subscribed locally.
+      // Register the subscription server-side. sub.toJSON() yields exactly the
+      // { endpoint, keys: { p256dh, auth } } payload PortailPushController expects.
+      await api.post('/portail/push/subscribe', sub.toJSON())
+
       setIsSubscribed(true)
       return true
     } catch (err) {
@@ -91,6 +94,13 @@ export function usePush(): Result {
       const reg = await navigator.serviceWorker.ready
       const sub = await reg.pushManager.getSubscription()
       if (sub) {
+        // Best-effort: drop the subscription server-side before tearing it down
+        // locally, so the backend stops targeting a dead endpoint.
+        await api
+          .delete('/portail/push/unsubscribe', {
+            data: { endpoint: sub.endpoint },
+          })
+          .catch(() => void 0)
         await sub.unsubscribe()
       }
       setIsSubscribed(false)
