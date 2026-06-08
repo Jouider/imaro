@@ -1030,6 +1030,8 @@
       "profil": "Mon Profil",
       "imports": "Import données",
       "recouvrement": "Recouvrement",
+      "assistanceRecouvrement": "Assistance recouvrement",
+      "badgePro": "Pro",
       "pointage": "Pointage bancaire",
       "autresRecettes": "Autres recettes",
       "remboursements": "Remboursements",
@@ -1046,6 +1048,123 @@
       "personnel": "Personnel",
       "rappels": "Rappels",
       "visites": "Visites"
+    },
+    "assistanceRecouvrement": {
+      "breadcrumb": "Finances",
+      "title": "Assistance recouvrement",
+      "subtitle": "Déléguez le recouvrement de vos impayés à notre équipe, des appels de fonds jusqu'au tribunal.",
+      "hero": {
+        "eyebrow": "Service optionnel payant",
+        "title": "Confiez votre recouvrement à des experts, en toute conformité avec la loi 18-00",
+        "desc": "Un accompagnement complet et structuré du recouvrement amiable jusqu'à l'action judiciaire. Idéal lorsque vous n'avez pas d'équipe dédiée pour gérer les impayés et les procédures légales.",
+        "target1": "Syndics bénévoles",
+        "target2": "Nouvelles sociétés de gestion",
+        "cta": "Demander l'assistance"
+      },
+      "legal": {
+        "title": "Les étapes légales du recouvrement (loi 18-00)",
+        "subtitle": "Une procédure rigoureuse et conforme, qui peut aller jusqu'au tribunal de première instance."
+      },
+      "steps": {
+        "appel": {
+          "title": "Appel de fonds",
+          "desc": "Émission et notification des appels de fonds aux copropriétaires, avec justificatifs conformes."
+        },
+        "relance": {
+          "title": "Relance amiable",
+          "desc": "Relances graduées par SMS, WhatsApp et e-mail pour obtenir un règlement à l'amiable."
+        },
+        "miseEnDemeure": {
+          "title": "Mise en demeure",
+          "desc": "Envoi d'une mise en demeure officielle par lettre recommandée avec accusé de réception."
+        },
+        "injonction": {
+          "title": "Injonction de payer",
+          "desc": "Constitution et dépôt du dossier d'injonction de payer auprès de la juridiction compétente."
+        },
+        "tribunal": {
+          "title": "Tribunal de première instance",
+          "desc": "Représentation et suivi de la procédure judiciaire jusqu'au jugement, avec notre réseau d'avocats."
+        },
+        "execution": {
+          "title": "Exécution du jugement",
+          "desc": "Mise en œuvre des voies d'exécution pour le recouvrement effectif des sommes dues."
+        }
+      },
+      "plans": {
+        "title": "Formules d'abonnement",
+        "subtitle": "Choisissez le niveau d'accompagnement adapté à votre copropriété.",
+        "popular": "Recommandé",
+        "selected": "Formule sélectionnée",
+        "choose": "Choisir cette formule",
+        "essentiel": {
+          "name": "Essentiel",
+          "price": "À partir de 490 DH / mois",
+          "desc": "Le recouvrement amiable géré pour vous, jusqu'à la mise en demeure.",
+          "features": [
+            "Appels de fonds et relances automatisées",
+            "Relances multicanal (SMS, WhatsApp, e-mail)",
+            "Mise en demeure officielle",
+            "Suivi mensuel des impayés"
+          ]
+        },
+        "complet": {
+          "name": "Complet",
+          "price": "À partir de 990 DH / mois",
+          "desc": "L'amiable et le judiciaire, jusqu'à l'injonction de payer.",
+          "features": [
+            "Tout de la formule Essentiel",
+            "Constitution du dossier judiciaire",
+            "Injonction de payer",
+            "Réseau d'avocats partenaires",
+            "Tableau de bord de suivi structuré"
+          ]
+        },
+        "sur_mesure": {
+          "name": "Sur mesure",
+          "price": "Sur devis",
+          "desc": "Accompagnement intégral jusqu'au tribunal et à l'exécution du jugement.",
+          "features": [
+            "Tout de la formule Complet",
+            "Représentation au tribunal de première instance",
+            "Exécution du jugement",
+            "Interlocuteur juridique dédié"
+          ]
+        }
+      },
+      "form": {
+        "title": "Demander l'assistance recouvrement",
+        "subtitle": "Remplissez ce formulaire : notre équipe vous recontacte sous 48 h pour cadrer l'abonnement.",
+        "syndicName": "Nom du syndic / société",
+        "contactName": "Personne à contacter",
+        "contactPhone": "Téléphone",
+        "contactEmail": "E-mail",
+        "residencesCount": "Nombre de résidences",
+        "residencesPlaceholder": "ex : 3",
+        "impayesEstimate": "Montant estimé des impayés",
+        "impayesPlaceholder": "ex : 120 000 DH",
+        "plan": "Formule souhaitée",
+        "message": "Précisions sur votre situation",
+        "messagePlaceholder": "Décrivez brièvement votre besoin (nombre de copropriétaires concernés, ancienneté des impayés, procédures déjà engagées…).",
+        "submit": "Envoyer la demande",
+        "submitting": "Envoi en cours…",
+        "mailtoHint": "Ou contactez-nous directement à",
+        "disclaimer": "Toutes les procédures sont menées en stricte conformité avec la loi 18-00 relative au statut de la copropriété. Le recouvrement peut aller jusqu'à l'action judiciaire devant le tribunal de première instance."
+      },
+      "success": {
+        "title": "Demande envoyée à l'équipe Imaro",
+        "desc": "Votre demande d'assistance recouvrement a bien été transmise. Notre équipe IT vous recontactera sous 48 h pour finaliser l'abonnement et démarrer la procédure.",
+        "reference": "Référence",
+        "newRequest": "Nouvelle demande",
+        "mailtoFallback": "Nous écrire par e-mail"
+      },
+      "mailto": {
+        "subject": "Demande d'assistance recouvrement — {{syndic}}"
+      },
+      "toast": {
+        "success": "Demande envoyée. Notre équipe vous recontacte sous 48 h.",
+        "error": "Échec de l'envoi. Réessayez ou écrivez-nous par e-mail."
+      }
     },
     "residences": {
       "title": "Résidences",
