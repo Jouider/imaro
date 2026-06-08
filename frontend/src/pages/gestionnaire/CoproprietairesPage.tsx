@@ -6,7 +6,7 @@ import {
   UserPlus,
   Copy,
   CheckCircle2,
-  MessageCircle,
+  Send,
   Building2,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -463,17 +463,6 @@ function SuccessDialog({
     }
   }
 
-  function sendWhatsApp() {
-    const code = result?.temp_password ?? ''
-    const msg = encodeURIComponent(
-      t('gestionnaire.coproprietaires.waMessage', {
-        name: result?.coproprietaire.name,
-        code,
-      }),
-    )
-    window.open(`https://wa.me/${phone.replace('+', '')}?text=${msg}`, '_blank')
-  }
-
   return (
     <Dialog
       open={open}
@@ -526,18 +515,12 @@ function SuccessDialog({
               </div>
             </div>
 
-            {/* WhatsApp */}
-            <div className="mt-3 space-y-2">
+            {/* Auto-send notice — code already sent by backend (SMS + WhatsApp + Email) */}
+            <div className="mt-3 flex items-start gap-2">
+              <Send className="size-3.5 shrink-0 mt-0.5 text-green-600 dark:text-green-400" />
               <p className="text-xs text-green-700 dark:text-green-400">
-                {t('gestionnaire.coproprietaires.shareCode')}
+                {t('gestionnaire.coproprietaires.codeAutoSent')}
               </p>
-              <button
-                onClick={sendWhatsApp}
-                className="flex items-center gap-2 rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-              >
-                <MessageCircle className="size-4" />
-                {t('gestionnaire.coproprietaires.sendWhatsApp')}
-              </button>
             </div>
           </div>
 

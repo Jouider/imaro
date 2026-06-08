@@ -1277,12 +1277,10 @@
       "createdSuccess": "Le copropriétaire a été créé avec succès.",
       "accessCode": "Code d'accès :",
       "copyCodeAria": "Copier le code",
-      "shareCode": "Partagez ce code avec le copropriétaire via WhatsApp.",
-      "sendWhatsApp": "Envoyer par WhatsApp",
+      "codeAutoSent": "Le code d'accès a été envoyé automatiquement au copropriétaire par SMS, WhatsApp et e-mail. Le code ci-dessus reste affiché en secours, si besoin de le communiquer oralement.",
       "createLotPrompt": "Souhaitez-vous créer un lot pour ce nouveau propriétaire ?",
       "yesCreateLot": "Oui, créer un lot",
       "noFinish": "Non, terminer",
-      "waMessage": "Bonjour {{name}} 👋\n\nVotre code d'accès Imaro est : *{{code}}*\n\nConnectez-vous sur l'application et entrez ce code pour accéder à votre espace copropriétaire.",
       "lotType": {
         "appartement": "Appartement",
         "commerce": "Commerce",
