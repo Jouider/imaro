@@ -31,6 +31,7 @@ import { AuditTrailPage } from '@/pages/gestionnaire/AuditTrailPage'
 import { AnnexesPage } from '@/pages/gestionnaire/AnnexesPage'
 import { ConformitePage } from '@/pages/gestionnaire/ConformitePage'
 import { RecouvrementPage } from '@/pages/gestionnaire/RecouvrementPage'
+import { AssistanceRecouvrementPage } from '@/pages/gestionnaire/AssistanceRecouvrementPage'
 import { RappelsPage } from '@/pages/gestionnaire/RappelsPage'
 import { VisitesPage } from '@/pages/gestionnaire/VisitesPage'
 import { VisitorPassPage } from '@/pages/public/VisitorPassPage'
@@ -114,6 +115,10 @@ export const router = createBrowserRouter([
       { path: 'depenses', element: <DepensesPage /> },
       { path: 'imports', element: <ImportsPage /> },
       { path: 'recouvrement', element: <RecouvrementPage /> },
+      {
+        path: 'assistance-recouvrement',
+        element: <AssistanceRecouvrementPage />,
+      },
       { path: 'rappels', element: <RappelsPage /> },
       { path: 'visites', element: <VisitesPage /> },
       { path: 'pointage', element: <PointagePage /> },

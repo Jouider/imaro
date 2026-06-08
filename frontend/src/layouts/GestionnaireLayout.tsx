@@ -29,6 +29,7 @@ import {
   BellRing,
   ScanLine,
   ShieldCheck,
+  LifeBuoy,
   LogOut,
   Menu,
   X,
@@ -72,6 +73,8 @@ type NavItem = {
   to: string
   icon: React.ReactNode
   labelKey: string
+  /** Optional accent pill (e.g. paid add-on), rendered after the label. */
+  badgeKey?: string
 }
 
 type NavSection = {
@@ -154,6 +157,12 @@ const NAV_SECTIONS: NavSection[] = [
         to: '/gestionnaire/recouvrement',
         icon: <Scale className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.recouvrement',
+      },
+      {
+        to: '/gestionnaire/assistance-recouvrement',
+        icon: <LifeBuoy className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.assistanceRecouvrement',
+        badgeKey: 'gestionnaire.nav.badgePro',
       },
       {
         to: '/gestionnaire/rappels',
@@ -413,8 +422,14 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
                         <span className="flex-1 truncate">
                           {t(item.labelKey)}
                         </span>
-                        {!isActive && (
-                          <ChevronRight className="size-3.5 opacity-0 group-hover:opacity-40 transition-opacity shrink-0" />
+                        {item.badgeKey ? (
+                          <span className="shrink-0 rounded-full bg-[#e67e22] px-1.5 py-0.5 text-[9px] font-bold uppercase leading-none tracking-wide text-white">
+                            {t(item.badgeKey)}
+                          </span>
+                        ) : (
+                          !isActive && (
+                            <ChevronRight className="size-3.5 opacity-0 group-hover:opacity-40 transition-opacity shrink-0" />
+                          )
                         )}
                       </>
                     )}

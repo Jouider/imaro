@@ -15,6 +15,7 @@ import {
   Receipt,
   PiggyBank,
   AlertTriangle,
+  LifeBuoy,
   Landmark,
   BellRing,
   TrendingUp,
@@ -164,6 +165,13 @@ export function CommandPalette() {
       label: t('gestionnaire.nav.recouvrement'),
       icon: AlertTriangle,
       to: '/gestionnaire/recouvrement',
+    },
+    {
+      key: 'nav-assistance-recouvrement',
+      group: 'nav',
+      label: t('gestionnaire.nav.assistanceRecouvrement'),
+      icon: LifeBuoy,
+      to: '/gestionnaire/assistance-recouvrement',
     },
     {
       key: 'nav-rappels',
