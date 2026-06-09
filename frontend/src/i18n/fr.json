@@ -1571,7 +1571,23 @@
       "emptyDesc": "Aucun ticket ne correspond aux filtres sélectionnés.",
       "viewKanban": "Kanban",
       "viewTable": "Tableau",
-      "toastClotureError": "Erreur lors de la clôture"
+      "toastClotureError": "Erreur lors de la clôture",
+      "create": "Nouveau ticket",
+      "createSuccess": "Ticket créé — {{ref}}",
+      "form": {
+        "lot": "Lot",
+        "selectLot": "Lot",
+        "categorie": "Catégorie",
+        "descPlaceholder": "Décrivez le problème…"
+      },
+      "audit": {
+        "tab": "Audit par résidence",
+        "title": "Réclamations par résidence",
+        "subtitle": "Volume de tickets par immeuble — du plus sollicité au moins sollicité.",
+        "total": "Total",
+        "most": "Le plus",
+        "least": "Le moins"
+      }
     },
     "dashboard": {
       "title": "Tableau de bord",

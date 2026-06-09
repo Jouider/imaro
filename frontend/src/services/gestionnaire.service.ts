@@ -251,6 +251,8 @@ export type Impaye = {
 
 export type Ticket = {
   id: number
+  /** Human-friendly unique reference, e.g. "TKT-2026-0007" (KAN-43). */
+  reference: string
   categorie: string
   description: string
   priorite: 'urgent' | 'normal' | 'faible'
@@ -533,6 +535,7 @@ const MOCK_IMPAYES: Impaye[] = [
 const MOCK_TICKETS: Ticket[] = [
   {
     id: 1,
+    reference: 'TKT-2026-0001',
     categorie: 'Plomberie',
     description: "Fuite d'eau importante au sous-sol — pompe endommagée",
     priorite: 'urgent',
@@ -546,6 +549,7 @@ const MOCK_TICKETS: Ticket[] = [
   },
   {
     id: 2,
+    reference: 'TKT-2026-0002',
     categorie: 'Électricité',
     description: "Panne d'électricité dans les parties communes — tableau HS",
     priorite: 'urgent',
@@ -559,6 +563,7 @@ const MOCK_TICKETS: Ticket[] = [
   },
   {
     id: 3,
+    reference: 'TKT-2026-0003',
     categorie: 'Sécurité',
     description: 'Portail principal bloqué — accès véhicule impossible',
     priorite: 'normal',
@@ -1152,6 +1157,53 @@ export async function closTicket(id: number): Promise<void> {
   return withMock(async () => {
     await api.post(`/gestionnaire/tickets/${id}/clos`)
   }, undefined)
+}
+
+export type CreateTicketInput = {
+  residence_id: number
+  lot_id: number
+  categorie: string
+  priorite: 'urgent' | 'normal' | 'faible'
+  description: string
+}
+
+/**
+ * Create a ticket from the gestionnaire side (KAN-43). The backend assigns the
+ * unique `reference` (the mock generates one so the flow works in dev).
+ */
+export async function createTicket(data: CreateTicketInput): Promise<Ticket> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<{ ticket: Ticket }>>(
+        '/gestionnaire/tickets',
+        data,
+      )
+      return res.data.data.ticket
+    },
+    (() => {
+      const id = Math.floor(Math.random() * 9000) + 1000
+      const residence = MOCK_RESIDENCES.find((r) => r.id === data.residence_id)
+      const seq = String(Math.floor(Math.random() * 9999) + 1).padStart(4, '0')
+      return {
+        id,
+        reference: `TKT-${new Date().getFullYear()}-${seq}`,
+        categorie: data.categorie,
+        description: data.description,
+        priorite: data.priorite,
+        statut: 'ouvert',
+        images: [],
+        closed_at: null,
+        created_at: new Date().toISOString(),
+        residence: {
+          id: data.residence_id,
+          name: residence?.name ?? 'Résidence',
+          city: residence?.city,
+        },
+        lot: { id: data.lot_id, numero: '—' },
+        user: { id: 0, name: 'Gestionnaire' },
+      }
+    })(),
+  )
 }
 
 export async function getTicketsUrgents(
