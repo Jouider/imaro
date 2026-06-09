@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import {
@@ -11,6 +12,7 @@ import {
   Circle,
   AlertTriangle,
   Clock,
+  ChevronRight,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -309,9 +311,25 @@ export function ConformitePage() {
                     {t(`gestionnaire.conformite.phaseLabel.${p.phase}`)}
                   </h3>
                   <p className="text-xs text-muted-foreground">
+                    {t(`gestionnaire.conformite.phaseDesc.${p.phase}`, {
+                      defaultValue: '',
+                    })}
+                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground/70">
                     {p.tasks.filter((t) => t.status === 'done').length}/
                     {p.tasks.length} tâches terminées
                   </p>
+                  {p.phase === 'preparation_ag' && (
+                    <Link
+                      to="/gestionnaire/assemblees"
+                      className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-[var(--color-imaro-primary)] hover:underline"
+                    >
+                      {t('gestionnaire.conformite.agLink', {
+                        defaultValue: 'Gérer les assemblées',
+                      })}
+                      <ChevronRight className="size-3.5 rtl:rotate-180" />
+                    </Link>
+                  )}
                 </div>
                 <span className="text-xs font-medium text-muted-foreground">
                   {p.progress_pct}%
