@@ -622,6 +622,9 @@ export function CoproprietairesPage() {
     void queryClient.invalidateQueries({
       queryKey: ['coproprietaires', residenceId],
     })
+    // KAN-40: the assigned lot now has an owner — refetch the lots so it drops
+    // out of the "available" list and can't be assigned twice.
+    void queryClient.invalidateQueries({ queryKey: ['lots'] })
   }
 
   function handleSuccessClose() {
