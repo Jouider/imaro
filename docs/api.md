@@ -702,6 +702,25 @@ Liste globale — toutes les résidences du gestionnaire.
 
 ---
 
+### POST /api/gestionnaire/coproprietaires
+Crée un copropriétaire. **Find-or-link** : un copro pouvant avoir plusieurs lots,
+si le `phone`/`email` correspond déjà à un résident **du même cabinet**, on
+**rattache** un nouveau lot à ce compte (restauré s'il était soft-deleted) au lieu
+d'échouer. Un compte ré-utilisé ne reçoit **pas** de nouveau code (`temp_password: null`).
+
+**Body** : `name`, `phone` et/ou `email`, `lot_id` ou `residence_id`, `type?`, `date_entree?`
+
+**Response 201** : `data.coproprietaire`, `data.temp_password` (null si rattachement), `data.reused` (bool)
+
+**Erreurs 422** :
+- déjà copropriétaire de ce lot
+- `phone`/`email` appartient à un membre de l'équipe (non-resident)
+- `phone`/`email` appartient à un copropriétaire d'un **autre cabinet** (unique global — comptes séparés par tenant)
+
+> Idem pour `POST /coproprietaires/bulk` (import Excel) : find-or-link par ligne, erreurs collectées par ligne.
+
+---
+
 ### POST /api/gestionnaire/coproprietaires/{id}/generate-code
 Génère un code d'accès temporaire pour un résident et l'envoie par WhatsApp (simulé par log en attendant Twilio).
 
