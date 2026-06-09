@@ -331,6 +331,33 @@
     "dashboard": {
       "welcome": "Bonjour, {{name}} !",
       "subtitle": "Portail copropriétaire"
+    },
+    "visiteurs": {
+      "title": "Mes visiteurs",
+      "subtitle": "Invitez un visiteur, livreur ou prestataire — il recevra un QR à présenter à l'entrée.",
+      "newInvite": "Inviter un visiteur",
+      "empty": "Aucun visiteur invité",
+      "emptyDesc": "Créez votre première invitation — votre visiteur recevra un lien à scanner à l'entrée.",
+      "form": {
+        "title": "Nouvelle invitation",
+        "desc": "Le QR est envoyé directement par WhatsApp / SMS au visiteur.",
+        "shareLater": "Vous pourrez le partager après création.",
+        "submit": "Créer & partager",
+        "submitting": "Création…",
+        "success": "Invitation créée"
+      },
+      "share": {
+        "title": "Partager le QR",
+        "copyLink": "Copier le lien",
+        "whatsapp": "WhatsApp",
+        "sms": "SMS",
+        "waMessage": "Bonjour {{name}}, votre laissez-passer Imaro : {{url}}"
+      },
+      "list": {
+        "upcoming": "À venir",
+        "past": "Passées"
+      },
+      "back": "← Retour à l'accueil"
     }
   },
   "home": {
