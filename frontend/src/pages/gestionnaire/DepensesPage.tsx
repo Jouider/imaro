@@ -48,6 +48,7 @@ import {
   getExercices,
   type Exercice,
 } from '@/services/gestionnaire.service'
+import { getPrestataires } from '@/services/prestataires.service'
 import { useResidenceStore } from '@/stores/residenceStore'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { KpiCard } from '@/components/shared/KpiCard'
@@ -144,6 +145,13 @@ function NouvelleDepenseModal({
     enabled: open,
   })
   const compteClasse6 = comptes.filter((c) => c.classe === 6)
+
+  // KAN-46: pick an existing prestataire (datalist) or type a new one freely.
+  const { data: prestataires = [] } = useQuery({
+    queryKey: ['prestataires', 'actif'],
+    queryFn: () => getPrestataires({ statut: 'actif' }),
+    enabled: open,
+  })
 
   // A dépense must be tied to a résidence + exercice (required by the API,
   // POST /gestionnaire/depenses-finance). Without them the backend rejects the
@@ -479,12 +487,19 @@ function NouvelleDepenseModal({
               })}
             </Label>
             <Input
+              list="depense-prestataires"
               value={form.prestataire}
               onChange={(e) =>
                 setForm((f) => ({ ...f, prestataire: e.target.value }))
               }
               placeholder={t('gestionnaire.depenses.beneficiaryPlaceholder')}
             />
+            {/* Existing prestataires as suggestions — free text still allowed. */}
+            <datalist id="depense-prestataires">
+              {prestataires.map((p) => (
+                <option key={p.id} value={p.name} />
+              ))}
+            </datalist>
           </div>
 
           <div className="space-y-1">
