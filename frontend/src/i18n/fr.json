@@ -2739,15 +2739,24 @@
       "timeline": "Chronologie des phases",
       "exerciceLabel": "Exercice {{n}}",
       "phaseLabel": {
-        "ops": "Opérations mensuelles",
-        "cloture": "Clôture d'exercice",
-        "prepAg": "Préparation de l'AG"
+        "operations_mensuelles": "Opérations mensuelles",
+        "cloture_exercice": "Clôture d'exercice",
+        "preparation_ag": "Préparation de l'AG",
+        "archivage": "Archivage"
       },
+      "phaseDesc": {
+        "operations_mensuelles": "Appels de fonds, encaissements et dépenses du mois.",
+        "cloture_exercice": "Arrêté des comptes et préparation des annexes comptables.",
+        "preparation_ag": "Convocation de l'assemblée générale (délai légal 15 j, loi 18-00) et documents à présenter.",
+        "archivage": "Conservation légale des pièces et procès-verbaux."
+      },
+      "agLink": "Gérer les assemblées",
       "phaseStatut": {
-        "todo": "À faire",
+        "pending": "À faire",
         "in_progress": "En cours",
         "done": "Terminé",
-        "skipped": "Ignoré"
+        "skipped": "Ignoré",
+        "overdue": "En retard"
       },
       "title": "Calendrier de conformité",
       "subtitle": "Cycle annuel de conformité — Décret 2.23.700"
