@@ -1076,6 +1076,10 @@
       "rappels": "Rappels",
       "visites": "Visites"
     },
+    "residenceSwitcher": {
+      "all": "Toutes les résidences",
+      "aria": "Filtrer par résidence"
+    },
     "assistanceRecouvrement": {
       "breadcrumb": "Finances",
       "title": "Assistance recouvrement",

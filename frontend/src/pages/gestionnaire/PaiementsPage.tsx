@@ -38,6 +38,7 @@ import {
   type AppelFonds,
   type Lot,
 } from '@/services/gestionnaire.service'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { MontantDisplay } from '@/components/shared/MontantDisplay'
@@ -812,9 +813,14 @@ export function PaiementsPage() {
 
   // ── Queries ────────────────────────────────────────────────────────────────
 
+  // Global residence scope (KAN-47). Forwarded as a server-side filter; the
+  // backend support (créance.residence + ?residence_id) is pending — see brief.
+  const residenceId = useResidenceStore((s) => s.residenceId)
+
   const { data: creances = [], isLoading: loadingCreances } = useQuery({
-    queryKey: ['creances'],
-    queryFn: () => getCreances(),
+    queryKey: ['creances', residenceId],
+    queryFn: () =>
+      getCreances(residenceId !== null ? { residence_id: residenceId } : {}),
   })
 
   const { data: encaissements = [], isLoading: loadingEnc } = useQuery({

@@ -11,6 +11,7 @@ import {
   type GestDoc,
 } from '@/services/documents.service'
 import { getResidences } from '@/services/gestionnaire.service'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { ConfirmModal } from '@/components/shared/ConfirmModal'
@@ -248,7 +249,7 @@ export function DocumentsPage() {
   const qc = useQueryClient()
 
   const [filterType, setFilterType] = useState<DocType | '_all'>('_all')
-  const [filterResidence, setFilterResidence] = useState<string>('_all')
+  const residenceId = useResidenceStore((s) => s.residenceId)
 
   const [addOpen, setAddOpen] = useState(false)
   const [form, setForm] = useState<AddForm>(EMPTY_FORM)
@@ -287,11 +288,8 @@ export function DocumentsPage() {
 
   const filtered = docs.filter((d) => {
     const typeOk = filterType === '_all' || d.type === filterType
-    const resOk =
-      filterResidence === '_all' ||
-      (filterResidence === '_none'
-        ? d.residence === null
-        : String(d.residence?.id) === filterResidence)
+    // Global residence scope (KAN-47): null = all (incl. cabinet-wide docs).
+    const resOk = residenceId === null || d.residence?.id === residenceId
     return typeOk && resOk
   })
 
@@ -528,25 +526,7 @@ export function DocumentsPage() {
             ))}
           </SelectContent>
         </Select>
-
-        {/* Résidence filter */}
-        <Select value={filterResidence} onValueChange={setFilterResidence}>
-          <SelectTrigger className="w-52">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="_all">
-              {t('gestionnaire.documents.filterAllResidences', {
-                defaultValue: 'Toutes les résidences',
-              })}
-            </SelectItem>
-            {residences.map((r) => (
-              <SelectItem key={r.id} value={String(r.id)}>
-                {r.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {/* Résidence is now scoped globally via the sidebar selector (KAN-47). */}
       </div>
 
       {/* Data table */}

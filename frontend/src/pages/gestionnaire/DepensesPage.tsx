@@ -48,6 +48,7 @@ import {
   getExercices,
   type Exercice,
 } from '@/services/gestionnaire.service'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { KpiCard } from '@/components/shared/KpiCard'
 import { DataTable, type Column } from '@/components/shared/DataTable'
@@ -854,6 +855,8 @@ export function DepensesPage() {
 
   // ── Queries ────────────────────────────────────────────────────────────────
 
+  const residenceId = useResidenceStore((s) => s.residenceId)
+
   const { data: depenses = [], isLoading } = useQuery({
     queryKey: ['depenses-finance'],
     queryFn: () => getDepensesFinance(),
@@ -907,6 +910,8 @@ export function DepensesPage() {
   // ── Filters ────────────────────────────────────────────────────────────────
 
   const filtered = depenses.filter((d) => {
+    // Global residence scope (KAN-47): null = all residences.
+    if (residenceId !== null && d.residence_id !== residenceId) return false
     if (filterCompte !== 'tous' && d.compte_charge !== filterCompte)
       return false
     if (

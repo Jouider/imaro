@@ -64,6 +64,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useMutation } from '@tanstack/react-query'
 import { CommandPalette } from '@/components/gestionnaire/CommandPalette'
+import { ResidenceSwitcher } from '@/components/gestionnaire/ResidenceSwitcher'
 import { canAccessRoute } from '@/lib/navAccess'
 import { cn } from '@/lib/utils'
 
@@ -372,6 +373,11 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
       {/* Logo */}
       <div className="flex h-16 shrink-0 items-center px-5 border-b border-white/8">
         <Wordmark inverted className="h-12 w-48" />
+      </div>
+
+      {/* Global residence scope (KAN-47) */}
+      <div className="shrink-0 border-b border-white/8 pt-3">
+        <ResidenceSwitcher onSelect={onNavClick} />
       </div>
 
       {/* Navigation */}

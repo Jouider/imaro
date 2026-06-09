@@ -1076,6 +1076,10 @@
       "rappels": "التذكيرات",
       "visites": "الزيارات"
     },
+    "residenceSwitcher": {
+      "all": "كل الإقامات",
+      "aria": "التصفية حسب الإقامة"
+    },
     "assistanceRecouvrement": {
       "breadcrumb": "المالية",
       "title": "مساعدة في التحصيل",
