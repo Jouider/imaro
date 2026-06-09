@@ -1702,7 +1702,9 @@
         "ordreDuJour": "Ordre du jour",
         "titrePlaceholder": "AG Ordinaire 2026",
         "lieuPlaceholder": "Salle de réunion, RDC",
-        "ordrePlaceholder": "1. Approbation des comptes\n2. Budget prévisionnel\n3. Questions diverses"
+        "ordrePlaceholder": "1. Approbation des comptes\n2. Budget prévisionnel\n3. Questions diverses",
+        "delaiHint": "Délai légal minimum : 15 jours (loi 18-00).",
+        "delaiError": "La convocation doit partir au moins 15 jours avant l’AG (loi 18-00, art. 16 quinquies)."
       },
       "empty": "Aucune assemblée",
       "emptyDesc": "Aucune assemblée générale programmée pour le moment.",

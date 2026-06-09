@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Plus, CalendarDays, Users } from 'lucide-react'
+import { Plus, CalendarDays, Users, AlertTriangle } from 'lucide-react'
 import {
   getAssemblees,
   getResidences,
@@ -86,6 +86,16 @@ export function AssembleesPage() {
   const now = new Date()
   const aVenir = assemblees.filter((a) => new Date(a.date) >= now)
   const passees = assemblees.filter((a) => new Date(a.date) < now)
+
+  // Loi 18-00 (art. 16 quinquies) : la convocation à l'AG doit partir au moins
+  // 15 jours avant la date. On bloque toute date trop rapprochée (KAN-44).
+  const AG_MIN_DELAY_DAYS = 15
+  const minDate = (() => {
+    const d = new Date()
+    d.setDate(d.getDate() + AG_MIN_DELAY_DAYS)
+    return d.toISOString().slice(0, 10)
+  })()
+  const delaiTropCourt = !!form.date && form.date < minDate
 
   const createMutation = useMutation({
     mutationFn: () => {
@@ -194,6 +204,7 @@ export function AssembleesPage() {
     form.titre.trim() &&
     form.residence_id &&
     form.date &&
+    !delaiTropCourt &&
     form.lieu.trim() &&
     form.ordre_du_jour.trim()
 
@@ -313,11 +324,29 @@ export function AssembleesPage() {
                 <Label>{t('gestionnaire.assemblees.form.date')}</Label>
                 <Input
                   type="date"
+                  min={minDate}
                   value={form.date}
                   onChange={(e) =>
                     setForm((f) => ({ ...f, date: e.target.value }))
                   }
+                  aria-invalid={delaiTropCourt}
                 />
+                {delaiTropCourt ? (
+                  <p className="flex items-start gap-1.5 text-xs text-[var(--color-imaro-danger)]">
+                    <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
+                    {t('gestionnaire.assemblees.form.delaiError', {
+                      defaultValue:
+                        'La convocation doit partir au moins 15 jours avant l’AG (loi 18-00, art. 16 quinquies).',
+                    })}
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    {t('gestionnaire.assemblees.form.delaiHint', {
+                      defaultValue:
+                        'Délai légal minimum : 15 jours (loi 18-00).',
+                    })}
+                  </p>
+                )}
               </div>
               <div className="space-y-1">
                 <Label>{t('gestionnaire.assemblees.form.heure')}</Label>
