@@ -752,8 +752,41 @@ export async function updateResidence(
   return res.data.data
 }
 
-export async function deleteResidence(id: number): Promise<void> {
-  await api.delete(`/gestionnaire/residences/${id}`)
+/**
+ * Request a one-time code (email/SMS) to authorise deleting a residence
+ * (KAN-49). Returns the channel it was sent on so the UI can tell the user.
+ *
+ * Backend Abdellah (futur) — `POST /api/gestionnaire/residences/:id/deletion-code`.
+ * Mock returns `email` so the confirm flow works end-to-end in dev.
+ */
+export async function requestResidenceDeletionCode(
+  id: number,
+): Promise<{ channel: 'email' | 'sms' }> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<{ channel: 'email' | 'sms' }>>(
+        `/gestionnaire/residences/${id}/deletion-code`,
+        {},
+      )
+      return res.data.data
+    },
+    { channel: 'email' },
+  )
+}
+
+/**
+ * Delete a residence. The `code` (KAN-49) is the OTP the user received; the
+ * backend must verify it before deleting. In dev the call is mocked so the
+ * flow works without a real code.
+ */
+export async function deleteResidence(
+  id: number,
+  code?: string,
+): Promise<void> {
+  if (import.meta.env.DEV) return
+  await api.delete(`/gestionnaire/residences/${id}`, {
+    data: code ? { code } : undefined,
+  })
 }
 
 export async function getResidenceOverview(
