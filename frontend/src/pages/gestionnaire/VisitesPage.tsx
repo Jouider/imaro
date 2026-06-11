@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import QRCode from 'qrcode'
@@ -124,9 +125,8 @@ function visitorPassUrl(token: string): string {
 export function VisitesPage() {
   const { t } = useTranslation()
   const qc = useQueryClient()
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
-    null,
-  )
+  const globalResidenceId = useResidenceStore((s) => s.residenceId)
+  const setResidenceId = useResidenceStore((s) => s.setResidenceId)
   const [createOpen, setCreateOpen] = useState(false)
   const [scanOpen, setScanOpen] = useState(false)
   const [detail, setDetail] = useState<Visite | null>(null)
@@ -137,7 +137,7 @@ export function VisitesPage() {
     queryKey: ['residences'],
     queryFn: () => getResidences(),
   })
-  const realResidenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
+  const realResidenceId = globalResidenceId ?? residencesQ.data?.[0]?.id ?? null
   const residenceId = realResidenceId ?? (import.meta.env.DEV ? 0 : null)
 
   const visitesQ = useQuery({
@@ -316,7 +316,7 @@ export function VisitesPage() {
       <div className="flex flex-wrap items-center gap-3">
         <Select
           value={residenceId ? String(residenceId) : ''}
-          onValueChange={(v) => setPickedResidenceId(Number(v))}
+          onValueChange={(v) => setResidenceId(Number(v))}
         >
           <SelectTrigger className="w-60">
             <SelectValue

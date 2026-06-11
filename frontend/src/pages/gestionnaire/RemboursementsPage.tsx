@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Undo2, Plus, Pencil, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -91,9 +92,8 @@ export function RemboursementsPage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
-    null,
-  )
+  const globalResidenceId = useResidenceStore((s) => s.residenceId)
+  const setResidenceId = useResidenceStore((s) => s.setResidenceId)
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Remboursement | null>(null)
   const [draft, setDraft] = useState<CreateRemboursementInput>(empty(0))
@@ -102,7 +102,7 @@ export function RemboursementsPage() {
     queryKey: ['residences'],
     queryFn: () => getResidences(),
   })
-  const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
+  const residenceId = globalResidenceId ?? residencesQ.data?.[0]?.id ?? null
 
   const copropQ = useQuery({
     queryKey: ['coproprietaires', residenceId],
@@ -221,7 +221,7 @@ export function RemboursementsPage() {
         <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
-          onValueChange={(v) => setPickedResidenceId(Number(v))}
+          onValueChange={(v) => setResidenceId(Number(v))}
         >
           <SelectTrigger className="w-72">
             <SelectValue placeholder={t('common.select')} />

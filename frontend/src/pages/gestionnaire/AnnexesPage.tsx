@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { FileText, Download, RefreshCw, Check, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -51,9 +52,8 @@ const ANNEXE_LABELS: Record<string, string> = {
 export function AnnexesPage() {
   const { t } = useTranslation()
 
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
-    null,
-  )
+  const globalResidenceId = useResidenceStore((s) => s.residenceId)
+  const setResidenceId = useResidenceStore((s) => s.setResidenceId)
   const [exercice, setExercice] = useState(2026)
 
   const residencesQ = useQuery({
@@ -62,7 +62,7 @@ export function AnnexesPage() {
   })
 
   // Derive effective residence id (picked or auto first)
-  const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
+  const residenceId = globalResidenceId ?? residencesQ.data?.[0]?.id ?? null
 
   const annexesQ = useQuery({
     queryKey: ['annexes', residenceId, exercice],
@@ -305,7 +305,7 @@ export function AnnexesPage() {
         <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
-          onValueChange={(v) => setPickedResidenceId(Number(v))}
+          onValueChange={(v) => setResidenceId(Number(v))}
         >
           <SelectTrigger className="w-64">
             <SelectValue placeholder={t('common.select')} />

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Wrench,
@@ -76,9 +77,8 @@ export function EquipementsPage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
-    null,
-  )
+  const globalResidenceId = useResidenceStore((s) => s.residenceId)
+  const setResidenceId = useResidenceStore((s) => s.setResidenceId)
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Equipement | null>(null)
   const [draft, setDraft] = useState<CreateEquipementInput>(emptyDraft(0))
@@ -87,7 +87,7 @@ export function EquipementsPage() {
     queryKey: ['residences'],
     queryFn: () => getResidences(),
   })
-  const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
+  const residenceId = globalResidenceId ?? residencesQ.data?.[0]?.id ?? null
 
   const equipementsQ = useQuery({
     queryKey: ['equipements', residenceId],
@@ -216,7 +216,7 @@ export function EquipementsPage() {
         <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
-          onValueChange={(v) => setPickedResidenceId(Number(v))}
+          onValueChange={(v) => setResidenceId(Number(v))}
         >
           <SelectTrigger className="w-72">
             <SelectValue placeholder={t('common.select')} />

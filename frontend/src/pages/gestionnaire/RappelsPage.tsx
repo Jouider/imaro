@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
@@ -153,9 +153,8 @@ const dtFmt = new Intl.DateTimeFormat('fr-MA', {
 export function RappelsPage() {
   const { t } = useTranslation()
   const qc = useQueryClient()
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
-    null,
-  )
+  const globalResidenceId = useResidenceStore((s) => s.residenceId)
+  const setResidenceId = useResidenceStore((s) => s.setResidenceId)
 
   const residencesQ = useQuery({
     queryKey: ['residences'],
@@ -164,7 +163,7 @@ export function RappelsPage() {
   // In dev with no real residences, fall back to a synthetic id so the
   // mock-backed queries still fire and the page renders with sample data.
   // In prod, residenceId stays null → page shows an empty state below.
-  const realResidenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
+  const realResidenceId = globalResidenceId ?? residencesQ.data?.[0]?.id ?? null
   const residenceId = realResidenceId ?? (import.meta.env.DEV ? 0 : null)
   const residence = residencesQ.data?.find((r) => r.id === residenceId)
 
@@ -323,7 +322,7 @@ export function RappelsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Select
           value={residenceId ? String(residenceId) : ''}
-          onValueChange={(v) => setPickedResidenceId(Number(v))}
+          onValueChange={(v) => setResidenceId(Number(v))}
         >
           <SelectTrigger className="w-64">
             <SelectValue

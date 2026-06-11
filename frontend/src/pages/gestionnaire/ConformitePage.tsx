@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { useQuery } from '@tanstack/react-query'
 import {
   CalendarCheck,
@@ -86,9 +87,8 @@ const STATUS_BADGES: Record<
 export function ConformitePage() {
   const { t } = useTranslation()
 
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
-    null,
-  )
+  const globalResidenceId = useResidenceStore((s) => s.residenceId)
+  const setResidenceId = useResidenceStore((s) => s.setResidenceId)
   const [exercice, setExercice] = useState(2026)
 
   const residencesQ = useQuery({
@@ -96,7 +96,7 @@ export function ConformitePage() {
     queryFn: () => getResidences(),
   })
 
-  const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
+  const residenceId = globalResidenceId ?? residencesQ.data?.[0]?.id ?? null
 
   const calendarQ = useQuery({
     queryKey: ['compliance', residenceId, exercice],
@@ -133,7 +133,7 @@ export function ConformitePage() {
         <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
-          onValueChange={(v) => setPickedResidenceId(Number(v))}
+          onValueChange={(v) => setResidenceId(Number(v))}
         >
           <SelectTrigger className="w-64">
             <SelectValue placeholder={t('common.select')} />
