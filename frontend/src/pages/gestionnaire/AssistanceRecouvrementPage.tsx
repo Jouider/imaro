@@ -270,9 +270,7 @@ export function AssistanceRecouvrementPage() {
                 <h4 className="text-base font-bold text-foreground">
                   {t(`${base}.name`)}
                 </h4>
-                <p className="mt-1 text-sm font-semibold text-[var(--color-imaro-primary)]">
-                  {t(`${base}.price`)}
-                </p>
+                {/* Prices intentionally hidden (KAN-51) — devis on request. */}
                 <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
                   {t(`${base}.desc`)}
                 </p>
