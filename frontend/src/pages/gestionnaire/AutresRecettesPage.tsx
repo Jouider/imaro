@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { TrendingUp, Plus, Pencil, Trash2, Calendar } from 'lucide-react'
 import { toast } from 'sonner'
@@ -64,9 +65,8 @@ export function AutresRecettesPage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
-    null,
-  )
+  const globalResidenceId = useResidenceStore((s) => s.residenceId)
+  const setResidenceId = useResidenceStore((s) => s.setResidenceId)
   const [exercice, setExercice] = useState(2026)
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<AutreRecette | null>(null)
@@ -76,7 +76,7 @@ export function AutresRecettesPage() {
     queryKey: ['residences'],
     queryFn: () => getResidences(),
   })
-  const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
+  const residenceId = globalResidenceId ?? residencesQ.data?.[0]?.id ?? null
 
   const recettesQ = useQuery({
     queryKey: ['autres-recettes', residenceId, exercice],
@@ -188,7 +188,7 @@ export function AutresRecettesPage() {
         <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
-          onValueChange={(v) => setPickedResidenceId(Number(v))}
+          onValueChange={(v) => setResidenceId(Number(v))}
         >
           <SelectTrigger className="w-60">
             <SelectValue placeholder={t('common.select')} />

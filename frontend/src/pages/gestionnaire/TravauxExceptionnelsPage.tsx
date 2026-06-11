@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { HardHat, Plus, Pencil, Trash2, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
@@ -80,9 +81,8 @@ export function TravauxExceptionnelsPage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
-    null,
-  )
+  const globalResidenceId = useResidenceStore((s) => s.residenceId)
+  const setResidenceId = useResidenceStore((s) => s.setResidenceId)
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<TravauxExceptionnel | null>(null)
   const [draft, setDraft] = useState<CreateTravauxInput>(emptyDraft(0))
@@ -91,7 +91,7 @@ export function TravauxExceptionnelsPage() {
     queryKey: ['residences'],
     queryFn: () => getResidences(),
   })
-  const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
+  const residenceId = globalResidenceId ?? residencesQ.data?.[0]?.id ?? null
 
   const travauxQ = useQuery({
     queryKey: ['travaux-exceptionnels', residenceId],
@@ -209,7 +209,7 @@ export function TravauxExceptionnelsPage() {
         <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
-          onValueChange={(v) => setPickedResidenceId(Number(v))}
+          onValueChange={(v) => setResidenceId(Number(v))}
         >
           <SelectTrigger className="w-72">
             <SelectValue placeholder={t('common.select')} />

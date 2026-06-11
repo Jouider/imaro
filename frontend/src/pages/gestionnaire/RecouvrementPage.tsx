@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Scale,
@@ -84,16 +85,15 @@ const STATUS_BADGES: Record<string, { label: string; cls: string }> = {
 export function RecouvrementPage() {
   const { t } = useTranslation()
 
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
-    null,
-  )
+  const globalResidenceId = useResidenceStore((s) => s.residenceId)
+  const setResidenceId = useResidenceStore((s) => s.setResidenceId)
 
   const residencesQ = useQuery({
     queryKey: ['residences'],
     queryFn: () => getResidences(),
   })
 
-  const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
+  const residenceId = globalResidenceId ?? residencesQ.data?.[0]?.id ?? null
 
   const recQ = useQuery({
     queryKey: ['recouvrement', residenceId],
@@ -200,7 +200,7 @@ export function RecouvrementPage() {
         <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
-          onValueChange={(v) => setPickedResidenceId(Number(v))}
+          onValueChange={(v) => setResidenceId(Number(v))}
         >
           <SelectTrigger className="w-72">
             <SelectValue placeholder={t('common.select')} />
