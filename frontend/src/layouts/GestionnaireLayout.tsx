@@ -160,12 +160,6 @@ const NAV_SECTIONS: NavSection[] = [
         labelKey: 'gestionnaire.nav.recouvrement',
       },
       {
-        to: '/gestionnaire/assistance-recouvrement',
-        icon: <LifeBuoy className="size-[18px]" aria-hidden="true" />,
-        labelKey: 'gestionnaire.nav.assistanceRecouvrement',
-        badgeKey: 'gestionnaire.nav.badgePro',
-      },
-      {
         to: '/gestionnaire/rappels',
         icon: <BellRing className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.rappels',
@@ -269,6 +263,18 @@ const NAV_SECTIONS: NavSection[] = [
         to: '/gestionnaire/personnel',
         icon: <HardHat className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.personnel',
+      },
+    ],
+  },
+  // Premium upsell — kept as the very last sidebar item (KAN-51).
+  {
+    labelKey: null,
+    items: [
+      {
+        to: '/gestionnaire/assistance-recouvrement',
+        icon: <LifeBuoy className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.assistanceRecouvrement',
+        badgeKey: 'gestionnaire.nav.badgePro',
       },
     ],
   },
