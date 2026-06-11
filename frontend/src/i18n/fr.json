@@ -1436,7 +1436,10 @@
         "commerce": "Commerce",
         "parking": "Parking",
         "cave": "Cave"
-      }
+      },
+      "editTitle": "Modifier le copropriétaire",
+      "editDesc": "Corrigez le nom, le téléphone ou l'email du copropriétaire.",
+      "editSuccess": "Copropriétaire mis à jour"
     },
     "appelsFonds": {
       "title": "Appels de fonds",

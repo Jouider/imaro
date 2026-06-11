@@ -976,6 +976,40 @@ export async function createCoproprietaire(
   }, mock)
 }
 
+/** Editable fields of a coproprietaire (KAN-50: fix a typo after creation). */
+export type UpdateCoproprietaireInput = {
+  name?: string
+  phone?: string
+  email?: string
+}
+
+/**
+ * Update a coproprietaire's contact info after creation (KAN-50).
+ *
+ * Backend Abdellah (futur) — `PATCH /api/gestionnaire/coproprietaires/:id`.
+ * Until it lands the call is mocked so the edit flow works end-to-end.
+ */
+export async function updateCoproprietaire(
+  id: number,
+  patch: UpdateCoproprietaireInput,
+): Promise<Coproprietaire> {
+  const mock: Coproprietaire = {
+    id,
+    name: patch.name ?? '',
+    phone: patch.phone ?? '',
+    email: patch.email,
+    solde: 0,
+    lot: null,
+  }
+  return withMock(async () => {
+    const res = await api.patch<ApiEnvelope<Coproprietaire>>(
+      `/gestionnaire/coproprietaires/${id}`,
+      patch,
+    )
+    return res.data.data
+  }, mock)
+}
+
 // ─── Exercices ───────────────────────────────────────────────────────────────
 
 export async function getExercices(residenceId: number): Promise<Exercice[]> {
