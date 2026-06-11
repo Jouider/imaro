@@ -297,7 +297,25 @@
       "photoSizeError": "الملف كبير جدًا (الحد الأقصى 5 ميغابايت للصورة)",
       "empty": "لا توجد شكاية",
       "emptyHint": "ستظهر شكاياتك المقدمة هنا.",
-      "sendError": "خطأ أثناء الإرسال"
+      "sendError": "خطأ أثناء الإرسال",
+      "customLabel": "حدّد النوع",
+      "customPlaceholder": "مثال: هوائي جماعي، مفرغة النفايات…",
+      "customRequired": "حدّد نوع الشكاية",
+      "categories": {
+        "parties_communes": "الأجزاء المشتركة",
+        "ascenseur": "المصعد",
+        "plomberie": "الماء / السباكة",
+        "electricite": "الكهرباء",
+        "chauffage": "التدفئة / التكييف",
+        "securite": "الأمن",
+        "proprete": "النظافة",
+        "nuisances": "الإزعاج الصوتي",
+        "espaces_verts": "المساحات الخضراء",
+        "parking": "موقف السيارات / المرآب",
+        "interphone": "الإنتركم / الولوج",
+        "degat_eaux": "أضرار المياه",
+        "autre": "آخر"
+      }
     },
     "profil": {
       "title": "ملفي الشخصي",

@@ -297,7 +297,25 @@
       "photoSizeError": "Fichier trop grand (max 5 Mo par photo)",
       "empty": "Aucune réclamation",
       "emptyHint": "Vos réclamations soumises apparaîtront ici.",
-      "sendError": "Erreur lors de l'envoi"
+      "sendError": "Erreur lors de l'envoi",
+      "customLabel": "Précisez le type",
+      "customPlaceholder": "Ex : Antenne collective, vide-ordures…",
+      "customRequired": "Précisez le type de réclamation",
+      "categories": {
+        "parties_communes": "Parties communes",
+        "ascenseur": "Ascenseur",
+        "plomberie": "Eau / Plomberie",
+        "electricite": "Électricité",
+        "chauffage": "Chauffage / Climatisation",
+        "securite": "Sécurité",
+        "proprete": "Propreté / Nettoyage",
+        "nuisances": "Nuisances sonores",
+        "espaces_verts": "Espaces verts",
+        "parking": "Parking / Garage",
+        "interphone": "Interphone / Accès",
+        "degat_eaux": "Dégât des eaux",
+        "autre": "Autre"
+      }
     },
     "profil": {
       "title": "Mon profil",
