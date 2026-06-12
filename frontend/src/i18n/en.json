@@ -2981,6 +2981,27 @@
       "create": {
         "success": "Visit created — QR generated"
       }
+    },
+    "aiChat": {
+      "fabLabel": "Assistant",
+      "title": "Imaro Assistant",
+      "subtitle": "Law 18-00 · Decree 2.23.700",
+      "placeholder": "Ask your question…",
+      "welcome": "Hello! I'm the Imaro assistant. I can answer your questions about co-ownership management, accounting and cite articles from **Law 18-00** and **Decree 2.23.700**.",
+      "disclaimer": "The AI does not replace professional legal advice.",
+      "send": "Send",
+      "thinking": "Analyzing…",
+      "errorMsg": "An error occurred. Please try again.",
+      "clearChat": "New conversation",
+      "poweredBy": "Powered by Claude",
+      "you": "You",
+      "legalRef": "Legal reference",
+      "suggestions": {
+        "s1": "How to calculate late payment penalties?",
+        "s2": "Which annexes do I need to generate?",
+        "s3": "What is the legal notice period for a general meeting?",
+        "s4": "How do I close the accounting fiscal year?"
+      }
     }
   },
   "onboarding": {

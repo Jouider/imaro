@@ -64,6 +64,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useMutation } from '@tanstack/react-query'
 import { CommandPalette } from '@/components/gestionnaire/CommandPalette'
+import { AiChatFab } from '@/components/gestionnaire/AiChatFab'
 import { ResidenceSwitcher } from '@/components/gestionnaire/ResidenceSwitcher'
 import { canAccessRoute } from '@/lib/navAccess'
 import { cn } from '@/lib/utils'
@@ -761,6 +762,9 @@ export function GestionnaireLayout() {
     <div className="flex min-h-svh">
       {/* Global Command Palette (Cmd+K) */}
       <CommandPalette />
+
+      {/* Floating AI assistant (KAN-53) */}
+      <AiChatFab />
 
       {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 start-0 hidden w-[240px] lg:block shadow-xl shadow-black/10">

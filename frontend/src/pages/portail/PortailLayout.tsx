@@ -7,6 +7,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { useThemeStore } from '@/stores/themeStore'
 import { UnreadBadge } from '@/components/portail/UnreadBadge'
 import { InstallPrompt } from '@/components/portail/InstallPrompt'
+import { AiChatFab } from '@/components/gestionnaire/AiChatFab'
 import { cn } from '@/lib/utils'
 
 type NavItem = {
@@ -140,6 +141,7 @@ export function PortailLayout() {
       </nav>
 
       <InstallPrompt />
+      <AiChatFab aboveNav />
     </div>
   )
 }
