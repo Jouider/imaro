@@ -4,8 +4,9 @@ import { initReactI18next } from 'react-i18next'
 
 import fr from './fr.json'
 import ar from './ar.json'
+import en from './en.json'
 
-export const SUPPORTED_LANGUAGES = ['fr', 'ar'] as const
+export const SUPPORTED_LANGUAGES = ['fr', 'ar', 'en'] as const
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number]
 
 void i18n
@@ -15,6 +16,7 @@ void i18n
     resources: {
       fr: { common: fr },
       ar: { common: ar },
+      en: { common: en },
     },
     fallbackLng: 'fr',
     supportedLngs: SUPPORTED_LANGUAGES,
