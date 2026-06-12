@@ -2981,6 +2981,27 @@
       "create": {
         "success": "Visite créée — QR généré"
       }
+    },
+    "aiChat": {
+      "fabLabel": "Assistant",
+      "title": "Assistant Imaro",
+      "subtitle": "Loi 18-00 · Décret 2.23.700",
+      "placeholder": "Posez votre question…",
+      "welcome": "Bonjour ! Je suis l'assistant Imaro. Je peux répondre à vos questions sur la gestion de copropriété, la comptabilité et vous citer les articles de la **Loi 18-00** et du **Décret 2.23.700**.",
+      "disclaimer": "L'IA ne remplace pas un conseil juridique professionnel.",
+      "send": "Envoyer",
+      "thinking": "Analyse en cours…",
+      "errorMsg": "Une erreur s'est produite. Réessayez.",
+      "clearChat": "Nouvelle conversation",
+      "poweredBy": "Propulsé par Claude",
+      "you": "Vous",
+      "legalRef": "Référence légale",
+      "suggestions": {
+        "s1": "Comment calculer les pénalités de retard ?",
+        "s2": "Quelles annexes dois-je générer ?",
+        "s3": "Quel est le délai légal de convocation d'une AG ?",
+        "s4": "Comment clôturer l'exercice comptable ?"
+      }
     }
   },
   "onboarding": {
