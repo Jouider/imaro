@@ -34,6 +34,7 @@ import {
   type AuditLogCategory,
   type AuditLogSeverity,
 } from '@/services/conformite.service'
+import { ResidenceFilter } from '@/components/shared'
 
 const CATEGORIES: { value: AuditLogCategory; label: string }[] = [
   { value: 'immeuble', label: 'immeuble' },
@@ -117,6 +118,7 @@ export function AuditTrailPage() {
             })}
           </p>
         </div>
+        <ResidenceFilter />
         <Button variant="outline" size="sm" className="gap-2">
           <Download className="size-4" />
           {t('gestionnaire.audit.exportCsv')}

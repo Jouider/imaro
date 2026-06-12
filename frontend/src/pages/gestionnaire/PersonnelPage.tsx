@@ -45,6 +45,7 @@ import {
   LoadingSkeleton,
   ConfirmModal,
   PageHeader,
+  ResidenceFilter,
   type Column,
 } from '@/components/shared'
 import {
@@ -59,6 +60,7 @@ import {
   type StaffPermission,
 } from '@/services/equipe.service'
 import { getResidences } from '@/services/gestionnaire.service'
+import { useResidenceStore } from '@/stores/residenceStore'
 
 type FormState = {
   name: string
@@ -94,8 +96,10 @@ export function PersonnelPage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
+  const residenceId = useResidenceStore((s) => s.residenceId)
+
   const query = useQuery({
-    queryKey: ['equipe', 'personnel'],
+    queryKey: ['residence-staff', { residenceId }],
     queryFn: () => getResidenceStaff(),
   })
 
@@ -355,13 +359,16 @@ export function PersonnelPage() {
         title={t('equipe.personnel.title')}
         subtitle={t('equipe.personnel.subtitle')}
         actions={
-          <Button
-            onClick={openCreate}
-            className="bg-gradient-imaro text-white shadow-sm hover:brightness-110"
-          >
-            <Plus className="size-4" />
-            {t('equipe.personnel.add')}
-          </Button>
+          <div className="flex items-center gap-2">
+            <ResidenceFilter />
+            <Button
+              onClick={openCreate}
+              className="bg-gradient-imaro text-white shadow-sm hover:brightness-110"
+            >
+              <Plus className="size-4" />
+              {t('equipe.personnel.add')}
+            </Button>
+          </div>
         }
       />
 

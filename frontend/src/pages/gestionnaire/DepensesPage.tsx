@@ -50,6 +50,7 @@ import {
 } from '@/services/gestionnaire.service'
 import { getPrestataires } from '@/services/prestataires.service'
 import { useResidenceStore } from '@/stores/residenceStore'
+import { ResidenceFilter } from '@/components/shared'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { KpiCard } from '@/components/shared/KpiCard'
 import { DataTable, type Column } from '@/components/shared/DataTable'
@@ -1081,6 +1082,7 @@ export function DepensesPage() {
         })}
         actions={
           <div className="flex gap-2">
+            <ResidenceFilter />
             <Button
               variant="outline"
               size="sm"

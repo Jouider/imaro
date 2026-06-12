@@ -50,6 +50,7 @@ import {
   type Match,
   type MatchableTarget,
 } from '@/services/pointage.service'
+import { ResidenceFilter } from '@/components/shared'
 
 const fmt = new Intl.NumberFormat('fr-MA', {
   minimumFractionDigits: 2,
@@ -201,17 +202,20 @@ export function PointagePage() {
             })}
           </p>
         </div>
-        {parsed && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            onClick={handleReset}
-          >
-            <RefreshCw className="size-4" />
-            {t('gestionnaire.pointage.newPointage')}
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          <ResidenceFilter />
+          {parsed && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={handleReset}
+            >
+              <RefreshCw className="size-4" />
+              {t('gestionnaire.pointage.newPointage')}
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Empty state — file upload */}

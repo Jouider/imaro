@@ -10,6 +10,8 @@ import {
   storeAssemblee,
   type Assemblee,
 } from '@/services/gestionnaire.service'
+import { useResidenceStore } from '@/stores/residenceStore'
+import { ResidenceFilter } from '@/components/shared'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { Button } from '@/components/ui/button'
@@ -73,9 +75,14 @@ export function AssembleesPage() {
   const [detailAG, setDetailAG] = useState<Assemblee | null>(null)
   const [form, setForm] = useState<AGForm>(EMPTY_FORM)
 
+  const residenceId = useResidenceStore((s) => s.residenceId)
+
   const { data: assemblees = [], isLoading } = useQuery({
-    queryKey: ['assemblees'],
-    queryFn: () => getAssemblees(),
+    queryKey: ['assemblees', { residenceId }],
+    queryFn: () =>
+      getAssemblees(
+        residenceId !== null ? { residence_id: residenceId } : undefined,
+      ),
   })
 
   const { data: residences = [] } = useQuery({
@@ -219,10 +226,13 @@ export function AssembleesPage() {
         title={t('gestionnaire.assemblees.title')}
         subtitle={t('gestionnaire.assemblees.subtitle')}
         actions={
-          <Button onClick={() => setCreateOpen(true)} size="sm">
-            <Plus className="me-1.5 size-4" />
-            {t('gestionnaire.assemblees.newAG')}
-          </Button>
+          <div className="flex items-center gap-2">
+            <ResidenceFilter />
+            <Button onClick={() => setCreateOpen(true)} size="sm">
+              <Plus className="me-1.5 size-4" />
+              {t('gestionnaire.assemblees.newAG')}
+            </Button>
+          </div>
         }
       />
 
