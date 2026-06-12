@@ -47,6 +47,7 @@ import {
   LoadingSkeleton,
   ConfirmModal,
   PageHeader,
+  ResidenceFilter,
   type Column,
 } from '@/components/shared'
 import {
@@ -368,13 +369,16 @@ export function UtilisateursPage() {
         title={t('equipe.utilisateurs.title')}
         subtitle={t('equipe.utilisateurs.subtitle')}
         actions={
-          <Button
-            onClick={openCreate}
-            className="bg-gradient-imaro text-white shadow-sm hover:brightness-110"
-          >
-            <Plus className="size-4" />
-            {t('equipe.utilisateurs.add')}
-          </Button>
+          <div className="flex items-center gap-2">
+            <ResidenceFilter />
+            <Button
+              onClick={openCreate}
+              className="bg-gradient-imaro text-white shadow-sm hover:brightness-110"
+            >
+              <Plus className="size-4" />
+              {t('equipe.utilisateurs.add')}
+            </Button>
+          </div>
         }
       />
 

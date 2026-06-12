@@ -65,6 +65,7 @@ import {
   generateBalancePdf,
   generateGrandLivrePdf,
 } from '@/lib/pdf-reports'
+import { ResidenceFilter } from '@/components/shared'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { KpiCard } from '@/components/shared/KpiCard'
 import { DataTable, type Column } from '@/components/shared/DataTable'
@@ -2593,6 +2594,7 @@ export function ComptabilitePage() {
         }
         actions={
           <div className="flex flex-wrap items-center gap-2">
+            <ResidenceFilter />
             <Button
               size="sm"
               onClick={() => setDepenseModalOpen(true)}

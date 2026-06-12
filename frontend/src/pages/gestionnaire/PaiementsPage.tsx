@@ -39,6 +39,7 @@ import {
   type Lot,
 } from '@/services/gestionnaire.service'
 import { useResidenceStore } from '@/stores/residenceStore'
+import { ResidenceFilter } from '@/components/shared'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { MontantDisplay } from '@/components/shared/MontantDisplay'
@@ -1421,6 +1422,7 @@ export function PaiementsPage() {
         })}
         actions={
           <div className="flex gap-2">
+            <ResidenceFilter />
             <Button
               variant="outline"
               size="sm"

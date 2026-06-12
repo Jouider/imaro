@@ -27,6 +27,7 @@ import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { ConfirmModal } from '@/components/shared/ConfirmModal'
 import { useResidenceStore } from '@/stores/residenceStore'
+import { ResidenceFilter } from '@/components/shared'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
@@ -610,12 +611,15 @@ export function TicketsPage() {
         title={t('gestionnaire.tickets.title')}
         subtitle={t('gestionnaire.tickets.subtitle')}
         actions={
-          <Button size="sm" onClick={() => setCreateOpen(true)}>
-            <Plus className="me-1.5 size-4" />
-            {t('gestionnaire.tickets.create', {
-              defaultValue: 'Nouveau ticket',
-            })}
-          </Button>
+          <div className="flex items-center gap-2">
+            <ResidenceFilter />
+            <Button size="sm" onClick={() => setCreateOpen(true)}>
+              <Plus className="me-1.5 size-4" />
+              {t('gestionnaire.tickets.create', {
+                defaultValue: 'Nouveau ticket',
+              })}
+            </Button>
+          </div>
         }
       />
 

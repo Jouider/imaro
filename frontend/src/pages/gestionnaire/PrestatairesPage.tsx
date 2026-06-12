@@ -12,6 +12,8 @@ import {
   type Contrat,
 } from '@/services/prestataires.service'
 import { getResidences } from '@/services/gestionnaire.service'
+import { useResidenceStore } from '@/stores/residenceStore'
+import { ResidenceFilter } from '@/components/shared'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { Button } from '@/components/ui/button'
@@ -96,8 +98,10 @@ export function PrestatairesPage() {
   const [contratForm, setContratForm] =
     useState<ContratForm>(EMPTY_CONTRAT_FORM)
 
+  const residenceId = useResidenceStore((s) => s.residenceId)
+
   const { data: prestataires = [], isLoading: loadingPresta } = useQuery({
-    queryKey: ['prestataires'],
+    queryKey: ['prestataires', { residenceId }],
     queryFn: () => getPrestataires(),
   })
 
@@ -307,17 +311,20 @@ export function PrestatairesPage() {
         title={t('gestionnaire.prestataires.title')}
         subtitle={t('gestionnaire.prestataires.subtitle')}
         actions={
-          activeTab === 'prestataires' ? (
-            <Button onClick={() => setCreatePrestaOpen(true)} size="sm">
-              <Plus className="me-1.5 size-4" />
-              {t('gestionnaire.prestataires.newPrestataire')}
-            </Button>
-          ) : (
-            <Button onClick={() => setCreateContratOpen(true)} size="sm">
-              <Plus className="me-1.5 size-4" />
-              {t('gestionnaire.prestataires.newContrat')}
-            </Button>
-          )
+          <div className="flex items-center gap-2">
+            <ResidenceFilter />
+            {activeTab === 'prestataires' ? (
+              <Button onClick={() => setCreatePrestaOpen(true)} size="sm">
+                <Plus className="me-1.5 size-4" />
+                {t('gestionnaire.prestataires.newPrestataire')}
+              </Button>
+            ) : (
+              <Button onClick={() => setCreateContratOpen(true)} size="sm">
+                <Plus className="me-1.5 size-4" />
+                {t('gestionnaire.prestataires.newContrat')}
+              </Button>
+            )}
+          </div>
         }
       />
 

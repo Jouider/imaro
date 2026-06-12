@@ -12,6 +12,7 @@ import {
 } from '@/services/documents.service'
 import { getResidences } from '@/services/gestionnaire.service'
 import { useResidenceStore } from '@/stores/residenceStore'
+import { ResidenceFilter } from '@/components/shared'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { ConfirmModal } from '@/components/shared/ConfirmModal'
@@ -494,10 +495,13 @@ export function DocumentsPage() {
           defaultValue: 'Gérez les documents de vos résidences',
         })}
         actions={
-          <Button onClick={() => setAddOpen(true)} size="sm">
-            <Plus className="me-1.5 size-4" />
-            {t('gestionnaire.documents.add', { defaultValue: 'Ajouter' })}
-          </Button>
+          <div className="flex items-center gap-2">
+            <ResidenceFilter />
+            <Button onClick={() => setAddOpen(true)} size="sm">
+              <Plus className="me-1.5 size-4" />
+              {t('gestionnaire.documents.add', { defaultValue: 'Ajouter' })}
+            </Button>
+          </div>
         }
       />
 
