@@ -2,13 +2,14 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 
 const LANGS = [
-  { code: 'fr', label: 'FR' },
-  { code: 'ar', label: 'AR' },
+  { code: 'fr', label: 'FR', name: 'Français' },
+  { code: 'ar', label: 'AR', name: 'العربية' },
+  { code: 'en', label: 'EN', name: 'English' },
 ] as const
 
 /**
- * Compact FR | AR pill toggle — no border outline, just a two-segment control.
- * Active segment: navy bg + white text. Inactive: muted, clickable.
+ * Compact FR | AR | EN pill toggle — no border outline, a three-segment
+ * control. Active segment: navy bg + white text. Inactive: muted, clickable.
  */
 export function LanguageSwitcher() {
   const { i18n, t } = useTranslation()
@@ -20,15 +21,15 @@ export function LanguageSwitcher() {
       role="group"
       aria-label={t('common.chooseLanguage')}
     >
-      {LANGS.map(({ code, label }) => (
+      {LANGS.map(({ code, label, name }) => (
         <button
           key={code}
           type="button"
           onClick={() => void i18n.changeLanguage(code)}
           aria-pressed={current === code}
-          aria-label={code === 'fr' ? 'Français' : 'العربية'}
+          aria-label={name}
           className={cn(
-            'min-w-[32px] rounded-md px-2 py-1 text-xs font-bold transition-all duration-150',
+            'min-w-[30px] rounded-md px-1.5 py-1 text-xs font-bold transition-all duration-150',
             current === code
               ? 'bg-[var(--color-imaro-primary)] text-white shadow-sm'
               : 'text-muted-foreground hover:text-foreground',

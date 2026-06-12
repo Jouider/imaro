@@ -12,7 +12,8 @@
   "language": {
     "fr": "Français",
     "ar": "العربية",
-    "switch": "Changer de langue"
+    "switch": "Changer de langue",
+    "en": "English"
   },
   "auth": {
     "title": "Connexion à Imaro",
