@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { useAuthStore } from '@/stores/authStore'
 import { useSettingsStore } from '@/stores/settingsStore'
@@ -50,8 +51,11 @@ export function ProfilPage() {
   const [editMode, setEditMode] = useState(false)
   const [editName, setEditName] = useState(user?.name ?? '')
   const [editPhone, setEditPhone] = useState(user?.phone ?? '')
+  // CNDP (loi 09-08) consent — must be accepted before saving personal data.
+  const [cndpConsent, setCndpConsent] = useState(false)
 
   const handleSaveProfile = () => {
+    if (!cndpConsent) return
     toast.success(t('gestionnaire.profil.toastSaved'))
     setEditMode(false)
   }
@@ -59,6 +63,7 @@ export function ProfilPage() {
   const handleCancelEdit = () => {
     setEditName(user?.name ?? '')
     setEditPhone(user?.phone ?? '')
+    setCndpConsent(false)
     setEditMode(false)
   }
 
@@ -190,8 +195,29 @@ export function ProfilPage() {
                 />
               </div>
             </div>
+            {/* CNDP (loi 09-08) consent — mandatory before saving */}
+            <label
+              htmlFor="cndp-consent"
+              className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-border bg-muted/30 p-3"
+            >
+              <Checkbox
+                id="cndp-consent"
+                checked={cndpConsent}
+                onCheckedChange={(v) => setCndpConsent(v === true)}
+                className="mt-0.5"
+                aria-required="true"
+              />
+              <span className="text-xs leading-relaxed text-muted-foreground">
+                {t('gestionnaire.profil.cndpConsent')}
+              </span>
+            </label>
+
             <div className="flex gap-2">
-              <Button size="sm" onClick={handleSaveProfile}>
+              <Button
+                size="sm"
+                onClick={handleSaveProfile}
+                disabled={!cndpConsent}
+              >
                 <Check className="me-1.5 size-3.5" />
                 {t('actions.save')}
               </Button>
