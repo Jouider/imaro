@@ -976,12 +976,34 @@ export async function getCoproprietaires(
   search?: string,
 ): Promise<Coproprietaire[]> {
   return withMock(async () => {
-    const params: Record<string, string> = {}
-    if (search) params.search = search
-    const res = await api.get<
-      ApiEnvelope<{ coproprietaires: Coproprietaire[] }>
-    >(`/gestionnaire/residences/${residenceId}/coproprietaires`, { params })
-    return res.data.data.coproprietaires
+    // The endpoint paginates (default 15/page). We fetch every page so the list
+    // shows the full résidence, not just the first 15 (issue #204).
+    type Page = {
+      coproprietaires: Coproprietaire[]
+      meta?: { current_page: number; last_page: number }
+    }
+    const perPage = 100
+    const fetchPage = async (page: number) => {
+      const params: Record<string, string> = {
+        per_page: String(perPage),
+        page: String(page),
+      }
+      if (search) params.search = search
+      const res = await api.get<ApiEnvelope<Page>>(
+        `/gestionnaire/residences/${residenceId}/coproprietaires`,
+        { params },
+      )
+      return res.data.data
+    }
+
+    const first = await fetchPage(1)
+    const lastPage = first.meta?.last_page ?? 1
+    const all = [...first.coproprietaires]
+    for (let page = 2; page <= lastPage; page++) {
+      const next = await fetchPage(page)
+      all.push(...next.coproprietaires)
+    }
+    return all
   }, MOCK_COPROPRIETAIRES)
 }
 
