@@ -30,7 +30,7 @@ class PortailPushController extends Controller
                 'endpoint_hash' => hash('sha256', $validated['endpoint']),
             ],
             [
-                'tenant_id'  => config('app.tenant_id'),
+                'tenant_id'  => $user->tenant_id,
                 'endpoint'   => $validated['endpoint'],
                 'p256dh'     => $validated['keys']['p256dh'],
                 'auth'       => $validated['keys']['auth'],
