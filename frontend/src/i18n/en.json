@@ -327,6 +327,7 @@
       "preferences": "Preferences",
       "account": "Account",
       "privacy": "Privacy",
+      "cndpNotice": "Your personal data is stored and processed securely, in accordance with Law 09-08 (CNDP) on the protection of personal data.",
       "logoutConfirmTitle": "Sign out?",
       "logoutConfirmDesc": "You'll need to enter your WhatsApp OTP again to return."
     },
@@ -2616,7 +2617,6 @@
       "roleGestionnaire": "Manager",
       "fullName": "Full name",
       "namePlaceholder": "Your name",
-      "cndpConsent": "I have read and accept the processing of my personal data in accordance with Law 09-08 (CNDP) on the protection of personal data.",
       "logoSection": "Syndic logo",
       "logoHint": "Shown in the navigation bar. PNG or JPG, 2 MB max.",
       "logoAlt": "Syndic logo",
