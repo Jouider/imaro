@@ -1451,6 +1451,7 @@
       "createCopro": "إنشاء المالك",
       "lotCreatedAssigned": "تم إنشاء الوحدة {{numero}} وإسنادها إلى {{name}}",
       "createLotError": "خطأ أثناء إنشاء الوحدة",
+      "lotNumeroExists": "رقم هذه الوحدة موجود بالفعل في هذه الإقامة. يجب أن يكون كل رقم فريدًا.",
       "createLotTitle": "إنشاء وحدة",
       "lotAssignDescPre": "سيتم إسناد هذه الوحدة تلقائيًا إلى ",
       "creatingShort": "جارٍ الإنشاء…",

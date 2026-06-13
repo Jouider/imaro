@@ -1451,6 +1451,7 @@
       "createCopro": "Créer le copropriétaire",
       "lotCreatedAssigned": "Lot {{numero}} créé et assigné à {{name}}",
       "createLotError": "Erreur lors de la création du lot",
+      "lotNumeroExists": "Ce numéro de lot existe déjà dans cette résidence. Chaque numéro doit être unique.",
       "createLotTitle": "Créer un lot",
       "lotAssignDescPre": "Ce lot sera automatiquement assigné à ",
       "creatingShort": "Création…",
