@@ -154,6 +154,14 @@ export function PortailProfilPage() {
         />
       </Section>
 
+      {/* CNDP (loi 09-08) data-protection notice */}
+      <div className="flex items-start gap-2.5 rounded-2xl border border-slate-200/70 bg-white px-4 py-3.5 dark:border-border dark:bg-card">
+        <ShieldCheck className="mt-0.5 size-[18px] shrink-0 text-[var(--color-imaro-success)]" />
+        <p className="text-[12px] leading-relaxed text-muted-foreground">
+          {t('portail.profil.cndpNotice')}
+        </p>
+      </div>
+
       {/* Logout */}
       <Button
         variant="outline"
