@@ -1289,6 +1289,26 @@ SIDs résolus depuis `config('notifications.whatsapp_templates.<name>')`.
 
 ---
 
+## Comptes bancaires (Art. 26 — compte séparé par syndicat)
+
+**Gestionnaire** (`role:manager|gestionnaire`) — sous `/residences/{residence}/comptes-bancaires` :
+- `GET` → `{ comptes: [{ id, residence_id, banque, titulaire, rib, iban, is_primary }] }`
+- `POST` (banque, titulaire, rib, iban?, is_primary?) → compte créé (un seul `is_primary` par résidence)
+- `PUT /{compte}` · `DELETE /{compte}` · `POST /{compte}/primary`
+
+**Résident** :
+- `GET /api/portail/comptes-bancaires` → `{ comptes: [...] }` (RIB/IBAN du syndicat de sa résidence, principal en premier)
+
+## Virements déclarés (résident → validation gestionnaire)
+
+- **Résident** `POST /api/portail/paiements` *(multipart)* : `montant`, `date`, `methode` (`virement|versement|cheque|especes`), `reference?`, `justificatif?` (pdf/jpg/png, ≤5 Mo) → crée un virement **`en_attente`**. `201`.
+- **Gestionnaire** :
+  - `GET /api/gestionnaire/virements-declares` → liste (`coproprietaire_nom`, `lot_numero`, `montant`, `methode`, `statut`, `justificatif_path`…), en_attente d'abord.
+  - `POST /virements-declares/{id}/valider` → crée un **Paiement réel** (exercice actif, `methode→mode`, `versement→virement`) + recalcule le solde + passe `valide`.
+  - `POST /virements-declares/{id}/rejeter` (`motif?`) → passe `rejete`.
+
+---
+
 ## Comptes de démo
 
 | Rôle | Email | Mot de passe |
