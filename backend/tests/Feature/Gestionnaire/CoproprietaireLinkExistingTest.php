@@ -141,3 +141,14 @@ it('refuse 422 si le téléphone appartient à un autre cabinet', function () {
         'lot_id' => $lot->id, 'residence_id' => $this->residence->id,
     ])->assertStatus(422)->assertJsonPath('errors.phone.0', fn ($m) => str_contains($m, 'autre cabinet'));
 });
+
+it('assigne le rôle Spatie resident au copro créé (sinon 403 sur le portail)', function () {
+    $lot = ($this->makeLot)('A09');
+
+    $this->withHeaders($this->auth)->postJson('/api/gestionnaire/coproprietaires', [
+        'name' => 'Karim', 'phone' => '+212611100009',
+        'lot_id' => $lot->id, 'residence_id' => $this->residence->id,
+    ])->assertStatus(201);
+
+    expect(User::where('phone', '+212611100009')->first()->hasRole('resident'))->toBeTrue();
+});

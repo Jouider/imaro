@@ -76,6 +76,12 @@ class CoproprietaireController extends Controller
                 ]);
             }
 
+            // Rôle Spatie obligatoire — sinon le middleware role:resident bloque
+            // l'accès au portail (403). La colonne `role` ne suffit pas.
+            if (! $user->hasRole('resident')) {
+                $user->assignRole('resident');
+            }
+
             return Coproprietaire::create([
                 'tenant_id'    => $tenantId,
                 'user_id'      => $user->id,
@@ -273,6 +279,11 @@ class CoproprietaireController extends Controller
                             'must_change_code' => true,
                             'status'           => 'active',
                         ]);
+                    }
+
+                    // Rôle Spatie obligatoire (sinon 403 sur le portail résident).
+                    if (! $user->hasRole('resident')) {
+                        $user->assignRole('resident');
                     }
 
                     Coproprietaire::create([
