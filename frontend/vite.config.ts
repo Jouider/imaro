@@ -22,7 +22,10 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: [
-        'favicon.svg',
+        'favicon.png',
+        'favicon-192.png',
+        'favicon-512.png',
+        'apple-touch-icon.png',
         'logo-stacked.png',
         'logo-horizontal.png',
         'logo-horizontal-inverted.png',
@@ -63,19 +66,25 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#ffffff',
-        theme_color: '#1D4ED8',
+        theme_color: '#1B4F72',
         lang: 'fr',
         dir: 'ltr',
         categories: ['finance', 'productivity', 'business'],
         icons: [
           {
-            src: '/logo-stacked.png',
+            src: '/favicon-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: '/favicon-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: '/logo-stacked.png',
+            src: '/favicon-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
