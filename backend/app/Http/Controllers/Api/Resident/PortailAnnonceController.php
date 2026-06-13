@@ -27,11 +27,11 @@ class PortailAnnonceController extends Controller
             ->orderByDesc('publiee_at')->orderByDesc('created_at')->get()
             ->map(fn ($a) => [
                 'id' => $a->id, 'titre' => $a->titre, 'contenu' => $a->contenu,
-                'type' => $a->priorite === 'urgente' ? 'urgent' : 'info',
+                'priorite' => $a->priorite === 'urgente' ? 'urgente' : 'normale',
                 'date' => ($a->publiee_at ?? $a->created_at)?->toDateString(),
             ]);
 
-        return response()->json(['status' => 'success', 'data' => $annonces]);
+        return response()->json(['status' => 'success', 'data' => ['annonces' => $annonces]]);
     }
 
     private function residentResidenceId(User $user): ?int
