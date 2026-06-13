@@ -30,13 +30,13 @@ class PortailBankAccountController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => [
+            'data' => [
                 'comptes' => $comptes->map(fn ($c) => [
-                    'id'         => $c->id,
-                    'banque'     => $c->banque,
-                    'titulaire'  => $c->titulaire,
-                    'rib'        => $c->rib,
-                    'iban'       => $c->iban,
+                    'id' => $c->id,
+                    'banque' => $c->banque,
+                    'titulaire' => $c->titulaire,
+                    'rib' => $c->rib,
+                    'iban' => $c->iban,
                     'is_primary' => $c->is_primary,
                 ])->values(),
             ],

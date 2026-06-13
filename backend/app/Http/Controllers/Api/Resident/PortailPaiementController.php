@@ -21,10 +21,10 @@ class PortailPaiementController extends Controller
         abort_if(! $copro, 422, 'Aucun lot n\'est associé à votre compte.');
 
         $data = $request->validate([
-            'montant'      => ['required', 'numeric', 'min:1'],
-            'date'         => ['required', 'date'],
-            'methode'      => ['required', 'in:virement,versement,cheque,especes'],
-            'reference'    => ['nullable', 'string', 'max:255'],
+            'montant' => ['required', 'numeric', 'min:1'],
+            'date' => ['required', 'date'],
+            'methode' => ['required', 'in:virement,versement,cheque,especes'],
+            'reference' => ['nullable', 'string', 'max:255'],
             'justificatif' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
         ]);
 
@@ -35,19 +35,19 @@ class PortailPaiementController extends Controller
         $residence = $copro->lot->residence;
 
         VirementDeclare::create([
-            'tenant_id'         => $residence->tenant_id,
-            'residence_id'      => $residence->id,
+            'tenant_id' => $residence->tenant_id,
+            'residence_id' => $residence->id,
             'coproprietaire_id' => $copro->id,
-            'montant'           => $data['montant'],
-            'date_declaration'  => $data['date'],
-            'methode'           => $data['methode'],
-            'reference'         => $data['reference'] ?? null,
+            'montant' => $data['montant'],
+            'date_declaration' => $data['date'],
+            'methode' => $data['methode'],
+            'reference' => $data['reference'] ?? null,
             'justificatif_path' => $path,
-            'statut'            => 'en_attente',
+            'statut' => 'en_attente',
         ]);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Paiement déclaré. Il sera validé par votre syndic.',
         ], 201);
     }

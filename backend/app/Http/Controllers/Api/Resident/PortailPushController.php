@@ -17,29 +17,29 @@ class PortailPushController extends Controller
     {
         $validated = $request->validate([
             'endpoint' => 'required|url|max:2048',
-            'keys'     => 'required|array',
+            'keys' => 'required|array',
             'keys.p256dh' => 'required|string|max:512',
-            'keys.auth'   => 'required|string|max:128',
+            'keys.auth' => 'required|string|max:128',
         ]);
 
         $user = $request->user();
 
         PushSubscription::updateOrCreate(
             [
-                'user_id'       => $user->id,
+                'user_id' => $user->id,
                 'endpoint_hash' => hash('sha256', $validated['endpoint']),
             ],
             [
-                'tenant_id'  => $user->tenant_id,
-                'endpoint'   => $validated['endpoint'],
-                'p256dh'     => $validated['keys']['p256dh'],
-                'auth'       => $validated['keys']['auth'],
+                'tenant_id' => $user->tenant_id,
+                'endpoint' => $validated['endpoint'],
+                'p256dh' => $validated['keys']['p256dh'],
+                'auth' => $validated['keys']['auth'],
                 'user_agent' => $request->userAgent(),
             ]
         );
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Subscription push enregistrée.',
         ]);
     }
@@ -59,7 +59,7 @@ class PortailPushController extends Controller
             ->delete();
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Subscription push supprimée.',
         ]);
     }

@@ -7,6 +7,7 @@ use App\Models\Lot;
 use App\Models\Ticket;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PortailReclamationController extends Controller
 {
@@ -23,31 +24,41 @@ class PortailReclamationController extends Controller
         'haute' => 'urgent', 'urgente' => 'urgent', 'urgent' => 'urgent',
     ];
 
+    /**
+     * Contrat front : { reclamations: Reclamation[] }
+     *   Reclamation = { id, reference, categorie, sujet, statut, priorite, created_at, nb_photos }
+     */
     public function index(Request $request): JsonResponse
     {
         $tickets = Ticket::where('user_id', $request->user()->id)   // la table tickets utilise user_id
             ->orderByDesc('created_at')->get()
-            ->map(fn ($t) => [
-                'id'          => $t->id,
-                'titre'       => self::LABELS[$t->categorie] ?? 'Réclamation',
-                'description' => $t->description,
-                'categorie'   => $t->categorie,
-                'priorite'    => $t->priorite,
-                'statut'      => $t->statut,
-                'date'        => $t->created_at?->toDateString(),
-            ]);
+            ->map(function ($t) {
+                // sujet = 1re ligne de la description (cf. store qui plie "sujet\n\ndescription")
+                $sujet = trim((string) strtok((string) $t->description, "\n"));
 
-        return response()->json(['status' => 'success', 'data' => $tickets]);
+                return [
+                    'id' => $t->id,
+                    'reference' => 'REC-'.($t->created_at?->format('Y') ?? date('Y')).'-'.str_pad((string) $t->id, 3, '0', STR_PAD_LEFT),
+                    'categorie' => $t->categorie,
+                    'sujet' => $sujet !== '' ? Str::limit($sujet, 80) : (self::LABELS[$t->categorie] ?? 'Réclamation'),
+                    'statut' => $t->statut,
+                    'priorite' => $t->priorite,
+                    'created_at' => $t->created_at?->toIso8601String(),
+                    'nb_photos' => is_array($t->images) ? count($t->images) : 0,
+                ];
+            });
+
+        return response()->json(['status' => 'success', 'data' => ['reclamations' => $tickets]]);
     }
 
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'titre'       => 'nullable|string|max:255',
-            'sujet'       => 'nullable|string|max:255',
+            'titre' => 'nullable|string|max:255',
+            'sujet' => 'nullable|string|max:255',
             'description' => 'required|string',
-            'categorie'   => 'nullable|in:plomberie,electricite,ascenseur,proprete,securite,autre',
-            'priorite'    => 'nullable|string',
+            'categorie' => 'nullable|in:plomberie,electricite,ascenseur,proprete,securite,autre',
+            'priorite' => 'nullable|string',
         ]);
 
         $user = $request->user();
@@ -59,20 +70,20 @@ class PortailReclamationController extends Controller
         $description = $sujet ? ($sujet."\n\n".$validated['description']) : $validated['description'];
 
         $ticket = Ticket::create([
-            'tenant_id'    => $user->tenant_id,
+            'tenant_id' => $user->tenant_id,
             'residence_id' => $lot?->residence_id,
-            'user_id'      => $user->id,
-            'lot_id'       => $copro?->lot_id,
-            'categorie'    => $validated['categorie'] ?? 'autre',
-            'description'  => $description,
-            'priorite'     => self::PRIORITE_MAP[$validated['priorite'] ?? 'normal'] ?? 'normal',
-            'statut'       => 'ouvert',
+            'user_id' => $user->id,
+            'lot_id' => $copro?->lot_id,
+            'categorie' => $validated['categorie'] ?? 'autre',
+            'description' => $description,
+            'priorite' => self::PRIORITE_MAP[$validated['priorite'] ?? 'normal'] ?? 'normal',
+            'statut' => 'ouvert',
         ]);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Réclamation envoyée.',
-            'data'    => ['id' => $ticket->id],
+            'data' => ['id' => $ticket->id],
         ], 201);
     }
 }

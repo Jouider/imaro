@@ -52,38 +52,40 @@ beforeEach(function () {
     $this->auth = ['Authorization' => 'Bearer '.$this->resident->createToken('t')->plainTextToken];
 });
 
-it('le résident voit son lot + sa résidence dans le profil', function () {
+it('le résident voit son lot + sa résidence dans le profil (chaînes)', function () {
     $this->withHeaders($this->auth)->getJson('/api/portail/profil')
         ->assertStatus(200)
-        ->assertJsonPath('data.lot.numero', 'A1')
-        ->assertJsonPath('data.residence.name', 'Aqualina');
+        ->assertJsonPath('data.lot', 'A1')
+        ->assertJsonPath('data.residence', 'Aqualina');
 });
 
 it('le résident voit les annonces publiées de sa résidence', function () {
     $this->withHeaders($this->auth)->getJson('/api/portail/annonces')
         ->assertStatus(200)
-        ->assertJsonCount(1, 'data')
-        ->assertJsonPath('data.0.titre', 'Coupure eau');
+        ->assertJsonCount(1, 'data.annonces')
+        ->assertJsonPath('data.annonces.0.titre', 'Coupure eau')
+        ->assertJsonPath('data.annonces.0.priorite', 'urgente');
 });
 
 it('le résident voit les documents de sa résidence', function () {
     $this->withHeaders($this->auth)->getJson('/api/portail/documents')
         ->assertStatus(200)
-        ->assertJsonCount(1, 'data')
-        ->assertJsonPath('data.0.titre', 'Règlement');
+        ->assertJsonCount(1, 'data.documents')
+        ->assertJsonPath('data.documents.0.nom', 'Règlement');
 });
 
 it('le résident voit ses réclamations', function () {
     $this->withHeaders($this->auth)->getJson('/api/portail/reclamations')
         ->assertStatus(200)
-        ->assertJsonCount(1, 'data')
-        ->assertJsonPath('data.0.categorie', 'plomberie');
+        ->assertJsonCount(1, 'data.reclamations')
+        ->assertJsonPath('data.reclamations.0.categorie', 'plomberie');
 });
 
 it('le résident voit les assemblées de sa résidence', function () {
     $this->withHeaders($this->auth)->getJson('/api/portail/assemblees')
         ->assertStatus(200)
-        ->assertJsonCount(1, 'data');
+        ->assertJsonCount(1, 'data.assemblees')
+        ->assertJsonPath('data.assemblees.0.statut', 'convoquee');   // planifiee → convoquee
 });
 
 it('le résident crée une réclamation (sujet plié dans la description)', function () {
@@ -97,15 +99,19 @@ it('le résident crée une réclamation (sujet plié dans la description)', func
         ->and($t->description)->toContain('Ascenseur en panne');
 });
 
-it('le résident voit ses charges dans les opérations', function () {
+it('le résident voit ses charges dans les opérations (flux unifié)', function () {
     $this->withHeaders($this->auth)->getJson('/api/portail/operations')
         ->assertStatus(200)
-        ->assertJsonCount(1, 'data.appels')
-        ->assertJsonPath('data.appels.0.montant_du', 1000);
+        ->assertJsonCount(1, 'data.operations')
+        ->assertJsonPath('data.operations.0.type', 'appel_fonds')
+        ->assertJsonPath('data.operations.0.montant', -1000);   // débit = négatif
 });
 
-it('le tableau de bord reflète le solde dû', function () {
+it('le tableau de bord reflète le solde dû (balance négative)', function () {
     $this->withHeaders($this->auth)->getJson('/api/portail/dashboard')
         ->assertStatus(200)
-        ->assertJsonPath('data.solde', 1000);
+        ->assertJsonPath('data.balance', -1000)            // doit 1000 → balance -1000
+        ->assertJsonPath('data.statut', 'en_retard')
+        ->assertJsonPath('data.resident.residence', 'Aqualina')
+        ->assertJsonPath('data.prochain_appel.montant', 1000);
 });
