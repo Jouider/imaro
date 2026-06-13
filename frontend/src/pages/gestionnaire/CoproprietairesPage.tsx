@@ -23,6 +23,7 @@ import {
   type CreateCoproprietaireResponse,
   type Lot,
 } from '@/services/gestionnaire.service'
+import { cn } from '@/lib/utils'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { MontantDisplay } from '@/components/shared/MontantDisplay'
@@ -78,9 +79,16 @@ function CreateCoproprietaireDialog({
     queryFn: () => getLots(Number(residenceId)),
     enabled: !!residenceId,
   })
-  const availableLots = (lotsData?.lots ?? []).filter(
-    (l: Lot) => !l.coproprietaire,
-  )
+  // Only unassigned lots, deduplicated by numéro so the same number can never
+  // appear twice in the list — an assigned/used number is excluded (KAN-40).
+  const seenNumeros = new Set<string>()
+  const availableLots = (lotsData?.lots ?? []).filter((l: Lot) => {
+    if (l.coproprietaire) return false
+    const key = l.numero.trim().toLowerCase().replace(/\s+/g, '')
+    if (seenNumeros.has(key)) return false
+    seenNumeros.add(key)
+    return true
+  })
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -283,6 +291,20 @@ function CreateLotDialog({
   const [superficie, setSuperficie] = useState('')
   const [tantieme, setTantieme] = useState('')
 
+  // Existing lots in this residence — used to enforce numéro uniqueness so the
+  // same lot can never be created twice (KAN-40).
+  const { data: lotsData } = useQuery({
+    queryKey: ['lots', String(residenceId)],
+    queryFn: () => getLots(residenceId),
+    enabled: open && !!residenceId,
+  })
+  const normalize = (s: string) => s.trim().toLowerCase().replace(/\s+/g, '')
+  const existingNumeros = new Set(
+    (lotsData?.lots ?? []).map((l: Lot) => normalize(l.numero)),
+  )
+  const isDuplicateNumero =
+    numero.trim() !== '' && existingNumeros.has(normalize(numero))
+
   const mutation = useMutation({
     mutationFn: () =>
       storeLot(residenceId, {
@@ -311,6 +333,7 @@ function CreateLotDialog({
 
   const canSubmit =
     !!numero.trim() &&
+    !isDuplicateNumero &&
     !!etage &&
     !!superficie &&
     !!tantieme &&
@@ -340,6 +363,7 @@ function CreateLotDialog({
           className="space-y-4 pt-2"
           onSubmit={(e) => {
             e.preventDefault()
+            if (isDuplicateNumero) return
             mutation.mutate()
           }}
         >
@@ -353,8 +377,18 @@ function CreateLotDialog({
                 value={numero}
                 onChange={(e) => setNumero(e.target.value)}
                 required
-                className={inputCls}
+                aria-invalid={isDuplicateNumero}
+                className={cn(
+                  inputCls,
+                  isDuplicateNumero &&
+                    'border-[var(--color-imaro-danger)] focus:border-[var(--color-imaro-danger)] focus:ring-[var(--color-imaro-danger)]/10',
+                )}
               />
+              {isDuplicateNumero && (
+                <p className="text-xs text-[var(--color-imaro-danger)]">
+                  {t('gestionnaire.coproprietaires.lotNumeroExists')}
+                </p>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="lot-type">{t('common.type')} *</Label>

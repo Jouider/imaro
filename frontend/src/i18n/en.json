@@ -1451,6 +1451,7 @@
       "createCopro": "Create owner",
       "lotCreatedAssigned": "Unit {{numero}} created and assigned to {{name}}",
       "createLotError": "Error creating the unit",
+      "lotNumeroExists": "This lot number already exists in this residence. Each number must be unique.",
       "createLotTitle": "Create a unit",
       "lotAssignDescPre": "This unit will be automatically assigned to ",
       "creatingShort": "Creating…",
