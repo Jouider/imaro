@@ -341,13 +341,15 @@ export async function createReclamation(data: {
 }): Promise<void> {
   const fd = new FormData()
   fd.append('categorie', data.categorie)
-  fd.append('description', `${data.sujet}\n\n${data.description}`)
-  fd.append('priorite', 'normal')
+  fd.append('sujet', data.sujet)
+  fd.append('description', data.description)
+  fd.append('priorite', 'normale')
   data.images?.forEach((f) => fd.append('images[]', f))
 
   await withMock(async () => {
-    // Change to '/portail/reclamations' when resident routes are ready
-    await api.post('/gestionnaire/tickets', fd, {
+    // Resident route — a copropriétaire has role `resident`, so it must NOT hit
+    // /gestionnaire/* (that requires role:gestionnaire → 403). See issue #210.
+    await api.post('/portail/reclamations', fd, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
   }, undefined)
