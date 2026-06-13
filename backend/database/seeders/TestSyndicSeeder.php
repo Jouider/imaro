@@ -104,7 +104,7 @@ class TestSyndicSeeder extends Seeder
             'Nabil', 'Fadwa', 'Walid', 'Siham', 'Othmane', 'Rim', 'Hicham', 'Ghizlane', 'Karim', 'Btissam'];
         $noms = ['El Khattabi', 'Berrada', 'Sebti', 'Lahlou', 'Bennis', 'Chraibi', 'Tazi', 'Alaoui', 'Bargach',
             'Skalli', 'Lamrani', 'Benkirane', 'Fihri', 'Guessous', 'Cherkaoui', 'Belghiti', 'Sefrioui', 'Kadiri'];
-        $vacants = [12, 33, 58, 70, 71, 73, 74];
+        $vacants = []; // tous les lots occupés
 
         $copros = [];
         $resCount = 0;
