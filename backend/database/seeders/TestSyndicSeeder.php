@@ -8,6 +8,7 @@ use App\Models\Assemblee;
 use App\Models\AuditLog;
 use App\Models\AutreRecette;
 use App\Models\Budget;
+use App\Models\CompteBancaire;
 use App\Models\Contrat;
 use App\Models\Coproprietaire;
 use App\Models\Depense;
@@ -29,6 +30,7 @@ use App\Models\Tenant;
 use App\Models\Ticket;
 use App\Models\TravauxExceptionnel;
 use App\Models\User;
+use App\Models\VirementDeclare;
 use App\Services\ComplianceCalendarService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -394,6 +396,25 @@ class TestSyndicSeeder extends Seeder
         }
 
         $this->seedAudit($manager, $gest);
+
+        // ── 18b. COMPTES BANCAIRES + VIREMENTS DÉCLARÉS ─────────────
+        CompteBancaire::create(['tenant_id' => $t, 'residence_id' => $res->id, 'banque' => 'Attijariwafa Bank', 'titulaire' => 'Syndic Résidence Aqualina', 'rib' => '007780000123456789012345', 'iban' => 'MA64007780000123456789012345', 'is_primary' => true]);
+        CompteBancaire::create(['tenant_id' => $t, 'residence_id' => $res->id, 'banque' => 'Banque Populaire', 'titulaire' => 'Syndic Résidence Aqualina', 'rib' => '012345000987654321098765', 'iban' => null, 'is_primary' => false]);
+
+        foreach ([
+            [1, 'en_attente', 'virement', '2026-06-10', 1863.00, 'VIR-AQ-0610'],
+            [4, 'en_attente', 'versement', '2026-06-08', 931.50, null],
+            [7, 'valide', 'cheque', '2026-05-20', 1863.00, 'CHQ-7788'],
+        ] as $vd) {
+            $c = $copros[$vd[0]];
+            VirementDeclare::create([
+                'tenant_id' => $t, 'residence_id' => $res->id, 'coproprietaire_id' => $c['copro']->id,
+                'montant' => $vd[4], 'date_declaration' => $vd[3], 'methode' => $vd[2], 'reference' => $vd[5],
+                'justificatif_path' => null, 'statut' => $vd[1],
+                'valide_par' => $vd[1] === 'valide' ? $gest->id : null,
+                'date_validation' => $vd[1] === 'valide' ? '2026-05-21 10:00:00' : null,
+            ]);
+        }
 
         // ── 19. NOTIFICATIONS ───────────────────────────────────────
         foreach ([

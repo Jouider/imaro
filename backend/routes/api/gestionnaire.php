@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\Gestionnaire\AssembleeController;
 use App\Http\Controllers\Api\Gestionnaire\BudgetController;
 use App\Http\Controllers\Api\Gestionnaire\ComptabiliteController;
 use App\Http\Controllers\Api\Gestionnaire\ContratController;
+use App\Http\Controllers\Api\Gestionnaire\CompteBancaireController;
 use App\Http\Controllers\Api\Gestionnaire\CoproprietaireController;
 use App\Http\Controllers\Api\Gestionnaire\DashboardController;
 use App\Http\Controllers\Api\Gestionnaire\DocumentController;
@@ -61,6 +62,12 @@ Route::prefix('residences/{residence}')->group(function () {
     Route::post('/import-soldes', [LotController::class, 'importSoldes']);
     Route::post('/import-paiements', [LotController::class, 'importPaiements']);
     Route::get('/coproprietaires', [CoproprietaireController::class, 'index']);
+    // Comptes bancaires (Art. 26 — compte séparé par syndicat)
+    Route::get('/comptes-bancaires', [CompteBancaireController::class, 'index']);
+    Route::post('/comptes-bancaires', [CompteBancaireController::class, 'store']);
+    Route::put('/comptes-bancaires/{compte}', [CompteBancaireController::class, 'update']);
+    Route::delete('/comptes-bancaires/{compte}', [CompteBancaireController::class, 'destroy']);
+    Route::post('/comptes-bancaires/{compte}/primary', [CompteBancaireController::class, 'setPrimary']);
     // Exercices
     Route::get('/exercices', [ExerciceController::class, 'index']);
     Route::post('/exercices', [ExerciceController::class, 'store']);
