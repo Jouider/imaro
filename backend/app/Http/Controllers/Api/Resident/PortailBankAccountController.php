@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Resident;
 
 use App\Http\Controllers\Controller;
 use App\Models\CompteBancaire;
+use App\Models\Lot;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -16,7 +17,11 @@ class PortailBankAccountController extends Controller
     public function __invoke(Request $request): JsonResponse
     {
         $copro = $request->user()->coproprietaire;
-        $residenceId = $copro?->lot?->residence_id;
+        // withoutGlobalScope : le lot/résidence doit se résoudre même si le
+        // contexte tenant de la requête (config app.tenant_id) n'est pas posé.
+        $residenceId = $copro?->lot_id
+            ? Lot::withoutGlobalScope('tenant')->find($copro->lot_id)?->residence_id
+            : null;
 
         $comptes = $residenceId
             ? CompteBancaire::where('residence_id', $residenceId)

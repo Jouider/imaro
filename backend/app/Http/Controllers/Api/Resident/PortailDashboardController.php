@@ -24,10 +24,13 @@ class PortailDashboardController extends Controller
             ]);
         }
 
+        // Pas de whereHas('appelFonds') (déclencherait le scope tenant d'AppelFonds,
+        // pas toujours posé pour un résident) — on charge sans scope et filtre en PHP.
         $lignes = AppelFondsLigne::where('coproprietaire_id', $copro->id)
-            ->with('appelFonds:id,libelle,date_echeance')
-            ->whereHas('appelFonds', fn ($q) => $q->where('statut', '!=', 'brouillon'))
-            ->get();
+            ->with(['appelFonds' => fn ($q) => $q->withoutGlobalScope('tenant')])
+            ->get()
+            ->filter(fn ($l) => $l->appelFonds && $l->appelFonds->statut !== 'brouillon')
+            ->values();
 
         $solde = $lignes->sum('montant_du') - $lignes->sum('montant_paye');
         $prochain = $lignes->filter(fn ($l) => $l->statut !== 'paye')

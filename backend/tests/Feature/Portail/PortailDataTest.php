@@ -1,9 +1,12 @@
 <?php
 
 use App\Models\Annonce;
+use App\Models\AppelFonds;
+use App\Models\AppelFondsLigne;
 use App\Models\Assemblee;
 use App\Models\Coproprietaire;
 use App\Models\Document;
+use App\Models\Exercice;
 use App\Models\Immeuble;
 use App\Models\Lot;
 use App\Models\Residence;
@@ -34,7 +37,12 @@ beforeEach(function () {
 
     $this->resident = User::create(['tenant_id' => $this->tenant->id, 'name' => 'Hassan', 'phone' => '+212611111111', 'role' => 'resident', 'status' => 'active', 'password' => bcrypt('x')]);
     $this->resident->assignRole('resident');
-    Coproprietaire::create(['tenant_id' => $this->tenant->id, 'user_id' => $this->resident->id, 'lot_id' => $this->lot->id, 'type' => 'proprietaire', 'solde_actuel' => 0]);
+    $this->copro = Coproprietaire::create(['tenant_id' => $this->tenant->id, 'user_id' => $this->resident->id, 'lot_id' => $this->lot->id, 'type' => 'proprietaire', 'solde_actuel' => 0]);
+
+    // Un appel de fonds + ligne (charge) pour tester les Opérations sans contexte tenant.
+    $ex = Exercice::withoutGlobalScope('tenant')->create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'annee' => 2026, 'date_debut' => '2026-01-01', 'date_fin' => '2026-12-31', 'statut' => 'actif']);
+    $appel = AppelFonds::withoutGlobalScope('tenant')->create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'exercice_id' => $ex->id, 'created_by' => $this->gest->id, 'libelle' => 'Charges T1 2026', 'montant_total' => 1000, 'date_echeance' => '2026-03-31', 'statut' => 'envoye', 'sent_at' => now()]);
+    AppelFondsLigne::create(['appel_fonds_id' => $appel->id, 'coproprietaire_id' => $this->copro->id, 'lot_id' => $this->lot->id, 'montant_du' => 1000, 'montant_paye' => 0, 'statut' => 'impaye']);
 
     Annonce::create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'created_by' => $this->gest->id, 'titre' => 'Coupure eau', 'contenu' => 'Demain', 'priorite' => 'urgente', 'statut' => 'publiee', 'publiee_at' => now()]);
     Document::create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'uploaded_by' => $this->gest->id, 'nom' => 'Règlement', 'type' => 'reglement', 'file_path' => 'documents/x.pdf', 'mime_type' => 'application/pdf', 'taille_ko' => 120, 'date' => '2026-01-01']);
@@ -87,4 +95,17 @@ it('le résident crée une réclamation (sujet plié dans la description)', func
     expect($t)->not->toBeNull()
         ->and($t->priorite)->toBe('urgent')        // haute → urgent
         ->and($t->description)->toContain('Ascenseur en panne');
+});
+
+it('le résident voit ses charges dans les opérations', function () {
+    $this->withHeaders($this->auth)->getJson('/api/portail/operations')
+        ->assertStatus(200)
+        ->assertJsonCount(1, 'data.appels')
+        ->assertJsonPath('data.appels.0.montant_du', 1000);
+});
+
+it('le tableau de bord reflète le solde dû', function () {
+    $this->withHeaders($this->auth)->getJson('/api/portail/dashboard')
+        ->assertStatus(200)
+        ->assertJsonPath('data.solde', 1000);
 });
