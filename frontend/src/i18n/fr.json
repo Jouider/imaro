@@ -993,7 +993,8 @@
         "residence": "Résidence affectée",
         "residencePh": "Choisir une résidence",
         "phone": "Téléphone",
-        "permissions": "Permissions accordées"
+        "permissions": "Permissions accordées",
+        "phoneHint": "Le code d'accès sera généré et envoyé à ce numéro par WhatsApp / SMS."
       },
       "toast": {
         "created": "Personnel ajouté",
@@ -1004,6 +1005,13 @@
         "deleteFailed": "Échec de la suppression",
         "toggled": "Statut mis à jour",
         "toggleFailed": "Échec du changement de statut"
+      },
+      "credentialsSent": {
+        "title": "Identifiants envoyés",
+        "desc": "Le compte de {{name}} a été créé et son code d’accès lui a été envoyé.",
+        "sentVia": "Code envoyé par WhatsApp / SMS au {{phone}}.",
+        "codeLabel": "Aperçu du code",
+        "note": "Le code complet n'est jamais affiché. Le membre du personnel le reçoit directement et devra le changer à la première connexion."
       }
     }
   },
