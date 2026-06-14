@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Resident;
 use App\Http\Controllers\Controller;
 use App\Models\AppelFondsLigne;
 use App\Models\Lot;
+use App\Models\Paiement;
 use App\Models\Residence;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -48,9 +49,13 @@ class PortailDashboardController extends Controller
             ->filter(fn ($l) => $l->appelFonds && $l->appelFonds->statut !== 'brouillon')
             ->values();
 
+        // Même formule que Coproprietaire::soldeCalcule() (cohérence résident ⇄ gestionnaire) :
+        // (paiements alloués + avances non allouées) − total dû. Négatif = solde dû.
         $du = (float) $lignes->sum('montant_du');
-        $paye = (float) $lignes->sum('montant_paye');
-        $balance = round($paye - $du, 2);   // négatif = solde dû
+        $payeAlloue = (float) $lignes->sum('montant_paye');
+        $avances = (float) Paiement::where('coproprietaire_id', $copro->id)
+            ->whereNull('appel_fonds_ligne_id')->sum('montant');
+        $balance = round(($payeAlloue + $avances) - $du, 2);
 
         $prochain = $lignes->filter(fn ($l) => $l->statut !== 'paye')
             ->sortBy(fn ($l) => $l->appelFonds?->date_echeance)->first();

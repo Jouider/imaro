@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\GenerateRecuPaiementJob;
 use App\Models\CompteBancaire;
 use App\Models\Coproprietaire;
 use App\Models\Exercice;
@@ -11,11 +12,17 @@ use App\Models\Tenant;
 use App\Models\User;
 use App\Models\VirementDeclare;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    // Comme en prod (queue redis) : les jobs ne s'exécutent pas dans le cycle requête.
+    // Évite aussi le listener tenant-aware de Spatie qui plante avec le driver sync.
+    Queue::fake();
+
     foreach (['manager', 'gestionnaire', 'conseil', 'resident'] as $r) {
         Role::firstOrCreate(['name' => $r, 'guard_name' => 'web']);
     }
@@ -74,6 +81,51 @@ it('le gestionnaire valide un virement → crée un Paiement réel', function ()
 
     expect(Paiement::where('coproprietaire_id', $this->copro->id)->where('montant', 1500)->exists())->toBeTrue()
         ->and($v->fresh()->paiement_id)->not->toBeNull();
+});
+
+it('valider un virement (copro à jour) crédite le solde + génère le reçu', function () {
+    $v = VirementDeclare::create([
+        'tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'coproprietaire_id' => $this->copro->id,
+        'montant' => 1500, 'date_declaration' => '2026-06-10', 'methode' => 'virement', 'statut' => 'en_attente',
+    ]);
+
+    $this->withHeaders($this->gestAuth)
+        ->postJson("/api/gestionnaire/virements-declares/{$v->id}/valider")
+        ->assertStatus(200);
+
+    // Le copro était à jour (0 ligne) : le paiement non alloué devient un crédit de +1500.
+    expect($this->copro->fresh()->solde_actuel)->toBe(1500.0);
+
+    // Le reçu PDF est généré en asynchrone.
+    Queue::assertPushed(GenerateRecuPaiementJob::class);
+});
+
+it('le tableau de bord reflète une avance (paiement non alloué) en crédit', function () {
+    // Paiement sans ligne d'appel (avance / copro à jour) → balance positive.
+    Paiement::create([
+        'tenant_id' => $this->tenant->id, 'coproprietaire_id' => $this->copro->id, 'saisi_par' => $this->gest->id,
+        'montant' => 1500, 'date_paiement' => '2026-06-10', 'mode' => 'virement',
+    ]);
+
+    $this->withHeaders($this->resAuth)->getJson('/api/portail/dashboard')
+        ->assertStatus(200)
+        ->assertJsonPath('data.balance', 1500)
+        ->assertJsonPath('data.statut', 'a_jour');
+});
+
+it('le reçu PDF est réellement produit et rattaché au paiement', function () {
+    Storage::fake('public');
+
+    $paiement = Paiement::create([
+        'tenant_id' => $this->tenant->id, 'coproprietaire_id' => $this->copro->id, 'saisi_par' => $this->gest->id,
+        'montant' => 1500, 'date_paiement' => '2026-06-10', 'mode' => 'virement', 'reference' => 'VIR-009',
+    ]);
+
+    (new GenerateRecuPaiementJob($paiement->id))->handle();
+
+    $path = $paiement->fresh()->recu_pdf_path;
+    expect($path)->not->toBeNull();
+    Storage::disk('public')->assertExists($path);
 });
 
 it('le gestionnaire liste les virements déclarés avec nom + lot', function () {

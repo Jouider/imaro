@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Gestionnaire;
 
 use App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
 use App\Http\Controllers\Controller;
+use App\Jobs\GenerateRecuPaiementJob;
 use App\Models\Exercice;
 use App\Models\Paiement;
 use App\Models\VirementDeclare;
@@ -20,10 +21,10 @@ class VirementDeclareController extends Controller
     use AuthorizesResidence;
 
     private const MODE_MAP = [
-        'virement'  => 'virement',
+        'virement' => 'virement',
         'versement' => 'virement',
-        'cheque'    => 'cheque',
-        'especes'   => 'especes',
+        'cheque' => 'cheque',
+        'especes' => 'especes',
     ];
 
     public function index(Request $request): JsonResponse
@@ -38,7 +39,7 @@ class VirementDeclareController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => $virements->map(fn ($v) => $this->present($v))->values(),
+            'data' => $virements->map(fn ($v) => $this->present($v))->values(),
         ]);
     }
 
@@ -53,31 +54,34 @@ class VirementDeclareController extends Controller
                 ->where('statut', 'actif')->first();
 
             $paiement = Paiement::create([
-                'tenant_id'         => $virement->tenant_id,
-                'exercice_id'       => $exercice?->id,
+                'tenant_id' => $virement->tenant_id,
+                'exercice_id' => $exercice?->id,
                 'coproprietaire_id' => $copro->id,
-                'saisi_par'         => $request->user()->id,
-                'montant'           => $virement->montant,
-                'mode'              => self::MODE_MAP[$virement->methode] ?? 'virement',
-                'reference'         => $virement->reference,
-                'note'              => 'Virement déclaré par le copropriétaire (validé).',
-                'date_paiement'     => $virement->date_declaration,
+                'saisi_par' => $request->user()->id,
+                'montant' => $virement->montant,
+                'mode' => self::MODE_MAP[$virement->methode] ?? 'virement',
+                'reference' => $virement->reference,
+                'note' => 'Virement déclaré par le copropriétaire (validé).',
+                'date_paiement' => $virement->date_declaration,
             ]);
 
             $virement->update([
-                'statut'          => 'valide',
-                'valide_par'      => $request->user()->id,
+                'statut' => 'valide',
+                'valide_par' => $request->user()->id,
                 'date_validation' => now(),
-                'paiement_id'     => $paiement->id,
+                'paiement_id' => $paiement->id,
             ]);
 
             $copro->recalculerSolde();
         });
 
+        // Reçu PDF généré en asynchrone (jamais dans le cycle requête — cf. CLAUDE.md).
+        GenerateRecuPaiementJob::dispatch($virement->paiement_id);
+
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Virement validé — paiement enregistré.',
-            'data'    => $this->present($virement->fresh(['coproprietaire.user', 'coproprietaire.lot', 'validePar'])),
+            'data' => $this->present($virement->fresh(['coproprietaire.user', 'coproprietaire.lot', 'validePar'])),
         ]);
     }
 
@@ -89,16 +93,16 @@ class VirementDeclareController extends Controller
         $data = $request->validate(['motif' => ['nullable', 'string', 'max:500']]);
 
         $virement->update([
-            'statut'          => 'rejete',
-            'motif_rejet'     => $data['motif'] ?? null,
-            'valide_par'      => $request->user()->id,
+            'statut' => 'rejete',
+            'motif_rejet' => $data['motif'] ?? null,
+            'valide_par' => $request->user()->id,
             'date_validation' => now(),
         ]);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Virement rejeté.',
-            'data'    => $this->present($virement->fresh(['coproprietaire.user', 'coproprietaire.lot', 'validePar'])),
+            'data' => $this->present($virement->fresh(['coproprietaire.user', 'coproprietaire.lot', 'validePar'])),
         ]);
     }
 
@@ -113,18 +117,18 @@ class VirementDeclareController extends Controller
     private function present(VirementDeclare $v): array
     {
         return [
-            'id'                => $v->id,
+            'id' => $v->id,
             'coproprietaire_id' => $v->coproprietaire_id,
             'coproprietaire_nom' => $v->coproprietaire?->user?->name ?? '—',
-            'lot_numero'        => $v->coproprietaire?->lot?->numero ?? '—',
-            'montant'           => round((float) $v->montant, 2),
-            'date_declaration'  => $v->date_declaration?->toDateString(),
-            'methode'           => $v->methode,
-            'reference'         => $v->reference,
+            'lot_numero' => $v->coproprietaire?->lot?->numero ?? '—',
+            'montant' => round((float) $v->montant, 2),
+            'date_declaration' => $v->date_declaration?->toDateString(),
+            'methode' => $v->methode,
+            'reference' => $v->reference,
             'justificatif_path' => $v->justificatif_path,
-            'statut'            => $v->statut,
-            'valide_par'        => $v->validePar?->name,
-            'date_validation'   => $v->date_validation?->toDateTimeString(),
+            'statut' => $v->statut,
+            'valide_par' => $v->validePar?->name,
+            'date_validation' => $v->date_validation?->toDateTimeString(),
         ];
     }
 }
