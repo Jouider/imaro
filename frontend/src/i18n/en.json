@@ -993,7 +993,8 @@
         "residence": "Assigned building",
         "residencePh": "Choose a building",
         "phone": "Phone",
-        "permissions": "Granted permissions"
+        "permissions": "Granted permissions",
+        "phoneHint": "The access code will be generated and sent to this number via WhatsApp / SMS."
       },
       "toast": {
         "created": "Staff added",
@@ -1004,6 +1005,13 @@
         "deleteFailed": "Deletion failed",
         "toggled": "Status updated",
         "toggleFailed": "Status change failed"
+      },
+      "credentialsSent": {
+        "title": "Credentials sent",
+        "desc": "{{name}}'s account was created and the access code was sent to them.",
+        "sentVia": "Code sent via WhatsApp / SMS to {{phone}}.",
+        "codeLabel": "Code preview",
+        "note": "The full code is never shown. The staff member receives it directly and must change it on first login."
       }
     }
   },

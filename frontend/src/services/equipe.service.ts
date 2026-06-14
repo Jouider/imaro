@@ -354,18 +354,26 @@ export async function getResidenceStaff(): Promise<ResidenceStaff[]> {
 export type CreateStaffInput = {
   name: string
   poste: StaffPoste
+  /** Required + unique — the backend generates the access code and sends it. */
+  phone: string
   residence_id: number
-  phone?: string | null
   permissions: StaffPermission[]
 }
+
+/**
+ * Create response — the staff record plus `code_apercu`: a masked preview of
+ * the generated access code (e.g. `AB••••••`). The full code is never returned;
+ * it is delivered to the staff member via WhatsApp → SMS → email (KAN-52).
+ */
+export type CreateStaffResult = ResidenceStaff & { code_apercu?: string }
 
 export async function createResidenceStaff(
   input: CreateStaffInput,
   residenceNom: string,
-): Promise<ResidenceStaff> {
+): Promise<CreateStaffResult> {
   return withMock(
     async () => {
-      const res = await api.post<ApiEnvelope<ResidenceStaff>>(
+      const res = await api.post<ApiEnvelope<CreateStaffResult>>(
         '/equipe/personnel',
         input,
       )
@@ -377,10 +385,11 @@ export async function createResidenceStaff(
       poste: input.poste,
       residence_id: input.residence_id,
       residence_nom: residenceNom,
-      phone: input.phone ?? null,
+      phone: input.phone,
       permissions: input.permissions,
       statut: 'actif',
       created_at: new Date().toISOString(),
+      code_apercu: 'AB••••••',
     },
   )
 }
