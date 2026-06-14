@@ -649,7 +649,7 @@ Filtre les lots par immeuble directement.
 
 Types valides : `appartement` | `local_commercial` | `parking` | `cave`
 
-**Validation :** `immeuble_id` obligatoire et doit appartenir à la résidence. La somme des tantièmes ne doit pas dépasser `total_tantieme`.
+**Validation :** `immeuble_id` obligatoire et doit appartenir à la résidence. La somme des tantièmes ne doit pas dépasser `total_tantieme`. **Le `numero` doit être unique au sein de la résidence** (trim appliqué ; contrainte DB `unique(residence_id, numero)`). Un doublon renvoie **422** avec `errors.numero` (KAN-40).
 
 **Response 201**
 
