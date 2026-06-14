@@ -13,7 +13,7 @@ class PersonnelResidence extends Model
     protected $table = 'personnel_residences';
 
     protected $fillable = [
-        'tenant_id', 'name', 'poste', 'residence_id',
+        'tenant_id', 'name', 'poste', 'residence_id', 'user_id',
         'phone', 'permissions', 'is_active',
     ];
 
@@ -21,7 +21,7 @@ class PersonnelResidence extends Model
     {
         return [
             'permissions' => 'array',
-            'is_active'   => 'boolean',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -33,5 +33,11 @@ class PersonnelResidence extends Model
     public function residence(): BelongsTo
     {
         return $this->belongsTo(Residence::class);
+    }
+
+    /** Compte de connexion (téléphone + code d'accès) du membre du personnel. */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
