@@ -105,7 +105,10 @@ function BrandPanel() {
         style={{ animationDelay: '4s' }}
       />
 
-      {/* Tagline + features (text only — logo moved to the right panel, KAN-58) */}
+      {/* Logo (top-left) */}
+      <Wordmark inverted className="absolute start-10 top-10 h-10 w-auto" />
+
+      {/* Tagline + features */}
       <div className="relative space-y-8">
         <div>
           <h2 className="text-[2rem] font-bold leading-tight text-white">

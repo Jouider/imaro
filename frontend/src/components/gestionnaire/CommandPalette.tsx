@@ -32,6 +32,8 @@ import {
   User,
   Plus,
   ShieldCheck,
+  ScanLine,
+  HardHat,
   CircleDollarSign,
   type LucideIcon,
 } from 'lucide-react'
@@ -65,7 +67,7 @@ type Entry = {
 
 /**
  * Command palette — Cmd+K / Ctrl+K trigger.
- * Fuzzy navigation across the 28 gestionnaire pages + quick actions
+ * Fuzzy navigation across all gestionnaire pages + quick actions
  * (new ticket, new payment, run IA audit, etc.).
  */
 export function CommandPalette() {
@@ -272,11 +274,32 @@ export function CommandPalette() {
       to: '/gestionnaire/tickets',
     },
     {
+      key: 'nav-visites',
+      group: 'nav',
+      label: t('gestionnaire.nav.visites'),
+      icon: ScanLine,
+      to: '/gestionnaire/visites',
+    },
+    {
       key: 'nav-documents',
       group: 'nav',
       label: t('gestionnaire.nav.documents'),
       icon: FileText,
       to: '/gestionnaire/documents',
+    },
+    {
+      key: 'nav-utilisateurs',
+      group: 'nav',
+      label: t('gestionnaire.nav.utilisateurs'),
+      icon: ShieldCheck,
+      to: '/gestionnaire/utilisateurs',
+    },
+    {
+      key: 'nav-personnel',
+      group: 'nav',
+      label: t('gestionnaire.nav.personnel'),
+      icon: HardHat,
+      to: '/gestionnaire/personnel',
     },
     {
       key: 'nav-profil',
