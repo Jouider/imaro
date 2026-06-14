@@ -1,38 +1,38 @@
 <?php
 
-use App\Http\Controllers\Api\Gestionnaire\AnnonceController;
-use App\Http\Controllers\Api\Gestionnaire\EquipePersonnelController;
-use App\Http\Controllers\Api\Gestionnaire\EquipeUtilisateurController;
 use App\Http\Controllers\Api\Gestionnaire\AnnexeController;
+use App\Http\Controllers\Api\Gestionnaire\AnnonceController;
+use App\Http\Controllers\Api\Gestionnaire\AppelFondsController;
+use App\Http\Controllers\Api\Gestionnaire\AssembleeController;
+use App\Http\Controllers\Api\Gestionnaire\AssistanceRecouvrementController;
 use App\Http\Controllers\Api\Gestionnaire\AuditLogController;
 use App\Http\Controllers\Api\Gestionnaire\AutreRecetteController;
 use App\Http\Controllers\Api\Gestionnaire\BilanOuvertureController;
 use App\Http\Controllers\Api\Gestionnaire\BudgetAnnexe5Controller;
+use App\Http\Controllers\Api\Gestionnaire\BudgetController;
 use App\Http\Controllers\Api\Gestionnaire\ComplianceCalendarController;
+use App\Http\Controllers\Api\Gestionnaire\ComptabiliteController;
+use App\Http\Controllers\Api\Gestionnaire\CompteBancaireController;
+use App\Http\Controllers\Api\Gestionnaire\ContratController;
+use App\Http\Controllers\Api\Gestionnaire\CoproprietaireController;
 use App\Http\Controllers\Api\Gestionnaire\CreanceController;
+use App\Http\Controllers\Api\Gestionnaire\DashboardController;
 use App\Http\Controllers\Api\Gestionnaire\DecompteController;
 use App\Http\Controllers\Api\Gestionnaire\DepenseFinanceController;
+use App\Http\Controllers\Api\Gestionnaire\DocumentController;
 use App\Http\Controllers\Api\Gestionnaire\EmpruntController;
 use App\Http\Controllers\Api\Gestionnaire\EncaissementController;
-use App\Http\Controllers\Api\Gestionnaire\VirementDeclareController;
 use App\Http\Controllers\Api\Gestionnaire\EquipementController;
+use App\Http\Controllers\Api\Gestionnaire\EquipePersonnelController;
+use App\Http\Controllers\Api\Gestionnaire\EquipeUtilisateurController;
+use App\Http\Controllers\Api\Gestionnaire\ExerciceController;
 use App\Http\Controllers\Api\Gestionnaire\GroupeHabitationController;
 use App\Http\Controllers\Api\Gestionnaire\ImmeubleController;
-use App\Http\Controllers\Api\Gestionnaire\AppelFondsController;
-use App\Http\Controllers\Api\Gestionnaire\AssembleeController;
-use App\Http\Controllers\Api\Gestionnaire\BudgetController;
-use App\Http\Controllers\Api\Gestionnaire\ComptabiliteController;
-use App\Http\Controllers\Api\Gestionnaire\ContratController;
-use App\Http\Controllers\Api\Gestionnaire\CompteBancaireController;
-use App\Http\Controllers\Api\Gestionnaire\CoproprietaireController;
-use App\Http\Controllers\Api\Gestionnaire\DashboardController;
-use App\Http\Controllers\Api\Gestionnaire\DocumentController;
-use App\Http\Controllers\Api\Gestionnaire\ExerciceController;
 use App\Http\Controllers\Api\Gestionnaire\ImpayeController;
 use App\Http\Controllers\Api\Gestionnaire\LotController;
 use App\Http\Controllers\Api\Gestionnaire\NotificationController;
-use App\Http\Controllers\Api\Gestionnaire\OnboardingController;
 use App\Http\Controllers\Api\Gestionnaire\OccupantController;
+use App\Http\Controllers\Api\Gestionnaire\OnboardingController;
 use App\Http\Controllers\Api\Gestionnaire\PaiementController;
 use App\Http\Controllers\Api\Gestionnaire\PenaltyController;
 use App\Http\Controllers\Api\Gestionnaire\PointageController;
@@ -43,10 +43,14 @@ use App\Http\Controllers\Api\Gestionnaire\RemboursementController;
 use App\Http\Controllers\Api\Gestionnaire\ResidenceController;
 use App\Http\Controllers\Api\Gestionnaire\TicketController;
 use App\Http\Controllers\Api\Gestionnaire\TravauxExceptionnelController;
+use App\Http\Controllers\Api\Gestionnaire\VirementDeclareController;
 use Illuminate\Support\Facades\Route;
 
 // Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index']);
+
+// Assistance recouvrement (service optionnel — demande d'accompagnement) — #179
+Route::post('/assistance-recouvrement', [AssistanceRecouvrementController::class, 'store']);
 
 // Résidences + lots + copropriétaires + exercices (KAN-13 + issue #95)
 Route::apiResource('residences', ResidenceController::class)

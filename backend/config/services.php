@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    // Boîte IT qui reçoit les demandes d'assistance recouvrement (#179).
+    'assistance_recouvrement' => [
+        'inbox' => env('ASSISTANCE_RECOUVREMENT_EMAIL', 'recouvrement@imaro.ma'),
+    ],
+
 ];

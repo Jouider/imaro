@@ -1309,6 +1309,18 @@ SIDs résolus depuis `config('notifications.whatsapp_templates.<name>')`.
 
 ---
 
+## Assistance recouvrement (service optionnel — #179)
+
+`POST /api/gestionnaire/assistance-recouvrement` · `role:manager|gestionnaire`
+
+Demande d'accompagnement au recouvrement. Persiste la demande (`assistance_requests`, statut `nouvelle`) et envoie un email à l'équipe IT (`ASSISTANCE_RECOUVREMENT_EMAIL`, défaut `recouvrement@imaro.ma`) en asynchrone.
+
+**Body** (camelCase) : `contactName`, `contactPhone`, `contactEmail`, `syndicName`, `residencesCount?`, `impayesEstimate?`, `plan` (`essentiel|complet|sur_mesure`), `message?`.
+
+**Response 201** : `{ "status": "success", "data": { "reference": "AR-7F3K9Q" } }`
+
+---
+
 ## Comptes de démo
 
 | Rôle | Email | Mot de passe |
