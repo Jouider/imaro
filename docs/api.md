@@ -1321,6 +1321,20 @@ Demande d'accompagnement au recouvrement. Persiste la demande (`assistance_reque
 
 ---
 
+## Personnel de terrain — identifiants de connexion (KAN-52)
+
+`POST /api/gestionnaire/equipe/personnel` · `app.permission:personnel`
+
+Crée le personnel (gardien, sécurité, ménage…) **et un compte de connexion** : login par **téléphone + code d'accès** (comme les résidents). Le `phone` est **requis** et unique. Le backend **génère** le code et l'**envoie** via la cascade WhatsApp → SMS → email.
+
+**Body** : `name`, `poste` (`securite|menage|gardien|jardinier|technicien|concierge`), `residence_id`, `phone` (requis, unique), `permissions?`.
+
+**Response 201** : enregistrement + `code_apercu` (**aperçu masqué** uniquement, ex. `AB••••••` — le code complet n'est jamais renvoyé).
+
+Connexion ensuite via `POST /api/auth/resident/login` (`phone` + `code`) — l'endpoint accepte les rôles `resident` **et** `personnel`. Première connexion → `must_change_code` → écran d'activation.
+
+---
+
 ## Comptes de démo
 
 | Rôle | Email | Mot de passe |

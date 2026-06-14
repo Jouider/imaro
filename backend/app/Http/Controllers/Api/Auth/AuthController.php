@@ -208,7 +208,7 @@ class AuthController extends Controller
         $user = User::withoutGlobalScopes()
             ->with('tenant')
             ->where('phone', $request->phone)
-            ->where('role', 'resident')
+            ->whereIn('role', ['resident', 'personnel'])
             ->whereNull('deleted_at')
             ->first();
 
@@ -281,7 +281,7 @@ class AuthController extends Controller
         $user = User::withoutGlobalScopes()
             ->with('tenant')
             ->where('phone', $request->phone)
-            ->where('role', 'resident')
+            ->whereIn('role', ['resident', 'personnel'])
             ->whereNull('deleted_at')
             ->first();
 
