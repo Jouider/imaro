@@ -105,8 +105,12 @@ function BrandPanel() {
         style={{ animationDelay: '4s' }}
       />
 
-      {/* Logo (top-left) */}
-      <Wordmark inverted className="absolute start-10 top-10 h-10 w-auto" />
+      {/* Logo — stacked, centered, large */}
+      <Wordmark
+        variant="stacked"
+        inverted
+        className="relative mx-auto mb-10 h-36 w-auto"
+      />
 
       {/* Tagline + features */}
       <div className="relative space-y-8">

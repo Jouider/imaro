@@ -22,10 +22,12 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: [
-        'favicon.png',
-        'favicon-192.png',
-        'favicon-512.png',
+        'favicon.ico',
+        'favicon.svg',
+        'favicon-96x96.png',
         'apple-touch-icon.png',
+        'web-app-manifest-192x192.png',
+        'web-app-manifest-512x512.png',
         'logo-stacked.png',
         'logo-horizontal.png',
         'logo-horizontal-inverted.png',
@@ -72,22 +74,22 @@ export default defineConfig({
         categories: ['finance', 'productivity', 'business'],
         icons: [
           {
-            src: '/favicon-192.png',
+            src: '/web-app-manifest-192x192.png',
             sizes: '192x192',
             type: 'image/png',
-            purpose: 'any',
+            purpose: 'maskable',
           },
           {
-            src: '/favicon-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any',
-          },
-          {
-            src: '/favicon-512.png',
+            src: '/web-app-manifest-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
+          },
+          {
+            src: '/web-app-manifest-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any',
           },
         ],
       },
