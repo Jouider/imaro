@@ -17,7 +17,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
@@ -101,9 +100,6 @@ export function ProfilPage() {
   })
 
   const initials = user ? getInitials(user.name) : 'G'
-  const planLabel = tenant?.plan
-    ? tenant.plan.charAt(0).toUpperCase() + tenant.plan.slice(1).toLowerCase()
-    : 'Standard'
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 px-4 py-8">
@@ -269,53 +265,6 @@ export function ProfilPage() {
               </Button>
             )}
           </div>
-        </div>
-      </div>
-
-      {/* ── 4. Syndic & Abonnement (was 3) ── */}
-      <div className="rounded-2xl bg-white shadow-sm p-6 dark:bg-card">
-        <div className="flex items-center gap-2 mb-4">
-          <Building2
-            className="size-4 shrink-0"
-            style={{ color: 'var(--color-imaro-primary)' }}
-          />
-          <h2 className="text-base font-semibold text-foreground">
-            {t('gestionnaire.profil.subSection')}
-          </h2>
-        </div>
-
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">
-              {t('gestionnaire.profil.plan')}
-            </span>
-            <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 font-semibold">
-              {planLabel}
-            </Badge>
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">
-              {t('common.societe')}
-            </span>
-            <span className="text-sm font-medium text-foreground">
-              {tenant?.name ?? '—'}
-            </span>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <a
-            href="#"
-            className="text-sm font-medium"
-            style={{ color: '#E67E22' }}
-            onClick={(e) => {
-              e.preventDefault()
-              toast.info(t('gestionnaire.profil.comingSoon'))
-            }}
-          >
-            {t('gestionnaire.profil.upgradePro')}
-          </a>
         </div>
       </div>
 
