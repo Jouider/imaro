@@ -7,9 +7,9 @@
  * under loi 18-00 — to the Imaro team. The form below submits a structured
  * request that the IT team turns into a follow-up.
  *
- * Backend Abdellah (futur) — see issue: the endpoint must email the IT inbox
- * AND persist the request for structured tracking. Until it lands, the call is
- * mocked so the flow works end-to-end; a mailto fallback is always offered.
+ * Backend (Abdellah, PR #225) — POST /api/gestionnaire/assistance-recouvrement
+ * emails the IT inbox AND persists the request for structured tracking. A
+ * mailto fallback is always offered on the page if the call fails.
  */
 import { api, type ApiEnvelope } from '@/lib/axios'
 
@@ -42,32 +42,16 @@ export type AssistanceRequestResult = {
 
 /**
  * Submit an assistance request to the backend (emails IT + persists for
- * tracking). Falls back to a mocked success in dev / on 404 so the UI flow is
- * never blocked by the missing endpoint.
+ * tracking) and return the reference the requester can quote.
  */
 export async function submitAssistanceRequest(
   payload: AssistanceRequestPayload,
 ): Promise<AssistanceRequestResult> {
-  const mock: AssistanceRequestResult = { reference: localReference() }
-
-  // Endpoint pending backend (Abdellah). Remove this early-return once
-  // POST /api/gestionnaire/assistance-recouvrement is deployed.
-  if (import.meta.env.DEV) return mock
-  try {
-    const { data } = await api.post<ApiEnvelope<AssistanceRequestResult>>(
-      '/gestionnaire/assistance-recouvrement',
-      payload,
-    )
-    return data.data ?? mock
-  } catch {
-    return mock
-  }
-}
-
-/** Human-friendly local reference, e.g. `AR-7F3K9Q`. */
-function localReference(): string {
-  const code = Math.random().toString(36).slice(2, 8).toUpperCase()
-  return `AR-${code}`
+  const { data } = await api.post<ApiEnvelope<AssistanceRequestResult>>(
+    '/gestionnaire/assistance-recouvrement',
+    payload,
+  )
+  return data.data
 }
 
 /**
