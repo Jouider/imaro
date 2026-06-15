@@ -384,7 +384,7 @@ export function LoginPage() {
       {/* ── Right form panel ── */}
       <div className="flex min-h-svh flex-1 flex-col bg-[#f4f7fa] dark:bg-background">
         {/* Top bar */}
-        <div className="flex h-16 shrink-0 items-center justify-between px-6 sm:px-10">
+        <div className="flex min-h-16 shrink-0 items-center justify-between px-6 pt-[env(safe-area-inset-top)] sm:px-10">
           {/* Desktop: back-to-site link (logo now sits atop the login card) */}
           <a
             href="/"
