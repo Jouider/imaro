@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
-import { HomePage } from '@/pages/HomePage'
+import { RootEntry } from '@/components/RootEntry'
 import { LoginPage } from '@/pages/LoginPage'
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { PortailLayout } from '@/pages/portail/PortailLayout'
@@ -50,7 +50,7 @@ import { UtilisateursPage } from '@/pages/gestionnaire/UtilisateursPage'
 import { PersonnelPage } from '@/pages/gestionnaire/PersonnelPage'
 
 export const router = createBrowserRouter([
-  { path: '/', element: <HomePage /> },
+  { path: '/', element: <RootEntry /> },
   { path: '/login', element: <LoginPage /> },
   { path: '/reset-password', element: <ResetPasswordPage /> },
 

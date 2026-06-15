@@ -10,7 +10,13 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import prettier from 'eslint-config-prettier'
 
 export default defineConfig([
-  globalIgnores(['dist', 'storybook-static', 'src/components/ui/**']),
+  globalIgnores([
+    'dist',
+    'storybook-static',
+    'src/components/ui/**',
+    'ios/**',
+    'android/**',
+  ]),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
