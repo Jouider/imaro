@@ -34,6 +34,7 @@ import {
   resetPasswordWithOtp,
 } from '@/services/auth.service'
 import { DemoRequestDialog } from '@/components/auth/DemoRequestDialog'
+import { isNative } from '@/lib/native'
 import { setStoredToken } from '@/lib/axios'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
@@ -402,8 +403,9 @@ export function LoginPage() {
           <div className="w-full max-w-[420px]">
             <Wordmark variant="stacked" className="mx-auto mb-6 h-16 w-auto" />
             <div className="rounded-3xl border border-slate-200/80 bg-white p-7 shadow-[0_24px_60px_-24px_rgb(0_18_68_/_0.28)] sm:p-9 dark:border-border dark:bg-card">
-              {/* Back button */}
-              {step !== 'role' && (
+              {/* Back button — hidden at the entry step on native, where the
+                  app boots straight to the Owner login (no role chooser). */}
+              {step !== 'role' && !(isNative && step === 'phone') && (
                 <button
                   type="button"
                   onClick={goBack}
