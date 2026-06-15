@@ -12,6 +12,7 @@ use App\Models\Exercice;
 use App\Models\Paiement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class ComptabiliteController extends Controller
@@ -38,7 +39,7 @@ class ComptabiliteController extends Controller
             'appelFonds',
             fn ($q) => $q->where('exercice_id', $exercice->id)->where('statut', '!=', 'brouillon')
         );
-        $totalDu   = (clone $lignes)->sum('montant_du');
+        $totalDu = (clone $lignes)->sum('montant_du');
         $totalPaye = (clone $lignes)->sum('montant_paye');
         $tauxRecouvrement = $totalDu > 0 ? round(($totalPaye / $totalDu) * 100, 1) : 0;
 
@@ -67,8 +68,8 @@ class ComptabiliteController extends Controller
         for ($m = 1; $m <= 12; $m++) {
             if (isset($chargesMensuelles[$m]) || isset($produitsMensuels[$m])) {
                 $evolutionMensuelle[] = [
-                    'mois'     => $moisLabels[$m - 1],
-                    'charges'  => round((float) ($chargesMensuelles[$m] ?? 0), 2),
+                    'mois' => $moisLabels[$m - 1],
+                    'charges' => round((float) ($chargesMensuelles[$m] ?? 0), 2),
                     'produits' => round((float) ($produitsMensuels[$m] ?? 0), 2),
                 ];
             }
@@ -79,29 +80,29 @@ class ComptabiliteController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => [
-                'produits'               => round((float) $totalProduits, 2),
-                'charges'                => round((float) $totalCharges, 2),
-                'resultat'               => $tresorerie,
-                'tresorerie'             => $tresorerie,
-                'creances'               => round((float) $creances, 2),
-                'taux_recouvrement'      => $tauxRecouvrement,
-                'couverture_tresorerie'  => $totalCharges > 0 ? round($tresorerie / (float) $totalCharges * 100, 1) : 0,
-                'banque_5121'            => $tresorerie,
-                'cheque_5122'            => 0,
-                'caisse_5161'            => 0,
-                'evolution'              => $evolutionMensuelle,
-                'charges_par_categorie'  => $chargesParCategorie->map(fn ($c) => [
+            'data' => [
+                'produits' => round((float) $totalProduits, 2),
+                'charges' => round((float) $totalCharges, 2),
+                'resultat' => $tresorerie,
+                'tresorerie' => $tresorerie,
+                'creances' => round((float) $creances, 2),
+                'taux_recouvrement' => $tauxRecouvrement,
+                'couverture_tresorerie' => $totalCharges > 0 ? round($tresorerie / (float) $totalCharges * 100, 1) : 0,
+                'banque_5121' => $tresorerie,
+                'cheque_5122' => 0,
+                'caisse_5161' => 0,
+                'evolution' => $evolutionMensuelle,
+                'charges_par_categorie' => $chargesParCategorie->map(fn ($c) => [
                     'categorie' => ucfirst($c['categorie']),
-                    'montant'   => $c['montant'],
-                    'couleur'   => match ($c['categorie']) {
-                        'gardiennage'   => '#3b82f6',
-                        'nettoyage'     => '#10b981',
-                        'entretien'     => '#f59e0b',
-                        'assurance'     => '#8b5cf6',
+                    'montant' => $c['montant'],
+                    'couleur' => match ($c['categorie']) {
+                        'gardiennage' => '#3b82f6',
+                        'nettoyage' => '#10b981',
+                        'entretien' => '#f59e0b',
+                        'assurance' => '#8b5cf6',
                         'administratif' => '#ef4444',
-                        'travaux'       => '#06b6d4',
-                        default         => '#6b7280',
+                        'travaux' => '#06b6d4',
+                        default => '#6b7280',
                     },
                 ])->values(),
             ],
@@ -127,54 +128,53 @@ class ComptabiliteController extends Controller
 
             // Debit line
             $ecritures->push([
-                'id'                    => $seqId++,
-                'exercice_id'           => $e['exercice_id'],
-                'date'                  => $e['date'],
-                'numero_compte'         => $e['compte_debit'],
-                'libelle_compte'        => $comptesRef[$e['compte_debit']]['libelle'] ?? 'Compte '.$e['compte_debit'],
-                'description'           => $e['libelle'],
-                'debit'                 => $e['montant'],
-                'credit'                => 0,
-                'piece_justificative'   => $e['piece'],
-                'type'                  => $type,
-                'locked'                => false,
+                'id' => $seqId++,
+                'exercice_id' => $e['exercice_id'],
+                'date' => $e['date'],
+                'numero_compte' => $e['compte_debit'],
+                'libelle_compte' => $comptesRef[$e['compte_debit']]['libelle'] ?? 'Compte '.$e['compte_debit'],
+                'description' => $e['libelle'],
+                'debit' => $e['montant'],
+                'credit' => 0,
+                'piece_justificative' => $e['piece'],
+                'type' => $type,
+                'locked' => false,
             ]);
 
             // Credit line
             $ecritures->push([
-                'id'                    => $seqId++,
-                'exercice_id'           => $e['exercice_id'],
-                'date'                  => $e['date'],
-                'numero_compte'         => $e['compte_credit'],
-                'libelle_compte'        => $comptesRef[$e['compte_credit']]['libelle'] ?? 'Compte '.$e['compte_credit'],
-                'description'           => $e['libelle'],
-                'debit'                 => 0,
-                'credit'                => $e['montant'],
-                'piece_justificative'   => $e['piece'],
-                'type'                  => $type,
-                'locked'                => false,
+                'id' => $seqId++,
+                'exercice_id' => $e['exercice_id'],
+                'date' => $e['date'],
+                'numero_compte' => $e['compte_credit'],
+                'libelle_compte' => $comptesRef[$e['compte_credit']]['libelle'] ?? 'Compte '.$e['compte_credit'],
+                'description' => $e['libelle'],
+                'debit' => 0,
+                'credit' => $e['montant'],
+                'piece_justificative' => $e['piece'],
+                'type' => $type,
+                'locked' => false,
             ]);
         }
 
         // Apply filters
         if ($search = $request->query('search')) {
             $q = strtolower($search);
-            $ecritures = $ecritures->filter(fn ($e) =>
-                str_contains(strtolower($e['description']), $q) ||
+            $ecritures = $ecritures->filter(fn ($e) => str_contains(strtolower($e['description']), $q) ||
                 str_contains($e['numero_compte'], $q)
             );
         }
 
         return response()->json([
             'status' => 'success',
-            'data'   => $ecritures->sortBy('date')->values(),
+            'data' => $ecritures->sortBy('date')->values(),
         ]);
     }
 
     /**
      * Build raw compound journal entries (internal use for journal + grandLivre).
      */
-    private function buildRawJournalEntries(Exercice $exercice): \Illuminate\Support\Collection
+    private function buildRawJournalEntries(Exercice $exercice): Collection
     {
         $entries = collect();
 
@@ -185,14 +185,14 @@ class ComptabiliteController extends Controller
 
         foreach ($paiements as $p) {
             $entries->push([
-                'id'            => 'P'.$p->id,
-                'date'          => $p->date_paiement->toDateString(),
-                'libelle'       => 'Paiement '.$p->coproprietaire?->user?->name,
-                'compte_debit'  => '5121',
+                'id' => 'P'.$p->id,
+                'date' => $p->date_paiement->toDateString(),
+                'libelle' => 'Paiement '.$p->coproprietaire?->user?->name,
+                'compte_debit' => '5121',
                 'compte_credit' => '7061',
-                'montant'       => round($p->montant, 2),
-                'piece'         => $p->reference ?? 'PAY-'.$p->id,
-                'exercice_id'   => $exercice->id,
+                'montant' => round($p->montant, 2),
+                'piece' => $p->reference ?? 'PAY-'.$p->id,
+                'exercice_id' => $exercice->id,
             ]);
         }
 
@@ -202,28 +202,28 @@ class ComptabiliteController extends Controller
             ->get();
 
         $categorieToCompte = [
-            'entretien'     => '6135',
-            'gardiennage'   => '6138',
-            'nettoyage'     => '6131',
-            'assurance'     => '6136',
+            'entretien' => '6135',
+            'gardiennage' => '6138',
+            'nettoyage' => '6131',
+            'assurance' => '6136',
             'administratif' => '6171',
-            'travaux'       => '6134',
-            'autre'         => '6188',
+            'travaux' => '6134',
+            'autre' => '6188',
         ];
 
         foreach ($depenses as $d) {
-            $compteDebit  = $categorieToCompte[strtolower($d->categorie)] ?? '6188';
+            $compteDebit = $categorieToCompte[strtolower($d->categorie)] ?? '6188';
             $compteCredit = $d->statut === 'paye' ? '5121' : '4011';
 
             $entries->push([
-                'id'            => 'D'.$d->id,
-                'date'          => $d->date->toDateString(),
-                'libelle'       => $d->description,
-                'compte_debit'  => $compteDebit,
+                'id' => 'D'.$d->id,
+                'date' => $d->date->toDateString(),
+                'libelle' => $d->description,
+                'compte_debit' => $compteDebit,
                 'compte_credit' => $compteCredit,
-                'montant'       => round($d->montant, 2),
-                'piece'         => 'DEP-'.$d->id,
-                'exercice_id'   => $exercice->id,
+                'montant' => round($d->montant, 2),
+                'piece' => 'DEP-'.$d->id,
+                'exercice_id' => $exercice->id,
             ]);
         }
 
@@ -248,27 +248,27 @@ class ComptabiliteController extends Controller
                 $numero = $e[$side];
                 if (! isset($comptes[$numero])) {
                     $comptes[$numero] = [
-                        'numero'          => $numero,
-                        'libelle'         => $comptesRef[$numero]['libelle'] ?? 'Compte '.$numero,
+                        'numero' => $numero,
+                        'libelle' => $comptesRef[$numero]['libelle'] ?? 'Compte '.$numero,
                         'solde_ouverture' => 0,
-                        'total_debit'     => 0,
-                        'total_credit'    => 0,
-                        'solde_final'     => 0,
-                        'lignes'          => [],
+                        'total_debit' => 0,
+                        'total_credit' => 0,
+                        'solde_final' => 0,
+                        'lignes' => [],
                     ];
                 }
 
                 $isDebit = $side === 'compte_debit';
-                $runningDebit  = $comptes[$numero]['total_debit'] + ($isDebit ? $e['montant'] : 0);
+                $runningDebit = $comptes[$numero]['total_debit'] + ($isDebit ? $e['montant'] : 0);
                 $runningCredit = $comptes[$numero]['total_credit'] + ($isDebit ? 0 : $e['montant']);
 
                 $comptes[$numero]['lignes'][] = [
-                    'id'          => $lineId++,
-                    'date'        => $e['date'],
+                    'id' => $lineId++,
+                    'date' => $e['date'],
                     'description' => $e['libelle'],
-                    'debit'       => $isDebit ? $e['montant'] : 0,
-                    'credit'      => $isDebit ? 0 : $e['montant'],
-                    'solde'       => round($runningDebit - $runningCredit, 2),
+                    'debit' => $isDebit ? $e['montant'] : 0,
+                    'credit' => $isDebit ? 0 : $e['montant'],
+                    'solde' => round($runningDebit - $runningCredit, 2),
                 ];
 
                 if ($isDebit) {
@@ -281,7 +281,7 @@ class ComptabiliteController extends Controller
 
         foreach ($comptes as &$c) {
             $c['solde_final'] = round($c['total_debit'] - $c['total_credit'], 2);
-            $c['total_debit']  = round($c['total_debit'], 2);
+            $c['total_debit'] = round($c['total_debit'], 2);
             $c['total_credit'] = round($c['total_credit'], 2);
         }
 
@@ -289,21 +289,22 @@ class ComptabiliteController extends Controller
         $compteFilter = $compte ?? $request->query('compte');
         if ($compteFilter) {
             $match = $comptes[$compteFilter] ?? null;
+
             return response()->json([
                 'status' => 'success',
-                'data'   => $match ?? [
-                    'numero'          => $compteFilter,
-                    'libelle'         => $comptesRef[$compteFilter]['libelle'] ?? 'Compte '.$compteFilter,
+                'data' => $match ?? [
+                    'numero' => $compteFilter,
+                    'libelle' => $comptesRef[$compteFilter]['libelle'] ?? 'Compte '.$compteFilter,
                     'solde_ouverture' => 0,
-                    'lignes'          => [],
-                    'solde_final'     => 0,
+                    'lignes' => [],
+                    'solde_final' => 0,
                 ],
             ]);
         }
 
         return response()->json([
             'status' => 'success',
-            'data'   => array_values($comptes),
+            'data' => array_values($comptes),
         ]);
     }
 
@@ -335,20 +336,25 @@ class ComptabiliteController extends Controller
         $balance = collect($comptes)->map(function ($totals, $numero) use ($comptesRef) {
             $ref = $comptesRef[$numero] ?? null;
             $solde = round($totals['debit'] - $totals['credit'], 2);
+
+            // PHP convertit les clés de tableau numériques en int : on recaste le
+            // numéro de compte en chaîne (le front trie via numero.localeCompare()).
+            $numero = (string) $numero;
+
             return [
-                'numero'          => $numero,
-                'libelle'         => $ref['libelle'] ?? 'Compte '.$numero,
-                'classe'          => $ref['classe'] ?? (int) substr($numero, 0, 1),
-                'total_debit'     => round($totals['debit'], 2),
-                'total_credit'    => round($totals['credit'], 2),
-                'solde_debiteur'  => $solde > 0 ? $solde : 0,
+                'numero' => $numero,
+                'libelle' => $ref['libelle'] ?? 'Compte '.$numero,
+                'classe' => $ref['classe'] ?? (int) substr($numero, 0, 1),
+                'total_debit' => round($totals['debit'], 2),
+                'total_credit' => round($totals['credit'], 2),
+                'solde_debiteur' => $solde > 0 ? $solde : 0,
                 'solde_crediteur' => $solde < 0 ? abs($solde) : 0,
             ];
         })->sortBy('numero')->values();
 
         return response()->json([
             'status' => 'success',
-            'data'   => $balance,
+            'data' => $balance,
         ]);
     }
 
@@ -360,13 +366,13 @@ class ComptabiliteController extends Controller
         $this->authorizeExercice($request, $exercice);
 
         $categorieToCompte = [
-            'gardiennage'   => '6138',
-            'nettoyage'     => '6131',
-            'entretien'     => '6135',
-            'assurance'     => '6136',
+            'gardiennage' => '6138',
+            'nettoyage' => '6131',
+            'entretien' => '6135',
+            'assurance' => '6136',
             'administratif' => '6171',
-            'travaux'       => '6134',
-            'autre'         => '6188',
+            'travaux' => '6134',
+            'autre' => '6188',
         ];
         $libellesCompte = [
             '6138' => 'Autres rémunérations',
@@ -384,25 +390,26 @@ class ComptabiliteController extends Controller
             ->get()
             ->map(function (Depense $d) use ($categorieToCompte, $libellesCompte) {
                 $compte = $categorieToCompte[$d->categorie] ?? '6188';
+
                 return [
-                    'id'                => $d->id,
-                    'exercice_id'       => $d->exercice_id,
-                    'titre'             => $d->description,
-                    'montant'           => round((float) $d->montant, 2),
-                    'date'              => $d->date->toDateString(),
-                    'prestataire_id'    => $d->prestataire_id,
-                    'prestataire_nom'   => $d->prestataire?->nom ?? null,
-                    'compte_charge'     => $compte,
-                    'libelle_compte'    => $libellesCompte[$compte] ?? 'Charges diverses',
-                    'mode_paiement'     => $d->statut === 'paye' ? 'virement' : 'autre',
+                    'id' => $d->id,
+                    'exercice_id' => $d->exercice_id,
+                    'titre' => $d->description,
+                    'montant' => round((float) $d->montant, 2),
+                    'date' => $d->date->toDateString(),
+                    'prestataire_id' => $d->prestataire_id,
+                    'prestataire_nom' => $d->prestataire?->nom ?? null,
+                    'compte_charge' => $compte,
+                    'libelle_compte' => $libellesCompte[$compte] ?? 'Charges diverses',
+                    'mode_paiement' => $d->statut === 'paye' ? 'virement' : 'autre',
                     'justificatif_path' => null,
-                    'ecriture_id'       => $d->id,
+                    'ecriture_id' => $d->id,
                 ];
             });
 
         return response()->json([
             'status' => 'success',
-            'data'   => $depenses,
+            'data' => $depenses,
         ]);
     }
 
@@ -415,30 +422,30 @@ class ComptabiliteController extends Controller
         abort_if($exercice->statut === 'cloture', 422, 'Exercice clôturé.');
 
         $depense = Depense::create([
-            'tenant_id'      => $request->user()->tenant_id,
-            'exercice_id'    => $exercice->id,
-            'residence_id'   => $exercice->residence_id,
+            'tenant_id' => $request->user()->tenant_id,
+            'exercice_id' => $exercice->id,
+            'residence_id' => $exercice->residence_id,
             'prestataire_id' => $request->prestataire_id,
-            'created_by'     => $request->user()->id,
-            'description'    => $request->description,
-            'categorie'      => $request->categorie,
-            'montant'        => $request->montant,
-            'date'           => $request->date,
-            'statut'         => $request->statut ?? 'en_attente',
+            'created_by' => $request->user()->id,
+            'description' => $request->description,
+            'categorie' => $request->categorie,
+            'montant' => $request->montant,
+            'date' => $request->date,
+            'statut' => $request->statut ?? 'en_attente',
         ]);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Dépense créée.',
-            'data'    => [
+            'data' => [
                 'depense' => [
-                    'id'          => $depense->id,
-                    'date'        => $depense->date->toDateString(),
+                    'id' => $depense->id,
+                    'date' => $depense->date->toDateString(),
                     'description' => $depense->description,
-                    'categorie'   => $depense->categorie,
-                    'montant'     => round($depense->montant, 2),
+                    'categorie' => $depense->categorie,
+                    'montant' => round($depense->montant, 2),
                     'prestataire' => $depense->prestataire?->name ?? $depense->description,
-                    'statut'      => $depense->statut,
+                    'statut' => $depense->statut,
                     'exercice_id' => $depense->exercice_id,
                 ],
             ],
@@ -485,20 +492,20 @@ class ComptabiliteController extends Controller
 
         $paiement = DB::transaction(function () use ($request, $exercice, $copro, $ligne) {
             $paiement = Paiement::create([
-                'tenant_id'             => $request->user()->tenant_id,
-                'exercice_id'           => $exercice->id,
-                'coproprietaire_id'     => $copro->id,
-                'appel_fonds_ligne_id'  => $ligne?->id,
-                'saisi_par'             => $request->user()->id,
-                'montant'               => $request->montant,
-                'mode'                  => 'virement',
-                'reference'             => $request->reference,
-                'date_paiement'         => $request->date,
+                'tenant_id' => $request->user()->tenant_id,
+                'exercice_id' => $exercice->id,
+                'coproprietaire_id' => $copro->id,
+                'appel_fonds_ligne_id' => $ligne?->id,
+                'saisi_par' => $request->user()->id,
+                'montant' => $request->montant,
+                'mode' => 'virement',
+                'reference' => $request->reference,
+                'date_paiement' => $request->date,
             ]);
 
             if ($ligne) {
                 $ligne->montant_paye = min($ligne->montant_du, $ligne->montant_paye + $request->montant);
-                $ligne->statut       = $ligne->montant_paye >= $ligne->montant_du ? 'paye' : 'partiel';
+                $ligne->statut = $ligne->montant_paye >= $ligne->montant_du ? 'paye' : 'partiel';
                 $ligne->save();
             }
 
@@ -508,15 +515,15 @@ class ComptabiliteController extends Controller
         });
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Encaissement enregistré.',
-            'data'    => [
+            'data' => [
                 'encaissement' => [
-                    'id'                => $paiement->id,
+                    'id' => $paiement->id,
                     'coproprietaire_id' => $paiement->coproprietaire_id,
-                    'montant'           => round($paiement->montant, 2),
-                    'date'              => $paiement->date_paiement->toDateString(),
-                    'reference'         => $paiement->reference,
+                    'montant' => round($paiement->montant, 2),
+                    'date' => $paiement->date_paiement->toDateString(),
+                    'reference' => $paiement->reference,
                 ],
             ],
         ], 201);
@@ -530,7 +537,7 @@ class ComptabiliteController extends Controller
     {
         return response()->json([
             'status' => 'success',
-            'data'   => $this->comptesReference(),
+            'data' => $this->comptesReference(),
         ]);
     }
 
@@ -546,12 +553,12 @@ class ComptabiliteController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => [
+            'data' => [
                 'exercice' => [
-                    'id'            => $exercice->id,
-                    'annee'         => $exercice->annee,
-                    'statut'        => 'cloture',
-                    'date_cloture'  => now()->toDateString(),
+                    'id' => $exercice->id,
+                    'annee' => $exercice->annee,
+                    'statut' => 'cloture',
+                    'date_cloture' => now()->toDateString(),
                 ],
             ],
         ]);
@@ -570,22 +577,22 @@ class ComptabiliteController extends Controller
             ->orderByDesc('date_paiement')
             ->get()
             ->map(fn (Paiement $p) => [
-                'id'                => $p->id,
-                'exercice_id'       => $p->exercice_id,
+                'id' => $p->id,
+                'exercice_id' => $p->exercice_id,
                 'coproprietaire_id' => $p->coproprietaire_id,
-                'coproprietaire_nom'=> $p->coproprietaire?->user?->name ?? '',
-                'lot_numero'        => $p->coproprietaire?->lot?->numero ?? '',
-                'montant'           => round($p->montant, 2),
-                'date'              => $p->date_paiement?->toDateString(),
-                'mode_paiement'     => $p->mode,
-                'reference_cheque'  => $p->reference,
-                'compte_destination'=> '5121',
-                'ecriture_id'       => $p->id,
+                'coproprietaire_nom' => $p->coproprietaire?->user?->name ?? '',
+                'lot_numero' => $p->coproprietaire?->lot?->numero ?? '',
+                'montant' => round($p->montant, 2),
+                'date' => $p->date_paiement?->toDateString(),
+                'mode_paiement' => $p->mode,
+                'reference_cheque' => $p->reference,
+                'compte_destination' => '5121',
+                'ecriture_id' => $p->id,
             ]);
 
         return response()->json([
             'status' => 'success',
-            'data'   => $paiements,
+            'data' => $paiements,
         ]);
     }
 
@@ -598,13 +605,13 @@ class ComptabiliteController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => [
-                'titre'                 => 'Facture importée',
-                'montant'               => 0,
-                'date'                  => now()->toDateString(),
-                'fournisseur'           => null,
+            'data' => [
+                'titre' => 'Facture importée',
+                'montant' => 0,
+                'date' => now()->toDateString(),
+                'fournisseur' => null,
                 'compte_charge_suggere' => '6188',
-                'confiance'             => 'faible',
+                'confiance' => 'faible',
             ],
         ]);
     }
@@ -615,7 +622,7 @@ class ComptabiliteController extends Controller
     {
         $residence = $exercice->residence;
 
-        $isManager      = $request->user()->role === 'manager';
+        $isManager = $request->user()->role === 'manager';
         $isGestionnaire = $residence->gestionnaire_id === $request->user()->id;
 
         abort_if(! $isManager && ! $isGestionnaire, 403, 'Accès refusé.');
@@ -651,19 +658,20 @@ class ComptabiliteController extends Controller
         ];
 
         $ordre = 1;
+
         return array_map(function ($c) use (&$ordre) {
             return [
-                'numero'              => $c['numero'],
-                'libelle'             => $c['libelle'],
-                'classe'              => $c['classe'],
-                'type'                => $c['type'],
-                'nature'              => $c['nature'] ?? 'courant',
-                'est_sous_compte'     => strlen($c['numero']) > 3,
-                'compte_parent'       => strlen($c['numero']) > 3 ? substr($c['numero'], 0, 3) : null,
-                'utilisable_depense'  => $c['utilisable_depense'] ?? false,
-                'utilisable_budget'   => $c['utilisable_budget'] ?? false,
-                'utilisable_produit'  => $c['utilisable_produit'] ?? false,
-                'ordre'               => $ordre++,
+                'numero' => $c['numero'],
+                'libelle' => $c['libelle'],
+                'classe' => $c['classe'],
+                'type' => $c['type'],
+                'nature' => $c['nature'] ?? 'courant',
+                'est_sous_compte' => strlen($c['numero']) > 3,
+                'compte_parent' => strlen($c['numero']) > 3 ? substr($c['numero'], 0, 3) : null,
+                'utilisable_depense' => $c['utilisable_depense'] ?? false,
+                'utilisable_budget' => $c['utilisable_budget'] ?? false,
+                'utilisable_produit' => $c['utilisable_produit'] ?? false,
+                'ordre' => $ordre++,
             ];
         }, $comptes);
     }
