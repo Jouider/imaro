@@ -21,6 +21,11 @@ export type AuthUser = {
    * super-admins, who have unrestricted access.
    */
   app_permissions?: string[]
+  /**
+   * CNDP (loi 09-08) consent timestamp. `null`/absent until the user accepts
+   * the data-protection consent on their profile (KAN-60, issue #230).
+   */
+  cndp_consent_at?: string | null
 }
 
 export type AuthTenant = {
@@ -44,6 +49,8 @@ type AuthState = {
   setSession: (s: { token: string; user: AuthUser; tenant: AuthTenant }) => void
   /** Refresh user + tenant from /auth/me without rotating the token. */
   refreshIdentity: (s: { user: AuthUser; tenant: AuthTenant }) => void
+  /** Merge a partial update into the current user (e.g. after consent). */
+  patchUser: (partial: Partial<AuthUser>) => void
   clear: () => void
 }
 
@@ -55,6 +62,8 @@ export const useAuthStore = create<AuthState>()(
       tenant: null,
       setSession: ({ token, user, tenant }) => set({ token, user, tenant }),
       refreshIdentity: ({ user, tenant }) => set({ user, tenant }),
+      patchUser: (partial) =>
+        set((s) => (s.user ? { user: { ...s.user, ...partial } } : s)),
       clear: () => set({ token: null, user: null, tenant: null }),
     }),
     { name: 'imaro.auth' },

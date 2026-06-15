@@ -1659,3 +1659,29 @@ export async function bulkStorePrestataires(
     { created: prestataires.length, errors: [] },
   )
 }
+
+// ─── Profil gestionnaire — consentement CNDP (loi 09-08) ─────────────────────
+
+export type GestionnaireProfil = {
+  cndp_consent_at: string | null
+  cndp_policy_version?: string | null
+}
+
+/**
+ * PATCH /api/gestionnaire/profil — records the CNDP (loi 09-08) consent
+ * (issue #230). The backend stamps `cndp_consent_at` + its own policy version.
+ */
+export async function updateGestionnaireProfil(payload: {
+  cndp_consent?: boolean
+}): Promise<GestionnaireProfil> {
+  return withMock(
+    async () => {
+      const res = await api.patch<ApiEnvelope<{ profil: GestionnaireProfil }>>(
+        '/gestionnaire/profil',
+        payload,
+      )
+      return res.data.data.profil
+    },
+    { cndp_consent_at: new Date().toISOString(), cndp_policy_version: '1.0' },
+  )
+}

@@ -2626,6 +2626,7 @@
       "roleGestionnaire": "Gestionnaire",
       "fullName": "Nom complet",
       "namePlaceholder": "Votre nom",
+      "cndpConsent": "J'ai pris connaissance et j'accepte la gestion des données personnelles conformément à la loi 09-08 (CNDP) relative à la protection des données à caractère personnel.",
       "logoSection": "Logo du Syndic",
       "logoHint": "Affiché dans la barre de navigation. PNG ou JPG, 2 Mo max.",
       "logoAlt": "Logo syndic",

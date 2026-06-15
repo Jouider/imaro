@@ -19,11 +19,13 @@ import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { useAuthStore } from '@/stores/authStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { setStoredToken } from '@/lib/axios'
 import { logout } from '@/services/auth.service'
+import { updateGestionnaireProfil } from '@/services/gestionnaire.service'
 import { cn } from '@/lib/utils'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -41,7 +43,7 @@ function getInitials(name: string): string {
 export function ProfilPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { user, tenant, clear } = useAuthStore()
+  const { user, tenant, clear, patchUser } = useAuthStore()
   const { logoUrl, setLogoUrl } = useSettingsStore()
   const logoInputRef = useRef<HTMLInputElement>(null)
 
@@ -50,14 +52,33 @@ export function ProfilPage() {
   const [editName, setEditName] = useState(user?.name ?? '')
   const [editPhone, setEditPhone] = useState(user?.phone ?? '')
 
+  // CNDP (loi 09-08) consent — mandatory until the user has consented once.
+  const cndpConsented = !!user?.cndp_consent_at
+  const [cndpConsent, setCndpConsent] = useState(false)
+
+  const saveMut = useMutation({
+    mutationFn: () =>
+      cndpConsented
+        ? Promise.resolve(null)
+        : updateGestionnaireProfil({ cndp_consent: true }),
+    onSuccess: (profil) => {
+      if (profil?.cndp_consent_at)
+        patchUser({ cndp_consent_at: profil.cndp_consent_at })
+      toast.success(t('gestionnaire.profil.toastSaved'))
+      setEditMode(false)
+    },
+    onError: () => toast.error(t('common.updateError')),
+  })
+
   const handleSaveProfile = () => {
-    toast.success(t('gestionnaire.profil.toastSaved'))
-    setEditMode(false)
+    if (!cndpConsented && !cndpConsent) return
+    saveMut.mutate()
   }
 
   const handleCancelEdit = () => {
     setEditName(user?.name ?? '')
     setEditPhone(user?.phone ?? '')
+    setCndpConsent(false)
     setEditMode(false)
   }
 
@@ -186,8 +207,31 @@ export function ProfilPage() {
                 />
               </div>
             </div>
+            {/* CNDP (loi 09-08) consent — required until consented once */}
+            {!cndpConsented && (
+              <label
+                htmlFor="cndp-consent"
+                className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-border bg-muted/30 p-3"
+              >
+                <Checkbox
+                  id="cndp-consent"
+                  checked={cndpConsent}
+                  onCheckedChange={(v) => setCndpConsent(v === true)}
+                  className="mt-0.5"
+                  aria-required="true"
+                />
+                <span className="text-xs leading-relaxed text-muted-foreground">
+                  {t('gestionnaire.profil.cndpConsent')}
+                </span>
+              </label>
+            )}
+
             <div className="flex gap-2">
-              <Button size="sm" onClick={handleSaveProfile}>
+              <Button
+                size="sm"
+                onClick={handleSaveProfile}
+                disabled={saveMut.isPending || (!cndpConsented && !cndpConsent)}
+              >
                 <Check className="me-1.5 size-3.5" />
                 {t('actions.save')}
               </Button>
