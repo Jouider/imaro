@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\Gestionnaire;
 use App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
 use App\Http\Controllers\Controller;
 use App\Models\AnnexeCache;
+use App\Models\Exercice;
+use App\Models\Paiement;
 use App\Models\Residence;
 use App\Services\AnnexeGeneratorService;
 use Illuminate\Http\JsonResponse;
@@ -26,11 +28,11 @@ class AnnexeController extends Controller
             ->keyBy('annexe_num');
 
         // Determine regime based on annual revenue (Décret 2.23.700)
-        $exerciceIds = \App\Models\Exercice::where('residence_id', $residence->id)
+        $exerciceIds = Exercice::where('residence_id', $residence->id)
             ->where('annee', $exercice)
             ->pluck('id');
 
-        $totalRecettes = \App\Models\Paiement::whereIn('exercice_id', $exerciceIds)
+        $totalRecettes = Paiement::whereIn('exercice_id', $exerciceIds)
             ->sum('montant');
 
         $regime = $totalRecettes <= 200000 ? 'simplifie' : 'normal';
@@ -48,6 +50,7 @@ class AnnexeController extends Controller
 
         $annexes = collect($allNums)->map(function ($num) use ($cached, $requiredNums, $supported) {
             $c = $cached->get($num);
+
             return [
                 'num' => $num,
                 'required' => in_array($num, $requiredNums),
@@ -77,29 +80,18 @@ class AnnexeController extends Controller
             ->where('annexe_num', $annexeNum)
             ->first();
 
+        // NB: on renvoie l'annexe DIRECTEMENT dans `data` (le front lit res.data.data
+        // comme le payload : payload.totals / payload.current / payload.excedent…).
+        // Un emballage supplémentaire ferait planter le générateur PDF (champs undefined).
         if ($cached) {
-            return response()->json([
-                'status' => 'success',
-                'data' => [
-                    'data' => $cached->data,
-                    'generated_at' => $cached->generated_at?->toISOString(),
-                    'pdf_url' => $cached->pdf_path,
-                ],
-            ]);
+            return response()->json(['status' => 'success', 'data' => $cached->data]);
         }
 
         // Generate on-the-fly
-        $service = new AnnexeGeneratorService();
+        $service = new AnnexeGeneratorService;
         $data = $service->generate($residence, $exercice, $annexeNum, auth()->id());
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'data' => $data,
-                'generated_at' => now()->toISOString(),
-                'pdf_url' => null,
-            ],
-        ]);
+        return response()->json(['status' => 'success', 'data' => $data]);
     }
 
     public function regenerate(Request $request, Residence $residence, string $annexeNum): JsonResponse
@@ -108,7 +100,7 @@ class AnnexeController extends Controller
 
         $exercice = $request->integer('exercice', (int) date('Y'));
 
-        $service = new AnnexeGeneratorService();
+        $service = new AnnexeGeneratorService;
         $data = $service->generate($residence, $exercice, $annexeNum, auth()->id());
 
         $cached = AnnexeCache::where('residence_id', $residence->id)
