@@ -22,6 +22,12 @@ const config: CapacitorConfig = {
       launchAutoHide: false,
       backgroundColor: '#1B4F72',
     },
+    // Route fetch/XHR through the native HTTP stack so API calls bypass the
+    // WebView's CORS checks (the app origin capacitor://localhost isn't in the
+    // backend allow-list — see KAN-71). No effect on the web build.
+    CapacitorHttp: {
+      enabled: true,
+    },
   },
 }
 
