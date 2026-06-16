@@ -1335,6 +1335,23 @@ Connexion ensuite via `POST /api/auth/resident/login` (`phone` + `code`) — l'e
 
 ---
 
+## Push natif mobile — FCM / APNs (KAN-68)
+
+`role:resident` · prefix `/portail`
+
+### POST /api/portail/push/register-device
+Enregistre (ou rafraîchit) le jeton push natif d'un appareil. Multi-device, upsert idempotent par hash du token.
+
+**Body** : `token` (string, requis), `platform` (`ios|android`, requis), `app_version?`.
+**Response 200** : `{ status, message }`.
+
+### DELETE /api/portail/push/register-device
+Supprime le jeton (à la déconnexion). **Body** : `token`.
+
+Envoi serveur : FCM HTTP v1 (Android) / APNs token-based (iOS), piloté par `services.fcm` / `services.apns`. Tant que les identifiants ne sont pas configurés (`FCM_*` / `APNS_*`), l'envoi est **no-op** (best-effort, jamais bloquant). Déclencheurs métier (annonce / rappel de paiement / réclamation) + livraison sur device réel : à câbler une fois les creds + l'app native en place.
+
+---
+
 ## Comptes de démo
 
 | Rôle | Email | Mot de passe |
