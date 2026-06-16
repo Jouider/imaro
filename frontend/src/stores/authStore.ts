@@ -66,6 +66,11 @@ export const useAuthStore = create<AuthState>()(
         set((s) => (s.user ? { user: { ...s.user, ...partial } } : s)),
       clear: () => set({ token: null, user: null, tenant: null }),
     }),
-    { name: 'imaro.auth' },
+    {
+      name: 'imaro.auth',
+      // The token is persisted separately in the secure token store (Keychain/
+      // Keystore via Preferences on native) — never in this localStorage blob.
+      partialize: (s) => ({ user: s.user, tenant: s.tenant }),
+    },
   ),
 )
