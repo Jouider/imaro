@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { RootEntry } from '@/components/RootEntry'
+import { BiometricGate } from '@/components/BiometricGate'
 import { LoginPage } from '@/pages/LoginPage'
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { PortailLayout } from '@/pages/portail/PortailLayout'
@@ -74,7 +75,9 @@ export const router = createBrowserRouter([
     path: '/portail',
     element: (
       <PortailGuard>
-        <PortailLayout />
+        <BiometricGate>
+          <PortailLayout />
+        </BiometricGate>
       </PortailGuard>
     ),
     children: [

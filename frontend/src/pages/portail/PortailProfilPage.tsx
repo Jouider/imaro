@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import {
   Bell,
   ChevronRight,
+  Fingerprint,
   Home as HomeIcon,
   LogOut,
   Mail,
@@ -22,6 +24,8 @@ import { logout } from '@/services/auth.service'
 import { getProfile } from '@/services/portail.service'
 import { ConfirmModal } from '@/components/shared'
 import { usePush } from '@/hooks/usePush'
+import { isBiometricAvailable, authenticateBiometric } from '@/lib/biometric'
+import { useBiometricStore } from '@/stores/biometricStore'
 import { cn } from '@/lib/utils'
 
 function getInitials(name: string): string {
@@ -43,6 +47,31 @@ export function PortailProfilPage() {
   const { theme, toggle: toggleTheme } = useThemeStore()
   const { permission, isSubscribed, subscribe, unsubscribe } = usePush()
   const [logoutOpen, setLogoutOpen] = useState(false)
+
+  // Biometric unlock (native only, when hardware is enrolled).
+  const bioEnabled = useBiometricStore((s) => s.enabled)
+  const setBioEnabled = useBiometricStore((s) => s.setEnabled)
+  const setBioUnlocked = useBiometricStore((s) => s.setUnlocked)
+  const [bioAvailable, setBioAvailable] = useState(false)
+  useEffect(() => {
+    void isBiometricAvailable().then(setBioAvailable)
+  }, [])
+
+  async function toggleBiometric(next: boolean) {
+    if (!next) {
+      setBioEnabled(false)
+      return
+    }
+    // Confirm the user can authenticate before turning it on.
+    const ok = await authenticateBiometric(t('portail.biometric.reason'))
+    if (ok) {
+      setBioEnabled(true)
+      setBioUnlocked(true)
+      toast.success(t('portail.biometric.enabled'))
+    } else {
+      toast.error(t('portail.biometric.enableFailed'))
+    }
+  }
 
   const logoutMutation = useMutation({
     mutationFn: logout,
@@ -142,6 +171,17 @@ export function PortailProfilPage() {
           onCheckedChange={togglePush}
           disabled={!pushSupported}
         />
+
+        {/* Biometric unlock — native only */}
+        {bioAvailable && (
+          <ToggleRow
+            icon={<Fingerprint className="size-[18px]" />}
+            label={t('portail.biometric.settingLabel')}
+            desc={t('portail.biometric.settingDesc')}
+            checked={bioEnabled}
+            onCheckedChange={(v) => void toggleBiometric(v)}
+          />
+        )}
       </Section>
 
       {/* Account */}
