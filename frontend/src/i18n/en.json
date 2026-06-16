@@ -379,6 +379,17 @@
         "past": "Past"
       },
       "back": "← Back to home"
+    },
+    "biometric": {
+      "reason": "Unlock your Imaro space",
+      "lockTitle": "Space locked",
+      "lockSubtitle": "Authenticate to access your space.",
+      "unlock": "Unlock",
+      "useCode": "Use access code",
+      "settingLabel": "Biometric unlock",
+      "settingDesc": "Face ID / fingerprint when opening the app.",
+      "enabled": "Biometric unlock enabled.",
+      "enableFailed": "Biometric authentication failed."
     }
   },
   "home": {

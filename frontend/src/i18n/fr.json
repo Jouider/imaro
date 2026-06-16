@@ -379,6 +379,17 @@
         "past": "Passées"
       },
       "back": "← Retour à l'accueil"
+    },
+    "biometric": {
+      "reason": "Déverrouillez votre espace Imaro",
+      "lockTitle": "Espace verrouillé",
+      "lockSubtitle": "Authentifiez-vous pour accéder à votre espace.",
+      "unlock": "Déverrouiller",
+      "useCode": "Utiliser le code d'accès",
+      "settingLabel": "Déverrouillage biométrique",
+      "settingDesc": "Face ID / empreinte à l'ouverture de l'application.",
+      "enabled": "Déverrouillage biométrique activé.",
+      "enableFailed": "Authentification biométrique échouée."
     }
   },
   "home": {
