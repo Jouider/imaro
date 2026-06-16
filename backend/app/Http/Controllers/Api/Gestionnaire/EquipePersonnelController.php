@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Gestionnaire;
 
+use App\Contracts\Notifications\NotificationResult;
 use App\Http\Controllers\Controller;
 use App\Models\PersonnelResidence;
 use App\Models\Residence;
@@ -94,25 +95,60 @@ class EquipePersonnelController extends Controller
 
         // Transmission du code via la cascade WhatsApp → SMS → email (backend l'envoie).
         $residence = Residence::find($validated['residence_id']);
-        app(CoproprietaireWelcomeNotifier::class)->send($staff->user, $code, $residence);
+        $result = app(CoproprietaireWelcomeNotifier::class)->send($staff->user, $code, $residence);
 
         $staff->load('residence');
 
         return response()->json([
             'status' => 'success',
-            'message' => "Personnel ajouté. Code d'accès envoyé par WhatsApp/SMS.",
+            'message' => 'Personnel ajouté.',
             'data' => [
                 ...$this->formatStaff($staff),
-                // Aperçu masqué uniquement (le code complet n'est jamais renvoyé).
-                'code_apercu' => $this->maskCode($code),
+                // Code visible par le gestionnaire (comme les utilisateurs d'app) — à
+                // communiquer au personnel ; il devra le changer à la 1re connexion.
+                'code' => $code,
+                'delivery' => $this->deliveryStatus($result),
             ],
         ], 201);
     }
 
-    /** Aperçu masqué du code, ex. « AB•••••• ». */
-    private function maskCode(string $code): string
+    /**
+     * POST /api/gestionnaire/equipe/personnel/{id}/send-code
+     * Bouton « Envoyer » : régénère un code et le (re)transmet — renvoie le statut de livraison.
+     * (L'ancien code est haché en base, irrécupérable → on en génère un nouveau.)
+     */
+    public function sendCode(int $id): JsonResponse
     {
-        return substr($code, 0, 2).str_repeat('•', max(0, strlen($code) - 2));
+        $staff = PersonnelResidence::with('residence')
+            ->where('tenant_id', $this->tenantId())->findOrFail($id);
+
+        $user = $staff->user;
+        abort_unless($user, 404, 'Compte de connexion introuvable.');
+
+        $code = strtoupper(Str::random(8));
+        $user->update(['access_code' => Hash::make($code), 'must_change_code' => true]);
+
+        $result = app(CoproprietaireWelcomeNotifier::class)->send($user, $code, $staff->residence);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Code régénéré et envoyé.',
+            'data' => [
+                'code' => $code,
+                'delivery' => $this->deliveryStatus($result),
+            ],
+        ]);
+    }
+
+    /** Statut de livraison lisible par le front (bouton « Envoyer » + badge). */
+    private function deliveryStatus(NotificationResult $result): array
+    {
+        return [
+            'delivered' => $result->success && $result->confirmed,
+            'channel' => $result->provider,            // sms8 | twilio | whatsapp | resend | none
+            'confirmed' => $result->confirmed,         // false = accepté mais livraison non garantie
+            'error' => $result->error,
+        ];
     }
 
     public function update(Request $request, int $id): JsonResponse
