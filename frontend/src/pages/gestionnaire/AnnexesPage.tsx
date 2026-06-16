@@ -208,7 +208,12 @@ export function AnnexesPage() {
             '10',
             exercice,
           )
-          data = { totals: payload.totals, rows: payload.rows }
+          // Guard against a malformed/partial payload — never read totals on
+          // undefined (issue #240). Fall back to client-computed data.
+          data =
+            payload?.totals && Array.isArray(payload?.rows)
+              ? { totals: payload.totals, rows: payload.rows }
+              : buildAnnexe10Rows()
         } catch {
           // backend unavailable → use client-computed data
           data = buildAnnexe10Rows()
@@ -222,6 +227,7 @@ export function AnnexesPage() {
             '13-1',
             exercice,
           )
+          if (!payload?.current || !payload?.previous) throw new Error('shape')
         } catch {
           const zero = {
             fondsReserve: 0,
@@ -240,6 +246,7 @@ export function AnnexesPage() {
             '13-2',
             exercice,
           )
+          if (!payload?.recettes || !payload?.depenses) throw new Error('shape')
         } catch {
           const z: Quad4 = { n1: 0, n: 0, n0: 0, nMinus1: 0 }
           payload = {
