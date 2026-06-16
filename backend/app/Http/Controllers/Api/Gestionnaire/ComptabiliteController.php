@@ -630,31 +630,78 @@ class ComptabiliteController extends Controller
 
     private function comptesReference(): array
     {
+        // Plan comptable copropriété — Décret 2.23.700 / CGNC (classes 1,3,4,5,6,7).
+        // Référentiel légal fixe : versionné en code (pas de table — identique pour tous les tenants).
+        $depense = ['utilisable_depense' => true, 'utilisable_budget' => true];
+        $produit = ['utilisable_produit' => true];
+
         $comptes = [
+            // ── Classe 1 — Financement permanent (fonds, provisions, emprunts) ──
+            ['numero' => '1100', 'libelle' => 'Fonds de réserve / travaux', 'classe' => 1, 'type' => 'capitaux', 'nature' => 'both'],
             ['numero' => '1200', 'libelle' => 'Résultat de l\'exercice', 'classe' => 1, 'type' => 'capitaux', 'nature' => 'both'],
             ['numero' => '1400', 'libelle' => 'Fonds de roulement', 'classe' => 1, 'type' => 'capitaux', 'nature' => 'both'],
+            ['numero' => '1481', 'libelle' => 'Emprunts auprès des établissements de crédit', 'classe' => 1, 'type' => 'capitaux', 'nature' => 'non_courant'],
             ['numero' => '1500', 'libelle' => 'Provisions pour charges', 'classe' => 1, 'type' => 'capitaux', 'nature' => 'both'],
+            ['numero' => '1750', 'libelle' => 'Avances reçues des copropriétaires', 'classe' => 1, 'type' => 'capitaux', 'nature' => 'both'],
+
+            // ── Classe 3 — Actif circulant (créances, avances) ──
             ['numero' => '3421', 'libelle' => 'Avances et acomptes versés', 'classe' => 3, 'type' => 'actif', 'nature' => 'courant'],
+            ['numero' => '3431', 'libelle' => 'Avances et acomptes versés aux fournisseurs', 'classe' => 3, 'type' => 'actif', 'nature' => 'courant'],
+            ['numero' => '3488', 'libelle' => 'Débiteurs divers', 'classe' => 3, 'type' => 'actif', 'nature' => 'courant'],
+            ['numero' => '3500', 'libelle' => 'Titres et valeurs de placement', 'classe' => 3, 'type' => 'actif', 'nature' => 'courant'],
+
+            // ── Classe 4 — Passif circulant / comptes de tiers ──
             ['numero' => '4011', 'libelle' => 'Fournisseurs', 'classe' => 4, 'type' => 'passif', 'nature' => 'courant', 'utilisable_depense' => true],
+            ['numero' => '4017', 'libelle' => 'Fournisseurs — retenues de garantie', 'classe' => 4, 'type' => 'passif', 'nature' => 'courant'],
             ['numero' => '4111', 'libelle' => 'Copropriétaires — cotisations à recevoir', 'classe' => 4, 'type' => 'actif', 'nature' => 'courant'],
+            ['numero' => '4411', 'libelle' => 'Copropriétaires créditeurs (avances / trop-perçu)', 'classe' => 4, 'type' => 'passif', 'nature' => 'courant'],
             ['numero' => '4417', 'libelle' => 'État — impôts et taxes', 'classe' => 4, 'type' => 'passif', 'nature' => 'courant'],
+            ['numero' => '4432', 'libelle' => 'Rémunérations dues au personnel', 'classe' => 4, 'type' => 'passif', 'nature' => 'courant'],
+            ['numero' => '4441', 'libelle' => 'Organismes sociaux (CNSS / AMO)', 'classe' => 4, 'type' => 'passif', 'nature' => 'courant'],
+            ['numero' => '4485', 'libelle' => 'Créditeurs divers', 'classe' => 4, 'type' => 'passif', 'nature' => 'courant'],
+
+            // ── Classe 5 — Trésorerie ──
             ['numero' => '5121', 'libelle' => 'Banque', 'classe' => 5, 'type' => 'tresorerie', 'nature' => 'courant'],
+            ['numero' => '5141', 'libelle' => 'Chèques et valeurs à encaisser', 'classe' => 5, 'type' => 'tresorerie', 'nature' => 'courant'],
             ['numero' => '5161', 'libelle' => 'Caisse', 'classe' => 5, 'type' => 'tresorerie', 'nature' => 'courant'],
-            ['numero' => '6121', 'libelle' => 'Eau et électricité', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant', 'utilisable_depense' => true, 'utilisable_budget' => true],
-            ['numero' => '6131', 'libelle' => 'Nettoyage des locaux', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant', 'utilisable_depense' => true, 'utilisable_budget' => true],
-            ['numero' => '6134', 'libelle' => 'Contrats de maintenance', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant', 'utilisable_depense' => true, 'utilisable_budget' => true],
-            ['numero' => '6135', 'libelle' => 'Entretien et petites réparations', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant', 'utilisable_depense' => true, 'utilisable_budget' => true],
-            ['numero' => '6136', 'libelle' => 'Primes d\'assurances', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant', 'utilisable_depense' => true, 'utilisable_budget' => true],
-            ['numero' => '6138', 'libelle' => 'Autres rémunérations (gardiennage)', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant', 'utilisable_depense' => true, 'utilisable_budget' => true],
-            ['numero' => '6141', 'libelle' => 'Charges de gardiennage et sécurité', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant', 'utilisable_depense' => true, 'utilisable_budget' => true],
-            ['numero' => '6171', 'libelle' => 'Frais de gestion courante', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant', 'utilisable_depense' => true, 'utilisable_budget' => true],
-            ['numero' => '6181', 'libelle' => 'Honoraires syndic', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant', 'utilisable_depense' => true, 'utilisable_budget' => true],
-            ['numero' => '6188', 'libelle' => 'Autres charges de copropriété', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant', 'utilisable_depense' => true, 'utilisable_budget' => true],
+
+            // ── Classe 6 — Charges ──
+            ['numero' => '6111', 'libelle' => 'Achats de fournitures et consommables', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6121', 'libelle' => 'Eau et électricité', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6122', 'libelle' => 'Combustibles et gaz', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6125', 'libelle' => 'Fournitures d\'entretien et petit équipement', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6131', 'libelle' => 'Nettoyage des locaux', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6132', 'libelle' => 'Enlèvement des ordures et déchets', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6133', 'libelle' => 'Entretien des espaces verts', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6134', 'libelle' => 'Contrats de maintenance', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6135', 'libelle' => 'Entretien et petites réparations', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6136', 'libelle' => 'Primes d\'assurances', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6137', 'libelle' => 'Maintenance ascenseur', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6138', 'libelle' => 'Autres rémunérations (gardiennage)', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6141', 'libelle' => 'Charges de gardiennage et sécurité', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6142', 'libelle' => 'Télésurveillance', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6151', 'libelle' => 'Locations de matériel', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6167', 'libelle' => 'Frais et commissions bancaires', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6171', 'libelle' => 'Frais de gestion courante', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6174', 'libelle' => 'Frais postaux et télécommunications', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6177', 'libelle' => 'Charges de personnel et cotisations sociales', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6181', 'libelle' => 'Honoraires syndic', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6182', 'libelle' => 'Honoraires comptable / expert-comptable', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6185', 'libelle' => 'Frais d\'actes et de contentieux (recouvrement)', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
+            ['numero' => '6188', 'libelle' => 'Autres charges de copropriété', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
             ['numero' => '6311', 'libelle' => 'Intérêts des emprunts', 'classe' => 6, 'type' => 'charge', 'nature' => 'non_courant', 'utilisable_depense' => true],
-            ['numero' => '7061', 'libelle' => 'Cotisations copropriétaires', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant', 'utilisable_produit' => true],
-            ['numero' => '7081', 'libelle' => 'Produits des activités annexes', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant', 'utilisable_produit' => true],
-            ['numero' => '7111', 'libelle' => 'Pénalités de retard', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant', 'utilisable_produit' => true],
-            ['numero' => '7381', 'libelle' => 'Intérêts et produits assimilés', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant', 'utilisable_produit' => true],
+            ['numero' => '6500', 'libelle' => 'Charges non courantes (travaux exceptionnels)', 'classe' => 6, 'type' => 'charge', 'nature' => 'non_courant'] + $depense,
+
+            // ── Classe 7 — Produits ──
+            ['numero' => '7061', 'libelle' => 'Cotisations copropriétaires', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant'] + $produit,
+            ['numero' => '7062', 'libelle' => 'Appels de fonds — travaux', 'classe' => 7, 'type' => 'produit', 'nature' => 'non_courant'] + $produit,
+            ['numero' => '7063', 'libelle' => 'Appels de fonds — fonds de réserve', 'classe' => 7, 'type' => 'produit', 'nature' => 'both'] + $produit,
+            ['numero' => '7081', 'libelle' => 'Produits des activités annexes', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant'] + $produit,
+            ['numero' => '7082', 'libelle' => 'Produits de location (parties communes)', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant'] + $produit,
+            ['numero' => '7111', 'libelle' => 'Pénalités de retard', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant'] + $produit,
+            ['numero' => '7181', 'libelle' => 'Indemnités et remboursements (assurances)', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant'] + $produit,
+            ['numero' => '7381', 'libelle' => 'Intérêts et produits financiers', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant'] + $produit,
+            ['numero' => '7500', 'libelle' => 'Produits non courants', 'classe' => 7, 'type' => 'produit', 'nature' => 'non_courant'] + $produit,
         ];
 
         $ordre = 1;
