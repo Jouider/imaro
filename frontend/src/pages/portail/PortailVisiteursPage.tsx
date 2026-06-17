@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -7,6 +7,7 @@ import QRCode from 'qrcode'
 import {
   Plus,
   ScanLine,
+  Share2,
   UserCheck,
   Truck,
   HardHat,
@@ -49,6 +50,7 @@ import {
   type VisiteStatus,
   type VisiteType,
 } from '@/services/visites.service'
+import { canShare, shareContent } from '@/lib/native-actions'
 import { cn } from '@/lib/utils'
 
 const TYPE_ICON: Record<VisiteType, typeof UserCheck> = {
@@ -406,7 +408,7 @@ function CreateInviteDialog({
   )
 }
 
-// ─── Share dialog (QR + WA/SMS/copy) ───────────────────────────────────────
+// ─── Share dialog (native sheet + WA/SMS/copy fallback) ────────────────────
 
 function ShareDialog({
   visit,
@@ -416,6 +418,7 @@ function ShareDialog({
   onClose: () => void
 }) {
   const { t } = useTranslation()
+  const [nativeShareAvailable, setNativeShareAvailable] = useState(false)
 
   const qrQ = useQuery({
     queryKey: ['portail-qr', visit?.qr_token],
@@ -428,6 +431,11 @@ function ShareDialog({
     enabled: !!visit?.qr_token,
     staleTime: Infinity,
   })
+
+  // Check once on mount whether the OS share sheet is available.
+  useEffect(() => {
+    void canShare().then(setNativeShareAvailable)
+  }, [])
 
   if (!visit) return null
   const url = visitorPassUrl(visit.qr_token)
@@ -443,6 +451,18 @@ function ShareDialog({
   const copy = () => {
     void navigator.clipboard.writeText(url)
     toast.success(t('gestionnaire.visites.detail.linkCopied'))
+  }
+
+  const nativeShare = async () => {
+    await shareContent({
+      title: t('portail.visiteurs.share.title'),
+      text: t('portail.visiteurs.share.waMessage', {
+        name: visit.visitor_name,
+        url,
+      }),
+      url,
+      dialogTitle: t('portail.visiteurs.share.title'),
+    })
   }
 
   return (
@@ -464,6 +484,24 @@ function ShareDialog({
           <code className="block break-all rounded bg-muted px-2 py-1 text-center text-[10px] text-muted-foreground">
             {url}
           </code>
+
+          {/* Native share sheet — primary action on iOS/Android */}
+          {nativeShareAvailable && (
+            <Button
+              className="w-full gap-2 bg-[var(--color-imaro-primary)] text-white"
+              onClick={() => void nativeShare()}
+            >
+              <Share2 className="size-4" />
+              {t('portail.visiteurs.share.shareNative')}
+            </Button>
+          )}
+
+          {/* Explicit channels — always shown as fallback / secondary */}
+          {nativeShareAvailable && (
+            <p className="text-xs text-muted-foreground">
+              {t('portail.visiteurs.share.orVia')}
+            </p>
+          )}
 
           <div className="grid w-full grid-cols-3 gap-2">
             <Button
