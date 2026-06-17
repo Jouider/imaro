@@ -418,8 +418,8 @@ export function AiChatFab({ aboveNav = false }: { aboveNav?: boolean }) {
         className={cn(
           'fixed z-50 end-6',
           aboveNav ? '' : 'bottom-6',
-          'flex items-center gap-2 rounded-full px-4 py-3',
-          'text-sm font-semibold text-white shadow-lg shadow-black/20',
+          'flex size-14 items-center justify-center rounded-full',
+          'text-white shadow-lg shadow-black/20',
           'transition-all duration-200 hover:scale-105 hover:shadow-xl active:scale-95',
           open
             ? 'opacity-0 pointer-events-none scale-90'
@@ -429,12 +429,11 @@ export function AiChatFab({ aboveNav = false }: { aboveNav?: boolean }) {
           background:
             'linear-gradient(135deg, var(--color-imaro-primary-light) 0%, var(--color-imaro-primary) 100%)',
           ...(aboveNav && {
-            bottom: 'calc(4rem + env(safe-area-inset-bottom) + 1rem)',
+            bottom: 'calc(var(--portail-nav-h) + 1rem)',
           }),
         }}
       >
-        <Sparkles className="size-4 shrink-0" />
-        <span>{t('gestionnaire.aiChat.fabLabel')}</span>
+        <Sparkles className="size-6" />
       </button>
     </>
   )

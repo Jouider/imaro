@@ -284,6 +284,19 @@
     background-position: 100% 100%;
   }
 
+  /* Safe-area helpers — used by FAB, StickyCta, and Toaster */
+  :root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    /* Total portail bottom-nav height (60px nav + home-indicator safe area) */
+    --portail-nav-h: calc(3.75rem + var(--safe-bottom));
+  }
+
+  /* Sonner toast: push below notch/status-bar on iOS */
+  [data-sonner-toaster][data-y-position='top'] {
+    top: calc(var(--safe-top) + 8px) !important;
+  }
+
   /* Subtle hover lift used on KpiCard, ModuleCard */
   .hover-lift {
     transition:
