@@ -16,11 +16,7 @@ export default function App() {
   return (
     <QueryProvider>
       <RouterProvider router={router} />
-      <Toaster
-        richColors
-        position="top-center"
-        offset="calc(env(safe-area-inset-top) + 8px)"
-      />
+      <Toaster richColors position="top-center" />
     </QueryProvider>
   )
 }
