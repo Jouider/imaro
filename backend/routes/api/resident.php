@@ -29,3 +29,6 @@ Route::post('/paiements',        [PortailPaiementController::class, 'store']);
 
 Route::post('/push/subscribe',   [PortailPushController::class, 'subscribe']);
 Route::delete('/push/unsubscribe', [PortailPushController::class, 'unsubscribe']);
+// Push natif mobile (FCM/APNs) — KAN-68
+Route::post('/push/register-device',   [PortailPushController::class, 'registerDevice']);
+Route::delete('/push/register-device', [PortailPushController::class, 'unregisterDevice']);

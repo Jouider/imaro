@@ -91,6 +91,9 @@ class AnnonceController extends Controller
             'publiee_at' => Carbon::now(),
         ]);
 
+        // Push natif aux résidents (KAN-68) — async, best-effort.
+        app(\App\Services\Notifications\PortailPushNotifier::class)->annoncePubliee($annonce);
+
         $annonce->load('residence');
 
         return response()->json([

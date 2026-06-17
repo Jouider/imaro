@@ -40,4 +40,20 @@ return [
         'inbox' => env('ASSISTANCE_RECOUVREMENT_EMAIL', 'recouvrement@imaro.ma'),
     ],
 
+    // Push natif Android — Firebase Cloud Messaging HTTP v1 (KAN-68).
+    // FCM_CREDENTIALS = chemin vers le JSON du compte de service Firebase.
+    'fcm' => [
+        'project_id' => env('FCM_PROJECT_ID'),
+        'credentials' => env('FCM_CREDENTIALS'),
+    ],
+
+    // Push natif iOS — Apple Push Notification service, auth par clé .p8 (KAN-68).
+    'apns' => [
+        'key_id' => env('APNS_KEY_ID'),
+        'team_id' => env('APNS_TEAM_ID'),
+        'bundle_id' => env('APNS_BUNDLE_ID'),
+        'key_path' => env('APNS_KEY_PATH'),           // chemin vers AuthKey_XXXX.p8
+        'production' => env('APNS_PRODUCTION', false), // false = sandbox
+    ],
+
 ];

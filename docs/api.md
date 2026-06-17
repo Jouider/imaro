@@ -1335,6 +1335,30 @@ Connexion ensuite via `POST /api/auth/resident/login` (`phone` + `code`) — l'e
 
 ---
 
+## Push natif mobile — FCM / APNs (KAN-68)
+
+`role:resident` · prefix `/portail`
+
+### POST /api/portail/push/register-device
+Enregistre (ou rafraîchit) le jeton push natif d'un appareil. Multi-device, upsert idempotent par hash du token.
+
+**Body** : `token` (string, requis), `platform` (`ios|android`, requis), `app_version?`.
+**Response 200** : `{ status, message }`.
+
+### DELETE /api/portail/push/register-device
+Supprime le jeton (à la déconnexion). **Body** : `token`.
+
+Envoi serveur : FCM HTTP v1 (Android) / APNs token-based (iOS), piloté par `services.fcm` / `services.apns`. Tant que les identifiants ne sont pas configurés (`FCM_*` / `APNS_*`), l'envoi est **no-op** (best-effort, jamais bloquant).
+
+**Déclencheurs métier câblés** (`PortailPushNotifier`, deep-link `data.route`) :
+- **Annonce publiée** (`POST /annonces/{id}/publier`) → résidents de la résidence · route `/portail`.
+- **Rappel de paiement** (`POST /creances/{id}/relancer` + `/creances/relancer-tout`) → copropriétaire(s) concerné(s) · route `/portail/finances`.
+- **Réclamation mise à jour / close** (`PUT /tickets/{id}` changement de statut, `POST /tickets/{id}/clos`) → auteur · route `/portail/reclamations`.
+
+Livraison sur device réel : nécessite les creds FCM/APNs + l'app native.
+
+---
+
 ## Comptes de démo
 
 | Rôle | Email | Mot de passe |
