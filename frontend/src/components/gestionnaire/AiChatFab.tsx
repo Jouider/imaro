@@ -263,7 +263,7 @@ export function AiChatFab({ aboveNav = false }: { aboveNav?: boolean }) {
           // Size
           'w-full sm:w-[380px]',
           aboveNav
-            ? 'h-[75svh] sm:h-[560px] sm:bottom-[96px] sm:end-6'
+            ? 'h-[75svh] sm:h-[560px] sm:end-6'
             : 'h-[85svh] sm:h-[600px] sm:bottom-[88px] sm:end-6',
           // Shape
           'rounded-t-2xl sm:rounded-2xl',
@@ -417,7 +417,7 @@ export function AiChatFab({ aboveNav = false }: { aboveNav?: boolean }) {
         aria-expanded={open}
         className={cn(
           'fixed z-50 end-6',
-          aboveNav ? 'bottom-[5.5rem]' : 'bottom-6',
+          aboveNav ? '' : 'bottom-6',
           'flex items-center gap-2 rounded-full px-4 py-3',
           'text-sm font-semibold text-white shadow-lg shadow-black/20',
           'transition-all duration-200 hover:scale-105 hover:shadow-xl active:scale-95',
@@ -428,6 +428,9 @@ export function AiChatFab({ aboveNav = false }: { aboveNav?: boolean }) {
         style={{
           background:
             'linear-gradient(135deg, var(--color-imaro-primary-light) 0%, var(--color-imaro-primary) 100%)',
+          ...(aboveNav && {
+            bottom: 'calc(4rem + env(safe-area-inset-bottom) + 1rem)',
+          }),
         }}
       >
         <Sparkles className="size-4 shrink-0" />
