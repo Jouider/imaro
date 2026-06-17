@@ -8,6 +8,7 @@ import { useThemeStore } from '@/stores/themeStore'
 import { UnreadBadge } from '@/components/portail/UnreadBadge'
 import { InstallPrompt } from '@/components/portail/InstallPrompt'
 import { AiChatFab } from '@/components/gestionnaire/AiChatFab'
+import { useNativePush } from '@/hooks/useNativePush'
 import { cn } from '@/lib/utils'
 
 type NavItem = {
@@ -106,6 +107,7 @@ function NavTab({ item }: { item: NavItem }) {
 export function PortailLayout() {
   const { t } = useTranslation()
   const theme = useThemeStore((s) => s.theme)
+  useNativePush()
   const totalUnread =
     (MOCK_UNREAD.finances ?? 0) + (MOCK_UNREAD.reclamations ?? 0)
 
