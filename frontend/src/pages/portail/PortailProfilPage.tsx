@@ -24,6 +24,7 @@ import { logout } from '@/services/auth.service'
 import { getProfile } from '@/services/portail.service'
 import { ConfirmModal } from '@/components/shared'
 import { usePush } from '@/hooks/usePush'
+import { unregisterNativePush } from '@/lib/push-native'
 import { isBiometricAvailable, authenticateBiometric } from '@/lib/biometric'
 import { useBiometricStore } from '@/stores/biometricStore'
 import { cn } from '@/lib/utils'
@@ -74,7 +75,10 @@ export function PortailProfilPage() {
   }
 
   const logoutMutation = useMutation({
-    mutationFn: logout,
+    mutationFn: async () => {
+      await unregisterNativePush()
+      await logout()
+    },
     onSettled: () => {
       setStoredToken(null)
       clear()

@@ -28,6 +28,10 @@ const config: CapacitorConfig = {
     CapacitorHttp: {
       enabled: true,
     },
+    PushNotifications: {
+      // Android: default notification channel shown to the user.
+      presentationOptions: ['badge', 'sound', 'alert'],
+    },
   },
 }
 
