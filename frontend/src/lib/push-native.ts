@@ -42,7 +42,10 @@ export async function initNativePush(navigate: NavigateFn): Promise<void> {
   await PushNotifications.addListener('registration', async (token: Token) => {
     const platform = Capacitor.getPlatform() as 'ios' | 'android'
     try {
-      await api.post('/portail/push/register-device', { token: token.value, platform })
+      await api.post('/portail/push/register-device', {
+        token: token.value,
+        platform,
+      })
     } catch {
       // Non-fatal: push will still arrive, but backend won't target this device.
     }
