@@ -47,6 +47,13 @@ return [
         'credentials' => env('FCM_CREDENTIALS'),
     ],
 
+    // Paiement en ligne (KAN-72 / #251) — passerelle agnostique.
+    // gateway vide = endpoint /paiement/initier renvoie 422 (aucun driver lié).
+    'payment' => [
+        'gateway' => env('PAYMENT_GATEWAY'),                                  // paydunya | cmi | …
+        'app_return' => env('PAYMENT_APP_RETURN', 'imaro://paiement/retour'), // deep-link de retour
+    ],
+
     // Push natif iOS — Apple Push Notification service, auth par clé .p8 (KAN-68).
     'apns' => [
         'key_id' => env('APNS_KEY_ID'),

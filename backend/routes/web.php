@@ -1,10 +1,14 @@
 <?php
 
+use App\Http\Controllers\Api\Resident\PortailPaiementOnlineController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Retour de la passerelle de paiement (public — redirection sans token) → deep-link app. KAN-72/#251
+Route::get('/paiement/retour', [PortailPaiementOnlineController::class, 'retour']);
 
 /*
  * Fichiers d'association deep-link (KAN-71).

@@ -1359,6 +1359,23 @@ Livraison sur device réel : nécessite les creds FCM/APNs + l'app native.
 
 ---
 
+## Paiement en ligne — passerelle (KAN-72 / #251)
+
+Socle **agnostique** : le driver de passerelle (PayDunya / CMI / …) est résolu via le conteneur, lié uniquement si `services.payment.gateway` est configuré.
+
+### POST /api/portail/paiement/initier
+`role:resident` — initie une session de paiement.
+**Body** : `montant` (numeric ≥ 1, requis), `reference?`.
+**Response 200** : `{ status, data: { payment_url, session_id } }`.
+**422** si aucune passerelle configurée (« paiement en ligne non disponible »).
+
+### GET /paiement/retour
+**Public** (la passerelle redirige sans token). Query `status` (`success|cancel|failed`) + `session_id` → met à jour la session puis **redirige vers le deep-link** `imaro://paiement/retour?status=…&session_id=…` (configurable via `PAYMENT_APP_RETURN`).
+
+> ⚠️ Confirmation non autoritative : un **webhook signé** propre à la passerelle reste à ajouter lors de l'implémentation du driver réel (PayDunya/CMI) + compte marchand.
+
+---
+
 ## Comptes de démo
 
 | Rôle | Email | Mot de passe |
