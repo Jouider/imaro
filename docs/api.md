@@ -1348,7 +1348,14 @@ Enregistre (ou rafraîchit) le jeton push natif d'un appareil. Multi-device, ups
 ### DELETE /api/portail/push/register-device
 Supprime le jeton (à la déconnexion). **Body** : `token`.
 
-Envoi serveur : FCM HTTP v1 (Android) / APNs token-based (iOS), piloté par `services.fcm` / `services.apns`. Tant que les identifiants ne sont pas configurés (`FCM_*` / `APNS_*`), l'envoi est **no-op** (best-effort, jamais bloquant). Déclencheurs métier (annonce / rappel de paiement / réclamation) + livraison sur device réel : à câbler une fois les creds + l'app native en place.
+Envoi serveur : FCM HTTP v1 (Android) / APNs token-based (iOS), piloté par `services.fcm` / `services.apns`. Tant que les identifiants ne sont pas configurés (`FCM_*` / `APNS_*`), l'envoi est **no-op** (best-effort, jamais bloquant).
+
+**Déclencheurs métier câblés** (`PortailPushNotifier`, deep-link `data.route`) :
+- **Annonce publiée** (`POST /annonces/{id}/publier`) → résidents de la résidence · route `/portail`.
+- **Rappel de paiement** (`POST /creances/{id}/relancer` + `/creances/relancer-tout`) → copropriétaire(s) concerné(s) · route `/portail/finances`.
+- **Réclamation mise à jour / close** (`PUT /tickets/{id}` changement de statut, `POST /tickets/{id}/clos`) → auteur · route `/portail/reclamations`.
+
+Livraison sur device réel : nécessite les creds FCM/APNs + l'app native.
 
 ---
 

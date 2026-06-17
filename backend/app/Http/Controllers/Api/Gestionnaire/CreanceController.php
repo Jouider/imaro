@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Gestionnaire;
 
 use App\Http\Controllers\Controller;
 use App\Models\AppelFondsLigne;
+use App\Services\Notifications\PortailPushNotifier;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,13 +21,13 @@ class CreanceController extends Controller
 
         $query = AppelFondsLigne::whereHas('appelFonds', function ($q) use ($tenantId) {
             $q->where('tenant_id', $tenantId)
-              ->where('statut', '!=', 'brouillon');
+                ->where('statut', '!=', 'brouillon');
         })
-        ->with([
-            'appelFonds:id,libelle,date_echeance',
-            'coproprietaire.user:id,name',
-            'coproprietaire.lot:id,numero',
-        ]);
+            ->with([
+                'appelFonds:id,libelle,date_echeance',
+                'coproprietaire.user:id,name',
+                'coproprietaire.lot:id,numero',
+            ]);
 
         $lignes = $query->get();
 
@@ -45,20 +46,20 @@ class CreanceController extends Controller
             }
 
             return [
-                'id'                    => $ligne->id,
-                'appel_fonds_id'        => $ligne->appel_fonds_id,
-                'appel_fonds_titre'     => $ligne->appelFonds?->libelle ?? '',
-                'coproprietaire_id'     => $ligne->coproprietaire_id,
-                'coproprietaire_nom'    => $ligne->coproprietaire?->user?->name ?? '',
-                'lot_numero'            => $ligne->coproprietaire?->lot?->numero ?? '',
-                'montant_initial'       => round((float) $ligne->montant_du, 2),
-                'montant_regle'         => round((float) $ligne->montant_paye, 2),
-                'solde_restant'         => round((float) ($ligne->montant_du - $ligne->montant_paye), 2),
-                'date_echeance'         => $echeance?->toDateString(),
+                'id' => $ligne->id,
+                'appel_fonds_id' => $ligne->appel_fonds_id,
+                'appel_fonds_titre' => $ligne->appelFonds?->libelle ?? '',
+                'coproprietaire_id' => $ligne->coproprietaire_id,
+                'coproprietaire_nom' => $ligne->coproprietaire?->user?->name ?? '',
+                'lot_numero' => $ligne->coproprietaire?->lot?->numero ?? '',
+                'montant_initial' => round((float) $ligne->montant_du, 2),
+                'montant_regle' => round((float) $ligne->montant_paye, 2),
+                'solde_restant' => round((float) ($ligne->montant_du - $ligne->montant_paye), 2),
+                'date_echeance' => $echeance?->toDateString(),
                 'date_derniere_relance' => null,
-                'statut'                => $statut,
-                'nb_relances'           => 0,
-                'jours_retard'          => $joursRetard,
+                'statut' => $statut,
+                'nb_relances' => 0,
+                'jours_retard' => $joursRetard,
             ];
         });
 
@@ -68,15 +69,14 @@ class CreanceController extends Controller
         }
         if ($search = $request->query('search')) {
             $q = strtolower($search);
-            $creances = $creances->filter(fn ($c) =>
-                str_contains(strtolower($c['coproprietaire_nom']), $q) ||
+            $creances = $creances->filter(fn ($c) => str_contains(strtolower($c['coproprietaire_nom']), $q) ||
                 str_contains(strtolower($c['lot_numero']), $q)
             );
         }
 
         return response()->json([
             'status' => 'success',
-            'data'   => $creances->values(),
+            'data' => $creances->values(),
         ]);
     }
 
@@ -85,8 +85,16 @@ class CreanceController extends Controller
      */
     public function relancer(int $id): JsonResponse
     {
+        $ligne = AppelFondsLigne::with('coproprietaire')->findOrFail($id);
+
+        // Push « rappel de paiement » au copropriétaire (KAN-68) — async, best-effort.
+        if ($ligne->coproprietaire) {
+            $reste = round((float) $ligne->montant_du - (float) $ligne->montant_paye, 2);
+            app(PortailPushNotifier::class)->rappelPaiement($ligne->coproprietaire, max(0, $reste));
+        }
+
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Relance envoyée.',
         ]);
     }
@@ -98,17 +106,28 @@ class CreanceController extends Controller
     {
         $tenantId = config('app.tenant_id');
 
-        $count = AppelFondsLigne::whereHas('appelFonds', function ($q) use ($tenantId) {
-            $q->where('tenant_id', $tenantId)
-              ->where('statut', '!=', 'brouillon')
-              ->where('date_echeance', '<', now());
-        })
-        ->where('statut', '!=', 'paye')
-        ->count();
+        $lignes = AppelFondsLigne::with('coproprietaire')
+            ->whereHas('appelFonds', function ($q) use ($tenantId) {
+                $q->where('tenant_id', $tenantId)
+                    ->where('statut', '!=', 'brouillon')
+                    ->where('date_echeance', '<', now());
+            })
+            ->where('statut', '!=', 'paye')
+            ->get();
+
+        $notifier = app(PortailPushNotifier::class);
+        $vus = [];
+        foreach ($lignes as $ligne) {
+            $copro = $ligne->coproprietaire;
+            if ($copro && ! in_array($copro->id, $vus, true)) {
+                $notifier->rappelPaiement($copro);
+                $vus[] = $copro->id;
+            }
+        }
 
         return response()->json([
             'status' => 'success',
-            'data'   => ['nb_envoye' => $count],
+            'data' => ['nb_envoye' => $lignes->count()],
         ]);
     }
 }
