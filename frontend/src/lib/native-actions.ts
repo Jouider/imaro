@@ -28,7 +28,9 @@ export async function canShare(): Promise<boolean> {
       return false
     }
   }
-  return typeof navigator !== 'undefined' && typeof navigator.share === 'function'
+  return (
+    typeof navigator !== 'undefined' && typeof navigator.share === 'function'
+  )
 }
 
 /**
