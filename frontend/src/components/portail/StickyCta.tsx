@@ -20,9 +20,10 @@ export function StickyCta({ children, context, className }: Props) {
   return (
     <div
       className={cn(
-        'fixed inset-x-0 bottom-16 z-30 border-t border-[var(--color-imaro-primary)]/10 bg-white/95 px-4 py-3 backdrop-blur-md shadow-[0_-4px_12px_-4px_rgb(29_78_216_/_0.10)] dark:bg-card/95',
+        'fixed inset-x-0 z-30 border-t border-[var(--color-imaro-primary)]/10 bg-white/95 px-4 py-3 backdrop-blur-md shadow-[0_-4px_12px_-4px_rgb(29_78_216_/_0.10)] dark:bg-card/95',
         className,
       )}
+      style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom))' }}
     >
       <div className="mx-auto flex w-full max-w-lg flex-col gap-2">
         {context && (
