@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Resident\PortailDashboardController;
 use App\Http\Controllers\Api\Resident\PortailDocumentController;
 use App\Http\Controllers\Api\Resident\PortailOperationsController;
 use App\Http\Controllers\Api\Resident\PortailPaiementController;
+use App\Http\Controllers\Api\Resident\PortailPaiementOnlineController;
 use App\Http\Controllers\Api\Resident\PortailProfilController;
 use App\Http\Controllers\Api\Resident\PortailPushController;
 use App\Http\Controllers\Api\Resident\PortailReclamationController;
@@ -26,6 +27,8 @@ Route::put('/profil',  [PortailProfilController::class, 'update']);
 
 Route::get('/comptes-bancaires', PortailBankAccountController::class);
 Route::post('/paiements',        [PortailPaiementController::class, 'store']);
+// Paiement en ligne (passerelle) — KAN-72 / #251 ; le retour est public (cf. web.php)
+Route::post('/paiement/initier', [PortailPaiementOnlineController::class, 'initier']);
 
 Route::post('/push/subscribe',   [PortailPushController::class, 'subscribe']);
 Route::delete('/push/unsubscribe', [PortailPushController::class, 'unsubscribe']);
