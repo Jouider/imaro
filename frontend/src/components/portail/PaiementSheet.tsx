@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   Check,
   Copy,
+  ExternalLink,
   Info,
   Loader2,
   QrCode,
@@ -18,6 +19,7 @@ import {
   type PortailBankAccount,
 } from '@/services/portail.service'
 import { banqueLabel, buildPaymentPayload } from '@/lib/payment'
+import { openExternal, listenForBrowserClose } from '@/lib/native-actions'
 import { BottomSheet } from '@/components/portail/BottomSheet'
 import { PaymentQr } from '@/components/shared'
 import { Button } from '@/components/ui/button'
@@ -39,6 +41,13 @@ type Props = {
   defaultMontant?: number
   /** Référence suggérée (ex. lot / appel de fonds). */
   defaultReference?: string
+  /**
+   * URL de paiement en ligne (passerelle bancaire).
+   * Quand fournie, un bouton "Payer en ligne" ouvre cette URL dans le
+   * navigateur intégré (Capacitor) ou un nouvel onglet (web).
+   * Abdellah: à brancher sur l'endpoint qui renvoie l'URL CMI/PayDunya.
+   */
+  paymentUrl?: string
   onSuccess?: () => void
 }
 
@@ -58,6 +67,7 @@ export function PaiementSheet({
   onOpenChange,
   defaultMontant,
   defaultReference,
+  paymentUrl,
   onSuccess,
 }: Props) {
   const { t } = useTranslation()
@@ -81,6 +91,16 @@ export function PaiementSheet({
     queryFn: getMyResidenceBankAccounts,
     enabled: open,
   })
+
+  // When the in-app browser closes after an online payment, treat it as a
+  // successful return and let the caller refresh (same as a declared payment).
+  useEffect(() => {
+    if (!open || !paymentUrl) return
+    return listenForBrowserClose(() => {
+      onOpenChange(false)
+      onSuccess?.()
+    })
+  }, [open, paymentUrl, onOpenChange, onSuccess])
 
   // Reset/populate on closed → open transition (render-time, no effect).
   if (open && !wasOpen) {
@@ -270,8 +290,20 @@ export function PaiementSheet({
             <p>{t('portail.paiement.instructions')}</p>
           </div>
 
+          {/* Online payment — only rendered when the backend provides a URL */}
+          {paymentUrl && (
+            <Button
+              className="w-full gap-2 bg-[var(--color-imaro-accent)] text-white hover:bg-[var(--color-imaro-accent)]/90"
+              onClick={() => void openExternal(paymentUrl)}
+            >
+              <ExternalLink className="size-4" />
+              {t('portail.paiement.payOnline')}
+            </Button>
+          )}
+
           <Button
             className="w-full"
+            variant={paymentUrl ? 'outline' : 'default'}
             disabled={accounts.length === 0}
             onClick={() => setStep('declare')}
           >

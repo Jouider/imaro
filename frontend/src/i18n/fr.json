@@ -279,6 +279,7 @@
       "referencePlaceholder": "Réf. du virement, n° de bordereau…",
       "justificatif": "Justificatif (capture / relevé)",
       "justificatifHint": "Ajouter une photo ou un PDF",
+      "payOnline": "Payer en ligne",
       "submit": "Déclarer le paiement",
       "toast": {
         "declared": "Paiement déclaré. Votre syndic va le vérifier.",
@@ -369,6 +370,8 @@
       },
       "share": {
         "title": "Partager le QR",
+        "shareNative": "Partager",
+        "orVia": "ou via :",
         "copyLink": "Copier le lien",
         "whatsapp": "WhatsApp",
         "sms": "SMS",

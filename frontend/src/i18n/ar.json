@@ -279,6 +279,7 @@
       "referencePlaceholder": "مرجع التحويل، رقم الإشعار…",
       "justificatif": "ما يثبت الأداء (لقطة / كشف)",
       "justificatifHint": "إضافة صورة أو ملف PDF",
+      "payOnline": "الدفع عبر الإنترنت",
       "submit": "التصريح بالدفعة",
       "toast": {
         "declared": "تم التصريح بالدفعة. سيقوم المتصرف بالتحقق منها.",
@@ -369,6 +370,8 @@
       },
       "share": {
         "title": "مشاركة رمز QR",
+        "shareNative": "مشاركة",
+        "orVia": "أو عبر :",
         "copyLink": "نسخ الرابط",
         "whatsapp": "واتساب",
         "sms": "SMS",
