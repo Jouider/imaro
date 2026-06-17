@@ -5,11 +5,16 @@ use App\Models\Tenant;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    // Comme en prod (queue redis) : les push natifs déclenchés par clos/update
+    // ne tournent pas inline (évite le listener tenant-aware Spatie en sync).
+    Queue::fake();
+
     foreach (['super_admin', 'manager', 'gestionnaire', 'agent_recouvrement', 'conseil', 'resident'] as $role) {
         Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
     }
