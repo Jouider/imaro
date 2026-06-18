@@ -8,6 +8,7 @@ use App\Models\Lot;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PortailAnnonceController extends Controller
 {
@@ -29,6 +30,10 @@ class PortailAnnonceController extends Controller
                 'id' => $a->id, 'titre' => $a->titre, 'contenu' => $a->contenu,
                 'priorite' => $a->priorite === 'urgente' ? 'urgente' : 'normale',
                 'date' => ($a->publiee_at ?? $a->created_at)?->toDateString(),
+                'media' => collect($a->media ?? [])->map(fn ($m) => [
+                    'type' => $m['type'] ?? 'image',
+                    'url' => Storage::disk('public')->url($m['path']),
+                ])->values(),
             ]);
 
         return response()->json(['status' => 'success', 'data' => ['annonces' => $annonces]]);

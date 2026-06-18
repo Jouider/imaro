@@ -977,6 +977,12 @@ Action irréversible.
 
 Priorités valides : `normale` | `urgente`
 
+**Médias (KAN-96)** — envoi en `multipart/form-data` : champ `media[]` (max 6).
+Images `jpeg/png/webp` ≤ 5 Mo, vidéos `mp4/quicktime/webm` ≤ 30 Mo.
+La réponse expose `data.annonce.media: [{ type: image|video, url, taille_ko }]`.
+À l'`update`, `media[]` s'ajoute (cumul) et `supprimer_media[]` (chemins) retire.
+*(Stockage disque public pour l'instant ; migration object storage prévue.)*
+
 ---
 
 ### PUT /api/gestionnaire/annonces/{id}
