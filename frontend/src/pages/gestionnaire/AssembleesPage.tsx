@@ -10,6 +10,7 @@ import {
   storeAssemblee,
   type Assemblee,
 } from '@/services/gestionnaire.service'
+import { AgDocumentsSidebar } from '@/components/gestionnaire/AgDocumentsSidebar'
 import { useResidenceStore } from '@/stores/residenceStore'
 import { ResidenceFilter } from '@/components/shared'
 import { PageHeader } from '@/components/shared/PageHeader'
@@ -74,6 +75,16 @@ export function AssembleesPage() {
   )
   const [detailAG, setDetailAG] = useState<Assemblee | null>(null)
   const [form, setForm] = useState<AGForm>(EMPTY_FORM)
+  const [checkedDocs, setCheckedDocs] = useState<Set<string>>(new Set())
+
+  function toggleDoc(key: string) {
+    setCheckedDocs((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
 
   const residenceId = useResidenceStore((s) => s.residenceId)
 
@@ -121,6 +132,7 @@ export function AssembleesPage() {
       void qc.invalidateQueries({ queryKey: ['assemblees'] })
       setCreateOpen(false)
       setForm(EMPTY_FORM)
+      setCheckedDocs(new Set())
       toast.success(t('gestionnaire.assemblees.toastCreated'))
     },
     onError: () => toast.error(t('common.createError')),
@@ -271,152 +283,186 @@ export function AssembleesPage() {
       />
 
       {/* Create AG dialog */}
-      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="max-w-lg">
+      <Dialog
+        open={createOpen}
+        onOpenChange={(open) => {
+          setCreateOpen(open)
+          if (!open) {
+            setForm(EMPTY_FORM)
+            setCheckedDocs(new Set())
+          }
+        }}
+      >
+        <DialogContent
+          className={cn(
+            form.type === 'ordinaire' ? 'sm:max-w-3xl' : 'max-w-lg',
+          )}
+        >
           <DialogHeader>
             <DialogTitle>{t('gestionnaire.assemblees.newAG')}</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 py-2">
-            <div className="space-y-1">
-              <Label>{t('gestionnaire.assemblees.form.titre')}</Label>
-              <Input
-                value={form.titre}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, titre: e.target.value }))
-                }
-                placeholder={t('gestionnaire.assemblees.form.titrePlaceholder')}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-4 sm:flex-row">
+            {/* ── Form ── */}
+            <div className="min-w-0 flex-1 space-y-4 py-2">
               <div className="space-y-1">
-                <Label>{t('gestionnaire.assemblees.form.type')}</Label>
-                <Select
-                  value={form.type}
-                  onValueChange={(v) => setForm((f) => ({ ...f, type: v }))}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ordinaire">
-                      {t('gestionnaire.assemblees.type.ordinaire')}
-                    </SelectItem>
-                    <SelectItem value="extraordinaire">
-                      {t('gestionnaire.assemblees.type.extraordinaire')}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1">
-                <Label>{t('gestionnaire.assemblees.form.residence')}</Label>
-                <Select
-                  value={form.residence_id}
-                  onValueChange={(v) =>
-                    setForm((f) => ({ ...f, residence_id: v }))
-                  }
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t('common.choose')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {residences.map((r) => (
-                      <SelectItem key={r.id} value={String(r.id)}>
-                        {r.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label>{t('gestionnaire.assemblees.form.date')}</Label>
+                <Label>{t('gestionnaire.assemblees.form.titre')}</Label>
                 <Input
-                  type="date"
-                  min={minDate}
-                  value={form.date}
+                  value={form.titre}
                   onChange={(e) =>
-                    setForm((f) => ({ ...f, date: e.target.value }))
-                  }
-                  aria-invalid={delaiTropCourt}
-                />
-                {delaiTropCourt ? (
-                  <p className="flex items-start gap-1.5 text-xs text-[var(--color-imaro-danger)]">
-                    <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
-                    {t('gestionnaire.assemblees.form.delaiError', {
-                      defaultValue:
-                        'La convocation doit partir au moins 15 jours avant l’AG (loi 18-00, art. 16 quinquies).',
-                    })}
-                  </p>
-                ) : (
-                  <p className="text-xs text-muted-foreground">
-                    {t('gestionnaire.assemblees.form.delaiHint', {
-                      defaultValue:
-                        'Délai légal minimum : 15 jours (loi 18-00).',
-                    })}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-1">
-                <Label>{t('gestionnaire.assemblees.form.heure')}</Label>
-                <Input
-                  type="time"
-                  value={form.heure}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, heure: e.target.value }))
-                  }
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label>{t('gestionnaire.assemblees.form.lieu')}</Label>
-                <Input
-                  value={form.lieu}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, lieu: e.target.value }))
+                    setForm((f) => ({ ...f, titre: e.target.value }))
                   }
                   placeholder={t(
-                    'gestionnaire.assemblees.form.lieuPlaceholder',
+                    'gestionnaire.assemblees.form.titrePlaceholder',
                   )}
                 />
               </div>
-              <div className="space-y-1">
-                <Label>{t('gestionnaire.assemblees.form.quorum')}</Label>
-                <div className="relative">
-                  <Input
-                    type="number"
-                    min={1}
-                    max={100}
-                    value={form.quorum_requis}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, quorum_requis: e.target.value }))
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label>{t('gestionnaire.assemblees.form.type')}</Label>
+                  <Select
+                    value={form.type}
+                    onValueChange={(v) => setForm((f) => ({ ...f, type: v }))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ordinaire">
+                        {t('gestionnaire.assemblees.type.ordinaire')}
+                      </SelectItem>
+                      <SelectItem value="extraordinaire">
+                        {t('gestionnaire.assemblees.type.extraordinaire')}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label>{t('gestionnaire.assemblees.form.residence')}</Label>
+                  <Select
+                    value={form.residence_id}
+                    onValueChange={(v) =>
+                      setForm((f) => ({ ...f, residence_id: v }))
                     }
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                    %
-                  </span>
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={t('common.choose')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {residences.map((r) => (
+                        <SelectItem key={r.id} value={String(r.id)}>
+                          {r.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label>{t('gestionnaire.assemblees.form.date')}</Label>
+                  <Input
+                    type="date"
+                    min={minDate}
+                    value={form.date}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, date: e.target.value }))
+                    }
+                    aria-invalid={delaiTropCourt}
+                  />
+                  {delaiTropCourt ? (
+                    <p className="flex items-start gap-1.5 text-xs text-[var(--color-imaro-danger)]">
+                      <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
+                      {t('gestionnaire.assemblees.form.delaiError', {
+                        defaultValue:
+                          "La convocation doit partir au moins 15 jours avant l'AG (loi 18-00, art. 16 quinquies).",
+                      })}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      {t('gestionnaire.assemblees.form.delaiHint', {
+                        defaultValue: 'Délai légal minimum : 15 jours (loi 18-00).',
+                      })}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <Label>{t('gestionnaire.assemblees.form.heure')}</Label>
+                  <Input
+                    type="time"
+                    value={form.heure}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, heure: e.target.value }))
+                    }
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label>{t('gestionnaire.assemblees.form.lieu')}</Label>
+                  <Input
+                    value={form.lieu}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, lieu: e.target.value }))
+                    }
+                    placeholder={t(
+                      'gestionnaire.assemblees.form.lieuPlaceholder',
+                    )}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>{t('gestionnaire.assemblees.form.quorum')}</Label>
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      min={1}
+                      max={100}
+                      value={form.quorum_requis}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          quorum_requis: e.target.value,
+                        }))
+                      }
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                      %
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Label>{t('gestionnaire.assemblees.form.ordreDuJour')}</Label>
+                <textarea
+                  value={form.ordre_du_jour}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, ordre_du_jour: e.target.value }))
+                  }
+                  placeholder={t(
+                    'gestionnaire.assemblees.form.ordrePlaceholder',
+                  )}
+                  className="min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </div>
             </div>
-            <div className="space-y-1">
-              <Label>{t('gestionnaire.assemblees.form.ordreDuJour')}</Label>
-              <textarea
-                value={form.ordre_du_jour}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, ordre_du_jour: e.target.value }))
-                }
-                placeholder={t('gestionnaire.assemblees.form.ordrePlaceholder')}
-                className="w-full min-h-[100px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+
+            {/* ── Documents sidebar (AG ordinaire only) ── */}
+            {form.type === 'ordinaire' && (
+              <AgDocumentsSidebar
+                checked={checkedDocs}
+                onToggle={toggleDoc}
               />
-            </div>
+            )}
           </div>
 
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setCreateOpen(false)}
+              onClick={() => {
+                setCreateOpen(false)
+                setForm(EMPTY_FORM)
+                setCheckedDocs(new Set())
+              }}
               disabled={createMutation.isPending}
             >
               {t('actions.cancel')}
@@ -439,7 +485,11 @@ export function AssembleesPage() {
         onOpenChange={(open) => !open && setDetailAG(null)}
       >
         {detailAG && (
-          <DialogContent className="max-w-lg">
+          <DialogContent
+            className={cn(
+              detailAG.type === 'ordinaire' ? 'sm:max-w-3xl' : 'max-w-lg',
+            )}
+          >
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <CalendarDays className="size-5 text-[var(--color-imaro-primary)]" />
@@ -447,7 +497,8 @@ export function AssembleesPage() {
               </DialogTitle>
             </DialogHeader>
 
-            <div className="space-y-4 py-2">
+            <div className="flex flex-col gap-4 sm:flex-row">
+            <div className="min-w-0 flex-1 space-y-4 py-2">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p className="font-medium text-muted-foreground">
@@ -534,6 +585,15 @@ export function AssembleesPage() {
                   ))}
                 </div>
               </div>
+            </div>
+
+            {/* ── Documents sidebar (AG ordinaire only) ── */}
+            {detailAG.type === 'ordinaire' && (
+              <AgDocumentsSidebar
+                checked={new Set<string>()}
+                onToggle={() => {}}
+              />
+            )}
             </div>
 
             <DialogFooter>

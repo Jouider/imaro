@@ -1786,7 +1786,31 @@
       "toastCreated": "تم إنشاء الجمع العام",
       "detailQuorum": "النصاب المطلوب: {{n}} %",
       "detailParticipants": "{{n}} مشارك حاضر",
-      "detailNotHeld": "لم يُعقد الجمع العام بعد"
+      "detailNotHeld": "لم يُعقد الجمع العام بعد",
+      "docs": {
+        "title": "الوثائق المطلوبة",
+        "subtitle": "القانون 18-00، الفصل 16 مكرر خامس",
+        "progress": "{{done}} / {{total}} وثيقة مؤكدة",
+        "requiredHint": "الوثائق المحددة بـ * إلزامية",
+        "cat": {
+          "exercice": "السنة المحاسبية",
+          "comptabilite": "المحاسبة",
+          "pmo": "الأشغال والصيانة",
+          "recouvrement": "التحصيل"
+        },
+        "items": {
+          "rapport_gestion": "التقرير السنوي للتسيير",
+          "bilan_exercice": "الميزانية الختامية للسنة",
+          "budget_previsionnel": "الميزانية التقديرية للسنة القادمة",
+          "recettes_depenses": "حالة المداخيل والمصاريف",
+          "releve_bancaire": "كشف الحساب البنكي للنادي",
+          "justificatifs_charges": "مستندات الأعباء المشتركة",
+          "plan_maintenance": "برنامج الصيانة الوقائية",
+          "pv_travaux": "محضر استلام الأشغال",
+          "etat_impayes": "حالة المتأخرات لكل مشارك",
+          "historique_relances": "سجل الإشعارات المرسلة"
+        }
+      }
     },
     "annonces": {
       "title": "الإعلانات",

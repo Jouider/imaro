@@ -1772,7 +1772,31 @@
       "toastCreated": "Assemblée créée",
       "detailQuorum": "Quorum requis : {{n}} %",
       "detailParticipants": "{{n}} participants présents",
-      "detailNotHeld": "AG non encore tenue"
+      "detailNotHeld": "AG non encore tenue",
+      "docs": {
+        "title": "Documents requis",
+        "subtitle": "Loi 18-00, art. 16 quinquies",
+        "progress": "{{done}} / {{total}} documents confirmés",
+        "requiredHint": "Les documents marqués * sont obligatoires",
+        "cat": {
+          "exercice": "Exercice comptable",
+          "comptabilite": "Comptabilité",
+          "pmo": "Travaux & PMO",
+          "recouvrement": "Recouvrement"
+        },
+        "items": {
+          "rapport_gestion": "Rapport annuel de gestion",
+          "bilan_exercice": "Bilan de l'exercice clôturé",
+          "budget_previsionnel": "Budget prévisionnel N+1",
+          "recettes_depenses": "État des recettes et dépenses",
+          "releve_bancaire": "Relevé bancaire du compte syndic",
+          "justificatifs_charges": "Justificatifs des charges communes",
+          "plan_maintenance": "Plan de maintenance préventive",
+          "pv_travaux": "PV de réception des travaux",
+          "etat_impayes": "État des impayés par copropriétaire",
+          "historique_relances": "Historique des relances"
+        }
+      }
     },
     "annonces": {
       "title": "Annonces",
