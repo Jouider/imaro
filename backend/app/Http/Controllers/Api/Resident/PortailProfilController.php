@@ -3,29 +3,23 @@
 namespace App\Http\Controllers\Api\Resident;
 
 use App\Http\Controllers\Controller;
+use App\Models\Lot;
+use App\Models\Residence;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Contrat front : ResidentProfile = { name, phone, lot:string, residence:string, email? }
+ * (lot et residence sont des chaînes, pas des objets.)
+ */
 class PortailProfilController extends Controller
 {
     public function show(Request $request): JsonResponse
     {
-        $user = $request->user();
-        $copro = $user->coproprietaire;
-
         return response()->json([
             'status' => 'success',
-            'data'   => [
-                'id' => $user->id, 'name' => $user->name,
-                'email' => $user->email, 'phone' => $user->phone,
-                'lot' => $copro?->lot ? [
-                    'numero' => $copro->lot->numero, 'etage' => $copro->lot->etage,
-                    'type' => $copro->lot->type, 'tantieme' => $copro->lot->tantieme,
-                ] : null,
-                'residence' => $copro?->lot?->residence ? [
-                    'id' => $copro->lot->residence->id, 'name' => $copro->lot->residence->name,
-                ] : null,
-            ],
+            'data' => $this->profile($request->user()),
         ]);
     }
 
@@ -41,7 +35,26 @@ class PortailProfilController extends Controller
 
         return response()->json([
             'status' => 'success', 'message' => 'Profil mis à jour.',
-            'data' => $request->user()->fresh(),
+            'data' => $this->profile($request->user()->fresh()),
         ]);
+    }
+
+    /** Forme aplatie attendue par le front. */
+    private function profile(User $user): array
+    {
+        $copro = $user->coproprietaire;
+
+        // Résolu sans le scope tenant : le lot/résidence du copro doit toujours
+        // s'afficher, même si le contexte tenant de la requête n'est pas posé.
+        $lot = $copro?->lot_id ? Lot::withoutGlobalScope('tenant')->find($copro->lot_id) : null;
+        $residence = $lot ? Residence::withoutGlobalScope('tenant')->find($lot->residence_id) : null;
+
+        return [
+            'name' => $user->name,
+            'phone' => $user->phone,
+            'email' => $user->email,
+            'lot' => $lot?->numero ?? '—',
+            'residence' => $residence?->name ?? '—',
+        ];
     }
 }

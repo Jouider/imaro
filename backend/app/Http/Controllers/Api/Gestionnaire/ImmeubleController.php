@@ -76,7 +76,7 @@ class ImmeubleController extends Controller
         return response()->json([
             'status'  => 'success',
             'message' => 'Immeuble créé',
-            'data'    => ['immeuble' => new ImmeubleResource($immeuble)],
+            'data'    => new ImmeubleResource($immeuble),
         ], 201);
     }
 
@@ -111,7 +111,7 @@ class ImmeubleController extends Controller
         return response()->json([
             'status'  => 'success',
             'message' => 'Immeuble mis à jour',
-            'data'    => ['immeuble' => new ImmeubleResource($immeuble)],
+            'data'    => new ImmeubleResource($immeuble),
         ]);
     }
 

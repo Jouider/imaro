@@ -1,5 +1,10 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 import { env } from '@/lib/env'
+import { getStoredToken, setStoredToken } from '@/lib/tokenStore'
+
+// Re-exported so existing imports from '@/lib/axios' keep working; the token is
+// now backed by secure native storage on the app (see tokenStore).
+export { getStoredToken, setStoredToken }
 
 export const api = axios.create({
   baseURL: env.apiBase,
@@ -8,17 +13,6 @@ export const api = axios.create({
     Accept: 'application/json',
   },
 })
-
-const TOKEN_STORAGE_KEY = 'imaro.token'
-
-export function getStoredToken(): string | null {
-  return localStorage.getItem(TOKEN_STORAGE_KEY)
-}
-
-export function setStoredToken(token: string | null) {
-  if (token) localStorage.setItem(TOKEN_STORAGE_KEY, token)
-  else localStorage.removeItem(TOKEN_STORAGE_KEY)
-}
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = getStoredToken()

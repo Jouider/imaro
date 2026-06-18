@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { TrendingUp, Plus, Pencil, Trash2, Calendar } from 'lucide-react'
 import { toast } from 'sonner'
@@ -64,9 +65,8 @@ export function AutresRecettesPage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
-    null,
-  )
+  const globalResidenceId = useResidenceStore((s) => s.residenceId)
+  const setResidenceId = useResidenceStore((s) => s.setResidenceId)
   const [exercice, setExercice] = useState(2026)
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<AutreRecette | null>(null)
@@ -76,7 +76,7 @@ export function AutresRecettesPage() {
     queryKey: ['residences'],
     queryFn: () => getResidences(),
   })
-  const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
+  const residenceId = globalResidenceId ?? residencesQ.data?.[0]?.id ?? null
 
   const recettesQ = useQuery({
     queryKey: ['autres-recettes', residenceId, exercice],
@@ -170,8 +170,7 @@ export function AutresRecettesPage() {
             })}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Recettes hors appels de fonds — locations, subventions, indemnités,
-            produits financiers
+            {t('gestionnaire.autresRecettes.subtitle')}
           </p>
         </div>
         <Button
@@ -181,7 +180,7 @@ export function AutresRecettesPage() {
           disabled={!residenceId}
         >
           <Plus className="size-4" />
-          Nouvelle recette
+          {t('gestionnaire.autres.newRecette')}
         </Button>
       </div>
 
@@ -189,7 +188,7 @@ export function AutresRecettesPage() {
         <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
-          onValueChange={(v) => setPickedResidenceId(Number(v))}
+          onValueChange={(v) => setResidenceId(Number(v))}
         >
           <SelectTrigger className="w-60">
             <SelectValue placeholder={t('common.select')} />
@@ -202,7 +201,7 @@ export function AutresRecettesPage() {
             ))}
           </SelectContent>
         </Select>
-        <label className="text-sm font-medium">Exercice</label>
+        <label className="text-sm font-medium">{t('common.exercice')}</label>
         <Select
           value={String(exercice)}
           onValueChange={(v) => setExercice(Number(v))}
@@ -223,7 +222,7 @@ export function AutresRecettesPage() {
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <div className="rounded-xl border bg-card p-4">
           <p className="mb-1 text-xs text-muted-foreground">
-            Total recettes {exercice}
+            {t('gestionnaire.autresRecettes.totalRecettes', { year: exercice })}
           </p>
           <p className="text-2xl font-bold tracking-tight text-green-600">
             {fmt.format(totalAll)} DH
@@ -261,9 +260,13 @@ export function AutresRecettesPage() {
               <TableHead>{t('common.date')}</TableHead>
               <TableHead>{t('common.libelle')}</TableHead>
               <TableHead>{t('common.categorie')}</TableHead>
-              <TableHead>Payeur</TableHead>
+              <TableHead>
+                {t('gestionnaire.autresRecettes.colPayeur')}
+              </TableHead>
               <TableHead className="text-right">{t('common.amount')}</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-right">
+                {t('common.actions')}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -273,7 +276,7 @@ export function AutresRecettesPage() {
                   colSpan={6}
                   className="py-8 text-center text-sm text-muted-foreground"
                 >
-                  Chargement…
+                  {t('common.chargement')}
                 </TableCell>
               </TableRow>
             ) : recettes.length === 0 ? (
@@ -408,7 +411,7 @@ export function AutresRecettesPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Payeur</Label>
+                <Label>{t('gestionnaire.autresRecettes.colPayeur')}</Label>
                 <Input
                   value={draft.payeur ?? ''}
                   onChange={(e) =>

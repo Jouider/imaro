@@ -23,13 +23,26 @@ import { cn } from '@/lib/utils'
 
 type Tab = 'submit' | 'history'
 
-const CATEGORIES = [
-  'Parties communes',
-  'Ascenseur',
-  'Eau/Plomberie',
-  'Électricité',
-  'Sécurité',
-  'Autre',
+/**
+ * Reclamation categories (KAN-55). The `key` is stable and i18n-translated in
+ * the dropdown; `fr` is the canonical label stored on submit so the data stays
+ * human-readable in the gestionnaire's ticket list regardless of UI language.
+ * `autre` reveals a free-text field for a custom type.
+ */
+const CATEGORIES: { key: string; fr: string }[] = [
+  { key: 'parties_communes', fr: 'Parties communes' },
+  { key: 'ascenseur', fr: 'Ascenseur' },
+  { key: 'plomberie', fr: 'Eau / Plomberie' },
+  { key: 'electricite', fr: 'Électricité' },
+  { key: 'chauffage', fr: 'Chauffage / Climatisation' },
+  { key: 'securite', fr: 'Sécurité' },
+  { key: 'proprete', fr: 'Propreté / Nettoyage' },
+  { key: 'nuisances', fr: 'Nuisances sonores' },
+  { key: 'espaces_verts', fr: 'Espaces verts' },
+  { key: 'parking', fr: 'Parking / Garage' },
+  { key: 'interphone', fr: 'Interphone / Accès' },
+  { key: 'degat_eaux', fr: 'Dégât des eaux' },
+  { key: 'autre', fr: 'Autre' },
 ]
 
 const MAX_IMAGES = 5
@@ -51,11 +64,17 @@ const STATUT_LABELS: Record<string, string> = {
 
 type FormState = {
   categorie: string
+  customCategorie: string
   sujet: string
   description: string
 }
 
-const EMPTY_FORM: FormState = { categorie: '', sujet: '', description: '' }
+const EMPTY_FORM: FormState = {
+  categorie: '',
+  customCategorie: '',
+  sujet: '',
+  description: '',
+}
 
 export function PortailReclamationsPage() {
   const { t } = useTranslation()
@@ -148,6 +167,8 @@ function SubmitForm({
   function validate(): boolean {
     const next: Partial<FormState> = {}
     if (!form.categorie) next.categorie = t('portail.reclamations.categorie')
+    if (form.categorie === 'autre' && !form.customCategorie.trim())
+      next.customCategorie = t('portail.reclamations.customRequired')
     if (form.sujet.trim().length < 5)
       next.sujet = t('portail.reclamations.sujet')
     if (!form.description.trim())
@@ -156,11 +177,19 @@ function SubmitForm({
     return Object.keys(next).length === 0
   }
 
+  /** Resolve the stored category string from the selected key (KAN-55). */
+  function resolveCategorie(): string {
+    if (form.categorie === 'autre') return form.customCategorie.trim()
+    return (
+      CATEGORIES.find((c) => c.key === form.categorie)?.fr ?? form.categorie
+    )
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!validate()) return
     mutation.mutate({
-      categorie: form.categorie,
+      categorie: resolveCategorie(),
       sujet: form.sujet.trim(),
       description: form.description.trim(),
       images,
@@ -210,8 +239,8 @@ function SubmitForm({
           </SelectTrigger>
           <SelectContent>
             {CATEGORIES.map((cat) => (
-              <SelectItem key={cat} value={cat}>
-                {cat}
+              <SelectItem key={cat.key} value={cat.key}>
+                {t(`portail.reclamations.categories.${cat.key}`)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -220,6 +249,29 @@ function SubmitForm({
           <p className="text-xs text-destructive">{errors.categorie}</p>
         )}
       </div>
+
+      {/* Custom type when "Autre" is picked (KAN-55) */}
+      {form.categorie === 'autre' && (
+        <div className="space-y-1.5">
+          <Label htmlFor="custom-categorie" className="text-base">
+            {t('portail.reclamations.customLabel')}
+          </Label>
+          <Input
+            id="custom-categorie"
+            value={form.customCategorie}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, customCategorie: e.target.value }))
+            }
+            placeholder={t('portail.reclamations.customPlaceholder')}
+            className="h-12 text-base"
+            data-invalid={!!errors.customCategorie}
+            maxLength={60}
+          />
+          {errors.customCategorie && (
+            <p className="text-xs text-destructive">{errors.customCategorie}</p>
+          )}
+        </div>
+      )}
 
       <div className="space-y-1.5">
         <Label htmlFor="sujet" className="text-base">

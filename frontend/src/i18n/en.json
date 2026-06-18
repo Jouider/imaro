@@ -1,0 +1,3295 @@
+{
+  "app": {
+    "name": "Imaro",
+    "tagline": "Property management — Morocco"
+  },
+  "nav": {
+    "home": "Home",
+    "login": "Sign in",
+    "logout": "Sign out",
+    "dashboard": "Dashboard"
+  },
+  "language": {
+    "fr": "Français",
+    "ar": "العربية",
+    "switch": "Change language",
+    "en": "English"
+  },
+  "auth": {
+    "title": "Sign in to Imaro",
+    "subtitle": "Get a 6-digit code on WhatsApp",
+    "phone": "Phone",
+    "phonePlaceholder": "+212 6XX XX XX XX",
+    "requestOtp": "Get the code",
+    "otp": "OTP code",
+    "otpPlaceholder": "123456",
+    "verifyOtp": "Verify",
+    "back": "Back",
+    "backToSite": "Back to site",
+    "brand": {
+      "taglineLine1": "Property",
+      "taglineLine2": "management",
+      "taglineLine3": "made simple.",
+      "subtitle": "Syndics, charges, meetings and documents — all in one place.",
+      "feature1": "Instant sign-in via WhatsApp",
+      "feature2": "Compliant with co-ownership law 18-00",
+      "feature3": "Interface available in French and Arabic",
+      "footer": "© {{year}} Imaro · Property management in Morocco"
+    },
+    "role": {
+      "welcomeTitle": "Welcome to Imaro",
+      "welcomeSubtitle": "Choose your space to continue",
+      "gestionnaireTitle": "Syndic / Manager",
+      "gestionnaireDesc": "Manage your buildings, budgets, works and owners",
+      "residentTitle": "Owner",
+      "residentDesc": "View your charges, report issues and track your payments",
+      "footnote": "Secure sign-in — managers by email, owners by access code"
+    },
+    "gestionnaire": {
+      "title": "Manager space",
+      "subtitle": "Sign in with your credentials",
+      "email": "Email address",
+      "emailPlaceholder": "you@email.com",
+      "password": "Password",
+      "passwordHint": "Credentials provided by the Imaro team",
+      "submit": "Sign in",
+      "submitting": "Signing in…"
+    },
+    "admin": {
+      "activateTitle": "Create your password",
+      "activateSubtitle": "Set a personal password of at least 8 characters",
+      "activateHint": "First sign-in — your account was created by your firm. Choose a personal password to secure your access.",
+      "newPassword": "New password",
+      "newPasswordPlaceholder": "At least 8 characters",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordPlaceholder": "Repeat your password",
+      "activateSubmit": "Confirm and access",
+      "activating": "Activating…",
+      "mismatch": "Passwords do not match",
+      "tooShort": "Password too short (8 characters minimum)"
+    },
+    "resident": {
+      "title": "Owner space",
+      "subtitle": "Enter your Moroccan phone number",
+      "phoneLabel": "Phone number",
+      "phonePlaceholder": "6XX XX XX XX",
+      "phoneHint": "E.g. 6XX XX XX XX or 7XX XX XX XX",
+      "continue": "Continue",
+      "codeTitle": "Access code",
+      "codeSubtitle": "Enter the code provided by your syndic for +212 {{digits}}",
+      "codeLabel": "Access code",
+      "codePlaceholder": "Code provided by your syndic",
+      "codeHint": "This code was sent to you by your manager via WhatsApp.",
+      "codeSubmit": "Access my space",
+      "codeVerifying": "Verifying…",
+      "activateTitle": "Create your personal code",
+      "activateSubtitle": "Set a personal code of at least 6 characters",
+      "activateHint": "First sign-in — choose a personal code you'll use each time you sign in.",
+      "newCode": "New code",
+      "newCodePlaceholder": "At least 6 characters",
+      "confirmCode": "Confirm code",
+      "confirmCodePlaceholder": "Repeat your code",
+      "activateSubmit": "Confirm and sign in",
+      "activating": "Activating…",
+      "codesMismatch": "Codes do not match",
+      "codeTooShort": "Code too short (6 characters minimum)"
+    },
+    "devBypass": "Dev mode — direct access",
+    "networkError": "Network error",
+    "forgot": {
+      "link": "Forgot password?",
+      "title": "Reset password",
+      "subtitle": "Choose how to receive your reset instructions.",
+      "method": {
+        "email": "By email",
+        "otp": "By SMS / WhatsApp"
+      },
+      "submit": "Send",
+      "sending": "Sending…",
+      "emailSentTitle": "Check your inbox",
+      "emailSentBody": "If an account exists for {{email}}, a reset link has just been sent.",
+      "backToLogin": "Back to sign in",
+      "otpTitle": "Enter the code received",
+      "otpSubtitle": "A code was sent to +212 {{phone}}. Enter it and choose a new password.",
+      "code": "Verification code",
+      "resetSubmit": "Reset password",
+      "resetting": "Resetting…",
+      "resetDone": "Password reset. You can sign in.",
+      "resetTitle": "New password",
+      "resetSubtitle": "Set a new password for {{email}}.",
+      "linkInvalid": "Invalid or expired link",
+      "linkInvalidBody": "This reset link is no longer valid. Request a new one from the sign-in page."
+    },
+    "demo": {
+      "eyebrow": "Create an account",
+      "title": "Request a demo",
+      "subtitle": "Tell us more and we'll get back to you within 24 h.",
+      "name": "Full name",
+      "cabinet": "Firm / Syndic",
+      "email": "Work email",
+      "phone": "Phone",
+      "message": "Message (optional)",
+      "messagePlaceholder": "Number of buildings, specific needs…",
+      "submit": "Send my request",
+      "privacy": "Your data is only used to contact you back. No commitment.",
+      "sentTitle": "Request sent ✅",
+      "sentBody": "Thank you! Our team will get back to you shortly to schedule your demo.",
+      "error": "Sending failed. Try again or email us at contact@imaro.ma.",
+      "noAccount": "No account yet?",
+      "cta": "Request a demo"
+    }
+  },
+  "statut": {
+    "paye": "Paid",
+    "impaye": "Unpaid",
+    "partiel": "Partial",
+    "retard": "Overdue"
+  },
+  "actions": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "loading": "Loading…",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "save": "Save",
+    "close": "Close",
+    "show": "Show",
+    "hide": "Hide"
+  },
+  "portail": {
+    "nav": {
+      "home": "Home",
+      "actualites": "News",
+      "finances": "Finances",
+      "reclamations": "Complaints",
+      "profil": "Profile",
+      "qr": "Invite",
+      "notifications": "Notifications",
+      "bottomBar": "Main navigation"
+    },
+    "installPrompt": {
+      "title": "Install Imaro",
+      "desc": "Add Imaro to your home screen for quick offline access.",
+      "install": "Install",
+      "later": "Later"
+    },
+    "pullToRefresh": {
+      "release": "Release to refresh",
+      "pull": "Pull to refresh",
+      "refreshing": "Refreshing…"
+    },
+    "push": {
+      "title": "Push notifications",
+      "desc": "Get an instant alert for your payments and complaints.",
+      "enable": "Enable",
+      "disable": "Disable",
+      "enabled": "Notifications enabled",
+      "unsupported": "Not supported on this browser"
+    },
+    "home": {
+      "balance": "My balance",
+      "aJour": "Up to date",
+      "enRetard": "Overdue",
+      "prochainAppel": "Next call",
+      "le": "on",
+      "annonces": "Announcements",
+      "voirTout": "See all",
+      "noAnnonces": "No announcement",
+      "kpiPaidYear": "Paid this year",
+      "kpiPending": "Left to pay",
+      "assemblees": "Upcoming meetings",
+      "noAssemblees": "No meeting scheduled",
+      "prochainPaiement": "Next payment",
+      "payer": "Pay →",
+      "convoquee": "Convened",
+      "inviteVisitor": "Invite a visitor",
+      "inviteVisitorDesc": "Generate a single-use QR for a relative, courier or contractor."
+    },
+    "actualites": {
+      "title": "News",
+      "tabAnnonces": "Announcements",
+      "tabAssemblees": "Meetings",
+      "tabCalendrier": "Calendar",
+      "noAnnonces": "No announcement for your building",
+      "noAssemblees": "No meeting scheduled",
+      "urgente": "Urgent",
+      "lectures": "{{n}} read{{s}}",
+      "quorum": "Quorum: {{n}} %",
+      "participants": "{{n}} attendee(s)",
+      "agNonTenue": "Meeting not yet held",
+      "ordreDuJour": "Agenda",
+      "convoquee": "Convened",
+      "tenue": "Held",
+      "annulee": "Cancelled",
+      "ordinaire": "Ordinary",
+      "extraordinaire": "Extraordinary",
+      "calendarHint": "Click a marked day to see the events",
+      "calendarEmpty": "No event this month",
+      "aVenir": "Upcoming",
+      "passees": "Past"
+    },
+    "finances": {
+      "title": "My finances",
+      "tabFinances": "Finances",
+      "tabDocuments": "Documents",
+      "filter": {
+        "all": "All",
+        "appels": "Funds calls",
+        "paiements": "Payments"
+      },
+      "empty": "No transaction",
+      "recu": "Download receipt",
+      "documents": {
+        "title": "My documents",
+        "empty": "No document available",
+        "download": "Download",
+        "groupReglement": "Co-ownership rules",
+        "groupPvAg": "Meeting minutes",
+        "groupContratFacture": "Contracts / Invoices",
+        "groupAutre": "Other documents"
+      },
+      "pay": "Pay my dues",
+      "amountDue": "Balance to settle"
+    },
+    "paiement": {
+      "howTitle": "How to pay",
+      "declareTitle": "Declare my payment",
+      "howIntro": "Make a transfer or deposit to one of the syndic's accounts, then declare your payment with a receipt.",
+      "noAccounts": "No bank account is configured yet for your building. Contact your syndic.",
+      "recommended": "Recommended",
+      "copyRib": "Copy the RIB",
+      "ribCopied": "RIB copied",
+      "copyError": "Could not copy the RIB",
+      "showQr": "Show the payment QR",
+      "qrHint": "Scan this code with your banking app to pre-fill the transfer.",
+      "instructions": "After your transfer, declare the payment below and attach the screenshot or statement. Your syndic will reconcile it with the bank statement.",
+      "iPaid": "I have made the payment",
+      "backToHow": "Back to the details",
+      "montant": "Amount paid (DH)",
+      "date": "Payment date",
+      "methode": "Payment method",
+      "methodes": {
+        "virement": "Bank transfer",
+        "versement": "Branch deposit",
+        "cheque": "Cheque",
+        "especes": "Cash"
+      },
+      "reference": "Reference (optional)",
+      "referencePlaceholder": "Transfer ref., slip no.…",
+      "justificatif": "Receipt (screenshot / statement)",
+      "justificatifHint": "Add a photo or a PDF",
+      "submit": "Declare the payment",
+      "toast": {
+        "declared": "Payment declared. Your syndic will verify it.",
+        "error": "An error occurred. Try again."
+      }
+    },
+    "reclamations": {
+      "title": "My complaints",
+      "categorie": "Category",
+      "sujet": "Subject",
+      "description": "Description",
+      "submit": "Report the issue",
+      "success": "Complaint sent",
+      "hint": "Your complaints are handled within 48 business hours.",
+      "addPhoto": "Add a photo",
+      "removePhoto": "Remove photo",
+      "photoHint": "JPEG, PNG or WebP · max 5 photos · 5 MB/photo",
+      "photoSizeError": "File too large (max 5 MB per photo)",
+      "empty": "No complaint",
+      "emptyHint": "Your submitted complaints will appear here.",
+      "sendError": "Error while sending",
+      "customLabel": "Specify the type",
+      "customPlaceholder": "E.g. Shared antenna, rubbish chute…",
+      "customRequired": "Specify the complaint type",
+      "categories": {
+        "parties_communes": "Common areas",
+        "ascenseur": "Elevator",
+        "plomberie": "Water / Plumbing",
+        "electricite": "Electricity",
+        "chauffage": "Heating / Air conditioning",
+        "securite": "Security",
+        "proprete": "Cleanliness",
+        "nuisances": "Noise nuisance",
+        "espaces_verts": "Green areas",
+        "parking": "Parking / Garage",
+        "interphone": "Intercom / Access",
+        "degat_eaux": "Water damage",
+        "autre": "Other"
+      }
+    },
+    "profil": {
+      "title": "My profile",
+      "apparence": "Appearance",
+      "darkMode": "Dark mode",
+      "logout": "Sign out",
+      "contact": "My contact details",
+      "preferences": "Preferences",
+      "account": "Account",
+      "privacy": "Privacy",
+      "cndpNotice": "Your personal data is stored and processed securely, in accordance with Law 09-08 (CNDP) on the protection of personal data.",
+      "logoutConfirmTitle": "Sign out?",
+      "logoutConfirmDesc": "You'll need to enter your WhatsApp OTP again to return."
+    },
+    "login": {
+      "title": "Owner portal",
+      "subtitle": "Get a 6-digit code on WhatsApp",
+      "phone": "Phone number",
+      "phonePlaceholder": "6XX XX XX XX",
+      "sendCode": "Get the WhatsApp code",
+      "sending": "Sending…",
+      "otp": "Verification code",
+      "otpHint": "Enter the 6-digit code received on WhatsApp",
+      "verify": "Access my space",
+      "verifying": "Verifying…",
+      "resend": "Resend the code",
+      "resendIn": "Resend in {{s}}s",
+      "changePhone": "Change number",
+      "noCode": "Didn't receive the code?",
+      "smsFallback": "Receive by SMS"
+    },
+    "dashboard": {
+      "welcome": "Hello, {{name}}!",
+      "subtitle": "Owner portal"
+    },
+    "visiteurs": {
+      "title": "My visitors",
+      "subtitle": "Invite a visitor, courier or provider — they'll get a QR to show at the entrance.",
+      "newInvite": "Invite a visitor",
+      "empty": "No visitor invited",
+      "emptyDesc": "Create your first invitation — your visitor will get a link to scan at the entrance.",
+      "form": {
+        "title": "New invitation",
+        "desc": "The QR is sent directly by WhatsApp / SMS to the visitor.",
+        "shareLater": "You'll be able to share it after creation.",
+        "submit": "Create & share",
+        "submitting": "Creating…",
+        "success": "Invitation created"
+      },
+      "share": {
+        "title": "Share the QR",
+        "copyLink": "Copy the link",
+        "whatsapp": "WhatsApp",
+        "sms": "SMS",
+        "waMessage": "Hello {{name}}, your Imaro visitor pass: {{url}}"
+      },
+      "list": {
+        "upcoming": "Upcoming",
+        "past": "Past"
+      },
+      "back": "Back to home"
+    },
+    "biometric": {
+      "reason": "Unlock your Imaro space",
+      "lockTitle": "Space locked",
+      "lockSubtitle": "Authenticate to access your space.",
+      "unlock": "Unlock",
+      "useCode": "Use access code",
+      "settingLabel": "Biometric unlock",
+      "settingDesc": "Face ID / fingerprint when opening the app.",
+      "enabled": "Biometric unlock enabled.",
+      "enableFailed": "Biometric authentication failed."
+    }
+  },
+  "home": {
+    "title": "Welcome to Imaro",
+    "subtitle": "Moroccan property-management platform — compliant with Law 18-00",
+    "ctaLogin": "Sign in",
+    "stackHeading": "Stack",
+    "cards": {
+      "residences": {
+        "title": "Co-ownerships",
+        "desc": "Units, shares, owners"
+      },
+      "appelsFonds": {
+        "title": "Funds calls",
+        "desc": "Auto calculation by share + reminders"
+      },
+      "loi": {
+        "title": "Law 18-00",
+        "desc": "Compliant PDFs & multi-tenant"
+      }
+    },
+    "nav": {
+      "gestionnaire": "Manager",
+      "coproprietaire": "Owner"
+    },
+    "hero": {
+      "headline1": "Property",
+      "headline2": "management reinvented",
+      "sub": "All-in-one platform for Moroccan syndics and owners — Law 18-00 compliant.",
+      "ctaGestionnaire": "Manager access",
+      "ctaCoproprietaire": "Owner access",
+      "badge": "Law 18-00 ✓"
+    },
+    "stats": {
+      "residences": "Co-ownerships",
+      "coproprietaires": "Owners",
+      "dispo": "Uptime",
+      "loi": "Law 18-00 compliant"
+    },
+    "features": {
+      "title": "Everything you need",
+      "sub": "A complete solution for modern property management",
+      "residences": {
+        "title": "Building management",
+        "desc": "Units, shares and owners centralized"
+      },
+      "appels": {
+        "title": "Automated funds calls",
+        "desc": "Calculation by share, instant WhatsApp delivery"
+      },
+      "paiements": {
+        "title": "Payment tracking",
+        "desc": "Full history and unpaid amounts in real time"
+      },
+      "tickets": {
+        "title": "Tickets & complaints",
+        "desc": "Handling with photos and status tracking"
+      },
+      "assemblees": {
+        "title": "General meetings",
+        "desc": "Notices, agendas and minutes"
+      },
+      "portail": {
+        "title": "Owner portal",
+        "desc": "Mobile app for every resident"
+      }
+    },
+    "howItWorks": {
+      "title": "Up and running in 3 steps",
+      "sub": "Get started in minutes, no technical training",
+      "step1": {
+        "title": "Create your building",
+        "desc": "Add your units, shares and owners in a few clicks"
+      },
+      "step2": {
+        "title": "Invite your owners",
+        "desc": "They get WhatsApp access to their personal portal"
+      },
+      "step3": {
+        "title": "Manage in real time",
+        "desc": "Dashboard, automatic reminders, instant reports"
+      }
+    },
+    "portals": {
+      "gestionnaire": {
+        "title": "Manager space",
+        "desc": "Manage your portfolio of buildings from a unified dashboard.",
+        "cta": "Manager access →"
+      },
+      "coproprietaire": {
+        "title": "Owner space",
+        "desc": "View your charges, pay online and report issues.",
+        "cta": "Owner access →"
+      }
+    },
+    "footer": {
+      "tagline": "Property management made simple for Morocco",
+      "legal": "Law 18-00 compliant · Morocco",
+      "copyright": "© 2026 Imaro. All rights reserved."
+    }
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "ia": "AI",
+      "conformite": "Compliance",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "login": "Log in",
+      "cta": "Request a demo"
+    },
+    "hero": {
+      "eyebrow": "Decree 2.23.700 · 100% compliant",
+      "title1": "Property management,",
+      "title2": "simplified.",
+      "subtitle": "Imaro brings accounting, compliance, collection and AI together in a single platform — designed for the Moroccan market.",
+      "ctaPrimary": "Try for free",
+      "ctaSecondary": "See the product",
+      "trust1": "Native WhatsApp OTP",
+      "trust2": "Moroccan chart of accounts",
+      "trust3": "Law 18-00 compliant",
+      "impayes": "Unpaid",
+      "tresorerie": "Cash",
+      "pointageDone": "Attijariwafa reconciliation complete"
+    },
+    "logoBar": {
+      "title": "They trust us"
+    },
+    "stats": {
+      "residences": "Buildings managed",
+      "copros": "Active owners",
+      "uptime": "Uptime",
+      "compliance": "Decree 2.23.700"
+    },
+    "features": {
+      "eyebrow": "Business modules",
+      "title": "Everything a syndic needs",
+      "subtitle": "Eight integrated modules, over 60 features, zero Excel to maintain.",
+      "learnMore": "Learn more",
+      "recouvrement": {
+        "title": "Smart collection",
+        "desc": "Managing unpaid amounts, automatic formal notices and five-year prescription alerts (Law 18-00 art. 25)."
+      },
+      "conformite": {
+        "title": "Legal compliance",
+        "desc": "Annual calendar, 12 annexes of Decree 2.23.700 generated in one click, audit log kept for 7 years."
+      },
+      "pointage": {
+        "title": "Bank reconciliation",
+        "desc": "10 Moroccan banks supported. Auto-match the bank statement with your payments and expenses in seconds."
+      },
+      "comptabilite": {
+        "title": "Double-entry accounting",
+        "desc": "Journal, ledger, trial balance, year-end close — to the standards of the Moroccan chart of accounts (CGNC)."
+      },
+      "patrimoine": {
+        "title": "Asset tracking",
+        "desc": "Amortized equipment, collective loans, major works voted at a meeting — everything is traced."
+      },
+      "ia": {
+        "title": "AI assistant",
+        "desc": "Automated compliance audit, invoice OCR, budget suggestions based on HCP inflation."
+      }
+    },
+    "modules": {
+      "eyebrow": "The complete platform",
+      "title": "The entire syndic profession, in one place",
+      "subtitle": "From the first contribution to the annual close — every operation of a professional Moroccan syndic, in a single platform.",
+      "badges": {
+        "new": "New",
+        "killer": "Popular",
+        "mobile": "Mobile"
+      },
+      "items": {
+        "comptabilite": {
+          "title": "Double-entry accounting",
+          "desc": "Journal, ledger, trial balance, balance sheet and management account to CGNC standards. Guided 4-step year-end close.",
+          "tag1": "Moroccan chart of accounts",
+          "tag2": "Annual close",
+          "tag3": "Balance sheet & trial balance"
+        },
+        "pointage": {
+          "title": "Bank reconciliation",
+          "desc": "Import the statement from 10 Moroccan banks. Auto-matching reconciles payments and expenses in seconds.",
+          "tag1": "10 banks",
+          "tag2": "Auto-matching"
+        },
+        "recouvrement": {
+          "title": "Collection & reminders",
+          "desc": "Unpaid amounts, late penalties, multichannel reminders and five-year prescription alert.",
+          "tag1": "Auto penalties",
+          "tag2": "Prescription"
+        },
+        "appels": {
+          "title": "Funds calls & budgets",
+          "desc": "Automatic monthly generation, breakdown by share, provisional budgets and reserve fund.",
+          "tag1": "By share",
+          "tag2": "Auto generation"
+        },
+        "patrimoine": {
+          "title": "Assets & contracts",
+          "desc": "Buildings, units, phases, amortized equipment, providers and contracts — all assets traced.",
+          "tag1": "Equipment",
+          "tag2": "Providers"
+        },
+        "assemblees": {
+          "title": "General meetings",
+          "desc": "Law 18-00 compliant notices, agenda, share-weighted voting and archived minutes.",
+          "tag1": "Legal notices",
+          "tag2": "Weighted voting"
+        },
+        "portail": {
+          "title": "Mobile resident portal",
+          "desc": "Installable app (PWA): charges, online payment, complaints and push notifications.",
+          "tag1": "Installable PWA",
+          "tag2": "Online payment"
+        },
+        "conformite": {
+          "title": "Decree 2.23.700 compliance",
+          "desc": "12 regulatory annexes generated in one click and an annual compliance calendar.",
+          "tag1": "12 annexes",
+          "tag2": "Calendar"
+        },
+        "documents": {
+          "title": "Documents & communication",
+          "desc": "Centralized document store, resident announcements and shared history — every file a link away.",
+          "tag1": "Document store",
+          "tag2": "Announcements"
+        },
+        "imports": {
+          "title": "Smart import",
+          "desc": "Bring over your existing data: 5 file types, automatic mapping and cross-validation.",
+          "tag1": "Excel & CSV",
+          "tag2": "Auto mapping"
+        }
+      }
+    },
+    "conformite": {
+      "eyebrow": "Legal compliance",
+      "title": "Compliant with Decree 2.23.700",
+      "subtitle": "Imaro is built around the Moroccan legal framework: Law 18-00 and Decree 2.23.700. Compliance is not an option, it's the foundation.",
+      "points": {
+        "regime": {
+          "title": "Simplified or standard regime",
+          "desc": "Imaro automatically adapts your obligations based on the 200,000 MAD annual-charges threshold."
+        },
+        "annexes": {
+          "title": "12 annexes generated",
+          "desc": "All regulatory annexes (3 to 13-2) produced as PDF, ready for the meeting and archiving."
+        },
+        "calendrier": {
+          "title": "Compliance calendar",
+          "desc": "Monthly operations, close, meeting, archiving: every legal deadline tracked and reminded."
+        }
+      },
+      "card": {
+        "title": "Compliant file",
+        "subtitle": "Decree 2.23.700 · Law 18-00",
+        "cycleLabel": "Annual cycle",
+        "annexesLabel": "Annexes generated",
+        "annexePrefix": "Annexe"
+      },
+      "phases": {
+        "operations": "Monthly operations",
+        "cloture": "Year-end close",
+        "ag": "General meeting",
+        "archivage": "Legal archiving"
+      }
+    },
+    "ia": {
+      "eyebrow": "Our differentiating moat",
+      "title": "The AI that makes your syndic smart",
+      "subtitle": "Three assistants powered by Claude that save you hours every week.",
+      "audit": {
+        "title": "Compliance audit in 30 seconds",
+        "desc": "Checks 30+ legal and operational points, produces a score and actionable findings."
+      },
+      "ocr": {
+        "title": "Smart invoice OCR",
+        "desc": "Drop a PDF or photo invoice, the AI extracts supplier, ICE, net/VAT/gross, and suggests the PCM account."
+      },
+      "budget": {
+        "title": "Data-driven budget suggestions",
+        "desc": "Analyzes your past fiscal years + HCP inflation + Lydec/Redal increases to propose the N+1 budget."
+      },
+      "report": {
+        "title": "Audit report",
+        "subtitle": "Atlas Building · 2026",
+        "status": "Good",
+        "f1": "Critical findings",
+        "f2": "Recommendations",
+        "f3": "Strengths",
+        "finding1": {
+          "title": "Penalties configured",
+          "desc": "Meeting vote not found in the minutes — check Law 18-00 art. 25 compliance"
+        },
+        "finding2": {
+          "title": "Annexes 10, 13-1, 13-2 generated",
+          "desc": "Compliance cycle up to date for the current fiscal year"
+        }
+      }
+    },
+    "pointage": {
+      "eyebrow": "Bank reconciliation",
+      "title": "Goodbye manual reconciliation",
+      "subtitle": "Connect any Moroccan bank. Imaro does the rest.",
+      "banksTitle": "Supported banks",
+      "fileSize": "32 KB · 124 transactions",
+      "benefit1": "10 Moroccan banks + generic format for the rest",
+      "benefit2": "Auto-matching on amount, date and label with fuzzy matching",
+      "benefit3": "Bulk confirmation in one click — no more hours on Excel",
+      "summary": "Auto-matched",
+      "timeGain": "saved per month on reconciliation",
+      "suggested": "Suggested"
+    },
+    "comparison": {
+      "eyebrow": "Why switch",
+      "title": "Excel & mail vs Imaro",
+      "subtitle": "For every syndic task, Imaro eliminates manual entry and errors.",
+      "colExcel": "Excel + mail",
+      "colImaro": "Imaro",
+      "row": {
+        "recouvrement": {
+          "label": "Collection",
+          "excel": "Manual spreadsheet tracking, paper letters",
+          "imaro": "Auto penalties, generated formal notices"
+        },
+        "annexes": {
+          "label": "Decree 2.23.700 annexes",
+          "excel": "Excel + Word formatting each fiscal year",
+          "imaro": "12 PDF annexes generated in one click"
+        },
+        "pointage": {
+          "label": "Bank reconciliation",
+          "excel": "2 hours per month reconciling line by line",
+          "imaro": "80% auto-match in under 10 minutes"
+        },
+        "reporting": {
+          "label": "Meeting reporting",
+          "excel": "Manual compilation of 5+ documents",
+          "imaro": "Full balance sheet + accounts generated automatically"
+        },
+        "archivage": {
+          "label": "Archiving",
+          "excel": "Paper binders in the office",
+          "imaro": "Encrypted document store + automatic 7-year retention"
+        },
+        "ia": {
+          "label": "Invoice entry",
+          "excel": "Re-type each invoice by hand",
+          "imaro": "AI OCR in 3 seconds per invoice"
+        }
+      }
+    },
+    "testimonials": {
+      "eyebrow": "Testimonials",
+      "title": "What syndics say",
+      "residences": "buildings",
+      "t1": {
+        "quote": "We grew our firm from 8 to 24 buildings without hiring. Imaro replaced 3 different tools and saved us 2 days a month on reconciliation.",
+        "name": "Hassan Alaoui",
+        "role": "Syndic Owner, Atlas Promotion"
+      },
+      "t2": {
+        "quote": "The AI audit saved me from a major non-compliance before a meeting. The report is delivered in 30 seconds, it's stunning.",
+        "name": "Salma Bennani",
+        "role": "Manager, Anfa Gestion"
+      },
+      "t3": {
+        "quote": "Our owners love the mobile portal. The unpaid rate dropped 18% in 6 months thanks to WhatsApp notifications.",
+        "name": "Karim El Fassi",
+        "role": "Syndic council, Marina Tower"
+      }
+    },
+    "pricing": {
+      "eyebrow": "Pricing",
+      "title": "Every co-ownership is unique",
+      "subtitle": "No rigid grid. Your price depends on the number of buildings, units and enabled modules — we build the offer with you.",
+      "popular": "Most chosen",
+      "from": "from",
+      "currency": "DH",
+      "perMonth": "per month, excl. tax",
+      "onQuote": "On quote",
+      "ctaStart": "Get started",
+      "ctaContact": "Contact us",
+      "features": {
+        "residences": "Unlimited buildings",
+        "copros": "Unlimited owners",
+        "support": "Email + WhatsApp support",
+        "ia": "AI assistant (audit, OCR, budget)",
+        "pointage": "Bank reconciliation 10 banks",
+        "multitenant": "Multi-tenant + teams"
+      },
+      "starter": {
+        "name": "Starter",
+        "tagline": "For small firms up to 5 buildings"
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "For growing firms"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "tagline": "For large portfolios and real-estate groups"
+      },
+      "cardEyebrow": "Custom offer",
+      "cardPrice": "On quote",
+      "cardDesc": "A single plan: yours. All features, tailored to the size of your firm.",
+      "includedTitle": "Included in every offer",
+      "included1": "All business & accounting modules",
+      "included2": "Full Decree 2.23.700 compliance",
+      "included3": "AI assistant — audit, OCR, budget",
+      "included4": "Unlimited resident portal (FR + AR)",
+      "included5": "Onboarding & migration of your data",
+      "included6": "Dedicated WhatsApp support",
+      "ctaQuote": "Request a quote",
+      "ctaExpert": "Talk to an expert",
+      "note": "No commitment · 14-day free trial"
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Your questions, our answers",
+      "subtitle": "If yours isn't listed, write to us at support@imaro.ma.",
+      "q1": {
+        "question": "Is Imaro compliant with Decree 2.23.700 and Law 18-00?",
+        "answer": "Yes — fully. The 12 mandatory annexes can be generated as signed PDFs. The compliance calendar follows the annual cycle automatically. The audit log is kept for 7 years as required by article 12."
+      },
+      "q2": {
+        "question": "How much does Imaro cost for my firm?",
+        "answer": "Pricing by tiers of managed units. Starter plan from 299 DH/month, Pro at 599 DH/month, Enterprise on quote. No setup fees, no annual commitment — no constraints."
+      },
+      "q3": {
+        "question": "Is my data secure?",
+        "answer": "Strict multi-tenant: your firm is fully isolated. No other syndic can see your data. EU hosting with daily backups. The AI processes data via Claude (Anthropic) without storing it or using it to train the models."
+      },
+      "q4": {
+        "question": "How long does migration from Excel take?",
+        "answer": "Less than 30 minutes for an average co-ownership. The import wizard accepts your existing Excel files, auto-maps the columns and validates each row before import. You keep all your history."
+      },
+      "q5": {
+        "question": "Is the resident portal really used by owners?",
+        "answer": "Yes — average activation rate of 78% in our client firms. Login by WhatsApp OTP (no password to remember), mobile-first interface 16 px minimum. WhatsApp notifications keep the resident informed in real time."
+      },
+      "q6": {
+        "question": "What if I speak Arabic?",
+        "answer": "The interface fully switches to Arabic with RTL (right-to-left) layout in one click. All modules are translated. The PDF annexes remain in French (the official language of the Moroccan administration)."
+      }
+    },
+    "cta": {
+      "eyebrow": "Ready to move to modern property management?",
+      "title": "Imaro is waiting for you.",
+      "subtitle": "Try it free for 14 days. No commitment, no credit card required.",
+      "primary": "Start the free trial",
+      "secondary": "Talk to an expert",
+      "fineprint": "Setup in under 30 minutes · Migration from Excel offered"
+    },
+    "footer": {
+      "tagline": "The co-ownership management platform designed for Morocco.",
+      "address": "Casablanca, Morocco",
+      "copyright": "© 2026 Imaro. All rights reserved.",
+      "compliance": "✓ Decree 2.23.700 compliant",
+      "maroc": "🇲🇦 Made in Morocco",
+      "col": {
+        "product": "Product",
+        "company": "Company",
+        "resources": "Resources",
+        "legal": "Legal"
+      },
+      "link": {
+        "features": "Features",
+        "pricing": "Pricing",
+        "ia": "AI assistant",
+        "security": "Security",
+        "about": "About",
+        "careers": "Careers",
+        "contact": "Contact",
+        "blog": "Blog",
+        "docs": "Documentation",
+        "manual": "User manual",
+        "help": "Help center",
+        "status": "Status",
+        "terms": "Terms of service",
+        "privacy": "Privacy",
+        "compliance": "Compliance",
+        "cookies": "Cookies"
+      }
+    }
+  },
+  "equipe": {
+    "optional": "optional",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "actions": {
+      "menu": "More options",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "permissions": {
+      "residences": "Buildings",
+      "coproprietaires": "Owners",
+      "finances": "Finances & payments",
+      "depenses": "Expenses",
+      "recouvrement": "Collection",
+      "assemblees": "Meetings",
+      "documents": "Documents",
+      "personnel": "Staff",
+      "parametres": "Settings"
+    },
+    "staffPerm": {
+      "acces_residence": "Building access",
+      "gestion_visiteurs": "Visitor management",
+      "pointage": "Attendance",
+      "incidents": "Incident reporting",
+      "cles": "Key management",
+      "livraisons": "Receiving deliveries"
+    },
+    "utilisateurs": {
+      "title": "Users",
+      "subtitle": "Members who run the app: syndic, accountant, manager…",
+      "add": "New user",
+      "searchPlaceholder": "Search a user…",
+      "empty": "No user",
+      "emptyDesc": "Add the members who operate Imaro with their permissions.",
+      "createTitle": "New user",
+      "editTitle": "Edit user",
+      "formDesc": "Enter the email, generate a password and grant permissions.",
+      "deleteTitle": "Delete user?",
+      "deleteDesc": "This action is irreversible. The user",
+      "toggleAria": "Enable or disable the user",
+      "allAccess": "Full access",
+      "nbPermissions": "{{count}} permission",
+      "nbPermissions_other": "{{count}} permissions",
+      "allResidences": "All",
+      "nbResidences": "{{count}} building",
+      "nbResidences_other": "{{count}} buildings",
+      "role": {
+        "administrateur": "Administrator",
+        "gestionnaire": "Manager",
+        "assistant": "Assistant",
+        "comptable": "Accountant"
+      },
+      "col": {
+        "name": "User",
+        "role": "Role",
+        "residences": "Buildings",
+        "permissions": "Permissions",
+        "status": "Status"
+      },
+      "form": {
+        "name": "Full name",
+        "namePh": "Hassan Alaoui",
+        "email": "Email",
+        "role": "Role",
+        "password": "Password",
+        "resetPassword": "Reset password",
+        "passwordKeep": "Leave empty to keep the current one",
+        "passwordHint": "Auto-generated password — share it with the user.",
+        "regenerate": "Regenerate",
+        "copy": "Copy",
+        "residences": "Managed buildings",
+        "residencesHint": "No selection = all buildings.",
+        "noResidences": "No building available.",
+        "permissions": "Granted permissions"
+      },
+      "toast": {
+        "created": "User created",
+        "createFailed": "Creation failed",
+        "updated": "User updated",
+        "updateFailed": "Update failed",
+        "deleted": "User deleted",
+        "deleteFailed": "Deletion failed",
+        "toggled": "Status updated",
+        "toggleFailed": "Status change failed",
+        "copyFailed": "Could not copy"
+      }
+    },
+    "personnel": {
+      "title": "Staff",
+      "subtitle": "Field staff assigned to buildings: security, cleaning, guarding…",
+      "add": "New staff",
+      "searchPlaceholder": "Search a staff member…",
+      "empty": "No staff",
+      "emptyDesc": "Add field staff and assign them to a building.",
+      "createTitle": "New staff",
+      "editTitle": "Edit staff",
+      "formDesc": "Assign the member to a building and grant their permissions.",
+      "deleteTitle": "Delete this member?",
+      "deleteDesc": "This action is irreversible. The member",
+      "toggleAria": "Enable or disable the member",
+      "nbPermissions": "{{count}} permission",
+      "nbPermissions_other": "{{count}} permissions",
+      "poste": {
+        "securite": "Security guard",
+        "menage": "Cleaner",
+        "gardien": "Caretaker",
+        "jardinier": "Gardener",
+        "technicien": "Technician",
+        "concierge": "Concierge"
+      },
+      "col": {
+        "name": "Name",
+        "poste": "Position",
+        "residence": "Building",
+        "contact": "Contact",
+        "permissions": "Permissions",
+        "status": "Status"
+      },
+      "form": {
+        "name": "Full name",
+        "namePh": "Mohammed Ouahbi",
+        "poste": "Position",
+        "residence": "Assigned building",
+        "residencePh": "Choose a building",
+        "phone": "Phone",
+        "permissions": "Granted permissions",
+        "phoneHint": "The access code will be generated and sent to this number via WhatsApp / SMS."
+      },
+      "toast": {
+        "created": "Staff added",
+        "createFailed": "Add failed",
+        "updated": "Staff updated",
+        "updateFailed": "Update failed",
+        "deleted": "Staff deleted",
+        "deleteFailed": "Deletion failed",
+        "toggled": "Status updated",
+        "toggleFailed": "Status change failed"
+      },
+      "credentialsSent": {
+        "title": "Credentials sent",
+        "desc": "{{name}}'s account was created and the access code was sent to them.",
+        "sentVia": "Code sent via WhatsApp / SMS to {{phone}}.",
+        "codeLabel": "Code preview",
+        "note": "The full code is never shown. The staff member receives it directly and must change it on first login."
+      }
+    }
+  },
+  "gestionnaire": {
+    "pointage": {
+      "title": "Bank reconciliation",
+      "subtitle": "Automatic reconciliation of the bank statement with your payments and expenses",
+      "declaredBadge": "Declared by resident",
+      "matchConfirmed": "Reconciliation confirmed",
+      "declaredConfirmed": "Resident payment validated — money confirmed received",
+      "declaredError": "Could not validate the declared payment",
+      "allConfirmed": "{{count}} reconciliations confirmed",
+      "toastMatchRejected": "Match rejected — line marked unreconciled",
+      "colLibelleBancaire": "Bank label",
+      "newPointage": "New reconciliation",
+      "dropHint": "Drop your statement here, or click to browse",
+      "formatsHint": "Accepted formats: .csv, .xlsx, .xls — max size 10 MB",
+      "supportedBanks": "Supported banks",
+      "noLineFilter": "No line for this filter.",
+      "confirmed": "Confirmed",
+      "noMatch": "Unreconciled",
+      "credits": "Credits",
+      "debits": "Debits",
+      "autoMatched": "Auto-matched",
+      "toCheck": "To review",
+      "confirmMatch": "Confirm match",
+      "rejectMatch": "Reject match",
+      "autoMatchedCount": "Auto-matched ({{n}})",
+      "parseError": "Parsing error",
+      "importedMsg": "{{total}} lines imported. {{auto}} auto-matched.",
+      "demoLoaded": "Demo loaded: {{n}} Attijariwafa lines",
+      "demo": "Demo",
+      "bankSource": "Source bank",
+      "confirmAll": "Confirm all",
+      "uploadHint": "Import the bank statement as CSV or Excel exported from your online banking space. Imaro automatically detects the columns (date, label, debit, credit).",
+      "chooseFile": "Choose a file",
+      "demoBanner": "No file at hand? Load the demo set (Attijariwafa statement with 10 lines for Atlas building)"
+    },
+    "cmdk": {
+      "title": "Quick search",
+      "description": "Type to find a page, run an action or look up an owner",
+      "placeholder": "Search pages, actions, data…",
+      "empty": "No result. Try another keyword.",
+      "trigger": "Quick search",
+      "navHeading": "Navigation",
+      "actionsHeading": "Quick actions",
+      "newTicket": "Create a ticket",
+      "recordPayment": "Record a payment",
+      "runAudit": "Run the AI audit",
+      "generateAnnexe": "Generate an annexe",
+      "import": "Import data"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "ia": "AI Assistant",
+      "sectionCopropriete": "Co-ownership",
+      "residences": "Buildings",
+      "coproprietaires": "Owners",
+      "occupants": "Occupants",
+      "prestataires": "Providers",
+      "sectionFinances": "Finances",
+      "appelsFonds": "Funds calls",
+      "paiements": "Payments",
+      "depenses": "Expenses",
+      "budgets": "Budgets",
+      "comptabilite": "Accounting",
+      "sectionOperations": "Operations",
+      "tickets": "Tickets",
+      "assemblees": "Meetings",
+      "annonces": "Announcements",
+      "documents": "Documents",
+      "profil": "My Profile",
+      "imports": "Data import",
+      "recouvrement": "Collection",
+      "assistanceRecouvrement": "Collection assistance",
+      "badgePro": "Pro",
+      "pointage": "Bank reconciliation",
+      "autresRecettes": "Other income",
+      "remboursements": "Refunds",
+      "sectionPatrimoine": "Assets",
+      "equipements": "Equipment",
+      "emprunts": "Loans",
+      "travauxExceptionnels": "Major works",
+      "sectionConformite": "Compliance",
+      "conformite": "Compliance calendar",
+      "annexes": "Accounting annexes",
+      "audit": "Audit log",
+      "sectionAdministration": "Administration",
+      "utilisateurs": "Users",
+      "personnel": "Staff",
+      "rappels": "Reminders",
+      "visites": "Visits"
+    },
+    "residenceSwitcher": {
+      "all": "All buildings",
+      "aria": "Filter by building"
+    },
+    "assistanceRecouvrement": {
+      "breadcrumb": "Finances",
+      "title": "Collection assistance",
+      "subtitle": "Delegate the collection of your unpaid amounts to our team, from funds calls all the way to court.",
+      "hero": {
+        "eyebrow": "Optional paid service",
+        "title": "Entrust your collection to experts, in full compliance with law 18-00",
+        "desc": "Complete and structured support from amicable collection through to legal action. Ideal when you have no dedicated team to handle unpaid amounts and legal procedures.",
+        "target1": "Volunteer syndics",
+        "target2": "New management companies",
+        "cta": "Request assistance"
+      },
+      "legal": {
+        "title": "The legal steps of collection (law 18-00)",
+        "subtitle": "A rigorous and compliant procedure, which can go all the way to the court of first instance."
+      },
+      "steps": {
+        "appel": {
+          "title": "Funds call",
+          "desc": "Issuing and notifying funds calls to owners, with compliant supporting documents."
+        },
+        "relance": {
+          "title": "Amicable reminder",
+          "desc": "Graduated reminders by SMS, WhatsApp and email to obtain an amicable settlement."
+        },
+        "miseEnDemeure": {
+          "title": "Formal notice",
+          "desc": "Sending an official formal notice by registered letter with acknowledgment of receipt."
+        },
+        "injonction": {
+          "title": "Payment order",
+          "desc": "Building and filing the payment order file with the competent jurisdiction."
+        },
+        "tribunal": {
+          "title": "Court of first instance",
+          "desc": "Representation and follow-up of the legal procedure through to judgment, with our network of lawyers."
+        },
+        "execution": {
+          "title": "Enforcement of the judgment",
+          "desc": "Implementing enforcement measures for the effective recovery of the sums due."
+        }
+      },
+      "plans": {
+        "title": "Subscription plans",
+        "subtitle": "Choose the level of support suited to your co-ownership.",
+        "popular": "Recommended",
+        "selected": "Selected plan",
+        "choose": "Choose this plan",
+        "essentiel": {
+          "name": "Essential",
+          "price": "From 490 DH / month",
+          "desc": "Amicable collection handled for you, up to the formal notice.",
+          "features": [
+            "Automated funds calls and reminders",
+            "Multichannel reminders (SMS, WhatsApp, email)",
+            "Official formal notice",
+            "Monthly tracking of unpaid amounts"
+          ]
+        },
+        "complet": {
+          "name": "Complete",
+          "price": "From 990 DH / month",
+          "desc": "Amicable and legal, up to the payment order.",
+          "features": [
+            "Everything in the Essential plan",
+            "Building the legal file",
+            "Payment order",
+            "Network of partner lawyers",
+            "Structured tracking dashboard"
+          ]
+        },
+        "sur_mesure": {
+          "name": "Custom",
+          "price": "On quote",
+          "desc": "Full support through to court and enforcement of the judgment.",
+          "features": [
+            "Everything in the Complete plan",
+            "Representation at the court of first instance",
+            "Enforcement of the judgment",
+            "Dedicated legal contact"
+          ]
+        }
+      },
+      "form": {
+        "title": "Request collection assistance",
+        "subtitle": "Fill in this form: our team will get back to you within 48 h to frame the subscription.",
+        "syndicName": "Syndic / company name",
+        "contactName": "Contact person",
+        "contactPhone": "Phone",
+        "contactEmail": "Email",
+        "residencesCount": "Number of buildings",
+        "residencesPlaceholder": "e.g. 3",
+        "impayesEstimate": "Estimated amount of unpaid",
+        "impayesPlaceholder": "e.g. 120,000 DH",
+        "plan": "Desired plan",
+        "message": "Details about your situation",
+        "messagePlaceholder": "Briefly describe your need (number of owners involved, age of the unpaid amounts, procedures already started…).",
+        "submit": "Send the request",
+        "submitting": "Sending…",
+        "mailtoHint": "Or contact us directly at",
+        "disclaimer": "All procedures are conducted in strict compliance with law 18-00 on the status of co-ownership. Collection can go as far as legal action before the court of first instance."
+      },
+      "success": {
+        "title": "Request sent to the Imaro team",
+        "desc": "Your collection assistance request has been successfully submitted. Our IT team will get back to you within 48 h to finalize the subscription and start the procedure.",
+        "reference": "Reference",
+        "newRequest": "New request",
+        "mailtoFallback": "Email us"
+      },
+      "mailto": {
+        "subject": "Collection assistance request — {{syndic}}"
+      },
+      "toast": {
+        "success": "Request sent. Our team will get back to you within 48 h.",
+        "error": "Sending failed. Try again or email us."
+      }
+    },
+    "residences": {
+      "title": "Buildings",
+      "subtitle": "All managed co-ownerships",
+      "searchPlaceholder": "Search by name, address or city…",
+      "colNom": "Name",
+      "colAdresse": "Address",
+      "colVille": "City",
+      "colLots": "Units",
+      "colRecouvrement": "Collection",
+      "add": "Add a building",
+      "allCities": "All cities",
+      "sortName": "Sort by name",
+      "sortLots": "Sort by units",
+      "sortRecouvrement": "Sort by collection",
+      "noMatch": "No building matches your search.",
+      "manage": "Manage",
+      "statusActif": "Active",
+      "statusInactif": "Inactive",
+      "deleteTitle": "Delete building",
+      "deleteDesc": "Building « {{name}} » and all its data will be permanently deleted.",
+      "empty": "No building",
+      "emptyDesc": "Your account does not manage any building yet.",
+      "toast": {
+        "created": "Building created",
+        "createError": "Error creating the building",
+        "updated": "Building updated",
+        "updateError": "Error during update",
+        "deleted": "Building deleted",
+        "deleteError": "Error during deletion"
+      },
+      "form": {
+        "createTitle": "New building",
+        "editTitle": "Edit building",
+        "subtitle": "Fill in the co-ownership details.",
+        "name": "Name",
+        "namePlaceholder": "e.g. Al Boustane Building",
+        "address": "Address",
+        "addressPlaceholder": "e.g. 12 Orangers Street",
+        "city": "City",
+        "cityPlaceholder": "e.g. Casablanca",
+        "jourEcheance": "Due day",
+        "modeCotisation": "Contribution mode",
+        "modeTantieme": "By share",
+        "modeFixe": "Fixed amount",
+        "montantFixe": "Fixed amount (DH)",
+        "createSubmit": "Create building"
+      },
+      "toastLotAdded": "Unit added",
+      "toastLotUpdated": "Unit updated",
+      "toastLotDeleted": "Unit deleted",
+      "noLotInImmeuble": "No unit in this building",
+      "addLotsHint": "Add units one by one or generate several",
+      "generateLots": "Generate units",
+      "addLotError": "Error adding the unit",
+      "modifyError": "Error during update",
+      "delete": {
+        "intro": "Deleting a building is permanent and erases its units, owners and entries. For security reasons, a validation code will be sent to you.",
+        "sendCode": "Send the code",
+        "codeSent": "Validation code sent",
+        "codeError": "Failed to send the code",
+        "sentVia": {
+          "email": "A code has been sent to your email address.",
+          "sms": "A code has been sent by SMS to your phone."
+        },
+        "codeLabel": "Validation code",
+        "resend": "Resend the code",
+        "confirmDelete": "Delete permanently",
+        "wrongCode": "Invalid or expired code"
+      }
+    },
+    "residence": {
+      "tabOverview": "Overview",
+      "tabLots": "Units",
+      "tabCoproprietaires": "Owners",
+      "tabExercices": "Fiscal years",
+      "tabImmeubles": "Buildings",
+      "tabTranches": "Phases",
+      "tabEncaissement": "Collection",
+      "tranches": {
+        "add": "Add a phase",
+        "edit": "Edit the phase",
+        "delete": "Delete the phase",
+        "deleteDesc": "Delete phase « {{nom}} »? The attached buildings will no longer be linked to any phase.",
+        "colNom": "Phase name",
+        "colCode": "Code",
+        "colNbImmeubles": "No. of buildings",
+        "colTranche": "Phase",
+        "nomPlaceholder": "e.g. Phase A",
+        "codePlaceholder": "e.g. PA",
+        "codeOptional": "optional",
+        "noneOption": "No phase",
+        "emptyTitle": "No phase defined",
+        "emptyDesc": "Phases (housing groups) are used for large multi-building co-ownerships where each phase has its own budget and its own funds calls. Optional — leave empty if your co-ownership is unified.",
+        "added": "Phase added",
+        "addError": "Error adding the phase",
+        "updated": "Phase updated",
+        "updateError": "Error updating the phase",
+        "deleted": "Phase deleted",
+        "deleteError": "Error deleting the phase"
+      },
+      "encaissement": {
+        "intro": "The bank accounts on which owners pay their contributions.",
+        "add": "Add an account",
+        "emptyTitle": "No bank account",
+        "emptyDesc": "Add an account to let owners pay by transfer.",
+        "primaryBadge": "Primary",
+        "setPrimary": "Set primary",
+        "showQr": "Show the payment QR",
+        "copy": "Copy the RIB",
+        "copied": "RIB copied",
+        "copyError": "Could not copy the RIB",
+        "createTitle": "Add a bank account",
+        "editTitle": "Edit the bank account",
+        "subtitle": "Fill in the co-ownership's bank details.",
+        "banque": "Bank",
+        "titulaire": "Account holder",
+        "titulairePlaceholder": "Al Andalous Building Syndic",
+        "rib": "RIB (24 digits)",
+        "iban": "IBAN (optional)",
+        "isPrimary": "Primary account for collections",
+        "createSubmit": "Add the account",
+        "qrTitle": "Payment QR",
+        "deleteTitle": "Delete the account",
+        "deleteDesc": "Delete the {{banque}} account? This action is irreversible.",
+        "toast": {
+          "created": "Bank account added",
+          "updated": "Bank account updated",
+          "deleted": "Bank account deleted",
+          "primarySet": "Primary account set",
+          "error": "An error occurred"
+        }
+      },
+      "generateLots": "Generate units",
+      "lotsCount_one": "{{count}} unit",
+      "lotsCount_other": "{{count}} units",
+      "echeanceChip": "Due on the {{day}}",
+      "checklist": {
+        "title": "Set up your co-ownership",
+        "subtitle": "A few steps to start managing.",
+        "progress": "{{done}}/{{total}}",
+        "immeuble": "Add a building",
+        "lots": "Add units",
+        "coproprietaires": "Assign owners",
+        "cotisation": "Set the contribution mode"
+      },
+      "overview": {
+        "kpiLots": "Units",
+        "kpiCopros": "Owners",
+        "kpiRecouvrement": "Collection",
+        "kpiTresorerie": "Cash",
+        "paymentsTitle": "Payments",
+        "payeCeMois": "Paid this month",
+        "enAttente": "Pending",
+        "enRetard": "Overdue",
+        "nbImpayes": "Units in arrears",
+        "treasuryTitle": "Cash",
+        "tresorerie": "Current balance",
+        "fondsReserve": "Reserve fund",
+        "viewCopros": "View the owners"
+      },
+      "immeubles": {
+        "add": "Add a building",
+        "edit": "Edit the building",
+        "delete": "Delete the building",
+        "deleteDesc": "Delete building « {{nom}} »?",
+        "colNom": "Name",
+        "colNbLots": "No. of units",
+        "nomPlaceholder": "e.g. Building A",
+        "added": "Building added",
+        "addError": "Error adding the building",
+        "updated": "Building updated",
+        "updateError": "Error updating the building",
+        "deleted": "Building deleted",
+        "deleteError": "Error deleting the building"
+      },
+      "lots": {
+        "immeuble": "Building",
+        "selectImmeuble": "Select a building"
+      },
+      "colNumero": "No.",
+      "colType": "Type",
+      "colEtage": "Floor",
+      "colSuperficie": "Area",
+      "colTantieme": "Share",
+      "colProprietaire": "Owner",
+      "colNom": "Name",
+      "colTelephone": "Phone",
+      "colSolde": "Balance",
+      "colAnnee": "Year",
+      "colStatut": "Status",
+      "addLot": "Add a unit",
+      "editLot": "Edit the unit",
+      "deleteLot": "Delete the unit",
+      "deleteLotDesc": "Unit {{numero}} will be permanently deleted.",
+      "addExercice": "New fiscal year",
+      "lotTypes": {
+        "appartement": "Apartment",
+        "commerce": "Shop",
+        "parking": "Parking",
+        "cave": "Storage",
+        "bureau": "Office",
+        "autre": "Other"
+      },
+      "exerciceStatut": {
+        "actif": "Active",
+        "cloture": "Closed"
+      },
+      "totalTantieme": "Total shares: {{val}} / 1000",
+      "backToList": "Buildings"
+    },
+    "coproprietaires": {
+      "title": "Owners",
+      "subtitle": "Select a building to display its owners",
+      "selectResidence": "Choose a building",
+      "allResidences": "All buildings",
+      "colNom": "Name",
+      "colTelephone": "Phone",
+      "colLot": "Unit",
+      "colSolde": "Balance",
+      "colResidence": "Building",
+      "empty": "No owner",
+      "emptyDesc": "Select a building above to display its owners.",
+      "addCopro": "Add an owner",
+      "dialogDesc": "This will create a new owner and generate an account for them to access their space.",
+      "createAccountError": "Error creating the account",
+      "selectResidencePlaceholder": "Select a building...",
+      "lotSelectFirst": "Select a building first",
+      "noLotAvailable": "No unit available",
+      "selectLot": "Select a unit...",
+      "fullNamePlaceholder": "Full name",
+      "emailOptional": "Email (optional)",
+      "creating": "Creating…",
+      "createCopro": "Create owner",
+      "lotCreatedAssigned": "Unit {{numero}} created and assigned to {{name}}",
+      "createLotError": "Error creating the unit",
+      "lotNumeroExists": "This lot number already exists in this residence. Each number must be unique.",
+      "createLotTitle": "Create a unit",
+      "lotAssignDescPre": "This unit will be automatically assigned to ",
+      "creatingShort": "Creating…",
+      "createAssignLot": "Create and assign the unit",
+      "codeCopied": "Code copied!",
+      "ownerCreated": "Owner created!",
+      "createdSuccess": "The owner was created successfully.",
+      "accessCode": "Access code:",
+      "copyCodeAria": "Copy the code",
+      "codeAutoSent": "The access code was automatically sent to the owner by SMS, WhatsApp and email. The code above remains shown as a backup, in case you need to communicate it verbally.",
+      "createLotPrompt": "Would you like to create a unit for this new owner?",
+      "yesCreateLot": "Yes, create a unit",
+      "noFinish": "No, finish",
+      "lotType": {
+        "appartement": "Apartment",
+        "commerce": "Shop",
+        "parking": "Parking",
+        "cave": "Storage"
+      },
+      "editTitle": "Edit owner",
+      "editDesc": "Correct the owner's name, phone or email.",
+      "editSuccess": "Owner updated"
+    },
+    "appelsFonds": {
+      "title": "Funds calls",
+      "subtitle": "Manage funds calls and track collection",
+      "newAppel": "New call",
+      "colTitre": "Title",
+      "colResidence": "Building",
+      "colMontant": "Total amount",
+      "colRecouvre": "Collected",
+      "colEcheance": "Due date",
+      "colStatut": "Status",
+      "colActions": "Actions",
+      "statut": {
+        "brouillon": "Draft",
+        "publie": "Published",
+        "cloture": "Closed"
+      },
+      "envoyer": "Send",
+      "envoyerConfirm": "Send the funds call to the owners?",
+      "envoyerDesc": "This action will send a WhatsApp notification to all owners.",
+      "envoyerSuccess": "Funds call sent",
+      "form": {
+        "titre": "Title",
+        "residence": "Building",
+        "montant": "Total amount (DH)",
+        "echeance": "Due date",
+        "description": "Description (optional)"
+      },
+      "empty": "No funds call",
+      "emptyDesc": "Create your first funds call.",
+      "toastCreated": "Funds call created",
+      "toastSent": "Funds call sent",
+      "createTitle": "Create a funds call",
+      "allTranches": "All tranches",
+      "calcRepartition": "Calculating the breakdown…",
+      "sendError": "Error while sending"
+    },
+    "paiements": {
+      "title": "Payment tracking",
+      "tabs": {
+        "creances": "Receivables",
+        "appels": "Funds calls",
+        "historique": "History",
+        "decomptes": "Statements",
+        "virements": "Transfers"
+      },
+      "creances": {
+        "enRetard": "overdue",
+        "aPayer": "to pay",
+        "tauxRecouvrement": "Collection rate",
+        "relancerTout": "Remind all unpaid",
+        "relanceSuccess": "Reminder sent",
+        "statuts": {
+          "a_payer": "To pay",
+          "en_retard": "Overdue",
+          "paye": "Paid",
+          "partiellement_paye": "Partial",
+          "annulee": "Cancelled"
+        },
+        "colCreance": "Owner",
+        "colSolde": "Balance",
+        "colEcheance": "Due date",
+        "colAnciennete": "Age",
+        "colRelance": "Last reminder",
+        "jourRetard": "days overdue"
+      },
+      "encaisser": "Collect",
+      "avance": {
+        "title": "Advance payment",
+        "info": "This payment will be automatically allocated to the next funds calls",
+        "success": "Advance payment recorded"
+      },
+      "virements": {
+        "title": "Declared transfers",
+        "valider": "Validate",
+        "rejeter": "Reject",
+        "motif": "Reason for rejection",
+        "valideSuccess": "Transfer validated",
+        "rejeteSuccess": "Transfer rejected",
+        "methode": "Method",
+        "justificatif": "Proof",
+        "voir": "View",
+        "openProof": "Open",
+        "previewUnavailable": "Preview unavailable",
+        "methodes": {
+          "virement": "Bank transfer",
+          "versement": "Deposit",
+          "cheque": "Cheque",
+          "especes": "Cash"
+        },
+        "statuts": {
+          "en_attente": "Pending",
+          "valide": "Validated",
+          "rejete": "Rejected"
+        }
+      },
+      "decompte": {
+        "title": "Individual statement",
+        "recherche": "Search an owner",
+        "generer": "Generate",
+        "exporter": "Export PDF",
+        "totalAppele": "Total called",
+        "totalPaye": "Total paid",
+        "solde": "Balance"
+      },
+      "repartitionTantieme": "Breakdown by share",
+      "notePlaceholder": "e.g. Incorrect reference...",
+      "searchPlaceholder": "Search owner or unit...",
+      "allMethods": "All methods",
+      "relanceAll": "Remind all unpaid",
+      "dueDate": "Due date",
+      "createAppel": "Create funds call",
+      "noCreance": "No receivable to collect",
+      "allStatuses": "All statuses",
+      "calcRepartition": "Calculating the breakdown…",
+      "sendAppelTitle": "Send the funds call",
+      "sendAppelDesc": "This action will send a WhatsApp notification to all owners.",
+      "saveError": "Error while saving",
+      "relancesSent": "{{n}} reminder(s) sent",
+      "noAppel": "No funds call",
+      "noEncaissement": "No collection",
+      "titrePlaceholder": "Q2 2026 charges",
+      "justificatifPlaceholder": "proof",
+      "envoyer": "Send",
+      "colLot": "Unit",
+      "encaisserPaiement": "Record a payment",
+      "envoyerRappels": "Send reminders",
+      "decompteEmpty": "Enter a name and click Generate to display the individual statement"
+    },
+    "tickets": {
+      "title": "Tickets",
+      "subtitle": "Tracking complaints and interventions",
+      "colRef": "Reference",
+      "colTitre": "Description",
+      "colResidence": "Building",
+      "colPriorite": "Priority",
+      "colStatut": "Status",
+      "colDate": "Date",
+      "colActions": "Actions",
+      "filterAll": "All",
+      "filterStatut": "Status",
+      "filterPriorite": "Priority",
+      "statut": {
+        "ouvert": "Open",
+        "en_cours": "In progress",
+        "resolu": "Resolved",
+        "clos": "Closed"
+      },
+      "priorite": {
+        "urgent": "Urgent",
+        "normal": "Normal",
+        "faible": "Low"
+      },
+      "detail": "Ticket detail",
+      "closeTicket": "Close the ticket",
+      "closeConfirm": "Permanently close this ticket?",
+      "closeDesc": "This action is irreversible. The ticket will move to 'Closed' status.",
+      "closeSuccess": "Ticket closed",
+      "updateSuccess": "Ticket updated",
+      "images": "Photos",
+      "noImages": "No photo",
+      "empty": "No ticket",
+      "emptyDesc": "No ticket matches the selected filters.",
+      "viewKanban": "Kanban",
+      "viewTable": "Table",
+      "toastClotureError": "Error while closing",
+      "create": "New ticket",
+      "createSuccess": "Ticket created — {{ref}}",
+      "form": {
+        "lot": "Unit",
+        "selectLot": "Unit",
+        "categorie": "Category",
+        "descPlaceholder": "Describe the problem…"
+      },
+      "audit": {
+        "tab": "Audit by building",
+        "title": "Complaints by building",
+        "subtitle": "Ticket volume by building — from most to least solicited.",
+        "total": "Total",
+        "most": "Most",
+        "least": "Least"
+      }
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "greeting": {
+        "morning": "Good morning",
+        "morningWithName": "Good morning, {{name}}",
+        "afternoon": "Good afternoon",
+        "afternoonWithName": "Good afternoon, {{name}}",
+        "evening": "Good evening",
+        "eveningWithName": "Good evening, {{name}}"
+      },
+      "residencesSg": "building",
+      "residencesPl": "buildings",
+      "actionsSg": "urgent action",
+      "actionsPl": "urgent actions",
+      "filterAll": "All buildings",
+      "kpi": {
+        "residences": "Buildings",
+        "coproprietaires": "Owners",
+        "caMensuel": "Collected this month",
+        "impayes": "Total unpaid"
+      },
+      "chart": {
+        "title": "Monthly collection",
+        "recouvre": "Collected",
+        "restant": "Remaining"
+      },
+      "topImpayes": {
+        "title": "Top unpaid",
+        "jours": "{{n}}d"
+      },
+      "ticketsUrgents": {
+        "title": "Urgent tickets",
+        "empty": "No urgent ticket"
+      },
+      "assemblees": {
+        "title": "Upcoming meetings",
+        "empty": "No meeting scheduled"
+      },
+      "actions": {
+        "title": "Quick actions",
+        "appelFonds": "Create funds call",
+        "paiement": "Record a payment",
+        "ticket": "New ticket",
+        "ag": "Convene a meeting",
+        "soon": "Coming soon"
+      },
+      "iaSubtitle": "Compliance audit · Invoice OCR · Budget suggestions",
+      "conformite": "Compliance",
+      "conformiteCycle": "Decree 2.23.700 cycle · Simplified regime"
+    },
+    "assemblees": {
+      "title": "General meetings",
+      "subtitle": "Notices, minutes and meeting tracking",
+      "newAG": "New meeting",
+      "tabAVenir": "Upcoming",
+      "tabPassees": "Past",
+      "colTitre": "Title",
+      "colType": "Type",
+      "colResidence": "Building",
+      "colDate": "Date & time",
+      "colLieu": "Location",
+      "colStatut": "Status",
+      "type": {
+        "ordinaire": "Ordinary",
+        "extraordinaire": "Extraordinary"
+      },
+      "statut": {
+        "convoquee": "Convened",
+        "tenue": "Held",
+        "annulee": "Cancelled"
+      },
+      "form": {
+        "titre": "Title",
+        "type": "Type",
+        "residence": "Building",
+        "date": "Date",
+        "heure": "Time",
+        "lieu": "Location",
+        "quorum": "Required quorum",
+        "ordreDuJour": "Agenda",
+        "titrePlaceholder": "Ordinary meeting 2026",
+        "lieuPlaceholder": "Meeting room, ground floor",
+        "ordrePlaceholder": "1. Approval of accounts\n2. Provisional budget\n3. Other matters",
+        "delaiHint": "Minimum legal notice: 15 days (law 18-00).",
+        "delaiError": "The notice must be sent at least 15 days before the meeting (law 18-00, art. 16 quinquies)."
+      },
+      "empty": "No meeting",
+      "emptyDesc": "No general meeting scheduled at the moment.",
+      "toastCreated": "Meeting created",
+      "detailQuorum": "Required quorum: {{n}} %",
+      "detailParticipants": "{{n}} participants present",
+      "detailNotHeld": "Meeting not yet held"
+    },
+    "annonces": {
+      "title": "Announcements",
+      "subtitle": "Communicate with the owners of your buildings",
+      "newAnnonce": "New announcement",
+      "tabToutes": "All",
+      "tabPubliees": "Published",
+      "tabBrouillons": "Drafts",
+      "tabArchivees": "Archived",
+      "colTitre": "Title",
+      "colResidence": "Building",
+      "colStatut": "Status",
+      "colPriorite": "Priority",
+      "colDate": "Date",
+      "colLectures": "Reads",
+      "statut": {
+        "brouillon": "Draft",
+        "publiee": "Published",
+        "archivee": "Archived"
+      },
+      "priorite": {
+        "normale": "Normal",
+        "urgente": "Urgent"
+      },
+      "toutes": "All buildings",
+      "publier": "Publish",
+      "archiver": "Archive",
+      "publishConfirm": "Publish this announcement?",
+      "publishDesc": "The relevant owners will be able to see this announcement right away.",
+      "publishSuccess": "Announcement published",
+      "archiveConfirm": "Archive this announcement?",
+      "archiveDesc": "The announcement will no longer be visible to owners.",
+      "archiveSuccess": "Announcement archived",
+      "deleteConfirm": "Delete this announcement?",
+      "deleteDesc": "This action is irreversible.",
+      "deleteSuccess": "Announcement deleted",
+      "form": {
+        "titre": "Title",
+        "contenu": "Content",
+        "priorite": "Priority",
+        "residence": "Building (leave empty = all)"
+      },
+      "empty": "No announcement",
+      "emptyDesc": "Create your first announcement to inform the owners.",
+      "toastCreated": "Announcement created",
+      "titlePlaceholder": "Elevator works — service interruption",
+      "descPlaceholder": "Describe the announcement…"
+    },
+    "prestataires": {
+      "title": "Providers & contracts",
+      "subtitle": "Manage your suppliers and maintenance contracts",
+      "tabPrestataires": "Providers",
+      "tabContrats": "Contracts",
+      "newPrestataire": "New provider",
+      "newContrat": "New contract",
+      "colNom": "Name",
+      "colSpecialite": "Specialty",
+      "colTelephone": "Phone",
+      "colNote": "Rating",
+      "colInterventions": "Interventions",
+      "colStatut": "Status",
+      "colTitre": "Title",
+      "colPrestataire": "Provider",
+      "colResidence": "Building",
+      "colMontant": "Amount/year",
+      "colDebut": "Start",
+      "colFin": "End",
+      "colRenouvellement": "Auto",
+      "statut": {
+        "actif": "Active",
+        "blackliste": "Blacklisted",
+        "expire": "Expired",
+        "resilie": "Terminated"
+      },
+      "specialite": {
+        "ascenseurs": "Elevators",
+        "electricite": "Electricity",
+        "proprete": "Cleaning",
+        "plomberie": "Plumbing",
+        "securite": "Security",
+        "autre": "Other"
+      },
+      "typeContrat": {
+        "maintenance": "Maintenance",
+        "nettoyage": "Cleaning",
+        "gardiennage": "Security guarding",
+        "autre": "Other"
+      },
+      "expiresIn": "Expires in {{n}} days",
+      "expired": "Expired",
+      "form": {
+        "nom": "Name",
+        "specialite": "Specialty",
+        "telephone": "Phone",
+        "email": "Email",
+        "adresse": "Address",
+        "titre": "Contract title",
+        "prestataire": "Provider",
+        "residence": "Building",
+        "typeContrat": "Contract type",
+        "montant": "Annual amount (DH)",
+        "dateDebut": "Start date",
+        "dateFin": "End date",
+        "renouvellementAuto": "Automatic renewal"
+      },
+      "emptyPrestataires": "No provider",
+      "emptyPrestatairesDesc": "Add your first provider.",
+      "emptyContrats": "No contract",
+      "emptyContratsDesc": "Create your first maintenance contract.",
+      "toastCreated": "Provider created",
+      "toastContratCreated": "Contract created"
+    },
+    "budgets": {
+      "title": "Budgets",
+      "subtitle": "Provisional budget and expense tracking by building",
+      "selectResidence": "Choose a building",
+      "selectExercice": "Choose the fiscal year",
+      "newPoste": "Add a line",
+      "editPoste": "Edit the line",
+      "deletePoste": "Delete the line",
+      "deletePosteDesc": "This line will be permanently deleted.",
+      "colCategorie": "Category",
+      "colDescription": "Description",
+      "colPrevu": "Planned (DH)",
+      "colRealise": "Actual (DH)",
+      "colEcart": "Variance",
+      "colExecution": "Execution",
+      "totalPrevu": "Total planned",
+      "totalRealise": "Total actual",
+      "tauxExecution": "Execution rate",
+      "categories": {
+        "maintenance": "Maintenance",
+        "nettoyage": "Cleaning",
+        "gardiennage": "Security guarding",
+        "electricite": "Electricity",
+        "eau": "Water",
+        "assurance": "Insurance",
+        "administratif": "Administrative",
+        "travaux": "Works",
+        "autre": "Other"
+      },
+      "statut": {
+        "brouillon": "Draft",
+        "approuve": "Approved"
+      },
+      "approve": "Approve the budget",
+      "approveConfirm": "Approve this budget?",
+      "approveDesc": "Once approved, the lines can no longer be edited.",
+      "approveSuccess": "Budget approved",
+      "form": {
+        "categorie": "Category",
+        "description": "Description",
+        "montantPrevu": "Planned amount (DH)",
+        "montantRealise": "Actual amount (DH)"
+      },
+      "empty": "No budget for this selection",
+      "emptyDesc": "Select a building and a fiscal year to display or create the budget.",
+      "noExercice": "No active fiscal year",
+      "toastLineAdded": "Line added",
+      "toastLineDeleted": "Line deleted",
+      "selectPrestataire": "Select a provider",
+      "saveError": "Error while saving",
+      "bulkUpdated": "{{n}} line(s) updated",
+      "consommationPoste": "Consumption by line",
+      "noData": "No data",
+      "submitApprovalDesc": "The budget will be submitted for approval at the next general meeting.",
+      "lockDesc": "The budget will be locked and can no longer be edited.",
+      "deleteLineTitle": "Delete the line",
+      "deleteLineDesc": "This budget line will be permanently deleted.",
+      "addLineTitle": "Add a line",
+      "lineDescPlaceholder": "Line description",
+      "linkPrestataire": "Link a provider (optional)",
+      "dateFin": "End date"
+    },
+    "documents": {
+      "title": "Documents",
+      "subtitle": "Centralize your co-ownership documents",
+      "add": "Add a document",
+      "filterType": "Type",
+      "filterResidence": "Building",
+      "filterAll": "All",
+      "colNom": "Name",
+      "colType": "Type",
+      "colResidence": "Building",
+      "colDate": "Date",
+      "colTaille": "Size",
+      "download": "Download",
+      "delete": "Delete",
+      "deleteConfirm": {
+        "title": "Delete the document?"
+      },
+      "deleteDesc": "This document will be permanently deleted.",
+      "toutes": "All buildings",
+      "empty": "No document",
+      "emptyDesc": "Add your first document to share it with the owners.",
+      "addSuccess": "Document added",
+      "deleteSuccess": "Document deleted",
+      "form": {
+        "nom": "Document name",
+        "type": "Type",
+        "residence": "Building (optional)",
+        "date": "Date",
+        "file": "File",
+        "nomPlaceholder": "e.g. Co-ownership rules 2026",
+        "customCategory": "Custom category",
+        "customCategoryPlaceholder": "e.g. Manual, Plan, Certificate…"
+      },
+      "types": {
+        "reglement": "Rules",
+        "pv_ag": "Meeting minutes",
+        "contrat": "Contract",
+        "facture": "Invoice",
+        "autre": "Other"
+      },
+      "edit": "Rename / edit",
+      "editDialog": {
+        "title": "Edit the document"
+      },
+      "updateSuccess": "Document updated",
+      "updateError": "Error during update",
+      "addError": "Error while adding",
+      "deleteError": "Error during deletion",
+      "col": {
+        "nom": "Name",
+        "type": "Type",
+        "residence": "Building",
+        "date": "Date",
+        "taille": "Size"
+      },
+      "allResidences": "All",
+      "filterAllTypes": "All types",
+      "filterAllResidences": "All buildings",
+      "searchPlaceholder": "Search a document…",
+      "emptyTitle": "No document",
+      "addDialog": {
+        "title": "Add a document"
+      }
+    },
+    "comptabilite": {
+      "title": "Accounting",
+      "exercice": "Fiscal year",
+      "statut": {
+        "ouvert": "Open",
+        "clos": "Closed 🔒"
+      },
+      "tabs": {
+        "dashboard": "Dashboard",
+        "journal": "Accounting journal",
+        "grandLivre": "General ledger",
+        "balance": "Trial balance",
+        "depenses": "Expenses",
+        "rapports": "Financial reports",
+        "cloture": "Closing"
+      },
+      "kpi": {
+        "produits": "Income",
+        "charges": "Charges",
+        "resultat": "Net result",
+        "tresorerie": "Cash",
+        "creances": "Receivables"
+      },
+      "tresorerie": {
+        "title": "Cash detail",
+        "banque": "Banks (5121)",
+        "cheque": "Cheques (5122)",
+        "caisse": "Cash box (5161)",
+        "depot": "Deposit",
+        "retrait": "Withdrawal",
+        "remise": "Remittance"
+      },
+      "recouvrement": "Collection rate",
+      "couverture": "Cash coverage",
+      "mois": "months",
+      "journal": {
+        "date": "Date",
+        "compte": "Account",
+        "description": "Description",
+        "type": "Type",
+        "debit": "Debit",
+        "credit": "Credit",
+        "piece": "Voucher",
+        "types": {
+          "depense": "Expense",
+          "encaissement": "Collection"
+        }
+      },
+      "grandLivre": {
+        "title": "GL account",
+        "selectCompte": "Select an account...",
+        "hint": "Select a GL account to display the entry detail."
+      },
+      "depenses": {
+        "title": "Expenses",
+        "add": "New expense",
+        "colDate": "Date",
+        "colTitre": "Title",
+        "colCompte": "Account",
+        "colPrestataire": "Provider",
+        "colMode": "Mode",
+        "colMontant": "Amount",
+        "modes": {
+          "virement": "Bank transfer",
+          "cheque": "Cheque",
+          "especes": "Cash",
+          "cb": "Card",
+          "prelevement": "Direct debit",
+          "autre": "Other"
+        },
+        "form": {
+          "titre": "Title",
+          "montant": "Amount (MAD)",
+          "date": "Date",
+          "compte": "Charge account",
+          "mode": "Payment method",
+          "prestataire": "Provider (optional)",
+          "justificatif": "Supporting document",
+          "importIa": "AI import",
+          "analyser": "Analyze",
+          "utiliser": "Use this data",
+          "confiance": "Confidence"
+        }
+      },
+      "encaissement": {
+        "title": "Record a payment",
+        "recherche": "Search owner or unit no.",
+        "step1": "Select receivable",
+        "step2": "Enter payment",
+        "soldeImpaye": "Unpaid balance",
+        "montant": "Amount",
+        "date": "Date",
+        "mode": "Payment method",
+        "compteDestination": "Destination account",
+        "refCheque": "Cheque reference",
+        "comptes": {
+          "5121": "Main bank (5121)",
+          "5122": "Cheque account (5122)",
+          "5161": "Cash box (5161)"
+        }
+      },
+      "cloture": {
+        "title": "Year-end close",
+        "checklist": "Pre-close checklist",
+        "equilibre": "Balanced entries (Debit = Credit)",
+        "classe6": "Charge accounts (cl. 6) with movements",
+        "classe7": "Income accounts (cl. 7) with movements",
+        "hasEcritures": "At least one entry recorded",
+        "totalDebit": "Total debit",
+        "totalCredit": "Total credit",
+        "btn": "Close the fiscal year",
+        "confirmTitle": "Confirm the close",
+        "confirmMsg": "This action is irreversible. All entries will be locked. Continue?",
+        "warning": "Warning — after closing, no entry can be edited.",
+        "already_clos": "Fiscal year closed",
+        "clos_msg": "This fiscal year was closed on"
+      },
+      "export": {
+        "title": "Export",
+        "excelJournal": "Excel — Full journal",
+        "excelGrandLivre": "Excel — General ledger",
+        "sageFec": "Sage FEC",
+        "pdfJournal": "PDF — Journal",
+        "pdfBalance": "PDF — Trial balance"
+      },
+      "seuil": {
+        "label": "Accounting threshold",
+        "moins200": "≤ 200,000 MAD — Simplified regime (Annexes 10, 13)",
+        "entre200et500": "200–500k MAD — Standard regime (Annexes 10-12)",
+        "plus500": "≥ 500,000 MAD — Full regime (Annexes 3-10)"
+      },
+      "suggestedAccount": "Suggested account:",
+      "selectAccount": "Select an account...",
+      "noEntries": "No accounting entry",
+      "toastClosed": "Fiscal year closed successfully",
+      "toastCloseError": "Error during closing",
+      "montantColon": "Amount:",
+      "noCreance": "No receivable",
+      "entree": "In",
+      "sortie": "Out",
+      "searchAccount": "Search an account...",
+      "prestataireNamePlaceholder": "Provider name",
+      "filterAccounts": "Filter accounts...",
+      "balanceAutoHint": "The trial balance will be built automatically from the fiscal year's entries.",
+      "legalDocsTitle": "Legal and official documents",
+      "annexesRegTitle": "Regulatory annexes (Decree 2.23.700)",
+      "annexesRegDesc": "Annexes 10, 13-1, 13-2 and other mandatory legal documents",
+      "viewAnnexes": "View the annexes",
+      "iaError": "AI analysis error",
+      "balanceEq": "Total debit = Total credit = {{debit}} DH · Balance gap: {{ecart}} DH",
+      "balanceNeq": "Debit/credit gap: {{ecart}} DH — check the entries",
+      "noEcritureCompte": "No entry for this account",
+      "classes": {
+        "1": "Class 1 — Equity",
+        "2": "Class 2 — Fixed assets",
+        "3": "Class 3 — Current-asset receivables",
+        "4": "Class 4 — Current-liability debts",
+        "5": "Class 5 — Cash",
+        "6": "Class 6 — Charges",
+        "7": "Class 7 — Income"
+      },
+      "balance": {
+        "totalDebit": "Total debit",
+        "totalCredit": "Total credit",
+        "soldeDebiteur": "Debit balances",
+        "soldeCrediteur": "Credit balances"
+      },
+      "balanceEquilibree": "Balanced",
+      "balanceDesequilibree": "Unbalanced",
+      "exportPdf": "Export PDF",
+      "rapportsFinanciers": "Financial reports",
+      "rapportFinancierAnnuel": "Annual financial report",
+      "rapportFinancier": "Financial report",
+      "syntheseFinanciere": "Financial summary, charge breakdown, unpaid analysis — 3 pages",
+      "registresObligatoires": "Mandatory registers (Art. 8 & 10)",
+      "balanceLabel": "Trial balance",
+      "legalNote": "This report is prepared in accordance with Law 18-00 (Dahir no. 1-02-298 of 3 October 2002) on the status of co-ownership of built properties. Any owner may request a copy from the syndic under article 8 of that law. The generated documents are informational and certified by the co-ownership manager.",
+      "filterTo": "To"
+    },
+    "depenses": {
+      "title": "Expenses",
+      "subtitle": "Tracking co-ownership charges",
+      "add": "Add an expense",
+      "importIa": "AI import...",
+      "recurrentes": "Recurring",
+      "saveSuccess": "Expense saved",
+      "kpi": {
+        "total": "Period total",
+        "nb": "No. of expenses",
+        "moyen": "Average amount",
+        "enAttente": "Pending approval"
+      },
+      "cols": {
+        "date": "Date",
+        "titre": "Title",
+        "prestataire": "Provider",
+        "compte": "GL account",
+        "montant": "Amount",
+        "mode": "Mode",
+        "approbation": "Approval"
+      },
+      "approbation": {
+        "approuve": "Approved",
+        "en_attente": "Pending",
+        "rejete": "Rejected"
+      },
+      "form": {
+        "titre": "Title",
+        "montant": "Amount (MAD)",
+        "date": "Date",
+        "compte": "Charge account",
+        "mode": "Payment method",
+        "prestataire": "Provider (optional)",
+        "justificatif": "Supporting document",
+        "scanner": "Analyze with AI",
+        "utiliser": "Use this data",
+        "seuilWarning": "This expense requires approval from the syndic council"
+      },
+      "recurrentModal": {
+        "title": "Recurring expenses",
+        "nouveau": "New template",
+        "frequences": {
+          "mensuelle": "Monthly",
+          "trimestrielle": "Quarterly",
+          "semestrielle": "Half-yearly",
+          "annuelle": "Yearly"
+        },
+        "jourEmission": "Issue day",
+        "prochaine": "Next issue"
+      },
+      "selectAccount": "Select an account",
+      "beneficiaryPlaceholder": "Atlas Security LLC",
+      "toastModelCreated": "Template created",
+      "newModel": "New template",
+      "frequency": "Frequency",
+      "toastDeleted": "Expense deleted",
+      "toastApproved": "Expense approved",
+      "toastRejected": "Expense rejected",
+      "downloading": "Downloading...",
+      "deleteTitle": "Delete the expense",
+      "rejectTitle": "Reject the expense",
+      "analyzeError": "Error during analysis",
+      "noModele": "No recurring template",
+      "compteCharge": "Charge account",
+      "dateFinOptional": "End date (optional)",
+      "evolutionMensuelle": "Monthly trend",
+      "repartitionPcg": "Breakdown by GL account",
+      "totalMad": "Total MAD",
+      "searchTitle": "Search title or provider...",
+      "allAccounts": "All accounts",
+      "allStatuses": "All statuses",
+      "motifRejet": "Reason for rejection"
+    },
+    "budget": {
+      "title": "Provisional budget",
+      "statuts": {
+        "brouillon": "Draft",
+        "soumis_ag": "Submitted to meeting",
+        "approuve": "Approved",
+        "verrouille": "Locked"
+      },
+      "kpi": {
+        "prevu": "Planned budget",
+        "engage": "Committed / Issued",
+        "realise": "Actual",
+        "reste": "Left to spend"
+      },
+      "annexe5": {
+        "title": "Annexe 5 table",
+        "colCompte": "Account",
+        "colLibelle": "Label",
+        "colRealiseN1": "Actual N-1",
+        "colBudgetN": "Budget N",
+        "colEngage": "Committed",
+        "colRealise": "Actual",
+        "colPct": "% Used",
+        "sections": {
+          "chargesCourantes": "I — Current charges",
+          "chargesTravaux": "II — Works charges",
+          "totalCharges": "III — Total charges",
+          "produitsCourants": "IV — Current income",
+          "produitsTravaux": "V — Works income",
+          "totalProduits": "VI — Total income",
+          "resultat": "VII — Result"
+        },
+        "saved": "Saved"
+      },
+      "simulation": {
+        "title": "Contribution simulator",
+        "budgetTotal": "Total charges budget",
+        "tantiemesTotal": "Total shares",
+        "colLot": "Unit",
+        "colCopro": "Owner",
+        "colTantieme": "Share",
+        "colPct": "Quota",
+        "colAnnuelle": "Annual contrib.",
+        "colMensuelle": "Monthly contrib.",
+        "colVariation": "Change vs N-1",
+        "exporter": "Export PDF"
+      },
+      "ia": {
+        "title": "AI suggestions",
+        "appliquer": "Apply the selected suggestions",
+        "justification": "Justification"
+      },
+      "soumettre": "Submit to meeting",
+      "verrouiller": "Lock the budget",
+      "exporter": "Export Annexe 5 PDF",
+      "creer": "Create the budget"
+    },
+    "imports": {
+      "title": "Data import",
+      "description": "Import your existing data to get started quickly",
+      "selectResidence": "Select a building",
+      "tabs": {
+        "lots": "Units",
+        "coproprietaires": "Owners",
+        "soldes": "Opening balances",
+        "paiements": "Payment history",
+        "prestataires": "Providers",
+        "bilanOuverture": "Opening balance sheet"
+      },
+      "steps": {
+        "upload": "Upload",
+        "mapping": "Map columns",
+        "preview": "Preview",
+        "execute": "Import"
+      },
+      "upload": {
+        "dropzone": "Drop your Excel file here",
+        "or": "or click to select",
+        "accepted": "Accepted formats: .xlsx, .csv",
+        "downloadTemplate": "Download the template"
+      },
+      "mapping": {
+        "source": "Source column",
+        "target": "Target field",
+        "confidence": "Confidence",
+        "auto": "Auto",
+        "manual": "Manual",
+        "unmapped": "Unmapped",
+        "requiredMissing": "Required fields not mapped"
+      },
+      "preview": {
+        "summary": "{valid} valid rows · {errors} errors",
+        "skipErrors": "Skip rows with errors",
+        "importButton": "Import {count} rows"
+      },
+      "execute": {
+        "inProgress": "Import in progress... {done}/{total} rows",
+        "success": "{count} rows imported successfully",
+        "failed": "{count} rows failed",
+        "done": "Done"
+      },
+      "order": "Recommended order: Units → Owners → Balances → Payments → Providers",
+      "selectFile": "Select a file",
+      "importDone": "Import done",
+      "reimport": "Re-import",
+      "removeFile": "Remove the file"
+    },
+    "autresRecettes": {
+      "toastAdded": "Income added",
+      "toastUpdated": "Income updated",
+      "toastDeleted": "Income deleted",
+      "emptyRow": "No income for this fiscal year.",
+      "title": "Other income",
+      "subtitle": "Income outside funds calls — rentals, subsidies, indemnities, financial products",
+      "totalRecettes": "Total income {{year}}",
+      "operations": "{{n}} transactions",
+      "colPayeur": "Payer"
+    },
+    "remboursements": {
+      "toastCreated": "Refund created",
+      "toastUpdated": "Refund updated",
+      "toastDeleted": "Refund deleted",
+      "totalRequested": "Total requested",
+      "subtitle": "Overpayments, indemnities and refunds to owners",
+      "newRemboursement": "New refund",
+      "colPaiement": "Payment",
+      "emptyRow": "No refund recorded.",
+      "dateDemande": "Request date",
+      "datePaiement": "Payment date",
+      "modalEdit": "Edit refund",
+      "descPlaceholder": "e.g. Double payment Q1 2026 call",
+      "statut": {
+        "demande": "Requested",
+        "approuve": "Approved",
+        "paye": "Paid",
+        "rejete": "Rejected"
+      },
+      "title": "Refunds",
+      "kpiEnAttente": "Pending",
+      "kpiPayes": "Paid",
+      "colMotif": "Reason",
+      "colDemande": "Request"
+    },
+    "emprunts": {
+      "toastCreated": "Loan recorded",
+      "toastUpdated": "Loan updated",
+      "toastDeleted": "Loan deleted",
+      "colMensualite": "Monthly payment",
+      "colResteDu": "Remaining due",
+      "libellePlaceholder": "e.g. Roof renovation 2023",
+      "organisme": "Lending institution",
+      "duree": "Term (months)",
+      "mensualiteDh": "Monthly payment (DH)",
+      "bannerTitle": "Annexe 8 — Decree 2.23.700",
+      "bannerBody": "· Any collective loan must be voted at a meeting (Law 18-00 art. 17). The amortization schedule is provided by the lending institution.",
+      "emptyRow": "No loan recorded.",
+      "dateFin": "End date",
+      "totalEmprunte": "Total borrowed",
+      "payeCumul": "Paid cumulative",
+      "payeExercice": "Paid this year",
+      "resteAPayer": "Left to pay",
+      "montantInitialDh": "Initial amount (DH)",
+      "amountInitialPositive": "Initial amount > 0",
+      "newEmprunt": "New loan",
+      "editEmprunt": "Edit loan",
+      "bankPlaceholder": "e.g. Banque Populaire",
+      "title": "Loans",
+      "subtitle": "Tracking loans taken by the co-ownership — Annexe 8 of Decree 2.23.700",
+      "colInitial": "Initial",
+      "colOrganisme": "Lender"
+    },
+    "recouvrement": {
+      "toastConfigSaved": "Configuration saved",
+      "recalcError": "Recalculation failed",
+      "penaltyType": "Penalty type",
+      "penalties": "Penalties",
+      "age": "Age",
+      "bannerTitle": "Meeting decision required",
+      "bannerBody": "— Penalties must be voted at a general meeting before they are legally applicable (Law 18-00 art. 25).",
+      "recalcPenalites": "Recalculate penalties",
+      "configTitle": "Late-payment penalty settings",
+      "penalitesActivees": "Penalties enabled",
+      "penalitesAutoDesc": "Automatic calculation on any unpaid amount after the grace period",
+      "graceDays": "Grace period (days)",
+      "graceHint": "Delay before penalties apply",
+      "plafondHint": "Capped penalty. Leave empty for no cap.",
+      "totalImpaye": "Total unpaid",
+      "penalites": "Penalties",
+      "prescriptionRisk": "Prescription risk",
+      "prescriptionBadge": "Law 18-00 · Five-year prescription",
+      "allLateLots": "All overdue units",
+      "saveError": "Save failed",
+      "severity": {
+        "low": "Low",
+        "medium": "Moderate",
+        "high": "High",
+        "critical": "Critical"
+      },
+      "riskPrescription": "Prescription risk",
+      "penaltiesRecalc": "{{n}} penalties recalculated ({{amount}} DH)",
+      "title": "Collection",
+      "subtitle": "Tracking unpaid amounts, penalties and formal notices",
+      "configPenalites": "Penalty settings",
+      "lotsEnRetard": "Units overdue",
+      "prescriptionBanner": "Co-ownership charge debts lapse after 5 years without interruption. Immediate legal action is required for critical-status debts.",
+      "colEcheance": "Due date",
+      "colJoursRestants": "Days left",
+      "colOrigine": "Origin"
+    },
+    "equipements": {
+      "toastAdded": "Equipment added",
+      "toastUpdated": "Equipment updated",
+      "toastDeleted": "Equipment deleted",
+      "designationRequired": "Designation required",
+      "dureeAmort": "Amortization period (months)",
+      "bannerTitle": "Annexe 9 — Decree 2.23.700",
+      "bannerBody": "· The shared-equipment register must be up to date for meeting notices and the annual balance sheet. Straight-line amortization is computed over the entered period.",
+      "title": "Equipment",
+      "subtitle": "Register of equipment and fixed assets — Annexe 9 of Decree 2.23.700",
+      "nbArticles": "Number of items",
+      "valeurAcquisition": "Acquisition value",
+      "valeurNette": "Net value (after amort. {{pct}}%)",
+      "colAcquisLe": "Acquired on",
+      "colVAcq": "Acq. value",
+      "colVNette": "Net value",
+      "statutActif": "Active",
+      "statutHorsService": "Out of service",
+      "emptyRow": "No equipment recorded.",
+      "confirmDelete": "Delete equipment « {{designation}} »?",
+      "modalEdit": "Edit equipment",
+      "modalNew": "Add equipment",
+      "designationPlaceholder": "e.g. Main Otis elevator",
+      "dateAcquisition": "Acquisition date",
+      "valeurAcquisitionDh": "Acquisition value (DH)",
+      "enService": "Equipment in service",
+      "enServiceHint": "Uncheck if out of service / decommissioned",
+      "notesOptional": "Notes (optional)",
+      "addError": "Add failed",
+      "valeurPositive": "Acquisition value must be > 0"
+    },
+    "travaux": {
+      "toastCreated": "Works recorded",
+      "toastUpdated": "Works updated",
+      "toastDeleted": "Works deleted",
+      "montantVote": "Voted amount",
+      "montantEngage": "Committed amount",
+      "montantRegle": "Paid amount",
+      "resteARegler": "Left to pay",
+      "colVote": "Voted",
+      "colEngage": "Committed",
+      "colRegle": "Paid",
+      "libellePlaceholder": "e.g. North facade renovation",
+      "montantVoteDh": "Voted amount (DH)",
+      "engageDh": "Committed (DH)",
+      "regleDh": "Paid (DH)",
+      "debut": "Start",
+      "finPrevue": "Expected end",
+      "bannerTitle": "Annexe 6 — Decree 2.23.700",
+      "bannerBody": "· Non-routine works (major maintenance, transformation, improvement) must be voted at a meeting (Law 18-00 art. 17) by the majority required for the type of works.",
+      "title": "Major works",
+      "subtitle": "Tracking non-routine works voted at a meeting — Annexe 6 of Decree 2.23.700",
+      "newTravaux": "New works",
+      "colVoteAg": "Meeting vote",
+      "dateVoteAg": "Meeting vote date",
+      "emptyRow": "No major works for this fiscal year.",
+      "confirmDelete": "Delete « {{libelle}} »?",
+      "modalEdit": "Edit works",
+      "modalNew": "New major works",
+      "statut": {
+        "vote": "Voted",
+        "en_cours": "In progress",
+        "termine": "Completed",
+        "annule": "Cancelled"
+      }
+    },
+    "audit": {
+      "allCategories": "All categories",
+      "colBy": "Performed by",
+      "colDetails": "Details",
+      "empty": "No event for this period or filter.",
+      "totalEvents": "Total events",
+      "searchPlaceholder": "Search action, user, target...",
+      "exportCsv": "Export CSV",
+      "sensitiveActions": "Sensitive actions",
+      "errorRate": "Error rate",
+      "categoryLabels": {
+        "immeuble": "Building",
+        "lot": "Unit",
+        "coproprietaire": "Owner",
+        "paiement": "Payment",
+        "depense": "Expense",
+        "budget": "Budget",
+        "ag": "Meeting",
+        "document": "Document",
+        "user": "User",
+        "auth": "Authentication",
+        "system": "System"
+      },
+      "title": "Audit log",
+      "subtitle": "Full traceability of actions on the platform",
+      "refresh": "Refresh",
+      "errors": "Errors",
+      "colHorodatage": "Timestamp",
+      "colCible": "Target",
+      "allFilter": "All"
+    },
+    "generateLots": {
+      "genError": "Error while generating units",
+      "tantiemePerLot": "Share per unit",
+      "startNumber": "Start number",
+      "floorsCount": "Number of floors",
+      "lotsPerFloorWing": "Units per floor / wing",
+      "lotsPerFloor": "Units per floor",
+      "prefix": "Prefix",
+      "entries": "Entries",
+      "unitTypes": "Unit types",
+      "quantity": "Quantity",
+      "generateTitle": "Generate units",
+      "typeLot": "Unit type",
+      "totalLots": "Total units",
+      "addWing": "Add a wing",
+      "wingsBlocks": "Wings / Blocks",
+      "removeWingAria": "Remove wing {{wing}}",
+      "startFloor": "Start floor",
+      "startFloorHint": "(negative for basements)",
+      "totalVillas": "Total villas",
+      "phase": "Phase",
+      "phasePlaceholder": "Phase 1 (optional)",
+      "nbLots": "No. of units",
+      "removeEntryAria": "Remove the entry",
+      "addEntry": "Add an entry",
+      "removeTypeAria": "Remove the type",
+      "addType": "Add a type",
+      "quickTemplates": "Quick templates",
+      "configuration": "Configuration",
+      "previewTitle": "Preview — first {{shown}} units of {{total}}",
+      "emptyPreview": "No unit to generate with this configuration.",
+      "previewTantieme": "• Share: {{n}}",
+      "moreLots": "… and {{n}} more units",
+      "generating": "Generating...",
+      "generateN": "Generate {{n}} units",
+      "templates": {
+        "residence_ensemble": {
+          "title": "Building / Property complex",
+          "subtitle": "Define entries with different counts (e.g. E1=12, Block B=8)"
+        },
+        "simple_sequential": {
+          "title": "Simple numbering",
+          "subtitle": "Example: 1, 2, 3, 4, 5"
+        },
+        "wings_floors": {
+          "title": "Building (Wings + Floors)",
+          "subtitle": "Example: A101, A102, B201, B202"
+        },
+        "floor_based": {
+          "title": "By floor (no wing)",
+          "subtitle": "Example: 101, 102, 201, 202"
+        },
+        "villa_townhouse": {
+          "title": "Villa / House",
+          "subtitle": "Example: Villa 1, Villa 2, Phase 1-Villa 1"
+        },
+        "commercial_mixed": {
+          "title": "Commercial / Mixed use",
+          "subtitle": "Example: Shop 1, Office A"
+        }
+      }
+    },
+    "profil": {
+      "title": "My profile",
+      "toastSaved": "Profile updated successfully",
+      "editAria": "Edit profile",
+      "roleManager": "Manager",
+      "roleGestionnaire": "Manager",
+      "fullName": "Full name",
+      "namePlaceholder": "Your name",
+      "cndpConsent": "I have read and accept the processing of personal data in accordance with Law 09-08 (CNDP) on the protection of personal data.",
+      "logoSection": "Syndic logo",
+      "logoHint": "Shown in the navigation bar. PNG or JPG, 2 MB max.",
+      "logoAlt": "Syndic logo",
+      "logoTooBig": "The logo must not exceed 2 MB",
+      "logoUpdated": "Logo updated — visible in the navigation bar",
+      "logoRemoved": "Logo removed",
+      "changeLogo": "Change the logo",
+      "importLogo": "Upload a logo",
+      "subSection": "Syndic & subscription",
+      "plan": "Plan",
+      "upgradePro": "Upgrade to Pro →",
+      "comingSoon": "Feature coming soon",
+      "notifSection": "Notification preferences",
+      "notifHint": "Choose the WhatsApp alerts you want to receive",
+      "notifMaster": "Enable WhatsApp notifications",
+      "notifPaiementLabel": "New payment received",
+      "notifPaiementDesc": "An owner makes a payment",
+      "notifTicketLabel": "New incident ticket",
+      "notifTicketDesc": "A resident reports an incident",
+      "notifAssembleeLabel": "Scheduled meeting",
+      "notifAssembleeDesc": "A general meeting is planned",
+      "notifRetardLabel": "Late payment",
+      "notifRetardDesc": "An owner passes the due date",
+      "appearance": "Appearance",
+      "darkMode": "Dark mode",
+      "dataSection": "My personal data",
+      "dataRightsPre": "Your rights under ",
+      "dataLaw": "law 09-08 on the protection of personal data",
+      "accessTitle": "Right of access (Article 7)",
+      "accessDesc": "Request a copy of all your data. The export will be available within 48h.",
+      "requestExport": "Request the export",
+      "exportRequested": "Request recorded. You will receive your export within 48h.",
+      "rectifTitle": "Right of rectification (Article 8)",
+      "rectifDesc": "Edit your personal information in the section above.",
+      "deleteTitle": "Right of deletion (Article 8)",
+      "deleteDesc": "Request the deletion of your account. An administrator will review your request.",
+      "deleteAccount": "Delete my account",
+      "deleteWarn": "This action is irreversible. Contact support@imaro.ma",
+      "retentionNote": "Some accounting data may be kept for 10 years in accordance with Moroccan legal obligations.",
+      "loggingOut": "Logging out…",
+      "logout": "Log out"
+    },
+    "occupants": {
+      "title": "Occupants",
+      "subtitle": "Register of occupants by unit — owners, tenants, usufructuaries",
+      "toastAdded": "Occupant added",
+      "toastUpdated": "Occupant updated",
+      "toastDeleted": "Occupant deleted",
+      "kpiOwners": "Resident owners",
+      "kpiTenants": "Tenants",
+      "kpiOthers": "Usufructuaries / others",
+      "bannerTitle": "Art. 11 Law 18-00",
+      "bannerBody": "— The occupant register must be up to date for meeting notices and charge communications. Only one active 'resident owner' per unit at a time.",
+      "colLot": "Unit",
+      "colNom": "Full name",
+      "emptyRow": "No occupant recorded.",
+      "confirmDelete": "Delete occupant « {{nom}} »?",
+      "modalEdit": "Edit an occupant",
+      "modalNew": "Add an occupant",
+      "chooseLot": "Choose a unit",
+      "dateFinOptional": "End date (optional)",
+      "type": {
+        "proprietaire_occupant": "Resident owner",
+        "locataire": "Tenant",
+        "usufruitier": "Usufructuary",
+        "autre": "Other"
+      }
+    },
+    "ia": {
+      "title": "AI assistant",
+      "subtitle": "Automated compliance audit · Invoice extraction · Smart budget suggestions",
+      "poweredBy": "Powered by Claude — your data stays private and encrypted.",
+      "toolAuditTitle": "Compliance audit",
+      "toolAuditDesc": "Full scan · legal risk · recommendations",
+      "toolInvoiceTitle": "Invoice extraction",
+      "toolInvoiceDesc": "OCR · accounting classification · pre-fill",
+      "toolBudgetTitle": "Budget suggestions",
+      "toolBudgetDesc": "History · inflation · forecast by line",
+      "analyzing": "Analyzing...",
+      "severity": {
+        "critical": "Critical",
+        "high": "High",
+        "medium": "Moderate",
+        "low": "Low",
+        "info": "Info"
+      },
+      "conf": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "auditDone": "Audit complete — score {{score}}/100",
+      "auditError": "Audit failed",
+      "auditEmptyTitle": "AI compliance audit",
+      "auditEmptyDesc": "Run a full analysis of your co-ownership file: missing charges, receivables nearing prescription, ungenerated annexes, Decree 2.23.700 compliance, etc.",
+      "runAudit": "Run the AI audit",
+      "auditHint": "~ 30 seconds · The result stays private on your tenant.",
+      "auditReport": "Audit report · {{name}}",
+      "exerciceBadge": "Fiscal year {{n}}",
+      "rerunAudit": "Rerun the audit",
+      "strengths": "Detected strengths",
+      "attentionPoints": "Points of attention ({{n}})",
+      "recommendedAction": "Recommended action",
+      "auditMeta": "Analysis · {{model}} · {{ms}}ms · {{tokens}} tokens · generated on {{date}}",
+      "invoiceDone": "Invoice extracted — confidence {{pct}}%",
+      "invoiceError": "Extraction failed",
+      "invoiceEmptyTitle": "AI invoice extraction",
+      "invoiceEmptyDesc": "Drop an invoice (PDF or image). The AI extracts supplier, ICE, amount, VAT, date, and automatically suggests the category + accounting account.",
+      "chooseInvoice": "Choose an invoice",
+      "acceptedFormats": "Accepted formats: PDF · JPG · PNG · max size 10 MB",
+      "analyzingInvoice": "{{fileName}} · AI vision + accounting classification",
+      "confidence": "Confidence {{pct}}%",
+      "newInvoice": "New invoice",
+      "fournisseur": "Supplier",
+      "numeroFacture": "Invoice no.",
+      "detectedLines": "Detected lines",
+      "classification": "Suggested AI classification",
+      "compteComptable": "Accounting account",
+      "createExpense": "Create the expense",
+      "invoiceMeta": "{{model}} · {{ms}}ms · {{count}} page",
+      "invoiceMeta_plural": "{{model}} · {{ms}}ms · {{count}} pages",
+      "budgetDone": "Suggestions generated · overall change {{variation}}",
+      "budgetError": "Suggestion failed",
+      "budgetEmptyTitle": "AI budget suggestions",
+      "budgetEmptyDesc": "The AI analyzes your expenses from the last 2 fiscal years, Moroccan inflation and your current contracts to propose a provisional budget line by line with justification.",
+      "exerciceCible": "Target fiscal year",
+      "generateSuggestions": "Generate the suggestions",
+      "budgetNMinus1": "Budget N-1",
+      "suggestionBudget": "AI suggestion — Budget {{n}}",
+      "variationGlobale": "Overall change",
+      "hypotheses": "Assumptions used by the AI",
+      "colCompte": "Account",
+      "colRealise": "Actual N-1",
+      "colSuggere": "Suggested {{n}}",
+      "colJustif": "AI justification",
+      "colConf": "Conf.",
+      "regenerate": "Regenerate",
+      "applyBudget": "Apply to budget {{n}}",
+      "budgetMeta": "{{model}} · {{ms}}ms · {{tokens}} tokens"
+    },
+    "annexes": {
+      "complementaires": "Additional annexes",
+      "regenerate": "Regenerate",
+      "downloaded": "Annexe {{num}} downloaded",
+      "obligatoires": "Mandatory annexes",
+      "exerciceClos": "Fiscal year ended 31 December {{year}}",
+      "title": "Accounting annexes",
+      "subtitle": "Regulatory annexes under Decree 2.23.700",
+      "regimeSimplifie": "Simplified regime (≤ 200,000 MAD/year)",
+      "regimeNormal": "Standard regime"
+    },
+    "layout": {
+      "deleteNotif": "Delete this notification",
+      "closeMenu": "Close menu",
+      "openMenu": "Open menu"
+    },
+    "conformite": {
+      "timeline": "Phase timeline",
+      "exerciceLabel": "Fiscal year {{n}}",
+      "phaseLabel": {
+        "operations_mensuelles": "Monthly operations",
+        "cloture_exercice": "Year-end close",
+        "preparation_ag": "Meeting preparation",
+        "archivage": "Archiving"
+      },
+      "phaseDesc": {
+        "operations_mensuelles": "Funds calls, collections and expenses for the month.",
+        "cloture_exercice": "Closing the accounts and preparing the accounting annexes.",
+        "preparation_ag": "Convening the general meeting (legal notice 15 days, law 18-00) and documents to present.",
+        "archivage": "Legal retention of records and minutes."
+      },
+      "agLink": "Manage meetings",
+      "phaseStatut": {
+        "pending": "To do",
+        "in_progress": "In progress",
+        "done": "Done",
+        "skipped": "Skipped",
+        "overdue": "Overdue"
+      },
+      "title": "Compliance calendar",
+      "subtitle": "Annual compliance cycle — Decree 2.23.700"
+    },
+    "autres": {
+      "newRecette": "New income"
+    },
+    "rappels": {
+      "title": "Reminders",
+      "subtitle": "Configure automatic payment reminders. Each message follows the resident's preferred language.",
+      "lots": "units",
+      "residents": "residents",
+      "totalDu": "total due",
+      "autoTitle": "Automatic reminders",
+      "autoDesc": "Automatically send scheduled reminders. Push notifications are always used; the other channels follow your configuration.",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "nextRun": "Next run",
+      "never": "—",
+      "sendAll": "Send all now",
+      "toastEnabled": "Automatic reminders enabled",
+      "toastDisabled": "Automatic reminders disabled",
+      "toastSentAll": "{{n}} reminder(s) queued for sending",
+      "toastConfigSaved": "Configuration saved",
+      "toastStageSent": "Reminder « {{stage}} » sent to {{n}} resident(s)",
+      "toastTest": "Test message sent",
+      "kpiDeliveryRate": "Delivery rate",
+      "kpiDelivered": "Successfully delivered",
+      "kpiFailed": "Not delivered",
+      "kpiSentMonth": "Sent this month",
+      "timelineTitle": "Reminder timeline",
+      "timelineSubtitle": "Configure the reminder schedule",
+      "globalSettings": "Global settings",
+      "pushNote": "All reminders always go out as a push notification. External channels are optional.",
+      "appliesAll": "Reminder settings apply to all your buildings",
+      "remaining": "{{n}}/{{max}} manual sends left",
+      "stageJ3": "3 days before the due date",
+      "stageJ2": "2 days before the due date",
+      "stageJ1": "1 day before the due date",
+      "stageJourJ": "On the due date",
+      "stageRetard": "Overdue (daily reminders)",
+      "stageDescJ3": "Gentle reminder sent to residents who have not paid yet.",
+      "stageDescJ2": "Follow-up reminder for residents still pending.",
+      "stageDescJ1": "Urgent reminder the day before the due date.",
+      "stageDescJourJ": "Final reminder on the due date.",
+      "stageDescRetard": "Daily reminders until the payment is received.",
+      "pushAlways": "Push notification",
+      "pushAlwaysHint": "Always sent via the app",
+      "extraChannels": "Additional channels",
+      "send": "Send",
+      "pendingCount": "{{n}} pending",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "sms": "SMS",
+      "free": "Free",
+      "previewTitle": "Preview",
+      "active": "Active",
+      "activeDesc": "Reminders are active. Messages go out automatically according to the schedule.",
+      "alwaysActive": "Always active",
+      "test": "Test",
+      "emailSubject": "Subject",
+      "langTitle": "Custom language",
+      "langDesc": "Each reminder is sent in the resident's preferred language.",
+      "recentTitle": "Recent reminders",
+      "recentSubtitle": "History of reminders sent to residents",
+      "recentEmpty": "No reminder sent yet",
+      "recentEmptyDesc": "The reminder history will appear here.",
+      "colResident": "Resident",
+      "colChannel": "Channel",
+      "colTrigger": "Trigger",
+      "statusDelivered": "Delivered",
+      "statusFailed": "Failed",
+      "statusPending": "Pending",
+      "statusSent": "Sent",
+      "triggerAuto": "Automatic",
+      "triggerManual": "Manual",
+      "howTitle": "How reminders work",
+      "howDaily": "Daily schedule",
+      "howDailyDesc": "Automatic reminders sent at {{hour}}:00 every day.",
+      "howOverdue": "Overdue frequency",
+      "howOverdueDesc": "Sent daily until the payment is received (max {{n}} days).",
+      "howLimits": "Daily limits",
+      "howLimitsDesc": "{{max}} manual sends per day — unlimited automatic.",
+      "howMultilang": "Multilingual",
+      "howMultilangDesc": "{{n}} languages supported.",
+      "selectResidence": "Select a building",
+      "colDate": "Date",
+      "colType": "Type",
+      "colStatus": "Status"
+    },
+    "visites": {
+      "title": "Visits",
+      "subtitle": "Tracking visitors, couriers and providers via single-use QR code",
+      "newVisite": "New visit",
+      "scanQr": "Scan a QR",
+      "kpiToday": "Visits today",
+      "kpiInside": "Currently inside",
+      "kpiPlanned": "Upcoming",
+      "kpiExpired": "Expired (24h)",
+      "selectResidence": "Select a building",
+      "allResidences": "All buildings",
+      "filterStatus": "Status",
+      "filterType": "Type",
+      "filterAll": "All",
+      "type": {
+        "visitor": "Visitor",
+        "delivery": "Delivery",
+        "contractor": "Contractor",
+        "prestataire": "Provider"
+      },
+      "status": {
+        "planned": "Planned",
+        "arrived": "Inside",
+        "departed": "Left",
+        "expired": "Expired",
+        "cancelled": "Cancelled"
+      },
+      "colVisitor": "Visitor",
+      "colType": "Type",
+      "colHost": "Host",
+      "colPlanned": "Planned",
+      "colArrived": "Arrived",
+      "colLeft": "Left",
+      "colStatus": "Status",
+      "colActions": "Actions",
+      "empty": "No visit recorded",
+      "emptyDesc": "Create a new visit to generate a QR code to send to the visitor.",
+      "form": {
+        "title": "New visit",
+        "desc": "Generates a single-use QR code. The visitor receives a link to scan at the entrance.",
+        "visitorName": "Visitor name",
+        "visitorNamePlaceholder": "e.g. Ahmed Ouazzani",
+        "visitorPhone": "Phone",
+        "phonePlaceholder": "+212 6XX XX XX XX",
+        "type": "Visit type",
+        "purpose": "Purpose",
+        "purposePlaceholder": "e.g. Family visit, Glovo delivery, plumber intervention",
+        "host": "Host unit (optional)",
+        "hostPlaceholder": "Select a unit",
+        "plannedAt": "Planned date and time",
+        "plannedAtHint": "Leave empty for an immediate visit (walk-in)",
+        "submit": "Create & generate QR",
+        "submitting": "Creating…",
+        "validationName": "Name required",
+        "validationPhone": "Phone required",
+        "recurring": "Recurring pass (regular provider)",
+        "recurringHint": "Reusable QR — for a provider who comes back regularly (weekly cleaning, gardener, etc.)",
+        "recurrence": "Frequency",
+        "recurrencePlaceholder": "Tuesday & Friday · 9am-12pm"
+      },
+      "detail": {
+        "title": "Visit detail",
+        "qrLabel": "Visit QR",
+        "qrHint": "To be scanned by the guard at entry / exit",
+        "linkLabel": "Public link",
+        "linkCopied": "Link copied",
+        "copyLink": "Copy the link",
+        "shareWa": "Share by WhatsApp",
+        "shareSms": "Share by SMS",
+        "waMessage": "Hello {{name}}, your Imaro pass is ready: {{url}}",
+        "createdBy": "Created by {{name}}",
+        "createdOn": "Created on {{date}}",
+        "cancel": "Cancel the visit",
+        "cancelConfirm": "Cancel this visit?",
+        "cancelled": "Visit cancelled",
+        "scanCheckIn": "Mark entry",
+        "scanCheckOut": "Mark exit",
+        "alreadyCheckedIn": "Entry already recorded",
+        "alreadyCheckedOut": "Visit completed",
+        "recurringBadge": "Recurring pass",
+        "recurrenceLabel": "Frequency",
+        "photoCaptured": "Photo captured at entry"
+      },
+      "scan": {
+        "title": "Scan the QR",
+        "desc": "Place the visitor's QR in front of the camera or paste the token manually.",
+        "manualToken": "QR token",
+        "manualPlaceholder": "vst_xxxxxxxxxxx",
+        "manualSubmit": "Validate the scan",
+        "cameraDenied": "Camera access denied. Enter the token manually.",
+        "cameraNotSupported": "Camera not available on this device.",
+        "successCheckIn": "{{name}} has been checked in",
+        "successCheckOut": "{{name}}'s exit recorded",
+        "rejected": "Invalid or expired QR"
+      },
+      "create": {
+        "success": "Visit created — QR generated"
+      }
+    },
+    "aiChat": {
+      "fabLabel": "Assistant",
+      "title": "Imaro Assistant",
+      "subtitle": "Law 18-00 · Decree 2.23.700",
+      "placeholder": "Ask your question…",
+      "welcome": "Hello! I'm the Imaro assistant. I can answer your questions about co-ownership management, accounting and cite articles from **Law 18-00** and **Decree 2.23.700**.",
+      "disclaimer": "The AI does not replace professional legal advice.",
+      "send": "Send",
+      "thinking": "Analyzing…",
+      "errorMsg": "An error occurred. Please try again.",
+      "clearChat": "New conversation",
+      "poweredBy": "Powered by Claude",
+      "you": "You",
+      "legalRef": "Legal reference",
+      "suggestions": {
+        "s1": "How to calculate late payment penalties?",
+        "s2": "Which annexes do I need to generate?",
+        "s3": "What is the legal notice period for a general meeting?",
+        "s4": "How do I close the accounting fiscal year?"
+      }
+    }
+  },
+  "onboarding": {
+    "eyebrow": "Setup",
+    "welcomeTitle": "Welcome, {{name}} 👋",
+    "continue": "Continue",
+    "back": "Back",
+    "later": "Later",
+    "team": {
+      "title": "Your team",
+      "intro": "Do you manage your syndic alone, or would you like to add a manager to your team?",
+      "selfTitle": "I manage on my own",
+      "selfDesc": "You'll be the only one accessing the space for now.",
+      "addTitle": "Add a manager",
+      "addDesc": "Invite a collaborator with dedicated access.",
+      "name": "Full name",
+      "namePlaceholder": "Karim Idrissi",
+      "email": "Email",
+      "hint": "A temporary password will be sent to them; they'll change it on first sign-in.",
+      "required": "Enter the manager's name and email.",
+      "created": "Manager created",
+      "error": "Could not create the manager.",
+      "credentialsTitle": "Manager created",
+      "copy": "Copy credentials",
+      "copied": "Credentials copied",
+      "credentialsHint": "Share these credentials with the manager. They'll change their password on first sign-in."
+    },
+    "residence": {
+      "title": "Your first building",
+      "intro": "Let's create the building you manage. You can add more afterwards.",
+      "name": "Building name",
+      "namePlaceholder": "Al Majd Residence",
+      "address": "Address",
+      "city": "City",
+      "echeance": "Due day",
+      "required": "Name, address and city are required.",
+      "error": "Could not create the building."
+    },
+    "lots": {
+      "title": "The building's units",
+      "intro": "Generate the units all at once. You can edit them individually later.",
+      "count": "Number of units",
+      "start": "Starting number",
+      "type": "Unit type",
+      "types": {
+        "appartement": "Apartment",
+        "commerce": "Shop",
+        "bureau": "Office",
+        "parking": "Parking",
+        "villa": "Villa"
+      },
+      "preview": "Preview ({{count}} units)",
+      "advancedHint": "Need wings, floors or phases? Configure them later on the building page.",
+      "generate": "Generate {{count}} units",
+      "required": "Indicate at least one unit to generate.",
+      "error": "Could not generate the units.",
+      "defaultBuilding": "Main building"
+    },
+    "done": {
+      "title": "All set",
+      "heading": "{{name}} is configured 🎉",
+      "body": "{{count}} units created. Here are the next steps to complete your file:",
+      "next": {
+        "copros": "Add the owners and their units",
+        "banque": "Enter the collection bank details",
+        "budget": "Set the budget and funds calls"
+      },
+      "cta": "Continue to the building"
+    },
+    "checklist": {
+      "title": "Finish your setup",
+      "subtitle": "A few steps to make your space fully operational.",
+      "progress": "{{done}} of {{total}} steps",
+      "step": {
+        "residence": "Create a building",
+        "lots": "Add units",
+        "copros": "Invite owners"
+      },
+      "resume": "Resume setup",
+      "start": "Start setup"
+    }
+  },
+  "common": {
+    "residence": "Building",
+    "selectResidence": "Select a building",
+    "selectExercice": "Select a fiscal year",
+    "select": "Select",
+    "coproprietaire": "Owner",
+    "selectCopro": "Choose an owner",
+    "tantieme": "Share",
+    "libelle": "Label",
+    "categorie": "Category",
+    "reference": "Reference",
+    "phone": "Phone",
+    "periode": "Period",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "paye": "Paid",
+    "societe": "Company",
+    "methode": "Method",
+    "amount": "Amount",
+    "designation": "Designation",
+    "createError": "Error while creating",
+    "updateError": "Error while updating",
+    "deleteError": "Error while deleting",
+    "saved": "Saved",
+    "created": "Created",
+    "updated": "Updated",
+    "deleted": "Deleted",
+    "copied": "Copied!",
+    "error": "Error",
+    "debit": "Debit",
+    "credit": "Credit",
+    "libelleRequired": "Label required",
+    "cheque": "Cheque",
+    "especes": "Cash",
+    "severity": "Severity",
+    "amountDue": "Amount due",
+    "view": "View",
+    "type": "Type",
+    "date": "Date",
+    "name": "Name",
+    "status": "Status",
+    "choose": "Choose",
+    "description": "Description",
+    "actions": "Actions",
+    "create": "Create",
+    "update": "Update",
+    "prestataire": "Provider",
+    "email": "Email",
+    "etage": "Floor",
+    "superficie": "Area (m²)",
+    "numero": "Number",
+    "createFailed": "Creation failed",
+    "updateFailed": "Update failed",
+    "deleteFailed": "Deletion failed",
+    "nameRequired": "Name required",
+    "lotRequired": "Unit required",
+    "lot": "Unit",
+    "total": "Total",
+    "montantMad": "Amount (MAD)",
+    "du": "From",
+    "exportInProgress": "Exporting...",
+    "saveError": "Error while saving",
+    "nouveau": "New",
+    "amountPositive": "Amount > 0",
+    "searchPlaceholder": "Search...",
+    "echeance": "Due date",
+    "appelDeFonds": "Funds call",
+    "chooseLanguage": "Choose language",
+    "exercice": "Fiscal year",
+    "titre": "Title",
+    "virement": "Bank transfer",
+    "compte": "Account",
+    "recouvre": "Collected",
+    "restant": "Remaining",
+    "rapproche": "Reconciled",
+    "recu": "Received",
+    "dateDeclaration": "Declaration date",
+    "justificatif": "Receipt",
+    "montantTotal": "Total amount",
+    "solde": "Balance",
+    "soldeD": "Debit bal.",
+    "soldeC": "Credit bal.",
+    "piece": "Document",
+    "action": "Action",
+    "chargement": "Loading…",
+    "loi1800Art25": "Law 18-00 · Art. 25",
+    "lotsEnRetard": "Units overdue",
+    "origine": "Origin",
+    "horodatage": "Timestamp",
+    "cible": "Target",
+    "erreurs": "Errors",
+    "actualiser": "Refresh",
+    "toutes": "All",
+    "payeur": "Payer",
+    "motif": "Reason",
+    "demande": "Request",
+    "initial": "Initial",
+    "organisme": "Lender",
+    "mensualite": "Monthly payment"
+  },
+  "public": {
+    "visitorPass": {
+      "title": "Visitor pass",
+      "subtitle": "Imaro · building access",
+      "showAtEntrance": "Show this QR at the entrance",
+      "scanByGuardian": "The guard scans it on your arrival and departure",
+      "visitor": "Visitor",
+      "host": "Host",
+      "scheduled": "Scheduled",
+      "purpose": "Purpose",
+      "expiresAfterScan": "Single-use code — expires after the exit scan",
+      "notFound": "Pass not found",
+      "notFoundDesc": "This link is invalid, already used or expired.",
+      "saveToPhone": "Save this QR",
+      "contactHost": "Contact host",
+      "statusPlanned": "Awaiting arrival",
+      "statusArrived": "Entered · visit in progress",
+      "statusDeparted": "Visit ended",
+      "statusExpired": "Link expired",
+      "statusCancelled": "Visit cancelled",
+      "addToAppleWallet": "Add to Apple Wallet",
+      "addToGoogleWallet": "Add to Google Wallet",
+      "recurringPass": "Recurring pass"
+    }
+  },
+  "gardien": {
+    "title": "Guard mode",
+    "subtitle": "QR scan at entry · exit · walk-in",
+    "hint": "Point the camera at the visitor's QR",
+    "scanAction": "Scan a QR",
+    "walkInAction": "Walk-in (visitor without QR)",
+    "activeCount": "{{n}} inside",
+    "activeCountZero": "Nobody inside",
+    "activeListTitle": "Visitors currently inside",
+    "since": "since {{time}}",
+    "logout": "Sign out of guard mode",
+    "scanResult": {
+      "checkInTitle": "Entry recorded",
+      "checkOutTitle": "Exit recorded",
+      "rejectedTitle": "QR rejected",
+      "newScan": "New scan",
+      "manualCheckOut": "Force exit"
+    },
+    "scanner": {
+      "starting": "Starting camera…",
+      "permissionNeeded": "Camera permission required",
+      "permissionDesc": "Imaro needs camera access to scan QR codes.",
+      "permissionAllow": "Allow camera",
+      "noCamera": "No camera detected on this device.",
+      "manualEntry": "Enter manually",
+      "switchCamera": "Other camera",
+      "scanFromImage": "Load from an image",
+      "cancelScan": "Cancel"
+    },
+    "walkIn": {
+      "title": "Visitor walk-in",
+      "desc": "Register a visitor immediately without a pre-generated QR.",
+      "submit": "Register & mark entry",
+      "submitting": "Registering…",
+      "success": "{{name}} registered at entry"
+    },
+    "guard": {
+      "notLoggedIn": "Sign in to access guard mode",
+      "goToLogin": "Go to sign in",
+      "wrongRole": "Your account does not have the guard role. Contact the manager."
+    },
+    "photo": {
+      "title": "Visitor photo",
+      "desc": "Capture a photo for the security audit (recommended).",
+      "capture": "Take the photo",
+      "retake": "Retake",
+      "skip": "Skip",
+      "confirm": "Confirm entry",
+      "starting": "Activating camera…",
+      "permissionDenied": "Camera denied — photo skipped",
+      "uploaded": "Photo saved",
+      "skipped": "Entry recorded without photo"
+    },
+    "install": {
+      "title": "Install Imaro Guard",
+      "desc": "Add to home screen for quick offline access.",
+      "install": "Install",
+      "later": "Later"
+    }
+  }
+}

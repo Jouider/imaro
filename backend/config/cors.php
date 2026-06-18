@@ -11,6 +11,10 @@ return [
         'https://imaro.ma',
         'https://www.imaro.ma',
         'https://staging.imaro.ma',
+        // App mobile Capacitor (KAN-71) — iOS: capacitor://localhost, Android: https://localhost
+        'capacitor://localhost',
+        'ionic://localhost',
+        'https://localhost',
     ])),
     'allowed_origins_patterns' => [],
     'allowed_headers' => ['*'],

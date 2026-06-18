@@ -1,0 +1,1671 @@
+{
+	"info": {
+		"_postman_id": "imaro-api-collection-2026",
+		"name": "imaro API — Backend complet",
+		"description": "Collection Postman complète pour l'API imaro (SaaS B2B copropriété Maroc).\n\nVariables :\n- `base_url` : URL de base de l'API\n- `token` : Token Sanctum (auto-set après login)\n\nDonnées de test alignées sur le DemoSeeder.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://api.imaro.ma/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login (gestionnaire)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    if (json.data && json.data.token) {",
+									"        pm.environment.set('token', json.data.token);",
+									"        pm.collectionVariables.set('token', json.data.token);",
+									"    }",
+									"}",
+									"",
+									"pm.test('Status 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Has token', function () {",
+									"    pm.expect(pm.response.json().data.token).to.be.a('string');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"fikri@gestsyndic.ma\",\n  \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Login email + mot de passe pour gestionnaire / manager / conseil / super_admin.\nRetourne un token Sanctum auto-stocké dans la variable `token`."
+					}
+				},
+				{
+					"name": "Resident Login (phone + code)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    if (json.data && json.data.token) {",
+									"        pm.environment.set('token', json.data.token);",
+									"        pm.collectionVariables.set('token', json.data.token);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone\": \"+212661000001\",\n  \"code\": \"ABC12XY8\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/resident/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "resident", "login"]
+						},
+						"description": "Login résident via téléphone + code d'accès.\nSi première connexion, retourne status 'first_login'."
+					}
+				},
+				{
+					"name": "Resident Activate (first login)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"phone\": \"+212661000001\",\n  \"temp_code\": \"ABC12XY8\",\n  \"new_code\": \"MONCODE1\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/resident/activate",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "resident", "activate"]
+						},
+						"description": "Première connexion résident : remplace le code temporaire par un code personnel."
+					}
+				},
+				{
+					"name": "Me (current user)",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "me"]
+						},
+						"description": "Retourne l'utilisateur authentifié + tenant info."
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "logout"]
+						},
+						"description": "Supprime le token Sanctum courant."
+					}
+				}
+			]
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Get Dashboard KPIs",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/dashboard",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "dashboard"]
+						},
+						"description": "KPIs gestionnaire : nb_residences, nb_coproprietaires, ca_mensuel, total_impayes + top impayés, tickets urgents, assemblées à venir."
+					}
+				}
+			]
+		},
+		{
+			"name": "Residences",
+			"item": [
+				{
+					"name": "List Residences",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/residences?per_page=15&search=",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "residences"],
+							"query": [
+								{ "key": "per_page", "value": "15" },
+								{ "key": "search", "value": "", "description": "Filtre par nom ou ville" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Show Residence",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/residences/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "residences", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Residence",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Résidence Atlas\",\n  \"adresse\": \"123 Bd Mohamed V, Casablanca\",\n  \"ville\": \"Casablanca\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/residences/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "residences", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Lots",
+			"item": [
+				{
+					"name": "List Lots (by residence)",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/residences/1/lots",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "residences", "1", "lots"]
+						},
+						"description": "Liste les lots de la résidence avec total_tantieme et sum_tantieme."
+					}
+				},
+				{
+					"name": "Create Lot",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numero\": \"C301\",\n  \"type\": \"appartement\",\n  \"etage\": 3,\n  \"superficie\": 92.0,\n  \"tantieme\": 50\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/residences/1/lots",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "residences", "1", "lots"]
+						}
+					}
+				},
+				{
+					"name": "Update Lot (nested)",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numero\": \"A101\",\n  \"type\": \"appartement\",\n  \"etage\": 1,\n  \"superficie\": 85.5,\n  \"tantieme\": 50\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/residences/1/lots/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "residences", "1", "lots", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Lot (flat)",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numero\": \"A101\",\n  \"type\": \"appartement\",\n  \"etage\": 1,\n  \"superficie\": 85.5,\n  \"tantieme\": 50\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/lots/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "lots", "1"]
+						},
+						"description": "Route plate attendue par le frontend."
+					}
+				},
+				{
+					"name": "Delete Lot (nested)",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/residences/1/lots/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "residences", "1", "lots", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Lot (flat)",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/lots/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "lots", "1"]
+						},
+						"description": "Route plate attendue par le frontend."
+					}
+				}
+			]
+		},
+		{
+			"name": "Coproprietaires",
+			"item": [
+				{
+					"name": "List Coproprietaires (by residence)",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/residences/1/coproprietaires?per_page=15&search=",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "residences", "1", "coproprietaires"],
+							"query": [
+								{ "key": "per_page", "value": "15" },
+								{ "key": "search", "value": "", "description": "Recherche par nom ou téléphone" }
+							]
+						}
+					}
+				},
+				{
+					"name": "List Coproprietaires (global)",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/coproprietaires",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "coproprietaires"]
+						},
+						"description": "Liste globale de tous les copropriétaires des résidences du gestionnaire."
+					}
+				},
+				{
+					"name": "Create Coproprietaire",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Youssef El Mansouri\",\n  \"phone\": \"+212612345678\",\n  \"email\": \"youssef.elmansouri@gmail.com\",\n  \"residence_id\": 1,\n  \"lot_id\": 1,\n  \"type\": \"proprietaire\",\n  \"date_entree\": \"2026-01-15\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/coproprietaires",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "coproprietaires"]
+						},
+						"description": "Crée un user résident + copropriétaire. Retourne temp_password (code d'accès temporaire)."
+					}
+				},
+				{
+					"name": "Generate Access Code",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/coproprietaires/1/generate-code",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "coproprietaires", "1", "generate-code"]
+						},
+						"description": "Génère un nouveau code d'accès temporaire pour un résident. Le code est affiché une seule fois."
+					}
+				}
+			]
+		},
+		{
+			"name": "Exercices",
+			"item": [
+				{
+					"name": "List Exercices",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/residences/1/exercices",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "residences", "1", "exercices"]
+						}
+					}
+				},
+				{
+					"name": "Create Exercice",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"annee\": 2027,\n  \"date_debut\": \"2027-01-01\",\n  \"date_fin\": \"2027-12-31\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/residences/1/exercices",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "residences", "1", "exercices"]
+						}
+					}
+				},
+				{
+					"name": "Cloturer Exercice (residence scoped)",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/residences/1/exercices/2/cloture",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "residences", "1", "exercices", "2", "cloture"]
+						},
+						"description": "Clôture l'exercice actif. exercice_id=2 correspond à l'exercice 2026 actif du DemoSeeder."
+					}
+				}
+			]
+		},
+		{
+			"name": "Appels de Fonds",
+			"item": [
+				{
+					"name": "List Appels de Fonds",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/appels-fonds?residence_id=1&statut=",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "appels-fonds"],
+							"query": [
+								{ "key": "residence_id", "value": "1", "description": "Filtrer par résidence" },
+								{ "key": "statut", "value": "", "description": "brouillon, envoye, partiel, solde" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Show Appel de Fonds",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/appels-fonds/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "appels-fonds", "1"]
+						},
+						"description": "Détail avec lignes de répartition par tantième."
+					}
+				},
+				{
+					"name": "Create Appel de Fonds",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Charges Q3 2026\",\n  \"residence_id\": 1,\n  \"exercice_id\": 2,\n  \"montant_total\": 24000,\n  \"date_echeance\": \"2026-09-30\",\n  \"description\": \"Charges trimestrielles Q3 — Résidence Atlas\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/appels-fonds",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "appels-fonds"]
+						},
+						"description": "Crée l'appel et génère automatiquement les lignes par tantième pour chaque copropriétaire."
+					}
+				},
+				{
+					"name": "Update Appel de Fonds",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"libelle\": \"Charges Q3 2026 — Révisé\",\n  \"montant_total\": 26000,\n  \"date_echeance\": \"2026-10-15\",\n  \"description\": \"Montant révisé suite AG\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/appels-fonds/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "appels-fonds", "1"]
+						},
+						"description": "Modification uniquement si statut = brouillon. Si montant_total change, les lignes sont régénérées."
+					}
+				},
+				{
+					"name": "Envoyer Appel de Fonds",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/appels-fonds/1/envoyer",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "appels-fonds", "1", "envoyer"]
+						},
+						"description": "Passe statut brouillon → envoyé. Déclenche les notifications WhatsApp (quand configuré)."
+					}
+				}
+			]
+		},
+		{
+			"name": "Paiements",
+			"item": [
+				{
+					"name": "List Paiements",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/paiements?residence_id=1&appel_fonds_id=",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "paiements"],
+							"query": [
+								{ "key": "residence_id", "value": "1" },
+								{ "key": "appel_fonds_id", "value": "", "description": "Filtrer par appel de fonds" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Paiement",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"appel_fonds_ligne_id\": 1,\n  \"montant\": 900,\n  \"mode\": \"virement\",\n  \"reference\": \"VIR-2026-048\",\n  \"note\": \"Paiement charges Q2\",\n  \"date_paiement\": \"2026-05-15\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/paiements",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "paiements"]
+						},
+						"description": "Enregistre un paiement sur une ligne d'appel de fonds. Met à jour automatiquement montant_paye, statut de la ligne, et recalcule le solde du copropriétaire."
+					}
+				}
+			]
+		},
+		{
+			"name": "Impayes",
+			"item": [
+				{
+					"name": "List Impayes",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/impayes?residence_id=1&appel_fonds_id=&overdue_only=false",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "impayes"],
+							"query": [
+								{ "key": "residence_id", "value": "1" },
+								{ "key": "appel_fonds_id", "value": "" },
+								{ "key": "overdue_only", "value": "false", "description": "true = seulement les échéances dépassées" }
+							]
+						},
+						"description": "Liste des lignes impayées ou partielles avec jours de retard."
+					}
+				}
+			]
+		},
+		{
+			"name": "Tickets",
+			"item": [
+				{
+					"name": "List Tickets",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/tickets?residence_id=&statut=&priorite=&categorie=",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "tickets"],
+							"query": [
+								{ "key": "residence_id", "value": "" },
+								{ "key": "statut", "value": "", "description": "ouvert, en_cours, resolu, clos" },
+								{ "key": "priorite", "value": "", "description": "urgent, normal, faible" },
+								{ "key": "categorie", "value": "", "description": "plomberie, electricite, ascenseur, etc." }
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Ticket",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "residence_id", "value": "1", "type": "text" },
+								{ "key": "lot_id", "value": "1", "type": "text" },
+								{ "key": "categorie", "value": "plomberie", "type": "text" },
+								{ "key": "description", "value": "Fuite d'eau importante dans le couloir du 2ème étage, près de l'appartement B204", "type": "text" },
+								{ "key": "priorite", "value": "urgent", "type": "text" },
+								{ "key": "images[]", "type": "file", "src": "", "description": "Photos du problème (max 5)" }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/tickets",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "tickets"]
+						},
+						"description": "Crée un ticket/réclamation. Supporte upload de photos (multipart)."
+					}
+				},
+				{
+					"name": "Show Ticket",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/tickets/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "tickets", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Ticket (change statut)",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"statut\": \"en_cours\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/tickets/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "tickets", "1"]
+						},
+						"description": "Utilisé par le Kanban drag-and-drop pour changer le statut."
+					}
+				},
+				{
+					"name": "Close Ticket",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/tickets/1/clos",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "tickets", "1", "clos"]
+						},
+						"description": "Clôture définitive du ticket."
+					}
+				}
+			]
+		},
+		{
+			"name": "Assemblees",
+			"item": [
+				{
+					"name": "List Assemblees",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/assemblees",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "assemblees"]
+						}
+					}
+				},
+				{
+					"name": "Create Assemblee",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"AG Ordinaire 2026\",\n  \"type\": \"ordinaire\",\n  \"residence_id\": 1,\n  \"date\": \"2026-06-15T10:00:00Z\",\n  \"lieu\": \"Salle de réunion, RDC — Résidence Atlas\",\n  \"quorum_requis\": 50,\n  \"ordre_du_jour\": \"1. Approbation des comptes 2025\\n2. Budget prévisionnel 2026\\n3. Travaux ascenseur\\n4. Questions diverses\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/assemblees",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "assemblees"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Annonces",
+			"item": [
+				{
+					"name": "List Annonces",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/annonces?statut=&residence_id=",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "annonces"],
+							"query": [
+								{ "key": "statut", "value": "", "description": "brouillon, publiee, archivee" },
+								{ "key": "residence_id", "value": "", "description": "Filtrer par résidence (null = toutes)" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Annonce",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Travaux ascenseur — interruption de service\",\n  \"contenu\": \"Chers résidents,\\n\\nNous vous informons que l'ascenseur sera hors service du 20 au 22 mai 2026 pour maintenance préventive.\\n\\nNous nous excusons pour la gêne occasionnée.\\n\\nCordialement,\\nGestion Atlas Syndic\",\n  \"priorite\": \"urgente\",\n  \"residence_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/annonces",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "annonces"]
+						}
+					}
+				},
+				{
+					"name": "Update Annonce",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Travaux ascenseur — report au 25 mai\",\n  \"contenu\": \"Suite à un retard du prestataire, les travaux sont reportés au 25 mai.\",\n  \"priorite\": \"urgente\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/annonces/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "annonces", "1"]
+						}
+					}
+				},
+				{
+					"name": "Publier Annonce",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/annonces/1/publier",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "annonces", "1", "publier"]
+						}
+					}
+				},
+				{
+					"name": "Archiver Annonce",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/annonces/1/archiver",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "annonces", "1", "archiver"]
+						}
+					}
+				},
+				{
+					"name": "Delete Annonce",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/annonces/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "annonces", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Prestataires",
+			"item": [
+				{
+					"name": "List Prestataires",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/prestataires?statut=&specialite=",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "prestataires"],
+							"query": [
+								{ "key": "statut", "value": "", "description": "actif, inactif" },
+								{ "key": "specialite", "value": "", "description": "ascenseurs, plomberie, electricite, nettoyage, etc." }
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Prestataire",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nom\": \"Ascenseurs Maroc SARL\",\n  \"telephone\": \"+212522000001\",\n  \"specialite\": \"ascenseurs\",\n  \"email\": \"contact@ascenseurs-maroc.ma\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/prestataires",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "prestataires"]
+						}
+					}
+				},
+				{
+					"name": "Update Prestataire",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nom\": \"Ascenseurs Maroc SARL\",\n  \"telephone\": \"+212522000002\",\n  \"specialite\": \"ascenseurs\",\n  \"email\": \"technique@ascenseurs-maroc.ma\",\n  \"statut\": \"actif\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/prestataires/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "prestataires", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Contrats",
+			"item": [
+				{
+					"name": "List Contrats",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/contrats?residence_id=1&statut=",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "contrats"],
+							"query": [
+								{ "key": "residence_id", "value": "1" },
+								{ "key": "statut", "value": "", "description": "actif, expire, resilie" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Contrat",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titre\": \"Contrat maintenance ascenseurs 2026\",\n  \"type\": \"maintenance\",\n  \"residence_id\": 1,\n  \"prestataire_id\": 1,\n  \"montant\": 18000,\n  \"date_debut\": \"2026-01-01\",\n  \"date_fin\": \"2026-12-31\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/contrats",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "contrats"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Budgets",
+			"item": [
+				{
+					"name": "Get Budget (by residence + exercice)",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/budgets?residence_id=1&exercice_id=2",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "budgets"],
+							"query": [
+								{ "key": "residence_id", "value": "1" },
+								{ "key": "exercice_id", "value": "2", "description": "Exercice 2026 actif" }
+							]
+						},
+						"description": "Retourne le budget (ou null) pour une résidence et un exercice donnés."
+					}
+				},
+				{
+					"name": "Create Budget",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"residence_id\": 1,\n  \"exercice_id\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/budgets",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "budgets"]
+						}
+					}
+				},
+				{
+					"name": "Approuver Budget",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/budgets/1/approuver",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "budgets", "1", "approuver"]
+						}
+					}
+				},
+				{
+					"name": "Create Poste Budgetaire",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categorie\": \"entretien\",\n  \"description\": \"Maintenance ascenseurs — Ascenseurs Maroc SARL\",\n  \"montant_prevu\": 18000,\n  \"montant_realise\": 9000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/budgets/1/postes",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "budgets", "1", "postes"]
+						}
+					}
+				},
+				{
+					"name": "Update Poste Budgetaire",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categorie\": \"entretien\",\n  \"description\": \"Maintenance ascenseurs — contrat révisé\",\n  \"montant_prevu\": 20000,\n  \"montant_realise\": 12000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/budgets/1/postes/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "budgets", "1", "postes", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Poste Budgetaire",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/budgets/1/postes/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "budgets", "1", "postes", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Documents",
+			"item": [
+				{
+					"name": "List Documents",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/documents?type=&residence_id=",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "documents"],
+							"query": [
+								{ "key": "type", "value": "", "description": "reglement, pv_ag, contrat, facture, autre" },
+								{ "key": "residence_id", "value": "" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Upload Document",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "nom", "value": "Règlement de copropriété 2024 — Résidence Atlas", "type": "text" },
+								{ "key": "type", "value": "reglement", "type": "text" },
+								{ "key": "residence_id", "value": "1", "type": "text" },
+								{ "key": "date", "value": "2024-01-15", "type": "text" },
+								{ "key": "file", "type": "file", "src": "", "description": "PDF, JPG, PNG, DOC, DOCX — max 20 Mo" }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/documents",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "documents"]
+						},
+						"description": "Upload multipart. Le champ 'file' est obligatoire."
+					}
+				},
+				{
+					"name": "Delete Document",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/documents/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "documents", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Profil",
+			"item": [
+				{
+					"name": "Get Profil",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/profil",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "profil"]
+						},
+						"description": "Retourne le profil du gestionnaire avec préférences de notification."
+					}
+				},
+				{
+					"name": "Update Profil",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Mohammed Fikri\",\n  \"notif_paiement\": true,\n  \"notif_ticket\": true,\n  \"notif_assemblee\": true,\n  \"notif_retard\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/profil",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "profil"]
+						}
+					}
+				},
+				{
+					"name": "Upload Logo Syndic",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "file", "type": "file", "src": "", "description": "PNG ou JPG, max 2 Mo" }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/profil/logo",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "profil", "logo"]
+						},
+						"description": "Upload du logo syndic. Retourne logo_url."
+					}
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "List Notifications",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/notifications",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "notifications"]
+						},
+						"description": "Dernières 50 notifications. Types : paiement, ticket, assemblee, retard, info."
+					}
+				},
+				{
+					"name": "Mark Notification as Read",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "PATCH",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/notifications/1/read",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "notifications", "1", "read"]
+						}
+					}
+				},
+				{
+					"name": "Mark All Notifications as Read",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "PATCH",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/notifications/read-all",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "notifications", "read-all"]
+						}
+					}
+				},
+				{
+					"name": "Delete Notification",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/notifications/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "notifications", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Comptabilite",
+			"item": [
+				{
+					"name": "Comptabilite Dashboard",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/exercices/2/dashboard",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "exercices", "2", "dashboard"]
+						},
+						"description": "KPIs comptables : total_charges, total_produits, solde, taux_recouvrement, charges_par_categorie, evolution_mensuelle."
+					}
+				},
+				{
+					"name": "Journal Comptable",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/exercices/2/journal?compte=&type=&date_debut=&date_fin=",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "exercices", "2", "journal"],
+							"query": [
+								{ "key": "compte", "value": "", "description": "Filtrer par numéro de compte PCG (ex: 401, 512, 614)" },
+								{ "key": "type", "value": "", "description": "debit ou credit" },
+								{ "key": "date_debut", "value": "" },
+								{ "key": "date_fin", "value": "" }
+							]
+						},
+						"description": "Ecritures en partie double synthétisées depuis paiements + dépenses."
+					}
+				},
+				{
+					"name": "Grand Livre",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/exercices/2/grand-livre?compte=",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "exercices", "2", "grand-livre"],
+							"query": [
+								{ "key": "compte", "value": "", "description": "Filtrer par numéro de compte (ex: 614)" }
+							]
+						},
+						"description": "Grand livre par compte avec écritures détaillées, totaux débit/crédit, solde final."
+					}
+				},
+				{
+					"name": "Balance des Comptes",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/exercices/2/balance",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "exercices", "2", "balance"]
+						},
+						"description": "Balance simplifiée : compte, intitulé, débit, crédit, solde."
+					}
+				},
+				{
+					"name": "List Depenses",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/exercices/2/depenses",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "exercices", "2", "depenses"]
+						}
+					}
+				},
+				{
+					"name": "Create Depense",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"description\": \"Facture gardiennage mai 2026\",\n  \"categorie\": \"Gardiennage\",\n  \"montant\": 1200,\n  \"date\": \"2026-05-15\",\n  \"prestataire\": \"Société Sécurité Atlas\",\n  \"prestataire_id\": null,\n  \"statut\": \"paye\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/exercices/2/depenses",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "exercices", "2", "depenses"]
+						},
+						"description": "Ajoute une dépense à l'exercice. Statut : paye, en_attente, annule."
+					}
+				},
+				{
+					"name": "Delete Depense",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/exercices/2/depenses/1",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "exercices", "2", "depenses", "1"]
+						}
+					}
+				},
+				{
+					"name": "Create Encaissement",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"coproprietaire_id\": 5,\n  \"montant\": 1500,\n  \"date\": \"2026-05-10\",\n  \"reference\": \"VIR-2026-047\",\n  \"appel_fonds_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/exercices/2/encaissements",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "exercices", "2", "encaissements"]
+						},
+						"description": "Enregistre un encaissement dans l'exercice. Met à jour la ligne d'appel de fonds et le solde du copropriétaire."
+					}
+				},
+				{
+					"name": "Cloturer Exercice",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/exercices/2/cloturer",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "exercices", "2", "cloturer"]
+						},
+						"description": "Clôture l'exercice. Passe statut ouvert → cloture. Lecture seule ensuite."
+					}
+				},
+				{
+					"name": "Comptes PCG (reference)",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/gestionnaire/comptes-pcg",
+							"host": ["{{base_url}}"],
+							"path": ["gestionnaire", "comptes-pcg"]
+						},
+						"description": "Liste statique des comptes du Plan Comptable Général pour les syndicats de copropriété."
+					}
+				}
+			]
+		},
+		{
+			"name": "Portail",
+			"item": [
+				{
+					"name": "Portail — Dashboard",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/portail/dashboard",
+							"host": ["{{base_url}}"],
+							"path": ["portail", "dashboard"]
+						},
+						"description": "Dashboard copropriétaire : balance, statut (a_jour/en_retard), prochain_appel."
+					}
+				},
+				{
+					"name": "Portail — Operations (finances)",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/portail/operations",
+							"host": ["{{base_url}}"],
+							"path": ["portail", "operations"]
+						},
+						"description": "Historique des opérations financières du copropriétaire (paiements + appels de fonds)."
+					}
+				},
+				{
+					"name": "Portail — Annonces",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/portail/annonces",
+							"host": ["{{base_url}}"],
+							"path": ["portail", "annonces"]
+						}
+					}
+				},
+				{
+					"name": "Portail — Assemblees",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/portail/assemblees",
+							"host": ["{{base_url}}"],
+							"path": ["portail", "assemblees"]
+						}
+					}
+				},
+				{
+					"name": "Portail — Documents",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/portail/documents",
+							"host": ["{{base_url}}"],
+							"path": ["portail", "documents"]
+						}
+					}
+				},
+				{
+					"name": "Portail — List Reclamations",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/portail/reclamations",
+							"host": ["{{base_url}}"],
+							"path": ["portail", "reclamations"]
+						}
+					}
+				},
+				{
+					"name": "Portail — Create Reclamation",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "titre", "value": "Fuite d'eau dans le couloir B2", "type": "text" },
+								{ "key": "description", "value": "Il y a une fuite d'eau importante dans le couloir du 2ème étage, près de l'appartement B204. L'eau coule depuis ce matin.", "type": "text" },
+								{ "key": "categorie", "value": "plomberie", "type": "text" },
+								{ "key": "photos[]", "type": "file", "src": "", "description": "Jusqu'à 5 photos" },
+								{ "key": "photos[]", "type": "file", "src": "" }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/portail/reclamations",
+							"host": ["{{base_url}}"],
+							"path": ["portail", "reclamations"]
+						},
+						"description": "Soumettre une réclamation avec photos (multipart)."
+					}
+				},
+				{
+					"name": "Portail — Get Profil",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/portail/profil",
+							"host": ["{{base_url}}"],
+							"path": ["portail", "profil"]
+						}
+					}
+				},
+				{
+					"name": "Portail — Update Profil",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Karim Benali\",\n  \"email\": \"karim.benali@gmail.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/portail/profil",
+							"host": ["{{base_url}}"],
+							"path": ["portail", "profil"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

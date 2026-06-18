@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { FileText, Download, RefreshCw, Check, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -51,9 +52,8 @@ const ANNEXE_LABELS: Record<string, string> = {
 export function AnnexesPage() {
   const { t } = useTranslation()
 
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
-    null,
-  )
+  const globalResidenceId = useResidenceStore((s) => s.residenceId)
+  const setResidenceId = useResidenceStore((s) => s.setResidenceId)
   const [exercice, setExercice] = useState(2026)
 
   const residencesQ = useQuery({
@@ -62,7 +62,7 @@ export function AnnexesPage() {
   })
 
   // Derive effective residence id (picked or auto first)
-  const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
+  const residenceId = globalResidenceId ?? residencesQ.data?.[0]?.id ?? null
 
   const annexesQ = useQuery({
     queryKey: ['annexes', residenceId, exercice],
@@ -96,7 +96,7 @@ export function AnnexesPage() {
 
   const commonCtx = {
     residenceName,
-    exerciceLabel: `Exercice clos le 31 décembre ${exercice}`,
+    exerciceLabel: t('gestionnaire.annexes.exerciceClos', { year: exercice }),
     exercice,
     generatedAtIso: new Date().toISOString(),
   }
@@ -208,7 +208,12 @@ export function AnnexesPage() {
             '10',
             exercice,
           )
-          data = { totals: payload.totals, rows: payload.rows }
+          // Guard against a malformed/partial payload — never read totals on
+          // undefined (issue #240). Fall back to client-computed data.
+          data =
+            payload?.totals && Array.isArray(payload?.rows)
+              ? { totals: payload.totals, rows: payload.rows }
+              : buildAnnexe10Rows()
         } catch {
           // backend unavailable → use client-computed data
           data = buildAnnexe10Rows()
@@ -222,6 +227,7 @@ export function AnnexesPage() {
             '13-1',
             exercice,
           )
+          if (!payload?.current || !payload?.previous) throw new Error('shape')
         } catch {
           const zero = {
             fondsReserve: 0,
@@ -240,6 +246,7 @@ export function AnnexesPage() {
             '13-2',
             exercice,
           )
+          if (!payload?.recettes || !payload?.depenses) throw new Error('shape')
         } catch {
           const z: Quad4 = { n1: 0, n: 0, n0: 0, nMinus1: 0 }
           payload = {
@@ -264,7 +271,7 @@ export function AnnexesPage() {
         // Annexes 3, 4, 5, 6, 7, 8, 9, 11, 12 — backend not ready yet
         await generateAnnexePdf(annexeNum, commonCtx)
       }
-      toast.success(`Annexe ${annexeNum} téléchargée`)
+      toast.success(t('gestionnaire.annexes.downloaded', { num: annexeNum }))
     } catch (err) {
       toast.error(
         err instanceof Error
@@ -305,7 +312,7 @@ export function AnnexesPage() {
         <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
-          onValueChange={(v) => setPickedResidenceId(Number(v))}
+          onValueChange={(v) => setResidenceId(Number(v))}
         >
           <SelectTrigger className="w-64">
             <SelectValue placeholder={t('common.select')} />
@@ -319,7 +326,7 @@ export function AnnexesPage() {
           </SelectContent>
         </Select>
 
-        <label className="text-sm font-medium">Exercice</label>
+        <label className="text-sm font-medium">{t('common.exercice')}</label>
         <Select
           value={String(exercice)}
           onValueChange={(v) => setExercice(Number(v))}
@@ -346,15 +353,15 @@ export function AnnexesPage() {
           )}
         >
           {regime === 'simplifie'
-            ? 'Régime simplifié (≤ 200 000 MAD/an)'
-            : 'Régime normal'}
+            ? t('gestionnaire.annexes.regimeSimplifie')
+            : t('gestionnaire.annexes.regimeNormal')}
         </Badge>
       </div>
 
       {/* Required annexes */}
       <section className="space-y-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Annexes obligatoires
+          {t('gestionnaire.annexes.obligatoires')}
         </h2>
         <div className="space-y-2">
           {required.map((a) => (

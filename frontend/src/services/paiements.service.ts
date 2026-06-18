@@ -419,6 +419,8 @@ const MOCK_DECOMPTES: Decompte[] = [
 export async function getCreances(params?: {
   statut?: string
   search?: string
+  /** Global residence scope (KAN-47). Server-side filter — pending backend. */
+  residence_id?: number
 }): Promise<Creance[]> {
   return withMock(
     async () => {

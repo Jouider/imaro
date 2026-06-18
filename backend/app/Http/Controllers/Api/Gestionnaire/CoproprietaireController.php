@@ -9,11 +9,11 @@ use App\Models\Coproprietaire;
 use App\Models\Lot;
 use App\Models\Residence;
 use App\Models\User;
+use App\Services\Notifications\CoproprietaireWelcomeNotifier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class CoproprietaireController extends Controller
@@ -35,23 +35,55 @@ class CoproprietaireController extends Controller
 
         abort_if(! $isManager && ! $isGestionnaire, 403, 'Accès refusé.');
 
-        $tempCode = strtoupper(Str::random(8));
+        $tenantId = $request->user()->tenant_id;
 
-        $coproprietaire = DB::transaction(function () use ($request, $lot, $tempCode) {
-            $user = User::create([
-                'tenant_id'        => $request->user()->tenant_id,
-                'name'             => $request->name,
-                'phone'            => $request->phone,
-                'email'            => $request->email,
-                'role'             => 'resident',
-                'password'         => Hash::make(Str::random(16)),
-                'access_code'      => Hash::make($tempCode),
-                'must_change_code' => true,
-                'status'           => 'active',
-            ]);
+        // A copropriétaire can hold several lots (across résidences). Re-use the
+        // existing account in this cabinet instead of failing on the unique phone.
+        $existing = $this->findResidentInTenant($tenantId, $request->phone, $request->email);
+
+        if (! $existing && $this->identityUsedInOtherTenant($tenantId, $request->phone, $request->email)) {
+            return $this->error422('Ce numéro ou email est déjà utilisé par un compte d\'un autre cabinet.', 'phone');
+        }
+
+        if ($existing && $existing->role !== 'resident') {
+            return $this->error422('Ce numéro ou email appartient à un membre de l\'équipe, pas à un copropriétaire.', 'phone');
+        }
+
+        if ($existing && Coproprietaire::where('lot_id', $lot->id)->where('user_id', $existing->id)->exists()) {
+            return $this->error422('Ce copropriétaire est déjà rattaché à ce lot.', 'lot_id');
+        }
+
+        // Only a freshly created account gets an access code + welcome cascade.
+        $tempCode = $existing ? null : strtoupper(Str::random(8));
+
+        $coproprietaire = DB::transaction(function () use ($request, $lot, $tenantId, $existing, $tempCode) {
+            if ($existing) {
+                if ($existing->trashed()) {
+                    $existing->restore();
+                }
+                $user = $existing;
+            } else {
+                $user = User::create([
+                    'tenant_id'        => $tenantId,
+                    'name'             => $request->name,
+                    'phone'            => $request->phone,
+                    'email'            => $request->email,
+                    'role'             => 'resident',
+                    'password'         => Hash::make(Str::random(16)),
+                    'access_code'      => Hash::make($tempCode),
+                    'must_change_code' => true,
+                    'status'           => 'active',
+                ]);
+            }
+
+            // Rôle Spatie obligatoire — sinon le middleware role:resident bloque
+            // l'accès au portail (403). La colonne `role` ne suffit pas.
+            if (! $user->hasRole('resident')) {
+                $user->assignRole('resident');
+            }
 
             return Coproprietaire::create([
-                'tenant_id'    => $request->user()->tenant_id,
+                'tenant_id'    => $tenantId,
                 'user_id'      => $user->id,
                 'lot_id'       => $lot->id,
                 'type'         => $request->type ?? 'proprietaire',
@@ -60,20 +92,61 @@ class CoproprietaireController extends Controller
             ]);
         });
 
-        Log::info('[CODE ACCÈS RÉSIDENT - SIMULÉ]', [
-            'destinataire' => $request->name,
-            'phone'        => $request->phone,
-            'code'         => $tempCode,
-        ]);
+        if ($tempCode !== null) {
+            app(CoproprietaireWelcomeNotifier::class)
+                ->send($coproprietaire->user, $tempCode, $lot->residence);
+        }
 
         return response()->json([
             'status'  => 'success',
-            'message' => 'Copropriétaire créé.',
+            'message' => $existing ? 'Copropriétaire existant rattaché au lot.' : 'Copropriétaire créé.',
             'data'    => [
                 'coproprietaire' => new CoproprietaireResource($coproprietaire->load(['user', 'lot'])),
-                'temp_password'  => $tempCode,
+                'temp_password'  => $tempCode,   // null when an existing account was re-used
+                'reused'         => (bool) $existing,
             ],
         ], 201);
+    }
+
+    /** Existing user (any role, incl. soft-deleted) of this cabinet matching phone or email. */
+    private function findResidentInTenant(int $tenantId, ?string $phone, ?string $email): ?User
+    {
+        return User::withTrashed()
+            ->where('tenant_id', $tenantId)
+            ->where(function ($q) use ($phone, $email) {
+                if ($phone) {
+                    $q->orWhere('phone', $phone);
+                }
+                if ($email) {
+                    $q->orWhere('email', $email);
+                }
+            })
+            ->first();
+    }
+
+    /** phone/email are globally unique — a match in another cabinet can't be re-used. */
+    private function identityUsedInOtherTenant(int $tenantId, ?string $phone, ?string $email): bool
+    {
+        return User::withTrashed()
+            ->where('tenant_id', '!=', $tenantId)
+            ->where(function ($q) use ($phone, $email) {
+                if ($phone) {
+                    $q->orWhere('phone', $phone);
+                }
+                if ($email) {
+                    $q->orWhere('email', $email);
+                }
+            })
+            ->exists();
+    }
+
+    private function error422(string $message, string $field): JsonResponse
+    {
+        return response()->json([
+            'status'  => 'error',
+            'message' => $message,
+            'errors'  => [$field => [$message]],
+        ], 422);
     }
 
     /**
@@ -98,15 +171,7 @@ class CoproprietaireController extends Controller
             'must_change_code' => true,
         ]);
 
-        // Simulé — sera remplacé par WhatsApp quand Twilio est configuré
-        Log::info('[CODE ACCÈS RÉSIDENT - SIMULÉ]', [
-            'destinataire' => $user->name,
-            'phone'        => $user->phone,
-            'residence'    => $residence->name,
-            'lot'          => $coproprietaire->lot->numero,
-            'code'         => $code,
-            'message'      => "Bonjour {$user->name}, bienvenue sur imaro ! Votre code d'accès est : {$code}. Connectez-vous sur l'application avec votre numéro {$user->phone}.",
-        ]);
+        app(CoproprietaireWelcomeNotifier::class)->send($user, $code, $residence);
 
         return response()->json([
             'status'  => 'success',
@@ -178,30 +243,65 @@ class CoproprietaireController extends Controller
                     continue;
                 }
 
-                $tempCode = strtoupper(\Illuminate\Support\Str::random(8));
+                $tenantId = $request->user()->tenant_id;
+                $email = $data['email'] ?? null;
 
-                DB::transaction(function () use ($data, $lot, $tempCode, $request) {
-                    $user = \App\Models\User::create([
-                        'tenant_id'        => $request->user()->tenant_id,
-                        'name'             => $data['name'],
-                        'phone'            => $data['phone'],
-                        'email'            => $data['email'] ?? null,
-                        'role'             => 'resident',
-                        'password'         => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(16)),
-                        'access_code'      => \Illuminate\Support\Facades\Hash::make($tempCode),
-                        'must_change_code' => true,
-                        'status'           => 'active',
-                    ]);
+                // Re-use an existing copro of this cabinet instead of failing on
+                // the unique phone; reject a cross-cabinet collision cleanly.
+                $existing = $this->findResidentInTenant($tenantId, $data['phone'], $email);
 
-                    \App\Models\Coproprietaire::create([
-                        'tenant_id'   => $request->user()->tenant_id,
+                if (! $existing && $this->identityUsedInOtherTenant($tenantId, $data['phone'], $email)) {
+                    $errors[] = "{$line}: numéro/email déjà utilisé par un autre cabinet (ignoré).";
+                    continue;
+                }
+                if ($existing && $existing->role !== 'resident') {
+                    $errors[] = "{$line}: numéro/email d'un membre de l'équipe (ignoré).";
+                    continue;
+                }
+
+                $tempCode = $existing ? null : strtoupper(Str::random(8));
+
+                $createdUser = DB::transaction(function () use ($data, $lot, $tenantId, $existing, $tempCode, $email) {
+                    if ($existing) {
+                        if ($existing->trashed()) {
+                            $existing->restore();
+                        }
+                        $user = $existing;
+                    } else {
+                        $user = User::create([
+                            'tenant_id'        => $tenantId,
+                            'name'             => $data['name'],
+                            'phone'            => $data['phone'],
+                            'email'            => $email,
+                            'role'             => 'resident',
+                            'password'         => Hash::make(Str::random(16)),
+                            'access_code'      => Hash::make($tempCode),
+                            'must_change_code' => true,
+                            'status'           => 'active',
+                        ]);
+                    }
+
+                    // Rôle Spatie obligatoire (sinon 403 sur le portail résident).
+                    if (! $user->hasRole('resident')) {
+                        $user->assignRole('resident');
+                    }
+
+                    Coproprietaire::create([
+                        'tenant_id'   => $tenantId,
                         'user_id'     => $user->id,
                         'lot_id'      => $lot->id,
                         'type'        => 'proprietaire',
                         'date_entree' => now()->toDateString(),
                         'solde_actuel'=> 0,
                     ]);
+
+                    return $user;
                 });
+
+                if ($tempCode !== null) {
+                    app(CoproprietaireWelcomeNotifier::class)
+                        ->send($createdUser, $tempCode, $lot->residence);
+                }
 
                 $created++;
             } catch (\Throwable $e) {

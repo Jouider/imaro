@@ -135,8 +135,14 @@ class TicketController extends Controller
         }
 
         unset($data['supprimer_images']);
+        $statutChange = array_key_exists('statut', $data) && $data['statut'] !== $ticket->getOriginal('statut');
         $ticket->update($data);
         $ticket->load(['residence', 'lot', 'user', 'prestataire']);
+
+        // Push à l'auteur si le statut a changé (KAN-68).
+        if ($statutChange) {
+            app(\App\Services\Notifications\PortailPushNotifier::class)->ticketMisAJour($ticket);
+        }
 
         return response()->json([
             'status'  => 'success',
@@ -163,6 +169,8 @@ class TicketController extends Controller
             'statut' => 'clos',
             'closed_at' => Carbon::now(),
         ]);
+
+        app(\App\Services\Notifications\PortailPushNotifier::class)->ticketMisAJour($ticket);
 
         return response()->json([
             'status' => 'success',

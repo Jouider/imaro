@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { useQuery } from '@tanstack/react-query'
 import {
   CalendarCheck,
@@ -11,6 +13,7 @@ import {
   Circle,
   AlertTriangle,
   Clock,
+  ChevronRight,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -33,17 +36,17 @@ const PHASE_META: Record<
   { label: string; icon: typeof Calendar; color: string }
 > = {
   operations_mensuelles: {
-    label: 'Opérations mensuelles',
+    label: 'ops',
     icon: Calendar,
     color: 'var(--color-imaro-primary-light)',
   },
   cloture_exercice: {
-    label: "Clôture d'exercice",
+    label: 'cloture',
     icon: Lock,
     color: '#E67E22',
   },
   preparation_ag: {
-    label: "Préparation de l'AG",
+    label: 'prepAg',
     icon: Users,
     color: '#8E44AD',
   },
@@ -63,27 +66,29 @@ const STATUS_BADGES: Record<
   { label: string; cls: string }
 > = {
   pending: {
-    label: 'À faire',
+    label: 'todo',
     cls: 'border-gray-200 bg-gray-50 text-gray-600',
   },
   in_progress: {
-    label: 'En cours',
+    label: 'in_progress',
     cls: 'border-blue-200 bg-blue-50 text-blue-700',
   },
   done: {
-    label: 'Terminé',
+    label: 'done',
     cls: 'border-green-200 bg-green-50 text-green-700',
   },
-  skipped: { label: 'Ignoré', cls: 'border-gray-200 bg-gray-50 text-gray-400' },
+  skipped: {
+    label: 'skipped',
+    cls: 'border-gray-200 bg-gray-50 text-gray-400',
+  },
   overdue: { label: 'En retard', cls: 'border-red-200 bg-red-50 text-red-700' },
 }
 
 export function ConformitePage() {
   const { t } = useTranslation()
 
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
-    null,
-  )
+  const globalResidenceId = useResidenceStore((s) => s.residenceId)
+  const setResidenceId = useResidenceStore((s) => s.setResidenceId)
   const [exercice, setExercice] = useState(2026)
 
   const residencesQ = useQuery({
@@ -91,7 +96,7 @@ export function ConformitePage() {
     queryFn: () => getResidences(),
   })
 
-  const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
+  const residenceId = globalResidenceId ?? residencesQ.data?.[0]?.id ?? null
 
   const calendarQ = useQuery({
     queryKey: ['compliance', residenceId, exercice],
@@ -128,7 +133,7 @@ export function ConformitePage() {
         <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
-          onValueChange={(v) => setPickedResidenceId(Number(v))}
+          onValueChange={(v) => setResidenceId(Number(v))}
         >
           <SelectTrigger className="w-64">
             <SelectValue placeholder={t('common.select')} />
@@ -142,7 +147,7 @@ export function ConformitePage() {
           </SelectContent>
         </Select>
 
-        <label className="text-sm font-medium">Exercice</label>
+        <label className="text-sm font-medium">{t('common.exercice')}</label>
         <Select
           value={String(exercice)}
           onValueChange={(v) => setExercice(Number(v))}
@@ -167,7 +172,9 @@ export function ConformitePage() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-bold">
-                  Exercice {calendar.exercice}
+                  {t('gestionnaire.conformite.exerciceLabel', {
+                    n: calendar.exercice,
+                  })}
                 </h2>
                 <Badge
                   variant="outline"
@@ -264,7 +271,7 @@ export function ConformitePage() {
                         isCurrent && 'text-[var(--color-imaro-primary)]',
                       )}
                     >
-                      {meta.label}
+                      {t(`gestionnaire.conformite.phaseLabel.${p.phase}`)}
                     </span>
                   </div>
                   {i < phases.length - 1 && (
@@ -300,11 +307,29 @@ export function ConformitePage() {
                   <Icon className="size-4" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-sm font-semibold">{meta.label}</h3>
+                  <h3 className="text-sm font-semibold">
+                    {t(`gestionnaire.conformite.phaseLabel.${p.phase}`)}
+                  </h3>
                   <p className="text-xs text-muted-foreground">
+                    {t(`gestionnaire.conformite.phaseDesc.${p.phase}`, {
+                      defaultValue: '',
+                    })}
+                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground/70">
                     {p.tasks.filter((t) => t.status === 'done').length}/
                     {p.tasks.length} tâches terminées
                   </p>
+                  {p.phase === 'preparation_ag' && (
+                    <Link
+                      to="/gestionnaire/assemblees"
+                      className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-[var(--color-imaro-primary)] hover:underline"
+                    >
+                      {t('gestionnaire.conformite.agLink', {
+                        defaultValue: 'Gérer les assemblées',
+                      })}
+                      <ChevronRight className="size-3.5 rtl:rotate-180" />
+                    </Link>
+                  )}
                 </div>
                 <span className="text-xs font-medium text-muted-foreground">
                   {p.progress_pct}%
@@ -352,7 +377,7 @@ export function ConformitePage() {
                         STATUS_BADGES[task.status].cls,
                       )}
                     >
-                      {STATUS_BADGES[task.status].label}
+                      {t(`gestionnaire.conformite.phaseStatut.${task.status}`)}
                     </Badge>
                   </li>
                 ))}

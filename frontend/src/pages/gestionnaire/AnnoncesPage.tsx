@@ -12,6 +12,8 @@ import {
   type Annonce,
 } from '@/services/annonces.service'
 import { getResidences } from '@/services/gestionnaire.service'
+import { useResidenceStore } from '@/stores/residenceStore'
+import { ResidenceFilter } from '@/components/shared'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -66,9 +68,14 @@ export function AnnoncesPage() {
     annonce: Annonce
   } | null>(null)
 
+  const residenceId = useResidenceStore((s) => s.residenceId)
+
   const { data: annonces = [], isLoading } = useQuery({
-    queryKey: ['annonces'],
-    queryFn: () => getAnnonces(),
+    queryKey: ['annonces', { residenceId }],
+    queryFn: () =>
+      getAnnonces(
+        residenceId !== null ? { residence_id: residenceId } : undefined,
+      ),
   })
 
   const { data: residences = [] } = useQuery({
@@ -165,10 +172,13 @@ export function AnnoncesPage() {
         title={t('gestionnaire.annonces.title')}
         subtitle={t('gestionnaire.annonces.subtitle')}
         actions={
-          <Button onClick={() => setCreateOpen(true)} size="sm">
-            <Plus className="me-1.5 size-4" />
-            {t('gestionnaire.annonces.newAnnonce')}
-          </Button>
+          <div className="flex items-center gap-2">
+            <ResidenceFilter />
+            <Button onClick={() => setCreateOpen(true)} size="sm">
+              <Plus className="me-1.5 size-4" />
+              {t('gestionnaire.annonces.newAnnonce')}
+            </Button>
+          </div>
         }
       />
 

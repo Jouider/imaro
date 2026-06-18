@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Coproprietaire extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'tenant_id', 'user_id', 'lot_id', 'type',
@@ -53,8 +53,24 @@ class Coproprietaire extends Model
 
     public function recalculerSolde(): void
     {
-        $du = $this->appelsFondsLignes()->sum('montant_du');
-        $paye = $this->appelsFondsLignes()->sum('montant_paye');
-        $this->update(['solde_actuel' => $paye - $du]);
+        $this->update(['solde_actuel' => $this->soldeCalcule()]);
+    }
+
+    /**
+     * Solde = (paiements alloués aux lignes + avances non allouées) − total dû.
+     * Positif = créditeur (avance/trop-perçu), négatif = doit de l'argent.
+     *
+     * Les paiements rattachés à une ligne sont déjà dans `montant_paye` ; on ajoute
+     * à part les paiements SANS ligne (virement validé d'un copro à jour, avance…)
+     * pour qu'ils impactent le solde — sinon ils restent invisibles. Pas de double
+     * comptage : `whereNull('appel_fonds_ligne_id')` exclut ceux déjà dans montant_paye.
+     */
+    public function soldeCalcule(): float
+    {
+        $du = (float) $this->appelsFondsLignes()->sum('montant_du');
+        $payeAlloue = (float) $this->appelsFondsLignes()->sum('montant_paye');
+        $avances = (float) $this->paiements()->whereNull('appel_fonds_ligne_id')->sum('montant');
+
+        return round(($payeAlloue + $avances) - $du, 2);
     }
 }

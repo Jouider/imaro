@@ -1,25 +1,29 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { useResidenceStore } from '@/stores/residenceStore'
 import {
   Users,
   UserPlus,
   Copy,
   CheckCircle2,
-  MessageCircle,
+  Send,
   Building2,
+  Pencil,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   getResidences,
   getCoproprietaires,
   createCoproprietaire,
+  updateCoproprietaire,
   getLots,
   storeLot,
   type Coproprietaire,
   type CreateCoproprietaireResponse,
   type Lot,
 } from '@/services/gestionnaire.service'
+import { cn } from '@/lib/utils'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { MontantDisplay } from '@/components/shared/MontantDisplay'
@@ -38,6 +42,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 type CoproRow = Coproprietaire & { residence_name: string }
@@ -74,9 +79,16 @@ function CreateCoproprietaireDialog({
     queryFn: () => getLots(Number(residenceId)),
     enabled: !!residenceId,
   })
-  const availableLots = (lotsData?.lots ?? []).filter(
-    (l: Lot) => !l.coproprietaire,
-  )
+  // Only unassigned lots, deduplicated by numéro so the same number can never
+  // appear twice in the list — an assigned/used number is excluded (KAN-40).
+  const seenNumeros = new Set<string>()
+  const availableLots = (lotsData?.lots ?? []).filter((l: Lot) => {
+    if (l.coproprietaire) return false
+    const key = l.numero.trim().toLowerCase().replace(/\s+/g, '')
+    if (seenNumeros.has(key)) return false
+    seenNumeros.add(key)
+    return true
+  })
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -279,6 +291,20 @@ function CreateLotDialog({
   const [superficie, setSuperficie] = useState('')
   const [tantieme, setTantieme] = useState('')
 
+  // Existing lots in this residence — used to enforce numéro uniqueness so the
+  // same lot can never be created twice (KAN-40).
+  const { data: lotsData } = useQuery({
+    queryKey: ['lots', String(residenceId)],
+    queryFn: () => getLots(residenceId),
+    enabled: open && !!residenceId,
+  })
+  const normalize = (s: string) => s.trim().toLowerCase().replace(/\s+/g, '')
+  const existingNumeros = new Set(
+    (lotsData?.lots ?? []).map((l: Lot) => normalize(l.numero)),
+  )
+  const isDuplicateNumero =
+    numero.trim() !== '' && existingNumeros.has(normalize(numero))
+
   const mutation = useMutation({
     mutationFn: () =>
       storeLot(residenceId, {
@@ -307,6 +333,7 @@ function CreateLotDialog({
 
   const canSubmit =
     !!numero.trim() &&
+    !isDuplicateNumero &&
     !!etage &&
     !!superficie &&
     !!tantieme &&
@@ -336,6 +363,7 @@ function CreateLotDialog({
           className="space-y-4 pt-2"
           onSubmit={(e) => {
             e.preventDefault()
+            if (isDuplicateNumero) return
             mutation.mutate()
           }}
         >
@@ -349,8 +377,18 @@ function CreateLotDialog({
                 value={numero}
                 onChange={(e) => setNumero(e.target.value)}
                 required
-                className={inputCls}
+                aria-invalid={isDuplicateNumero}
+                className={cn(
+                  inputCls,
+                  isDuplicateNumero &&
+                    'border-[var(--color-imaro-danger)] focus:border-[var(--color-imaro-danger)] focus:ring-[var(--color-imaro-danger)]/10',
+                )}
               />
+              {isDuplicateNumero && (
+                <p className="text-xs text-[var(--color-imaro-danger)]">
+                  {t('gestionnaire.coproprietaires.lotNumeroExists')}
+                </p>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="lot-type">{t('common.type')} *</Label>
@@ -463,17 +501,6 @@ function SuccessDialog({
     }
   }
 
-  function sendWhatsApp() {
-    const code = result?.temp_password ?? ''
-    const msg = encodeURIComponent(
-      t('gestionnaire.coproprietaires.waMessage', {
-        name: result?.coproprietaire.name,
-        code,
-      }),
-    )
-    window.open(`https://wa.me/${phone.replace('+', '')}?text=${msg}`, '_blank')
-  }
-
   return (
     <Dialog
       open={open}
@@ -526,18 +553,12 @@ function SuccessDialog({
               </div>
             </div>
 
-            {/* WhatsApp */}
-            <div className="mt-3 space-y-2">
+            {/* Auto-send notice — code already sent by backend (SMS + WhatsApp + Email) */}
+            <div className="mt-3 flex items-start gap-2">
+              <Send className="size-3.5 shrink-0 mt-0.5 text-green-600 dark:text-green-400" />
               <p className="text-xs text-green-700 dark:text-green-400">
-                {t('gestionnaire.coproprietaires.shareCode')}
+                {t('gestionnaire.coproprietaires.codeAutoSent')}
               </p>
-              <button
-                onClick={sendWhatsApp}
-                className="flex items-center gap-2 rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-              >
-                <MessageCircle className="size-4" />
-                {t('gestionnaire.coproprietaires.sendWhatsApp')}
-              </button>
             </div>
           </div>
 
@@ -565,12 +586,133 @@ function SuccessDialog({
   )
 }
 
+// ─── Edit dialog (KAN-50) ─────────────────────────────────────────────────────
+
+function EditCoproprietaireDialog({
+  target,
+  onOpenChange,
+  onSaved,
+}: {
+  target: Coproprietaire | null
+  onOpenChange: (open: boolean) => void
+  onSaved: () => void
+}) {
+  const { t } = useTranslation()
+  const [name, setName] = useState('')
+  const [phoneDigits, setPhoneDigits] = useState('')
+  const [email, setEmail] = useState('')
+
+  // Sync local fields whenever a new target opens (derived from props, no effect).
+  const [syncedId, setSyncedId] = useState<number | null>(null)
+  if (target && target.id !== syncedId) {
+    setSyncedId(target.id)
+    setName(target.name)
+    setPhoneDigits(target.phone.replace(/^\+212/, ''))
+    setEmail(target.email ?? '')
+  }
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      updateCoproprietaire(target!.id, {
+        name: name.trim(),
+        phone: `+212${phoneDigits}`,
+        ...(email.trim() ? { email: email.trim() } : {}),
+      }),
+    onSuccess: () => {
+      toast.success(t('gestionnaire.coproprietaires.editSuccess'))
+      onSaved()
+      onOpenChange(false)
+    },
+    onError: () => toast.error(t('common.updateError')),
+  })
+
+  const canSubmit = !!name.trim() && !!phoneDigits.trim() && !mutation.isPending
+
+  return (
+    <Dialog open={!!target} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {t('gestionnaire.coproprietaires.editTitle')}
+          </DialogTitle>
+          <DialogDescription>
+            {t('gestionnaire.coproprietaires.editDesc')}
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          className="space-y-4 pt-2"
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (canSubmit) mutation.mutate()
+          }}
+        >
+          <div className="space-y-1.5">
+            <Label htmlFor="edit-copro-name">{t('common.name')} *</Label>
+            <Input
+              id="edit-copro-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="edit-copro-phone">{t('common.phone')} *</Label>
+            <div className="flex overflow-hidden rounded-lg border border-border focus-within:border-[var(--color-imaro-primary)] focus-within:ring-2 focus-within:ring-[var(--color-imaro-primary)]/10">
+              <span className="flex items-center border-e bg-muted px-3 text-sm font-bold text-[var(--color-imaro-primary)]">
+                +212
+              </span>
+              <input
+                id="edit-copro-phone"
+                type="tel"
+                inputMode="numeric"
+                dir="ltr"
+                value={phoneDigits}
+                onChange={(e) =>
+                  setPhoneDigits(e.target.value.replace(/\D/g, '').slice(0, 9))
+                }
+                required
+                className="min-h-[44px] flex-1 bg-white px-3 text-sm text-foreground focus:outline-none dark:bg-card"
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="edit-copro-email">
+              {t('gestionnaire.coproprietaires.emailOptional')}
+            </Label>
+            <Input
+              id="edit-copro-email"
+              type="email"
+              dir="ltr"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
+              {t('actions.cancel')}
+            </Button>
+            <Button type="submit" disabled={!canSubmit}>
+              {mutation.isPending ? t('actions.loading') : t('actions.save')}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export function CoproprietairesPage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const [selectedResidenceId, setSelectedResidenceId] = useState<string>('')
+  const storeResidenceId = useResidenceStore((s) => s.residenceId)
+  const setStoreResidence = useResidenceStore((s) => s.setResidenceId)
+  const selectedResidenceId = storeResidenceId ? String(storeResidenceId) : ''
   const [createOpen, setCreateOpen] = useState(false)
   const [successResult, setSuccessResult] =
     useState<CreateCoproprietaireResponse | null>(null)
@@ -578,6 +720,7 @@ export function CoproprietairesPage() {
     phone: '',
   })
   const [createLotOpen, setCreateLotOpen] = useState(false)
+  const [editTarget, setEditTarget] = useState<Coproprietaire | null>(null)
   const [lotTarget, setLotTarget] = useState<{
     coproprietaireId: number
     coproprietaireName: string
@@ -589,7 +732,7 @@ export function CoproprietairesPage() {
     queryFn: () => getResidences(),
   })
 
-  const residenceId = selectedResidenceId ? Number(selectedResidenceId) : null
+  const residenceId = storeResidenceId
 
   const { data: coproprietaires = [], isLoading: loadingCopro } = useQuery({
     queryKey: ['coproprietaires', residenceId],
@@ -627,6 +770,23 @@ export function CoproprietairesPage() {
       sortable: true,
       renderCell: (r) => <MontantDisplay value={r.solde} colorize />,
     },
+    {
+      key: 'id',
+      header: '',
+      className: 'w-16 text-right',
+      renderCell: (r) => (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-8"
+          aria-label={t('actions.edit')}
+          title={t('actions.edit')}
+          onClick={() => setEditTarget(r)}
+        >
+          <Pencil className="size-3.5" />
+        </Button>
+      ),
+    },
   ]
 
   function handleCreateSuccess(
@@ -639,6 +799,9 @@ export function CoproprietairesPage() {
     void queryClient.invalidateQueries({
       queryKey: ['coproprietaires', residenceId],
     })
+    // KAN-40: the assigned lot now has an owner — refetch the lots so it drops
+    // out of the "available" list and can't be assigned twice.
+    void queryClient.invalidateQueries({ queryKey: ['lots'] })
   }
 
   function handleSuccessClose() {
@@ -676,7 +839,7 @@ export function CoproprietairesPage() {
       <div className="mb-6">
         <Select
           value={selectedResidenceId}
-          onValueChange={setSelectedResidenceId}
+          onValueChange={(v) => setStoreResidence(Number(v))}
           disabled={loadingResidences}
         >
           <SelectTrigger className="w-72">
@@ -713,6 +876,18 @@ export function CoproprietairesPage() {
         residences={residences}
         defaultResidenceId={selectedResidenceId}
         onSuccess={handleCreateSuccess}
+      />
+
+      <EditCoproprietaireDialog
+        target={editTarget}
+        onOpenChange={(open) => {
+          if (!open) setEditTarget(null)
+        }}
+        onSaved={() =>
+          void queryClient.invalidateQueries({
+            queryKey: ['coproprietaires', residenceId],
+          })
+        }
       />
 
       <SuccessDialog

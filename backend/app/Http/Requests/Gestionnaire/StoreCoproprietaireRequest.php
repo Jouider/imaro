@@ -15,8 +15,12 @@ class StoreCoproprietaireRequest extends FormRequest
     {
         return [
             'name'         => 'required|string|max:255',
-            'phone'        => 'nullable|string|max:20|unique:users,phone',
-            'email'        => 'nullable|email|max:255|unique:users,email',
+            // No `unique` here: an existing copropriétaire (same cabinet) must be
+            // re-usable on a new lot. The controller does find-or-link and returns
+            // a clear 422 for a cross-tenant collision (phone/email are globally
+            // unique at the DB level).
+            'phone'        => 'nullable|string|max:20',
+            'email'        => 'nullable|email|max:255',
             'lot_id'       => 'nullable|integer|exists:lots,id',
             'residence_id' => 'nullable|integer|exists:residences,id',
             'type'         => 'nullable|in:proprietaire,locataire',

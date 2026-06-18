@@ -50,6 +50,7 @@ import {
   type Match,
   type MatchableTarget,
 } from '@/services/pointage.service'
+import { ResidenceFilter } from '@/components/shared'
 
 const fmt = new Intl.NumberFormat('fr-MA', {
   minimumFractionDigits: 2,
@@ -201,17 +202,20 @@ export function PointagePage() {
             })}
           </p>
         </div>
-        {parsed && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            onClick={handleReset}
-          >
-            <RefreshCw className="size-4" />
-            {t('gestionnaire.pointage.newPointage')}
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          <ResidenceFilter />
+          {parsed && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={handleReset}
+            >
+              <RefreshCw className="size-4" />
+              {t('gestionnaire.pointage.newPointage')}
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Empty state — file upload */}
@@ -222,7 +226,7 @@ export function PointagePage() {
             <div className="flex flex-wrap items-end gap-4">
               <div className="flex-1 min-w-[240px] space-y-1.5">
                 <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Banque source
+                  {t('gestionnaire.pointage.bankSource')}
                 </label>
                 <Select
                   value={banque}
@@ -241,9 +245,7 @@ export function PointagePage() {
                 </Select>
               </div>
               <p className="text-xs text-muted-foreground max-w-md">
-                Importez le relevé bancaire au format CSV ou Excel exporté
-                depuis votre espace bancaire en ligne. Imaro détecte
-                automatiquement les colonnes (date, libellé, débit, crédit).
+                {t('gestionnaire.pointage.uploadHint')}
               </p>
             </div>
 
@@ -285,7 +287,7 @@ export function PointagePage() {
                 ) : (
                   <Upload className="size-4" />
                 )}
-                Choisir un fichier
+                {t('gestionnaire.pointage.chooseFile')}
               </Button>
             </div>
 
@@ -293,8 +295,7 @@ export function PointagePage() {
             <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-900/30 dark:bg-amber-950/20">
               <Sparkles className="size-4 text-amber-600" />
               <p className="flex-1 text-xs text-amber-700 dark:text-amber-300">
-                Pas de fichier sous la main ? Chargez le jeu de démo (relevé
-                Attijariwafa avec 10 lignes pour résidence Atlas).
+                {t('gestionnaire.pointage.demoBanner')}
               </p>
               <Button variant="outline" size="sm" onClick={handleLoadDemo}>
                 {t('gestionnaire.pointage.demo')}
@@ -428,7 +429,9 @@ export function PointagePage() {
                     {t('common.credit')}
                   </TableHead>
                   <TableHead>Rapprochement Imaro</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-right">
+                    {t('common.actions')}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -583,7 +586,7 @@ export function PointagePage() {
                 }}
               >
                 <CheckCircle2 className="size-4" />
-                Tout confirmer
+                {t('gestionnaire.pointage.confirmAll')}
               </Button>
             </div>
           )}

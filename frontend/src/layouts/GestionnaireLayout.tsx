@@ -26,7 +26,10 @@ import {
   CalendarCheck,
   ClipboardCheck,
   Activity,
+  BellRing,
+  ScanLine,
   ShieldCheck,
+  LifeBuoy,
   LogOut,
   Menu,
   X,
@@ -61,6 +64,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useMutation } from '@tanstack/react-query'
 import { CommandPalette } from '@/components/gestionnaire/CommandPalette'
+import { AiChatFab } from '@/components/gestionnaire/AiChatFab'
+import { ResidenceSwitcher } from '@/components/gestionnaire/ResidenceSwitcher'
 import { canAccessRoute } from '@/lib/navAccess'
 import { cn } from '@/lib/utils'
 
@@ -70,6 +75,8 @@ type NavItem = {
   to: string
   icon: React.ReactNode
   labelKey: string
+  /** Optional accent pill (e.g. paid add-on), rendered after the label. */
+  badgeKey?: string
 }
 
 type NavSection = {
@@ -154,6 +161,11 @@ const NAV_SECTIONS: NavSection[] = [
         labelKey: 'gestionnaire.nav.recouvrement',
       },
       {
+        to: '/gestionnaire/rappels',
+        icon: <BellRing className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.rappels',
+      },
+      {
         to: '/gestionnaire/pointage',
         icon: <Landmark className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.pointage',
@@ -214,6 +226,11 @@ const NAV_SECTIONS: NavSection[] = [
     labelKey: 'gestionnaire.nav.sectionOperations',
     items: [
       {
+        to: '/gestionnaire/visites',
+        icon: <ScanLine className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.visites',
+      },
+      {
         to: '/gestionnaire/tickets',
         icon: <Wrench className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.tickets',
@@ -247,6 +264,18 @@ const NAV_SECTIONS: NavSection[] = [
         to: '/gestionnaire/personnel',
         icon: <HardHat className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.personnel',
+      },
+    ],
+  },
+  // Premium upsell — kept as the very last sidebar item (KAN-51).
+  {
+    labelKey: null,
+    items: [
+      {
+        to: '/gestionnaire/assistance-recouvrement',
+        icon: <LifeBuoy className="size-[18px]" aria-hidden="true" />,
+        labelKey: 'gestionnaire.nav.assistanceRecouvrement',
+        badgeKey: 'gestionnaire.nav.badgePro',
       },
     ],
   },
@@ -353,6 +382,11 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
         <Wordmark inverted className="h-12 w-48" />
       </div>
 
+      {/* Global residence scope (KAN-47) */}
+      <div className="shrink-0 border-b border-white/8 pt-3">
+        <ResidenceSwitcher onSelect={onNavClick} />
+      </div>
+
       {/* Navigation */}
       <nav className="no-scrollbar flex-1 overflow-y-auto px-3 py-4 space-y-5">
         {sections.map((section, si) => (
@@ -401,8 +435,14 @@ function SidebarNav({ onNavClick }: SidebarNavProps) {
                         <span className="flex-1 truncate">
                           {t(item.labelKey)}
                         </span>
-                        {!isActive && (
-                          <ChevronRight className="size-3.5 opacity-0 group-hover:opacity-40 transition-opacity shrink-0" />
+                        {item.badgeKey ? (
+                          <span className="shrink-0 rounded-full bg-[#e67e22] px-1.5 py-0.5 text-[9px] font-bold uppercase leading-none tracking-wide text-white">
+                            {t(item.badgeKey)}
+                          </span>
+                        ) : (
+                          !isActive && (
+                            <ChevronRight className="size-3.5 opacity-0 group-hover:opacity-40 transition-opacity shrink-0" />
+                          )
                         )}
                       </>
                     )}
@@ -722,6 +762,9 @@ export function GestionnaireLayout() {
     <div className="flex min-h-svh">
       {/* Global Command Palette (Cmd+K) */}
       <CommandPalette />
+
+      {/* Floating AI assistant (KAN-53) */}
+      <AiChatFab />
 
       {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 start-0 hidden w-[240px] lg:block shadow-xl shadow-black/10">

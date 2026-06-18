@@ -174,19 +174,33 @@ Première connexion résident — crée le code personnel et retourne le token d
 
 Retourne l'utilisateur courant, ses rôles et permissions.
 
-**Response 200**
+**Auto-refresh** : si le token expire dans moins de 7 jours, la réponse
+inclut un nouveau token (30j de TTL) dans `data.token` et l'ancien est
+révoqué. Le client doit alors swap le token stocké. Détectable via
+`data.refreshed === true`.
+
+**Response 200 — token frais (pas de refresh)**
 ```json
 {
   "status": "success",
   "data": {
-    "user": {
-      "id": 1,
-      "name": "Mohammed Fikri",
-      "role": "manager",
-      "tenant": { "id": 1, "name": "Blanca Syndic", "subdomain": "blanca" }
-    },
-    "roles": ["manager"],
-    "permissions": []
+    "user":   { "id": 1, "name": "Mohammed Fikri", "role": "manager" },
+    "tenant": { "id": 1, "name": "Blanca Syndic", "subdomain": "blanca" }
+  }
+}
+```
+
+**Response 200 — token bientôt expiré (refresh émis)**
+```json
+{
+  "status": "success",
+  "data": {
+    "user":       { "id": 1, "name": "Mohammed Fikri", "role": "manager" },
+    "tenant":     { "id": 1, "name": "Blanca Syndic", "subdomain": "blanca" },
+    "token":      "12|abcdef...",
+    "token_type": "Bearer",
+    "expires_in": 2592000,
+    "refreshed":  true
   }
 }
 ```
@@ -635,7 +649,7 @@ Filtre les lots par immeuble directement.
 
 Types valides : `appartement` | `local_commercial` | `parking` | `cave`
 
-**Validation :** `immeuble_id` obligatoire et doit appartenir à la résidence. La somme des tantièmes ne doit pas dépasser `total_tantieme`.
+**Validation :** `immeuble_id` obligatoire et doit appartenir à la résidence. La somme des tantièmes ne doit pas dépasser `total_tantieme`. **Le `numero` doit être unique au sein de la résidence** (trim appliqué ; contrainte DB `unique(residence_id, numero)`). Un doublon renvoie **422** avec `errors.numero` (KAN-40).
 
 **Response 201**
 
@@ -685,6 +699,25 @@ Soft delete. Bloqué si le lot a des appels de fonds impayés.
 
 ### GET /api/gestionnaire/coproprietaires
 Liste globale — toutes les résidences du gestionnaire.
+
+---
+
+### POST /api/gestionnaire/coproprietaires
+Crée un copropriétaire. **Find-or-link** : un copro pouvant avoir plusieurs lots,
+si le `phone`/`email` correspond déjà à un résident **du même cabinet**, on
+**rattache** un nouveau lot à ce compte (restauré s'il était soft-deleted) au lieu
+d'échouer. Un compte ré-utilisé ne reçoit **pas** de nouveau code (`temp_password: null`).
+
+**Body** : `name`, `phone` et/ou `email`, `lot_id` ou `residence_id`, `type?`, `date_entree?`
+
+**Response 201** : `data.coproprietaire`, `data.temp_password` (null si rattachement), `data.reused` (bool)
+
+**Erreurs 422** :
+- déjà copropriétaire de ce lot
+- `phone`/`email` appartient à un membre de l'équipe (non-resident)
+- `phone`/`email` appartient à un copropriétaire d'un **autre cabinet** (unique global — comptes séparés par tenant)
+
+> Idem pour `POST /coproprietaires/bulk` (import Excel) : find-or-link par ligne, erreurs collectées par ligne.
 
 ---
 
@@ -1220,7 +1253,126 @@ Types valides : `ordinaire` | `extraordinaire`
 | Annonce publiée | WhatsApp push | Résidents de la résidence |
 
 > WhatsApp = priorité 1. SMS = fallback. Les envois sont toujours asynchrones via Laravel Horizon.
-> Twilio BSP — en attente d'approbation Meta. Actuellement simulé via `Log::info`.
+> Twilio BSP — compte actif, sender `+212704768521` online. Templates Meta en cours d'approbation.
+
+### Couche notifications (architecture interne)
+
+`NotificationManager` route chaque message vers une chaîne de providers définie
+dans `config/notifications.php` (fallback automatique), et logge chaque tentative
+dans `notifications_log` (`statut`: `envoye` | `en_attente` | `livre` | `echec` | `skipped`).
+
+**Confirmation de livraison :** un envoi seulement *accepté* par la passerelle
+(ex. SMS8 SIM perso — l'opérateur peut le droper en silence) est loggé
+`en_attente` (pas `envoye`) ; un webhook de delivery le passera à `livre`/`echec`.
+Un succès **non confirmé n'arrête pas une cascade** (voir `sendCascade`).
+
+**Méthodes :**
+- `send(NotificationMessage)` — synchrone, 1 canal, avec fallback.
+- `sendMany(iterable<NotificationMessage>)` — fan-out multi-canal (1 message pré-rendu par canal, car le corps diffère : SMS court, WhatsApp = template, Email long).
+- `sendCascade(iterable<NotificationMessage>)` — priorité, **stop au 1er succès CONFIRMÉ** (onboarding : SMS → WhatsApp → Email).
+- `queue()` / `queueMany()` — versions asynchrones via `SendNotificationJob` (Horizon).
+
+**Templates WhatsApp :** créés/soumis à Meta de façon reproductible —
+`php artisan imaro:wa-auth-template` (template AUTHENTICATION code d'accès).
+
+**Préférences utilisateur (`users.notification_prefs`, opt-out, défaut activé) :**
+catégories `paiement` | `ticket` | `assemblee` | `retard`. Si une catégorie est
+désactivée, le message portant `category: <cat>` est ignoré (`statut: skipped`, pas d'envoi).
+
+**Toujours envoyés malgré les prefs :**
+- Messages sans catégorie (`category: null`) — transactionnels/sécurité (OTP, onboarding).
+- Messages légaux avec `force: true` — mise en demeure (Art. 25), convocation AG (Art. 16quinquies).
+
+**WhatsApp hors fenêtre 24h :** obligatoirement un template Meta approuvé. Le caller
+passe le Content SID + variables via `meta: ['content_sid' => ..., 'content_variables' => [...]]`.
+SIDs résolus depuis `config('notifications.whatsapp_templates.<name>')`.
+
+---
+
+## Comptes bancaires (Art. 26 — compte séparé par syndicat)
+
+**Gestionnaire** (`role:manager|gestionnaire`) — sous `/residences/{residence}/comptes-bancaires` :
+- `GET` → `{ comptes: [{ id, residence_id, banque, titulaire, rib, iban, is_primary }] }`
+- `POST` (banque, titulaire, rib, iban?, is_primary?) → compte créé (un seul `is_primary` par résidence)
+- `PUT /{compte}` · `DELETE /{compte}` · `POST /{compte}/primary`
+
+**Résident** :
+- `GET /api/portail/comptes-bancaires` → `{ comptes: [...] }` (RIB/IBAN du syndicat de sa résidence, principal en premier)
+
+## Virements déclarés (résident → validation gestionnaire)
+
+- **Résident** `POST /api/portail/paiements` *(multipart)* : `montant`, `date`, `methode` (`virement|versement|cheque|especes`), `reference?`, `justificatif?` (pdf/jpg/png, ≤5 Mo) → crée un virement **`en_attente`**. `201`.
+- **Gestionnaire** :
+  - `GET /api/gestionnaire/virements-declares` → liste (`coproprietaire_nom`, `lot_numero`, `montant`, `methode`, `statut`, `justificatif_path`…), en_attente d'abord.
+  - `POST /virements-declares/{id}/valider` → crée un **Paiement réel** (exercice actif, `methode→mode`, `versement→virement`) + recalcule le solde + passe `valide`.
+  - `POST /virements-declares/{id}/rejeter` (`motif?`) → passe `rejete`.
+
+---
+
+## Assistance recouvrement (service optionnel — #179)
+
+`POST /api/gestionnaire/assistance-recouvrement` · `role:manager|gestionnaire`
+
+Demande d'accompagnement au recouvrement. Persiste la demande (`assistance_requests`, statut `nouvelle`) et envoie un email à l'équipe IT (`ASSISTANCE_RECOUVREMENT_EMAIL`, défaut `recouvrement@imaro.ma`) en asynchrone.
+
+**Body** (camelCase) : `contactName`, `contactPhone`, `contactEmail`, `syndicName`, `residencesCount?`, `impayesEstimate?`, `plan` (`essentiel|complet|sur_mesure`), `message?`.
+
+**Response 201** : `{ "status": "success", "data": { "reference": "AR-7F3K9Q" } }`
+
+---
+
+## Personnel de terrain — identifiants de connexion (KAN-52)
+
+`POST /api/gestionnaire/equipe/personnel` · `app.permission:personnel`
+
+Crée le personnel (gardien, sécurité, ménage…) **et un compte de connexion** : login par **téléphone + code d'accès** (comme les résidents). Le `phone` est **requis** et unique. Le backend **génère** le code et l'**envoie** via la cascade WhatsApp → SMS → email.
+
+**Body** : `name`, `poste` (`securite|menage|gardien|jardinier|technicien|concierge`), `residence_id`, `phone` (requis, unique), `permissions?`.
+
+**Response 201** : enregistrement + `code_apercu` (**aperçu masqué** uniquement, ex. `AB••••••` — le code complet n'est jamais renvoyé).
+
+Connexion ensuite via `POST /api/auth/resident/login` (`phone` + `code`) — l'endpoint accepte les rôles `resident` **et** `personnel`. Première connexion → `must_change_code` → écran d'activation.
+
+---
+
+## Push natif mobile — FCM / APNs (KAN-68)
+
+`role:resident` · prefix `/portail`
+
+### POST /api/portail/push/register-device
+Enregistre (ou rafraîchit) le jeton push natif d'un appareil. Multi-device, upsert idempotent par hash du token.
+
+**Body** : `token` (string, requis), `platform` (`ios|android`, requis), `app_version?`.
+**Response 200** : `{ status, message }`.
+
+### DELETE /api/portail/push/register-device
+Supprime le jeton (à la déconnexion). **Body** : `token`.
+
+Envoi serveur : FCM HTTP v1 (Android) / APNs token-based (iOS), piloté par `services.fcm` / `services.apns`. Tant que les identifiants ne sont pas configurés (`FCM_*` / `APNS_*`), l'envoi est **no-op** (best-effort, jamais bloquant).
+
+**Déclencheurs métier câblés** (`PortailPushNotifier`, deep-link `data.route`) :
+- **Annonce publiée** (`POST /annonces/{id}/publier`) → résidents de la résidence · route `/portail`.
+- **Rappel de paiement** (`POST /creances/{id}/relancer` + `/creances/relancer-tout`) → copropriétaire(s) concerné(s) · route `/portail/finances`.
+- **Réclamation mise à jour / close** (`PUT /tickets/{id}` changement de statut, `POST /tickets/{id}/clos`) → auteur · route `/portail/reclamations`.
+
+Livraison sur device réel : nécessite les creds FCM/APNs + l'app native.
+
+---
+
+## Paiement en ligne — passerelle (KAN-72 / #251)
+
+Socle **agnostique** : le driver de passerelle (PayDunya / CMI / …) est résolu via le conteneur, lié uniquement si `services.payment.gateway` est configuré.
+
+### POST /api/portail/paiement/initier
+`role:resident` — initie une session de paiement.
+**Body** : `montant` (numeric ≥ 1, requis), `reference?`.
+**Response 200** : `{ status, data: { payment_url, session_id } }`.
+**422** si aucune passerelle configurée (« paiement en ligne non disponible »).
+
+### GET /paiement/retour
+**Public** (la passerelle redirige sans token). Query `status` (`success|cancel|failed`) + `session_id` → met à jour la session puis **redirige vers le deep-link** `imaro://paiement/retour?status=…&session_id=…` (configurable via `PAYMENT_APP_RETURN`).
+
+> ⚠️ Confirmation non autoritative : un **webhook signé** propre à la passerelle reste à ajouter lors de l'implémentation du driver réel (PayDunya/CMI) + compte marchand.
 
 ---
 

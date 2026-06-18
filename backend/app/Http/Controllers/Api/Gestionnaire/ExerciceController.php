@@ -21,13 +21,12 @@ class ExerciceController extends Controller
             ->orderByDesc('annee')
             ->get()
             ->map(fn ($e) => [
-                'id'               => $e->id,
-                'residence_id'     => $e->residence_id,
-                'annee'            => $e->annee,
-                'statut'           => $e->statut === 'cloture' ? 'clos' : 'ouvert',
-                'date_ouverture'   => $e->date_debut?->toDateString(),
-                'date_cloture'     => $e->statut === 'cloture' ? ($e->date_fin?->toDateString()) : null,
-                'seuil_comptable'  => 0,
+                'id'           => $e->id,
+                'residence_id' => $e->residence_id,
+                'annee'        => $e->annee,
+                'statut'       => $e->statut,                        // 'actif' | 'cloture'
+                'date_debut'   => $e->date_debut?->toDateString(),
+                'date_fin'     => $e->date_fin?->toDateString(),
             ]);
 
         return response()->json([

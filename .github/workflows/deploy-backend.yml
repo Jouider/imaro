@@ -8,6 +8,12 @@ on:
       - 'backend/**'
   workflow_dispatch:
 
+# Sérialise les déploiements : un merge rapproché attend la fin du déploiement en
+# cours (évite les sessions SSH qui se chevauchent et les timeouts).
+concurrency:
+  group: deploy-prod-backend
+  cancel-in-progress: false
+
 jobs:
   deploy:
     name: Deploy to Production

@@ -10,6 +10,8 @@ import {
   Phone,
   Building2,
   ShieldCheck,
+  CheckCircle2,
+  Send,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -45,6 +47,7 @@ import {
   LoadingSkeleton,
   ConfirmModal,
   PageHeader,
+  ResidenceFilter,
   type Column,
 } from '@/components/shared'
 import {
@@ -59,6 +62,7 @@ import {
   type StaffPermission,
 } from '@/services/equipe.service'
 import { getResidences } from '@/services/gestionnaire.service'
+import { useResidenceStore } from '@/stores/residenceStore'
 
 type FormState = {
   name: string
@@ -94,8 +98,10 @@ export function PersonnelPage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
+  const residenceId = useResidenceStore((s) => s.residenceId)
+
   const query = useQuery({
-    queryKey: ['equipe', 'personnel'],
+    queryKey: ['residence-staff', { residenceId }],
     queryFn: () => getResidenceStaff(),
   })
 
@@ -109,6 +115,12 @@ export function PersonnelPage() {
   const [editTarget, setEditTarget] = useState<ResidenceStaff | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<ResidenceStaff | null>(null)
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
+  // After a successful create — shows the "credentials sent" confirmation.
+  const [credentials, setCredentials] = useState<{
+    name: string
+    phone: string
+    codeApercu?: string
+  } | null>(null)
 
   const isEdit = editTarget !== null
   const dialogOpen = createOpen || isEdit
@@ -126,15 +138,21 @@ export function PersonnelPage() {
           name: data.name,
           poste: data.poste,
           residence_id: Number(data.residence_id),
-          phone: data.phone || null,
+          phone: data.phone.trim(),
           permissions: data.permissions,
         },
         residenceNom(Number(data.residence_id)),
       ),
-    onSuccess: () => {
-      toast.success(t('equipe.personnel.toast.created'))
+    onSuccess: (staff) => {
       invalidate()
       closeDialog()
+      // Show the "credentials sent by WhatsApp/SMS" confirmation with the masked
+      // code preview — no password is shown (backend generates + sends it).
+      setCredentials({
+        name: staff.name,
+        phone: staff.phone ?? '',
+        codeApercu: staff.code_apercu,
+      })
     },
     onError: () => toast.error(t('equipe.personnel.toast.createFailed')),
   })
@@ -355,13 +373,16 @@ export function PersonnelPage() {
         title={t('equipe.personnel.title')}
         subtitle={t('equipe.personnel.subtitle')}
         actions={
-          <Button
-            onClick={openCreate}
-            className="bg-gradient-imaro text-white shadow-sm hover:brightness-110"
-          >
-            <Plus className="size-4" />
-            {t('equipe.personnel.add')}
-          </Button>
+          <div className="flex items-center gap-2">
+            <ResidenceFilter />
+            <Button
+              onClick={openCreate}
+              className="bg-gradient-imaro text-white shadow-sm hover:brightness-110"
+            >
+              <Plus className="size-4" />
+              {t('equipe.personnel.add')}
+            </Button>
+          </div>
         }
       />
 
@@ -458,9 +479,7 @@ export function PersonnelPage() {
             <div className="space-y-1.5">
               <Label htmlFor="s-phone">
                 {t('equipe.personnel.form.phone')}{' '}
-                <span className="text-muted-foreground">
-                  ({t('equipe.optional')})
-                </span>
+                <span className="text-[var(--color-imaro-danger)]">*</span>
               </Label>
               <Input
                 id="s-phone"
@@ -468,6 +487,9 @@ export function PersonnelPage() {
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 placeholder="+212 6 12 34 56 78"
               />
+              <p className="text-xs text-muted-foreground">
+                {t('equipe.personnel.form.phoneHint')}
+              </p>
             </div>
 
             {/* Permissions */}
@@ -501,12 +523,64 @@ export function PersonnelPage() {
               disabled={
                 !form.name ||
                 !form.residence_id ||
+                !form.phone.trim() ||
                 createMut.isPending ||
                 updateMut.isPending
               }
               className="bg-gradient-imaro text-white shadow-sm hover:brightness-110"
             >
               {isEdit ? t('actions.save') : t('actions.create')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Credentials sent confirmation (after create) */}
+      <Dialog
+        open={credentials !== null}
+        onOpenChange={(o) => !o && setCredentials(null)}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle2 className="size-5 text-[var(--color-imaro-success)]" />
+              {t('equipe.personnel.credentialsSent.title')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('equipe.personnel.credentialsSent.desc', {
+                name: credentials?.name ?? '',
+              })}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-900/40 dark:bg-green-950/20">
+            <div className="flex items-start gap-2">
+              <Send className="mt-0.5 size-4 shrink-0 text-[var(--color-imaro-success)]" />
+              <p className="text-sm text-green-800 dark:text-green-300">
+                {t('equipe.personnel.credentialsSent.sentVia', {
+                  phone: credentials?.phone ?? '',
+                })}
+              </p>
+            </div>
+            {credentials?.codeApercu && (
+              <div className="flex items-center justify-between gap-3 border-t border-green-200 pt-3 dark:border-green-900/40">
+                <span className="text-sm text-muted-foreground">
+                  {t('equipe.personnel.credentialsSent.codeLabel')}
+                </span>
+                <span className="rounded-md bg-green-200 px-3 py-1 font-mono text-base font-bold tracking-widest text-green-900 dark:bg-green-800 dark:text-green-100">
+                  {credentials.codeApercu}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            {t('equipe.personnel.credentialsSent.note')}
+          </p>
+
+          <DialogFooter>
+            <Button onClick={() => setCredentials(null)}>
+              {t('actions.close')}
             </Button>
           </DialogFooter>
         </DialogContent>

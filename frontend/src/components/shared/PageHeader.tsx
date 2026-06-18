@@ -42,7 +42,10 @@ export function PageHeader({
     <div className={cn('mb-6', className)}>
       {breadcrumbs && breadcrumbs.length > 0 && (
         <nav className="mb-2 flex items-center gap-1 text-sm text-muted-foreground">
-          <Link to="/" className="hover:text-[var(--primary)]">
+          <Link
+            to="/gestionnaire/dashboard"
+            className="hover:text-[var(--primary)]"
+          >
             <Home className="size-3.5" />
           </Link>
           {breadcrumbs.map((crumb, i) => (

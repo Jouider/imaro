@@ -4,14 +4,15 @@ type Variant = 'horizontal' | 'stacked'
 
 type Props = {
   /**
-   * Applied to the outer element.
-   * - horizontal: set width + height (e.g. "w-44 h-14") — the image is cropped to show the logo
-   * - stacked: set height only (e.g. "h-32 w-auto") — the image is contained as-is
+   * Applied to the <img>. The logo is contained (never cropped), so:
+   * - horizontal (~3.3:1): set height, width auto — e.g. "h-12 w-auto"
+   *   (passing a fixed width also works; the logo fits inside, centered)
+   * - stacked (~1.3:1): set height, width auto — e.g. "h-32 w-auto mx-auto"
    */
   className?: string
   /** Layout variant. 'horizontal' = icon + text side-by-side (default). 'stacked' = icon above text. */
   variant?: Variant
-  /** Use the white/outlined version — for navy or dark backgrounds */
+  /** Use the white/orange version — for navy or dark backgrounds */
   inverted?: boolean
 }
 
@@ -25,20 +26,19 @@ const SRC: Record<`${Variant}${'' | '-inverted'}`, string> = {
 /**
  * Imaro logo — renders the official PNG asset.
  *
- * The PNG canvases have generous whitespace, so:
- * - horizontal: uses object-cover in a clipping container to zoom into the mark.
- *   Pass both width + height via className (e.g. "w-44 h-14").
- * - stacked: uses object-contain. Pass height only (e.g. "h-32 w-auto mx-auto").
+ * The PNGs are tightly trimmed to the artwork (transparent background), so the
+ * image is simply contained within the box you size — no cropping. Size by
+ * height and let width be auto to preserve the aspect ratio.
  *
  * @example
  * // Nav header (light bg)
- * <Wordmark className="w-44 h-14" />
+ * <Wordmark className="h-12 w-auto" />
  *
  * // Login card (centred, stacked)
- * <Wordmark variant="stacked" className="h-36 w-auto mx-auto" />
+ * <Wordmark variant="stacked" className="h-32 w-auto mx-auto" />
  *
  * // Navy sidebar
- * <Wordmark inverted className="w-44 h-14" />
+ * <Wordmark inverted className="h-12 w-auto" />
  */
 export function Wordmark({
   className,
@@ -47,26 +47,11 @@ export function Wordmark({
 }: Props) {
   const key: keyof typeof SRC = inverted ? `${variant}-inverted` : variant
 
-  if (variant === 'horizontal') {
-    // object-cover + overflow-hidden crops the excess whitespace of the 1:1 canvas,
-    // zooming in on the centred logo mark.
-    return (
-      <div className={cn('overflow-hidden', className)}>
-        <img
-          src={SRC[key]}
-          alt="Imaro"
-          className="h-full w-full object-cover object-center"
-        />
-      </div>
-    )
-  }
-
-  // stacked — square canvas, content fills more of the frame → contain is fine
   return (
     <img
       src={SRC[key]}
       alt="Imaro"
-      className={cn('object-contain', className)}
+      className={cn('object-contain object-left', className)}
     />
   )
 }

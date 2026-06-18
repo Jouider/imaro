@@ -251,6 +251,8 @@ export type Impaye = {
 
 export type Ticket = {
   id: number
+  /** Human-friendly unique reference, e.g. "TKT-2026-0007" (KAN-43). */
+  reference: string
   categorie: string
   description: string
   priorite: 'urgent' | 'normal' | 'faible'
@@ -533,6 +535,7 @@ const MOCK_IMPAYES: Impaye[] = [
 const MOCK_TICKETS: Ticket[] = [
   {
     id: 1,
+    reference: 'TKT-2026-0001',
     categorie: 'Plomberie',
     description: "Fuite d'eau importante au sous-sol — pompe endommagée",
     priorite: 'urgent',
@@ -546,6 +549,7 @@ const MOCK_TICKETS: Ticket[] = [
   },
   {
     id: 2,
+    reference: 'TKT-2026-0002',
     categorie: 'Électricité',
     description: "Panne d'électricité dans les parties communes — tableau HS",
     priorite: 'urgent',
@@ -559,6 +563,7 @@ const MOCK_TICKETS: Ticket[] = [
   },
   {
     id: 3,
+    reference: 'TKT-2026-0003',
     categorie: 'Sécurité',
     description: 'Portail principal bloqué — accès véhicule impossible',
     priorite: 'normal',
@@ -708,13 +713,15 @@ export async function getRecouvrementMensuel(): Promise<RecouvrementMois[]> {
 // ─── Résidences ──────────────────────────────────────────────────────────────
 
 export async function getResidences(search?: string): Promise<Residence[]> {
-  const params: Record<string, string> = {}
-  if (search) params.search = search
-  const res = await api.get<ApiEnvelope<{ residences: Residence[] }>>(
-    '/gestionnaire/residences',
-    { params },
-  )
-  return res.data.data.residences
+  return withMock(async () => {
+    const params: Record<string, string> = {}
+    if (search) params.search = search
+    const res = await api.get<ApiEnvelope<{ residences: Residence[] }>>(
+      '/gestionnaire/residences',
+      { params },
+    )
+    return res.data.data.residences
+  }, MOCK_RESIDENCES)
 }
 
 export async function getResidence(id: number): Promise<Residence> {
@@ -745,8 +752,41 @@ export async function updateResidence(
   return res.data.data
 }
 
-export async function deleteResidence(id: number): Promise<void> {
-  await api.delete(`/gestionnaire/residences/${id}`)
+/**
+ * Request a one-time code (email/SMS) to authorise deleting a residence
+ * (KAN-49). Returns the channel it was sent on so the UI can tell the user.
+ *
+ * Backend Abdellah (futur) — `POST /api/gestionnaire/residences/:id/deletion-code`.
+ * Mock returns `email` so the confirm flow works end-to-end in dev.
+ */
+export async function requestResidenceDeletionCode(
+  id: number,
+): Promise<{ channel: 'email' | 'sms' }> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<{ channel: 'email' | 'sms' }>>(
+        `/gestionnaire/residences/${id}/deletion-code`,
+        {},
+      )
+      return res.data.data
+    },
+    { channel: 'email' },
+  )
+}
+
+/**
+ * Delete a residence. The `code` (KAN-49) is the OTP the user received; the
+ * backend must verify it before deleting. In dev the call is mocked so the
+ * flow works without a real code.
+ */
+export async function deleteResidence(
+  id: number,
+  code?: string,
+): Promise<void> {
+  if (import.meta.env.DEV) return
+  await api.delete(`/gestionnaire/residences/${id}`, {
+    data: code ? { code } : undefined,
+  })
 }
 
 export async function getResidenceOverview(
@@ -936,12 +976,34 @@ export async function getCoproprietaires(
   search?: string,
 ): Promise<Coproprietaire[]> {
   return withMock(async () => {
-    const params: Record<string, string> = {}
-    if (search) params.search = search
-    const res = await api.get<
-      ApiEnvelope<{ coproprietaires: Coproprietaire[] }>
-    >(`/gestionnaire/residences/${residenceId}/coproprietaires`, { params })
-    return res.data.data.coproprietaires
+    // The endpoint paginates (default 15/page). We fetch every page so the list
+    // shows the full résidence, not just the first 15 (issue #204).
+    type Page = {
+      coproprietaires: Coproprietaire[]
+      meta?: { current_page: number; last_page: number }
+    }
+    const perPage = 100
+    const fetchPage = async (page: number) => {
+      const params: Record<string, string> = {
+        per_page: String(perPage),
+        page: String(page),
+      }
+      if (search) params.search = search
+      const res = await api.get<ApiEnvelope<Page>>(
+        `/gestionnaire/residences/${residenceId}/coproprietaires`,
+        { params },
+      )
+      return res.data.data
+    }
+
+    const first = await fetchPage(1)
+    const lastPage = first.meta?.last_page ?? 1
+    const all = [...first.coproprietaires]
+    for (let page = 2; page <= lastPage; page++) {
+      const next = await fetchPage(page)
+      all.push(...next.coproprietaires)
+    }
+    return all
   }, MOCK_COPROPRIETAIRES)
 }
 
@@ -964,6 +1026,40 @@ export async function createCoproprietaire(
     const res = await api.post<ApiEnvelope<CreateCoproprietaireResponse>>(
       '/gestionnaire/coproprietaires',
       { ...input, type: input.type ?? 'proprietaire' },
+    )
+    return res.data.data
+  }, mock)
+}
+
+/** Editable fields of a coproprietaire (KAN-50: fix a typo after creation). */
+export type UpdateCoproprietaireInput = {
+  name?: string
+  phone?: string
+  email?: string
+}
+
+/**
+ * Update a coproprietaire's contact info after creation (KAN-50).
+ *
+ * Backend Abdellah (futur) — `PATCH /api/gestionnaire/coproprietaires/:id`.
+ * Until it lands the call is mocked so the edit flow works end-to-end.
+ */
+export async function updateCoproprietaire(
+  id: number,
+  patch: UpdateCoproprietaireInput,
+): Promise<Coproprietaire> {
+  const mock: Coproprietaire = {
+    id,
+    name: patch.name ?? '',
+    phone: patch.phone ?? '',
+    email: patch.email,
+    solde: 0,
+    lot: null,
+  }
+  return withMock(async () => {
+    const res = await api.patch<ApiEnvelope<Coproprietaire>>(
+      `/gestionnaire/coproprietaires/${id}`,
+      patch,
     )
     return res.data.data
   }, mock)
@@ -1152,6 +1248,53 @@ export async function closTicket(id: number): Promise<void> {
   return withMock(async () => {
     await api.post(`/gestionnaire/tickets/${id}/clos`)
   }, undefined)
+}
+
+export type CreateTicketInput = {
+  residence_id: number
+  lot_id: number
+  categorie: string
+  priorite: 'urgent' | 'normal' | 'faible'
+  description: string
+}
+
+/**
+ * Create a ticket from the gestionnaire side (KAN-43). The backend assigns the
+ * unique `reference` (the mock generates one so the flow works in dev).
+ */
+export async function createTicket(data: CreateTicketInput): Promise<Ticket> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<{ ticket: Ticket }>>(
+        '/gestionnaire/tickets',
+        data,
+      )
+      return res.data.data.ticket
+    },
+    (() => {
+      const id = Math.floor(Math.random() * 9000) + 1000
+      const residence = MOCK_RESIDENCES.find((r) => r.id === data.residence_id)
+      const seq = String(Math.floor(Math.random() * 9999) + 1).padStart(4, '0')
+      return {
+        id,
+        reference: `TKT-${new Date().getFullYear()}-${seq}`,
+        categorie: data.categorie,
+        description: data.description,
+        priorite: data.priorite,
+        statut: 'ouvert',
+        images: [],
+        closed_at: null,
+        created_at: new Date().toISOString(),
+        residence: {
+          id: data.residence_id,
+          name: residence?.name ?? 'Résidence',
+          city: residence?.city,
+        },
+        lot: { id: data.lot_id, numero: '—' },
+        user: { id: 0, name: 'Gestionnaire' },
+      }
+    })(),
+  )
 }
 
 export async function getTicketsUrgents(
@@ -1514,5 +1657,31 @@ export async function bulkStorePrestataires(
       return res.data.data
     },
     { created: prestataires.length, errors: [] },
+  )
+}
+
+// ─── Profil gestionnaire — consentement CNDP (loi 09-08) ─────────────────────
+
+export type GestionnaireProfil = {
+  cndp_consent_at: string | null
+  cndp_policy_version?: string | null
+}
+
+/**
+ * PATCH /api/gestionnaire/profil — records the CNDP (loi 09-08) consent
+ * (issue #230). The backend stamps `cndp_consent_at` + its own policy version.
+ */
+export async function updateGestionnaireProfil(payload: {
+  cndp_consent?: boolean
+}): Promise<GestionnaireProfil> {
+  return withMock(
+    async () => {
+      const res = await api.patch<ApiEnvelope<{ profil: GestionnaireProfil }>>(
+        '/gestionnaire/profil',
+        payload,
+      )
+      return res.data.data.profil
+    },
+    { cndp_consent_at: new Date().toISOString(), cndp_policy_version: '1.0' },
   )
 }

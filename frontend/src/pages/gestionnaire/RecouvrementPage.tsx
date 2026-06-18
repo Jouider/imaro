@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useResidenceStore } from '@/stores/residenceStore'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Scale,
@@ -54,16 +55,16 @@ const SEVERITY_META: Record<
   PrescriptionSeverity,
   { label: string; cls: string }
 > = {
-  low: { label: 'Faible', cls: 'border-green-200 bg-green-50 text-green-700' },
+  low: { label: 'low', cls: 'border-green-200 bg-green-50 text-green-700' },
   medium: {
-    label: 'Modéré',
+    label: 'medium',
     cls: 'border-amber-200 bg-amber-50 text-amber-700',
   },
   high: {
-    label: 'Élevé',
+    label: 'high',
     cls: 'border-orange-200 bg-orange-50 text-orange-700',
   },
-  critical: { label: 'Critique', cls: 'border-red-200 bg-red-50 text-red-700' },
+  critical: { label: 'critical', cls: 'border-red-200 bg-red-50 text-red-700' },
 }
 
 const STATUS_BADGES: Record<string, { label: string; cls: string }> = {
@@ -84,16 +85,15 @@ const STATUS_BADGES: Record<string, { label: string; cls: string }> = {
 export function RecouvrementPage() {
   const { t } = useTranslation()
 
-  const [pickedResidenceId, setPickedResidenceId] = useState<number | null>(
-    null,
-  )
+  const globalResidenceId = useResidenceStore((s) => s.residenceId)
+  const setResidenceId = useResidenceStore((s) => s.setResidenceId)
 
   const residencesQ = useQuery({
     queryKey: ['residences'],
     queryFn: () => getResidences(),
   })
 
-  const residenceId = pickedResidenceId ?? residencesQ.data?.[0]?.id ?? null
+  const residenceId = globalResidenceId ?? residencesQ.data?.[0]?.id ?? null
 
   const recQ = useQuery({
     queryKey: ['recouvrement', residenceId],
@@ -155,7 +155,10 @@ export function RecouvrementPage() {
     mutationFn: () => recalculatePenalties(residenceId!),
     onSuccess: (r) => {
       toast.success(
-        `${r.recalculated} pénalités recalculées (${r.total_penalty_amount.toFixed(2)} DH)`,
+        t('gestionnaire.recouvrement.penaltiesRecalc', {
+          n: r.recalculated,
+          amount: r.total_penalty_amount.toFixed(2),
+        }),
       )
       void queryClient.invalidateQueries({
         queryKey: ['recouvrement', residenceId],
@@ -197,7 +200,7 @@ export function RecouvrementPage() {
         <label className="text-sm font-medium">{t('common.residence')}</label>
         <Select
           value={residenceId ? String(residenceId) : ''}
-          onValueChange={(v) => setPickedResidenceId(Number(v))}
+          onValueChange={(v) => setResidenceId(Number(v))}
         >
           <SelectTrigger className="w-72">
             <SelectValue placeholder={t('common.select')} />
@@ -257,7 +260,7 @@ export function RecouvrementPage() {
               variant="outline"
               className="ml-2 border-blue-200 bg-blue-50 text-[10px] text-blue-700"
             >
-              Loi 18-00 · Art. 25
+              {t('common.loi1800Art25')}
             </Badge>
           </div>
 
@@ -460,13 +463,13 @@ export function RecouvrementPage() {
           tone="warning"
         />
         <Kpi
-          label="Lots en retard"
+          label={t('gestionnaire.recouvrement.lotsEnRetard')}
           value={data?.nb_lots_en_retard ?? 0}
           icon={<AlertTriangle className="size-4" />}
           tone="warning"
         />
         <Kpi
-          label="Risque prescription"
+          label={t('gestionnaire.recouvrement.riskPrescription')}
           value={`${criticalCount + highCount}`}
           icon={<ShieldAlert className="size-4" />}
           tone="danger"
@@ -493,9 +496,7 @@ export function RecouvrementPage() {
           </Badge>
         </div>
         <p className="mb-4 text-xs text-red-700/80 dark:text-red-300/80">
-          Les créances de charges de copropriété sont prescrites après 5 ans
-          sans interruption. Une action légale immédiate est requise pour les
-          créances à statut critique.
+          {t('gestionnaire.recouvrement.prescriptionBanner')}
         </p>
 
         {data?.prescription_risks.length === 0 ? (
@@ -512,8 +513,12 @@ export function RecouvrementPage() {
                   <TableHead className="text-right">
                     {t('common.amount')}
                   </TableHead>
-                  <TableHead>Origine</TableHead>
-                  <TableHead className="text-right">Jours restants</TableHead>
+                  <TableHead>
+                    {t('gestionnaire.recouvrement.colOrigine')}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t('gestionnaire.recouvrement.colJoursRestants')}
+                  </TableHead>
                   <TableHead>{t('common.severity')}</TableHead>
                 </TableRow>
               </TableHeader>
@@ -555,7 +560,7 @@ export function RecouvrementPage() {
                           SEVERITY_META[r.severite].cls,
                         )}
                       >
-                        {SEVERITY_META[r.severite].label}
+                        {t(`gestionnaire.recouvrement.severity.${r.severite}`)}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -587,7 +592,9 @@ export function RecouvrementPage() {
                   {t('gestionnaire.recouvrement.age')}
                 </TableHead>
                 <TableHead>{t('common.status')}</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-right">
+                  {t('common.actions')}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

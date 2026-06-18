@@ -13,7 +13,6 @@ import {
   Trash2,
 } from 'lucide-react'
 import {
-  deleteResidence,
   getResidences,
   storeResidence,
   updateResidence,
@@ -22,8 +21,8 @@ import {
 } from '@/services/gestionnaire.service'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { EmptyState } from '@/components/shared/EmptyState'
-import { ConfirmModal } from '@/components/shared/ConfirmModal'
 import { ResidenceFormDialog } from '@/components/gestionnaire/ResidenceFormDialog'
+import { DeleteResidenceDialog } from '@/components/gestionnaire/DeleteResidenceDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -104,16 +103,6 @@ export function ResidencesPage() {
       toast.success(t('gestionnaire.residences.toast.updated'))
     },
     onError: () => toast.error(t('gestionnaire.residences.toast.updateError')),
-  })
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteResidence(id),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['residences'] })
-      setDeleting(null)
-      toast.success(t('gestionnaire.residences.toast.deleted'))
-    },
-    onError: () => toast.error(t('gestionnaire.residences.toast.deleteError')),
   })
 
   function openCreate() {
@@ -238,15 +227,13 @@ export function ResidencesPage() {
         isLoading={storeMutation.isPending || updateMutation.isPending}
       />
 
-      <ConfirmModal
-        open={!!deleting}
+      <DeleteResidenceDialog
+        residence={deleting}
         onOpenChange={(o) => !o && setDeleting(null)}
-        title={t('gestionnaire.residences.deleteTitle')}
-        description={t('gestionnaire.residences.deleteDesc', {
-          name: deleting?.name ?? '',
-        })}
-        onConfirm={() => deleting && deleteMutation.mutate(deleting.id)}
-        isLoading={deleteMutation.isPending}
+        onDeleted={() => {
+          void qc.invalidateQueries({ queryKey: ['residences'] })
+          setDeleting(null)
+        }}
       />
     </div>
   )
