@@ -418,7 +418,7 @@ export function AiChatFab({ aboveNav = false }: { aboveNav?: boolean }) {
         className={cn(
           'fixed z-50 end-6',
           aboveNav ? '' : 'bottom-6',
-          'flex size-14 items-center justify-center rounded-full',
+          'flex size-10 items-center justify-center rounded-full',
           'text-white shadow-lg shadow-black/20',
           'transition-all duration-200 hover:scale-105 hover:shadow-xl active:scale-95',
           open
@@ -433,7 +433,7 @@ export function AiChatFab({ aboveNav = false }: { aboveNav?: boolean }) {
           }),
         }}
       >
-        <Sparkles className="size-6" />
+        <Sparkles className="size-4" />
       </button>
     </>
   )

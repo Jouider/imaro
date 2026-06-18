@@ -16,11 +16,11 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: 'https',
   },
-  backgroundColor: '#1B4F72',
+  backgroundColor: '#001244',
   plugins: {
     SplashScreen: {
       launchAutoHide: false,
-      backgroundColor: '#1B4F72',
+      backgroundColor: '#001244',
     },
     // Route fetch/XHR through the native HTTP stack so API calls bypass the
     // WebView's CORS checks (the app origin capacitor://localhost isn't in the
