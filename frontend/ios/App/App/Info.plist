@@ -4,6 +4,8 @@
 <dict>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Imaro utilise Face ID pour déverrouiller votre espace en toute sécurité.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Imaro utilise l’appareil photo pour scanner les QR codes d’accès et photographier les visiteurs.</string>
     <key>CAPACITOR_DEBUG</key>
 	<string>$(CAPACITOR_DEBUG)</string>
 	<key>CFBundleDevelopmentRegion</key>

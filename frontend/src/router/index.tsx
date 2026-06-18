@@ -37,6 +37,7 @@ import { AssistanceRecouvrementPage } from '@/pages/gestionnaire/AssistanceRecou
 import { RappelsPage } from '@/pages/gestionnaire/RappelsPage'
 import { VisitesPage } from '@/pages/gestionnaire/VisitesPage'
 import { VisitorPassPage } from '@/pages/public/VisitorPassPage'
+import { ConfidentialitePage } from '@/pages/public/ConfidentialitePage'
 import { GardienPage } from '@/pages/gardien/GardienPage'
 import { GardienGuard } from './GardienGuard'
 import { PointagePage } from '@/pages/gestionnaire/PointagePage'
@@ -57,6 +58,9 @@ export const router = createBrowserRouter([
 
   // ── Public visitor pass (no auth, scanned at the lobby) ──
   { path: '/v/:token', element: <VisitorPassPage /> },
+
+  // ── Public privacy policy (loi 09-08 / CNDP — required by both stores) ──
+  { path: '/confidentialite', element: <ConfidentialitePage /> },
 
   // ── Gardien (lobby PWA — scan + walk-in) ──
   {
