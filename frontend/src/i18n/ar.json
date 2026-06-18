@@ -1857,7 +1857,18 @@
       "emptyDesc": "أنشئ أول إعلان لإعلام الملاك.",
       "toastCreated": "تم إنشاء الإعلان",
       "titlePlaceholder": "أشغال المصعد — انقطاع الخدمة",
-      "descPlaceholder": "صف الإعلان…"
+      "descPlaceholder": "صف الإعلان…",
+      "media": {
+        "label": "الصور والفيديوهات",
+        "add": "إضافة",
+        "hint": "صور (≤ 5 ميغا) وفيديوهات (≤ 30 ميغا) — {{n}} وسائط كحد أقصى.",
+        "uploading": "جارٍ رفع الوسائط…",
+        "remove": "إزالة",
+        "maxReached": "الحد الأقصى {{n}} وسائط لكل إعلان.",
+        "invalidType": "« {{name}} »: صيغة غير مدعومة (صور JPEG/PNG/WebP، فيديوهات MP4/MOV/WebM).",
+        "imageTooLarge": "« {{name}} »: الصورة كبيرة جدًا (5 ميغا كحد أقصى).",
+        "videoTooLarge": "« {{name}} »: الفيديو كبير جدًا (30 ميغا كحد أقصى)."
+      }
     },
     "prestataires": {
       "title": "المزودون والعقود",
@@ -3232,7 +3243,11 @@
     "demande": "الطلب",
     "initial": "الأولي",
     "organisme": "الجهة",
-    "mensualite": "القسط الشهري"
+    "mensualite": "القسط الشهري",
+    "media": {
+      "playVideo": "تشغيل الفيديو",
+      "viewImage": "عرض الصورة"
+    }
   },
   "public": {
     "visitorPass": {
@@ -3355,9 +3370,7 @@
         },
         {
           "h": "13. الاتصال",
-          "p": [
-            "لأي سؤال: contact@imaro.ma."
-          ]
+          "p": ["لأي سؤال: contact@imaro.ma."]
         }
       ]
     }
