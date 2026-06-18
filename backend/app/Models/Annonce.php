@@ -12,13 +12,14 @@ class Annonce extends Model
 
     protected $fillable = [
         'tenant_id', 'residence_id', 'created_by',
-        'titre', 'contenu', 'priorite', 'statut', 'publiee_at',
+        'titre', 'contenu', 'media', 'priorite', 'statut', 'publiee_at',
     ];
 
     protected function casts(): array
     {
         return [
             'publiee_at' => 'datetime',
+            'media' => 'array',
         ];
     }
 
