@@ -195,6 +195,7 @@ export function PortailProfilPage() {
           label={t('portail.profil.privacy')}
           trailing={<ChevronRight className="size-4 text-muted-foreground" />}
           clickable
+          onClick={() => navigate('/confidentialite')}
         />
       </Section>
 
@@ -260,14 +261,17 @@ function Row({
   label,
   trailing,
   clickable = false,
+  onClick,
 }: {
   icon: React.ReactNode
   label: string
   trailing?: React.ReactNode
   clickable?: boolean
+  onClick?: () => void
 }) {
   return (
     <div
+      onClick={onClick}
       className={cn(
         'flex items-center gap-3 px-4 py-3.5',
         clickable &&

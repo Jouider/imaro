@@ -3233,6 +3233,109 @@
       "addToAppleWallet": "Ajouter à Apple Wallet",
       "addToGoogleWallet": "Ajouter à Google Wallet",
       "recurringPass": "Pass récurrent"
+    },
+    "confidentialite": {
+      "title": "Politique de confidentialité",
+      "brand": "Imaro",
+      "updated": "Dernière mise à jour : 18 juin 2026",
+      "intro": "La présente politique décrit comment l’application Imaro collecte, utilise et protège vos données personnelles, conformément à la loi marocaine 09-08 relative à la protection des personnes physiques à l’égard du traitement des données à caractère personnel.",
+      "back": "Retour",
+      "sections": [
+        {
+          "h": "1. Responsable du traitement",
+          "p": [
+            "Imaro édite et exploite l’application de gestion de copropriété « Imaro ».",
+            "Pour toute question relative à vos données : contact@imaro.ma — https://imaro.ma."
+          ]
+        },
+        {
+          "h": "2. Données que nous collectons",
+          "p": [
+            "Données d’identité : nom, prénom, numéro de téléphone, adresse e-mail.",
+            "Données de copropriété : lot, résidence, tantièmes, soldes et historique de paiements.",
+            "Données techniques : modèle d’appareil, système, journaux de connexion et identifiants de session.",
+            "Données biométriques : Face ID / Touch ID / empreinte sont gérées localement par votre appareil (iOS/Android) ; Imaro ne reçoit ni ne stocke jamais vos données biométriques.",
+            "Photos et QR codes : photos de visiteurs et QR d’accès, lorsque vous utilisez ces fonctionnalités."
+          ]
+        },
+        {
+          "h": "3. Finalités du traitement",
+          "p": [
+            "Gérer votre copropriété (appels de fonds, charges, réclamations, assemblées).",
+            "Vous authentifier et sécuriser l’accès à votre espace.",
+            "Vous envoyer des notifications utiles (paiements, annonces, accès visiteurs).",
+            "Faciliter les paiements en ligne et la gestion des accès."
+          ]
+        },
+        {
+          "h": "4. Base légale",
+          "p": [
+            "Exécution du contrat de syndic et de la relation de copropriété.",
+            "Votre consentement, pour les fonctionnalités optionnelles (biométrie, notifications).",
+            "Le respect d’obligations légales, notamment comptables (loi 18-00 relative à la copropriété)."
+          ]
+        },
+        {
+          "h": "5. Destinataires des données",
+          "p": [
+            "Votre syndic / gestionnaire de copropriété.",
+            "Nos prestataires techniques (hébergement, envoi WhatsApp/SMS, prestataires de paiement), strictement pour fournir le service.",
+            "Imaro ne vend ni ne loue jamais vos données personnelles à des tiers."
+          ]
+        },
+        {
+          "h": "6. Stockage local et sécurité",
+          "p": [
+            "Votre jeton d’authentification est stocké de façon sécurisée dans le Trousseau (Keychain) iOS ou le Keystore Android.",
+            "Les échanges avec nos serveurs sont chiffrés via HTTPS.",
+            "La vérification biométrique est effectuée localement par votre appareil."
+          ]
+        },
+        {
+          "h": "7. Durée de conservation",
+          "p": [
+            "Vos données sont conservées pendant la durée de la relation de copropriété, puis pendant les durées imposées par les obligations légales et comptables applicables."
+          ]
+        },
+        {
+          "h": "8. Vos droits (loi 09-08)",
+          "p": [
+            "Vous disposez d’un droit d’accès, de rectification, d’opposition et de suppression de vos données.",
+            "Pour exercer ces droits : contact@imaro.ma.",
+            "Vous pouvez également saisir la Commission Nationale de contrôle de la protection des Données à caractère Personnel (CNDP) — https://www.cndp.ma."
+          ]
+        },
+        {
+          "h": "9. Appareil photo et photos",
+          "p": [
+            "L’appareil photo n’est utilisé que pour scanner les QR codes d’accès et photographier les visiteurs, à votre initiative. Aucune image n’est capturée sans action de votre part."
+          ]
+        },
+        {
+          "h": "10. Notifications push",
+          "p": [
+            "Les notifications sont facultatives et soumises à votre autorisation. Vous pouvez les désactiver à tout moment dans les réglages de votre appareil."
+          ]
+        },
+        {
+          "h": "11. Mineurs",
+          "p": [
+            "L’application s’adresse aux copropriétaires et n’est pas destinée aux personnes mineures."
+          ]
+        },
+        {
+          "h": "12. Modifications",
+          "p": [
+            "Cette politique peut être mise à jour. Toute modification sera publiée sur cette page avec une nouvelle date de mise à jour."
+          ]
+        },
+        {
+          "h": "13. Contact",
+          "p": [
+            "Pour toute question : contact@imaro.ma."
+          ]
+        }
+      ]
     }
   },
   "gardien": {
