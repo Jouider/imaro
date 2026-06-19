@@ -386,6 +386,7 @@ Route::middleware(['app.permission:personnel'])->group(function () {
 
     Route::get('/equipe/personnel', [EquipePersonnelController::class, 'index']);
     Route::post('/equipe/personnel', [EquipePersonnelController::class, 'store']);
+    Route::post('/equipe/personnel/{id}/send-code', [EquipePersonnelController::class, 'sendCode']);
     Route::put('/equipe/personnel/{id}', [EquipePersonnelController::class, 'update']);
     Route::delete('/equipe/personnel/{id}', [EquipePersonnelController::class, 'destroy']);
 });

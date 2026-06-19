@@ -1335,7 +1335,15 @@ Crée le personnel (gardien, sécurité, ménage…) **et un compte de connexion
 
 **Body** : `name`, `poste` (`securite|menage|gardien|jardinier|technicien|concierge`), `residence_id`, `phone` (requis, unique), `permissions?`.
 
-**Response 201** : enregistrement + `code_apercu` (**aperçu masqué** uniquement, ex. `AB••••••` — le code complet n'est jamais renvoyé).
+**Response 201** : enregistrement + `code` (**code complet visible** par le gestionnaire, à communiquer au personnel — il devra le changer à la 1re connexion) + `delivery` (statut d'envoi) :
+```json
+{ "code": "AB12CD34",
+  "delivery": { "delivered": true, "channel": "sms8", "confirmed": true, "error": null } }
+```
+
+### POST /api/gestionnaire/equipe/personnel/{id}/send-code
+Bouton « **Envoyer** » — **régénère** un code (l'ancien est haché, irrécupérable) et le (re)transmet via la cascade WhatsApp → SMS → email.
+**Response 200** : `{ "code": "…", "delivery": { "delivered", "channel", "confirmed", "error" } }`.
 
 Connexion ensuite via `POST /api/auth/resident/login` (`phone` + `code`) — l'endpoint accepte les rôles `resident` **et** `personnel`. Première connexion → `must_change_code` → écran d'activation.
 
