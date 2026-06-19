@@ -131,6 +131,9 @@ Route::post('tickets/{ticket}/clos', [TicketController::class, 'clos']);
 Route::middleware(['app.permission:assemblees'])->group(function () {
     Route::get('/assemblees', [AssembleeController::class, 'index']);
     Route::post('/assemblees', [AssembleeController::class, 'store']);
+    // Convocations AG (KAN-98 / #269) — génération async + PDF fusionné
+    Route::post('/assemblees/{assemblee}/convocations', [AssembleeController::class, 'genererConvocations']);
+    Route::get('/assemblees/{assemblee}/convocations', [AssembleeController::class, 'convocations']);
 
     // Annonces
     Route::get('/annonces', [AnnonceController::class, 'index']);
