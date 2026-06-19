@@ -12,6 +12,13 @@ async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
+/** Média attaché à une annonce (KAN-96). `url` est servie par le backend. */
+export type AnnonceMedia = {
+  type: 'image' | 'video'
+  url: string
+  taille_ko: number
+}
+
 export type Annonce = {
   id: number
   titre: string
@@ -22,6 +29,7 @@ export type Annonce = {
   date_publication: string | null
   created_at: string
   nb_lectures: number
+  media?: AnnonceMedia[]
 }
 
 // ─── Mock data ───────────────────────────────────────────────────────────────
@@ -109,17 +117,32 @@ export async function getAnnonces(params?: {
   )
 }
 
-export async function storeAnnonce(data: {
-  titre: string
-  contenu: string
-  priorite: string
-  residence_id?: number
-}): Promise<Annonce> {
+export async function storeAnnonce(
+  data: {
+    titre: string
+    contenu: string
+    priorite: string
+    residence_id?: number
+    /** Fichiers image/vidéo à uploader (max 6) — envoyés en multipart `media[]`. */
+    media?: File[]
+  },
+  opts?: { onProgress?: (pct: number) => void },
+): Promise<Annonce> {
   return withMock(
     async () => {
+      const hasMedia = !!data.media?.length
+      const body = hasMedia ? buildAnnonceFormData(data) : data
       const res = await api.post<ApiEnvelope<{ annonce: Annonce }>>(
         '/gestionnaire/annonces',
-        data,
+        body,
+        hasMedia
+          ? {
+              onUploadProgress: (e) => {
+                if (opts?.onProgress && e.total)
+                  opts.onProgress(Math.round((e.loaded / e.total) * 100))
+              },
+            }
+          : undefined,
       )
       return res.data.data.annonce
     },
@@ -133,8 +156,29 @@ export async function storeAnnonce(data: {
       date_publication: null,
       created_at: new Date().toISOString(),
       nb_lectures: 0,
+      media: [],
     },
   )
+}
+
+/** Builds the multipart payload for create/update with `media[]` files. */
+function buildAnnonceFormData(data: {
+  titre: string
+  contenu: string
+  priorite: string
+  residence_id?: number
+  media?: File[]
+  supprimer_media?: string[]
+}): FormData {
+  const fd = new FormData()
+  fd.append('titre', data.titre)
+  fd.append('contenu', data.contenu)
+  fd.append('priorite', data.priorite)
+  if (data.residence_id != null)
+    fd.append('residence_id', String(data.residence_id))
+  data.media?.forEach((file) => fd.append('media[]', file))
+  data.supprimer_media?.forEach((path) => fd.append('supprimer_media[]', path))
+  return fd
 }
 
 export async function updateAnnonce(

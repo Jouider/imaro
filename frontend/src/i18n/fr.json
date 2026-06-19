@@ -1843,7 +1843,18 @@
       "emptyDesc": "Créez votre première annonce pour informer les copropriétaires.",
       "toastCreated": "Annonce créée",
       "titlePlaceholder": "Travaux ascenseur — interruption de service",
-      "descPlaceholder": "Décrivez l'annonce…"
+      "descPlaceholder": "Décrivez l'annonce…",
+      "media": {
+        "label": "Photos et vidéos",
+        "add": "Ajouter",
+        "hint": "Photos (≤ 5 Mo) et vidéos (≤ 30 Mo) — {{n}} médias maximum.",
+        "uploading": "Envoi des médias…",
+        "remove": "Retirer",
+        "maxReached": "Maximum {{n}} médias par annonce.",
+        "invalidType": "« {{name}} » : format non supporté (images JPEG/PNG/WebP, vidéos MP4/MOV/WebM).",
+        "imageTooLarge": "« {{name}} » : image trop lourde (5 Mo maximum).",
+        "videoTooLarge": "« {{name}} » : vidéo trop lourde (30 Mo maximum)."
+      }
     },
     "prestataires": {
       "title": "Prestataires & Contrats",
@@ -3232,7 +3243,11 @@
     "demande": "Demande",
     "initial": "Initial",
     "organisme": "Organisme",
-    "mensualite": "Mensualité"
+    "mensualite": "Mensualité",
+    "media": {
+      "playVideo": "Lire la vidéo",
+      "viewImage": "Voir l'image"
+    }
   },
   "public": {
     "visitorPass": {
@@ -3355,9 +3370,7 @@
         },
         {
           "h": "13. Contact",
-          "p": [
-            "Pour toute question : contact@imaro.ma."
-          ]
+          "p": ["Pour toute question : contact@imaro.ma."]
         }
       ]
     }

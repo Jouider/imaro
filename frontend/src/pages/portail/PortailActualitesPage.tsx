@@ -11,8 +11,10 @@ import {
   ChevronUp,
   ChevronLeft,
   ChevronRight,
+  Image as ImageIcon,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { MediaGallery } from '@/components/shared'
 import {
   getAnnonces,
   getAssembleesPortail,
@@ -489,6 +491,12 @@ function AnnoncesTab({
                     <span className="text-xs text-muted-foreground">
                       {dateStr}
                     </span>
+                    {a.media && a.media.length > 0 && (
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <ImageIcon className="size-3" />
+                        {a.media.length}
+                      </span>
+                    )}
                   </div>
                   <p className="font-semibold text-sm leading-snug">
                     {a.titre}
@@ -510,10 +518,13 @@ function AnnoncesTab({
             </button>
 
             {isExpanded && (
-              <div className="border-t px-4 pb-4 pt-3">
+              <div className="border-t px-4 pb-4 pt-3 space-y-3">
                 <p className="text-sm leading-relaxed whitespace-pre-line">
                   {a.contenu}
                 </p>
+                {a.media && a.media.length > 0 && (
+                  <MediaGallery media={a.media} />
+                )}
               </div>
             )}
           </div>

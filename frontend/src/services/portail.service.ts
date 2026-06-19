@@ -1,5 +1,6 @@
 import { api, type ApiEnvelope } from '@/lib/axios'
 import type { BankAccount } from '@/services/gestionnaire.service'
+import type { AnnonceMedia } from '@/services/annonces.service'
 
 async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
   if (!import.meta.env.DEV && !import.meta.env.VITE_SHOW_DEV_BYPASS)
@@ -32,6 +33,7 @@ export type Annonce = {
   contenu: string
   date: string
   priorite: 'normale' | 'urgente'
+  media?: AnnonceMedia[]
 }
 
 export type DashboardData = {
