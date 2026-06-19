@@ -1796,6 +1796,18 @@
           "etat_impayes": "État des impayés par copropriétaire",
           "historique_relances": "Historique des relances"
         }
+      },
+      "convocations": {
+        "title": "Convocations",
+        "generate": "Générer les convocations",
+        "regenerate": "Régénérer",
+        "generating": "Génération des convocations en cours…",
+        "generated": "{{n}} convocation(s) générée(s)",
+        "empty": "Aucune convocation générée pour cette assemblée.",
+        "printAll": "Imprimer tout",
+        "download": "Télécharger la convocation",
+        "lotTantieme": "Lot {{lot}} · {{tantieme}}/1000 tantièmes",
+        "delaiWarning": "La date de l'AG ne respecte pas le préavis légal de {{n}} jours (loi 18-00)."
       }
     },
     "annonces": {
