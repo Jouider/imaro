@@ -1203,6 +1203,24 @@ Catégories valides : `entretien` | `gardiennage` | `nettoyage` | `administratif
 
 Types valides : `ordinaire` | `extraordinaire`
 
+### POST /api/gestionnaire/assemblees/{id}/convocations  *(KAN-98)*
+Déclenche la génération **asynchrone** (Job) d'une convocation PDF par copropriétaire de la résidence (Loi 18-00 art. 16quinquies) + un PDF fusionné « Imprimer tout ».
+**Response 202** : `{ "status": "accepted", "count": <nb_copro> }`
+
+### GET /api/gestionnaire/assemblees/{id}/convocations  *(KAN-98)*
+**Response 200**
+```json
+{
+  "status": "ready",            // "pending" tant que le Job tourne (le front poll)
+  "generated_at": "2026-06-19T10:00:00+00:00",
+  "merged_url": "https://.../storage/convocations/12/merged.pdf",
+  "convocations": [
+    { "id": 1, "coproprietaire_nom": "Hassan Benali", "lot": "A-102", "tantieme": 350, "url": "https://.../conv-1.pdf" }
+  ]
+}
+```
+Contenu PDF : en-tête syndic/résidence, date/heure/lieu, ordre du jour, mention préavis 15 j, nom + lot + tantièmes, **formulaire de pouvoir** pré-rempli. Conservation 5 ans (Décret 2.23.700).
+
 ---
 
 ## 15. Super Admin
