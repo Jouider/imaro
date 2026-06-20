@@ -11,6 +11,7 @@ import {
   type Assemblee,
 } from '@/services/gestionnaire.service'
 import { AgDocumentsSidebar } from '@/components/gestionnaire/AgDocumentsSidebar'
+import { AgConvocations } from '@/components/gestionnaire/AgConvocations'
 import { useResidenceStore } from '@/stores/residenceStore'
 import { ResidenceFilter } from '@/components/shared'
 import { PageHeader } from '@/components/shared/PageHeader'
@@ -381,7 +382,8 @@ export function AssembleesPage() {
                   ) : (
                     <p className="text-xs text-muted-foreground">
                       {t('gestionnaire.assemblees.form.delaiHint', {
-                        defaultValue: 'Délai légal minimum : 15 jours (loi 18-00).',
+                        defaultValue:
+                          'Délai légal minimum : 15 jours (loi 18-00).',
                       })}
                     </p>
                   )}
@@ -448,10 +450,7 @@ export function AssembleesPage() {
 
             {/* ── Documents sidebar (AG ordinaire only) ── */}
             {form.type === 'ordinaire' && (
-              <AgDocumentsSidebar
-                checked={checkedDocs}
-                onToggle={toggleDoc}
-              />
+              <AgDocumentsSidebar checked={checkedDocs} onToggle={toggleDoc} />
             )}
           </div>
 
@@ -498,102 +497,105 @@ export function AssembleesPage() {
             </DialogHeader>
 
             <div className="flex flex-col gap-4 sm:flex-row">
-            <div className="min-w-0 flex-1 space-y-4 py-2">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="font-medium text-muted-foreground">
-                    {t('common.residence')}
-                  </p>
-                  <p>{detailAG.residence.name}</p>
-                </div>
-                <div>
-                  <p className="font-medium text-muted-foreground">
-                    {t('common.type')}
-                  </p>
-                  <p className="capitalize">{detailAG.type}</p>
-                </div>
-                <div>
-                  <p className="font-medium text-muted-foreground">
-                    {t('common.date')}
-                  </p>
-                  <p>
-                    {new Date(detailAG.date).toLocaleDateString('fr-FR', {
-                      weekday: 'long',
-                      day: '2-digit',
-                      month: 'long',
-                      year: 'numeric',
-                    })}
-                    {' à '}
-                    {new Date(detailAG.date).toLocaleTimeString('fr-FR', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </p>
-                </div>
-                <div>
-                  <p className="font-medium text-muted-foreground">
-                    {t('gestionnaire.assemblees.colLieu')}
-                  </p>
-                  <p>{detailAG.lieu}</p>
-                </div>
-              </div>
-
-              {/* Quorum */}
-              <div className="flex items-center gap-3 rounded-lg border p-3">
-                <Users className="size-5 shrink-0 text-muted-foreground" />
-                <div className="flex-1 text-sm">
-                  <p className="font-medium">
-                    {t('gestionnaire.assemblees.detailQuorum', {
-                      n: detailAG.quorum_requis,
-                    })}
-                  </p>
-                  {detailAG.participants_count !== null ? (
-                    <p className="text-muted-foreground">
-                      {t('gestionnaire.assemblees.detailParticipants', {
-                        n: detailAG.participants_count,
+              <div className="min-w-0 flex-1 space-y-4 py-2">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="font-medium text-muted-foreground">
+                      {t('common.residence')}
+                    </p>
+                    <p>{detailAG.residence.name}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium text-muted-foreground">
+                      {t('common.type')}
+                    </p>
+                    <p className="capitalize">{detailAG.type}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium text-muted-foreground">
+                      {t('common.date')}
+                    </p>
+                    <p>
+                      {new Date(detailAG.date).toLocaleDateString('fr-FR', {
+                        weekday: 'long',
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                      {' à '}
+                      {new Date(detailAG.date).toLocaleTimeString('fr-FR', {
+                        hour: '2-digit',
+                        minute: '2-digit',
                       })}
                     </p>
-                  ) : (
-                    <p className="text-muted-foreground">
-                      {t('gestionnaire.assemblees.detailNotHeld')}
+                  </div>
+                  <div>
+                    <p className="font-medium text-muted-foreground">
+                      {t('gestionnaire.assemblees.colLieu')}
                     </p>
-                  )}
+                    <p>{detailAG.lieu}</p>
+                  </div>
                 </div>
-                <Badge
-                  className={cn(
-                    STATUT_STYLES[detailAG.statut] ??
-                      'bg-gray-100 text-gray-600',
-                    'border-0 shrink-0',
-                  )}
-                >
-                  {t(`gestionnaire.assemblees.statut.${detailAG.statut}`, {
-                    defaultValue: detailAG.statut,
-                  })}
-                </Badge>
+
+                {/* Quorum */}
+                <div className="flex items-center gap-3 rounded-lg border p-3">
+                  <Users className="size-5 shrink-0 text-muted-foreground" />
+                  <div className="flex-1 text-sm">
+                    <p className="font-medium">
+                      {t('gestionnaire.assemblees.detailQuorum', {
+                        n: detailAG.quorum_requis,
+                      })}
+                    </p>
+                    {detailAG.participants_count !== null ? (
+                      <p className="text-muted-foreground">
+                        {t('gestionnaire.assemblees.detailParticipants', {
+                          n: detailAG.participants_count,
+                        })}
+                      </p>
+                    ) : (
+                      <p className="text-muted-foreground">
+                        {t('gestionnaire.assemblees.detailNotHeld')}
+                      </p>
+                    )}
+                  </div>
+                  <Badge
+                    className={cn(
+                      STATUT_STYLES[detailAG.statut] ??
+                        'bg-gray-100 text-gray-600',
+                      'border-0 shrink-0',
+                    )}
+                  >
+                    {t(`gestionnaire.assemblees.statut.${detailAG.statut}`, {
+                      defaultValue: detailAG.statut,
+                    })}
+                  </Badge>
+                </div>
+
+                {/* Ordre du jour */}
+                <div>
+                  <p className="mb-2 text-sm font-medium text-muted-foreground">
+                    {t('gestionnaire.assemblees.form.ordreDuJour')}
+                  </p>
+                  <div className="rounded-md border bg-muted/30 p-3">
+                    {detailAG.ordre_du_jour.split('\n').map((line, i) => (
+                      <p key={i} className="text-sm">
+                        {line}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Convocations PDF (KAN-98) */}
+                <AgConvocations ag={detailAG} />
               </div>
 
-              {/* Ordre du jour */}
-              <div>
-                <p className="mb-2 text-sm font-medium text-muted-foreground">
-                  {t('gestionnaire.assemblees.form.ordreDuJour')}
-                </p>
-                <div className="rounded-md border bg-muted/30 p-3">
-                  {detailAG.ordre_du_jour.split('\n').map((line, i) => (
-                    <p key={i} className="text-sm">
-                      {line}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* ── Documents sidebar (AG ordinaire only) ── */}
-            {detailAG.type === 'ordinaire' && (
-              <AgDocumentsSidebar
-                checked={new Set<string>()}
-                onToggle={() => {}}
-              />
-            )}
+              {/* ── Documents sidebar (AG ordinaire only) ── */}
+              {detailAG.type === 'ordinaire' && (
+                <AgDocumentsSidebar
+                  checked={new Set<string>()}
+                  onToggle={() => {}}
+                />
+              )}
             </div>
 
             <DialogFooter>
