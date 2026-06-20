@@ -43,6 +43,8 @@ export type DashboardData = {
   prochain_appel: { montant: number; date: string } | null
 }
 
+export type ReclamationRating = 'satisfait' | 'insatisfait'
+
 export type Reclamation = {
   id: number
   reference: string
@@ -52,6 +54,7 @@ export type Reclamation = {
   priorite: 'urgent' | 'normal' | 'faible'
   created_at: string
   nb_photos: number
+  rating?: ReclamationRating
 }
 
 export type ResidentProfile = {
@@ -197,6 +200,7 @@ const MOCK_RECLAMATIONS: Reclamation[] = [
     priorite: 'urgent',
     created_at: '2026-04-10T09:00:00Z',
     nb_photos: 2,
+    rating: undefined,
   },
   {
     id: 2,
@@ -354,6 +358,16 @@ export async function createReclamation(data: {
     await api.post('/portail/reclamations', fd, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
+  }, undefined)
+}
+
+/** Submit satisfaction rating after ticket resolution (KAN-90). */
+export async function rateReclamation(
+  id: number,
+  rating: ReclamationRating,
+): Promise<void> {
+  await withMock(async () => {
+    await api.patch(`/portail/reclamations/${id}/rating`, { rating })
   }, undefined)
 }
 

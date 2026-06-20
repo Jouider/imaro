@@ -305,6 +305,11 @@
       "customLabel": "Précisez le type",
       "customPlaceholder": "Ex : Antenne collective, vide-ordures…",
       "customRequired": "Précisez le type de réclamation",
+      "ratingPrompt": "Comment s'est passée la résolution ?",
+      "ratingSatisfait": "Satisfait",
+      "ratingInsatisfait": "Pas satisfait",
+      "ratingThanks": "Merci pour votre avis !",
+      "ratingChange": "Modifier mon avis",
       "categories": {
         "parties_communes": "Parties communes",
         "ascenseur": "Ascenseur",

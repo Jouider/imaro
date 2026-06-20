@@ -305,6 +305,11 @@
       "customLabel": "حدّد النوع",
       "customPlaceholder": "مثال: هوائي جماعي، مفرغة النفايات…",
       "customRequired": "حدّد نوع الشكاية",
+      "ratingPrompt": "كيف سارت عملية الحل؟",
+      "ratingSatisfait": "راضٍ",
+      "ratingInsatisfait": "غير راضٍ",
+      "ratingThanks": "شكراً لرأيك!",
+      "ratingChange": "تعديل رأيي",
       "categories": {
         "parties_communes": "الأجزاء المشتركة",
         "ascenseur": "المصعد",
