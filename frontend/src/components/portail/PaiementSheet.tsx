@@ -128,7 +128,7 @@ export function PaiementSheet({
         montant: Number(montant),
         date,
         methode,
-        reference: reference.trim() || undefined,
+        reference: reference.trim(),
         justificatif: justificatif ?? undefined,
       }),
     onSuccess: () => {
@@ -151,8 +151,12 @@ export function PaiementSheet({
   }
 
   const montantValue = Number(montant)
+  // KAN-83 : la référence est obligatoire pour la traçabilité du règlement.
   const canSubmit =
-    Number.isFinite(montantValue) && montantValue > 0 && date !== ''
+    Number.isFinite(montantValue) &&
+    montantValue > 0 &&
+    date !== '' &&
+    reference.trim() !== ''
 
   const title =
     step === 'how'
@@ -364,13 +368,20 @@ export function PaiementSheet({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="pay-ref">{t('portail.paiement.reference')}</Label>
+            <Label htmlFor="pay-ref">
+              {t('portail.paiement.reference')}{' '}
+              <span className="text-[var(--color-imaro-danger)]">*</span>
+            </Label>
             <Input
               id="pay-ref"
               value={reference}
               onChange={(e) => setReference(e.target.value)}
               placeholder={t('portail.paiement.referencePlaceholder')}
+              aria-invalid={reference.trim() === ''}
             />
+            <p className="text-xs text-muted-foreground">
+              {t('portail.paiement.referenceRequired')}
+            </p>
           </div>
 
           {/* Justificatif upload */}

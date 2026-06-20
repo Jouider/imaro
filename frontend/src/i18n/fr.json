@@ -284,7 +284,8 @@
       "toast": {
         "declared": "Paiement déclaré. Votre syndic va le vérifier.",
         "error": "Une erreur est survenue. Réessayez."
-      }
+      },
+      "referenceRequired": "La référence est obligatoire (ex. n° de virement ou bordereau)."
     },
     "reclamations": {
       "title": "Mes réclamations",
