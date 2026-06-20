@@ -267,6 +267,8 @@ export type Ticket = {
   user: { id: number; name: string; phone?: string }
   /** Satisfaction rating from resident (KAN-90/KAN-91). */
   rating?: 'satisfait' | 'insatisfait'
+  /** Gestionnaire assigned to handle the ticket (KAN-88). */
+  assignee?: { id: number; name: string }
 }
 
 export type TicketUrgent = Ticket
@@ -550,6 +552,7 @@ const MOCK_TICKETS: Ticket[] = [
     residence: { id: 1, name: 'Atlas Casablanca', city: 'Casablanca' },
     lot: { id: 1, numero: 'A-01' },
     user: { id: 1, name: 'Hassan Benali', phone: '+212600000010' },
+    assignee: { id: 2, name: 'Salma Bennani' },
   },
   {
     id: 2,
@@ -564,6 +567,7 @@ const MOCK_TICKETS: Ticket[] = [
     residence: { id: 2, name: 'Blanca Rabat', city: 'Rabat' },
     lot: { id: 5, numero: 'B-01' },
     user: { id: 2, name: 'Fatima Chraibi', phone: '+212600000011' },
+    assignee: { id: 2, name: 'Salma Bennani' },
   },
   {
     id: 3,
@@ -623,6 +627,7 @@ const MOCK_TICKETS: Ticket[] = [
     residence: { id: 1, name: 'Atlas Casablanca', city: 'Casablanca' },
     lot: { id: 3, numero: 'A-03' },
     user: { id: 6, name: 'Nadia Tazi', phone: '+212600000015' },
+    assignee: { id: 2, name: 'Salma Bennani' },
   },
   {
     id: 7,
@@ -1390,6 +1395,18 @@ export async function updateTicket(
 export async function closTicket(id: number): Promise<void> {
   return withMock(async () => {
     await api.post(`/gestionnaire/tickets/${id}/clos`)
+  }, undefined)
+}
+
+/** Assign (or unassign) a ticket to a gestionnaire (KAN-88). */
+export async function assignTicket(
+  ticketId: number,
+  gestionnaireId: number | null,
+): Promise<void> {
+  await withMock(async () => {
+    await api.patch(`/gestionnaire/tickets/${ticketId}/assign`, {
+      gestionnaire_id: gestionnaireId,
+    })
   }, undefined)
 }
 

@@ -15,6 +15,8 @@ import {
   PieChart as PieIcon,
   Clock,
   ThumbsUp,
+  Inbox,
+  UserCheck,
 } from 'lucide-react'
 import {
   PieChart,
@@ -33,11 +35,14 @@ import {
   updateTicket,
   closTicket,
   createTicket,
+  assignTicket,
   getResidences,
   getLots,
   type Ticket,
   type Lot,
 } from '@/services/gestionnaire.service'
+import { getAppUsers } from '@/services/equipe.service'
+import { useAuthStore } from '@/stores/authStore'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { ConfirmModal } from '@/components/shared/ConfirmModal'
@@ -175,6 +180,12 @@ function KanbanCard({ ticket, onDragStart, onClick }: KanbanCardProps) {
         <span className="truncate max-w-[110px]">{ticket.residence.name}</span>
         <span>{ticket.created_at.slice(0, 10)}</span>
       </div>
+      {ticket.assignee && (
+        <div className="mt-1.5 flex items-center gap-1 text-[10px] text-[var(--color-imaro-primary)]">
+          <UserCheck className="size-3 shrink-0" />
+          <span className="truncate">{ticket.assignee.name}</span>
+        </div>
+      )}
     </div>
   )
 }
@@ -684,6 +695,103 @@ function TicketsDashboard({ tickets }: { tickets: Ticket[] }) {
 }
 
 // ---------------------------------------------------------------------------
+// TicketsInbox — mes tickets assignés (KAN-88)
+// ---------------------------------------------------------------------------
+
+function TicketsInbox({
+  tickets,
+  currentUserId,
+  onCardClick,
+  t,
+}: {
+  tickets: Ticket[]
+  currentUserId: number | null
+  onCardClick: (ticket: Ticket) => void
+  t: (k: string, o?: Record<string, unknown>) => string
+}) {
+  const mine = currentUserId
+    ? tickets.filter((t) => t.assignee?.id === currentUserId)
+    : []
+
+  if (mine.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-20 text-center">
+        <Inbox className="size-12 text-muted-foreground/30" />
+        <p className="font-medium text-sm text-muted-foreground">
+          {t('gestionnaire.tickets.inbox.empty', {
+            defaultValue: 'Aucun ticket assigné',
+          })}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          {t('gestionnaire.tickets.inbox.emptyHint', {
+            defaultValue:
+              'Les tickets qui vous sont assignés apparaîtront ici.',
+          })}
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-2">
+      <p className="text-xs text-muted-foreground mb-3">
+        {t('gestionnaire.tickets.inbox.count', {
+          defaultValue: '{{n}} ticket(s) assigné(s)',
+          n: mine.length,
+        })}
+      </p>
+      {mine.map((ticket) => {
+        const statusCls =
+          STATUT_STYLES[ticket.statut] ?? 'bg-gray-100 text-gray-600'
+        const priorityCls =
+          PRIORITE_STYLES[ticket.priorite] ?? 'bg-gray-100 text-gray-600'
+        return (
+          <button
+            key={ticket.id}
+            type="button"
+            onClick={() => onCardClick(ticket)}
+            className="w-full text-start rounded-xl border bg-card p-4 hover:shadow-sm transition-shadow"
+          >
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="min-w-0">
+                <p className="font-mono text-xs text-[var(--color-imaro-primary)] mb-0.5">
+                  {ticket.reference}
+                </p>
+                <p className="text-sm font-medium line-clamp-1">
+                  {ticket.description}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {ticket.residence.name} · {ticket.categorie}
+                </p>
+              </div>
+              <div className="flex flex-col items-end gap-1 shrink-0">
+                <Badge className={`${statusCls} border-0 text-xs`}>
+                  {t(`gestionnaire.tickets.statut.${ticket.statut}`, {
+                    defaultValue: ticket.statut,
+                  })}
+                </Badge>
+                <Badge className={`${priorityCls} border-0 text-[10px]`}>
+                  {t(`gestionnaire.tickets.priorite.${ticket.priorite}`, {
+                    defaultValue: ticket.priorite,
+                  })}
+                </Badge>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {new Date(ticket.created_at).toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+              })}
+            </p>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // TicketsAudit — réclamations par résidence (KAN-43)
 // ---------------------------------------------------------------------------
 function TicketsAudit({
@@ -811,8 +919,11 @@ export function TicketsPage() {
   const [closeTarget, setCloseTarget] = useState<Ticket | null>(null)
   const [newStatut, setNewStatut] = useState<string>('')
   const [viewMode, setViewMode] = useState<
-    'table' | 'kanban' | 'audit' | 'stats'
+    'table' | 'kanban' | 'audit' | 'stats' | 'inbox'
   >('table')
+  const [assigneeId, setAssigneeId] = useState<string>('')
+
+  const currentUser = useAuthStore((s) => s.user)
 
   const [createOpen, setCreateOpen] = useState(false)
   const [createForm, setCreateForm] = useState({
@@ -851,6 +962,14 @@ export function TicketsPage() {
     enabled: createOpen && !!createForm.residence_id,
   })
   const lots: Lot[] = lotsData?.lots ?? []
+
+  const { data: allUsers = [] } = useQuery({
+    queryKey: ['app-users'],
+    queryFn: getAppUsers,
+  })
+  const gestionnaires = allUsers.filter(
+    (u) => u.role === 'gestionnaire' && u.statut === 'actif',
+  )
 
   // Audit reflects the active residence scope (KAN-43 + KAN-47).
   const audit = buildAudit(scopedTickets)
@@ -906,9 +1025,29 @@ export function TicketsPage() {
     onError: () => toast.error(t('gestionnaire.tickets.toastClotureError')),
   })
 
+  const assignMut = useMutation({
+    mutationFn: ({
+      id,
+      gestionnaireId,
+    }: {
+      id: number
+      gestionnaireId: number | null
+    }) => assignTicket(id, gestionnaireId),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['tickets'] })
+      toast.success(
+        t('gestionnaire.tickets.assignSuccess', {
+          defaultValue: 'Ticket assigné',
+        }),
+      )
+    },
+    onError: () => toast.error(t('common.updateError')),
+  })
+
   function openDetail(ticket: Ticket) {
     setDetailTicket(ticket)
     setNewStatut(ticket.statut)
+    setAssigneeId(ticket.assignee ? String(ticket.assignee.id) : '')
   }
 
   const columns: Column<Ticket>[] = [
@@ -970,6 +1109,21 @@ export function TicketsPage() {
       header: t('gestionnaire.tickets.colDate'),
       sortable: true,
       renderCell: (r) => r.created_at.slice(0, 10),
+    },
+    {
+      key: 'assignee',
+      header: t('gestionnaire.tickets.colAssignee', {
+        defaultValue: 'Assigné à',
+      }),
+      renderCell: (r) =>
+        r.assignee ? (
+          <span className="flex items-center gap-1 text-xs text-[var(--color-imaro-primary)]">
+            <UserCheck className="size-3 shrink-0" />
+            {r.assignee.name}
+          </span>
+        ) : (
+          <span className="text-xs text-muted-foreground">—</span>
+        ),
     },
     {
       key: 'categorie',
@@ -1098,12 +1252,34 @@ export function TicketsPage() {
           >
             <PieIcon className="size-4" />
           </button>
+          <button
+            type="button"
+            aria-label={t('gestionnaire.tickets.inbox.tab', {
+              defaultValue: 'Mes tickets',
+            })}
+            onClick={() => setViewMode('inbox')}
+            className={cn(
+              'flex items-center justify-center px-2.5 py-1.5 transition-colors',
+              viewMode === 'inbox'
+                ? 'bg-[var(--color-imaro-primary)] text-white'
+                : 'bg-white text-muted-foreground hover:bg-muted',
+            )}
+          >
+            <Inbox className="size-4" />
+          </button>
         </div>
       </div>
 
       {/* Main content */}
       {viewMode === 'stats' ? (
         <TicketsDashboard tickets={scopedTickets} />
+      ) : viewMode === 'inbox' ? (
+        <TicketsInbox
+          tickets={scopedTickets}
+          currentUserId={currentUser?.id ?? null}
+          onCardClick={openDetail}
+          t={t}
+        />
       ) : viewMode === 'audit' ? (
         <TicketsAudit audit={audit} t={t} />
       ) : viewMode === 'kanban' ? (
@@ -1410,6 +1586,71 @@ export function TicketsPage() {
                   </Select>
                 </div>
               )}
+
+              {/* Assignation — KAN-88 */}
+              <div className="space-y-1">
+                <p className="text-sm font-medium flex items-center gap-1.5">
+                  <UserCheck className="size-3.5" />
+                  {t('gestionnaire.tickets.assignTo', {
+                    defaultValue: 'Assigner à',
+                  })}
+                </p>
+                <div className="flex gap-2">
+                  <Select
+                    value={assigneeId}
+                    onValueChange={setAssigneeId}
+                    disabled={assignMut.isPending}
+                  >
+                    <SelectTrigger className="flex-1">
+                      <SelectValue
+                        placeholder={t(
+                          'gestionnaire.tickets.assignPlaceholder',
+                          {
+                            defaultValue: 'Sélectionner un gestionnaire',
+                          },
+                        )}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="unassigned">
+                        {t('gestionnaire.tickets.unassigned', {
+                          defaultValue: 'Non assigné',
+                        })}
+                      </SelectItem>
+                      {gestionnaires.map((g) => (
+                        <SelectItem key={g.id} value={String(g.id)}>
+                          {g.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={
+                      assignMut.isPending ||
+                      assigneeId ===
+                        (detailTicket.assignee
+                          ? String(detailTicket.assignee.id)
+                          : 'unassigned') ||
+                      assigneeId === ''
+                    }
+                    onClick={() =>
+                      assignMut.mutate({
+                        id: detailTicket.id,
+                        gestionnaireId:
+                          assigneeId === 'unassigned'
+                            ? null
+                            : Number(assigneeId),
+                      })
+                    }
+                  >
+                    {assignMut.isPending
+                      ? t('actions.loading')
+                      : t('actions.save')}
+                  </Button>
+                </div>
+              </div>
             </div>
 
             <DialogFooter className="flex-row gap-2">
