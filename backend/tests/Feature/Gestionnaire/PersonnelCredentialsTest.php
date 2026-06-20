@@ -1,5 +1,6 @@
 <?php
 
+use App\Contracts\Notifications\NotificationResult;
 use App\Models\PersonnelResidence;
 use App\Models\Residence;
 use App\Models\Tenant;
@@ -29,17 +30,21 @@ beforeEach(function () {
     $this->auth = ['Authorization' => 'Bearer '.$this->manager->createToken('t')->plainTextToken];
 });
 
-it('crée un compte de connexion + envoie le code, renvoie un aperçu masqué', function () {
-    // Le notifier ne doit pas réellement envoyer en test, mais être appelé.
-    $this->mock(CoproprietaireWelcomeNotifier::class)->shouldReceive('send')->once();
+it('crée un compte + renvoie le code complet au gestionnaire et le statut de livraison', function () {
+    // Le notifier ne doit pas réellement envoyer en test — il renvoie un statut livré.
+    $this->mock(CoproprietaireWelcomeNotifier::class)
+        ->shouldReceive('send')->once()
+        ->andReturn(NotificationResult::ok('sms8'));
 
     $res = $this->withHeaders($this->auth)->postJson('/api/gestionnaire/equipe/personnel', [
         'name' => 'Ahmed Gardien', 'poste' => 'gardien',
         'residence_id' => $this->residence->id, 'phone' => '+212611223344',
     ])->assertStatus(201);
 
-    // Aperçu masqué uniquement (jamais le code complet).
-    expect($res->json('data.code_apercu'))->toMatch('/^.{2}•+$/u');
+    // Code complet visible par le gestionnaire (8 car.) + statut de livraison.
+    expect($res->json('data.code'))->toMatch('/^[A-Z0-9]{8}$/');
+    $res->assertJsonPath('data.delivery.delivered', true)
+        ->assertJsonPath('data.delivery.channel', 'sms8');
 
     $user = User::where('phone', '+212611223344')->first();
     expect($user)->not->toBeNull()
@@ -50,6 +55,31 @@ it('crée un compte de connexion + envoie le code, renvoie un aperçu masqué', 
 
     $staff = PersonnelResidence::where('phone', '+212611223344')->first();
     expect($staff->user_id)->toBe($user->id);
+});
+
+it('le bouton « Envoyer » régénère un code et renvoie le statut', function () {
+    $this->mock(CoproprietaireWelcomeNotifier::class)
+        ->shouldReceive('send')->once()
+        ->andReturn(NotificationResult::accepted('twilio'));
+
+    $user = User::create([
+        'tenant_id' => $this->tenant->id, 'name' => 'Said', 'phone' => '+212611220000',
+        'role' => 'personnel', 'status' => 'active', 'access_code' => bcrypt('OLD12345'), 'must_change_code' => false,
+    ]);
+    $staff = PersonnelResidence::create([
+        'tenant_id' => $this->tenant->id, 'name' => 'Said', 'poste' => 'gardien',
+        'residence_id' => $this->residence->id, 'user_id' => $user->id, 'phone' => '+212611220000', 'is_active' => true,
+    ]);
+
+    $res = $this->withHeaders($this->auth)->postJson("/api/gestionnaire/equipe/personnel/{$staff->id}/send-code")
+        ->assertStatus(200);
+
+    expect($res->json('data.code'))->toMatch('/^[A-Z0-9]{8}$/');
+    // accepted() = success mais non confirmé → delivered=false, confirmed=false.
+    $res->assertJsonPath('data.delivery.delivered', false)
+        ->assertJsonPath('data.delivery.channel', 'twilio');
+
+    expect($user->fresh()->must_change_code)->toBeTrue();
 });
 
 it('refuse un téléphone déjà utilisé (422)', function () {

@@ -13,7 +13,8 @@ import {
 } from '@/services/annonces.service'
 import { getResidences } from '@/services/gestionnaire.service'
 import { useResidenceStore } from '@/stores/residenceStore'
-import { ResidenceFilter } from '@/components/shared'
+import { ResidenceFilter, MediaGallery } from '@/components/shared'
+import { AnnonceMediaPicker } from '@/components/gestionnaire/AnnonceMediaPicker'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -48,6 +49,7 @@ type AnnonceForm = {
   contenu: string
   priorite: 'normale' | 'urgente'
   residence_id: string
+  media: File[]
 }
 
 const EMPTY_FORM: AnnonceForm = {
@@ -55,6 +57,7 @@ const EMPTY_FORM: AnnonceForm = {
   contenu: '',
   priorite: 'normale',
   residence_id: '',
+  media: [],
 }
 
 export function AnnoncesPage() {
@@ -63,6 +66,7 @@ export function AnnoncesPage() {
   const [activeTab, setActiveTab] = useState<Tab>('toutes')
   const [createOpen, setCreateOpen] = useState(false)
   const [form, setForm] = useState<AnnonceForm>(EMPTY_FORM)
+  const [uploadPct, setUploadPct] = useState<number | null>(null)
   const [confirmAction, setConfirmAction] = useState<{
     type: 'publish' | 'archive' | 'delete'
     annonce: Annonce
@@ -92,20 +96,32 @@ export function AnnoncesPage() {
   })
 
   const createMutation = useMutation({
-    mutationFn: () =>
-      storeAnnonce({
-        titre: form.titre,
-        contenu: form.contenu,
-        priorite: form.priorite,
-        residence_id: form.residence_id ? Number(form.residence_id) : undefined,
-      }),
+    mutationFn: () => {
+      setUploadPct(form.media.length ? 0 : null)
+      return storeAnnonce(
+        {
+          titre: form.titre,
+          contenu: form.contenu,
+          priorite: form.priorite,
+          residence_id: form.residence_id
+            ? Number(form.residence_id)
+            : undefined,
+          media: form.media.length ? form.media : undefined,
+        },
+        { onProgress: setUploadPct },
+      )
+    },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['annonces'] })
       setCreateOpen(false)
       setForm(EMPTY_FORM)
+      setUploadPct(null)
       toast.success(t('gestionnaire.annonces.toastCreated'))
     },
-    onError: () => toast.error(t('common.createError')),
+    onError: () => {
+      setUploadPct(null)
+      toast.error(t('common.createError'))
+    },
   })
 
   const publishMutation = useMutation({
@@ -236,7 +252,16 @@ export function AnnoncesPage() {
       )}
 
       {/* Create dialog */}
-      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+      <Dialog
+        open={createOpen}
+        onOpenChange={(open) => {
+          setCreateOpen(open)
+          if (!open) {
+            setForm(EMPTY_FORM)
+            setUploadPct(null)
+          }
+        }}
+      >
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>{t('gestionnaire.annonces.newAnnonce')}</DialogTitle>
@@ -320,6 +345,32 @@ export function AnnoncesPage() {
                 className="w-full min-h-[120px] rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </div>
+
+            {/* Médias (KAN-96) */}
+            <div className="space-y-1">
+              <Label>{t('gestionnaire.annonces.media.label')}</Label>
+              <AnnonceMediaPicker
+                files={form.media}
+                onChange={(media) => setForm((f) => ({ ...f, media }))}
+                disabled={createMutation.isPending}
+              />
+            </div>
+
+            {/* Upload progress */}
+            {uploadPct !== null && (
+              <div className="space-y-1">
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>{t('gestionnaire.annonces.media.uploading')}</span>
+                  <span className="tabular-nums">{uploadPct}%</span>
+                </div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full bg-[var(--color-imaro-primary)] transition-all"
+                    style={{ width: `${uploadPct}%` }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <DialogFooter>
@@ -444,6 +495,10 @@ function AnnonceCard({
         <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
           {annonce.contenu}
         </p>
+
+        {annonce.media && annonce.media.length > 0 && (
+          <MediaGallery media={annonce.media} className="mt-2 max-w-sm" />
+        )}
 
         <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
           {annonce.residence ? (

@@ -977,6 +977,12 @@ Action irréversible.
 
 Priorités valides : `normale` | `urgente`
 
+**Médias (KAN-96)** — envoi en `multipart/form-data` : champ `media[]` (max 6).
+Images `jpeg/png/webp` ≤ 5 Mo, vidéos `mp4/quicktime/webm` ≤ 30 Mo.
+La réponse expose `data.annonce.media: [{ type: image|video, url, taille_ko }]`.
+À l'`update`, `media[]` s'ajoute (cumul) et `supprimer_media[]` (chemins) retire.
+*(Stockage disque public pour l'instant ; migration object storage prévue.)*
+
 ---
 
 ### PUT /api/gestionnaire/annonces/{id}
@@ -1197,6 +1203,24 @@ Catégories valides : `entretien` | `gardiennage` | `nettoyage` | `administratif
 
 Types valides : `ordinaire` | `extraordinaire`
 
+### POST /api/gestionnaire/assemblees/{id}/convocations  *(KAN-98)*
+Déclenche la génération **asynchrone** (Job) d'une convocation PDF par copropriétaire de la résidence (Loi 18-00 art. 16quinquies) + un PDF fusionné « Imprimer tout ».
+**Response 202** : `{ "status": "accepted", "count": <nb_copro> }`
+
+### GET /api/gestionnaire/assemblees/{id}/convocations  *(KAN-98)*
+**Response 200**
+```json
+{
+  "status": "ready",            // "pending" tant que le Job tourne (le front poll)
+  "generated_at": "2026-06-19T10:00:00+00:00",
+  "merged_url": "https://.../storage/convocations/12/merged.pdf",
+  "convocations": [
+    { "id": 1, "coproprietaire_nom": "Hassan Benali", "lot": "A-102", "tantieme": 350, "url": "https://.../conv-1.pdf" }
+  ]
+}
+```
+Contenu PDF : en-tête syndic/résidence, date/heure/lieu, ordre du jour, mention préavis 15 j, nom + lot + tantièmes, **formulaire de pouvoir** pré-rempli. Conservation 5 ans (Décret 2.23.700).
+
 ---
 
 ## 15. Super Admin
@@ -1329,7 +1353,15 @@ Crée le personnel (gardien, sécurité, ménage…) **et un compte de connexion
 
 **Body** : `name`, `poste` (`securite|menage|gardien|jardinier|technicien|concierge`), `residence_id`, `phone` (requis, unique), `permissions?`.
 
-**Response 201** : enregistrement + `code_apercu` (**aperçu masqué** uniquement, ex. `AB••••••` — le code complet n'est jamais renvoyé).
+**Response 201** : enregistrement + `code` (**code complet visible** par le gestionnaire, à communiquer au personnel — il devra le changer à la 1re connexion) + `delivery` (statut d'envoi) :
+```json
+{ "code": "AB12CD34",
+  "delivery": { "delivered": true, "channel": "sms8", "confirmed": true, "error": null } }
+```
+
+### POST /api/gestionnaire/equipe/personnel/{id}/send-code
+Bouton « **Envoyer** » — **régénère** un code (l'ancien est haché, irrécupérable) et le (re)transmet via la cascade WhatsApp → SMS → email.
+**Response 200** : `{ "code": "…", "delivery": { "delivered", "channel", "confirmed", "error" } }`.
 
 Connexion ensuite via `POST /api/auth/resident/login` (`phone` + `code`) — l'endpoint accepte les rôles `resident` **et** `personnel`. Première connexion → `must_change_code` → écran d'activation.
 

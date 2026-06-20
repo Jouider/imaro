@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "253420159405",
+    "project_id": "imaro-bcdd8",
+    "storage_bucket": "imaro-bcdd8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253420159405:android:efbc8ee3327af7eea7a124",
+        "android_client_info": {
+          "package_name": "ma.imaro.portail"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVs1Ing_L-t0mAsEs3mPSdT4Tji0SsCds"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

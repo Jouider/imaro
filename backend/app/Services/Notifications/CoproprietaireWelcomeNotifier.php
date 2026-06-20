@@ -4,6 +4,7 @@ namespace App\Services\Notifications;
 
 use App\Contracts\Notifications\NotificationChannel;
 use App\Contracts\Notifications\NotificationMessage;
+use App\Contracts\Notifications\NotificationResult;
 use App\Models\Residence;
 use App\Models\User;
 use App\Notifications\NotificationManager;
@@ -28,9 +29,9 @@ class CoproprietaireWelcomeNotifier
 
     public function __construct(private readonly NotificationManager $notifier) {}
 
-    public function send(User $user, string $tempCode, ?Residence $residence = null): void
+    public function send(User $user, string $tempCode, ?Residence $residence = null): NotificationResult
     {
-        $this->notifier->sendCascade($this->candidates($user, $tempCode, $residence?->name));
+        return $this->notifier->sendCascade($this->candidates($user, $tempCode, $residence?->name));
     }
 
     /**
@@ -57,7 +58,7 @@ class CoproprietaireWelcomeNotifier
                     NotificationChannel::Whatsapp,
                     $this->whatsappPreview($code),
                     meta: [
-                        'content_sid'       => $waSid,
+                        'content_sid' => $waSid,
                         'content_variables' => ['1' => $code],
                     ],
                 );
@@ -84,12 +85,12 @@ class CoproprietaireWelcomeNotifier
         array $meta = [],
     ): NotificationMessage {
         return new NotificationMessage(
-            to:           $user,
-            channel:      $channel,
+            to: $user,
+            channel: $channel,
             templateName: self::TEMPLATE,
-            body:         $body,
-            subject:      $subject,
-            meta:         $meta,
+            body: $body,
+            subject: $subject,
+            meta: $meta,
             // No category → transactional/security, never muted by prefs.
         );
     }

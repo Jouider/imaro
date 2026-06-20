@@ -283,7 +283,8 @@
       "toast": {
         "declared": "Payment declared. Your syndic will verify it.",
         "error": "An error occurred. Try again."
-      }
+      },
+      "referenceRequired": "The reference is required (e.g. transfer no. or slip)."
     },
     "reclamations": {
       "title": "My complaints",
@@ -303,6 +304,11 @@
       "customLabel": "Specify the type",
       "customPlaceholder": "E.g. Shared antenna, rubbish chute…",
       "customRequired": "Specify the complaint type",
+      "ratingPrompt": "How was the resolution?",
+      "ratingSatisfait": "Satisfied",
+      "ratingInsatisfait": "Not satisfied",
+      "ratingThanks": "Thank you for your feedback!",
+      "ratingChange": "Update my feedback",
       "categories": {
         "parties_communes": "Common areas",
         "ascenseur": "Elevator",
@@ -1019,12 +1025,22 @@
       },
       "credentialsSent": {
         "title": "Credentials sent",
-        "desc": "{{name}}'s account was created and the access code was sent to them.",
+        "desc": "{{name}}'s account was created and their access code was sent.",
         "sentVia": "Code sent via WhatsApp / SMS to {{phone}}.",
-        "codeLabel": "Code preview",
-        "note": "The full code is never shown. The staff member receives it directly and must change it on first login."
+        "codeLabel": "Access code",
+        "note": "Share this code with the staff member. They must change it on first login.",
+        "deliveredConfirmed": "Code sent via {{channel}} to {{phone}} — delivery confirmed.",
+        "deliveredUnconfirmed": "Code sent via {{channel}} to {{phone}} — delivery not confirmed.",
+        "deliveryFailed": "Delivery to {{phone}} failed. Share the code manually or retry.",
+        "copy": "Copy code",
+        "resend": "Resend code",
+        "resent": "New code sent",
+        "resendError": "Failed to send the code",
+        "copyError": "Couldn't copy the code"
       }
-    }
+    },
+    "cin": "National ID",
+    "cinPlaceholder": "e.g. AB123456"
   },
   "gestionnaire": {
     "pointage": {
@@ -1445,7 +1461,9 @@
         "cloture": "Closed"
       },
       "totalTantieme": "Total shares: {{val}} / 1000",
-      "backToList": "Buildings"
+      "backToList": "Buildings",
+      "colTitreFoncier": "Land title",
+      "titreFoncierPh": "e.g. TF 12345/06"
     },
     "coproprietaires": {
       "title": "Owners",
@@ -1769,7 +1787,19 @@
       "toastCreated": "Meeting created",
       "detailQuorum": "Required quorum: {{n}} %",
       "detailParticipants": "{{n}} participants present",
-      "detailNotHeld": "Meeting not yet held"
+      "detailNotHeld": "Meeting not yet held",
+      "convocations": {
+        "title": "Notices",
+        "generate": "Generate notices",
+        "regenerate": "Regenerate",
+        "generating": "Generating notices…",
+        "generated": "{{n}} notice(s) generated",
+        "empty": "No notices generated for this meeting.",
+        "printAll": "Print all",
+        "download": "Download notice",
+        "lotTantieme": "Unit {{lot}} · {{tantieme}}/1000 shares",
+        "delaiWarning": "The AGM date does not meet the {{n}}-day legal notice period (law 18-00)."
+      }
     },
     "annonces": {
       "title": "Announcements",
@@ -1816,7 +1846,18 @@
       "emptyDesc": "Create your first announcement to inform the owners.",
       "toastCreated": "Announcement created",
       "titlePlaceholder": "Elevator works — service interruption",
-      "descPlaceholder": "Describe the announcement…"
+      "descPlaceholder": "Describe the announcement…",
+      "media": {
+        "label": "Photos & videos",
+        "add": "Add",
+        "hint": "Photos (≤ 5 MB) and videos (≤ 30 MB) — up to {{n}} files.",
+        "uploading": "Uploading media…",
+        "remove": "Remove",
+        "maxReached": "Maximum {{n}} media per announcement.",
+        "invalidType": "« {{name}} »: unsupported format (images JPEG/PNG/WebP, videos MP4/MOV/WebM).",
+        "imageTooLarge": "« {{name}} »: image too large (5 MB max).",
+        "videoTooLarge": "« {{name}} »: video too large (30 MB max)."
+      }
     },
     "prestataires": {
       "title": "Providers & contracts",
@@ -3205,7 +3246,11 @@
     "demande": "Request",
     "initial": "Initial",
     "organisme": "Lender",
-    "mensualite": "Monthly payment"
+    "mensualite": "Monthly payment",
+    "media": {
+      "playVideo": "Play video",
+      "viewImage": "View image"
+    }
   },
   "public": {
     "visitorPass": {

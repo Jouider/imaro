@@ -284,7 +284,8 @@
       "toast": {
         "declared": "تم التصريح بالدفعة. سيقوم المتصرف بالتحقق منها.",
         "error": "حدث خطأ. حاول مرة أخرى."
-      }
+      },
+      "referenceRequired": "المرجع إلزامي (مثال: رقم التحويل أو الإشعار)."
     },
     "reclamations": {
       "title": "شكاياتي",
@@ -304,6 +305,11 @@
       "customLabel": "حدّد النوع",
       "customPlaceholder": "مثال: هوائي جماعي، مفرغة النفايات…",
       "customRequired": "حدّد نوع الشكاية",
+      "ratingPrompt": "كيف سارت عملية الحل؟",
+      "ratingSatisfait": "راضٍ",
+      "ratingInsatisfait": "غير راضٍ",
+      "ratingThanks": "شكراً لرأيك!",
+      "ratingChange": "تعديل رأيي",
       "categories": {
         "parties_communes": "الأجزاء المشتركة",
         "ascenseur": "المصعد",
@@ -1024,10 +1030,20 @@
         "title": "تم إرسال بيانات الدخول",
         "desc": "تم إنشاء حساب {{name}} وإرسال رمز الدخول إليه.",
         "sentVia": "تم إرسال الرمز عبر واتساب / SMS إلى {{phone}}.",
-        "codeLabel": "معاينة الرمز",
-        "note": "لا يتم عرض الرمز الكامل أبدًا. يستلمه الموظف مباشرةً وسيغيّره عند أول تسجيل دخول."
+        "codeLabel": "رمز الولوج",
+        "note": "سلّم هذا الرمز لعضو الطاقم. سيتعيّن عليه تغييره عند أول اتصال.",
+        "deliveredConfirmed": "أُرسل الرمز عبر {{channel}} إلى {{phone}} — تم تأكيد التسليم.",
+        "deliveredUnconfirmed": "أُرسل الرمز عبر {{channel}} إلى {{phone}} — لم يُؤكَّد التسليم.",
+        "deliveryFailed": "فشل الإرسال إلى {{phone}}. سلّم الرمز يدويًا أو أعد المحاولة.",
+        "copy": "نسخ الرمز",
+        "resend": "إعادة إرسال الرمز",
+        "resent": "تم إرسال رمز جديد",
+        "resendError": "فشل إرسال الرمز",
+        "copyError": "تعذّر نسخ الرمز"
       }
-    }
+    },
+    "cin": "بطاقة التعريف الوطنية",
+    "cinPlaceholder": "مثال: AB123456"
   },
   "gestionnaire": {
     "pointage": {
@@ -1448,7 +1464,9 @@
         "cloture": "مغلق"
       },
       "totalTantieme": "إجمالي الحصص: {{val}} / 1000",
-      "backToList": "الإقامات"
+      "backToList": "الإقامات",
+      "colTitreFoncier": "الرسم العقاري",
+      "titreFoncierPh": "مثال: TF 12345/06"
     },
     "coproprietaires": {
       "title": "الملاك المشاركون",
@@ -1810,6 +1828,18 @@
           "etat_impayes": "حالة المتأخرات لكل مشارك",
           "historique_relances": "سجل الإشعارات المرسلة"
         }
+      },
+      "convocations": {
+        "title": "الاستدعاءات",
+        "generate": "توليد الاستدعاءات",
+        "regenerate": "إعادة التوليد",
+        "generating": "جارٍ توليد الاستدعاءات…",
+        "generated": "تم توليد {{n}} استدعاء",
+        "empty": "لا توجد استدعاءات مولّدة لهذا الجمع العام.",
+        "printAll": "طباعة الكل",
+        "download": "تحميل الاستدعاء",
+        "lotTantieme": "الوحدة {{lot}} · {{tantieme}}/1000 من الأنصبة",
+        "delaiWarning": "تاريخ الجمع العام لا يحترم أجل الإشعار القانوني البالغ {{n}} يومًا (القانون 18-00)."
       }
     },
     "annonces": {
@@ -1857,7 +1887,18 @@
       "emptyDesc": "أنشئ أول إعلان لإعلام الملاك.",
       "toastCreated": "تم إنشاء الإعلان",
       "titlePlaceholder": "أشغال المصعد — انقطاع الخدمة",
-      "descPlaceholder": "صف الإعلان…"
+      "descPlaceholder": "صف الإعلان…",
+      "media": {
+        "label": "الصور والفيديوهات",
+        "add": "إضافة",
+        "hint": "صور (≤ 5 ميغا) وفيديوهات (≤ 30 ميغا) — {{n}} وسائط كحد أقصى.",
+        "uploading": "جارٍ رفع الوسائط…",
+        "remove": "إزالة",
+        "maxReached": "الحد الأقصى {{n}} وسائط لكل إعلان.",
+        "invalidType": "« {{name}} »: صيغة غير مدعومة (صور JPEG/PNG/WebP، فيديوهات MP4/MOV/WebM).",
+        "imageTooLarge": "« {{name}} »: الصورة كبيرة جدًا (5 ميغا كحد أقصى).",
+        "videoTooLarge": "« {{name}} »: الفيديو كبير جدًا (30 ميغا كحد أقصى)."
+      }
     },
     "prestataires": {
       "title": "المزودون والعقود",
@@ -3232,7 +3273,11 @@
     "demande": "الطلب",
     "initial": "الأولي",
     "organisme": "الجهة",
-    "mensualite": "القسط الشهري"
+    "mensualite": "القسط الشهري",
+    "media": {
+      "playVideo": "تشغيل الفيديو",
+      "viewImage": "عرض الصورة"
+    }
   },
   "public": {
     "visitorPass": {
@@ -3355,9 +3400,7 @@
         },
         {
           "h": "13. الاتصال",
-          "p": [
-            "لأي سؤال: contact@imaro.ma."
-          ]
+          "p": ["لأي سؤال: contact@imaro.ma."]
         }
       ]
     }

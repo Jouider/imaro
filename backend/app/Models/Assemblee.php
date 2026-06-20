@@ -14,6 +14,7 @@ class Assemblee extends Model
     protected $fillable = [
         'tenant_id', 'residence_id', 'created_by', 'titre', 'type',
         'date', 'lieu', 'quorum_requis', 'ordre_du_jour', 'statut', 'quorum_atteint', 'pv_pdf_path',
+        'convocations_status', 'convocations_merged_path', 'convocations_generated_at',
     ];
 
     protected function casts(): array
@@ -21,6 +22,7 @@ class Assemblee extends Model
         return [
             'date' => 'datetime',
             'quorum_atteint' => 'boolean',
+            'convocations_generated_at' => 'datetime',
         ];
     }
 

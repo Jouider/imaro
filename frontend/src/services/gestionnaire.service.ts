@@ -164,6 +164,8 @@ export type Lot = {
   etage: number
   superficie: number
   tantieme: number
+  /** Titre foncier — obligatoire à la saisie unitaire (KAN-94). */
+  titre_foncier?: string
   immeuble_id?: number
   immeuble?: { id: number; nom: string }
   coproprietaire: { id: number; name: string; phone: string } | null
@@ -918,7 +920,10 @@ export async function getLots(
 
 export async function storeLot(
   residenceId: number,
-  data: Pick<Lot, 'numero' | 'type' | 'etage' | 'superficie' | 'tantieme'> & {
+  data: Pick<
+    Lot,
+    'numero' | 'type' | 'etage' | 'superficie' | 'tantieme' | 'titre_foncier'
+  > & {
     immeuble_id?: number
   },
 ): Promise<Lot> {
@@ -929,6 +934,7 @@ export async function storeLot(
     etage: data.etage,
     superficie: data.superficie,
     tantieme: data.tantieme,
+    titre_foncier: data.titre_foncier,
     immeuble_id: data.immeuble_id,
     coproprietaire: null,
   }
@@ -945,7 +951,10 @@ export async function updateLot(
   residenceId: number,
   lotId: number,
   data: Partial<
-    Pick<Lot, 'numero' | 'type' | 'etage' | 'superficie' | 'tantieme'>
+    Pick<
+      Lot,
+      'numero' | 'type' | 'etage' | 'superficie' | 'tantieme' | 'titre_foncier'
+    >
   > & { immeuble_id?: number },
 ): Promise<Lot> {
   return withMock(

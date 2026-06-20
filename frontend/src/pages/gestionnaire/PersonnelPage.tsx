@@ -12,6 +12,10 @@ import {
   ShieldCheck,
   CheckCircle2,
   Send,
+  Copy,
+  Check,
+  RefreshCw,
+  AlertTriangle,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -55,17 +59,20 @@ import {
   createResidenceStaff,
   updateResidenceStaff,
   deleteResidenceStaff,
+  sendStaffCode,
   STAFF_POSTES,
   STAFF_PERMISSIONS,
   type ResidenceStaff,
   type StaffPoste,
   type StaffPermission,
+  type StaffDelivery,
 } from '@/services/equipe.service'
 import { getResidences } from '@/services/gestionnaire.service'
 import { useResidenceStore } from '@/stores/residenceStore'
 
 type FormState = {
   name: string
+  cin: string
   poste: StaffPoste
   residence_id: string
   phone: string
@@ -74,6 +81,7 @@ type FormState = {
 
 const EMPTY_FORM: FormState = {
   name: '',
+  cin: '',
   poste: 'securite',
   residence_id: '',
   phone: '',
@@ -115,12 +123,17 @@ export function PersonnelPage() {
   const [editTarget, setEditTarget] = useState<ResidenceStaff | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<ResidenceStaff | null>(null)
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
-  // After a successful create — shows the "credentials sent" confirmation.
+  // After a successful create — shows the access-code confirmation (KAN-52).
   const [credentials, setCredentials] = useState<{
+    id: number
     name: string
     phone: string
+    /** Full code to display/copy (#248) — falls back to masked `codeApercu` (#227). */
+    code?: string
     codeApercu?: string
+    delivery?: StaffDelivery
   } | null>(null)
+  const [codeCopied, setCodeCopied] = useState(false)
 
   const isEdit = editTarget !== null
   const dialogOpen = createOpen || isEdit
@@ -136,6 +149,7 @@ export function PersonnelPage() {
       createResidenceStaff(
         {
           name: data.name,
+          cin: data.cin.trim(),
           poste: data.poste,
           residence_id: Number(data.residence_id),
           phone: data.phone.trim(),
@@ -146,16 +160,46 @@ export function PersonnelPage() {
     onSuccess: (staff) => {
       invalidate()
       closeDialog()
-      // Show the "credentials sent by WhatsApp/SMS" confirmation with the masked
-      // code preview — no password is shown (backend generates + sends it).
+      setCodeCopied(false)
+      // Show the access code (#248: full code + delivery status) so the manager
+      // can hand it over / resend. Falls back to the masked preview on pre-#248
+      // backends. The code is generated + sent by the backend over the cascade.
       setCredentials({
+        id: staff.id,
         name: staff.name,
         phone: staff.phone ?? '',
+        code: staff.code,
         codeApercu: staff.code_apercu,
+        delivery: staff.delivery,
       })
     },
     onError: () => toast.error(t('equipe.personnel.toast.createFailed')),
   })
+
+  const sendCodeMut = useMutation({
+    mutationFn: (id: number) => sendStaffCode(id),
+    onSuccess: (res) => {
+      setCodeCopied(false)
+      setCredentials((c) =>
+        c ? { ...c, code: res.code, delivery: res.delivery } : c,
+      )
+      toast.success(t('equipe.personnel.credentialsSent.resent'))
+    },
+    onError: () =>
+      toast.error(t('equipe.personnel.credentialsSent.resendError')),
+  })
+
+  async function copyCode() {
+    const value = credentials?.code
+    if (!value) return
+    try {
+      await navigator.clipboard.writeText(value)
+      setCodeCopied(true)
+      window.setTimeout(() => setCodeCopied(false), 1500)
+    } catch {
+      toast.error(t('equipe.personnel.credentialsSent.copyError'))
+    }
+  }
 
   const updateMut = useMutation({
     mutationFn: (input: { id: number; data: FormState }) =>
@@ -163,6 +207,7 @@ export function PersonnelPage() {
         input.id,
         {
           name: input.data.name,
+          cin: input.data.cin.trim(),
           poste: input.data.poste,
           residence_id: Number(input.data.residence_id),
           phone: input.data.phone || null,
@@ -216,6 +261,7 @@ export function PersonnelPage() {
     setEditTarget(s)
     setForm({
       name: s.name,
+      cin: s.cin,
       poste: s.poste,
       residence_id: String(s.residence_id),
       phone: s.phone ?? '',
@@ -429,6 +475,20 @@ export function PersonnelPage() {
               />
             </div>
 
+            <div className="space-y-1.5">
+              <Label htmlFor="s-cin">
+                {t('equipe.cin')}{' '}
+                <span className="text-[var(--color-imaro-danger)]">*</span>
+              </Label>
+              <Input
+                id="s-cin"
+                value={form.cin}
+                onChange={(e) => setForm({ ...form, cin: e.target.value })}
+                placeholder={t('equipe.cinPlaceholder')}
+                aria-invalid={form.cin.trim() === ''}
+              />
+            </div>
+
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="s-poste">
@@ -522,6 +582,7 @@ export function PersonnelPage() {
               onClick={submitForm}
               disabled={
                 !form.name ||
+                !form.cin.trim() ||
                 !form.residence_id ||
                 !form.phone.trim() ||
                 createMut.isPending ||
@@ -554,22 +615,70 @@ export function PersonnelPage() {
           </DialogHeader>
 
           <div className="space-y-3 rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-900/40 dark:bg-green-950/20">
-            <div className="flex items-start gap-2">
-              <Send className="mt-0.5 size-4 shrink-0 text-[var(--color-imaro-success)]" />
-              <p className="text-sm text-green-800 dark:text-green-300">
-                {t('equipe.personnel.credentialsSent.sentVia', {
-                  phone: credentials?.phone ?? '',
-                })}
-              </p>
-            </div>
-            {credentials?.codeApercu && (
+            {/* Delivery status */}
+            {credentials?.delivery ? (
+              credentials.delivery.delivered ? (
+                <div className="flex items-start gap-2">
+                  <Send className="mt-0.5 size-4 shrink-0 text-[var(--color-imaro-success)]" />
+                  <p className="text-sm text-green-800 dark:text-green-300">
+                    {t(
+                      credentials.delivery.confirmed
+                        ? 'equipe.personnel.credentialsSent.deliveredConfirmed'
+                        : 'equipe.personnel.credentialsSent.deliveredUnconfirmed',
+                      {
+                        phone: credentials.phone,
+                        channel: credentials.delivery.channel ?? '—',
+                      },
+                    )}
+                  </p>
+                </div>
+              ) : (
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="mt-0.5 size-4 shrink-0 text-[var(--color-imaro-danger)]" />
+                  <p className="text-sm text-[var(--color-imaro-danger)]">
+                    {t('equipe.personnel.credentialsSent.deliveryFailed', {
+                      phone: credentials.phone,
+                    })}
+                  </p>
+                </div>
+              )
+            ) : (
+              <div className="flex items-start gap-2">
+                <Send className="mt-0.5 size-4 shrink-0 text-[var(--color-imaro-success)]" />
+                <p className="text-sm text-green-800 dark:text-green-300">
+                  {t('equipe.personnel.credentialsSent.sentVia', {
+                    phone: credentials?.phone ?? '',
+                  })}
+                </p>
+              </div>
+            )}
+
+            {/* Access code — full (copyable) on #248, masked preview otherwise */}
+            {(credentials?.code || credentials?.codeApercu) && (
               <div className="flex items-center justify-between gap-3 border-t border-green-200 pt-3 dark:border-green-900/40">
                 <span className="text-sm text-muted-foreground">
                   {t('equipe.personnel.credentialsSent.codeLabel')}
                 </span>
-                <span className="rounded-md bg-green-200 px-3 py-1 font-mono text-base font-bold tracking-widest text-green-900 dark:bg-green-800 dark:text-green-100">
-                  {credentials.codeApercu}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="rounded-md bg-green-200 px-3 py-1 font-mono text-base font-bold tracking-widest text-green-900 dark:bg-green-800 dark:text-green-100">
+                    {credentials.code ?? credentials.codeApercu}
+                  </span>
+                  {credentials.code && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="size-8 p-0"
+                      onClick={() => void copyCode()}
+                      aria-label={t('equipe.personnel.credentialsSent.copy')}
+                    >
+                      {codeCopied ? (
+                        <Check className="size-4 text-[var(--color-imaro-success)]" />
+                      ) : (
+                        <Copy className="size-4" />
+                      )}
+                    </Button>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -578,7 +687,19 @@ export function PersonnelPage() {
             {t('equipe.personnel.credentialsSent.note')}
           </p>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-2">
+            {credentials?.id != null && (
+              <Button
+                variant="outline"
+                onClick={() => sendCodeMut.mutate(credentials.id)}
+                disabled={sendCodeMut.isPending}
+              >
+                <RefreshCw
+                  className={`size-4 ${sendCodeMut.isPending ? 'animate-spin' : ''}`}
+                />
+                {t('equipe.personnel.credentialsSent.resend')}
+              </Button>
+            )}
             <Button onClick={() => setCredentials(null)}>
               {t('actions.close')}
             </Button>
