@@ -1449,7 +1449,9 @@
         "cloture": "Clôturé"
       },
       "totalTantieme": "Total tantièmes : {{val}} / 1000",
-      "backToList": "Résidences"
+      "backToList": "Résidences",
+      "colTitreFoncier": "Titre foncier",
+      "titreFoncierPh": "Ex. TF 12345/06"
     },
     "coproprietaires": {
       "title": "Copropriétaires",
