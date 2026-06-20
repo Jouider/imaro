@@ -1027,7 +1027,9 @@
         "codeLabel": "Aperçu du code",
         "note": "Le code complet n'est jamais affiché. Le membre du personnel le reçoit directement et devra le changer à la première connexion."
       }
-    }
+    },
+    "cin": "CIN",
+    "cinPlaceholder": "Ex. AB123456"
   },
   "gestionnaire": {
     "pointage": {

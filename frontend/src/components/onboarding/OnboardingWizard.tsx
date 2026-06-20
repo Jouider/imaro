@@ -81,6 +81,7 @@ export function OnboardingWizard() {
   const [teamMode, setTeamMode] = useState<'self' | 'team'>('self')
   const [gestName, setGestName] = useState('')
   const [gestEmail, setGestEmail] = useState('')
+  const [gestCin, setGestCin] = useState('')
   const [gestPassword, setGestPassword] = useState('')
 
   // Step 1 — residence
@@ -108,7 +109,7 @@ export function OnboardingWizard() {
       setStep(1)
       return
     }
-    if (!gestName.trim() || !gestEmail.trim()) {
+    if (!gestName.trim() || !gestEmail.trim() || !gestCin.trim()) {
       toast.error(t('onboarding.team.required'))
       return
     }
@@ -118,6 +119,7 @@ export function OnboardingWizard() {
       await createAppUser({
         name: gestName.trim(),
         email: gestEmail.trim(),
+        cin: gestCin.trim(),
         password: pwd,
         role: 'gestionnaire',
         permissions: ROLE_PERMISSION_PRESETS.gestionnaire,
@@ -314,6 +316,13 @@ export function OnboardingWizard() {
                       value={gestEmail}
                       onChange={(e) => setGestEmail(e.target.value)}
                       placeholder="gestionnaire@cabinet.ma"
+                    />
+                  </Field>
+                  <Field label={t('equipe.cin')}>
+                    <Input
+                      value={gestCin}
+                      onChange={(e) => setGestCin(e.target.value)}
+                      placeholder={t('equipe.cinPlaceholder')}
                     />
                   </Field>
                   <p className="text-xs text-muted-foreground">

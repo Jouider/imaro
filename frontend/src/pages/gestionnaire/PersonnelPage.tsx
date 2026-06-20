@@ -66,6 +66,7 @@ import { useResidenceStore } from '@/stores/residenceStore'
 
 type FormState = {
   name: string
+  cin: string
   poste: StaffPoste
   residence_id: string
   phone: string
@@ -74,6 +75,7 @@ type FormState = {
 
 const EMPTY_FORM: FormState = {
   name: '',
+  cin: '',
   poste: 'securite',
   residence_id: '',
   phone: '',
@@ -136,6 +138,7 @@ export function PersonnelPage() {
       createResidenceStaff(
         {
           name: data.name,
+          cin: data.cin.trim(),
           poste: data.poste,
           residence_id: Number(data.residence_id),
           phone: data.phone.trim(),
@@ -163,6 +166,7 @@ export function PersonnelPage() {
         input.id,
         {
           name: input.data.name,
+          cin: input.data.cin.trim(),
           poste: input.data.poste,
           residence_id: Number(input.data.residence_id),
           phone: input.data.phone || null,
@@ -216,6 +220,7 @@ export function PersonnelPage() {
     setEditTarget(s)
     setForm({
       name: s.name,
+      cin: s.cin,
       poste: s.poste,
       residence_id: String(s.residence_id),
       phone: s.phone ?? '',
@@ -429,6 +434,20 @@ export function PersonnelPage() {
               />
             </div>
 
+            <div className="space-y-1.5">
+              <Label htmlFor="s-cin">
+                {t('equipe.cin')}{' '}
+                <span className="text-[var(--color-imaro-danger)]">*</span>
+              </Label>
+              <Input
+                id="s-cin"
+                value={form.cin}
+                onChange={(e) => setForm({ ...form, cin: e.target.value })}
+                placeholder={t('equipe.cinPlaceholder')}
+                aria-invalid={form.cin.trim() === ''}
+              />
+            </div>
+
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="s-poste">
@@ -522,6 +541,7 @@ export function PersonnelPage() {
               onClick={submitForm}
               disabled={
                 !form.name ||
+                !form.cin.trim() ||
                 !form.residence_id ||
                 !form.phone.trim() ||
                 createMut.isPending ||
