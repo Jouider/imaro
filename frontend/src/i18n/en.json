@@ -304,6 +304,11 @@
       "customLabel": "Specify the type",
       "customPlaceholder": "E.g. Shared antenna, rubbish chute…",
       "customRequired": "Specify the complaint type",
+      "ratingPrompt": "How was the resolution?",
+      "ratingSatisfait": "Satisfied",
+      "ratingInsatisfait": "Not satisfied",
+      "ratingThanks": "Thank you for your feedback!",
+      "ratingChange": "Update my feedback",
       "categories": {
         "parties_communes": "Common areas",
         "ascenseur": "Elevator",

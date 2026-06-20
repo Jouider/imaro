@@ -17,7 +17,9 @@ import {
 import {
   createReclamation,
   getMyReclamations,
+  rateReclamation,
   type Reclamation,
+  type ReclamationRating,
 } from '@/services/portail.service'
 import { cn } from '@/lib/utils'
 
@@ -415,12 +417,32 @@ function HistoryTab() {
 // ─── ReclamationCard ──────────────────────────────────────────────────────────
 
 function ReclamationCard({ rec }: { rec: Reclamation }) {
+  const { t } = useTranslation()
+  const qc = useQueryClient()
+  const [localRating, setLocalRating] = useState<ReclamationRating | undefined>(
+    rec.rating,
+  )
+  const [showChange, setShowChange] = useState(false)
+
+  const rateMut = useMutation({
+    mutationFn: (rating: ReclamationRating) => rateReclamation(rec.id, rating),
+    onSuccess: (_data, rating) => {
+      setLocalRating(rating)
+      setShowChange(false)
+      void qc.invalidateQueries({ queryKey: ['portail-reclamations'] })
+    },
+    onError: () => toast.error(t('actions.error')),
+  })
+
   const cls = STATUT_STYLES[rec.statut] ?? 'bg-gray-100 text-gray-600'
   const dateStr = new Date(rec.created_at).toLocaleDateString('fr-FR', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
   })
+
+  const isResolved = rec.statut === 'resolu' || rec.statut === 'clos'
+  const showRatingUI = isResolved
 
   return (
     <div className="rounded-xl border bg-card p-4 space-y-2">
@@ -467,6 +489,63 @@ function ReclamationCard({ rec }: { rec: Reclamation }) {
           )
         })}
       </div>
+
+      {/* Satisfaction rating — shown on resolu/clos tickets (KAN-90) */}
+      {showRatingUI && (
+        <div className="pt-2 border-t">
+          {localRating && !showChange ? (
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                <span className="text-base leading-none">
+                  {localRating === 'satisfait' ? '😀' : '😞'}
+                </span>
+                {t('portail.reclamations.ratingThanks')}
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowChange(true)}
+                className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+              >
+                {t('portail.reclamations.ratingChange')}
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">
+                {t('portail.reclamations.ratingPrompt')}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  disabled={rateMut.isPending}
+                  onClick={() => rateMut.mutate('satisfait')}
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-2 rounded-lg border py-2.5 text-sm font-medium transition-colors',
+                    'hover:bg-green-50 hover:border-green-400 hover:text-green-700',
+                    rateMut.isPending && 'opacity-50 cursor-not-allowed',
+                  )}
+                >
+                  <span className="text-xl leading-none">😀</span>
+                  {t('portail.reclamations.ratingSatisfait')}
+                </button>
+                <button
+                  type="button"
+                  disabled={rateMut.isPending}
+                  onClick={() => rateMut.mutate('insatisfait')}
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-2 rounded-lg border py-2.5 text-sm font-medium transition-colors',
+                    'hover:bg-orange-50 hover:border-orange-400 hover:text-orange-700',
+                    rateMut.isPending && 'opacity-50 cursor-not-allowed',
+                  )}
+                >
+                  <span className="text-xl leading-none">😞</span>
+                  {t('portail.reclamations.ratingInsatisfait')}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
