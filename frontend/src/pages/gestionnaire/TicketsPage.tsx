@@ -12,7 +12,22 @@ import {
   BarChart3,
   TrendingUp,
   TrendingDown,
+  PieChart as PieIcon,
+  Clock,
+  ThumbsUp,
 } from 'lucide-react'
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from 'recharts'
 import {
   getTickets,
   updateTicket,
@@ -301,6 +316,374 @@ function KanbanBoard({ tickets, onCardClick, onMove }: KanbanBoardProps) {
 }
 
 // ---------------------------------------------------------------------------
+// TicketsDashboard — KPIs + charts analytics (KAN-91)
+// ---------------------------------------------------------------------------
+
+const STATUS_COLORS: Record<string, string> = {
+  ouvert: '#e74c3c',
+  en_cours: '#2980b9',
+  resolu: '#27ae60',
+  clos: '#95a5a6',
+}
+const PRIORITY_COLORS: Record<string, string> = {
+  urgent: '#e74c3c',
+  normal: '#f39c12',
+  faible: '#95a5a6',
+}
+
+type TicketStats = {
+  total: number
+  byStatus: { name: string; key: string; value: number; color: string }[]
+  byCategory: { name: string; value: number }[]
+  byPriority: { name: string; key: string; value: number; color: string }[]
+  byMonth: { month: string; value: number }[]
+  avgResolutionDays: number | null
+  satisfactionRate: number | null
+  ratedCount: number
+}
+
+function computeStats(tickets: Ticket[]): TicketStats {
+  const total = tickets.length
+
+  const byStatus = STATUTS.map((key) => ({
+    key,
+    name:
+      key === 'en_cours'
+        ? 'En cours'
+        : key.charAt(0).toUpperCase() + key.slice(1),
+    value: tickets.filter((t) => t.statut === key).length,
+    color: STATUS_COLORS[key],
+  }))
+
+  const catMap = new Map<string, number>()
+  for (const t of tickets) {
+    catMap.set(t.categorie, (catMap.get(t.categorie) ?? 0) + 1)
+  }
+  const byCategory = [...catMap.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([name, value]) => ({ name, value }))
+
+  const byPriority = PRIORITES.map((key) => ({
+    key,
+    name: key.charAt(0).toUpperCase() + key.slice(1),
+    value: tickets.filter((t) => t.priorite === key).length,
+    color: PRIORITY_COLORS[key],
+  }))
+
+  const monthMap = new Map<string, number>()
+  for (const t of tickets) {
+    const m = t.created_at.slice(0, 7)
+    monthMap.set(m, (monthMap.get(m) ?? 0) + 1)
+  }
+  const byMonth = [...monthMap.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(-6)
+    .map(([m, value]) => ({
+      month: new Date(m + '-01').toLocaleDateString('fr-FR', {
+        month: 'short',
+        year: '2-digit',
+      }),
+      value,
+    }))
+
+  const resolved = tickets.filter(
+    (t) =>
+      (t.statut === 'resolu' || t.statut === 'clos') && t.closed_at !== null,
+  )
+  const avgResolutionDays =
+    resolved.length > 0
+      ? resolved.reduce((acc, t) => {
+          const days =
+            (new Date(t.closed_at!).getTime() -
+              new Date(t.created_at).getTime()) /
+            (1000 * 3600 * 24)
+          return acc + days
+        }, 0) / resolved.length
+      : null
+
+  const rated = tickets.filter((t) => t.rating)
+  const satisfiedCount = rated.filter((t) => t.rating === 'satisfait').length
+  const satisfactionRate =
+    rated.length > 0 ? Math.round((satisfiedCount / rated.length) * 100) : null
+
+  return {
+    total,
+    byStatus,
+    byCategory,
+    byPriority,
+    byMonth,
+    avgResolutionDays,
+    satisfactionRate,
+    ratedCount: rated.length,
+  }
+}
+
+function KpiCard({
+  title,
+  value,
+  sub,
+  color,
+  icon,
+}: {
+  title: string
+  value: string | number
+  sub?: string
+  color: string
+  icon: React.ReactNode
+}) {
+  return (
+    <div className="rounded-xl border bg-card p-4 flex items-start gap-3">
+      <div
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
+        style={{ backgroundColor: color + '20', color }}
+      >
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className="text-xs text-muted-foreground">{title}</p>
+        <p className="text-2xl font-bold leading-tight" style={{ color }}>
+          {value}
+        </p>
+        {sub && <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>}
+      </div>
+    </div>
+  )
+}
+
+function TicketsDashboard({ tickets }: { tickets: Ticket[] }) {
+  const { t } = useTranslation()
+  const stats = computeStats(tickets)
+
+  const active = stats.byStatus
+    .filter((s) => s.key === 'ouvert' || s.key === 'en_cours')
+    .reduce((acc, s) => acc + s.value, 0)
+
+  return (
+    <div className="space-y-6">
+      {/* KPI row */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <KpiCard
+          title={t('gestionnaire.tickets.stats.total', {
+            defaultValue: 'Total tickets',
+          })}
+          value={stats.total}
+          color="#1b4f72"
+          icon={<Wrench className="size-5" />}
+        />
+        <KpiCard
+          title={t('gestionnaire.tickets.stats.active', {
+            defaultValue: 'En cours / Ouverts',
+          })}
+          value={active}
+          color="#e67e22"
+          icon={<BarChart3 className="size-5" />}
+        />
+        <KpiCard
+          title={t('gestionnaire.tickets.stats.avgResolution', {
+            defaultValue: 'Délai moyen de résolution',
+          })}
+          value={
+            stats.avgResolutionDays !== null
+              ? `${stats.avgResolutionDays.toFixed(1)}j`
+              : '—'
+          }
+          sub={
+            stats.avgResolutionDays !== null
+              ? t('gestionnaire.tickets.stats.days', { defaultValue: 'jours' })
+              : t('gestionnaire.tickets.stats.noData', {
+                  defaultValue: 'Aucun ticket clôturé',
+                })
+          }
+          color="#27ae60"
+          icon={<Clock className="size-5" />}
+        />
+        <KpiCard
+          title={t('gestionnaire.tickets.stats.satisfaction', {
+            defaultValue: 'Taux de satisfaction',
+          })}
+          value={
+            stats.satisfactionRate !== null ? `${stats.satisfactionRate}%` : '—'
+          }
+          sub={
+            stats.ratedCount > 0
+              ? t('gestionnaire.tickets.stats.rated', {
+                  defaultValue: '{{n}} avis',
+                  n: stats.ratedCount,
+                })
+              : t('gestionnaire.tickets.stats.noRatings', {
+                  defaultValue: 'Aucun avis',
+                })
+          }
+          color="#9b59b6"
+          icon={<ThumbsUp className="size-5" />}
+        />
+      </div>
+
+      {/* Charts row 1: donut by status + bars by category */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        {/* Donut — by status */}
+        <div className="rounded-xl border bg-card p-4">
+          <p className="mb-3 text-sm font-semibold">
+            {t('gestionnaire.tickets.stats.byStatus', {
+              defaultValue: 'Répartition par statut',
+            })}
+          </p>
+          <div className="flex items-center gap-4">
+            <ResponsiveContainer width={120} height={120}>
+              <PieChart>
+                <Pie
+                  data={stats.byStatus}
+                  dataKey="value"
+                  innerRadius={34}
+                  outerRadius={56}
+                  paddingAngle={2}
+                >
+                  {stats.byStatus.map((entry) => (
+                    <Cell key={entry.key} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="space-y-1.5 text-xs">
+              {stats.byStatus.map((s) => (
+                <div key={s.key} className="flex items-center gap-2">
+                  <span
+                    className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
+                    style={{ background: s.color }}
+                  />
+                  <span className="text-muted-foreground">{s.name}</span>
+                  <span className="ms-auto font-semibold tabular-nums">
+                    {s.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Bars — by category */}
+        <div className="rounded-xl border bg-card p-4">
+          <p className="mb-3 text-sm font-semibold">
+            {t('gestionnaire.tickets.stats.byCategory', {
+              defaultValue: 'Tickets par catégorie',
+            })}
+          </p>
+          {stats.byCategory.length === 0 ? (
+            <p className="py-8 text-center text-xs text-muted-foreground">
+              {t('gestionnaire.tickets.empty')}
+            </p>
+          ) : (
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart
+                data={stats.byCategory}
+                layout="vertical"
+                margin={{ left: 0, right: 16, top: 0, bottom: 0 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  horizontal={false}
+                  stroke="#f0f0f0"
+                />
+                <XAxis
+                  type="number"
+                  tick={{ fontSize: 11 }}
+                  allowDecimals={false}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  tick={{ fontSize: 11 }}
+                  width={80}
+                />
+                <Tooltip
+                  contentStyle={{ fontSize: 12 }}
+                  cursor={{ fill: '#f8f9fa' }}
+                />
+                <Bar
+                  dataKey="value"
+                  fill="#1b4f72"
+                  radius={[0, 4, 4, 0]}
+                  maxBarSize={16}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </div>
+
+      {/* Charts row 2: priority + monthly trend */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        {/* Bars — by priority */}
+        <div className="rounded-xl border bg-card p-4">
+          <p className="mb-3 text-sm font-semibold">
+            {t('gestionnaire.tickets.stats.byPriority', {
+              defaultValue: 'Répartition par priorité',
+            })}
+          </p>
+          <ResponsiveContainer width="100%" height={140}>
+            <BarChart
+              data={stats.byPriority}
+              margin={{ left: 0, right: 16, top: 4, bottom: 4 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#f0f0f0"
+              />
+              <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+              <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+              <Tooltip contentStyle={{ fontSize: 12 }} />
+              <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={40}>
+                {stats.byPriority.map((entry) => (
+                  <Cell key={entry.key} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Bars — monthly trend */}
+        <div className="rounded-xl border bg-card p-4">
+          <p className="mb-3 text-sm font-semibold">
+            {t('gestionnaire.tickets.stats.trend', {
+              defaultValue: 'Tendance (6 derniers mois)',
+            })}
+          </p>
+          {stats.byMonth.length === 0 ? (
+            <p className="py-8 text-center text-xs text-muted-foreground">
+              {t('gestionnaire.tickets.empty')}
+            </p>
+          ) : (
+            <ResponsiveContainer width="100%" height={140}>
+              <BarChart
+                data={stats.byMonth}
+                margin={{ left: 0, right: 16, top: 4, bottom: 4 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#f0f0f0"
+                />
+                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                <Tooltip contentStyle={{ fontSize: 12 }} />
+                <Bar
+                  dataKey="value"
+                  fill="#e67e22"
+                  radius={[4, 4, 0, 0]}
+                  maxBarSize={40}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // TicketsAudit — réclamations par résidence (KAN-43)
 // ---------------------------------------------------------------------------
 function TicketsAudit({
@@ -427,9 +810,9 @@ export function TicketsPage() {
   const [detailTicket, setDetailTicket] = useState<Ticket | null>(null)
   const [closeTarget, setCloseTarget] = useState<Ticket | null>(null)
   const [newStatut, setNewStatut] = useState<string>('')
-  const [viewMode, setViewMode] = useState<'table' | 'kanban' | 'audit'>(
-    'table',
-  )
+  const [viewMode, setViewMode] = useState<
+    'table' | 'kanban' | 'audit' | 'stats'
+  >('table')
 
   const [createOpen, setCreateOpen] = useState(false)
   const [createForm, setCreateForm] = useState({
@@ -700,11 +1083,28 @@ export function TicketsPage() {
           >
             <BarChart3 className="size-4" />
           </button>
+          <button
+            type="button"
+            aria-label={t('gestionnaire.tickets.stats.tab', {
+              defaultValue: 'Statistiques',
+            })}
+            onClick={() => setViewMode('stats')}
+            className={cn(
+              'flex items-center justify-center px-2.5 py-1.5 transition-colors',
+              viewMode === 'stats'
+                ? 'bg-[var(--color-imaro-primary)] text-white'
+                : 'bg-white text-muted-foreground hover:bg-muted',
+            )}
+          >
+            <PieIcon className="size-4" />
+          </button>
         </div>
       </div>
 
       {/* Main content */}
-      {viewMode === 'audit' ? (
+      {viewMode === 'stats' ? (
+        <TicketsDashboard tickets={scopedTickets} />
+      ) : viewMode === 'audit' ? (
         <TicketsAudit audit={audit} t={t} />
       ) : viewMode === 'kanban' ? (
         <KanbanBoard
