@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Resident\PortailPaiementOnlineController;
 use App\Http\Controllers\Api\Resident\PortailProfilController;
 use App\Http\Controllers\Api\Resident\PortailPushController;
 use App\Http\Controllers\Api\Resident\PortailReclamationController;
+use App\Http\Controllers\Api\Resident\PortailVisiteController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/dashboard',    PortailDashboardController::class);
@@ -24,6 +25,11 @@ Route::post('/reclamations', [PortailReclamationController::class, 'store']);
 
 Route::get('/profil',  [PortailProfilController::class, 'show']);
 Route::put('/profil',  [PortailProfilController::class, 'update']);
+
+// Visiteurs attendus + QR (KAN-102)
+Route::get('/visites',         [PortailVisiteController::class, 'index']);
+Route::post('/visites',        [PortailVisiteController::class, 'store']);
+Route::delete('/visites/{id}', [PortailVisiteController::class, 'destroy']);
 
 Route::get('/comptes-bancaires', PortailBankAccountController::class);
 Route::post('/paiements',        [PortailPaiementController::class, 'store']);
