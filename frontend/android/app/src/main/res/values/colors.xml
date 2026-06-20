@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Splash système Android 12+ (deep navy Imaro, identique à splash.png). -->
+    <color name="splash_background">#001244</color>
+</resources>
