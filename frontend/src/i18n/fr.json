@@ -1036,7 +1036,9 @@
         "resendError": "Échec de l'envoi du code",
         "copyError": "Impossible de copier le code"
       }
-    }
+    },
+    "cin": "CIN",
+    "cinPlaceholder": "Ex. AB123456"
   },
   "gestionnaire": {
     "pointage": {
