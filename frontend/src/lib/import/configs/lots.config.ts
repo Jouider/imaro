@@ -16,6 +16,7 @@ export type LotImportPayload = {
   etage?: number
   superficie?: number
   tantieme: number
+  titre_foncier: string
   immeuble_id?: number
 }
 
@@ -78,6 +79,21 @@ export const lotsConfig: ImportConfig<LotImportPayload> = {
       required: true,
     },
     {
+      key: 'titre_foncier',
+      label: 'Titre foncier',
+      aliases: [
+        'titre foncier',
+        'titre_foncier',
+        'tf',
+        'titre',
+        'land title',
+        'réquisition',
+        'requisition',
+      ],
+      type: 'string',
+      required: true,
+    },
+    {
       key: 'immeuble',
       label: 'Immeuble',
       aliases: [
@@ -97,6 +113,9 @@ export const lotsConfig: ImportConfig<LotImportPayload> = {
     const errors: string[] = []
     const numero = String(row.numero ?? '').trim()
     if (!numero) errors.push('Numéro du lot requis')
+
+    const titreFoncier = String(row.titre_foncier ?? '').trim()
+    if (!titreFoncier) errors.push('Titre foncier requis')
 
     const tantiemeStr = String(row.tantieme ?? '').trim()
     if (!tantiemeStr) {
@@ -155,6 +174,7 @@ export const lotsConfig: ImportConfig<LotImportPayload> = {
       ...(etageStr ? { etage: parseNumber(etageStr) } : {}),
       ...(superficieStr ? { superficie: parseNumber(superficieStr) } : {}),
       tantieme: parseNumber(String(row.tantieme ?? '0')),
+      titre_foncier: String(row.titre_foncier ?? '').trim(),
       ...(immeuble_id ? { immeuble_id } : {}),
     }
   },
@@ -170,6 +190,7 @@ export const lotsConfig: ImportConfig<LotImportPayload> = {
       etage: 1,
       superficie: 85,
       tantieme: 45,
+      titre_foncier: 'TF 12345/06',
       immeuble: 'Bloc A',
     },
     {
@@ -178,6 +199,7 @@ export const lotsConfig: ImportConfig<LotImportPayload> = {
       etage: -1,
       superficie: 15,
       tantieme: 8,
+      titre_foncier: 'TF 67890/06',
       immeuble: 'Bloc A',
     },
   ],

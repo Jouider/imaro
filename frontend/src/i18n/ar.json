@@ -1448,7 +1448,9 @@
         "cloture": "مغلق"
       },
       "totalTantieme": "إجمالي الحصص: {{val}} / 1000",
-      "backToList": "الإقامات"
+      "backToList": "الإقامات",
+      "colTitreFoncier": "الرسم العقاري",
+      "titreFoncierPh": "مثال: TF 12345/06"
     },
     "coproprietaires": {
       "title": "الملاك المشاركون",

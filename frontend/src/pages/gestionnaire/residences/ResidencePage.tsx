@@ -89,6 +89,7 @@ type LotForm = {
   etage: string
   superficie: string
   tantieme: string
+  titre_foncier: string
   immeuble_id: string
 }
 
@@ -98,6 +99,7 @@ const EMPTY_FORM: LotForm = {
   etage: '0',
   superficie: '',
   tantieme: '',
+  titre_foncier: '',
   immeuble_id: '',
 }
 
@@ -411,6 +413,7 @@ export function ResidencePage() {
       etage: String(lot.etage),
       superficie: String(lot.superficie),
       tantieme: String(lot.tantieme),
+      titre_foncier: lot.titre_foncier ?? '',
       immeuble_id: String(lot.immeuble_id ?? ''),
     })
     setLotDialogOpen(true)
@@ -423,6 +426,7 @@ export function ResidencePage() {
       etage: Number(form.etage),
       superficie: Number(form.superficie),
       tantieme: Number(form.tantieme),
+      titre_foncier: form.titre_foncier.trim(),
     }
     if (editingLot) {
       const payload: Parameters<typeof updateLot>[2] = {
@@ -1174,6 +1178,21 @@ export function ResidencePage() {
                 />
               </div>
             </div>
+
+            <div className="space-y-1">
+              <Label>
+                {t('gestionnaire.residence.colTitreFoncier')}{' '}
+                <span className="text-[var(--color-imaro-danger)]">*</span>
+              </Label>
+              <Input
+                value={form.titre_foncier}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, titre_foncier: e.target.value }))
+                }
+                placeholder={t('gestionnaire.residence.titreFoncierPh')}
+                aria-invalid={form.titre_foncier.trim() === ''}
+              />
+            </div>
           </div>
 
           <DialogFooter>
@@ -1184,7 +1203,10 @@ export function ResidencePage() {
             >
               {t('actions.cancel')}
             </Button>
-            <Button onClick={handleSubmitLot} disabled={isMutating}>
+            <Button
+              onClick={handleSubmitLot}
+              disabled={isMutating || !form.titre_foncier.trim()}
+            >
               {isMutating ? t('actions.loading') : t('actions.save')}
             </Button>
           </DialogFooter>
