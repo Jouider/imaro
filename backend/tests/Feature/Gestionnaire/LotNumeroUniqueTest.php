@@ -38,7 +38,7 @@ beforeEach(function () {
 
     $this->store = fn (array $payload) => $this->withHeaders($this->auth)
         ->postJson("/api/gestionnaire/residences/{$this->residence->id}/lots", array_merge([
-            'type' => 'appartement', 'etage' => 1, 'tantieme' => 50, 'immeuble_id' => $this->immeubleA->id,
+            'titre_foncier' => 'TF/12345', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 50, 'immeuble_id' => $this->immeubleA->id,
         ], $payload));
 });
 

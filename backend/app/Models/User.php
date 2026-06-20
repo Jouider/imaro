@@ -15,7 +15,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, HasRoles, SoftDeletes;
 
     protected $fillable = [
-        'tenant_id', 'name', 'phone', 'email', 'password',
+        'tenant_id', 'name', 'phone', 'cin', 'email', 'password',
         'access_code', 'must_change_code', 'must_change_password',
         'role', 'otp_code', 'otp_expires_at', 'lang',
         'avatar', 'status', 'last_login_at', 'notification_prefs',
