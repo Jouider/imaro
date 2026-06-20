@@ -361,11 +361,27 @@ export type CreateStaffInput = {
 }
 
 /**
- * Create response — the staff record plus `code_apercu`: a masked preview of
- * the generated access code (e.g. `AB••••••`). The full code is never returned;
- * it is delivered to the staff member via WhatsApp → SMS → email (KAN-52).
+ * Delivery status of the access code over the WhatsApp → SMS → email cascade
+ * (KAN-52, contrat #248). `confirmed` = a webhook acknowledged delivery.
  */
-export type CreateStaffResult = ResidenceStaff & { code_apercu?: string }
+export type StaffDelivery = {
+  delivered: boolean
+  channel?: string | null // sms8 | twilio | whatsapp | resend
+  confirmed?: boolean
+  error?: string | null
+}
+
+/**
+ * Create response (KAN-52). Contrat #248 : `code` = code d'accès **complet** à
+ * afficher/copier + `delivery` = statut d'envoi. `code_apercu` est conservé en
+ * repli pour l'ancien contrat #227 (aperçu masqué) tant que #248 n'est pas
+ * mergé — l'UI préfère `code` quand il est présent.
+ */
+export type CreateStaffResult = ResidenceStaff & {
+  code?: string
+  delivery?: StaffDelivery
+  code_apercu?: string
+}
 
 export async function createResidenceStaff(
   input: CreateStaffInput,
@@ -389,7 +405,31 @@ export async function createResidenceStaff(
       permissions: input.permissions,
       statut: 'actif',
       created_at: new Date().toISOString(),
-      code_apercu: 'AB••••••',
+      code: 'AB12CD34',
+      delivery: { delivered: true, channel: 'whatsapp', confirmed: true },
+    },
+  )
+}
+
+/** Result of (re)generating + sending a staff access code (#248). */
+export type SendCodeResult = { code: string; delivery?: StaffDelivery }
+
+/**
+ * Regenerate the staff access code and (re)send it over the cascade (KAN-52,
+ * `POST /equipe/personnel/{id}/send-code`). The previous code is hashed and
+ * irrecoverable; the returned `code` is the new full code to display/copy.
+ */
+export async function sendStaffCode(id: number): Promise<SendCodeResult> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<SendCodeResult>>(
+        `/equipe/personnel/${id}/send-code`,
+      )
+      return res.data.data
+    },
+    {
+      code: 'XY98ZW76',
+      delivery: { delivered: true, channel: 'sms8', confirmed: false },
     },
   )
 }

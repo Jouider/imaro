@@ -1025,8 +1025,16 @@
         "title": "Identifiants envoyés",
         "desc": "Le compte de {{name}} a été créé et son code d’accès lui a été envoyé.",
         "sentVia": "Code envoyé par WhatsApp / SMS au {{phone}}.",
-        "codeLabel": "Aperçu du code",
-        "note": "Le code complet n'est jamais affiché. Le membre du personnel le reçoit directement et devra le changer à la première connexion."
+        "codeLabel": "Code d'accès",
+        "note": "Communiquez ce code au membre du personnel. Il devra le changer à sa première connexion.",
+        "deliveredConfirmed": "Code envoyé via {{channel}} au {{phone}} — livraison confirmée.",
+        "deliveredUnconfirmed": "Code envoyé via {{channel}} au {{phone}} — livraison non confirmée.",
+        "deliveryFailed": "Échec de l'envoi au {{phone}}. Communiquez le code manuellement ou réessayez.",
+        "copy": "Copier le code",
+        "resend": "Renvoyer le code",
+        "resent": "Nouveau code envoyé",
+        "resendError": "Échec de l'envoi du code",
+        "copyError": "Impossible de copier le code"
       }
     }
   },
