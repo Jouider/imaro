@@ -94,4 +94,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:resident')
         ->prefix('portail')
         ->group(base_path('routes/api/resident.php'));
+
+    // Personnel de terrain (agent sécurité / gardien) — login téléphone + code
+    Route::middleware('role:personnel')
+        ->prefix('personnel')
+        ->group(base_path('routes/api/personnel.php'));
 });

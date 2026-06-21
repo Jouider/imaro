@@ -1336,6 +1336,28 @@ SIDs résolus depuis `config('notifications.whatsapp_templates.<name>')`.
 
 ---
 
+## Visiteurs attendus & scan QR (KAN-102)
+
+Le résident déclare un visiteur attendu ; le backend génère un `qr_token` que l'app affiche en QR. L'agent de sécurité (rôle `personnel`, login téléphone + code) scanne le QR à l'entrée.
+
+**Résident** (`role:resident`, prefix `/portail`) :
+- `GET /api/portail/visites` → `{ visites: [{ id, visiteur_nom, motif, date_visite, lot, statut, qr_token, scanned_at, created_at }] }` (récentes d'abord).
+- `POST /api/portail/visites` : `visiteur_nom` (requis), `motif?`, `date_visite?` (défaut aujourd'hui, **≥ today**) → `201` `{ visite: { …, qr_token } }`. `statut` initial = `attendu`.
+- `DELETE /api/portail/visites/{id}` → annule (`statut=annule`). `409` si déjà scannée.
+
+**Agent** (`role:personnel`, prefix `/personnel`) :
+- `GET /api/personnel/visites` → visiteurs **attendus aujourd'hui** sur les résidences de l'agent : `{ visites: [{ visite_id, resident_nom, lot, visiteur_nom, motif, statut, scanned_at }] }`.
+- `POST /api/personnel/visites/scan` : body `{ qr_token }` →
+  - `200` `{ visite_id, resident_nom, lot, motif, statut }` avec `statut`:
+    - `attendu` → visiteur valide, **entrée OK** (la visite passe à `scanne`).
+    - `non_attendu` → token connu mais visite **annulée** ou **périmée** (rien n'est marqué).
+  - `404` si `qr_token` inconnu.
+  - `409` si déjà scanné (renvoie `{ visite_id, scanned_at }`).
+
+`statut` (colonne) : `attendu` → `scanne` (après scan) | `annule` (annulé par le résident).
+
+---
+
 ## Assistance recouvrement (service optionnel — #179)
 
 `POST /api/gestionnaire/assistance-recouvrement` · `role:manager|gestionnaire`
