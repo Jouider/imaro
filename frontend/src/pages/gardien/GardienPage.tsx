@@ -7,12 +7,9 @@ import {
   ScanLine,
   UserPlus,
   CheckCircle2,
-  XCircle,
   LogOut,
   Users,
   ArrowRight,
-  Building2,
-  Clock,
   Download,
   Camera,
 } from 'lucide-react'
@@ -27,10 +24,10 @@ import { setStoredToken } from '@/lib/axios'
 import { logout } from '@/services/auth.service'
 import { useInstallPromptGardien } from '@/hooks/useInstallPromptGardien'
 import {
-  getActiveVisites,
-  scanVisite,
+  getPersonnelVisites,
+  scanPersonnelVisite,
   uploadVisitePhoto,
-  type ScanResult,
+  type PersonnelScanResult,
 } from '@/services/visites.service'
 import { cn } from '@/lib/utils'
 import { WalkInDialog } from './WalkInDialog'
@@ -41,17 +38,8 @@ type ViewState =
   | { kind: 'scan' }
   | { kind: 'walk-in' }
   | { kind: 'manual' }
-  | { kind: 'photo'; result: ScanResult }
-  | { kind: 'result'; result: ScanResult }
-
-const sinceFmt = new Intl.RelativeTimeFormat('fr-MA', { numeric: 'auto' })
-
-function relativeSince(iso: string): string {
-  const diffMin = Math.round((Date.now() - new Date(iso).getTime()) / 60_000)
-  if (diffMin < 60) return sinceFmt.format(-diffMin, 'minute')
-  const diffH = Math.round(diffMin / 60)
-  return sinceFmt.format(-diffH, 'hour')
-}
+  | { kind: 'photo'; result: PersonnelScanResult }
+  | { kind: 'result'; result: PersonnelScanResult }
 
 export function GardienPage() {
   const { t } = useTranslation()
@@ -61,8 +49,8 @@ export function GardienPage() {
   const [view, setView] = useState<ViewState>({ kind: 'home' })
 
   const activeQ = useQuery({
-    queryKey: ['gardien-active'],
-    queryFn: () => getActiveVisites(),
+    queryKey: ['gardien-expected'],
+    queryFn: () => getPersonnelVisites(),
     refetchInterval: 30_000,
   })
   const active = activeQ.data ?? []
@@ -78,35 +66,21 @@ export function GardienPage() {
   })
 
   const scanMut = useMutation({
-    mutationFn: (token: string) => scanVisite(extractToken(token)),
+    mutationFn: (token: string) => scanPersonnelVisite(extractToken(token)),
     onSuccess: (res) => {
-      // On check-in we prompt for a photo; on check-out / rejected we skip.
-      if (res.action === 'check_in') {
-        setView({ kind: 'photo', result: res })
-      } else {
-        setView({ kind: 'result', result: res })
-      }
-      void qc.invalidateQueries({ queryKey: ['gardien-active'] })
+      setView({ kind: 'photo', result: res })
+      void qc.invalidateQueries({ queryKey: ['gardien-expected'] })
     },
-    onError: () => {
-      setView({
-        kind: 'result',
-        result: {
-          visit: {
-            id: 0,
-            residence_id: 0,
-            qr_token: '',
-            visitor_name: '—',
-            visitor_phone: '',
-            type: 'visitor',
-            status: 'expired',
-            created_by_name: '',
-            created_at: '',
-          },
-          action: 'rejected',
-          reason: 'network',
-        },
-      })
+    onError: (err) => {
+      const status = (err as { response?: { status: number } }).response?.status
+      if (status === 404) {
+        toast.error(t('gardien.scanResult.unknownToken'))
+      } else if (status === 409) {
+        toast.warning(t('gardien.scanResult.alreadyScanned'))
+      } else {
+        toast.error(t('common.networkError'))
+      }
+      setView({ kind: 'scan' })
     },
   })
 
@@ -223,34 +197,37 @@ export function GardienPage() {
               ) : (
                 <div className="space-y-2">
                   {active.map((v) => (
-                    <button
-                      key={v.id}
-                      type="button"
-                      onClick={() => scanMut.mutate(v.qr_token)}
-                      disabled={scanMut.isPending}
-                      className="flex w-full items-center gap-3 rounded-xl bg-white/95 px-3 py-2.5 text-left text-foreground shadow-sm transition-transform active:scale-[0.98]"
+                    <div
+                      key={v.visite_id}
+                      className="flex w-full items-center gap-3 rounded-xl bg-white/95 px-3 py-2.5 text-foreground shadow-sm"
                     >
-                      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
-                        <Building2 className="size-5" />
+                      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[var(--color-imaro-primary)]/10 text-[var(--color-imaro-primary)]">
+                        <Users className="size-5" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold">
-                          {v.visitor_name}
+                          {v.resident_nom}
                         </p>
                         <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                          <Clock className="size-3" />
-                          {v.arrived_at ? relativeSince(v.arrived_at) : '—'}
-                          {v.host_lot_numero && (
-                            <span className="ms-auto rounded-md bg-muted px-1.5 py-0.5 font-mono">
-                              Lot {v.host_lot_numero}
-                            </span>
-                          )}
+                          {v.motif}
+                          <span className="ms-auto rounded-md bg-muted px-1.5 py-0.5 font-mono">
+                            Lot {v.lot}
+                          </span>
                         </p>
                       </div>
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
-                        {t('gardien.scanResult.manualCheckOut')}
+                      <span
+                        className={cn(
+                          'rounded-full px-2 py-0.5 text-[10px] font-semibold',
+                          v.statut === 'attendu'
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-orange-100 text-orange-700',
+                        )}
+                      >
+                        {v.statut === 'attendu'
+                          ? t('gardien.scanResult.attendu')
+                          : t('gardien.scanResult.nonAttendu')}
                       </span>
-                    </button>
+                    </div>
                   ))}
                 </div>
               )}
@@ -288,13 +265,13 @@ export function GardienPage() {
                 {t('gardien.photo.desc')}
               </p>
               <p className="mt-2 text-sm font-semibold">
-                → {view.result.visit.visitor_name}
+                → Lot {view.result.lot} · {view.result.resident_nom}
               </p>
             </div>
             <PhotoCapture
               onCapture={(dataUrl) => {
                 photoUploadMut.mutate({
-                  id: view.result.visit.id,
+                  id: view.result.visite_id,
                   dataUrl,
                 })
                 setView({ kind: 'result', result: view.result })
@@ -382,64 +359,42 @@ function ResultPanel({
   onNewScan,
   onHome,
 }: {
-  result: ScanResult
+  result: PersonnelScanResult
   onNewScan: () => void
   onHome: () => void
 }) {
   const { t } = useTranslation()
-  const isRejected = result.action === 'rejected'
-  const Icon = isRejected ? XCircle : CheckCircle2
-
-  const tone = isRejected
-    ? 'from-red-500 to-red-700'
-    : result.action === 'check_out'
-      ? 'from-slate-500 to-slate-700'
-      : 'from-emerald-500 to-emerald-700'
-
-  const titleKey = isRejected
-    ? 'gardien.scanResult.rejectedTitle'
-    : result.action === 'check_out'
-      ? 'gardien.scanResult.checkOutTitle'
-      : 'gardien.scanResult.checkInTitle'
 
   return (
     <div className="rounded-2xl bg-white/95 p-5 text-foreground shadow-2xl dark:bg-card">
-      <div
-        className={cn(
-          'mx-auto -mt-12 mb-4 flex size-16 items-center justify-center rounded-full bg-gradient-to-br text-white shadow-lg',
-          tone,
-        )}
-      >
-        <Icon className="size-8" />
+      <div className="mx-auto -mt-12 mb-4 flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-lg">
+        <CheckCircle2 className="size-8" />
       </div>
-      <h2 className="text-center font-display text-2xl">{t(titleKey)}</h2>
+      <h2 className="text-center font-display text-2xl">
+        {t('gardien.scanResult.checkInTitle')}
+      </h2>
 
-      {!isRejected && (
-        <div className="mt-4 space-y-2 rounded-xl border bg-muted/30 p-3">
-          <p className="text-center text-base font-semibold">
-            {result.visit.visitor_name}
-          </p>
-          <p className="text-center text-xs text-muted-foreground">
-            {result.visit.visitor_phone}
-          </p>
-          {result.visit.host_name && (
-            <p className="text-center text-xs">
-              → {result.visit.host_name}
-              {result.visit.host_lot_numero && (
-                <span className="ms-1 text-muted-foreground">
-                  (Lot {result.visit.host_lot_numero})
-                </span>
-              )}
-            </p>
-          )}
+      <div className="mt-4 space-y-2 rounded-xl border bg-muted/30 p-3">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm font-semibold">{result.resident_nom}</p>
+          <span
+            className={cn(
+              'rounded-full px-2 py-0.5 text-[10px] font-semibold',
+              result.statut === 'attendu'
+                ? 'bg-emerald-100 text-emerald-700'
+                : 'bg-orange-100 text-orange-700',
+            )}
+          >
+            {result.statut === 'attendu'
+              ? t('gardien.scanResult.attendu')
+              : t('gardien.scanResult.nonAttendu')}
+          </span>
         </div>
-      )}
-
-      {isRejected && result.reason && (
-        <p className="mt-3 text-center text-xs text-muted-foreground">
-          {result.reason}
+        <p className="text-xs text-muted-foreground">
+          <span className="font-mono font-medium">Lot {result.lot}</span>
+          {result.motif && <span className="ms-2">· {result.motif}</span>}
         </p>
-      )}
+      </div>
 
       <div className="mt-5 flex flex-col gap-2 sm:flex-row">
         <Button onClick={onNewScan} className="flex-1 gap-1.5">

@@ -435,3 +435,84 @@ export async function getVisitePublic(token: string): Promise<Visite | null> {
     MOCK_VISITES.find((v) => v.qr_token === token) ?? MOCK_VISITES[0],
   )
 }
+
+// ─── Personnel / agent-side API (KAN-102 — Abdellah PR #284) ─────────────────
+
+export type PersonnelScanResult = {
+  visite_id: number
+  resident_nom: string
+  lot: string
+  motif: string
+  /** 'attendu' = pre-registered by resident, 'non_attendu' = walk-in. */
+  statut: 'attendu' | 'non_attendu'
+}
+
+export type PersonnelVisite = {
+  visite_id: number
+  resident_nom: string
+  lot: string
+  motif: string
+  statut: 'attendu' | 'non_attendu'
+}
+
+const MOCK_PERSONNEL_SCAN: PersonnelScanResult = {
+  visite_id: 42,
+  resident_nom: 'Hassan Benali',
+  lot: 'A-12',
+  motif: 'Visite familiale',
+  statut: 'attendu',
+}
+
+const MOCK_PERSONNEL_VISITES: PersonnelVisite[] = [
+  {
+    visite_id: 1,
+    resident_nom: 'Hassan Benali',
+    lot: 'A-12',
+    motif: 'Visite familiale',
+    statut: 'attendu',
+  },
+  {
+    visite_id: 2,
+    resident_nom: 'Fatima Chraibi',
+    lot: 'B-04',
+    motif: 'Livraison Glovo',
+    statut: 'non_attendu',
+  },
+  {
+    visite_id: 3,
+    resident_nom: 'Salma El Idrissi',
+    lot: 'A-05',
+    motif: 'Réparation ascenseur',
+    statut: 'attendu',
+  },
+]
+
+/**
+ * Agent scans a visitor QR code at the lobby.
+ * POST /personnel/visites/scan {qr_token}
+ * Errors: 404 = unknown / expired token, 409 = already scanned today.
+ */
+export async function scanPersonnelVisite(
+  qr_token: string,
+): Promise<PersonnelScanResult> {
+  return withMock(
+    async () =>
+      (
+        await api.post<ApiEnvelope<PersonnelScanResult>>(
+          '/personnel/visites/scan',
+          { qr_token },
+        )
+      ).data.data,
+    MOCK_PERSONNEL_SCAN,
+  )
+}
+
+/** Today's expected visitors list — used on the agent home screen. */
+export async function getPersonnelVisites(): Promise<PersonnelVisite[]> {
+  return withMock(
+    async () =>
+      (await api.get<ApiEnvelope<PersonnelVisite[]>>('/personnel/visites')).data
+        .data,
+    MOCK_PERSONNEL_VISITES,
+  )
+}
