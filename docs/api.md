@@ -639,6 +639,7 @@ Filtre les lots par immeuble directement.
 ```json
 {
   "numero": "A101",
+  "titre_foncier": "TF-12345/C",
   "type": "appartement",
   "etage": 1,
   "superficie": 85.00,
@@ -649,7 +650,9 @@ Filtre les lots par immeuble directement.
 
 Types valides : `appartement` | `local_commercial` | `parking` | `cave`
 
-**Validation :** `immeuble_id` obligatoire et doit appartenir à la résidence. La somme des tantièmes ne doit pas dépasser `total_tantieme`. **Le `numero` doit être unique au sein de la résidence** (trim appliqué ; contrainte DB `unique(residence_id, numero)`). Un doublon renvoie **422** avec `errors.numero` (KAN-40).
+**Validation :** `immeuble_id` obligatoire et doit appartenir à la résidence. **`titre_foncier` obligatoire** (string, max 100 — KAN-94) ; absent ⇒ **422** avec `errors.titre_foncier`. La somme des tantièmes ne doit pas dépasser `total_tantieme`. **Le `numero` doit être unique au sein de la résidence** (trim appliqué ; contrainte DB `unique(residence_id, numero)`). Un doublon renvoie **422** avec `errors.numero` (KAN-40).
+
+> `titre_foncier` est renvoyé dans toutes les réponses lot (liste `GET /lots`, détail, création, import bulk). Idem pour le bulk : `POST /api/gestionnaire/residences/{id}/lots/bulk` exige `lots.*.titre_foncier`.
 
 **Response 201**
 
@@ -1325,7 +1328,7 @@ SIDs résolus depuis `config('notifications.whatsapp_templates.<name>')`.
 
 ## Virements déclarés (résident → validation gestionnaire)
 
-- **Résident** `POST /api/portail/paiements` *(multipart)* : `montant`, `date`, `methode` (`virement|versement|cheque|especes`), `reference?`, `justificatif?` (pdf/jpg/png, ≤5 Mo) → crée un virement **`en_attente`**. `201`.
+- **Résident** `POST /api/portail/paiements` *(multipart)* : `montant`, `date`, `methode` (`virement|versement|cheque|especes`), **`reference` (obligatoire — KAN-83, string max 255 ; absent ⇒ 422 `errors.reference`)**, `justificatif?` (pdf/jpg/png, ≤5 Mo) → crée un virement **`en_attente`**. `201`.
 - **Gestionnaire** :
   - `GET /api/gestionnaire/virements-declares` → liste (`coproprietaire_nom`, `lot_numero`, `montant`, `methode`, `statut`, `justificatif_path`…), en_attente d'abord.
   - `POST /virements-declares/{id}/valider` → crée un **Paiement réel** (exercice actif, `methode→mode`, `versement→virement`) + recalcule le solde + passe `valide`.
@@ -1351,7 +1354,9 @@ Demande d'accompagnement au recouvrement. Persiste la demande (`assistance_reque
 
 Crée le personnel (gardien, sécurité, ménage…) **et un compte de connexion** : login par **téléphone + code d'accès** (comme les résidents). Le `phone` est **requis** et unique. Le backend **génère** le code et l'**envoie** via la cascade WhatsApp → SMS → email.
 
-**Body** : `name`, `poste` (`securite|menage|gardien|jardinier|technicien|concierge`), `residence_id`, `phone` (requis, unique), `permissions?`.
+**Body** : `name`, **`cin` (obligatoire — KAN-92, string max 20 ; absent ⇒ 422 `errors.cin`)**, `poste` (`securite|menage|gardien|jardinier|technicien|concierge`), `residence_id`, `phone` (requis, unique), `permissions?`. Le `cin` est renvoyé dans les réponses (`GET`/création) côté fiche personnel **et** sur le compte de connexion associé.
+
+> **Utilisateurs d'équipe** — `POST /api/equipe/utilisateurs` exige lui aussi **`cin` obligatoire** (KAN-92, string max 20 ; absent ⇒ 422 `errors.cin`). Le `cin` figure dans les réponses `index`/`store`.
 
 **Response 201** : enregistrement + `code` (**code complet visible** par le gestionnaire, à communiquer au personnel — il devra le changer à la 1re connexion) + `delivery` (statut d'envoi) :
 ```json

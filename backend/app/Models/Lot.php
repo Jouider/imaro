@@ -12,10 +12,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Lot extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
-        'tenant_id', 'residence_id', 'immeuble_id', 'numero', 'etage',
+        'tenant_id', 'residence_id', 'immeuble_id', 'numero', 'titre_foncier', 'etage',
         'type', 'superficie', 'tantieme',
     ];
 

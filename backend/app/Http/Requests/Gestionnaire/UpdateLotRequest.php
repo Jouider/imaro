@@ -33,6 +33,7 @@ class UpdateLotRequest extends FormRequest
                     ->where(fn ($q) => $q->where('residence_id', $residenceId))
                     ->ignore($lotId),
             ],
+            'titre_foncier' => ['sometimes', 'string', 'max:100'],
             'type' => ['sometimes', 'in:appartement,local_commercial,commerce,parking,cave,bureau,autre'],
             'etage' => ['sometimes', 'integer', 'min:-5', 'max:50'],
             'superficie' => ['sometimes', 'nullable', 'numeric', 'min:1', 'max:9999'],

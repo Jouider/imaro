@@ -37,7 +37,7 @@ it('crée un compte + renvoie le code complet au gestionnaire et le statut de li
         ->andReturn(NotificationResult::ok('sms8'));
 
     $res = $this->withHeaders($this->auth)->postJson('/api/gestionnaire/equipe/personnel', [
-        'name' => 'Ahmed Gardien', 'poste' => 'gardien',
+        'name' => 'Ahmed Gardien', 'cin' => 'AB123456', 'poste' => 'gardien',
         'residence_id' => $this->residence->id, 'phone' => '+212611223344',
     ])->assertStatus(201);
 
@@ -86,7 +86,7 @@ it('refuse un téléphone déjà utilisé (422)', function () {
     User::create(['tenant_id' => $this->tenant->id, 'name' => 'X', 'phone' => '+212611223344', 'role' => 'resident', 'status' => 'active']);
 
     $this->withHeaders($this->auth)->postJson('/api/gestionnaire/equipe/personnel', [
-        'name' => 'Ahmed', 'poste' => 'gardien', 'residence_id' => $this->residence->id, 'phone' => '+212611223344',
+        'name' => 'Ahmed', 'cin' => 'AB123456', 'poste' => 'gardien', 'residence_id' => $this->residence->id, 'phone' => '+212611223344',
     ])->assertStatus(422)->assertJsonPath('errors.phone.0', fn ($m) => is_string($m));
 });
 

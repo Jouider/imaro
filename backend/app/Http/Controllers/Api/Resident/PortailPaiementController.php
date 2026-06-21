@@ -24,7 +24,8 @@ class PortailPaiementController extends Controller
             'montant' => ['required', 'numeric', 'min:1'],
             'date' => ['required', 'date'],
             'methode' => ['required', 'in:virement,versement,cheque,especes'],
-            'reference' => ['nullable', 'string', 'max:255'],
+            // KAN-83 — référence obligatoire (n° de transaction / bordereau / chèque).
+            'reference' => ['required', 'string', 'max:255'],
             'justificatif' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
         ]);
 
@@ -41,7 +42,7 @@ class PortailPaiementController extends Controller
             'montant' => $data['montant'],
             'date_declaration' => $data['date'],
             'methode' => $data['methode'],
-            'reference' => $data['reference'] ?? null,
+            'reference' => $data['reference'],
             'justificatif_path' => $path,
             'statut' => 'en_attente',
         ]);

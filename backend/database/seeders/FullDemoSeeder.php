@@ -150,6 +150,7 @@ class FullDemoSeeder extends Seeder
             $lot = Lot::withoutGlobalScope('tenant')->create([
                 'tenant_id' => $this->t, 'residence_id' => $r1->id, 'immeuble_id' => $imm->id,
                 'numero' => $i < 16 ? 'A'.($i + 101) : 'B'.($i - 15),
+                'titre_foncier' => 'TF-'.($i < 16 ? '14' : '22').'/'.str_pad((string) ($i + 1), 4, '0', STR_PAD_LEFT).'-C',
                 'etage' => (int) floor($i / 4) + 1, 'type' => $typesLot[$i % count($typesLot)],
                 'superficie' => rand(55, 130), 'tantieme' => $tantiemesAtlas[$i],
             ]);
@@ -177,7 +178,8 @@ class FullDemoSeeder extends Seeder
         foreach ($nomsAnfa as $i => $nom) {
             $lot = Lot::withoutGlobalScope('tenant')->create([
                 'tenant_id' => $this->t, 'residence_id' => $r2->id, 'immeuble_id' => $immAnfa->id,
-                'numero' => 'C'.($i + 201), 'etage' => (int) floor($i / 3) + 1,
+                'numero' => 'C'.($i + 201), 'titre_foncier' => 'TF-31/'.str_pad((string) ($i + 1), 4, '0', STR_PAD_LEFT).'-C',
+                'etage' => (int) floor($i / 3) + 1,
                 'type' => $i === 9 ? 'local_commercial' : 'appartement',
                 'superficie' => rand(75, 160), 'tantieme' => $tantiemesAnfa[$i],
             ]);

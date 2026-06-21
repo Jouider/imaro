@@ -130,7 +130,7 @@ class TestSyndicSeeder extends Seeder
 
             $lot = Lot::withoutGlobalScope('tenant')->create([
                 'tenant_id' => $t, 'residence_id' => $res->id, 'immeuble_id' => $imm->id,
-                'numero' => $numero, 'etage' => $etage, 'type' => $type,
+                'numero' => $numero, 'titre_foncier' => 'TF-'.$res->id.'/'.$numero, 'etage' => $etage, 'type' => $type,
                 'superficie' => $isMag ? rand(25, 80) : rand(60, 140), 'tantieme' => $tant,
             ]);
 

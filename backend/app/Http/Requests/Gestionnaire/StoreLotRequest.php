@@ -30,6 +30,8 @@ class StoreLotRequest extends FormRequest
                 // Unicité autoritaire par résidence (KAN-40).
                 Rule::unique('lots', 'numero')->where(fn ($q) => $q->where('residence_id', $residenceId)),
             ],
+            // KAN-94 — titre foncier obligatoire.
+            'titre_foncier' => ['required', 'string', 'max:100'],
             'type' => ['required', 'in:appartement,local_commercial,commerce,parking,cave,bureau,autre'],
             'etage' => ['required', 'integer', 'min:-5', 'max:50'],
             'superficie' => ['nullable', 'numeric', 'min:0', 'max:9999'],
