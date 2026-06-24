@@ -1336,25 +1336,44 @@ SIDs résolus depuis `config('notifications.whatsapp_templates.<name>')`.
 
 ---
 
-## Visiteurs attendus & scan QR (KAN-102)
+## Visites — laissez-passer QR + audit trail (KAN-102)
 
-Le résident déclare un visiteur attendu ; le backend génère un `qr_token` que l'app affiche en QR. L'agent de sécurité (rôle `personnel`, login téléphone + code) scanne le QR à l'entrée.
+Implémente `docs/feature-visites-backend-brief.md`. Cycle de vie :
+`planned → arrived → departed` (+ `expired`, `cancelled`). Enveloppe standard
+(`data` = la ressource/le tableau directement). Champ `status` en anglais.
+
+**Shape `Visite`** (toutes les réponses authentifiées) :
+```jsonc
+{ "id", "residence_id", "qr_token", "visitor_name", "visitor_phone",
+  "type": "visitor|delivery|contractor|prestataire", "purpose",
+  "host_lot_id", "host_lot_numero", "host_name",
+  "planned_at", "arrived_at", "left_at",
+  "status": "planned|arrived|departed|expired|cancelled",
+  "photo_url", "is_recurring", "recurrence", "created_by_name", "created_at" }
+```
+
+**Gestionnaire** (`role:manager|gestionnaire`, prefix `/gestionnaire`) :
+- `GET  /residences/{residence}/visites` → `data: Visite[]` (récentes d'abord).
+- `GET  /residences/{residence}/visites/stats` → `{ today, currently_inside, planned, expired_today }`.
+- `POST /residences/{residence}/visites` : `visitor_name`*, `visitor_phone`*, `type`*, `purpose?`, `host_lot_id?`, `planned_at?` (absent ⇒ walk-in `arrived`), `is_recurring?`, `recurrence?` → `201` `data: Visite`.
+- `POST /visites/{id}/cancel` → `data: Visite` (`status=cancelled`) ; `422` si non `planned|arrived`.
+
+**Gardien / personnel** (`role:personnel|gestionnaire|manager`) :
+- `POST /visites/scan` : `{ token }` → `200 { visit: Visite, action: "check_in|check_out|rejected", reason }`. `404` token inconnu. Cycle : `planned`+fenêtre ±2h → check_in ; `arrived` → check_out ; sinon `rejected` (`too_early|expired|cancelled|already_departed`). Chaque scan journalisé (`visite_scan_logs`).
+- `POST /visites/walk-in` : `{ residence_id, visitor_name, visitor_phone, type, purpose?, host_lot_id? }` → crée + marque `arrived` (idempotent phone+nom ±5 min).
+- `GET  /gardien/visites/active` → `data: Visite[]` (status `arrived`) sur la/les résidence(s) du gardien.
 
 **Résident** (`role:resident`, prefix `/portail`) :
-- `GET /api/portail/visites` → `{ visites: [{ id, visiteur_nom, motif, date_visite, lot, statut, qr_token, scanned_at, created_at }] }` (récentes d'abord).
-- `POST /api/portail/visites` : `visiteur_nom` (requis), `motif?`, `date_visite?` (défaut aujourd'hui, **≥ today**) → `201` `{ visite: { …, qr_token } }`. `statut` initial = `attendu`.
-- `DELETE /api/portail/visites/{id}` → annule (`statut=annule`). `409` si déjà scannée.
+- `GET  /portail/visites` → `data: Visite[]` invitées par le résident.
+- `POST /portail/visites` : `visitor_name`*, `visitor_phone`*, `type`*, `purpose?`, `planned_at?` → `201`. `residence_id`/`host_lot_id`/host inférés du compte. Limite 10 visites actives ⇒ `422`.
 
-**Agent** (`role:personnel`, prefix `/personnel`) :
-- `GET /api/personnel/visites` → visiteurs **attendus aujourd'hui** sur les résidences de l'agent : `{ visites: [{ visite_id, resident_nom, lot, visiteur_nom, motif, statut, scanned_at }] }`.
-- `POST /api/personnel/visites/scan` : body `{ qr_token }` →
-  - `200` `{ visite_id, resident_nom, lot, motif, statut }` avec `statut`:
-    - `attendu` → visiteur valide, **entrée OK** (la visite passe à `scanne`).
-    - `non_attendu` → token connu mais visite **annulée** ou **périmée** (rien n'est marqué).
-  - `404` si `qr_token` inconnu.
-  - `409` si déjà scanné (renvoie `{ visite_id, scanned_at }`).
+**Public** (aucune auth — page `/v/:token`) :
+- `GET /api/public/visites/{token}` → champs limités (`visitor_name`, `host_name`, `host_lot_numero`, `planned_at`, `status`, `type`, `purpose`, `is_recurring`, `recurrence`). `404` si inconnu/annulé/expiré. **N'expose pas** `id`, `residence_id`, `visitor_phone`.
+- `GET /api/public/visites/{token}/wallet` → `404` (Apple/Google Wallet non implémenté MVP — le front masque les boutons).
 
-`statut` (colonne) : `attendu` → `scanne` (après scan) | `annule` (annulé par le résident).
+**Cron** : `visites:expire` (quotidien 03:00) passe à `expired` les `planned` jamais honorées (>24h, non récurrentes).
+
+> Auth gardien = login **téléphone + code** (personnel KAN-52, poste `securite`/`gardien`). Le front redirige `role=personnel` → `/gardien`. `photo_url` est dans le schéma mais l'upload (`POST /visites/{id}/photo`) n'est pas branché en MVP.
 
 ---
 
