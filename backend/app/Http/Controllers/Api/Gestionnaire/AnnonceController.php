@@ -8,6 +8,7 @@ use App\Models\Annonce;
 use App\Services\Notifications\PortailPushNotifier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -168,9 +169,15 @@ class AnnonceController extends Controller
         return [
             'media' => 'nullable|array|max:6',
             'media.*' => [
+                // bail : si ce n'est pas un fichier uploadé, on n'exécute pas la closure
+                // (sinon $file est un array → fatal sur getMimeType()).
+                'bail',
                 'file',
                 'mimetypes:image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm',
                 function ($attribute, $file, $fail) {
+                    if (! $file instanceof UploadedFile) {
+                        return;
+                    }
                     $isVideo = str_starts_with((string) $file->getMimeType(), 'video/');
                     $maxKb = $isVideo ? 30720 : 5120;
                     if ($file->getSize() / 1024 > $maxKb) {

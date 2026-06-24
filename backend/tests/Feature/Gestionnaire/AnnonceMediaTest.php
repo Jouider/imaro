@@ -55,6 +55,15 @@ it('refuse un type de fichier non autorisé (422)', function () {
     ])->assertStatus(422);
 });
 
+it('renvoie 422 (et non 500) si media contient une valeur non-fichier', function () {
+    // Régression : un élément media non-fichier faisait planter la closure de
+    // validation (getMimeType() on array → 500). Doit renvoyer un 422 propre.
+    $this->withHeaders($this->auth)->postJson('/api/gestionnaire/annonces', [
+        'titre' => 'X', 'contenu' => 'Y',
+        'media' => ['pas-un-fichier'],
+    ])->assertStatus(422)->assertJsonValidationErrors(['media.0']);
+});
+
 it('supprime les fichiers média à la suppression de l\'annonce', function () {
     $this->withHeaders($this->auth)->post('/api/gestionnaire/annonces', [
         'titre' => 'A', 'contenu' => 'B',
