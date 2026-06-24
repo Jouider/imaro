@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\Public\VisitePublicController;
+use App\Http\Controllers\Api\VisiteScanController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -11,13 +13,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
     // Admin (manager, gestionnaire, conseil, super_admin) — email + password
-    Route::post('/login',    [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login']);
     Route::post('/activate', [AuthController::class, 'activate']);
 
     // Résident (portail mobile) — téléphone + code
-    Route::post('/resident/login',    [AuthController::class, 'residentLogin']);
+    Route::post('/resident/login', [AuthController::class, 'residentLogin']);
     Route::post('/resident/activate', [AuthController::class, 'residentActivate']);
 });
+
+// Laissez-passer visiteur — page publique /v/:token (KAN-102, AUCUNE auth)
+Route::get('/public/visites/{token}', [VisitePublicController::class, 'show']);
+Route::get('/public/visites/{token}/wallet', [VisitePublicController::class, 'wallet']);
 
 /*
 |--------------------------------------------------------------------------
@@ -95,8 +101,10 @@ Route::middleware('auth:sanctum')->group(function () {
         ->prefix('portail')
         ->group(base_path('routes/api/resident.php'));
 
-    // Personnel de terrain (agent sécurité / gardien) — login téléphone + code
-    Route::middleware('role:personnel')
-        ->prefix('personnel')
-        ->group(base_path('routes/api/personnel.php'));
+    // Scan QR + walk-in + visiteurs actifs — gardien/personnel (override gestionnaire/manager) (KAN-102)
+    Route::middleware('role:personnel|gestionnaire|manager')->group(function () {
+        Route::post('/visites/scan', [VisiteScanController::class, 'scan']);
+        Route::post('/visites/walk-in', [VisiteScanController::class, 'walkIn']);
+        Route::get('/gardien/visites/active', [VisiteScanController::class, 'active']);
+    });
 });

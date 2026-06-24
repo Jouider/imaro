@@ -44,6 +44,7 @@ use App\Http\Controllers\Api\Gestionnaire\ResidenceController;
 use App\Http\Controllers\Api\Gestionnaire\TicketController;
 use App\Http\Controllers\Api\Gestionnaire\TravauxExceptionnelController;
 use App\Http\Controllers\Api\Gestionnaire\VirementDeclareController;
+use App\Http\Controllers\Api\Gestionnaire\VisiteController;
 use Illuminate\Support\Facades\Route;
 
 // Dashboard
@@ -126,6 +127,12 @@ Route::middleware(['app.permission:recouvrement,finances'])->group(function () {
 // Tickets (KAN-21)
 Route::apiResource('tickets', TicketController::class)->only(['index', 'store', 'show', 'update']);
 Route::post('tickets/{ticket}/clos', [TicketController::class, 'clos']);
+
+// Visites — laissez-passer QR (KAN-102, cf. brief Visites)
+Route::get('/residences/{residence}/visites', [VisiteController::class, 'index']);
+Route::get('/residences/{residence}/visites/stats', [VisiteController::class, 'stats']);
+Route::post('/residences/{residence}/visites', [VisiteController::class, 'store']);
+Route::post('/visites/{visite}/cancel', [VisiteController::class, 'cancel']);
 
 // Assemblées (Sprint 2)
 Route::middleware(['app.permission:assemblees'])->group(function () {

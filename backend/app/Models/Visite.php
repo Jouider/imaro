@@ -5,24 +5,28 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 /**
- * KAN-102 — visite attendue déclarée par un résident, scannée par un agent.
+ * Visite (laissez-passer QR) — cf. docs/feature-visites-backend-brief.md.
+ * Cycle : planned → arrived → departed (+ expired/cancelled).
  */
 class Visite extends Model
 {
     protected $fillable = [
-        'tenant_id', 'residence_id', 'lot_id', 'coproprietaire_id', 'declarant_user_id',
-        'resident_nom', 'lot_numero', 'visiteur_nom', 'motif', 'date_visite',
-        'qr_token', 'statut', 'scanned_at', 'scanned_by',
+        'tenant_id', 'residence_id', 'qr_token', 'visitor_name', 'visitor_phone',
+        'type', 'purpose', 'host_lot_id', 'host_user_id', 'planned_at', 'arrived_at',
+        'left_at', 'status', 'photo_url', 'is_recurring', 'recurrence', 'created_by_id',
     ];
 
     protected function casts(): array
     {
         return [
-            'date_visite' => 'date',
-            'scanned_at' => 'datetime',
+            'planned_at' => 'datetime',
+            'arrived_at' => 'datetime',
+            'left_at' => 'datetime',
+            'is_recurring' => 'boolean',
         ];
     }
 
@@ -35,11 +39,11 @@ class Visite extends Model
         });
     }
 
-    /** Jeton opaque encodé dans le QR (unique). */
+    /** Jeton opaque encodé dans le QR / l'URL publique /v/:token (unique). */
     public static function generateToken(): string
     {
         do {
-            $token = Str::lower(Str::random(40));
+            $token = 'vst_'.Str::lower(Str::random(18));
         } while (static::withoutGlobalScope('tenant')->where('qr_token', $token)->exists());
 
         return $token;
@@ -50,13 +54,23 @@ class Visite extends Model
         return $this->belongsTo(Residence::class);
     }
 
-    public function lot(): BelongsTo
+    public function hostLot(): BelongsTo
     {
-        return $this->belongsTo(Lot::class);
+        return $this->belongsTo(Lot::class, 'host_lot_id');
     }
 
-    public function coproprietaire(): BelongsTo
+    public function hostUser(): BelongsTo
     {
-        return $this->belongsTo(Coproprietaire::class);
+        return $this->belongsTo(User::class, 'host_user_id');
+    }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by_id');
+    }
+
+    public function scanLogs(): HasMany
+    {
+        return $this->hasMany(VisiteScanLog::class);
     }
 }
