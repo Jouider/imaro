@@ -7,9 +7,12 @@ import {
   ScanLine,
   UserPlus,
   CheckCircle2,
+  XCircle,
   LogOut,
   Users,
   ArrowRight,
+  Building2,
+  Clock,
   Download,
   Camera,
 } from 'lucide-react'
@@ -18,16 +21,15 @@ import { Badge } from '@/components/ui/badge'
 import { Wordmark } from '@/components/Wordmark'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { QrScanner } from '@/components/shared/QrScanner'
-import { PhotoCapture } from '@/components/shared/PhotoCapture'
 import { useAuthStore } from '@/stores/authStore'
 import { setStoredToken } from '@/lib/axios'
 import { logout } from '@/services/auth.service'
 import { useInstallPromptGardien } from '@/hooks/useInstallPromptGardien'
 import {
-  getPersonnelVisites,
-  scanPersonnelVisite,
-  uploadVisitePhoto,
-  type PersonnelScanResult,
+  getActiveVisites,
+  scanVisite,
+  type ScanResult,
+  type Visite,
 } from '@/services/visites.service'
 import { cn } from '@/lib/utils'
 import { WalkInDialog } from './WalkInDialog'
@@ -38,8 +40,16 @@ type ViewState =
   | { kind: 'scan' }
   | { kind: 'walk-in' }
   | { kind: 'manual' }
-  | { kind: 'photo'; result: PersonnelScanResult }
-  | { kind: 'result'; result: PersonnelScanResult }
+  | { kind: 'result'; result: ScanResult }
+
+const sinceFmt = new Intl.RelativeTimeFormat('fr-MA', { numeric: 'auto' })
+
+function relativeSince(iso: string): string {
+  const diffMin = Math.round((Date.now() - new Date(iso).getTime()) / 60_000)
+  if (diffMin < 60) return sinceFmt.format(-diffMin, 'minute')
+  const diffH = Math.round(diffMin / 60)
+  return sinceFmt.format(-diffH, 'hour')
+}
 
 export function GardienPage() {
   const { t } = useTranslation()
@@ -48,39 +58,36 @@ export function GardienPage() {
   const { user, clear } = useAuthStore()
   const [view, setView] = useState<ViewState>({ kind: 'home' })
 
+  // Visitors currently inside (status='arrived') — tap one to force check-out.
   const activeQ = useQuery({
-    queryKey: ['gardien-expected'],
-    queryFn: () => getPersonnelVisites(),
+    queryKey: ['gardien-active'],
+    queryFn: () => getActiveVisites(),
     refetchInterval: 30_000,
   })
   const active = activeQ.data ?? []
 
   const install = useInstallPromptGardien()
 
-  const photoUploadMut = useMutation({
-    mutationFn: ({ id, dataUrl }: { id: number; dataUrl: string }) =>
-      uploadVisitePhoto(id, dataUrl),
-    onSuccess: () => {
-      toast.success(t('gardien.photo.uploaded'))
-    },
-  })
-
   const scanMut = useMutation({
-    mutationFn: (token: string) => scanPersonnelVisite(extractToken(token)),
+    mutationFn: (token: string) => scanVisite(extractToken(token)),
+    // Photo capture is MVP-off (POST /visites/{id}/photo → 404), so a
+    // successful scan goes straight to the result panel.
     onSuccess: (res) => {
-      setView({ kind: 'photo', result: res })
-      void qc.invalidateQueries({ queryKey: ['gardien-expected'] })
+      setView({ kind: 'result', result: res })
+      void qc.invalidateQueries({ queryKey: ['gardien-active'] })
     },
     onError: (err) => {
-      const status = (err as { response?: { status: number } }).response?.status
-      if (status === 404) {
-        toast.error(t('gardien.scanResult.unknownToken'))
-      } else if (status === 409) {
-        toast.warning(t('gardien.scanResult.alreadyScanned'))
-      } else {
-        toast.error(t('common.networkError'))
-      }
-      setView({ kind: 'scan' })
+      const status = (err as { response?: { status?: number } }).response
+        ?.status
+      // 404 = token unknown/expired ; anything else = network/server.
+      setView({
+        kind: 'result',
+        result: {
+          visit: EMPTY_VISIT,
+          action: 'rejected',
+          reason: status === 404 ? 'unknown' : 'network',
+        },
+      })
     },
   })
 
@@ -172,7 +179,7 @@ export function GardienPage() {
               </Button>
             </div>
 
-            {/* Active list */}
+            {/* Currently-inside list */}
             <section>
               <div className="mb-2 flex items-center justify-between px-1">
                 <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/70">
@@ -197,37 +204,34 @@ export function GardienPage() {
               ) : (
                 <div className="space-y-2">
                   {active.map((v) => (
-                    <div
-                      key={v.visite_id}
-                      className="flex w-full items-center gap-3 rounded-xl bg-white/95 px-3 py-2.5 text-foreground shadow-sm"
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => scanMut.mutate(v.qr_token)}
+                      disabled={scanMut.isPending}
+                      className="flex w-full items-center gap-3 rounded-xl bg-white/95 px-3 py-2.5 text-left text-foreground shadow-sm transition-transform active:scale-[0.98]"
                     >
-                      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[var(--color-imaro-primary)]/10 text-[var(--color-imaro-primary)]">
-                        <Users className="size-5" />
+                      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                        <Building2 className="size-5" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold">
-                          {v.resident_nom}
+                          {v.visitor_name}
                         </p>
                         <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                          {v.motif}
-                          <span className="ms-auto rounded-md bg-muted px-1.5 py-0.5 font-mono">
-                            Lot {v.lot}
-                          </span>
+                          <Clock className="size-3" />
+                          {v.arrived_at ? relativeSince(v.arrived_at) : '—'}
+                          {v.host_lot_numero && (
+                            <span className="ms-auto rounded-md bg-muted px-1.5 py-0.5 font-mono">
+                              Lot {v.host_lot_numero}
+                            </span>
+                          )}
                         </p>
                       </div>
-                      <span
-                        className={cn(
-                          'rounded-full px-2 py-0.5 text-[10px] font-semibold',
-                          v.statut === 'attendu'
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-orange-100 text-orange-700',
-                        )}
-                      >
-                        {v.statut === 'attendu'
-                          ? t('gardien.scanResult.attendu')
-                          : t('gardien.scanResult.nonAttendu')}
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+                        {t('gardien.scanResult.manualCheckOut')}
                       </span>
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}
@@ -252,36 +256,6 @@ export function GardienPage() {
             >
               {t('gardien.scanner.cancelScan')}
             </Button>
-          </div>
-        )}
-
-        {view.kind === 'photo' && (
-          <div className="rounded-2xl bg-white/95 p-5 text-foreground shadow-2xl dark:bg-card">
-            <div className="mb-3 text-center">
-              <h2 className="font-display text-xl">
-                {t('gardien.photo.title')}
-              </h2>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {t('gardien.photo.desc')}
-              </p>
-              <p className="mt-2 text-sm font-semibold">
-                → Lot {view.result.lot} · {view.result.resident_nom}
-              </p>
-            </div>
-            <PhotoCapture
-              onCapture={(dataUrl) => {
-                photoUploadMut.mutate({
-                  id: view.result.visite_id,
-                  dataUrl,
-                })
-                setView({ kind: 'result', result: view.result })
-              }}
-              onSkip={() => {
-                toast.info(t('gardien.photo.skipped'))
-                setView({ kind: 'result', result: view.result })
-              }}
-              onCancel={() => setView({ kind: 'home' })}
-            />
           </div>
         )}
 
@@ -359,42 +333,75 @@ function ResultPanel({
   onNewScan,
   onHome,
 }: {
-  result: PersonnelScanResult
+  result: ScanResult
   onNewScan: () => void
   onHome: () => void
 }) {
   const { t } = useTranslation()
+  const isRejected = result.action === 'rejected'
+  const Icon = isRejected ? XCircle : CheckCircle2
+
+  const tone = isRejected
+    ? 'from-red-500 to-red-700'
+    : result.action === 'check_out'
+      ? 'from-slate-500 to-slate-700'
+      : 'from-emerald-500 to-emerald-700'
+
+  const titleKey = isRejected
+    ? 'gardien.scanResult.rejectedTitle'
+    : result.action === 'check_out'
+      ? 'gardien.scanResult.checkOutTitle'
+      : 'gardien.scanResult.checkInTitle'
+
+  // Map backend reason codes to a localized message; fall back to the raw code.
+  const reasonKey = result.reason
+    ? `gardien.scanResult.reason.${result.reason}`
+    : null
+  const reasonLabel = reasonKey
+    ? (() => {
+        const translated = t(reasonKey)
+        return translated === reasonKey ? result.reason : translated
+      })()
+    : null
 
   return (
     <div className="rounded-2xl bg-white/95 p-5 text-foreground shadow-2xl dark:bg-card">
-      <div className="mx-auto -mt-12 mb-4 flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-lg">
-        <CheckCircle2 className="size-8" />
+      <div
+        className={cn(
+          'mx-auto -mt-12 mb-4 flex size-16 items-center justify-center rounded-full bg-gradient-to-br text-white shadow-lg',
+          tone,
+        )}
+      >
+        <Icon className="size-8" />
       </div>
-      <h2 className="text-center font-display text-2xl">
-        {t('gardien.scanResult.checkInTitle')}
-      </h2>
+      <h2 className="text-center font-display text-2xl">{t(titleKey)}</h2>
 
-      <div className="mt-4 space-y-2 rounded-xl border bg-muted/30 p-3">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-semibold">{result.resident_nom}</p>
-          <span
-            className={cn(
-              'rounded-full px-2 py-0.5 text-[10px] font-semibold',
-              result.statut === 'attendu'
-                ? 'bg-emerald-100 text-emerald-700'
-                : 'bg-orange-100 text-orange-700',
-            )}
-          >
-            {result.statut === 'attendu'
-              ? t('gardien.scanResult.attendu')
-              : t('gardien.scanResult.nonAttendu')}
-          </span>
+      {!isRejected && (
+        <div className="mt-4 space-y-2 rounded-xl border bg-muted/30 p-3">
+          <p className="text-center text-base font-semibold">
+            {result.visit.visitor_name}
+          </p>
+          <p className="text-center text-xs text-muted-foreground">
+            {result.visit.visitor_phone}
+          </p>
+          {result.visit.host_name && (
+            <p className="text-center text-xs">
+              → {result.visit.host_name}
+              {result.visit.host_lot_numero && (
+                <span className="ms-1 text-muted-foreground">
+                  (Lot {result.visit.host_lot_numero})
+                </span>
+              )}
+            </p>
+          )}
         </div>
-        <p className="text-xs text-muted-foreground">
-          <span className="font-mono font-medium">Lot {result.lot}</span>
-          {result.motif && <span className="ms-2">· {result.motif}</span>}
+      )}
+
+      {isRejected && reasonLabel && (
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          {reasonLabel}
         </p>
-      </div>
+      )}
 
       <div className="mt-5 flex flex-col gap-2 sm:flex-row">
         <Button onClick={onNewScan} className="flex-1 gap-1.5">
@@ -407,6 +414,19 @@ function ResultPanel({
       </div>
     </div>
   )
+}
+
+/** Placeholder visit for a rejected scan (no visit payload to show). */
+const EMPTY_VISIT: Visite = {
+  id: 0,
+  residence_id: 0,
+  qr_token: '',
+  visitor_name: '—',
+  visitor_phone: '',
+  type: 'visitor',
+  status: 'expired',
+  created_by_name: '',
+  created_at: '',
 }
 
 /**
