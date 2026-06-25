@@ -3420,6 +3420,14 @@
       "checkInTitle": "Entrée enregistrée",
       "checkOutTitle": "Sortie enregistrée",
       "rejectedTitle": "QR refusé",
+      "reason": {
+        "too_early": "Trop tôt — hors de la fenêtre d'arrivée prévue",
+        "expired": "Laissez-passer expiré",
+        "cancelled": "Laissez-passer annulé",
+        "already_departed": "Visiteur déjà sorti",
+        "unknown": "QR inconnu ou expiré",
+        "network": "Échec réseau — réessayez"
+      },
       "newScan": "Nouveau scan",
       "manualCheckOut": "Forcer la sortie"
     },

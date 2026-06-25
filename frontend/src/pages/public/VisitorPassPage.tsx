@@ -123,7 +123,10 @@ function Pass({
   const status = STATUS_META[visit.status]
   const StatusIcon = status.icon
 
-  // Wallet links — lazy fetch only when the visit is still actionable
+  // Wallet links — lazy fetch only when the visit is still actionable.
+  // MVP-off on the backend (404): the query fails, `data` stays undefined and
+  // the wallet buttons below never render. `retry: false` avoids retrying a
+  // known 404.
   const walletQ = useQuery({
     queryKey: ['wallet-links', visit.qr_token],
     queryFn: () => getWalletLinks(visit.qr_token),
@@ -132,6 +135,7 @@ function Pass({
       visit.status === 'arrived' ||
       !!visit.is_recurring,
     staleTime: 5 * 60_000,
+    retry: false,
   })
 
   return (

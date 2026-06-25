@@ -225,7 +225,7 @@ export function LoginPage() {
         setStoredToken(res.data.token)
         setSession(res.data)
         void navigate(
-          res.data.user.role === 'gardien'
+          res.data.user.role === 'personnel'
             ? '/gardien'
             : '/gestionnaire/dashboard',
           { replace: true },
@@ -256,7 +256,12 @@ export function LoginPage() {
       if (res.status === 'success') {
         setStoredToken(res.data.token)
         setSession(res.data)
-        void navigate('/portail', { replace: true })
+        // Field staff (gardien/sécurité) share the resident phone+code login
+        // but land on the lobby screen, not the resident portal (KAN-106).
+        void navigate(
+          res.data.user.role === 'personnel' ? '/gardien' : '/portail',
+          { replace: true },
+        )
       } else if (res.status === 'first_login') {
         // Resident must set their own personal code
         setStep('activate')
@@ -271,7 +276,9 @@ export function LoginPage() {
     onSuccess: ({ token, user, tenant }) => {
       setStoredToken(token)
       setSession({ token, user, tenant })
-      void navigate('/portail', { replace: true })
+      void navigate(user.role === 'personnel' ? '/gardien' : '/portail', {
+        replace: true,
+      })
     },
     onError: (err) => toast.error(extractError(err, t('auth.networkError'))),
   })
