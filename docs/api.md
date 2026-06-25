@@ -1336,6 +1336,22 @@ SIDs résolus depuis `config('notifications.whatsapp_templates.<name>')`.
 
 ---
 
+## Exports comptables (KAN-100)
+
+`role:manager|gestionnaire` · préfixe `/api/gestionnaire/comptabilite/exercices/{exercice}/export`. Chaque endpoint renvoie un **fichier** (`Content-Disposition: attachment`). Mêmes données que les vues JSON (journal / grand-livre / balance) via `ComptabiliteExportService`.
+
+| Endpoint | Format | Fichier |
+|---|---|---|
+| `GET /export/journal.xlsx` | Excel (PhpSpreadsheet) | `journal-{annee}.xlsx` |
+| `GET /export/grand-livre.xlsx` | Excel | `grand-livre-{annee}.xlsx` |
+| `GET /export/fec` | Texte tabulé — **FEC** (norme DGFiP, 18 colonnes, dates `YYYYMMDD`, montants `0,00`) | `FEC-{annee}.txt` |
+| `GET /export/journal.pdf` | PDF (DomPDF, paysage) | `journal-{annee}.pdf` |
+| `GET /export/balance.pdf` | PDF (DomPDF) | `balance-{annee}.pdf` |
+
+`403` si l'exercice n'appartient pas au gestionnaire (manager bypass). Réponse directe (pas de Job — volumes copropriété faibles). Frontend : KAN-101 (téléchargement blob).
+
+---
+
 ## Visites — laissez-passer QR + audit trail (KAN-102)
 
 Implémente `docs/feature-visites-backend-brief.md`. Cycle de vie :

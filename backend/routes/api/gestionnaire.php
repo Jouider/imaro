@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\Gestionnaire\BudgetAnnexe5Controller;
 use App\Http\Controllers\Api\Gestionnaire\BudgetController;
 use App\Http\Controllers\Api\Gestionnaire\ComplianceCalendarController;
 use App\Http\Controllers\Api\Gestionnaire\ComptabiliteController;
+use App\Http\Controllers\Api\Gestionnaire\ComptabiliteExportController;
 use App\Http\Controllers\Api\Gestionnaire\CompteBancaireController;
 use App\Http\Controllers\Api\Gestionnaire\ContratController;
 use App\Http\Controllers\Api\Gestionnaire\CoproprietaireController;
@@ -330,6 +331,13 @@ Route::prefix('comptabilite/exercices/{exercice}')->group(function () {
     Route::post('/encaissements', [ComptabiliteController::class, 'storeEncaissement']);
     Route::get('/encaissements', [ComptabiliteController::class, 'encaissementsIndex']);
     Route::post('/cloture', [ComptabiliteController::class, 'cloturer']);
+
+    // Exports comptables (KAN-100) — fichiers téléchargeables
+    Route::get('/export/journal.xlsx', [ComptabiliteExportController::class, 'journalXlsx']);
+    Route::get('/export/grand-livre.xlsx', [ComptabiliteExportController::class, 'grandLivreXlsx']);
+    Route::get('/export/fec', [ComptabiliteExportController::class, 'fec']);
+    Route::get('/export/journal.pdf', [ComptabiliteExportController::class, 'journalPdf']);
+    Route::get('/export/balance.pdf', [ComptabiliteExportController::class, 'balancePdf']);
 });
 
 // Frontend calls /residences/{id}/comptabilite/exercices
