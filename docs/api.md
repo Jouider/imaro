@@ -1361,6 +1361,7 @@ Implémente `docs/feature-visites-backend-brief.md`. Cycle de vie :
 **Gardien / personnel** (`role:personnel|gestionnaire|manager`) :
 - `POST /visites/scan` : `{ token }` → `200 { visit: Visite, action: "check_in|check_out|rejected", reason }`. `404` token inconnu. Cycle : `planned`+fenêtre ±2h → check_in ; `arrived` → check_out ; sinon `rejected` (`too_early|expired|cancelled|already_departed`). Chaque scan journalisé (`visite_scan_logs`).
 - `POST /visites/walk-in` : `{ residence_id, visitor_name, visitor_phone, type, purpose?, host_lot_id? }` → crée + marque `arrived` (idempotent phone+nom ±5 min).
+- `POST /visites/{id}/photo` : `{ photo: "data:image/jpeg|png|webp;base64,…" }` (≤ 500 ko) → stocke la photo du visiteur (anti-spoofing au check-in), renvoie la `Visite` avec `photo_url`. `422` si pas une data URL image valide / trop volumineuse.
 - `GET  /gardien/visites/active` → `data: Visite[]` (status `arrived`) sur la/les résidence(s) du gardien.
 
 **Résident** (`role:resident`, prefix `/portail`) :
@@ -1373,7 +1374,7 @@ Implémente `docs/feature-visites-backend-brief.md`. Cycle de vie :
 
 **Cron** : `visites:expire` (quotidien 03:00) passe à `expired` les `planned` jamais honorées (>24h, non récurrentes).
 
-> Auth gardien = login **téléphone + code** (personnel KAN-52, poste `securite`/`gardien`). Le front redirige `role=personnel` → `/gardien`. `photo_url` est dans le schéma mais l'upload (`POST /visites/{id}/photo`) n'est pas branché en MVP.
+> Auth gardien = login **téléphone + code** (personnel KAN-52, poste `securite`/`gardien`). Le front redirige `role=personnel` → `/gardien`. Wallet (Apple/Google) reste hors MVP (`/wallet` → 404).
 
 ---
 
