@@ -67,8 +67,8 @@ export function PageHeader({
           ))}
         </nav>
       )}
-      <div className="flex items-start justify-between gap-4">
-        <div>
+      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+        <div className="min-w-0">
           <h1 className="font-display text-3xl leading-tight tracking-tight text-[var(--primary)]">
             {title}
           </h1>
@@ -77,7 +77,9 @@ export function PageHeader({
           )}
         </div>
         {actions && (
-          <div className="flex shrink-0 items-center gap-2">{actions}</div>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {actions}
+          </div>
         )}
       </div>
     </div>
