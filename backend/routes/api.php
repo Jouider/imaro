@@ -105,6 +105,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:personnel|gestionnaire|manager')->group(function () {
         Route::post('/visites/scan', [VisiteScanController::class, 'scan']);
         Route::post('/visites/walk-in', [VisiteScanController::class, 'walkIn']);
+        Route::post('/visites/{visite}/photo', [VisiteScanController::class, 'photo']);
         Route::get('/gardien/visites/active', [VisiteScanController::class, 'active']);
     });
 });

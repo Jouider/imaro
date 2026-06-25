@@ -14,6 +14,7 @@ use App\Models\Tenant;
 use App\Models\User;
 use App\Models\Visite;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
@@ -184,6 +185,28 @@ it('gardien voit les visiteurs actuellement à l\'intérieur', function () {
     $res = $this->withHeaders($this->agentAuth)->getJson('/api/gardien/visites/active')->assertStatus(200);
     expect($res->json('data'))->toHaveCount(1)
         ->and($res->json('data.0.status'))->toBe('arrived');
+});
+
+// ── Photo check-in ───────────────────────────────────────────────────────────
+
+it('le gardien attache une photo au check-in → photo_url rempli', function () {
+    Storage::fake('public');
+    $v = makeVisite($this, ['status' => 'arrived', 'arrived_at' => now()]);
+
+    // 1×1 PNG en data URL.
+    $png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+
+    $res = $this->withHeaders($this->agentAuth)->postJson("/api/visites/{$v->id}/photo", ['photo' => $png])
+        ->assertStatus(200);
+
+    expect($res->json('data.photo_url'))->toBeString()->toContain('/storage/visites/');
+    expect($v->fresh()->photo_url)->not->toBeNull();
+});
+
+it('rejette (422) un photo qui n\'est pas une data URL image', function () {
+    $v = makeVisite($this);
+    $this->withHeaders($this->agentAuth)->postJson("/api/visites/{$v->id}/photo", ['photo' => 'pas-une-image'])
+        ->assertStatus(422)->assertJsonValidationErrors('photo');
 });
 
 // ── Public /v/:token ─────────────────────────────────────────────────────────

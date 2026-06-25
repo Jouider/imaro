@@ -10,6 +10,8 @@ use App\Models\Visite;
 use App\Services\Visites\VisiteService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 /**
@@ -90,6 +92,45 @@ class VisiteScanController extends Controller
             'message' => 'Visiteur enregistré (walk-in).',
             'data' => new VisiteResource($visite->load($this->service->eagerLoad())),
         ], 201);
+    }
+
+    /**
+     * POST /api/visites/{visite}/photo — photo du visiteur capturée au check-in (anti-spoofing).
+     * Corps : { photo: "data:image/jpeg;base64,…" } ≤ 500 ko (jpeg/png/webp).
+     */
+    public function photo(Request $request, int $visite): JsonResponse
+    {
+        $request->validate([
+            'photo' => ['required', 'string', 'regex:#^data:image/(jpeg|png|webp);base64,#'],
+        ]);
+
+        $v = Visite::findOrFail($visite);
+
+        [$meta, $b64] = explode(',', $request->input('photo'), 2);
+        $ext = str_contains($meta, 'png') ? 'png' : (str_contains($meta, 'webp') ? 'webp' : 'jpg');
+        $binary = base64_decode($b64, true);
+
+        abort_if($binary === false, 422, 'Image base64 invalide.');
+        abort_if(strlen($binary) > 500 * 1024, 422, 'Photo trop volumineuse (max 500 ko).');
+
+        $path = "visites/{$v->id}/".Str::lower(Str::random(24)).'.'.$ext;
+        Storage::disk('public')->put($path, $binary);
+
+        // Remplace l'ancienne photo le cas échéant.
+        if ($v->photo_url) {
+            $old = Str::after($v->photo_url, '/storage/');
+            if ($old !== $v->photo_url) {
+                Storage::disk('public')->delete($old);
+            }
+        }
+
+        $v->update(['photo_url' => Storage::disk('public')->url($path)]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Photo enregistrée.',
+            'data' => new VisiteResource($v->load($this->service->eagerLoad())),
+        ]);
     }
 
     /** GET /api/gardien/visites/active — visiteurs actuellement à l'intérieur. */
