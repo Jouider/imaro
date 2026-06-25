@@ -10,6 +10,7 @@ use App\Models\Coproprietaire;
 use App\Models\Depense;
 use App\Models\Exercice;
 use App\Models\Paiement;
+use App\Services\Comptabilite\ComptabiliteExportService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -176,58 +177,8 @@ class ComptabiliteController extends Controller
      */
     private function buildRawJournalEntries(Exercice $exercice): Collection
     {
-        $entries = collect();
-
-        $paiements = Paiement::where('exercice_id', $exercice->id)
-            ->with('coproprietaire.user')
-            ->orderBy('date_paiement')
-            ->get();
-
-        foreach ($paiements as $p) {
-            $entries->push([
-                'id' => 'P'.$p->id,
-                'date' => $p->date_paiement->toDateString(),
-                'libelle' => 'Paiement '.$p->coproprietaire?->user?->name,
-                'compte_debit' => '5121',
-                'compte_credit' => '7061',
-                'montant' => round($p->montant, 2),
-                'piece' => $p->reference ?? 'PAY-'.$p->id,
-                'exercice_id' => $exercice->id,
-            ]);
-        }
-
-        $depenses = Depense::where('exercice_id', $exercice->id)
-            ->where('statut', '!=', 'annule')
-            ->orderBy('date')
-            ->get();
-
-        $categorieToCompte = [
-            'entretien' => '6135',
-            'gardiennage' => '6138',
-            'nettoyage' => '6131',
-            'assurance' => '6136',
-            'administratif' => '6171',
-            'travaux' => '6134',
-            'autre' => '6188',
-        ];
-
-        foreach ($depenses as $d) {
-            $compteDebit = $categorieToCompte[strtolower($d->categorie)] ?? '6188';
-            $compteCredit = $d->statut === 'paye' ? '5121' : '4011';
-
-            $entries->push([
-                'id' => 'D'.$d->id,
-                'date' => $d->date->toDateString(),
-                'libelle' => $d->description,
-                'compte_debit' => $compteDebit,
-                'compte_credit' => $compteCredit,
-                'montant' => round($d->montant, 2),
-                'piece' => 'DEP-'.$d->id,
-                'exercice_id' => $exercice->id,
-            ]);
-        }
-
-        return $entries;
+        // Source unique : ComptabiliteExportService (réutilisé par les exports KAN-100).
+        return app(ComptabiliteExportService::class)->rawEntries($exercice);
     }
 
     /**
@@ -630,96 +581,7 @@ class ComptabiliteController extends Controller
 
     private function comptesReference(): array
     {
-        // Plan comptable copropriété — Décret 2.23.700 / CGNC (classes 1,3,4,5,6,7).
-        // Référentiel légal fixe : versionné en code (pas de table — identique pour tous les tenants).
-        $depense = ['utilisable_depense' => true, 'utilisable_budget' => true];
-        $produit = ['utilisable_produit' => true];
-
-        $comptes = [
-            // ── Classe 1 — Financement permanent (fonds, provisions, emprunts) ──
-            ['numero' => '1100', 'libelle' => 'Fonds de réserve / travaux', 'classe' => 1, 'type' => 'capitaux', 'nature' => 'both'],
-            ['numero' => '1200', 'libelle' => 'Résultat de l\'exercice', 'classe' => 1, 'type' => 'capitaux', 'nature' => 'both'],
-            ['numero' => '1400', 'libelle' => 'Fonds de roulement', 'classe' => 1, 'type' => 'capitaux', 'nature' => 'both'],
-            ['numero' => '1481', 'libelle' => 'Emprunts auprès des établissements de crédit', 'classe' => 1, 'type' => 'capitaux', 'nature' => 'non_courant'],
-            ['numero' => '1500', 'libelle' => 'Provisions pour charges', 'classe' => 1, 'type' => 'capitaux', 'nature' => 'both'],
-            ['numero' => '1750', 'libelle' => 'Avances reçues des copropriétaires', 'classe' => 1, 'type' => 'capitaux', 'nature' => 'both'],
-
-            // ── Classe 3 — Actif circulant (créances, avances) ──
-            ['numero' => '3421', 'libelle' => 'Avances et acomptes versés', 'classe' => 3, 'type' => 'actif', 'nature' => 'courant'],
-            ['numero' => '3431', 'libelle' => 'Avances et acomptes versés aux fournisseurs', 'classe' => 3, 'type' => 'actif', 'nature' => 'courant'],
-            ['numero' => '3488', 'libelle' => 'Débiteurs divers', 'classe' => 3, 'type' => 'actif', 'nature' => 'courant'],
-            ['numero' => '3500', 'libelle' => 'Titres et valeurs de placement', 'classe' => 3, 'type' => 'actif', 'nature' => 'courant'],
-
-            // ── Classe 4 — Passif circulant / comptes de tiers ──
-            ['numero' => '4011', 'libelle' => 'Fournisseurs', 'classe' => 4, 'type' => 'passif', 'nature' => 'courant', 'utilisable_depense' => true],
-            ['numero' => '4017', 'libelle' => 'Fournisseurs — retenues de garantie', 'classe' => 4, 'type' => 'passif', 'nature' => 'courant'],
-            ['numero' => '4111', 'libelle' => 'Copropriétaires — cotisations à recevoir', 'classe' => 4, 'type' => 'actif', 'nature' => 'courant'],
-            ['numero' => '4411', 'libelle' => 'Copropriétaires créditeurs (avances / trop-perçu)', 'classe' => 4, 'type' => 'passif', 'nature' => 'courant'],
-            ['numero' => '4417', 'libelle' => 'État — impôts et taxes', 'classe' => 4, 'type' => 'passif', 'nature' => 'courant'],
-            ['numero' => '4432', 'libelle' => 'Rémunérations dues au personnel', 'classe' => 4, 'type' => 'passif', 'nature' => 'courant'],
-            ['numero' => '4441', 'libelle' => 'Organismes sociaux (CNSS / AMO)', 'classe' => 4, 'type' => 'passif', 'nature' => 'courant'],
-            ['numero' => '4485', 'libelle' => 'Créditeurs divers', 'classe' => 4, 'type' => 'passif', 'nature' => 'courant'],
-
-            // ── Classe 5 — Trésorerie ──
-            ['numero' => '5121', 'libelle' => 'Banque', 'classe' => 5, 'type' => 'tresorerie', 'nature' => 'courant'],
-            ['numero' => '5141', 'libelle' => 'Chèques et valeurs à encaisser', 'classe' => 5, 'type' => 'tresorerie', 'nature' => 'courant'],
-            ['numero' => '5161', 'libelle' => 'Caisse', 'classe' => 5, 'type' => 'tresorerie', 'nature' => 'courant'],
-
-            // ── Classe 6 — Charges ──
-            ['numero' => '6111', 'libelle' => 'Achats de fournitures et consommables', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6121', 'libelle' => 'Eau et électricité', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6122', 'libelle' => 'Combustibles et gaz', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6125', 'libelle' => 'Fournitures d\'entretien et petit équipement', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6131', 'libelle' => 'Nettoyage des locaux', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6132', 'libelle' => 'Enlèvement des ordures et déchets', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6133', 'libelle' => 'Entretien des espaces verts', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6134', 'libelle' => 'Contrats de maintenance', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6135', 'libelle' => 'Entretien et petites réparations', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6136', 'libelle' => 'Primes d\'assurances', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6137', 'libelle' => 'Maintenance ascenseur', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6138', 'libelle' => 'Autres rémunérations (gardiennage)', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6141', 'libelle' => 'Charges de gardiennage et sécurité', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6142', 'libelle' => 'Télésurveillance', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6151', 'libelle' => 'Locations de matériel', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6167', 'libelle' => 'Frais et commissions bancaires', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6171', 'libelle' => 'Frais de gestion courante', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6174', 'libelle' => 'Frais postaux et télécommunications', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6177', 'libelle' => 'Charges de personnel et cotisations sociales', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6181', 'libelle' => 'Honoraires syndic', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6182', 'libelle' => 'Honoraires comptable / expert-comptable', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6185', 'libelle' => 'Frais d\'actes et de contentieux (recouvrement)', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6188', 'libelle' => 'Autres charges de copropriété', 'classe' => 6, 'type' => 'charge', 'nature' => 'courant'] + $depense,
-            ['numero' => '6311', 'libelle' => 'Intérêts des emprunts', 'classe' => 6, 'type' => 'charge', 'nature' => 'non_courant', 'utilisable_depense' => true],
-            ['numero' => '6500', 'libelle' => 'Charges non courantes (travaux exceptionnels)', 'classe' => 6, 'type' => 'charge', 'nature' => 'non_courant'] + $depense,
-
-            // ── Classe 7 — Produits ──
-            ['numero' => '7061', 'libelle' => 'Cotisations copropriétaires', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant'] + $produit,
-            ['numero' => '7062', 'libelle' => 'Appels de fonds — travaux', 'classe' => 7, 'type' => 'produit', 'nature' => 'non_courant'] + $produit,
-            ['numero' => '7063', 'libelle' => 'Appels de fonds — fonds de réserve', 'classe' => 7, 'type' => 'produit', 'nature' => 'both'] + $produit,
-            ['numero' => '7081', 'libelle' => 'Produits des activités annexes', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant'] + $produit,
-            ['numero' => '7082', 'libelle' => 'Produits de location (parties communes)', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant'] + $produit,
-            ['numero' => '7111', 'libelle' => 'Pénalités de retard', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant'] + $produit,
-            ['numero' => '7181', 'libelle' => 'Indemnités et remboursements (assurances)', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant'] + $produit,
-            ['numero' => '7381', 'libelle' => 'Intérêts et produits financiers', 'classe' => 7, 'type' => 'produit', 'nature' => 'courant'] + $produit,
-            ['numero' => '7500', 'libelle' => 'Produits non courants', 'classe' => 7, 'type' => 'produit', 'nature' => 'non_courant'] + $produit,
-        ];
-
-        $ordre = 1;
-
-        return array_map(function ($c) use (&$ordre) {
-            return [
-                'numero' => $c['numero'],
-                'libelle' => $c['libelle'],
-                'classe' => $c['classe'],
-                'type' => $c['type'],
-                'nature' => $c['nature'] ?? 'courant',
-                'est_sous_compte' => strlen($c['numero']) > 3,
-                'compte_parent' => strlen($c['numero']) > 3 ? substr($c['numero'], 0, 3) : null,
-                'utilisable_depense' => $c['utilisable_depense'] ?? false,
-                'utilisable_budget' => $c['utilisable_budget'] ?? false,
-                'utilisable_produit' => $c['utilisable_produit'] ?? false,
-                'ordre' => $ordre++,
-            ];
-        }, $comptes);
+        // Source unique : ComptabiliteExportService (réutilisé par les exports KAN-100).
+        return app(ComptabiliteExportService::class)->comptesReference();
     }
 }

@@ -12,6 +12,7 @@
         "laravel/horizon": "^5.46",
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^3.0",
+        "phpoffice/phpspreadsheet": "^5.8",
         "predis/predis": "*",
         "resend/resend-php": "^1.0",
         "spatie/laravel-multitenancy": "^4.1",
