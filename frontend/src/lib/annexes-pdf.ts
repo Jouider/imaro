@@ -455,10 +455,7 @@ export async function generateAnnexe10Pdf(data: Annexe10Input): Promise<void> {
     data.documentCode ?? genDocCode('10', data.residenceName, data.exercice)
   const verifyUrl = buildVerifyUrl(docCode)
   const qrDataUri = await generateVerifyQr(docCode)
-  const totalPages = 1
-
   drawTopAccent(doc)
-  drawTopBar(doc, docCode, 1, totalPages)
   let y = drawHeaderBand(
     doc,
     '10',
@@ -511,6 +508,52 @@ export async function generateAnnexe10Pdf(data: Annexe10Input): Promise<void> {
 
   y += kpiH + 10
 
+  // Total must equal CONTENT_W (182mm): 17 + 53 + 28 + 24 + 24 + 36 = 182
+  const colW = [17, 53, 28, 24, 24, 36]
+  const headers = [
+    'Lot',
+    'Copropriétaire',
+    'Solde initial',
+    'Appelé',
+    'Payé',
+    'Solde final',
+  ]
+
+  // Draws the navy column-header row at `yy`; returns the y just below it.
+  const drawTableHead = (yy: number): number => {
+    doc.setFillColor(...NAVY)
+    doc.rect(MARGIN, yy, CONTENT_W, 9, 'F')
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(7.5)
+    doc.setTextColor(255, 255, 255)
+    let cx = MARGIN + 4
+    headers.forEach((h, i) => {
+      const align = i >= 2 ? 'right' : 'left'
+      const tx = align === 'right' ? cx + colW[i] - 4 : cx
+      doc.text(h.toUpperCase(), tx, yy + 6, { align })
+      cx += colW[i]
+    })
+    return yy + 9
+  }
+
+  // Opens a continuation page (accent + header band) and returns the y to
+  // resume at. Top bar + footer are stamped once at the end (page numbering).
+  const continuationPage = (): number => {
+    doc.addPage()
+    drawTopAccent(doc)
+    return (
+      drawHeaderBand(
+        doc,
+        '10',
+        'Suivi des contributions des copropriétaires',
+        logo,
+      ) + 5
+    )
+  }
+
+  // Rows must stop above the footer separator (262) to avoid overlapping it.
+  const ROW_MAX = 254
+
   // Table
   if (data.rows.length === 0) {
     doc.setFillColor(...HEADER_BG)
@@ -523,41 +566,21 @@ export async function generateAnnexe10Pdf(data: Annexe10Input): Promise<void> {
     })
     y += 20 + 6
   } else {
-    // Total must equal CONTENT_W (182mm): 17 + 53 + 28 + 24 + 24 + 36 = 182
-    const colW = [17, 53, 28, 24, 24, 36]
-    const headers = [
-      'Lot',
-      'Copropriétaire',
-      'Solde initial',
-      'Appelé',
-      'Payé',
-      'Solde final',
-    ]
+    y = drawTableHead(y)
 
-    // Header row — navy with white text
-    doc.setFillColor(...NAVY)
-    doc.rect(MARGIN, y, CONTENT_W, 9, 'F')
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(7.5)
-    doc.setTextColor(255, 255, 255)
-    let cx = MARGIN + 4
-    headers.forEach((h, i) => {
-      const align = i >= 2 ? 'right' : 'left'
-      const tx = align === 'right' ? cx + colW[i] - 4 : cx
-      doc.text(h.toUpperCase(), tx, y + 6, { align })
-      cx += colW[i]
-    })
-    y += 9
-
-    // Rows
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(9)
-    doc.setTextColor(...TEXT_DARK)
+    // Rows — break to a new page (re-drawing the header band + column head)
+    // before a row would reach the footer zone.
     data.rows.forEach((r, idx) => {
+      if (y + 8 > ROW_MAX) {
+        y = drawTableHead(continuationPage())
+      }
       if (idx % 2 === 1) {
         doc.setFillColor(...ROW_ALT)
         doc.rect(MARGIN, y, CONTENT_W, 8, 'F')
       }
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(9)
+      doc.setTextColor(...TEXT_DARK)
       let rx = MARGIN + 4
       const cells = [
         r.lotNumero,
@@ -576,7 +599,10 @@ export async function generateAnnexe10Pdf(data: Annexe10Input): Promise<void> {
       y += 8
     })
 
-    // Totals row — orange highlight
+    // Totals row — orange highlight (kept with the table; new page if needed).
+    if (y + 9 > ROW_MAX) {
+      y = drawTableHead(continuationPage())
+    }
     doc.setFillColor(...ORANGE_SOFT)
     doc.rect(MARGIN, y, CONTENT_W, 9, 'F')
     // Orange left border
@@ -603,8 +629,20 @@ export async function generateAnnexe10Pdf(data: Annexe10Input): Promise<void> {
     y += 9 + 6
   }
 
+  // Signature box on the last page — move to a fresh page if it would collide
+  // with the footer.
+  if (y > 238) {
+    y = continuationPage() + 3
+  }
   drawSignatureBox(doc, Math.max(y, 215))
-  drawFooter(doc, 1, totalPages, qrDataUri, verifyUrl)
+
+  // Stamp the top bar + footer on every page now that the total is known.
+  const totalPages = doc.getNumberOfPages()
+  for (let p = 1; p <= totalPages; p++) {
+    doc.setPage(p)
+    drawTopBar(doc, docCode, p, totalPages)
+    drawFooter(doc, p, totalPages, qrDataUri, verifyUrl)
+  }
 
   doc.save(`annexe10_${data.exercice}.pdf`)
 }
