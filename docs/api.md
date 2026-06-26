@@ -1367,6 +1367,26 @@ SIDs résolus depuis `config('notifications.whatsapp_templates.<name>')`.
 
 ---
 
+## Assistant EMARO — FAQ syndic (KAN-107)
+
+`role:manager|gestionnaire`
+
+### GET /api/gestionnaire/assistant/faq
+Renvoie les **4 réponses** clés de l'assistant (système SyndikPro + Loi 18-00 / Décret 2.23.700). Query `residence_id?` → enrichit la réponse pénalités (config réelle) et la réponse AG (prochaine assemblée + alerte préavis < 15 j).
+
+**Response 200**
+```jsonc
+{ "data": { "questions": [
+  { "key": "penalites_retard",    "question": "Comment calculer les pénalités de retard ?", "answer": "…markdown…", "refs": ["Loi 18-00 art. 25"] },
+  { "key": "annexes",             "question": "Quelles annexes dois-je générer ?",          "answer": "…", "refs": ["Décret 2.23.700"] },
+  { "key": "delai_convocation_ag","question": "Quel est le délai légal de convocation d'une AG ?", "answer": "…", "refs": ["Loi 18-00 art. 16quinquies", "art. 18", "art. 19"] },
+  { "key": "cloture_exercice",    "question": "Comment clôturer l'exercice comptable ?",     "answer": "…", "refs": ["Décret 2.23.700"] }
+] } }
+```
+`answer` est du **markdown** ; `403` si `residence_id` n'appartient pas au gestionnaire.
+
+---
+
 ## Exports comptables (KAN-100)
 
 `role:manager|gestionnaire` · préfixe `/api/gestionnaire/comptabilite/exercices/{exercice}/export`. Chaque endpoint renvoie un **fichier** (`Content-Disposition: attachment`). Mêmes données que les vues JSON (journal / grand-livre / balance) via `ComptabiliteExportService`.
