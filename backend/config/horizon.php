@@ -218,6 +218,21 @@ return [
                 'maxProcesses' => 10,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
+                // Génération de convocations (jusqu'à N PDF + fusion) : marge de temps/mémoire.
+                'timeout' => 300,
+                'memory' => 256,
+            ],
+        ],
+
+        // Sans ce bloc, Horizon ne provisionne AUCUN worker en staging
+        // (APP_ENV=staging) → les jobs (convocations, push…) restent en file.
+        'staging' => [
+            'supervisor-1' => [
+                'maxProcesses' => 5,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+                'timeout' => 300,
+                'memory' => 256,
             ],
         ],
 
