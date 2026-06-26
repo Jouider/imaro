@@ -76,6 +76,15 @@ it('rattache une catégorie à un lot (création) et l\'expose', function () {
         ->assertJsonPath('data.lot.categorie_lot_id', $cat->id);
 });
 
+it('exige une catégorie sur un lot quand la résidence est en mode catégorie', function () {
+    $this->withHeaders($this->auth)
+        ->postJson("/api/gestionnaire/residences/{$this->residence->id}/lots", [
+            'numero' => 'A1', 'titre_foncier' => 'TF/1', 'type' => 'appartement', 'etage' => 1,
+            'tantieme' => 100, 'immeuble_id' => $this->imm->id, // pas de categorie_lot_id
+        ])
+        ->assertStatus(422)->assertJsonValidationErrors('categorie_lot_id');
+});
+
 it('refuse une catégorie d\'une autre résidence sur un lot', function () {
     $autre = Residence::withoutGlobalScope('tenant')->create(['tenant_id' => $this->tenant->id, 'gestionnaire_id' => $this->manager->id, 'name' => 'B', 'address' => 'Y', 'city' => 'Casa', 'total_tantieme' => 1000, 'nb_lots' => 0, 'status' => 'active', 'mode_cotisation' => 'categorie']);
     $catAutre = CategorieLot::create(['tenant_id' => $this->tenant->id, 'residence_id' => $autre->id, 'nom' => 'X', 'cotisation' => 100]);

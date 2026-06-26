@@ -193,7 +193,7 @@ class LotController extends Controller
             'lots' => ['required', 'array', 'min:1', 'max:50'],
             'lots.*.numero' => ['required', 'string', 'max:20'],
             'lots.*.titre_foncier' => ['required', 'string', 'max:100'],
-            'lots.*.categorie_lot_id' => ['nullable', Rule::exists('categories_lot', 'id')->where('residence_id', $residence->id)],
+            'lots.*.categorie_lot_id' => [$residence->mode_cotisation === 'categorie' ? 'required' : 'nullable', Rule::exists('categories_lot', 'id')->where('residence_id', $residence->id)],
             'lots.*.type' => ['required', 'in:appartement,local_commercial,commerce,parking,cave,bureau,autre'],
             'lots.*.etage' => ['nullable', 'integer', 'min:-5', 'max:50'],
             'lots.*.superficie' => ['nullable', 'numeric', 'min:1'],
