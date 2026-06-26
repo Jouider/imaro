@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Gestionnaire\AnnonceController;
 use App\Http\Controllers\Api\Gestionnaire\AppelFondsController;
 use App\Http\Controllers\Api\Gestionnaire\AssembleeController;
 use App\Http\Controllers\Api\Gestionnaire\AssistanceRecouvrementController;
+use App\Http\Controllers\Api\Gestionnaire\AssistantController;
 use App\Http\Controllers\Api\Gestionnaire\AuditLogController;
 use App\Http\Controllers\Api\Gestionnaire\AutreRecetteController;
 use App\Http\Controllers\Api\Gestionnaire\BilanOuvertureController;
@@ -51,6 +52,9 @@ use Illuminate\Support\Facades\Route;
 
 // Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index']);
+
+// Assistant EMARO — FAQ syndic (KAN-107)
+Route::get('/assistant/faq', [AssistantController::class, 'faq']);
 
 // Assistance recouvrement (service optionnel — demande d'accompagnement) — #179
 Route::post('/assistance-recouvrement', [AssistanceRecouvrementController::class, 'store']);
