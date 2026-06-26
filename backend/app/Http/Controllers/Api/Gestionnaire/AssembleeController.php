@@ -76,12 +76,23 @@ class AssembleeController extends Controller
     {
         $this->authorizeAssemblee($request, $assemblee);
 
+        // Le job génère une convocation par lot, copro assigné ou non
+        // ("Non assigné") : le count annoncé doit refléter ça (pas seulement
+        // les lots avec coproprietairePrincipal, sinon "accepted count:0"
+        // alors que N convocations seront bien créées).
         $count = Lot::withoutGlobalScope('tenant')
             ->where('residence_id', $assemblee->residence_id)
-            ->whereHas('coproprietairePrincipal')
             ->count();
 
-        $assemblee->update(['convocations_status' => 'pending']);
+        // On vide aussi le PDF fusionné/la date de la génération précédente :
+        // sinon, pendant que le job tourne (statut "pending"), le GET renvoie
+        // encore l'ancien merged_url/generated_at, ce qui laisse croire au
+        // frontend qu'une génération (obsolète) est déjà prête.
+        $assemblee->update([
+            'convocations_status' => 'pending',
+            'convocations_merged_path' => null,
+            'convocations_generated_at' => null,
+        ]);
         GenerateConvocationsJob::dispatch($assemblee->id);
 
         return response()->json(['status' => 'accepted', 'count' => $count], 202);

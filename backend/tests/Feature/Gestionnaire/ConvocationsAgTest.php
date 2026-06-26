@@ -46,6 +46,20 @@ it('POST convocations → 202 accepted + count, dispatch du Job, statut pending'
     expect($this->assemblee->fresh()->convocations_status)->toBe('pending');
 });
 
+it('POST count compte aussi les lots sans copro assigné ("Non assigné")', function () {
+    // Régression : le count annoncé doit matcher ce que le Job génère réellement
+    // (un lot par lot, copro assigné ou pas), pas seulement whereHas('coproprietairePrincipal').
+    $imm = Immeuble::withoutGlobalScope('tenant')->first();
+    Lot::withoutGlobalScope('tenant')->create([
+        'tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'immeuble_id' => $imm->id,
+        'numero' => 'A2', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 1,
+    ]);
+
+    $this->withHeaders($this->auth)->postJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations")
+        ->assertStatus(202)
+        ->assertJsonPath('count', 2);
+});
+
 it('le Job génère une convocation par copro + le PDF fusionné', function () {
     Storage::fake('public');
 
@@ -61,6 +75,20 @@ it('le Job génère une convocation par copro + le PDF fusionné', function () {
     expect($a->convocations_status)->toBe('ready')
         ->and($a->convocations_merged_path)->not->toBeNull();
     Storage::disk('public')->assertExists($a->convocations_merged_path);
+});
+
+it('POST régénère : vide merged_url/generated_at de l\'ancienne génération (sinon GET montre du stale pendant "pending")', function () {
+    Storage::fake('public');
+    (new GenerateConvocationsJob($this->assemblee->id))->handle();
+    expect($this->assemblee->fresh()->convocations_merged_path)->not->toBeNull();
+
+    $this->withHeaders($this->auth)->postJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations")
+        ->assertStatus(202);
+
+    $a = $this->assemblee->fresh();
+    expect($a->convocations_status)->toBe('pending')
+        ->and($a->convocations_merged_path)->toBeNull()
+        ->and($a->convocations_generated_at)->toBeNull();
 });
 
 it('GET convocations → ready + merged_url + liste', function () {
