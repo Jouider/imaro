@@ -917,7 +917,9 @@ Marque un paiement par **chèque** comme rejeté par la banque. Body optionnel :
 ### GET /api/gestionnaire/tickets
 `role:manager|gestionnaire`
 
-**Query params :** `residence_id`, `statut` (`ouvert`|`en_cours`|`resolu`|`clos`), `priorite` (`urgent`|`normal`|`faible`), `categorie`, `per_page`
+**Query params :** `residence_id`, `statut` (`ouvert`|`en_cours`|`resolu`|`clos`), `priorite` (`urgent`|`normal`|`faible`), `categorie`, **`search`** (réf. ou description — KAN-105), `per_page`
+
+> **Référence ticket (KAN-105)** : chaque ticket a une `reference` unique auto-générée `TKT-{année}-{id ≥3 chiffres}` (ex. `TKT-2026-042`), exposée côté gestionnaire (`TicketResource`) **et** résident (`/portail/reclamations`). Le copropriétaire cite ce code ; le gestionnaire le retrouve via `?search=`.
 
 **Response 200**
 ```json
