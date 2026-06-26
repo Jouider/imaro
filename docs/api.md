@@ -937,6 +937,8 @@ Marque un paiement par **chèque** comme rejeté par la banque. Body optionnel :
 
 > **Référence ticket (KAN-105)** : chaque ticket a une `reference` unique auto-générée `TKT-{année}-{id ≥3 chiffres}` (ex. `TKT-2026-042`), exposée côté gestionnaire (`TicketResource`) **et** résident (`/portail/reclamations`). Le copropriétaire cite ce code ; le gestionnaire le retrouve via `?search=`.
 
+> **Assignation (KAN-88)** : `PATCH /api/gestionnaire/tickets/{ticket}/assign` body `{ gestionnaire_id: number|null }` (null = désassigner). `gestionnaire_id` doit être un user du tenant de rôle `gestionnaire`/`manager` (sinon 422). Notifie le gestionnaire assigné. `TicketResource` expose `assigned_to` + `assignee {id,name}`. **Inbox** : `GET /tickets?assigned_to=me` (ou un id) filtre les tickets assignés.
+
 **Response 200**
 ```json
 {

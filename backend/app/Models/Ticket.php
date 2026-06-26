@@ -11,7 +11,7 @@ class Ticket extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tenant_id', 'reference', 'residence_id', 'lot_id', 'user_id', 'prestataire_id',
+        'tenant_id', 'reference', 'residence_id', 'lot_id', 'user_id', 'assigned_to', 'prestataire_id',
         'categorie', 'description', 'priorite', 'statut',
         'cout_estime', 'cout_reel', 'note_satisfaction', 'images', 'closed_at',
     ];
@@ -55,5 +55,11 @@ class Ticket extends Model
     public function prestataire(): BelongsTo
     {
         return $this->belongsTo(Prestataire::class);
+    }
+
+    /** Gestionnaire assigné au ticket (KAN-88). */
+    public function assignedTo(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
     }
 }

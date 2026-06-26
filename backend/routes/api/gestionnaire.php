@@ -142,6 +142,8 @@ Route::middleware(['app.permission:recouvrement,finances'])->group(function () {
 // Tickets (KAN-21)
 Route::apiResource('tickets', TicketController::class)->only(['index', 'store', 'show', 'update']);
 Route::post('tickets/{ticket}/clos', [TicketController::class, 'clos']);
+// KAN-88 — assignation d'un ticket à un gestionnaire
+Route::patch('tickets/{ticket}/assign', [TicketController::class, 'assign']);
 
 // Visites — laissez-passer QR (KAN-102, cf. brief Visites)
 Route::get('/residences/{residence}/visites', [VisiteController::class, 'index']);
