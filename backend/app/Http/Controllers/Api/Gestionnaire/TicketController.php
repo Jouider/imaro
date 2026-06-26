@@ -8,6 +8,7 @@ use App\Http\Requests\Gestionnaire\StoreTicketRequest;
 use App\Http\Requests\Gestionnaire\UpdateTicketRequest;
 use App\Http\Resources\TicketResource;
 use App\Models\Ticket;
+use App\Services\Notifications\PortailPushNotifier;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Storage;
 class TicketController extends Controller
 {
     use AuthorizesResidence;
+
     /**
      * GET /api/gestionnaire/tickets
      */
@@ -41,6 +43,12 @@ class TicketController extends Controller
             $query->where('categorie', $request->categorie);
         }
 
+        // KAN-105 — recherche par référence (le copro cite son code) ou description.
+        if ($search = trim((string) $request->query('search'))) {
+            $query->where(fn ($q) => $q->where('reference', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%"));
+        }
+
         $tickets = $query->latest()->paginate($request->integer('per_page', 15));
 
         return response()->json([
@@ -63,14 +71,14 @@ class TicketController extends Controller
     public function store(StoreTicketRequest $request): JsonResponse
     {
         $ticket = Ticket::create([
-            'tenant_id'   => config('app.tenant_id'),
-            'residence_id'=> $request->residence_id,
-            'lot_id'      => $request->lot_id,
-            'user_id'     => $request->user()->id,
-            'categorie'   => $request->categorie,
+            'tenant_id' => config('app.tenant_id'),
+            'residence_id' => $request->residence_id,
+            'lot_id' => $request->lot_id,
+            'user_id' => $request->user()->id,
+            'categorie' => $request->categorie,
             'description' => $request->description,
-            'priorite'    => $request->priorite,
-            'statut'      => 'ouvert',
+            'priorite' => $request->priorite,
+            'statut' => 'ouvert',
         ]);
 
         if ($request->hasFile('images')) {
@@ -80,9 +88,9 @@ class TicketController extends Controller
         $ticket->load(['residence', 'lot', 'user']);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Ticket créé',
-            'data'    => ['ticket' => new TicketResource($ticket)],
+            'data' => ['ticket' => new TicketResource($ticket)],
         ], 201);
     }
 
@@ -115,7 +123,7 @@ class TicketController extends Controller
         }
 
         // Supprimer des photos existantes
-        if (!empty($data['supprimer_images'])) {
+        if (! empty($data['supprimer_images'])) {
             $remaining = collect($ticket->images ?? [])
                 ->reject(fn ($path) => in_array($path, $data['supprimer_images']))
                 ->values()
@@ -141,13 +149,13 @@ class TicketController extends Controller
 
         // Push à l'auteur si le statut a changé (KAN-68).
         if ($statutChange) {
-            app(\App\Services\Notifications\PortailPushNotifier::class)->ticketMisAJour($ticket);
+            app(PortailPushNotifier::class)->ticketMisAJour($ticket);
         }
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Ticket mis à jour',
-            'data'    => ['ticket' => new TicketResource($ticket)],
+            'data' => ['ticket' => new TicketResource($ticket)],
         ]);
     }
 
@@ -170,7 +178,7 @@ class TicketController extends Controller
             'closed_at' => Carbon::now(),
         ]);
 
-        app(\App\Services\Notifications\PortailPushNotifier::class)->ticketMisAJour($ticket);
+        app(PortailPushNotifier::class)->ticketMisAJour($ticket);
 
         return response()->json([
             'status' => 'success',
@@ -189,6 +197,7 @@ class TicketController extends Controller
         foreach ($files as $file) {
             $paths[] = $file->store("tickets/{$ticketId}", 'public');
         }
+
         return $paths;
     }
 
