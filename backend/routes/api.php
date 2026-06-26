@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\IaChatController;
 use App\Http\Controllers\Api\Public\VisitePublicController;
 use App\Http\Controllers\Api\VisiteScanController;
 use Illuminate\Support\Facades\Route;
@@ -100,6 +101,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:resident')
         ->prefix('portail')
         ->group(base_path('routes/api/resident.php'));
+
+    // Assistant EMARO — chat IA (KAN-53 / KAN-107)
+    Route::middleware('role:manager|gestionnaire')->post('/ia/chat', [IaChatController::class, 'chat']);
 
     // Scan QR + walk-in + visiteurs actifs — gardien/personnel (override gestionnaire/manager) (KAN-102)
     Route::middleware('role:personnel|gestionnaire|manager')->group(function () {
