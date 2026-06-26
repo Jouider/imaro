@@ -18,6 +18,15 @@ class LotResource extends JsonResource
             'superficie' => $this->superficie,
             'tantieme' => $this->tantieme,
             'immeuble_id' => $this->immeuble_id,
+            'categorie_lot_id' => $this->categorie_lot_id,
+            'categorie' => $this->when(
+                $this->relationLoaded('categorieLot') && $this->categorieLot,
+                fn () => [
+                    'id' => $this->categorieLot->id,
+                    'nom' => $this->categorieLot->nom,
+                    'cotisation' => $this->categorieLot->cotisation,
+                ]
+            ),
             'immeuble' => $this->when(
                 $this->relationLoaded('immeuble') && $this->immeuble,
                 fn () => [
