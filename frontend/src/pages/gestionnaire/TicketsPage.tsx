@@ -91,14 +91,12 @@ const STATUTS = ['ouvert', 'en_cours', 'resolu', 'clos'] as const
 const PRIORITES = ['urgent', 'normal', 'faible'] as const
 
 const CATEGORIES = [
-  'Plomberie',
-  'Électricité',
-  'Ascenseur',
-  'Sécurité',
-  'Ménage',
-  'Espaces verts',
-  'Toiture',
-  'Autre',
+  'plomberie',
+  'electricite',
+  'ascenseur',
+  'proprete',
+  'securite',
+  'autre',
 ] as const
 
 type StatutKey = (typeof STATUTS)[number]
@@ -929,7 +927,7 @@ export function TicketsPage() {
   const [createForm, setCreateForm] = useState({
     residence_id: '',
     lot_id: '',
-    categorie: 'Plomberie',
+    categorie: 'plomberie',
     priorite: 'normal' as Ticket['priorite'],
     description: '',
   })
@@ -989,7 +987,7 @@ export function TicketsPage() {
       setCreateForm({
         residence_id: '',
         lot_id: '',
-        categorie: 'Plomberie',
+        categorie: 'plomberie',
         priorite: 'normal',
         description: '',
       })
@@ -1392,7 +1390,9 @@ export function TicketsPage() {
                   <SelectContent>
                     {CATEGORIES.map((c) => (
                       <SelectItem key={c} value={c}>
-                        {c}
+                        {t(`gestionnaire.tickets.categories.${c}`, {
+                          defaultValue: c,
+                        })}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -1456,6 +1456,7 @@ export function TicketsPage() {
                 !createForm.residence_id ||
                 !createForm.lot_id ||
                 !createForm.description.trim() ||
+                createForm.description.trim().length < 10 ||
                 createMutation.isPending
               }
             >

@@ -291,6 +291,7 @@
       "title": "Mes réclamations",
       "categorie": "Catégorie",
       "sujet": "Sujet",
+      "sujetMin": "Sujet trop court (5 caractères minimum)",
       "description": "Description",
       "submit": "Signaler le problème",
       "success": "Réclamation envoyée",
@@ -1688,7 +1689,16 @@
         "lot": "Lot",
         "selectLot": "Lot",
         "categorie": "Catégorie",
-        "descPlaceholder": "Décrivez le problème…"
+        "descPlaceholder": "Décrivez le problème…",
+        "descMin": "La description doit contenir au moins 10 caractères"
+      },
+      "categories": {
+        "plomberie": "Plomberie",
+        "electricite": "Électricité",
+        "ascenseur": "Ascenseur",
+        "proprete": "Propreté / Nettoyage",
+        "securite": "Sécurité",
+        "autre": "Autre"
       },
       "audit": {
         "tab": "Audit par résidence",

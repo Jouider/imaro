@@ -182,7 +182,7 @@ function SubmitForm({
     if (form.categorie === 'autre' && !form.customCategorie.trim())
       next.customCategorie = t('portail.reclamations.customRequired')
     if (form.sujet.trim().length < 5)
-      next.sujet = t('portail.reclamations.sujet')
+      next.sujet = t('portail.reclamations.sujetMin')
     if (!form.description.trim())
       next.description = t('portail.reclamations.description')
     setErrors(next)
