@@ -2421,7 +2421,7 @@ function TabRapports({
                 ) : (
                   <Printer className="me-1.5 size-4" />
                 )}
-                {t('gestionnaire.comptabilite.journal')}
+                {t('gestionnaire.comptabilite.journalLabel')}
               </Button>
 
               <Button
@@ -2435,7 +2435,7 @@ function TabRapports({
                 ) : (
                   <Printer className="me-1.5 size-4" />
                 )}
-                {t('gestionnaire.comptabilite.grandLivre')}
+                {t('gestionnaire.comptabilite.grandLivreLabel')}
               </Button>
 
               <Button

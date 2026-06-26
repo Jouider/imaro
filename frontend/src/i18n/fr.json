@@ -1832,6 +1832,7 @@
       "title": "Annonces",
       "subtitle": "Communiquez avec les copropriétaires de vos résidences",
       "newAnnonce": "Nouvelle annonce",
+      "formDesc": "Rédigez votre annonce, ajoutez des photos ou vidéos, puis publiez-la.",
       "tabToutes": "Toutes",
       "tabPubliees": "Publiées",
       "tabBrouillons": "Brouillons",
@@ -2252,6 +2253,8 @@
       "syntheseFinanciere": "Synthèse financière, répartition des charges, analyse des impayés — 3 pages",
       "registresObligatoires": "Registres obligatoires (Art. 8 & 10)",
       "balanceLabel": "Balance",
+      "journalLabel": "Journal comptable",
+      "grandLivreLabel": "Grand-Livre",
       "legalNote": "Ce rapport est établi conformément à la Loi 18-00 (Dahir n° 1-02-298 du 3 octobre 2002) relative au statut de la copropriété des immeubles bâtis. Tout copropriétaire peut en demander copie au syndic selon l'article 8 de ladite loi. Les documents générés ont valeur informative et sont certifiés par le gestionnaire de la copropriété.",
       "filterTo": "Au"
     },
