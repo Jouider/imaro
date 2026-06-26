@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Gestionnaire\StorePaiementRequest;
 use App\Http\Resources\PaiementResource;
 use App\Models\AppelFondsLigne;
+use App\Models\Notification;
 use App\Models\Paiement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 class PaiementController extends Controller
 {
     use AuthorizesResidence;
+
     /**
      * GET /api/gestionnaire/paiements
      */
@@ -109,6 +111,70 @@ class PaiementController extends Controller
             'message' => 'Paiement enregistré',
             'data' => ['paiement' => new PaiementResource($paiement)],
         ], 201);
+    }
+
+    /**
+     * POST /api/gestionnaire/paiements/{paiement}/cheque-impaye (KAN-85)
+     * Marque un paiement par chèque comme rejeté : annule son effet (ligne + solde)
+     * et notifie le résident. Une contre-passation apparaît au journal comptable.
+     */
+    public function chequeImpaye(Request $request, Paiement $paiement): JsonResponse
+    {
+        $paiement->load(['appelFondsLigne.appelFonds.residence', 'coproprietaire.user', 'coproprietaire.lot.residence']);
+
+        if ($paiement->mode !== 'cheque') {
+            return response()->json(['status' => 'error', 'message' => 'Ce paiement n\'est pas un chèque.'], 422);
+        }
+        if ($paiement->statut === 'cheque_rejete') {
+            return response()->json(['status' => 'error', 'message' => 'Ce chèque est déjà marqué impayé.'], 422);
+        }
+
+        $residence = $paiement->appelFondsLigne?->appelFonds?->residence
+            ?? $paiement->coproprietaire?->lot?->residence;
+        abort_if(! $residence, 422, 'Résidence introuvable pour ce paiement.');
+        $this->authorizeResidence($request, $residence);
+
+        $motif = $request->validate(['motif' => ['nullable', 'string', 'max:255']])['motif'] ?? null;
+
+        DB::transaction(function () use ($paiement, $motif) {
+            // Revenir sur la ligne d'appel de fonds le cas échéant.
+            if ($ligne = $paiement->appelFondsLigne) {
+                $newPaye = max(0, round($ligne->montant_paye - $paiement->montant, 2));
+                $statut = $newPaye <= 0 ? 'impaye' : ($newPaye >= $ligne->montant_du ? 'paye' : 'partiel');
+                $ligne->update(['montant_paye' => $newPaye, 'statut' => $statut]);
+                $this->recalculerStatutAppelFonds($ligne->appelFonds);
+            }
+
+            $paiement->update([
+                'statut' => 'cheque_rejete',
+                'cheque_rejete_at' => now(),
+                'motif_rejet' => $motif,
+            ]);
+
+            $paiement->coproprietaire?->recalculerSolde();
+
+            if ($userId = $paiement->coproprietaire?->user_id) {
+                Notification::create([
+                    'tenant_id' => $paiement->tenant_id,
+                    'user_id' => $userId,
+                    'type' => 'paiement',
+                    'title' => 'Chèque rejeté',
+                    'message' => 'Votre chèque de '.number_format($paiement->montant, 2, ',', ' ').' DH'
+                        .($paiement->reference ? ' (réf. '.$paiement->reference.')' : '')
+                        .' a été rejeté par la banque. Le montant reste dû.',
+                    'read' => false,
+                    'data' => ['paiement_id' => $paiement->id, 'montant' => $paiement->montant, 'motif' => $motif],
+                ]);
+            }
+        });
+
+        $paiement->load(['coproprietaire.user', 'coproprietaire.lot', 'appelFondsLigne.appelFonds', 'saisePar']);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Chèque marqué impayé. Le solde du copropriétaire a été régularisé.',
+            'data' => ['paiement' => new PaiementResource($paiement)],
+        ]);
     }
 
     private function recalculerStatutAppelFonds($appelFonds): void
