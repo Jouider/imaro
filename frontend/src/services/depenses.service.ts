@@ -339,7 +339,6 @@ export async function storeDepenseFinance(
       const res = await api.post<ApiEnvelope<DepenseFinance>>(
         '/gestionnaire/depenses-finance',
         data,
-        { headers: { 'Content-Type': 'multipart/form-data' } },
       )
       return res.data.data
     },
@@ -383,7 +382,6 @@ export async function importFactureIa(file: File): Promise<ImportIaDepense> {
       const res = await api.post<ApiEnvelope<ImportIaDepense>>(
         '/gestionnaire/depenses-finance/import-ia',
         fd,
-        { headers: { 'Content-Type': 'multipart/form-data' } },
       )
       return res.data.data
     },
