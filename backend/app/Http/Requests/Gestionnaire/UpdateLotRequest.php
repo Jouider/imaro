@@ -22,7 +22,7 @@ class UpdateLotRequest extends FormRequest
 
     public function rules(): array
     {
-        $residenceId = $this->route('residence')?->id;
+        $residenceId = $this->route('residence')?->id ?? $this->route('lot')?->residence_id;
         $lotId = $this->route('lot')?->id;
 
         return [
@@ -33,6 +33,8 @@ class UpdateLotRequest extends FormRequest
                     ->where(fn ($q) => $q->where('residence_id', $residenceId))
                     ->ignore($lotId),
             ],
+            'titre_foncier' => ['sometimes', 'string', 'max:100'],
+            'categorie_lot_id' => ['sometimes', 'nullable', Rule::exists('categories_lot', 'id')->where('residence_id', $residenceId)],
             'type' => ['sometimes', 'in:appartement,local_commercial,commerce,parking,cave,bureau,autre'],
             'etage' => ['sometimes', 'integer', 'min:-5', 'max:50'],
             'superficie' => ['sometimes', 'nullable', 'numeric', 'min:1', 'max:9999'],

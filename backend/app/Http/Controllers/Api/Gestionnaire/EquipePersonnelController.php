@@ -34,6 +34,7 @@ class EquipePersonnelController extends Controller
             'residence_id' => $p->residence_id,
             'residence_nom' => $p->residence?->nom ?? '',
             'phone' => $p->phone,
+            'cin' => $p->cin,
             'permissions' => $p->permissions ?? [],
             'statut' => $p->is_active ? 'actif' : 'inactif',
             'created_at' => $p->created_at?->toIso8601String(),
@@ -55,6 +56,7 @@ class EquipePersonnelController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'cin' => 'required|string|max:20', // KAN-92 — CIN obligatoire
             'poste' => ['required', Rule::in(self::POSTES)],
             'residence_id' => 'required|integer|exists:residences,id',
             // Téléphone requis : c'est l'identifiant de connexion du personnel (KAN-52).
@@ -71,6 +73,7 @@ class EquipePersonnelController extends Controller
                 'tenant_id' => $this->tenantId(),
                 'name' => $validated['name'],
                 'phone' => $validated['phone'],
+                'cin' => $validated['cin'],
                 'role' => 'personnel',
                 'access_code' => Hash::make($code),
                 'must_change_code' => true,
@@ -88,6 +91,7 @@ class EquipePersonnelController extends Controller
                 'residence_id' => $validated['residence_id'],
                 'user_id' => $user->id,
                 'phone' => $validated['phone'],
+                'cin' => $validated['cin'],
                 'permissions' => $validated['permissions'] ?? [],
                 'is_active' => true,
             ]);
@@ -160,6 +164,7 @@ class EquipePersonnelController extends Controller
             'poste' => ['sometimes', Rule::in(self::POSTES)],
             'residence_id' => 'sometimes|integer|exists:residences,id',
             'phone' => 'nullable|string|max:20',
+            'cin' => 'sometimes|string|max:20',
             'permissions' => 'sometimes|array',
             'permissions.*' => 'string',
             'is_active' => 'sometimes|boolean',

@@ -109,9 +109,9 @@ describe('lots/bulk', function () {
         $response = $this->withHeaders($this->auth)
             ->postJson("/api/gestionnaire/residences/{$this->residence->id}/lots/bulk", [
                 'lots' => [
-                    ['numero' => 'B01', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 300],
-                    ['numero' => 'B02', 'type' => 'appartement', 'etage' => 2, 'tantieme' => 250],
-                    ['numero' => 'B03', 'type' => 'parking',     'etage' => 0, 'tantieme' => 100],
+                    ['numero' => 'B01', 'titre_foncier' => 'TF/B01', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 300],
+                    ['numero' => 'B02', 'titre_foncier' => 'TF/B02', 'type' => 'appartement', 'etage' => 2, 'tantieme' => 250],
+                    ['numero' => 'B03', 'titre_foncier' => 'TF/B03', 'type' => 'parking',     'etage' => 0, 'tantieme' => 100],
                 ],
             ])
             ->assertStatus(200)
@@ -134,8 +134,8 @@ describe('lots/bulk', function () {
         $response = $this->withHeaders($this->auth)
             ->postJson("/api/gestionnaire/residences/{$this->residence->id}/lots/bulk", [
                 'lots' => [
-                    ['numero' => 'B01', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 300],
-                    ['numero' => 'B02', 'type' => 'appartement', 'etage' => 2, 'tantieme' => 200],
+                    ['numero' => 'B01', 'titre_foncier' => 'TF/B01', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 300],
+                    ['numero' => 'B02', 'titre_foncier' => 'TF/B02', 'type' => 'appartement', 'etage' => 2, 'tantieme' => 200],
                 ],
             ])
             ->assertStatus(200)
@@ -149,8 +149,8 @@ describe('lots/bulk', function () {
         $response = $this->withHeaders($this->auth)
             ->postJson("/api/gestionnaire/residences/{$this->residence->id}/lots/bulk", [
                 'lots' => [
-                    ['numero' => 'B01', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 600],
-                    ['numero' => 'B02', 'type' => 'appartement', 'etage' => 2, 'tantieme' => 500], // 600+500 > 1000
+                    ['numero' => 'B01', 'titre_foncier' => 'TF/B01', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 600],
+                    ['numero' => 'B02', 'titre_foncier' => 'TF/B02', 'type' => 'appartement', 'etage' => 2, 'tantieme' => 500], // 600+500 > 1000
                 ],
             ])
             ->assertStatus(200);
@@ -168,7 +168,7 @@ describe('lots/bulk', function () {
         $this->withHeaders($this->auth)
             ->postJson("/api/gestionnaire/residences/{$this->residence->id}/lots/bulk", [
                 'lots' => [
-                    ['numero' => 'C01', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 100, 'immeuble_id' => $autreImmeuble->id],
+                    ['numero' => 'C01', 'titre_foncier' => 'TF/C01', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 100, 'immeuble_id' => $autreImmeuble->id],
                 ],
             ])
             ->assertStatus(200)

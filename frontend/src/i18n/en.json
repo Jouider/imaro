@@ -1805,6 +1805,7 @@
       "title": "Announcements",
       "subtitle": "Communicate with the owners of your buildings",
       "newAnnonce": "New announcement",
+      "formDesc": "Write your announcement, add photos or videos, then publish it.",
       "tabToutes": "All",
       "tabPubliees": "Published",
       "tabBrouillons": "Drafts",
@@ -2225,6 +2226,8 @@
       "syntheseFinanciere": "Financial summary, charge breakdown, unpaid analysis — 3 pages",
       "registresObligatoires": "Mandatory registers (Art. 8 & 10)",
       "balanceLabel": "Trial balance",
+      "journalLabel": "Accounting journal",
+      "grandLivreLabel": "General ledger",
       "legalNote": "This report is prepared in accordance with Law 18-00 (Dahir no. 1-02-298 of 3 October 2002) on the status of co-ownership of built properties. Any owner may request a copy from the syndic under article 8 of that law. The generated documents are informational and certified by the co-ownership manager.",
       "filterTo": "To"
     },
@@ -3292,6 +3295,14 @@
       "checkInTitle": "Entry recorded",
       "checkOutTitle": "Exit recorded",
       "rejectedTitle": "QR rejected",
+      "reason": {
+        "too_early": "Too early — outside the planned arrival window",
+        "expired": "Pass expired",
+        "cancelled": "Pass cancelled",
+        "already_departed": "Visitor already left",
+        "unknown": "Unknown or expired QR",
+        "network": "Network error — try again"
+      },
       "newScan": "New scan",
       "manualCheckOut": "Force exit"
     },

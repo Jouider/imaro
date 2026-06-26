@@ -14,12 +14,12 @@ class StoreResidenceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'            => ['required', 'string', 'max:255'],
-            'address'         => ['nullable', 'string', 'max:500'],
-            'city'            => ['required', 'string', 'max:100'],
-            'mode_cotisation' => ['required', 'in:tantieme,fixe'],
-            'montant_fixe'    => ['nullable', 'required_if:mode_cotisation,fixe', 'numeric', 'min:0'],
-            'jour_echeance'   => ['nullable', 'integer', 'between:1,28'],
+            'name' => ['required', 'string', 'max:255'],
+            'address' => ['nullable', 'string', 'max:500'],
+            'city' => ['required', 'string', 'max:100'],
+            'mode_cotisation' => ['required', 'in:tantieme,fixe,categorie'],
+            'montant_fixe' => ['nullable', 'required_if:mode_cotisation,fixe', 'numeric', 'min:0'],
+            'jour_echeance' => ['nullable', 'integer', 'between:1,28'],
         ];
     }
 

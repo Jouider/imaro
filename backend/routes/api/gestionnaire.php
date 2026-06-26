@@ -5,13 +5,16 @@ use App\Http\Controllers\Api\Gestionnaire\AnnonceController;
 use App\Http\Controllers\Api\Gestionnaire\AppelFondsController;
 use App\Http\Controllers\Api\Gestionnaire\AssembleeController;
 use App\Http\Controllers\Api\Gestionnaire\AssistanceRecouvrementController;
+use App\Http\Controllers\Api\Gestionnaire\AssistantController;
 use App\Http\Controllers\Api\Gestionnaire\AuditLogController;
 use App\Http\Controllers\Api\Gestionnaire\AutreRecetteController;
 use App\Http\Controllers\Api\Gestionnaire\BilanOuvertureController;
 use App\Http\Controllers\Api\Gestionnaire\BudgetAnnexe5Controller;
 use App\Http\Controllers\Api\Gestionnaire\BudgetController;
+use App\Http\Controllers\Api\Gestionnaire\CategorieLotController;
 use App\Http\Controllers\Api\Gestionnaire\ComplianceCalendarController;
 use App\Http\Controllers\Api\Gestionnaire\ComptabiliteController;
+use App\Http\Controllers\Api\Gestionnaire\ComptabiliteExportController;
 use App\Http\Controllers\Api\Gestionnaire\CompteBancaireController;
 use App\Http\Controllers\Api\Gestionnaire\ContratController;
 use App\Http\Controllers\Api\Gestionnaire\CoproprietaireController;
@@ -44,10 +47,14 @@ use App\Http\Controllers\Api\Gestionnaire\ResidenceController;
 use App\Http\Controllers\Api\Gestionnaire\TicketController;
 use App\Http\Controllers\Api\Gestionnaire\TravauxExceptionnelController;
 use App\Http\Controllers\Api\Gestionnaire\VirementDeclareController;
+use App\Http\Controllers\Api\Gestionnaire\VisiteController;
 use Illuminate\Support\Facades\Route;
 
 // Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index']);
+
+// Assistant EMARO — FAQ syndic (KAN-107)
+Route::get('/assistant/faq', [AssistantController::class, 'faq']);
 
 // Assistance recouvrement (service optionnel — demande d'accompagnement) — #179
 Route::post('/assistance-recouvrement', [AssistanceRecouvrementController::class, 'store']);
@@ -61,6 +68,9 @@ Route::prefix('residences/{residence}')->group(function () {
     Route::get('/lots', [LotController::class, 'index']);
     Route::post('/lots', [LotController::class, 'store']);
     Route::post('/lots/bulk', [LotController::class, 'bulkStore']);
+    // Catégories de lot (KAN-93 — mode cotisation « par catégorie »)
+    Route::get('/categories-lot', [CategorieLotController::class, 'index']);
+    Route::post('/categories-lot', [CategorieLotController::class, 'store']);
     Route::put('/lots/{lot}', [LotController::class, 'update']);
     Route::delete('/lots/{lot}', [LotController::class, 'destroy']);
     Route::post('/import-soldes', [LotController::class, 'importSoldes']);
@@ -98,6 +108,10 @@ Route::get('/immeubles/{immeuble}/lots', [ImmeubleController::class, 'lots']);
 Route::put('/lots/{lot}', [LotController::class, 'updateFlat']);
 Route::delete('/lots/{lot}', [LotController::class, 'destroyFlat']);
 
+// Catégories de lot — modification / suppression (KAN-93)
+Route::put('/categories-lot/{categorie}', [CategorieLotController::class, 'update']);
+Route::delete('/categories-lot/{categorie}', [CategorieLotController::class, 'destroy']);
+
 // Copropriétaires — liste globale + création + import bulk + code d'accès
 Route::middleware(['app.permission:coproprietaires'])->group(function () {
     Route::get('/coproprietaires', [CoproprietaireController::class, 'indexGlobal']);
@@ -118,6 +132,8 @@ Route::middleware(['app.permission:finances'])->group(function () {
 Route::middleware(['app.permission:finances'])->group(function () {
     Route::get('/paiements', [PaiementController::class, 'index']);
     Route::post('/paiements', [PaiementController::class, 'store']);
+    // KAN-85 — marquer un chèque comme impayé (rejet bancaire)
+    Route::post('/paiements/{paiement}/cheque-impaye', [PaiementController::class, 'chequeImpaye']);
 });
 Route::middleware(['app.permission:recouvrement,finances'])->group(function () {
     Route::get('/impayes', [ImpayeController::class, 'index']);
@@ -126,6 +142,14 @@ Route::middleware(['app.permission:recouvrement,finances'])->group(function () {
 // Tickets (KAN-21)
 Route::apiResource('tickets', TicketController::class)->only(['index', 'store', 'show', 'update']);
 Route::post('tickets/{ticket}/clos', [TicketController::class, 'clos']);
+// KAN-88 — assignation d'un ticket à un gestionnaire
+Route::patch('tickets/{ticket}/assign', [TicketController::class, 'assign']);
+
+// Visites — laissez-passer QR (KAN-102, cf. brief Visites)
+Route::get('/residences/{residence}/visites', [VisiteController::class, 'index']);
+Route::get('/residences/{residence}/visites/stats', [VisiteController::class, 'stats']);
+Route::post('/residences/{residence}/visites', [VisiteController::class, 'store']);
+Route::post('/visites/{visite}/cancel', [VisiteController::class, 'cancel']);
 
 // Assemblées (Sprint 2)
 Route::middleware(['app.permission:assemblees'])->group(function () {
@@ -323,6 +347,13 @@ Route::prefix('comptabilite/exercices/{exercice}')->group(function () {
     Route::post('/encaissements', [ComptabiliteController::class, 'storeEncaissement']);
     Route::get('/encaissements', [ComptabiliteController::class, 'encaissementsIndex']);
     Route::post('/cloture', [ComptabiliteController::class, 'cloturer']);
+
+    // Exports comptables (KAN-100) — fichiers téléchargeables
+    Route::get('/export/journal.xlsx', [ComptabiliteExportController::class, 'journalXlsx']);
+    Route::get('/export/grand-livre.xlsx', [ComptabiliteExportController::class, 'grandLivreXlsx']);
+    Route::get('/export/fec', [ComptabiliteExportController::class, 'fec']);
+    Route::get('/export/journal.pdf', [ComptabiliteExportController::class, 'journalPdf']);
+    Route::get('/export/balance.pdf', [ComptabiliteExportController::class, 'balancePdf']);
 });
 
 // Frontend calls /residences/{id}/comptabilite/exercices

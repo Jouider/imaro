@@ -639,6 +639,7 @@ Filtre les lots par immeuble directement.
 ```json
 {
   "numero": "A101",
+  "titre_foncier": "TF-12345/C",
   "type": "appartement",
   "etage": 1,
   "superficie": 85.00,
@@ -649,7 +650,25 @@ Filtre les lots par immeuble directement.
 
 Types valides : `appartement` | `local_commercial` | `parking` | `cave`
 
-**Validation :** `immeuble_id` obligatoire et doit appartenir à la résidence. La somme des tantièmes ne doit pas dépasser `total_tantieme`. **Le `numero` doit être unique au sein de la résidence** (trim appliqué ; contrainte DB `unique(residence_id, numero)`). Un doublon renvoie **422** avec `errors.numero` (KAN-40).
+**Validation :** `immeuble_id` obligatoire et doit appartenir à la résidence. **`titre_foncier` obligatoire** (string, max 100 — KAN-94) ; absent ⇒ **422** avec `errors.titre_foncier`. La somme des tantièmes ne doit pas dépasser `total_tantieme`. **Le `numero` doit être unique au sein de la résidence** (trim appliqué ; contrainte DB `unique(residence_id, numero)`). Un doublon renvoie **422** avec `errors.numero` (KAN-40).
+
+> `titre_foncier` est renvoyé dans toutes les réponses lot (liste `GET /lots`, détail, création, import bulk). Idem pour le bulk : `POST /api/gestionnaire/residences/{id}/lots/bulk` exige `lots.*.titre_foncier`.
+
+> **Catégorie de lot (KAN-93)** : un lot peut recevoir `categorie_lot_id` (optionnel, doit appartenir à la résidence) à la création/màj/bulk. Renvoyé dans `LotResource` (`categorie_lot_id` + objet `categorie` si chargé).
+
+---
+
+## Cotisation par catégorie (KAN-93 / KAN-108)
+
+Mode de cotisation **`categorie`** (3ᵉ mode, en plus de `tantieme`/`fixe`) : le manager définit des **catégories de lot** (nom + cotisation) par résidence ; chaque lot rattaché à une catégorie paie sa cotisation. À la génération d'un appel de fonds en mode `categorie`, `montant_du` du lot = cotisation de sa catégorie.
+
+`role:manager|gestionnaire` :
+- `GET  /api/gestionnaire/residences/{residence}/categories-lot` → `[{ id, residence_id, nom, cotisation, nb_lots }]`
+- `POST /api/gestionnaire/residences/{residence}/categories-lot` : `nom` (unique/résidence), `cotisation` (numeric ≥ 0) → `201`
+- `PUT  /api/gestionnaire/categories-lot/{categorie}` : `nom?`, `cotisation?`
+- `DELETE /api/gestionnaire/categories-lot/{categorie}` (les lots rattachés sont détachés)
+
+`residences.mode_cotisation` accepte désormais `tantieme|fixe|categorie`. On rattache un lot via `categorie_lot_id` (cf. POST/PUT lots).
 
 **Response 201**
 
@@ -866,6 +885,19 @@ Modes valides : `especes` | `cheque` | `virement` | `mobile`
 
 ---
 
+### POST /api/gestionnaire/paiements/{paiement}/cheque-impaye  *(KAN-85)*
+
+Marque un paiement par **chèque** comme rejeté par la banque. Body optionnel : `motif` (string, max 255).
+
+- `422` si le paiement n'est pas en mode `cheque`, ou déjà `cheque_rejete`.
+- Effet : annule la ligne d'appel de fonds liée (retour `montant_paye`/`statut`), **régularise le solde** du copropriétaire, passe le paiement à `statut = cheque_rejete` (+ `cheque_rejete_at`, `motif_rejet`).
+- **Notification** au résident (in-app portail).
+- **Comptabilité** : une **contre-passation** (`Chèque impayé — …`, 7061 ↔ 5121) apparaît au journal / PDF (Décret 2.23.700).
+
+`PaiementResource` expose désormais `statut` (`valide`|`cheque_rejete`), `cheque_rejete_at`, `motif_rejet`.
+
+---
+
 ### GET /api/gestionnaire/impayes
 
 **Query params :** `residence_id`, `appel_fonds_id`
@@ -901,7 +933,11 @@ Modes valides : `especes` | `cheque` | `virement` | `mobile`
 ### GET /api/gestionnaire/tickets
 `role:manager|gestionnaire`
 
-**Query params :** `residence_id`, `statut` (`ouvert`|`en_cours`|`resolu`|`clos`), `priorite` (`urgent`|`normal`|`faible`), `categorie`, `per_page`
+**Query params :** `residence_id`, `statut` (`ouvert`|`en_cours`|`resolu`|`clos`), `priorite` (`urgent`|`normal`|`faible`), `categorie`, **`search`** (réf. ou description — KAN-105), `per_page`
+
+> **Référence ticket (KAN-105)** : chaque ticket a une `reference` unique auto-générée `TKT-{année}-{id ≥3 chiffres}` (ex. `TKT-2026-042`), exposée côté gestionnaire (`TicketResource`) **et** résident (`/portail/reclamations`). Le copropriétaire cite ce code ; le gestionnaire le retrouve via `?search=`.
+
+> **Assignation (KAN-88)** : `PATCH /api/gestionnaire/tickets/{ticket}/assign` body `{ gestionnaire_id: number|null }` (null = désassigner). `gestionnaire_id` doit être un user du tenant de rôle `gestionnaire`/`manager` (sinon 422). Notifie le gestionnaire assigné. `TicketResource` expose `assigned_to` + `assignee {id,name}`. **Inbox** : `GET /tickets?assigned_to=me` (ou un id) filtre les tickets assignés.
 
 **Response 200**
 ```json
@@ -1325,11 +1361,102 @@ SIDs résolus depuis `config('notifications.whatsapp_templates.<name>')`.
 
 ## Virements déclarés (résident → validation gestionnaire)
 
-- **Résident** `POST /api/portail/paiements` *(multipart)* : `montant`, `date`, `methode` (`virement|versement|cheque|especes`), `reference?`, `justificatif?` (pdf/jpg/png, ≤5 Mo) → crée un virement **`en_attente`**. `201`.
+- **Résident** `POST /api/portail/paiements` *(multipart)* : `montant`, `date`, `methode` (`virement|versement|cheque|especes`), **`reference` (obligatoire — KAN-83, string max 255 ; absent ⇒ 422 `errors.reference`)**, `justificatif?` (pdf/jpg/png, ≤5 Mo) → crée un virement **`en_attente`**. `201`.
 - **Gestionnaire** :
   - `GET /api/gestionnaire/virements-declares` → liste (`coproprietaire_nom`, `lot_numero`, `montant`, `methode`, `statut`, `justificatif_path`…), en_attente d'abord.
   - `POST /virements-declares/{id}/valider` → crée un **Paiement réel** (exercice actif, `methode→mode`, `versement→virement`) + recalcule le solde + passe `valide`.
   - `POST /virements-declares/{id}/rejeter` (`motif?`) → passe `rejete`.
+
+---
+
+## Assistant EMARO — chat IA (KAN-53)
+
+`role:manager|gestionnaire`
+
+### POST /api/ia/chat
+Body : `{ messages: [{ role: "user"|"assistant", content }], residence_id?, language }` → `{ data: { content, citations?: [{ article, loi, excerpt }] } }`.
+
+- Les **4 questions clés** (pénalités, annexes, délai AG, clôture) → **réponse figée** + citation légale (déterministe, sans clé IA), détectées par mots-clés même reformulées. `residence_id` enrichit (config pénalités, prochaine AG).
+- Question **libre** → **Claude** si `ANTHROPIC_API_KEY` configurée (system prompt syndic Maroc / Loi 18-00), sinon un **message d'aide** listant les 4 sujets.
+- `422` si `messages` absent.
+
+---
+
+## Assistant EMARO — FAQ syndic (KAN-107)
+
+`role:manager|gestionnaire`
+
+### GET /api/gestionnaire/assistant/faq
+Renvoie les **4 réponses** clés de l'assistant (système SyndikPro + Loi 18-00 / Décret 2.23.700). Query `residence_id?` → enrichit la réponse pénalités (config réelle) et la réponse AG (prochaine assemblée + alerte préavis < 15 j).
+
+**Response 200**
+```jsonc
+{ "data": { "questions": [
+  { "key": "penalites_retard",    "question": "Comment calculer les pénalités de retard ?", "answer": "…markdown…", "refs": ["Loi 18-00 art. 25"] },
+  { "key": "annexes",             "question": "Quelles annexes dois-je générer ?",          "answer": "…", "refs": ["Décret 2.23.700"] },
+  { "key": "delai_convocation_ag","question": "Quel est le délai légal de convocation d'une AG ?", "answer": "…", "refs": ["Loi 18-00 art. 16quinquies", "art. 18", "art. 19"] },
+  { "key": "cloture_exercice",    "question": "Comment clôturer l'exercice comptable ?",     "answer": "…", "refs": ["Décret 2.23.700"] }
+] } }
+```
+`answer` est du **markdown** ; `403` si `residence_id` n'appartient pas au gestionnaire.
+
+---
+
+## Exports comptables (KAN-100)
+
+`role:manager|gestionnaire` · préfixe `/api/gestionnaire/comptabilite/exercices/{exercice}/export`. Chaque endpoint renvoie un **fichier** (`Content-Disposition: attachment`). Mêmes données que les vues JSON (journal / grand-livre / balance) via `ComptabiliteExportService`.
+
+| Endpoint | Format | Fichier |
+|---|---|---|
+| `GET /export/journal.xlsx` | Excel (PhpSpreadsheet) | `journal-{annee}.xlsx` |
+| `GET /export/grand-livre.xlsx` | Excel | `grand-livre-{annee}.xlsx` |
+| `GET /export/fec` | Texte tabulé — **FEC** (norme DGFiP, 18 colonnes, dates `YYYYMMDD`, montants `0,00`) | `FEC-{annee}.txt` |
+| `GET /export/journal.pdf` | PDF (DomPDF, paysage) | `journal-{annee}.pdf` |
+| `GET /export/balance.pdf` | PDF (DomPDF) | `balance-{annee}.pdf` |
+
+`403` si l'exercice n'appartient pas au gestionnaire (manager bypass). Réponse directe (pas de Job — volumes copropriété faibles). Frontend : KAN-101 (téléchargement blob).
+
+---
+
+## Visites — laissez-passer QR + audit trail (KAN-102)
+
+Implémente `docs/feature-visites-backend-brief.md`. Cycle de vie :
+`planned → arrived → departed` (+ `expired`, `cancelled`). Enveloppe standard
+(`data` = la ressource/le tableau directement). Champ `status` en anglais.
+
+**Shape `Visite`** (toutes les réponses authentifiées) :
+```jsonc
+{ "id", "residence_id", "qr_token", "visitor_name", "visitor_phone",
+  "type": "visitor|delivery|contractor|prestataire", "purpose",
+  "host_lot_id", "host_lot_numero", "host_name",
+  "planned_at", "arrived_at", "left_at",
+  "status": "planned|arrived|departed|expired|cancelled",
+  "photo_url", "is_recurring", "recurrence", "created_by_name", "created_at" }
+```
+
+**Gestionnaire** (`role:manager|gestionnaire`, prefix `/gestionnaire`) :
+- `GET  /residences/{residence}/visites` → `data: Visite[]` (récentes d'abord).
+- `GET  /residences/{residence}/visites/stats` → `{ today, currently_inside, planned, expired_today }`.
+- `POST /residences/{residence}/visites` : `visitor_name`*, `visitor_phone`*, `type`*, `purpose?`, `host_lot_id?`, `planned_at?` (absent ⇒ walk-in `arrived`), `is_recurring?`, `recurrence?` → `201` `data: Visite`.
+- `POST /visites/{id}/cancel` → `data: Visite` (`status=cancelled`) ; `422` si non `planned|arrived`.
+
+**Gardien / personnel** (`role:personnel|gestionnaire|manager`) :
+- `POST /visites/scan` : `{ token }` → `200 { visit: Visite, action: "check_in|check_out|rejected", reason }`. `404` token inconnu. Cycle : `planned`+fenêtre ±2h → check_in ; `arrived` → check_out ; sinon `rejected` (`too_early|expired|cancelled|already_departed`). Chaque scan journalisé (`visite_scan_logs`).
+- `POST /visites/walk-in` : `{ residence_id, visitor_name, visitor_phone, type, purpose?, host_lot_id? }` → crée + marque `arrived` (idempotent phone+nom ±5 min).
+- `POST /visites/{id}/photo` : `{ photo: "data:image/jpeg|png|webp;base64,…" }` (≤ 500 ko) → stocke la photo du visiteur (anti-spoofing au check-in), renvoie la `Visite` avec `photo_url`. `422` si pas une data URL image valide / trop volumineuse.
+- `GET  /gardien/visites/active` → `data: Visite[]` (status `arrived`) sur la/les résidence(s) du gardien.
+
+**Résident** (`role:resident`, prefix `/portail`) :
+- `GET  /portail/visites` → `data: Visite[]` invitées par le résident.
+- `POST /portail/visites` : `visitor_name`*, `visitor_phone`*, `type`*, `purpose?`, `planned_at?` → `201`. `residence_id`/`host_lot_id`/host inférés du compte. Limite 10 visites actives ⇒ `422`.
+
+**Public** (aucune auth — page `/v/:token`) :
+- `GET /api/public/visites/{token}` → champs limités (`visitor_name`, `host_name`, `host_lot_numero`, `planned_at`, `status`, `type`, `purpose`, `is_recurring`, `recurrence`). `404` si inconnu/annulé/expiré. **N'expose pas** `id`, `residence_id`, `visitor_phone`.
+- `GET /api/public/visites/{token}/wallet` → `404` (Apple/Google Wallet non implémenté MVP — le front masque les boutons).
+
+**Cron** : `visites:expire` (quotidien 03:00) passe à `expired` les `planned` jamais honorées (>24h, non récurrentes).
+
+> Auth gardien = login **téléphone + code** (personnel KAN-52, poste `securite`/`gardien`). Le front redirige `role=personnel` → `/gardien`. Wallet (Apple/Google) reste hors MVP (`/wallet` → 404).
 
 ---
 
@@ -1351,7 +1478,9 @@ Demande d'accompagnement au recouvrement. Persiste la demande (`assistance_reque
 
 Crée le personnel (gardien, sécurité, ménage…) **et un compte de connexion** : login par **téléphone + code d'accès** (comme les résidents). Le `phone` est **requis** et unique. Le backend **génère** le code et l'**envoie** via la cascade WhatsApp → SMS → email.
 
-**Body** : `name`, `poste` (`securite|menage|gardien|jardinier|technicien|concierge`), `residence_id`, `phone` (requis, unique), `permissions?`.
+**Body** : `name`, **`cin` (obligatoire — KAN-92, string max 20 ; absent ⇒ 422 `errors.cin`)**, `poste` (`securite|menage|gardien|jardinier|technicien|concierge`), `residence_id`, `phone` (requis, unique), `permissions?`. Le `cin` est renvoyé dans les réponses (`GET`/création) côté fiche personnel **et** sur le compte de connexion associé.
+
+> **Utilisateurs d'équipe** — `POST /api/equipe/utilisateurs` exige lui aussi **`cin` obligatoire** (KAN-92, string max 20 ; absent ⇒ 422 `errors.cin`). Le `cin` figure dans les réponses `index`/`store`.
 
 **Response 201** : enregistrement + `code` (**code complet visible** par le gestionnaire, à communiquer au personnel — il devra le changer à la 1re connexion) + `delivery` (statut d'envoi) :
 ```json

@@ -12,6 +12,7 @@ class TicketResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'reference' => $this->reference,
             'categorie' => $this->categorie,
             'description' => $this->description,
             'priorite' => $this->priorite,
@@ -22,7 +23,7 @@ class TicketResource extends JsonResource
             'images' => collect($this->images ?? [])->map(
                 fn ($path) => Storage::disk('public')->url($path)
             )->values()->all(),
-            'closed_at'  => $this->closed_at?->toIso8601String(),
+            'closed_at' => $this->closed_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
             'residence' => $this->when($this->relationLoaded('residence'), fn () => [
@@ -38,6 +39,11 @@ class TicketResource extends JsonResource
                 'id' => $this->user->id,
                 'name' => $this->user->name,
                 'phone' => $this->user->phone,
+            ]),
+            'assigned_to' => $this->assigned_to,
+            'assignee' => $this->when($this->relationLoaded('assignedTo') && $this->assignedTo, fn () => [
+                'id' => $this->assignedTo->id,
+                'name' => $this->assignedTo->name,
             ]),
             'prestataire' => $this->when(
                 $this->relationLoaded('prestataire') && $this->prestataire,

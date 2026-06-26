@@ -794,8 +794,10 @@ export function GestionnaireLayout() {
         </>
       )}
 
-      {/* Main area */}
-      <div className="flex min-h-svh flex-1 flex-col lg:ms-[240px]">
+      {/* Main area — min-w-0 lets this flex column shrink to the available
+          width instead of growing to its widest child (charts/tables), which
+          otherwise pushes the whole page past the viewport (KAN-103). */}
+      <div className="flex min-h-svh min-w-0 flex-1 flex-col lg:ms-[240px]">
         {/* ── Topbar ── */}
         <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-white/95 px-3 backdrop-blur-sm dark:border-border dark:bg-card/95 sm:gap-3 sm:px-4">
           {/* Mobile hamburger */}
@@ -841,7 +843,7 @@ export function GestionnaireLayout() {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 bg-[var(--color-imaro-surface)] dark:bg-background">
+        <main className="min-w-0 flex-1 bg-[var(--color-imaro-surface)] dark:bg-background">
           <Outlet />
         </main>
       </div>

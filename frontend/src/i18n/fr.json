@@ -291,6 +291,7 @@
       "title": "Mes réclamations",
       "categorie": "Catégorie",
       "sujet": "Sujet",
+      "sujetMin": "Sujet trop court (5 caractères minimum)",
       "description": "Description",
       "submit": "Signaler le problème",
       "success": "Réclamation envoyée",
@@ -1688,7 +1689,16 @@
         "lot": "Lot",
         "selectLot": "Lot",
         "categorie": "Catégorie",
-        "descPlaceholder": "Décrivez le problème…"
+        "descPlaceholder": "Décrivez le problème…",
+        "descMin": "La description doit contenir au moins 10 caractères"
+      },
+      "categories": {
+        "plomberie": "Plomberie",
+        "electricite": "Électricité",
+        "ascenseur": "Ascenseur",
+        "proprete": "Propreté / Nettoyage",
+        "securite": "Sécurité",
+        "autre": "Autre"
       },
       "audit": {
         "tab": "Audit par résidence",
@@ -1832,6 +1842,7 @@
       "title": "Annonces",
       "subtitle": "Communiquez avec les copropriétaires de vos résidences",
       "newAnnonce": "Nouvelle annonce",
+      "formDesc": "Rédigez votre annonce, ajoutez des photos ou vidéos, puis publiez-la.",
       "tabToutes": "Toutes",
       "tabPubliees": "Publiées",
       "tabBrouillons": "Brouillons",
@@ -2252,6 +2263,8 @@
       "syntheseFinanciere": "Synthèse financière, répartition des charges, analyse des impayés — 3 pages",
       "registresObligatoires": "Registres obligatoires (Art. 8 & 10)",
       "balanceLabel": "Balance",
+      "journalLabel": "Journal comptable",
+      "grandLivreLabel": "Grand-Livre",
       "legalNote": "Ce rapport est établi conformément à la Loi 18-00 (Dahir n° 1-02-298 du 3 octobre 2002) relative au statut de la copropriété des immeubles bâtis. Tout copropriétaire peut en demander copie au syndic selon l'article 8 de ladite loi. Les documents générés ont valeur informative et sont certifiés par le gestionnaire de la copropriété.",
       "filterTo": "Au"
     },
@@ -3420,6 +3433,14 @@
       "checkInTitle": "Entrée enregistrée",
       "checkOutTitle": "Sortie enregistrée",
       "rejectedTitle": "QR refusé",
+      "reason": {
+        "too_early": "Trop tôt — hors de la fenêtre d'arrivée prévue",
+        "expired": "Laissez-passer expiré",
+        "cancelled": "Laissez-passer annulé",
+        "already_departed": "Visiteur déjà sorti",
+        "unknown": "QR inconnu ou expiré",
+        "network": "Échec réseau — réessayez"
+      },
       "newScan": "Nouveau scan",
       "manualCheckOut": "Forcer la sortie"
     },

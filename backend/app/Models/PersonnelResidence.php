@@ -14,7 +14,7 @@ class PersonnelResidence extends Model
 
     protected $fillable = [
         'tenant_id', 'name', 'poste', 'residence_id', 'user_id',
-        'phone', 'permissions', 'is_active',
+        'phone', 'cin', 'permissions', 'is_active',
     ];
 
     protected function casts(): array

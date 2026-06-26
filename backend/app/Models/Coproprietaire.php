@@ -69,7 +69,11 @@ class Coproprietaire extends Model
     {
         $du = (float) $this->appelsFondsLignes()->sum('montant_du');
         $payeAlloue = (float) $this->appelsFondsLignes()->sum('montant_paye');
-        $avances = (float) $this->paiements()->whereNull('appel_fonds_ligne_id')->sum('montant');
+        // Les chèques rejetés (KAN-85) ne comptent plus dans les avances.
+        $avances = (float) $this->paiements()
+            ->whereNull('appel_fonds_ligne_id')
+            ->where(fn ($q) => $q->whereNull('statut')->orWhere('statut', '!=', 'cheque_rejete'))
+            ->sum('montant');
 
         return round(($payeAlloue + $avances) - $du, 2);
     }

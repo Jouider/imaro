@@ -38,7 +38,8 @@ class PortailReclamationController extends Controller
 
                 return [
                     'id' => $t->id,
-                    'reference' => 'REC-'.($t->created_at?->format('Y') ?? date('Y')).'-'.str_pad((string) $t->id, 3, '0', STR_PAD_LEFT),
+                    // Référence persistée et partagée avec le gestionnaire (KAN-105).
+                    'reference' => $t->reference ?? 'TKT-'.($t->created_at?->format('Y') ?? date('Y')).'-'.str_pad((string) $t->id, 3, '0', STR_PAD_LEFT),
                     'categorie' => $t->categorie,
                     'sujet' => $sujet !== '' ? Str::limit($sujet, 80) : (self::LABELS[$t->categorie] ?? 'Réclamation'),
                     'statut' => $t->statut,

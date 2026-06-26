@@ -355,9 +355,7 @@ export async function createReclamation(data: {
   await withMock(async () => {
     // Resident route — a copropriétaire has role `resident`, so it must NOT hit
     // /gestionnaire/* (that requires role:gestionnaire → 403). See issue #210.
-    await api.post('/portail/reclamations', fd, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
+    await api.post('/portail/reclamations', fd)
   }, undefined)
 }
 
@@ -496,8 +494,6 @@ export async function declarePaiement(
   if (data.justificatif) fd.append('justificatif', data.justificatif)
 
   await withMock(async () => {
-    await api.post('/portail/paiements', fd, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
+    await api.post('/portail/paiements', fd)
   }, undefined)
 }

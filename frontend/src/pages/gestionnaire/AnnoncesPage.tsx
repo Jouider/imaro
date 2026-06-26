@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { isAxiosError } from 'axios'
 import { Plus, Megaphone, Globe, Eye, Trash2 } from 'lucide-react'
 import {
   getAnnonces,
@@ -25,6 +26,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
 import {
@@ -118,9 +120,18 @@ export function AnnoncesPage() {
       setUploadPct(null)
       toast.success(t('gestionnaire.annonces.toastCreated'))
     },
-    onError: () => {
+    onError: (err) => {
       setUploadPct(null)
-      toast.error(t('common.createError'))
+      // Surface the backend's validation message (e.g. media too large /
+      // unsupported type) instead of a generic error — KAN-96 follow-up.
+      let msg: string | undefined
+      if (isAxiosError(err)) {
+        const data = err.response?.data as
+          | { message?: string; errors?: Record<string, string[]> }
+          | undefined
+        msg = data?.message ?? Object.values(data?.errors ?? {})[0]?.[0]
+      }
+      toast.error(msg ?? t('common.createError'))
     },
   })
 
@@ -265,6 +276,9 @@ export function AnnoncesPage() {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>{t('gestionnaire.annonces.newAnnonce')}</DialogTitle>
+            <DialogDescription>
+              {t('gestionnaire.annonces.formDesc')}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
@@ -410,14 +424,14 @@ export function AnnoncesPage() {
                   t('gestionnaire.annonces.deleteConfirm')}
               </DialogTitle>
             </DialogHeader>
-            <p className="text-sm text-muted-foreground">
+            <DialogDescription className="text-sm text-muted-foreground">
               {confirmAction.type === 'publish' &&
                 t('gestionnaire.annonces.publishDesc')}
               {confirmAction.type === 'archive' &&
                 t('gestionnaire.annonces.archiveDesc')}
               {confirmAction.type === 'delete' &&
                 t('gestionnaire.annonces.deleteDesc')}
-            </p>
+            </DialogDescription>
             <DialogFooter>
               <Button
                 variant="outline"

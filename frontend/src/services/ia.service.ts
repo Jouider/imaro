@@ -280,7 +280,6 @@ export async function extractInvoiceData(
     const res = await api.post<ApiEnvelope<InvoiceExtraction>>(
       '/ia/extract-invoice',
       formData,
-      { headers: { 'Content-Type': 'multipart/form-data' } },
     )
     return res.data.data
   }, MOCK_INVOICE)

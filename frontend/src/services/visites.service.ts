@@ -2,26 +2,15 @@
  * Visites — visitor management via single-use QR codes.
  *
  * Lite portal model: visitors don't install the app. They receive a public
- * link (`/v/:token`) with their QR code on it; the guardian at the lobby
- * scans the QR to check them in/out. Each QR has a single visit lifecycle:
- * one check-in + one check-out, then expires.
+ * link (`/v/:token`) with their QR code on it; the guardian (role `personnel`)
+ * at the lobby scans the QR to check them in/out. Each QR has a single visit
+ * lifecycle: one check-in + one check-out, then expires.
  *
- * Backend Abdellah (futur) — see docs/feature-visites-backend-brief.md.
- * Until the endpoints land, everything is mocked via `withMock`.
+ * Backend realigned on `docs/feature-visites-backend-brief.md` (KAN-102,
+ * PR #288). Contract: `docs/api.md` § « Visites — laissez-passer QR ». All
+ * routes are live, so we call them directly (no mocks).
  */
 import { api, type ApiEnvelope } from '@/lib/axios'
-
-async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
-  // Endpoints pending backend — skip the API call in dev so the UI renders
-  // immediately from mock data. Remove this early-return once the routes
-  // are deployed.
-  if (import.meta.env.DEV) return mock
-  try {
-    return await call()
-  } catch {
-    return mock
-  }
-}
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -52,7 +41,10 @@ export type Visite = {
   arrived_at?: string | null
   left_at?: string | null
   status: VisiteStatus
-  /** Photo captured by gardien at check-in (data URL or remote URL). */
+  /**
+   * Photo captured by gardien at check-in. In the schema but the upload
+   * (`POST /visites/{id}/photo`) is not wired in MVP — stays null.
+   */
   photo_url?: string | null
   /**
    * Recurring prestataire pass: when true the QR can be re-used across
@@ -95,208 +87,56 @@ export type ScanResult = {
   visit: Visite
   /** What just happened on this scan. */
   action: 'check_in' | 'check_out' | 'rejected'
-  reason?: string
+  /** Reason code when rejected: too_early | expired | cancelled | already_departed. */
+  reason?: string | null
 }
 
-// ─── Mocks ───────────────────────────────────────────────────────────────────
-
-function isoOffset(hours: number): string {
-  const d = new Date()
-  d.setHours(d.getHours() + hours)
-  return d.toISOString()
-}
-
-const MOCK_VISITES: Visite[] = [
-  {
-    id: 1,
-    residence_id: 1,
-    qr_token: 'vst_abc123demo',
-    visitor_name: 'Ahmed Ouazzani',
-    visitor_phone: '+212600112233',
-    type: 'visitor',
-    purpose: 'Visite familiale',
-    host_lot_id: 12,
-    host_lot_numero: 'A-12',
-    host_name: 'Hassan Benali',
-    planned_at: isoOffset(2),
-    arrived_at: null,
-    left_at: null,
-    status: 'planned',
-    created_by_name: 'Hassan Benali',
-    created_at: isoOffset(-1),
-  },
-  {
-    id: 2,
-    residence_id: 1,
-    qr_token: 'vst_def456demo',
-    visitor_name: 'Glovo — livreur',
-    visitor_phone: '+212611223344',
-    type: 'delivery',
-    purpose: 'Livraison repas',
-    host_lot_id: 8,
-    host_lot_numero: 'B-04',
-    host_name: 'Fatima Chraibi',
-    planned_at: null,
-    arrived_at: isoOffset(-0.5),
-    left_at: null,
-    status: 'arrived',
-    created_by_name: 'Gardien lobby',
-    created_at: isoOffset(-0.5),
-  },
-  {
-    id: 3,
-    residence_id: 1,
-    qr_token: 'vst_ghi789demo',
-    visitor_name: 'Cleanly Pro — équipe ménage',
-    visitor_phone: '+212622334455',
-    type: 'prestataire',
-    purpose: 'Nettoyage parties communes (hebdo)',
-    host_lot_id: null,
-    host_lot_numero: null,
-    host_name: 'Syndic',
-    planned_at: isoOffset(-3),
-    arrived_at: isoOffset(-3),
-    left_at: isoOffset(-1),
-    status: 'departed',
-    is_recurring: true,
-    recurrence: 'Mardi & vendredi · 9h-12h',
-    created_by_name: 'Mouad Smac',
-    created_at: isoOffset(-24),
-  },
-  {
-    id: 4,
-    residence_id: 1,
-    qr_token: 'vst_jkl012demo',
-    visitor_name: 'Yassine Berrada',
-    visitor_phone: '+212633445566',
-    type: 'visitor',
-    purpose: 'Rendez-vous personnel',
-    host_lot_id: 5,
-    host_lot_numero: 'A-05',
-    host_name: 'Salma El Idrissi',
-    planned_at: isoOffset(-30),
-    arrived_at: null,
-    left_at: null,
-    status: 'expired',
-    created_by_name: 'Salma El Idrissi',
-    created_at: isoOffset(-48),
-  },
-  {
-    id: 5,
-    residence_id: 1,
-    qr_token: 'vst_mno345demo',
-    visitor_name: 'Réparation Otis',
-    visitor_phone: '+212644556677',
-    type: 'contractor',
-    purpose: 'Maintenance ascenseur',
-    host_lot_id: null,
-    host_lot_numero: null,
-    host_name: 'Syndic',
-    planned_at: isoOffset(4),
-    arrived_at: null,
-    left_at: null,
-    status: 'planned',
-    created_by_name: 'Mouad Smac',
-    created_at: isoOffset(-2),
-  },
-]
-
-const MOCK_STATS: VisitesStats = {
-  today: 4,
-  currently_inside: 1,
-  planned: 2,
-  expired_today: 1,
-}
-
-// ─── API ─────────────────────────────────────────────────────────────────────
+// ─── Gestionnaire API ────────────────────────────────────────────────────────
 
 export async function getVisites(residenceId: number): Promise<Visite[]> {
-  return withMock(
-    async () =>
-      (
-        await api.get<ApiEnvelope<Visite[]>>(
-          `/gestionnaire/residences/${residenceId}/visites`,
-        )
-      ).data.data,
-    MOCK_VISITES,
+  const res = await api.get<ApiEnvelope<Visite[]>>(
+    `/gestionnaire/residences/${residenceId}/visites`,
   )
+  return res.data.data
 }
 
 export async function getVisitesStats(
   residenceId: number,
 ): Promise<VisitesStats> {
-  return withMock(
-    async () =>
-      (
-        await api.get<ApiEnvelope<VisitesStats>>(
-          `/gestionnaire/residences/${residenceId}/visites/stats`,
-        )
-      ).data.data,
-    MOCK_STATS,
+  const res = await api.get<ApiEnvelope<VisitesStats>>(
+    `/gestionnaire/residences/${residenceId}/visites/stats`,
   )
+  return res.data.data
 }
 
 export async function createVisite(input: CreateVisiteInput): Promise<Visite> {
-  return withMock(
-    async () =>
-      (
-        await api.post<ApiEnvelope<Visite>>(
-          `/gestionnaire/residences/${input.residence_id}/visites`,
-          input,
-        )
-      ).data.data,
-    {
-      id: Math.floor(Math.random() * 10_000) + 100,
-      residence_id: input.residence_id,
-      qr_token: `vst_${Math.random().toString(36).slice(2, 14)}`,
-      visitor_name: input.visitor_name,
-      visitor_phone: input.visitor_phone,
-      type: input.type,
-      purpose: input.purpose ?? null,
-      host_lot_id: input.host_lot_id ?? null,
-      host_lot_numero: null,
-      host_name: null,
-      planned_at: input.planned_at ?? null,
-      arrived_at: null,
-      left_at: null,
-      status: 'planned',
-      created_by_name: 'Mouad Smac',
-      created_at: new Date().toISOString(),
-    },
+  const res = await api.post<ApiEnvelope<Visite>>(
+    `/gestionnaire/residences/${input.residence_id}/visites`,
+    input,
   )
+  return res.data.data
 }
 
 export async function cancelVisite(id: number): Promise<Visite> {
-  return withMock(
-    async () =>
-      (
-        await api.post<ApiEnvelope<Visite>>(
-          `/gestionnaire/visites/${id}/cancel`,
-        )
-      ).data.data,
-    {
-      ...MOCK_VISITES[0],
-      id,
-      status: 'cancelled',
-    },
+  const res = await api.post<ApiEnvelope<Visite>>(
+    `/gestionnaire/visites/${id}/cancel`,
   )
+  return res.data.data
 }
 
-/** Manual override scan-in (gardien flow embedded in gestionnaire page). */
+// ─── Gardien / personnel API ──────────────────────────────────────────────────
+
+/**
+ * Scan a visitor QR at the lobby. `token` may be the raw token or the full
+ * `/v/:token` URL (caller strips it). Returns the visit + what happened.
+ * `404` when the token is unknown (caller shows "introuvable"); business
+ * refusals come back `200` with `action='rejected'` + a `reason`.
+ */
 export async function scanVisite(token: string): Promise<ScanResult> {
-  return withMock(
-    async () =>
-      (await api.post<ApiEnvelope<ScanResult>>(`/visites/scan`, { token })).data
-        .data,
-    {
-      visit: {
-        ...MOCK_VISITES[0],
-        status: 'arrived',
-        arrived_at: new Date().toISOString(),
-      },
-      action: 'check_in',
-    },
-  )
+  const res = await api.post<ApiEnvelope<ScanResult>>(`/visites/scan`, {
+    token,
+  })
+  return res.data.data
 }
 
 /**
@@ -304,42 +144,25 @@ export async function scanVisite(token: string): Promise<ScanResult> {
  * Creates the visit AND immediately marks it as arrived in one round-trip.
  */
 export async function walkInVisite(input: CreateVisiteInput): Promise<Visite> {
-  return withMock(
-    async () =>
-      (await api.post<ApiEnvelope<Visite>>(`/visites/walk-in`, input)).data
-        .data,
-    {
-      id: Math.floor(Math.random() * 10_000) + 200,
-      residence_id: input.residence_id,
-      qr_token: `vst_${Math.random().toString(36).slice(2, 14)}`,
-      visitor_name: input.visitor_name,
-      visitor_phone: input.visitor_phone,
-      type: input.type,
-      purpose: input.purpose ?? null,
-      host_lot_id: input.host_lot_id ?? null,
-      host_lot_numero: null,
-      host_name: null,
-      planned_at: null,
-      arrived_at: new Date().toISOString(),
-      left_at: null,
-      status: 'arrived',
-      created_by_name: 'Gardien lobby',
-      created_at: new Date().toISOString(),
-    },
-  )
+  const res = await api.post<ApiEnvelope<Visite>>(`/visites/walk-in`, input)
+  return res.data.data
 }
+
+/** Currently-inside list (status='arrived') for the gardien's residence(s). */
+export async function getActiveVisites(): Promise<Visite[]> {
+  const res = await api.get<ApiEnvelope<Visite[]>>(`/gardien/visites/active`)
+  return res.data.data
+}
+
+// ─── Résident (portail) API ───────────────────────────────────────────────────
 
 /**
  * Visits invited by the currently-authenticated resident. Backend reads the
  * user from the token (no userId arg). Returns recent first.
  */
 export async function getMyVisites(): Promise<Visite[]> {
-  return withMock(
-    async () =>
-      (await api.get<ApiEnvelope<Visite[]>>(`/portail/visites`)).data.data,
-    // Resident dev fallback: a couple of MOCK_VISITES they'd "own"
-    MOCK_VISITES.slice(0, 3),
-  )
+  const res = await api.get<ApiEnvelope<Visite[]>>(`/portail/visites`)
+  return res.data.data
 }
 
 /**
@@ -353,85 +176,49 @@ export async function createMyVisite(input: {
   purpose?: string
   planned_at?: string
 }): Promise<Visite> {
-  return withMock(
-    async () =>
-      (await api.post<ApiEnvelope<Visite>>(`/portail/visites`, input)).data
-        .data,
-    {
-      id: Math.floor(Math.random() * 10_000) + 300,
-      residence_id: 1,
-      qr_token: `vst_${Math.random().toString(36).slice(2, 14)}`,
-      visitor_name: input.visitor_name,
-      visitor_phone: input.visitor_phone,
-      type: input.type,
-      purpose: input.purpose ?? null,
-      host_lot_id: 1,
-      host_lot_numero: 'A-12',
-      host_name: 'Vous',
-      planned_at: input.planned_at ?? null,
-      arrived_at: null,
-      left_at: null,
-      status: 'planned',
-      created_by_name: 'Vous',
-      created_at: new Date().toISOString(),
-    },
-  )
+  const res = await api.post<ApiEnvelope<Visite>>(`/portail/visites`, input)
+  return res.data.data
 }
 
-/** Currently-inside list (visits with status='arrived'). Used by gardien home. */
-export async function getActiveVisites(): Promise<Visite[]> {
-  return withMock(
-    async () =>
-      (await api.get<ApiEnvelope<Visite[]>>(`/gardien/visites/active`)).data
-        .data,
-    MOCK_VISITES.filter((v) => v.status === 'arrived'),
-  )
-}
+// ─── Public / MVP-off endpoints ───────────────────────────────────────────────
 
 /**
- * Wallet pass URLs. Backend signs an Apple `.pkpass` and generates a Google
- * Wallet JWT URL; frontend just opens them. Token is the visit's qr_token.
+ * Wallet pass URLs (Apple `.pkpass` + Google Wallet JWT). Not implemented in
+ * MVP — the backend returns 404, so this rejects and the pass page simply
+ * hides the wallet buttons. Wired ahead of the backend landing it.
  */
 export async function getWalletLinks(token: string): Promise<WalletLinks> {
-  return withMock(
-    async () =>
-      (
-        await api.get<ApiEnvelope<WalletLinks>>(
-          `/public/visites/${token}/wallet`,
-        )
-      ).data.data,
-    {
-      apple_url: `${window.location.origin}/api/public/visites/${token}/apple.pkpass`,
-      google_url: `https://pay.google.com/gp/v/save/${token}-mock-jwt`,
-    },
+  const res = await api.get<ApiEnvelope<WalletLinks>>(
+    `/public/visites/${token}/wallet`,
   )
+  return res.data.data
 }
 
 /**
- * Upload a visitor photo captured by the gardien at check-in. Accepts a base64
- * data URL; backend stores and returns the public URL on the visit object.
+ * Upload a visitor photo captured by the gardien at check-in. Not wired in
+ * MVP (`POST /visites/{id}/photo` → 404); kept for when the endpoint lands.
  */
 export async function uploadVisitePhoto(
   visiteId: number,
   photoDataUrl: string,
 ): Promise<Visite> {
-  return withMock(
-    async () =>
-      (
-        await api.post<ApiEnvelope<Visite>>(`/visites/${visiteId}/photo`, {
-          photo: photoDataUrl,
-        })
-      ).data.data,
-    { ...MOCK_VISITES[0], id: visiteId, photo_url: photoDataUrl },
+  const res = await api.post<ApiEnvelope<Visite>>(
+    `/visites/${visiteId}/photo`,
+    { photo: photoDataUrl },
   )
+  return res.data.data
 }
 
-/** Public lookup by token — used by /v/:token visitor pass page. No auth. */
+/**
+ * Public lookup by token — used by the `/v/:token` visitor pass page. No auth.
+ * Returns `null` when the token is unknown / expired / cancelled (404) so the
+ * page can render its "laissez-passer introuvable" state.
+ */
 export async function getVisitePublic(token: string): Promise<Visite | null> {
-  return withMock(
-    async () =>
-      (await api.get<ApiEnvelope<Visite>>(`/public/visites/${token}`)).data
-        .data,
-    MOCK_VISITES.find((v) => v.qr_token === token) ?? MOCK_VISITES[0],
-  )
+  try {
+    const res = await api.get<ApiEnvelope<Visite>>(`/public/visites/${token}`)
+    return res.data.data
+  } catch {
+    return null
+  }
 }

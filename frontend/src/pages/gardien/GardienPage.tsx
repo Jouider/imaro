@@ -21,7 +21,6 @@ import { Badge } from '@/components/ui/badge'
 import { Wordmark } from '@/components/Wordmark'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { QrScanner } from '@/components/shared/QrScanner'
-import { PhotoCapture } from '@/components/shared/PhotoCapture'
 import { useAuthStore } from '@/stores/authStore'
 import { setStoredToken } from '@/lib/axios'
 import { logout } from '@/services/auth.service'
@@ -29,8 +28,8 @@ import { useInstallPromptGardien } from '@/hooks/useInstallPromptGardien'
 import {
   getActiveVisites,
   scanVisite,
-  uploadVisitePhoto,
   type ScanResult,
+  type Visite,
 } from '@/services/visites.service'
 import { cn } from '@/lib/utils'
 import { WalkInDialog } from './WalkInDialog'
@@ -41,7 +40,6 @@ type ViewState =
   | { kind: 'scan' }
   | { kind: 'walk-in' }
   | { kind: 'manual' }
-  | { kind: 'photo'; result: ScanResult }
   | { kind: 'result'; result: ScanResult }
 
 const sinceFmt = new Intl.RelativeTimeFormat('fr-MA', { numeric: 'auto' })
@@ -60,6 +58,7 @@ export function GardienPage() {
   const { user, clear } = useAuthStore()
   const [view, setView] = useState<ViewState>({ kind: 'home' })
 
+  // Visitors currently inside (status='arrived') — tap one to force check-out.
   const activeQ = useQuery({
     queryKey: ['gardien-active'],
     queryFn: () => getActiveVisites(),
@@ -69,42 +68,24 @@ export function GardienPage() {
 
   const install = useInstallPromptGardien()
 
-  const photoUploadMut = useMutation({
-    mutationFn: ({ id, dataUrl }: { id: number; dataUrl: string }) =>
-      uploadVisitePhoto(id, dataUrl),
-    onSuccess: () => {
-      toast.success(t('gardien.photo.uploaded'))
-    },
-  })
-
   const scanMut = useMutation({
     mutationFn: (token: string) => scanVisite(extractToken(token)),
+    // Photo capture is MVP-off (POST /visites/{id}/photo → 404), so a
+    // successful scan goes straight to the result panel.
     onSuccess: (res) => {
-      // On check-in we prompt for a photo; on check-out / rejected we skip.
-      if (res.action === 'check_in') {
-        setView({ kind: 'photo', result: res })
-      } else {
-        setView({ kind: 'result', result: res })
-      }
+      setView({ kind: 'result', result: res })
       void qc.invalidateQueries({ queryKey: ['gardien-active'] })
     },
-    onError: () => {
+    onError: (err) => {
+      const status = (err as { response?: { status?: number } }).response
+        ?.status
+      // 404 = token unknown/expired ; anything else = network/server.
       setView({
         kind: 'result',
         result: {
-          visit: {
-            id: 0,
-            residence_id: 0,
-            qr_token: '',
-            visitor_name: '—',
-            visitor_phone: '',
-            type: 'visitor',
-            status: 'expired',
-            created_by_name: '',
-            created_at: '',
-          },
+          visit: EMPTY_VISIT,
           action: 'rejected',
-          reason: 'network',
+          reason: status === 404 ? 'unknown' : 'network',
         },
       })
     },
@@ -198,7 +179,7 @@ export function GardienPage() {
               </Button>
             </div>
 
-            {/* Active list */}
+            {/* Currently-inside list */}
             <section>
               <div className="mb-2 flex items-center justify-between px-1">
                 <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/70">
@@ -275,36 +256,6 @@ export function GardienPage() {
             >
               {t('gardien.scanner.cancelScan')}
             </Button>
-          </div>
-        )}
-
-        {view.kind === 'photo' && (
-          <div className="rounded-2xl bg-white/95 p-5 text-foreground shadow-2xl dark:bg-card">
-            <div className="mb-3 text-center">
-              <h2 className="font-display text-xl">
-                {t('gardien.photo.title')}
-              </h2>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {t('gardien.photo.desc')}
-              </p>
-              <p className="mt-2 text-sm font-semibold">
-                → {view.result.visit.visitor_name}
-              </p>
-            </div>
-            <PhotoCapture
-              onCapture={(dataUrl) => {
-                photoUploadMut.mutate({
-                  id: view.result.visit.id,
-                  dataUrl,
-                })
-                setView({ kind: 'result', result: view.result })
-              }}
-              onSkip={() => {
-                toast.info(t('gardien.photo.skipped'))
-                setView({ kind: 'result', result: view.result })
-              }}
-              onCancel={() => setView({ kind: 'home' })}
-            />
           </div>
         )}
 
@@ -402,6 +353,17 @@ function ResultPanel({
       ? 'gardien.scanResult.checkOutTitle'
       : 'gardien.scanResult.checkInTitle'
 
+  // Map backend reason codes to a localized message; fall back to the raw code.
+  const reasonKey = result.reason
+    ? `gardien.scanResult.reason.${result.reason}`
+    : null
+  const reasonLabel = reasonKey
+    ? (() => {
+        const translated = t(reasonKey)
+        return translated === reasonKey ? result.reason : translated
+      })()
+    : null
+
   return (
     <div className="rounded-2xl bg-white/95 p-5 text-foreground shadow-2xl dark:bg-card">
       <div
@@ -435,9 +397,9 @@ function ResultPanel({
         </div>
       )}
 
-      {isRejected && result.reason && (
+      {isRejected && reasonLabel && (
         <p className="mt-3 text-center text-xs text-muted-foreground">
-          {result.reason}
+          {reasonLabel}
         </p>
       )}
 
@@ -452,6 +414,19 @@ function ResultPanel({
       </div>
     </div>
   )
+}
+
+/** Placeholder visit for a rejected scan (no visit payload to show). */
+const EMPTY_VISIT: Visite = {
+  id: 0,
+  residence_id: 0,
+  qr_token: '',
+  visitor_name: '—',
+  visitor_phone: '',
+  type: 'visitor',
+  status: 'expired',
+  created_by_name: '',
+  created_at: '',
 }
 
 /**

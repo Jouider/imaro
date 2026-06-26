@@ -94,6 +94,19 @@ function addFooter(doc: jsPDF, pageNum: number, totalPages: number): void {
   })
 }
 
+/**
+ * Stamp the standard footer (disclaimer + correct `Page x / N`) on every page,
+ * once the final page count is known. Avoids the estimated-vs-actual page-count
+ * mismatch that previously produced footers like "Page 4 / 3" (KAN-104).
+ */
+function stampFooters(doc: jsPDF): void {
+  const total = doc.getNumberOfPages()
+  for (let p = 1; p <= total; p++) {
+    doc.setPage(p)
+    addFooter(doc, p, total)
+  }
+}
+
 function addSectionHeader(doc: jsPDF, title: string, y: number): number {
   doc.setFillColor(27, 79, 114)
   doc.rect(MARGIN, y, CONTENT_W, 8, 'F')
@@ -573,8 +586,9 @@ export function generateJournalPdf(params: JournalPdfParams): void {
   const totalDebit = ecritures.reduce((s, e) => s + e.debit, 0)
   const totalCredit = ecritures.reduce((s, e) => s + e.credit, 0)
 
-  // Split into pages
-  const rowsPerPage = 30
+  // Split into pages. 24 rows (≈7mm each, starting ~y84) keep the last row
+  // clear of the footer at y285 — 30 used to overflow into it (KAN-104).
+  const rowsPerPage = 24
   const totalChunks = Math.max(1, Math.ceil(rows.length / rowsPerPage))
 
   for (let page = 0; page < totalChunks; page++) {
@@ -597,10 +611,9 @@ export function generateJournalPdf(params: JournalPdfParams): void {
         y,
       )
     }
-
-    addFooter(doc, page + 1, totalChunks)
   }
 
+  stampFooters(doc)
   doc.save(`Journal_${annee}.pdf`)
 }
 
@@ -654,9 +667,6 @@ export function generateBalancePdf(params: BalancePdfParams): void {
 
   // Rows per page budget
   const MAX_Y = FOOTER_Y - 20
-  let pageNum = 1
-  // Count total pages (approximate)
-  const estimatedPages = Math.max(1, Math.ceil(balance.length / 28))
 
   for (const ligne of balance) {
     // Section header when class changes
@@ -665,9 +675,7 @@ export function generateBalancePdf(params: BalancePdfParams): void {
 
       // Need space for section header (8) + at least one row (7)
       if (y + 20 > MAX_Y) {
-        addFooter(doc, pageNum, estimatedPages)
         doc.addPage()
-        pageNum++
         addHeader(doc, companyName, title, residenceName, city)
         y = 65
       }
@@ -697,9 +705,7 @@ export function generateBalancePdf(params: BalancePdfParams): void {
 
     // Page break check
     if (y + 7 > MAX_Y) {
-      addFooter(doc, pageNum, estimatedPages)
       doc.addPage()
-      pageNum++
       addHeader(doc, companyName, title, residenceName, city)
       y = 65
       lastClasse = -1 // Force section header reprint
@@ -754,9 +760,7 @@ export function generateBalancePdf(params: BalancePdfParams): void {
 
   // Total row
   if (y + 10 > MAX_Y) {
-    addFooter(doc, pageNum, estimatedPages)
     doc.addPage()
-    pageNum++
     addHeader(doc, companyName, title, residenceName, city)
     y = 65
   }
@@ -775,7 +779,7 @@ export function generateBalancePdf(params: BalancePdfParams): void {
     y,
   )
 
-  addFooter(doc, pageNum, pageNum)
+  stampFooters(doc)
 
   doc.save(`Balance_${annee}.pdf`)
 }
@@ -826,8 +830,6 @@ export function generateGrandLivrePdf(params: GrandLivrePdfParams): void {
   ]
 
   const MAX_Y = FOOTER_Y - 20
-  let pageNum = 1
-  const totalPages = Math.max(1, Math.ceil(ecritures.length / 25))
   let firstPage = true
 
   for (const [numero, { libelle, lignes }] of comptes) {
@@ -845,9 +847,7 @@ export function generateGrandLivrePdf(params: GrandLivrePdfParams): void {
     }
 
     if (y + 25 > MAX_Y) {
-      addFooter(doc, pageNum, totalPages)
       doc.addPage()
-      pageNum++
       addHeader(doc, companyName, title, residenceName, city)
       y = 65
     }
@@ -890,9 +890,7 @@ export function generateGrandLivrePdf(params: GrandLivrePdfParams): void {
       runningBalance += e.debit - e.credit
 
       if (y + 6 > MAX_Y) {
-        addFooter(doc, pageNum, totalPages)
         doc.addPage()
-        pageNum++
         addHeader(doc, companyName, title, residenceName, city)
         y = 65
 
@@ -971,7 +969,7 @@ export function generateGrandLivrePdf(params: GrandLivrePdfParams): void {
     )
   }
 
-  addFooter(doc, pageNum, pageNum)
+  stampFooters(doc)
 
   doc.save(`GrandLivre_${annee}.pdf`)
 }

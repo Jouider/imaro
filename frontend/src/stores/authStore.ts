@@ -8,7 +8,9 @@ export type UserRole =
   | 'agent_recouvrement'
   | 'conseil'
   | 'resident'
-  | 'gardien'
+  /** Field staff (gardien/sécurité/ménage…). Logs in by phone + code; the
+   *  lobby gardien flow lives at /gardien. (KAN-52 / KAN-106) */
+  | 'personnel'
 
 export type AuthUser = {
   id: number

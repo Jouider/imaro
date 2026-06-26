@@ -53,6 +53,7 @@ beforeEach(function () {
 it('manager can create an equipe gestionnaire with limited permissions', function () {
     $response = $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
         'name'          => 'Salma Limited',
+        'cin'           => 'AB123456',
         'email'         => 'salma@test.ma',
         'password'      => 'secret123',
         'role'          => 'assistant',
@@ -204,6 +205,7 @@ it('manager can recreate a gestionnaire with same email after soft-delete', func
     // Create first
     $response = $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
         'name'        => 'Salma',
+        'cin'         => 'AB123456',
         'email'       => 'salma@test.ma',
         'password'    => 'secret123',
         'role'        => 'assistant',
@@ -220,6 +222,7 @@ it('manager can recreate a gestionnaire with same email after soft-delete', func
     // Recreate with same email — must succeed
     $recreateResponse = $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
         'name'        => 'Salma Nouvelle',
+        'cin'         => 'AB123456',
         'email'       => 'salma@test.ma',
         'password'    => 'newsecret123',
         'role'        => 'gestionnaire',
@@ -234,6 +237,7 @@ it('newly created equipe user can login (soft-deleted predecessor does not inter
     // Create a first user, soft-delete it
     $first = $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
         'name'        => 'Salma',
+        'cin'         => 'AB123456',
         'email'       => 'salma@test.ma',
         'password'    => 'oldpass123',
         'role'        => 'assistant',
@@ -247,6 +251,7 @@ it('newly created equipe user can login (soft-deleted predecessor does not inter
     // Recreate with same email but new password
     $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
         'name'        => 'Salma Nouvelle',
+        'cin'         => 'AB123456',
         'email'       => 'salma@test.ma',
         'password'    => 'newpass456',
         'role'        => 'assistant',
@@ -266,6 +271,7 @@ it('newly created equipe user can login (soft-deleted predecessor does not inter
 it('newly created equipe user has must_change_password = true', function () {
     $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
         'name'        => 'Salma',
+        'cin'         => 'AB123456',
         'email'       => 'salma@test.ma',
         'password'    => 'temppass123',
         'role'        => 'assistant',
@@ -279,6 +285,7 @@ it('newly created equipe user has must_change_password = true', function () {
 it('first login of equipe user returns status=first_login (no token)', function () {
     $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
         'name'        => 'Salma',
+        'cin'         => 'AB123456',
         'email'       => 'salma@test.ma',
         'password'    => 'temppass123',
         'role'        => 'assistant',
@@ -299,6 +306,7 @@ it('first login of equipe user returns status=first_login (no token)', function 
 it('activate endpoint sets new password and returns token', function () {
     $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
         'name'        => 'Salma',
+        'cin'         => 'AB123456',
         'email'       => 'salma@test.ma',
         'password'    => 'temppass123',
         'role'        => 'assistant',
@@ -324,6 +332,7 @@ it('activate endpoint sets new password and returns token', function () {
 it('login with new password works after activation', function () {
     $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
         'name'        => 'Salma',
+        'cin'         => 'AB123456',
         'email'       => 'salma@test.ma',
         'password'    => 'temppass123',
         'role'        => 'assistant',
@@ -351,6 +360,7 @@ it('login with new password works after activation', function () {
 it('activate rejects an already-activated account', function () {
     $this->actingAs($this->manager)->postJson('/api/equipe/utilisateurs', [
         'name'        => 'Salma',
+        'cin'         => 'AB123456',
         'email'       => 'salma@test.ma',
         'password'    => 'temppass123',
         'role'        => 'assistant',

@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { isAxiosError } from 'axios'
 import { Camera, X, FileText, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -163,7 +164,16 @@ function SubmitForm({
       setPreviews([])
       void qc.invalidateQueries({ queryKey: ['portail-reclamations'] })
     },
-    onError: () => toast.error(t('portail.reclamations.sendError')),
+    onError: (err) => {
+      let msg: string | undefined
+      if (isAxiosError(err)) {
+        const data = err.response?.data as
+          | { message?: string; errors?: Record<string, string[]> }
+          | undefined
+        msg = data?.message ?? Object.values(data?.errors ?? {})[0]?.[0]
+      }
+      toast.error(msg ?? t('portail.reclamations.sendError'))
+    },
   })
 
   function validate(): boolean {
@@ -172,28 +182,32 @@ function SubmitForm({
     if (form.categorie === 'autre' && !form.customCategorie.trim())
       next.customCategorie = t('portail.reclamations.customRequired')
     if (form.sujet.trim().length < 5)
-      next.sujet = t('portail.reclamations.sujet')
+      next.sujet = t('portail.reclamations.sujetMin')
     if (!form.description.trim())
       next.description = t('portail.reclamations.description')
     setErrors(next)
     return Object.keys(next).length === 0
   }
 
-  /** Resolve the stored category string from the selected key (KAN-55). */
-  function resolveCategorie(): string {
-    if (form.categorie === 'autre') return form.customCategorie.trim()
-    return (
-      CATEGORIES.find((c) => c.key === form.categorie)?.fr ?? form.categorie
-    )
-  }
-
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!validate()) return
+    // The backend validates `categorie` against the enum
+    // (plomberie|electricite|ascenseur|proprete|securite|autre), so we must
+    // send the key — not the localized label. The free-text custom type
+    // (only for "autre") has no dedicated field, so we fold it into the
+    // description to preserve it (KAN-55).
+    const customType =
+      form.categorie === 'autre' && form.customCategorie.trim()
+        ? form.customCategorie.trim()
+        : null
+    const description = customType
+      ? `${customType}\n\n${form.description.trim()}`
+      : form.description.trim()
     mutation.mutate({
-      categorie: resolveCategorie(),
+      categorie: form.categorie,
       sujet: form.sujet.trim(),
-      description: form.description.trim(),
+      description,
       images,
     })
   }

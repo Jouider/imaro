@@ -211,6 +211,7 @@ it('creates a lot and validates tantieme budget', function () {
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->postJson("/api/gestionnaire/residences/{$this->residence->id}/lots", [
             'numero'    => 'A01',
+            'titre_foncier' => 'TF/A01',
             'type'      => 'appartement',
             'etage'     => 1,
             'tantieme'  => 500,
@@ -235,6 +236,7 @@ it('rejects lot creation when tantieme would exceed total', function () {
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->postJson("/api/gestionnaire/residences/{$this->residence->id}/lots", [
             'numero'   => 'A02',
+            'titre_foncier' => 'TF/A02',
             'type'     => 'appartement',
             'etage'    => 1,
             'tantieme' => 200, // would make 1100 > 1000
