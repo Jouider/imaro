@@ -22,7 +22,10 @@ class StoreLotRequest extends FormRequest
 
     public function rules(): array
     {
-        $residenceId = $this->route('residence')?->id;
+        $residence = $this->route('residence');
+        $residenceId = $residence?->id;
+        // KAN-93 — en mode « catégorie », chaque lot doit avoir une catégorie.
+        $categorieRequis = $residence?->mode_cotisation === 'categorie';
 
         return [
             'numero' => [
@@ -32,8 +35,8 @@ class StoreLotRequest extends FormRequest
             ],
             // KAN-94 — titre foncier obligatoire.
             'titre_foncier' => ['required', 'string', 'max:100'],
-            // KAN-93 — catégorie de lot (mode cotisation « par catégorie »).
-            'categorie_lot_id' => ['nullable', Rule::exists('categories_lot', 'id')->where('residence_id', $residenceId)],
+            // KAN-93 — catégorie de lot (obligatoire en mode « par catégorie »).
+            'categorie_lot_id' => [$categorieRequis ? 'required' : 'nullable', Rule::exists('categories_lot', 'id')->where('residence_id', $residenceId)],
             'type' => ['required', 'in:appartement,local_commercial,commerce,parking,cave,bureau,autre'],
             'etage' => ['required', 'integer', 'min:-5', 'max:50'],
             'superficie' => ['nullable', 'numeric', 'min:0', 'max:9999'],
