@@ -40,6 +40,11 @@ class TicketResource extends JsonResource
                 'name' => $this->user->name,
                 'phone' => $this->user->phone,
             ]),
+            'assigned_to' => $this->assigned_to,
+            'assignee' => $this->when($this->relationLoaded('assignedTo') && $this->assignedTo, fn () => [
+                'id' => $this->assignedTo->id,
+                'name' => $this->assignedTo->name,
+            ]),
             'prestataire' => $this->when(
                 $this->relationLoaded('prestataire') && $this->prestataire,
                 fn () => [

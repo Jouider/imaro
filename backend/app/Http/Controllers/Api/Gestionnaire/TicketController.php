@@ -7,12 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Gestionnaire\StoreTicketRequest;
 use App\Http\Requests\Gestionnaire\UpdateTicketRequest;
 use App\Http\Resources\TicketResource;
+use App\Models\Notification;
 use App\Models\Ticket;
 use App\Services\Notifications\PortailPushNotifier;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class TicketController extends Controller
 {
@@ -23,7 +25,7 @@ class TicketController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Ticket::with(['residence', 'lot', 'user', 'prestataire'])
+        $query = Ticket::with(['residence', 'lot', 'user', 'prestataire', 'assignedTo'])
             ->where('tenant_id', config('app.tenant_id'))
             ->whereHas('residence', $this->residenceScope($request));
 
@@ -47,6 +49,11 @@ class TicketController extends Controller
         if ($search = trim((string) $request->query('search'))) {
             $query->where(fn ($q) => $q->where('reference', 'like', "%{$search}%")
                 ->orWhere('description', 'like', "%{$search}%"));
+        }
+
+        // KAN-88 — inbox : tickets assignés à un gestionnaire (`me` = l'utilisateur courant).
+        if ($assignedTo = $request->query('assigned_to')) {
+            $query->where('assigned_to', $assignedTo === 'me' ? $request->user()->id : (int) $assignedTo);
         }
 
         $tickets = $query->latest()->paginate($request->integer('per_page', 15));
@@ -101,7 +108,7 @@ class TicketController extends Controller
     {
         $this->authorizeTicket($request, $ticket);
 
-        $ticket->load(['residence', 'lot', 'user', 'prestataire']);
+        $ticket->load(['residence', 'lot', 'user', 'prestataire', 'assignedTo']);
 
         return response()->json([
             'status' => 'success',
@@ -145,7 +152,7 @@ class TicketController extends Controller
         unset($data['supprimer_images']);
         $statutChange = array_key_exists('statut', $data) && $data['statut'] !== $ticket->getOriginal('statut');
         $ticket->update($data);
-        $ticket->load(['residence', 'lot', 'user', 'prestataire']);
+        $ticket->load(['residence', 'lot', 'user', 'prestataire', 'assignedTo']);
 
         // Push à l'auteur si le statut a changé (KAN-68).
         if ($statutChange) {
@@ -184,6 +191,47 @@ class TicketController extends Controller
             'status' => 'success',
             'message' => 'Ticket clos',
             'data' => ['ticket' => new TicketResource($ticket->load(['residence', 'lot', 'user']))],
+        ]);
+    }
+
+    /**
+     * PATCH /api/gestionnaire/tickets/{ticket}/assign  (KAN-88)
+     * Assigne (ou désassigne avec null) le ticket à un gestionnaire/manager.
+     */
+    public function assign(Request $request, Ticket $ticket): JsonResponse
+    {
+        $this->authorizeTicket($request, $ticket);
+
+        $data = $request->validate([
+            'gestionnaire_id' => [
+                'present', 'nullable', 'integer',
+                Rule::exists('users', 'id')
+                    ->where('tenant_id', config('app.tenant_id'))
+                    ->whereIn('role', ['gestionnaire', 'manager']),
+            ],
+        ]);
+
+        $ticket->update(['assigned_to' => $data['gestionnaire_id']]);
+
+        // Notifie le gestionnaire nouvellement assigné (inbox).
+        if ($data['gestionnaire_id']) {
+            Notification::create([
+                'tenant_id' => $ticket->tenant_id,
+                'user_id' => $data['gestionnaire_id'],
+                'type' => 'ticket',
+                'title' => 'Ticket assigné',
+                'message' => "Le ticket {$ticket->reference} vous a été assigné.",
+                'read' => false,
+                'data' => ['ticket_id' => $ticket->id, 'reference' => $ticket->reference],
+            ]);
+        }
+
+        $ticket->load(['residence', 'lot', 'user', 'prestataire', 'assignedTo']);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $data['gestionnaire_id'] ? 'Ticket assigné' : 'Ticket désassigné',
+            'data' => ['ticket' => new TicketResource($ticket)],
         ]);
     }
 
