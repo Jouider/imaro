@@ -869,6 +869,19 @@ Modes valides : `especes` | `cheque` | `virement` | `mobile`
 
 ---
 
+### POST /api/gestionnaire/paiements/{paiement}/cheque-impaye  *(KAN-85)*
+
+Marque un paiement par **chèque** comme rejeté par la banque. Body optionnel : `motif` (string, max 255).
+
+- `422` si le paiement n'est pas en mode `cheque`, ou déjà `cheque_rejete`.
+- Effet : annule la ligne d'appel de fonds liée (retour `montant_paye`/`statut`), **régularise le solde** du copropriétaire, passe le paiement à `statut = cheque_rejete` (+ `cheque_rejete_at`, `motif_rejet`).
+- **Notification** au résident (in-app portail).
+- **Comptabilité** : une **contre-passation** (`Chèque impayé — …`, 7061 ↔ 5121) apparaît au journal / PDF (Décret 2.23.700).
+
+`PaiementResource` expose désormais `statut` (`valide`|`cheque_rejete`), `cheque_rejete_at`, `motif_rejet`.
+
+---
+
 ### GET /api/gestionnaire/impayes
 
 **Query params :** `residence_id`, `appel_fonds_id`

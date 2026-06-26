@@ -120,6 +120,8 @@ Route::middleware(['app.permission:finances'])->group(function () {
 Route::middleware(['app.permission:finances'])->group(function () {
     Route::get('/paiements', [PaiementController::class, 'index']);
     Route::post('/paiements', [PaiementController::class, 'store']);
+    // KAN-85 — marquer un chèque comme impayé (rejet bancaire)
+    Route::post('/paiements/{paiement}/cheque-impaye', [PaiementController::class, 'chequeImpaye']);
 });
 Route::middleware(['app.permission:recouvrement,finances'])->group(function () {
     Route::get('/impayes', [ImpayeController::class, 'index']);

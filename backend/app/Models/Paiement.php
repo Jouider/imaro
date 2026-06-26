@@ -14,6 +14,7 @@ class Paiement extends Model
     protected $fillable = [
         'tenant_id', 'exercice_id', 'coproprietaire_id', 'appel_fonds_ligne_id',
         'saisi_par', 'montant', 'mode', 'reference',
+        'statut', 'cheque_rejete_at', 'motif_rejet',
         'note', 'recu_pdf_path', 'date_paiement',
         'penalty_amount', 'penalty_calculated_at',
         'mise_en_demeure_sent_at', 'mise_en_demeure_pdf_url',
@@ -25,6 +26,7 @@ class Paiement extends Model
             'montant' => 'float',
             'penalty_amount' => 'float',
             'date_paiement' => 'date',
+            'cheque_rejete_at' => 'datetime',
             'penalty_calculated_at' => 'datetime',
             'mise_en_demeure_sent_at' => 'datetime',
         ];

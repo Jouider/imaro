@@ -34,6 +34,20 @@ class ComptabiliteExportService
                 'piece' => $p->reference ?? 'PAY-'.$p->id,
                 'exercice_id' => $exercice->id,
             ]);
+
+            // Chèque rejeté (KAN-85) : contre-passation (annule l'encaissement).
+            if ($p->statut === 'cheque_rejete') {
+                $entries->push([
+                    'id' => 'R'.$p->id,
+                    'date' => ($p->cheque_rejete_at ?? $p->date_paiement)->toDateString(),
+                    'libelle' => 'Chèque impayé — '.$p->coproprietaire?->user?->name,
+                    'compte_debit' => '7061',
+                    'compte_credit' => '5121',
+                    'montant' => round($p->montant, 2),
+                    'piece' => 'REJ-'.$p->id,
+                    'exercice_id' => $exercice->id,
+                ]);
+            }
         }
 
         $depenses = Depense::where('exercice_id', $exercice->id)
