@@ -19,6 +19,13 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if (token) {
     config.headers.set('Authorization', `Bearer ${token}`)
   }
+  // For multipart uploads, drop the JSON default (and any hardcoded
+  // `multipart/form-data`) so the browser sets `Content-Type` itself, *with*
+  // the boundary. Forcing it manually omits the boundary and the backend
+  // can't parse the files (KAN-96: `media.0: validation.file`).
+  if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+    config.headers.delete('Content-Type')
+  }
   return config
 })
 

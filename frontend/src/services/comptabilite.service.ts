@@ -2292,7 +2292,6 @@ export async function storeDepense(
       const res = await api.post<ApiEnvelope<Depense>>(
         `/gestionnaire/comptabilite/exercices/${exerciceId}/depenses`,
         data,
-        { headers: { 'Content-Type': 'multipart/form-data' } },
       )
       return res.data.data
     },
@@ -2384,7 +2383,6 @@ export async function importFactureIa(
     const res = await api.post<ApiEnvelope<ImportIaResult>>(
       `/gestionnaire/comptabilite/exercices/${exerciceId}/import-ia`,
       fd,
-      { headers: { 'Content-Type': 'multipart/form-data' } },
     )
     return res.data.data
   }, MOCK_IMPORT_IA)
