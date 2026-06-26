@@ -1369,6 +1369,19 @@ SIDs résolus depuis `config('notifications.whatsapp_templates.<name>')`.
 
 ---
 
+## Assistant EMARO — chat IA (KAN-53)
+
+`role:manager|gestionnaire`
+
+### POST /api/ia/chat
+Body : `{ messages: [{ role: "user"|"assistant", content }], residence_id?, language }` → `{ data: { content, citations?: [{ article, loi, excerpt }] } }`.
+
+- Les **4 questions clés** (pénalités, annexes, délai AG, clôture) → **réponse figée** + citation légale (déterministe, sans clé IA), détectées par mots-clés même reformulées. `residence_id` enrichit (config pénalités, prochaine AG).
+- Question **libre** → **Claude** si `ANTHROPIC_API_KEY` configurée (system prompt syndic Maroc / Loi 18-00), sinon un **message d'aide** listant les 4 sujets.
+- `422` si `messages` absent.
+
+---
+
 ## Assistant EMARO — FAQ syndic (KAN-107)
 
 `role:manager|gestionnaire`

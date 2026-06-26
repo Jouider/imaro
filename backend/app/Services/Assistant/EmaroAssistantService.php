@@ -18,35 +18,81 @@ class EmaroAssistantService
 
     public const MISE_EN_DEMEURE_JOURS = 30;     // Loi 18-00 art. 25
 
-    /** @return array<int,array{key:string,question:string,answer:string,refs:array<int,string>}> */
-    public function faq(?Residence $residence = null): array
+    /**
+     * Définition centrale des 4 sujets : question, réponse (enrichie), références,
+     * mots-clés de détection et citation légale. Source de faq() + cannedReply().
+     */
+    private function items(?Residence $residence): array
     {
         return [
-            [
-                'key' => 'penalites_retard',
+            'penalites_retard' => [
                 'question' => 'Comment calculer les pénalités de retard ?',
                 'answer' => $this->penalites($residence),
                 'refs' => ['Loi 18-00 art. 25'],
+                'keywords' => ['penalit', 'retard', 'mise en demeure'],
+                'citation' => ['article' => 'Article 25', 'loi' => 'Loi 18-00', 'excerpt' => 'Après une mise en demeure restée sans effet 30 jours, toutes les provisions de l\'exercice deviennent exigibles.'],
             ],
-            [
-                'key' => 'annexes',
+            'annexes' => [
                 'question' => 'Quelles annexes dois-je générer ?',
                 'answer' => $this->annexes(),
                 'refs' => ['Décret 2.23.700'],
+                'keywords' => ['annexe', 'etat des charges', 'comptes annexes'],
+                'citation' => ['article' => 'Décret 2.23.700', 'loi' => 'Décret 2.23.700', 'excerpt' => 'Les comptes sont présentés selon des annexes normalisées, soumises à l\'AG d\'approbation et conservées 5 ans.'],
             ],
-            [
-                'key' => 'delai_convocation_ag',
+            'delai_convocation_ag' => [
                 'question' => "Quel est le délai légal de convocation d'une AG ?",
                 'answer' => $this->convocationAg($residence),
                 'refs' => ['Loi 18-00 art. 16quinquies', 'art. 18', 'art. 19'],
+                'keywords' => ['convocation', 'delai', 'assemblee', ' ag ', 'preavis'],
+                'citation' => ['article' => 'Article 16quinquies', 'loi' => 'Loi 18-00', 'excerpt' => 'La convocation à l\'assemblée générale est adressée au moins 15 jours avant la réunion.'],
             ],
-            [
-                'key' => 'cloture_exercice',
+            'cloture_exercice' => [
                 'question' => "Comment clôturer l'exercice comptable ?",
                 'answer' => $this->clotureExercice(),
                 'refs' => ['Décret 2.23.700'],
+                'keywords' => ['clotur', 'exercice', 'arreter les comptes', 'cloture'],
+                'citation' => ['article' => 'Décret 2.23.700', 'loi' => 'Décret 2.23.700', 'excerpt' => 'Les comptes de l\'exercice sont arrêtés, approuvés en AG et le résultat reporté ; pièces conservées 5 ans.'],
             ],
         ];
+    }
+
+    /** @return array<int,array{key:string,question:string,answer:string,refs:array<int,string>}> */
+    public function faq(?Residence $residence = null): array
+    {
+        $out = [];
+        foreach ($this->items($residence) as $key => $i) {
+            $out[] = ['key' => $key, 'question' => $i['question'], 'answer' => $i['answer'], 'refs' => $i['refs']];
+        }
+
+        return $out;
+    }
+
+    /**
+     * Réponse figée (déterministe) si la question correspond à l'un des 4 sujets.
+     *
+     * @return null|array{content:string,citations:array<int,array<string,string>>}
+     */
+    public function cannedReply(string $question, ?Residence $residence = null): ?array
+    {
+        $q = ' '.$this->normalize($question).' ';
+
+        foreach ($this->items($residence) as $i) {
+            foreach ($i['keywords'] as $kw) {
+                if (str_contains($q, $this->normalize($kw))) {
+                    return ['content' => $i['answer'], 'citations' => [$i['citation']]];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /** Minuscule + sans accents, pour une détection robuste de mots-clés. */
+    private function normalize(string $s): string
+    {
+        $s = mb_strtolower($s);
+
+        return strtr($s, ['à' => 'a', 'â' => 'a', 'ä' => 'a', 'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e', 'î' => 'i', 'ï' => 'i', 'ô' => 'o', 'ö' => 'o', 'û' => 'u', 'ù' => 'u', 'ü' => 'u', 'ç' => 'c']);
     }
 
     private function penalites(?Residence $residence): string

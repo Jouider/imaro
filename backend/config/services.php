@@ -18,6 +18,13 @@ return [
         'key' => env('POSTMARK_API_KEY'),
     ],
 
+    // Assistant EMARO — chat IA (KAN-53). Sans clé, l'assistant répond aux 4
+    // questions clés (réponses figées) ; avec clé, le free-form passe par Claude.
+    'anthropic' => [
+        'key' => env('ANTHROPIC_API_KEY'),
+        'model' => env('ANTHROPIC_MODEL', 'claude-haiku-4-5-20251001'),
+    ],
+
     'resend' => [
         'key' => env('RESEND_API_KEY'),
     ],
