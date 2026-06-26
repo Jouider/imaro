@@ -15,7 +15,7 @@ class Lot extends Model
     use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
-        'tenant_id', 'residence_id', 'immeuble_id', 'numero', 'titre_foncier', 'etage',
+        'tenant_id', 'residence_id', 'immeuble_id', 'categorie_lot_id', 'numero', 'titre_foncier', 'etage',
         'type', 'superficie', 'tantieme',
     ];
 
@@ -35,6 +35,11 @@ class Lot extends Model
     public function immeuble(): BelongsTo
     {
         return $this->belongsTo(Immeuble::class);
+    }
+
+    public function categorieLot(): BelongsTo
+    {
+        return $this->belongsTo(CategorieLot::class, 'categorie_lot_id');
     }
 
     public function coproprietaires(): HasMany

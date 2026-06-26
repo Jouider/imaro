@@ -32,6 +32,8 @@ class StoreLotRequest extends FormRequest
             ],
             // KAN-94 — titre foncier obligatoire.
             'titre_foncier' => ['required', 'string', 'max:100'],
+            // KAN-93 — catégorie de lot (mode cotisation « par catégorie »).
+            'categorie_lot_id' => ['nullable', Rule::exists('categories_lot', 'id')->where('residence_id', $residenceId)],
             'type' => ['required', 'in:appartement,local_commercial,commerce,parking,cave,bureau,autre'],
             'etage' => ['required', 'integer', 'min:-5', 'max:50'],
             'superficie' => ['nullable', 'numeric', 'min:0', 'max:9999'],

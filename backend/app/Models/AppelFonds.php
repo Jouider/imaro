@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -77,7 +78,10 @@ class AppelFonds extends Model
 
         foreach ($lots as $lot) {
             foreach ($lot->coproprietaires as $copro) {
-                if ($modeCotisation === 'fixe') {
+                if ($modeCotisation === 'categorie') {
+                    // Chaque lot paie la cotisation de sa catégorie (KAN-93).
+                    $montantDu = round((float) ($lot->categorieLot?->cotisation ?? 0), 2);
+                } elseif ($modeCotisation === 'fixe') {
                     $montantDu = $nbLots > 0
                         ? round($this->montant_total / $nbLots, 2)
                         : 0;
@@ -90,10 +94,10 @@ class AppelFonds extends Model
 
                 $this->lignes()->create([
                     'coproprietaire_id' => $copro->id,
-                    'lot_id'            => $lot->id,
-                    'montant_du'        => $montantDu,
-                    'montant_paye'      => 0,
-                    'statut'            => 'impaye',
+                    'lot_id' => $lot->id,
+                    'montant_du' => $montantDu,
+                    'montant_paye' => 0,
+                    'statut' => 'impaye',
                 ]);
             }
         }
@@ -102,16 +106,16 @@ class AppelFonds extends Model
     /**
      * Lots concernés : ceux du GH si défini, sinon tous les lots de la résidence.
      */
-    private function getLotsInScope(): \Illuminate\Database\Eloquent\Collection
+    private function getLotsInScope(): Collection
     {
         if ($this->groupe_habitation_id) {
             return Lot::whereHas('immeuble', function ($q) {
                 $q->where('groupe_habitation_id', $this->groupe_habitation_id);
-            })->with('coproprietaires')->get();
+            })->with('coproprietaires', 'categorieLot')->get();
         }
 
         return Lot::where('residence_id', $this->residence_id)
-            ->with('coproprietaires')
+            ->with('coproprietaires', 'categorieLot')
             ->get();
     }
 

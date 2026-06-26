@@ -14,6 +14,7 @@ use App\Models\Residence;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class LotController extends Controller
 {
@@ -75,6 +76,7 @@ class LotController extends Controller
             'tenant_id' => config('app.tenant_id'),
             'residence_id' => $residence->id,
             'immeuble_id' => $immeuble->id,
+            'categorie_lot_id' => $request->categorie_lot_id,
             'numero' => $request->numero,
             'titre_foncier' => $request->titre_foncier,
             'type' => $request->type,
@@ -191,6 +193,7 @@ class LotController extends Controller
             'lots' => ['required', 'array', 'min:1', 'max:50'],
             'lots.*.numero' => ['required', 'string', 'max:20'],
             'lots.*.titre_foncier' => ['required', 'string', 'max:100'],
+            'lots.*.categorie_lot_id' => ['nullable', Rule::exists('categories_lot', 'id')->where('residence_id', $residence->id)],
             'lots.*.type' => ['required', 'in:appartement,local_commercial,commerce,parking,cave,bureau,autre'],
             'lots.*.etage' => ['nullable', 'integer', 'min:-5', 'max:50'],
             'lots.*.superficie' => ['nullable', 'numeric', 'min:1'],
@@ -235,6 +238,7 @@ class LotController extends Controller
                     'tenant_id' => config('app.tenant_id'),
                     'residence_id' => $residence->id,
                     'immeuble_id' => $immeuble->id,
+                    'categorie_lot_id' => $data['categorie_lot_id'] ?? null,
                     'numero' => $data['numero'],
                     'titre_foncier' => $data['titre_foncier'],
                     'type' => $data['type'],

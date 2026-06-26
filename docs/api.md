@@ -654,6 +654,22 @@ Types valides : `appartement` | `local_commercial` | `parking` | `cave`
 
 > `titre_foncier` est renvoyé dans toutes les réponses lot (liste `GET /lots`, détail, création, import bulk). Idem pour le bulk : `POST /api/gestionnaire/residences/{id}/lots/bulk` exige `lots.*.titre_foncier`.
 
+> **Catégorie de lot (KAN-93)** : un lot peut recevoir `categorie_lot_id` (optionnel, doit appartenir à la résidence) à la création/màj/bulk. Renvoyé dans `LotResource` (`categorie_lot_id` + objet `categorie` si chargé).
+
+---
+
+## Cotisation par catégorie (KAN-93 / KAN-108)
+
+Mode de cotisation **`categorie`** (3ᵉ mode, en plus de `tantieme`/`fixe`) : le manager définit des **catégories de lot** (nom + cotisation) par résidence ; chaque lot rattaché à une catégorie paie sa cotisation. À la génération d'un appel de fonds en mode `categorie`, `montant_du` du lot = cotisation de sa catégorie.
+
+`role:manager|gestionnaire` :
+- `GET  /api/gestionnaire/residences/{residence}/categories-lot` → `[{ id, residence_id, nom, cotisation, nb_lots }]`
+- `POST /api/gestionnaire/residences/{residence}/categories-lot` : `nom` (unique/résidence), `cotisation` (numeric ≥ 0) → `201`
+- `PUT  /api/gestionnaire/categories-lot/{categorie}` : `nom?`, `cotisation?`
+- `DELETE /api/gestionnaire/categories-lot/{categorie}` (les lots rattachés sont détachés)
+
+`residences.mode_cotisation` accepte désormais `tantieme|fixe|categorie`. On rattache un lot via `categorie_lot_id` (cf. POST/PUT lots).
+
 **Response 201**
 
 ---

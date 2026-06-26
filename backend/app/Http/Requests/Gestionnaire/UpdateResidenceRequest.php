@@ -14,14 +14,14 @@ class UpdateResidenceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'            => ['sometimes', 'string', 'max:255'],
-            'address'         => ['sometimes', 'nullable', 'string', 'max:500'],
-            'city'            => ['sometimes', 'string', 'max:100'],
-            'photo'           => ['sometimes', 'nullable', 'string', 'max:500'],
-            'status'          => ['sometimes', 'in:active,archive'],
-            'mode_cotisation' => ['sometimes', 'in:tantieme,fixe'],
-            'montant_fixe'    => ['sometimes', 'nullable', 'numeric', 'min:0'],
-            'jour_echeance'   => ['sometimes', 'nullable', 'integer', 'between:1,28'],
+            'name' => ['sometimes', 'string', 'max:255'],
+            'address' => ['sometimes', 'nullable', 'string', 'max:500'],
+            'city' => ['sometimes', 'string', 'max:100'],
+            'photo' => ['sometimes', 'nullable', 'string', 'max:500'],
+            'status' => ['sometimes', 'in:active,archive'],
+            'mode_cotisation' => ['sometimes', 'in:tantieme,fixe,categorie'],
+            'montant_fixe' => ['sometimes', 'nullable', 'numeric', 'min:0'],
+            'jour_echeance' => ['sometimes', 'nullable', 'integer', 'between:1,28'],
         ];
     }
 

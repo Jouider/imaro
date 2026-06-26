@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\Gestionnaire\AutreRecetteController;
 use App\Http\Controllers\Api\Gestionnaire\BilanOuvertureController;
 use App\Http\Controllers\Api\Gestionnaire\BudgetAnnexe5Controller;
 use App\Http\Controllers\Api\Gestionnaire\BudgetController;
+use App\Http\Controllers\Api\Gestionnaire\CategorieLotController;
 use App\Http\Controllers\Api\Gestionnaire\ComplianceCalendarController;
 use App\Http\Controllers\Api\Gestionnaire\ComptabiliteController;
 use App\Http\Controllers\Api\Gestionnaire\ComptabiliteExportController;
@@ -63,6 +64,9 @@ Route::prefix('residences/{residence}')->group(function () {
     Route::get('/lots', [LotController::class, 'index']);
     Route::post('/lots', [LotController::class, 'store']);
     Route::post('/lots/bulk', [LotController::class, 'bulkStore']);
+    // Catégories de lot (KAN-93 — mode cotisation « par catégorie »)
+    Route::get('/categories-lot', [CategorieLotController::class, 'index']);
+    Route::post('/categories-lot', [CategorieLotController::class, 'store']);
     Route::put('/lots/{lot}', [LotController::class, 'update']);
     Route::delete('/lots/{lot}', [LotController::class, 'destroy']);
     Route::post('/import-soldes', [LotController::class, 'importSoldes']);
@@ -99,6 +103,10 @@ Route::get('/immeubles/{immeuble}/lots', [ImmeubleController::class, 'lots']);
 // Lots — routes plates pour PUT/DELETE (attendues par le frontend)
 Route::put('/lots/{lot}', [LotController::class, 'updateFlat']);
 Route::delete('/lots/{lot}', [LotController::class, 'destroyFlat']);
+
+// Catégories de lot — modification / suppression (KAN-93)
+Route::put('/categories-lot/{categorie}', [CategorieLotController::class, 'update']);
+Route::delete('/categories-lot/{categorie}', [CategorieLotController::class, 'destroy']);
 
 // Copropriétaires — liste globale + création + import bulk + code d'accès
 Route::middleware(['app.permission:coproprietaires'])->group(function () {
