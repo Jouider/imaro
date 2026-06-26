@@ -10,6 +10,7 @@ use App\Models\Residence;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
@@ -89,6 +90,32 @@ it('POST régénère : vide merged_url/generated_at de l\'ancienne génération 
     expect($a->convocations_status)->toBe('pending')
         ->and($a->convocations_merged_path)->toBeNull()
         ->and($a->convocations_generated_at)->toBeNull();
+});
+
+it('POST ignore un re-déclenchement tant que le précédent est "pending" (évite les doublons)', function () {
+    // Régression : un double-clic / retry frontend dispatchait un 2e Job
+    // concurrent qui bouclait sur les mêmes lots → convocations dupliquées.
+    $this->withHeaders($this->auth)->postJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations")->assertStatus(202);
+    expect($this->assemblee->fresh()->convocations_status)->toBe('pending');
+
+    $this->withHeaders($this->auth)->postJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations")->assertStatus(202);
+
+    Queue::assertPushed(GenerateConvocationsJob::class, 1);
+});
+
+it('le Job ignore une exécution concurrente pour la même assemblée (lock) — pas de doublons', function () {
+    Storage::fake('public');
+    $this->withHeaders($this->auth)->postJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations");
+
+    $lock = Cache::lock("convocations-gen-{$this->assemblee->id}", 600);
+    $lock->get(); // simule le Job 1 déjà en cours (lock détenu)
+
+    (new GenerateConvocationsJob($this->assemblee->id))->handle(); // Job 2 concurrent
+
+    expect(Convocation::where('assemblee_id', $this->assemblee->id)->count())->toBe(0)
+        ->and($this->assemblee->fresh()->convocations_status)->toBe('pending');
+
+    $lock->release();
 });
 
 it('GET convocations → ready + merged_url + liste', function () {

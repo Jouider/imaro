@@ -13,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Multitenancy\Jobs\NotTenantAware;
 
@@ -27,6 +28,24 @@ class GenerateConvocationsJob implements NotTenantAware, ShouldQueue
     public function __construct(public int $assembleeId) {}
 
     public function handle(): void
+    {
+        // Si un Job précédent pour la même assemblée tourne encore (redelivery
+        // Horizon après un restart pendant un déploiement, double-clic frontend
+        // avant le guard du contrôleur…), on ne relance pas une génération
+        // concurrente : les deux boucleraient sur les mêmes lots → doublons.
+        $lock = Cache::lock("convocations-gen-{$this->assembleeId}", 600);
+        if (! $lock->get()) {
+            return;
+        }
+
+        try {
+            $this->generate();
+        } finally {
+            $lock->release();
+        }
+    }
+
+    private function generate(): void
     {
         $assemblee = Assemblee::find($this->assembleeId);
         if (! $assemblee) {
