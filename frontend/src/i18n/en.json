@@ -327,7 +327,8 @@
         "interphone": "Intercom / Access",
         "degat_eaux": "Water damage",
         "autre": "Other"
-      }
+      },
+      "sujetMin": "Subject too short (5 characters minimum)"
     },
     "profil": {
       "title": "My profile",
@@ -1689,7 +1690,8 @@
         "lot": "Unit",
         "selectLot": "Unit",
         "categorie": "Category",
-        "descPlaceholder": "Describe the problem…"
+        "descPlaceholder": "Describe the problem…",
+        "descMin": "The description must be at least 10 characters"
       },
       "audit": {
         "tab": "Audit by building",
@@ -1698,6 +1700,21 @@
         "total": "Total",
         "most": "Most",
         "least": "Least"
+      },
+      "categories": {
+        "parties_communes": "Common areas",
+        "ascenseur": "Elevator",
+        "plomberie": "Water / Plumbing",
+        "electricite": "Electricity",
+        "chauffage": "Heating / Air conditioning",
+        "securite": "Security",
+        "proprete": "Cleanliness",
+        "nuisances": "Noise nuisance",
+        "espaces_verts": "Green areas",
+        "parking": "Parking / Garage",
+        "interphone": "Intercom / Access",
+        "degat_eaux": "Water damage",
+        "autre": "Other"
       }
     },
     "dashboard": {

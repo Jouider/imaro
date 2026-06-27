@@ -3,7 +3,26 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { isAxiosError } from 'axios'
-import { Camera, X, FileText, Clock } from 'lucide-react'
+import {
+  Camera,
+  X,
+  FileText,
+  Clock,
+  Building2,
+  ArrowUpDown,
+  Droplet,
+  Zap,
+  Thermometer,
+  ShieldCheck,
+  Sparkles,
+  Volume2,
+  Trees,
+  Car,
+  Phone,
+  Droplets,
+  Tag,
+  type LucideIcon,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -47,6 +66,23 @@ const CATEGORIES: { key: string; fr: string }[] = [
   { key: 'degat_eaux', fr: 'Dégât des eaux' },
   { key: 'autre', fr: 'Autre' },
 ]
+
+/** Icône par catégorie (KAN-55) — repère visuel à gauche de chaque option. */
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  parties_communes: Building2,
+  ascenseur: ArrowUpDown,
+  plomberie: Droplet,
+  electricite: Zap,
+  chauffage: Thermometer,
+  securite: ShieldCheck,
+  proprete: Sparkles,
+  nuisances: Volume2,
+  espaces_verts: Trees,
+  parking: Car,
+  interphone: Phone,
+  degat_eaux: Droplets,
+  autre: Tag,
+}
 
 const MAX_IMAGES = 5
 const MAX_SIZE_BYTES = 5 * 1024 * 1024
@@ -182,7 +218,7 @@ function SubmitForm({
     if (form.categorie === 'autre' && !form.customCategorie.trim())
       next.customCategorie = t('portail.reclamations.customRequired')
     if (form.sujet.trim().length < 5)
-      next.sujet = t('portail.reclamations.sujet')
+      next.sujet = t('portail.reclamations.sujetMin')
     if (!form.description.trim())
       next.description = t('portail.reclamations.description')
     setErrors(next)
@@ -254,11 +290,20 @@ function SubmitForm({
             <SelectValue placeholder={t('portail.reclamations.categorie')} />
           </SelectTrigger>
           <SelectContent>
-            {CATEGORIES.map((cat) => (
-              <SelectItem key={cat.key} value={cat.key}>
-                {t(`portail.reclamations.categories.${cat.key}`)}
-              </SelectItem>
-            ))}
+            {CATEGORIES.map((cat) => {
+              const Icon = CATEGORY_ICONS[cat.key] ?? Tag
+              return (
+                <SelectItem key={cat.key} value={cat.key}>
+                  <span className="flex items-center gap-2.5">
+                    <Icon
+                      className="size-4 shrink-0 text-[var(--color-imaro-primary)]"
+                      aria-hidden="true"
+                    />
+                    {t(`portail.reclamations.categories.${cat.key}`)}
+                  </span>
+                </SelectItem>
+              )
+            })}
           </SelectContent>
         </Select>
         {errors.categorie && (
