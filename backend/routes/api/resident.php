@@ -4,7 +4,6 @@ use App\Http\Controllers\Api\Resident\PortailAnnonceController;
 use App\Http\Controllers\Api\Resident\PortailAnnonceLikeController;
 use App\Http\Controllers\Api\Resident\PortailAssembleeController;
 use App\Http\Controllers\Api\Resident\PortailBankAccountController;
-use App\Http\Controllers\Api\Resident\PortailBonPaiementController;
 use App\Http\Controllers\Api\Resident\PortailDashboardController;
 use App\Http\Controllers\Api\Resident\PortailDocumentController;
 use App\Http\Controllers\Api\Resident\PortailOperationsController;
@@ -36,13 +35,9 @@ Route::get('/visites', [PortailVisiteController::class, 'index']);
 Route::post('/visites', [PortailVisiteController::class, 'store']);
 
 Route::get('/comptes-bancaires', PortailBankAccountController::class);
+// Paiements déclarés par le résident : déclaration + liste/détail (statut, reçu après validation)
+Route::get('/paiements', [PortailPaiementController::class, 'index']);
 Route::post('/paiements', [PortailPaiementController::class, 'store']);
-
-// Bons de paiement résident (KAN-110) — émission + historique + PDF
-Route::get('/bons-paiement', [PortailBonPaiementController::class, 'index']);
-Route::post('/bons-paiement', [PortailBonPaiementController::class, 'store']);
-Route::get('/bons-paiement/{id}', [PortailBonPaiementController::class, 'show']);
-Route::get('/bons-paiement/{id}/pdf', [PortailBonPaiementController::class, 'pdf']);
 // Paiement en ligne (passerelle) — KAN-72 / #251 ; le retour est public (cf. web.php)
 Route::post('/paiement/initier', [PortailPaiementOnlineController::class, 'initier']);
 

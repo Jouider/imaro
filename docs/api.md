@@ -1395,50 +1395,28 @@ SIDs résolus depuis `config('notifications.whatsapp_templates.<name>')`.
 **Résident** :
 - `GET /api/portail/comptes-bancaires` → `{ comptes: [...] }` (RIB/IBAN du syndicat de sa résidence, principal en premier)
 
-## Virements déclarés (résident → validation gestionnaire)
+## Paiements déclarés (résident → validation syndic) — KAN-110
 
-- **Résident** `POST /api/portail/paiements` *(multipart)* : `montant`, `date`, `methode` (`virement|versement|cheque|especes`), **`reference` (obligatoire — KAN-83, string max 255 ; absent ⇒ 422 `errors.reference`)**, `justificatif?` (pdf/jpg/png, ≤5 Mo) → crée un virement **`en_attente`**. `201`.
-- **Gestionnaire** :
-  - `GET /api/gestionnaire/virements-declares` → liste (`coproprietaire_nom`, `lot_numero`, `montant`, `methode`, `statut`, `justificatif_path`…), en_attente d'abord.
-  - `POST /virements-declares/{id}/valider` → crée un **Paiement réel** (exercice actif, `methode→mode`, `versement→virement`) + recalcule le solde + passe `valide`.
-  - `POST /virements-declares/{id}/rejeter` (`motif?`) → passe `rejete`.
+Le résident déclare un paiement effectué ; le syndic le valide **après un délai légal minimal de 24 h** (`validable_at`). À la validation : un **Paiement réel** est créé (recalcul du solde) et un **reçu PDF** est généré — c'est « le bon » que le résident récupère ensuite dans son détail de paiement.
 
----
-
-## Bons de paiement (résident → validation syndic) — KAN-110
-
-Le résident émet un **bon de paiement** ; le syndic le valide après un **délai légal minimal de 24 h**. À la validation : un **ticket de suivi** (module tickets, accessible au résident) est créé et un **PDF** est généré (téléchargeable façon relevé bancaire).
-
-Forme de la ressource (enveloppe standard `{status:'success', data:{…}}`) :
+**Résident** (`role:resident`, prefix `/portail`) :
+- `POST /api/portail/paiements` *(multipart)* : `montant`, `date`, `methode` (`virement|versement|cheque|especes`), **`reference` (obligatoire — KAN-83, string max 255 ; absent ⇒ 422 `errors.reference`)**, `justificatif?` (pdf/jpg/png, ≤5 Mo) → crée un paiement déclaré **`en_attente`**, `validable_at = now + 24 h`. `201` → `{ data: { paiement } }`.
+- `GET /api/portail/paiements` → `{ data: { paiements: [...] } }` (les siens, récents d'abord). Chaque entrée :
 ```json
 {
-  "id": 1,
-  "reference": "BP-2026-001",
-  "compte_emetteur": "Compte chèque · 000335E000304708",
-  "beneficiaire": "Syndic Résidence Al Blanca",
-  "montant": 1500,
-  "motif": "Appel de fonds T1 2026",
-  "statut": "en_attente",        // en_attente | valide | rejete | expire
-  "created_at": "2026-05-02T10:00:00+00:00",
-  "validable_at": "2026-05-03T10:00:00+00:00",
-  "validated_at": null,
-  "ticket_reference": null,       // réf. du ticket de suivi une fois validé (ex. TKT-2026-014)
-  "pdf_url": null                 // dispo une fois validé + PDF généré
+  "id": 1, "reference": "VIR-001", "montant": 300, "methode": "virement",
+  "date": "2026-06-27", "statut": "en_attente",   // en_attente | valide | rejete
+  "validable_at": "2026-06-28T18:07:00+00:00",
+  "validated_at": null, "motif_rejet": null,
+  "justificatif_url": null,
+  "recu_url": null                                  // « le bon » : reçu PDF, dispo une fois validé
 }
 ```
 
-**Résident** (`role:resident`, prefix `/portail`) :
-- `GET /portail/bons-paiement` → `{ data: { bons: BonPaiement[] } }` (les siens uniquement).
-- `POST /portail/bons-paiement` → body `{ compte_emetteur, beneficiaire, montant (>0), motif }`. Crée un bon `en_attente`, `validable_at = now + 24 h`. `201` → `{ data: { bon } }`.
-- `GET /portail/bons-paiement/{id}` → détail (`{ data: { bon } }`, 403 si pas le sien).
-- `GET /portail/bons-paiement/{id}/pdf` → téléchargement du PDF (`404` tant que non validé / PDF non généré).
-
-**Gestionnaire / syndic** (`role:manager|gestionnaire`, permission `finances`) :
-- `GET /gestionnaire/bons-paiement` → liste (résidences accessibles), `en_attente` d'abord.
-- `POST /gestionnaire/bons-paiement/{id}/valider` → **422 avant `validable_at`** (délai 24 h non écoulé) ou si déjà traité ; sinon passe `valide`, crée le ticket de suivi (`ticket_reference`), génère le PDF (async) et notifie le résident.
-- `POST /gestionnaire/bons-paiement/{id}/rejeter` (`motif?`) → passe `rejete`.
-
-> Note : `expire` est prévu dans l'enum statut pour évolution (péremption automatique) — non déclenché actuellement.
+**Gestionnaire** (`role:manager|gestionnaire`, permission `finances`) :
+- `GET /api/gestionnaire/virements-declares` → liste (`coproprietaire_nom`, `lot_numero`, `montant`, `methode`, `statut`, `validable_at`, `justificatif_path`…), `en_attente` d'abord.
+- `POST /virements-declares/{id}/valider` → **422 avant `validable_at`** (délai 24 h non écoulé) ou si déjà traité ; sinon crée un **Paiement réel** (exercice actif, `methode→mode`, `versement→virement`) + recalcule le solde + passe `valide`, génère le reçu PDF (async) et notifie le résident.
+- `POST /virements-declares/{id}/rejeter` (`motif?`) → passe `rejete`.
 
 ---
 
