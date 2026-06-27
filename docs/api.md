@@ -1028,6 +1028,30 @@ La réponse expose `data.annonce.media: [{ type: image|video, url, taille_ko }]`
 
 ---
 
+### POST /api/portail/annonces/{annonce}/like
+
+`auth:sanctum` · `role:resident` — KAN-96. Toggle idempotent du « j'aime » du
+résident courant sur une annonce (visible : même tenant, publiée, sa résidence
+ou globale).
+
+**Body**
+```json
+{ "liked": true }
+```
+
+**Response 200**
+```json
+{ "status": "success", "data": { "likes_count": 12, "liked": true } }
+```
+
+- `404` — annonce introuvable ou non visible par ce résident.
+
+> **Exposition** : `GET /api/portail/annonces` renvoie pour chaque annonce
+> `likes_count` (int) et `liked` (bool, pour l'utilisateur courant).
+> `AnnonceResource` (gestionnaire) expose `likes_count`.
+
+---
+
 ## 11. Prestataires & Contrats
 
 `auth:sanctum` · `role:manager|gestionnaire`

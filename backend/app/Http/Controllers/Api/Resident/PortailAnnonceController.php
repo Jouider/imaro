@@ -25,6 +25,11 @@ class PortailAnnonceController extends Controller
                     $q->orWhere('residence_id', $residenceId);
                 }
             })
+            // KAN-96 — total des likes + like de l'utilisateur courant.
+            ->withCount([
+                'likes',
+                'likes as liked' => fn ($q) => $q->where('user_id', $user->id),
+            ])
             ->orderByDesc('publiee_at')->orderByDesc('created_at')->get()
             ->map(fn ($a) => [
                 'id' => $a->id, 'titre' => $a->titre, 'contenu' => $a->contenu,
@@ -34,6 +39,8 @@ class PortailAnnonceController extends Controller
                     'type' => $m['type'] ?? 'image',
                     'url' => Storage::disk('public')->url($m['path']),
                 ])->values(),
+                'likes_count' => (int) $a->likes_count,
+                'liked' => (bool) $a->liked,
             ]);
 
         return response()->json(['status' => 'success', 'data' => ['annonces' => $annonces]]);

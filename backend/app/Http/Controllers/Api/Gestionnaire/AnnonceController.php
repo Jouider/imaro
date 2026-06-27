@@ -18,6 +18,7 @@ class AnnonceController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = Annonce::with('residence')
+            ->withCount('likes')   // KAN-96 — expose likes_count dans AnnonceResource
             ->where('tenant_id', config('app.tenant_id'));
 
         if ($request->filled('statut')) {

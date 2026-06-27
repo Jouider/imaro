@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Resident\PortailAnnonceController;
+use App\Http\Controllers\Api\Resident\PortailAnnonceLikeController;
 use App\Http\Controllers\Api\Resident\PortailAssembleeController;
 use App\Http\Controllers\Api\Resident\PortailBankAccountController;
 use App\Http\Controllers\Api\Resident\PortailDashboardController;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/dashboard', PortailDashboardController::class);
 Route::get('/operations', PortailOperationsController::class);
 Route::get('/annonces', PortailAnnonceController::class);
+Route::post('/annonces/{annonce}/like', PortailAnnonceLikeController::class);
 Route::get('/assemblees', PortailAssembleeController::class);
 Route::get('/documents', PortailDocumentController::class);
 
