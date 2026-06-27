@@ -41,6 +41,10 @@ class PortailReclamationController extends Controller
                     'priorite' => $t->priorite,
                     'created_at' => $t->created_at?->toIso8601String(),
                     'nb_photos' => is_array($t->images) ? count($t->images) : 0,
+                    // Avis de satisfaction déjà donné (KAN-90) : note >= 3 → satisfait.
+                    'rating' => $t->note_satisfaction === null
+                        ? null
+                        : ($t->note_satisfaction >= 3 ? 'satisfait' : 'insatisfait'),
                 ];
             });
 
@@ -81,5 +85,33 @@ class PortailReclamationController extends Controller
             'message' => 'Réclamation envoyée.',
             'data' => ['id' => $ticket->id],
         ], 201);
+    }
+
+    /**
+     * PATCH /api/portail/reclamations/{id}/rating (KAN-90)
+     * Avis de satisfaction du résident après résolution. Binaire côté front
+     * (satisfait/insatisfait) → stocké dans note_satisfaction (5 / 1).
+     */
+    public function rating(Request $request, int $id): JsonResponse
+    {
+        $data = $request->validate([
+            'rating' => ['required', Rule::in(['satisfait', 'insatisfait'])],
+        ]);
+
+        // findOrFail scoping sur user_id : un 404 couvre "introuvable" et "pas le sien".
+        $ticket = Ticket::where('user_id', $request->user()->id)->findOrFail($id);
+        abort_unless(
+            in_array($ticket->statut, ['resolu', 'clos'], true),
+            422,
+            'La réclamation doit être traitée avant de pouvoir être évaluée.'
+        );
+
+        $ticket->update(['note_satisfaction' => $data['rating'] === 'satisfait' ? 5 : 1]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Merci pour votre retour.',
+            'data' => ['rating' => $data['rating']],
+        ]);
     }
 }

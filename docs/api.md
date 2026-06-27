@@ -939,6 +939,8 @@ Marque un paiement par **chèque** comme rejeté par la banque. Body optionnel :
 
 > **Assignation (KAN-88)** : `PATCH /api/gestionnaire/tickets/{ticket}/assign` body `{ gestionnaire_id: number|null }` (null = désassigner). `gestionnaire_id` doit être un user du tenant de rôle `gestionnaire`/`manager` (sinon 422). Notifie le gestionnaire assigné. `TicketResource` expose `assigned_to` + `assignee {id,name}`. **Inbox** : `GET /tickets?assigned_to=me` (ou un id) filtre les tickets assignés.
 
+> **Avis de satisfaction résident (KAN-90)** : `PATCH /api/portail/reclamations/{id}/rating` body `{ rating: "satisfait" | "insatisfait" }`. Autorisé seulement sur **sa propre** réclamation (404 sinon) et si elle est **`resolu`/`clos`** (422 sinon). Stocké dans `note_satisfaction` (satisfait = 5, insatisfait = 1). `GET /portail/reclamations` renvoie `rating` (`note_satisfaction >= 3 → satisfait`, sinon `insatisfait`, `null` si pas encore noté).
+
 **Response 200**
 ```json
 {
