@@ -10,6 +10,40 @@ class Ticket extends Model
 {
     use HasFactory;
 
+    /**
+     * Catégories de réclamation/ticket (KAN-55). Source unique de vérité,
+     * partagée par la validation résident, la validation gestionnaire et
+     * l'enum DB `tickets.categorie`.
+     *
+     * @var array<int, string>
+     */
+    public const CATEGORIES = [
+        'parties_communes', 'ascenseur', 'plomberie', 'electricite',
+        'chauffage', 'securite', 'proprete', 'nuisances',
+        'espaces_verts', 'parking', 'interphone', 'degat_eaux', 'autre',
+    ];
+
+    /**
+     * Catégorie → libellé FR affiché (la table tickets n'a pas de colonne titre).
+     *
+     * @var array<string, string>
+     */
+    public const CATEGORIE_LABELS = [
+        'parties_communes' => 'Parties communes',
+        'ascenseur'        => 'Ascenseur',
+        'plomberie'        => 'Eau / Plomberie',
+        'electricite'      => 'Électricité',
+        'chauffage'        => 'Chauffage / Climatisation',
+        'securite'         => 'Sécurité',
+        'proprete'         => 'Propreté / Nettoyage',
+        'nuisances'        => 'Nuisances sonores',
+        'espaces_verts'    => 'Espaces verts',
+        'parking'          => 'Parking / Garage',
+        'interphone'       => 'Interphone / Accès',
+        'degat_eaux'       => 'Dégât des eaux',
+        'autre'            => 'Autre',
+    ];
+
     protected $fillable = [
         'tenant_id', 'reference', 'residence_id', 'lot_id', 'user_id', 'assigned_to', 'prestataire_id',
         'categorie', 'description', 'priorite', 'statut',

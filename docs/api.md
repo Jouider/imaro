@@ -973,7 +973,7 @@ Marque un paiement par **chèque** comme rejeté par la banque. Body optionnel :
 |---|---|---|---|
 | `residence_id` | integer | ✅ | |
 | `lot_id` | integer | — | |
-| `categorie` | string | ✅ | `plomberie` \| `electricite` \| `ascenseur` \| `proprete` \| `securite` \| `autre` |
+| `categorie` | string | ✅ | KAN-55 — `parties_communes` \| `ascenseur` \| `plomberie` \| `electricite` \| `chauffage` \| `securite` \| `proprete` \| `nuisances` \| `espaces_verts` \| `parking` \| `interphone` \| `degat_eaux` \| `autre` |
 | `description` | string | ✅ | Min 10, max 2000 chars |
 | `priorite` | string | ✅ | `urgent` \| `normal` \| `faible` |
 | `images[]` | file | — | Max 5 · jpeg/png/webp · max 5 MB/photo |

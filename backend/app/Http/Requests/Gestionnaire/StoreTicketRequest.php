@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Gestionnaire;
 
+use App\Models\Ticket;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreTicketRequest extends FormRequest
 {
@@ -16,7 +18,7 @@ class StoreTicketRequest extends FormRequest
         return [
             'residence_id' => ['required', 'integer', 'exists:residences,id'],
             'lot_id'       => ['nullable', 'integer', 'exists:lots,id'],
-            'categorie'    => ['required', 'in:plomberie,electricite,ascenseur,proprete,securite,autre'],
+            'categorie'    => ['required', Rule::in(Ticket::CATEGORIES)],
             'description'  => ['required', 'string', 'min:10', 'max:2000'],
             'priorite'     => ['required', 'in:urgent,normal,faible'],
             'images'       => ['nullable', 'array', 'max:5'],
