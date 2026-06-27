@@ -26,9 +26,9 @@ import {
   getAnnonces,
   getOperations,
   getAssembleesPortail,
-  type Annonce,
   type AssembleePortail,
 } from '@/services/portail.service'
+import { AnnoncePostCard } from '@/components/portail/AnnoncePostCard'
 import { cn } from '@/lib/utils'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import { PullRefreshIndicator } from '@/components/portail/PullRefreshIndicator'
@@ -48,37 +48,6 @@ function formatDate(iso: string): string {
     month: '2-digit',
     year: 'numeric',
   })
-}
-
-function AnnonceCard({ annonce }: { annonce: Annonce }) {
-  const isUrgente = annonce.priorite === 'urgente'
-  return (
-    <Card
-      className={cn(
-        'overflow-hidden',
-        isUrgente && 'border-l-4 border-l-[var(--color-imaro-accent)]',
-      )}
-    >
-      <CardContent className="pt-4 pb-4">
-        <div className="flex items-start justify-between gap-2">
-          <p className="font-semibold text-base leading-snug">
-            {annonce.titre}
-          </p>
-          {isUrgente && (
-            <span className="shrink-0 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700">
-              Urgent
-            </span>
-          )}
-        </div>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          {formatDate(annonce.date)}
-        </p>
-        <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-          {annonce.contenu}
-        </p>
-      </CardContent>
-    </Card>
-  )
 }
 
 export function PortailHomePage() {
@@ -304,7 +273,7 @@ export function PortailHomePage() {
         ) : (
           <div className="space-y-3">
             {annonces.slice(0, 3).map((a) => (
-              <AnnonceCard key={a.id} annonce={a} />
+              <AnnoncePostCard key={a.id} annonce={a} />
             ))}
             {annonces.length > 3 && (
               <Link

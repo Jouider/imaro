@@ -34,6 +34,10 @@ export type Annonce = {
   date: string
   priorite: 'normale' | 'urgente'
   media?: AnnonceMedia[]
+  /** Nombre total de « j'aime » sur l'annonce (KAN-96). */
+  likes_count?: number
+  /** L'utilisateur courant a-t-il aimé cette annonce. */
+  liked?: boolean
 }
 
 export type DashboardData = {
@@ -160,6 +164,8 @@ const MOCK_ANNONCES: Annonce[] = [
       "L'ascenseur sera hors service du 20 au 22 mai 2026 pour maintenance préventive annuelle. Merci de votre compréhension.",
     date: '2026-05-10',
     priorite: 'urgente',
+    likes_count: 12,
+    liked: false,
   },
   {
     id: 2,
@@ -168,6 +174,8 @@ const MOCK_ANNONCES: Annonce[] = [
       "L'assemblée générale ordinaire se tiendra le samedi 31 mai 2026 à 10h00 dans la salle commune du rez-de-chaussée. Ordre du jour : approbation des comptes 2025, budget prévisionnel 2026.",
     date: '2026-05-08',
     priorite: 'normale',
+    likes_count: 5,
+    liked: true,
   },
   {
     id: 3,
@@ -176,6 +184,8 @@ const MOCK_ANNONCES: Annonce[] = [
       'Le nettoyage renforcé des couloirs et halls aura lieu chaque mercredi matin à partir du 15 mai 2026.',
     date: '2026-05-05',
     priorite: 'normale',
+    likes_count: 0,
+    liked: false,
   },
 ]
 
@@ -297,6 +307,26 @@ export async function getAnnonces(): Promise<Annonce[]> {
       await api.get<ApiEnvelope<{ annonces: Annonce[] }>>('/portail/annonces')
     return res.data.data.annonces
   }, MOCK_ANNONCES)
+}
+
+/**
+ * Aimer / ne plus aimer une annonce (KAN-96). Toggle : on envoie l'état
+ * souhaité, le backend renvoie le compteur et l'état réels.
+ * Endpoint attendu : POST /portail/annonces/{id}/like { liked } (cf. issue backend).
+ */
+export async function toggleAnnonceLike(
+  id: number,
+  liked: boolean,
+): Promise<{ likes_count: number; liked: boolean }> {
+  return withMock(
+    async () => {
+      const res = await api.post<
+        ApiEnvelope<{ likes_count: number; liked: boolean }>
+      >(`/portail/annonces/${id}/like`, { liked })
+      return res.data.data
+    },
+    { likes_count: liked ? 1 : 0, liked },
+  )
 }
 
 export async function getAssembleesPortail(): Promise<AssembleePortail[]> {

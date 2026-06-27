@@ -204,7 +204,10 @@
       "payer": "Pay →",
       "convoquee": "Convened",
       "inviteVisitor": "Invite a visitor",
-      "inviteVisitorDesc": "Generate a single-use QR for a relative, courier or contractor."
+      "inviteVisitorDesc": "Generate a single-use QR for a relative, courier or contractor.",
+      "urgent": "Urgent",
+      "like": "Like",
+      "unlike": "Unlike"
     },
     "actualites": {
       "title": "News",
