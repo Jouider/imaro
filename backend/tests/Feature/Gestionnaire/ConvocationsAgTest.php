@@ -119,6 +119,18 @@ it('le Job ignore une exécution concurrente pour la même assemblée (lock) —
     $lock->release();
 });
 
+it('GET sur une AG jamais générée ne renvoie pas "pending" (sinon spinner infini, bouton Générer masqué)', function () {
+    // Régression : convocations_status = null (aucune génération lancée) était
+    // mappé en "pending" → le front affichait « Génération en cours… » à l'infini
+    // alors que rien ne tournait, sans jamais montrer le bouton « Générer ».
+    expect($this->assemblee->convocations_status)->toBeNull();
+
+    $this->withHeaders($this->auth)->getJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations")
+        ->assertStatus(200)
+        ->assertJsonPath('data.status', 'ready')
+        ->assertJsonPath('data.convocations', []);
+});
+
 it('GET convocations → ready + merged_url + liste', function () {
     Storage::fake('public');
     (new GenerateConvocationsJob($this->assemblee->id))->handle();
