@@ -76,6 +76,18 @@ class AssembleeController extends Controller
     {
         $this->authorizeAssemblee($request, $assemblee);
 
+        // Un clic répété (ou un retry frontend) pendant qu'une génération tourne
+        // déjà déclenchait un 2e Job concurrent : les deux bouclaient sur les
+        // mêmes lots → convocations dupliquées tant que l'un des deux n'avait
+        // pas fini sa purge. On ignore le re-déclenchement tant que c'est "pending".
+        if ($assemblee->convocations_status === 'pending') {
+            $count = Lot::withoutGlobalScope('tenant')
+                ->where('residence_id', $assemblee->residence_id)
+                ->count();
+
+            return response()->json(['status' => 'accepted', 'count' => $count], 202);
+        }
+
         // Le job génère une convocation par lot, copro assigné ou non
         // ("Non assigné") : le count annoncé doit refléter ça (pas seulement
         // les lots avec coproprietairePrincipal, sinon "accepted count:0"
