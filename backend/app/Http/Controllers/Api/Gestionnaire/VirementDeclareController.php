@@ -8,6 +8,7 @@ use App\Jobs\GenerateRecuPaiementJob;
 use App\Models\Exercice;
 use App\Models\Paiement;
 use App\Models\VirementDeclare;
+use App\Services\Notifications\PortailPushNotifier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -47,6 +48,7 @@ class VirementDeclareController extends Controller
     {
         $virement = $this->findAccessible($request, $id);
         abort_if($virement->statut !== 'en_attente', 422, 'Ce virement a déjà été traité.');
+        abort_unless($virement->estValidable(), 422, 'Validation impossible avant le délai légal de 24 h.');
 
         DB::transaction(function () use ($request, $virement) {
             $copro = $virement->coproprietaire;
@@ -77,6 +79,9 @@ class VirementDeclareController extends Controller
 
         // Reçu PDF généré en asynchrone (jamais dans le cycle requête — cf. CLAUDE.md).
         GenerateRecuPaiementJob::dispatch($virement->paiement_id);
+
+        // Notification résident : paiement validé, reçu disponible.
+        app(PortailPushNotifier::class)->paiementValide($virement->coproprietaire, $virement->reference);
 
         return response()->json([
             'status' => 'success',
@@ -127,6 +132,7 @@ class VirementDeclareController extends Controller
             'reference' => $v->reference,
             'justificatif_path' => $v->justificatif_path,
             'statut' => $v->statut,
+            'validable_at' => $v->validable_at?->toIso8601String(),
             'valide_par' => $v->validePar?->name,
             'date_validation' => $v->date_validation?->toDateTimeString(),
         ];
