@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import {
   ArrowDown,
   ArrowUp,
@@ -9,6 +10,8 @@ import {
   Eye,
   Wallet,
   X,
+  Receipt,
+  ChevronRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -516,6 +519,29 @@ export function PortailFinancesPage() {
       <h1 className="text-xl font-semibold text-[var(--color-imaro-primary)]">
         {t('portail.finances.title', { defaultValue: 'Finances' })}
       </h1>
+
+      {/* Bons de paiement — entry to the dedicated section (KAN-110) */}
+      <Link
+        to="/portail/bons-paiement"
+        className="flex items-center gap-3 rounded-xl border border-[var(--color-imaro-primary)]/15 bg-gradient-to-br from-[var(--color-imaro-primary)]/5 to-transparent p-3.5 transition-transform active:scale-[0.99]"
+      >
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-imaro-primary)]/10 text-[var(--color-imaro-primary)]">
+          <Receipt className="size-5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-foreground">
+            {t('portail.bonsPaiement.title', {
+              defaultValue: 'Bons de paiement',
+            })}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {t('portail.bonsPaiement.entryDesc', {
+              defaultValue: 'Émettre un ordre de paiement et voir l’historique',
+            })}
+          </p>
+        </div>
+        <ChevronRight className="size-4 shrink-0 text-muted-foreground rtl:rotate-180" />
+      </Link>
 
       {/* Main tab toggle */}
       <div className="flex gap-1 rounded-xl bg-muted p-1">

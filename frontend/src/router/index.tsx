@@ -7,6 +7,7 @@ import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { PortailLayout } from '@/pages/portail/PortailLayout'
 import { PortailHomePage } from '@/pages/portail/PortailHomePage'
 import { PortailFinancesPage } from '@/pages/portail/PortailFinancesPage'
+import { PortailBonsPaiementPage } from '@/pages/portail/PortailBonsPaiementPage'
 import { PortailReclamationsPage } from '@/pages/portail/PortailReclamationsPage'
 import { PortailProfilPage } from '@/pages/portail/PortailProfilPage'
 import { PortailActualitesPage } from '@/pages/portail/PortailActualitesPage'
@@ -94,6 +95,7 @@ export const router = createBrowserRouter([
           { index: true, element: <PortailHomePage /> },
           { path: 'actualites', element: <PortailActualitesPage /> },
           { path: 'finances', element: <PortailFinancesPage /> },
+          { path: 'bons-paiement', element: <PortailBonsPaiementPage /> },
           { path: 'reclamations', element: <PortailReclamationsPage /> },
           { path: 'visiteurs', element: <PortailVisiteursPage /> },
           { path: 'profil', element: <PortailProfilPage /> },

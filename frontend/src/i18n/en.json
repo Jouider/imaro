@@ -155,7 +155,9 @@
     "save": "Save",
     "close": "Close",
     "show": "Show",
-    "hide": "Hide"
+    "hide": "Hide",
+    "continue": "Continue",
+    "back": "Back"
   },
   "portail": {
     "nav": {
@@ -401,6 +403,37 @@
       "settingDesc": "Face ID / fingerprint when opening the app.",
       "enabled": "Biometric unlock enabled.",
       "enableFailed": "Biometric authentication failed."
+    },
+    "bonsPaiement": {
+      "title": "Payment vouchers",
+      "subtitle": "Issue a payment order to the syndic and find your history.",
+      "entryDesc": "Issue a payment order and view history",
+      "empty": "No payment voucher",
+      "new": "New voucher",
+      "from": "Source account",
+      "to": "Beneficiary",
+      "montant": "Amount",
+      "motif": "Reason",
+      "motifPlaceholder": "e.g. Q1 2026 funds call",
+      "delaiNotice": "Validation by the syndic is possible after a 24h delay.",
+      "validableLe": "Validatable on",
+      "validatedWithTicket": "Validated. Tracking ticket",
+      "download": "Download",
+      "downloadPending": "Available after validation",
+      "step1": "Sender & beneficiary",
+      "step2": "Amount",
+      "step3": "Reason",
+      "step4": "Confirmation",
+      "stepOf": "Step {{current}} of {{total}}",
+      "emit": "Issue voucher",
+      "created": "Payment voucher issued",
+      "createError": "Issuance failed, try again",
+      "statut": {
+        "en_attente": "Pending",
+        "valide": "Validated",
+        "rejete": "Rejected",
+        "expire": "Expired"
+      }
     }
   },
   "home": {
