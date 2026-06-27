@@ -48,7 +48,6 @@ class VirementDeclareController extends Controller
     {
         $virement = $this->findAccessible($request, $id);
         abort_if($virement->statut !== 'en_attente', 422, 'Ce virement a déjà été traité.');
-        abort_unless($virement->estValidable(), 422, 'Validation impossible avant le délai légal de 24 h.');
 
         DB::transaction(function () use ($request, $virement) {
             $copro = $virement->coproprietaire;
@@ -132,7 +131,6 @@ class VirementDeclareController extends Controller
             'reference' => $v->reference,
             'justificatif_path' => $v->justificatif_path,
             'statut' => $v->statut,
-            'validable_at' => $v->validable_at?->toIso8601String(),
             'valide_par' => $v->validePar?->name,
             'date_validation' => $v->date_validation?->toDateTimeString(),
         ];

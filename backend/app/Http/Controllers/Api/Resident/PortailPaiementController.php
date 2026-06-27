@@ -16,9 +16,6 @@ use Illuminate\Support\Facades\Storage;
  */
 class PortailPaiementController extends Controller
 {
-    /** Délai légal minimal avant validation par le syndic. */
-    private const DELAI_VALIDATION_HEURES = 24;
-
     /**
      * GET /api/portail/paiements
      * Historique des paiements déclarés par le résident (avec reçu si validé).
@@ -44,7 +41,7 @@ class PortailPaiementController extends Controller
     /**
      * POST /api/portail/paiements
      * Déclaration d'un paiement effectué (avec justificatif). Crée un virement
-     * « en_attente » validable par le syndic après 24 h.
+     * « en_attente » que le syndic valide ensuite.
      */
     public function store(Request $request): JsonResponse
     {
@@ -76,12 +73,11 @@ class PortailPaiementController extends Controller
             'reference' => $data['reference'],
             'justificatif_path' => $path,
             'statut' => 'en_attente',
-            'validable_at' => now()->addHours(self::DELAI_VALIDATION_HEURES),
         ]);
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Paiement déclaré. Il sera validé par votre syndic après 24 h.',
+            'message' => 'Paiement déclaré. Il sera validé par votre syndic.',
             'data' => ['paiement' => $this->present($virement)],
         ], 201);
     }
@@ -98,7 +94,6 @@ class PortailPaiementController extends Controller
             'methode' => $v->methode,
             'date' => $v->date_declaration?->toDateString(),
             'statut' => $v->statut,                       // en_attente | valide | rejete
-            'validable_at' => $v->validable_at?->toIso8601String(),
             'validated_at' => $v->date_validation?->toIso8601String(),
             'motif_rejet' => $v->motif_rejet,
             'justificatif_url' => $v->justificatif_path ? Storage::disk('public')->url($v->justificatif_path) : null,

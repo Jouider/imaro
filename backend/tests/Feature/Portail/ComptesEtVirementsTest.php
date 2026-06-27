@@ -100,29 +100,17 @@ it('valider un virement (copro à jour) crédite le solde + génère le reçu', 
     Queue::assertPushed(GenerateRecuPaiementJob::class);
 });
 
-it('un paiement déclaré fixe validable_at à +24 h (KAN-110)', function () {
-    $this->withHeaders($this->resAuth)->postJson('/api/portail/paiements', [
-        'montant' => 300, 'date' => '2026-06-27', 'methode' => 'virement', 'reference' => 'VIR-024',
-    ])->assertStatus(201)->assertJsonPath('data.paiement.statut', 'en_attente');
-
-    $v = VirementDeclare::where('coproprietaire_id', $this->copro->id)->first();
-    expect($v->validable_at)->not->toBeNull()
-        ->and($v->validable_at->timestamp)->toBeGreaterThan(now()->addHours(23)->timestamp)
-        ->and($v->estValidable())->toBeFalse();
-});
-
-it('le gestionnaire NE PEUT PAS valider avant le délai de 24 h (422)', function () {
+it('le gestionnaire peut valider un paiement déclaré immédiatement (pas de délai 24 h)', function () {
+    // Déclaration fraîche (à l'instant) : aucune attente imposée.
     $v = VirementDeclare::create([
         'tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'coproprietaire_id' => $this->copro->id,
-        'montant' => 300, 'date_declaration' => '2026-06-27', 'methode' => 'virement', 'statut' => 'en_attente',
-        'validable_at' => now()->addHours(24),
+        'montant' => 300, 'date_declaration' => now()->toDateString(), 'methode' => 'virement',
+        'reference' => 'VIR-024', 'statut' => 'en_attente',
     ]);
 
     $this->withHeaders($this->gestAuth)->postJson("/api/gestionnaire/virements-declares/{$v->id}/valider")
-        ->assertStatus(422);
-
-    expect($v->fresh()->statut)->toBe('en_attente');
-    Queue::assertNotPushed(GenerateRecuPaiementJob::class);
+        ->assertStatus(200)
+        ->assertJsonPath('data.statut', 'valide');
 });
 
 it('le résident liste ses paiements déclarés ; le reçu apparaît après validation', function () {
@@ -130,7 +118,7 @@ it('le résident liste ses paiements déclarés ; le reçu apparaît après vali
     $v = VirementDeclare::create([
         'tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'coproprietaire_id' => $this->copro->id,
         'montant' => 300, 'date_declaration' => '2026-06-27', 'methode' => 'virement', 'reference' => 'VIR-025',
-        'statut' => 'en_attente', 'validable_at' => now()->subHour(),
+        'statut' => 'en_attente',
     ]);
 
     // En attente → pas de reçu.

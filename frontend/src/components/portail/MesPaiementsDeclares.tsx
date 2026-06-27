@@ -208,23 +208,13 @@ function DetailSheet({
           />
         </dl>
 
-        {/* Délai 24 h / rejet */}
-        {paiement.statut === 'en_attente' && paiement.validable_at ? (
+        {/* En attente de validation / rejet */}
+        {paiement.statut === 'en_attente' ? (
           <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-800 dark:bg-amber-950/20">
             <Clock className="mt-0.5 size-4 shrink-0" />
             <p className="text-xs leading-relaxed">
-              {t('portail.bonsPaiement.delaiNotice', {
-                defaultValue:
-                  'Validation par le syndic possible après un délai de 24 h.',
-              })}{' '}
-              {t('portail.bonsPaiement.validableLe', {
-                defaultValue: 'Validable le',
-              })}{' '}
-              {new Date(paiement.validable_at).toLocaleString('fr-MA', {
-                day: '2-digit',
-                month: 'short',
-                hour: '2-digit',
-                minute: '2-digit',
+              {t('portail.paiements.enAttenteNotice', {
+                defaultValue: 'En attente de validation par le syndic.',
               })}
             </p>
           </div>
