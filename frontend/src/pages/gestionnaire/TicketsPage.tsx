@@ -90,15 +90,21 @@ const PRIORITE_STYLES: Record<string, string> = {
 const STATUTS = ['ouvert', 'en_cours', 'resolu', 'clos'] as const
 const PRIORITES = ['urgent', 'normal', 'faible'] as const
 
+// Clés d'énumération backend (Ticket::CATEGORIES, KAN-55/#311) — libellés via i18n.
 const CATEGORIES = [
-  'Plomberie',
-  'Électricité',
-  'Ascenseur',
-  'Sécurité',
-  'Ménage',
-  'Espaces verts',
-  'Toiture',
-  'Autre',
+  'parties_communes',
+  'ascenseur',
+  'plomberie',
+  'electricite',
+  'chauffage',
+  'securite',
+  'proprete',
+  'nuisances',
+  'espaces_verts',
+  'parking',
+  'interphone',
+  'degat_eaux',
+  'autre',
 ] as const
 
 type StatutKey = (typeof STATUTS)[number]
@@ -929,7 +935,7 @@ export function TicketsPage() {
   const [createForm, setCreateForm] = useState({
     residence_id: '',
     lot_id: '',
-    categorie: 'Plomberie',
+    categorie: 'plomberie',
     priorite: 'normal' as Ticket['priorite'],
     description: '',
   })
@@ -989,7 +995,7 @@ export function TicketsPage() {
       setCreateForm({
         residence_id: '',
         lot_id: '',
-        categorie: 'Plomberie',
+        categorie: 'plomberie',
         priorite: 'normal',
         description: '',
       })
@@ -1392,7 +1398,9 @@ export function TicketsPage() {
                   <SelectContent>
                     {CATEGORIES.map((c) => (
                       <SelectItem key={c} value={c}>
-                        {c}
+                        {t(`gestionnaire.tickets.categories.${c}`, {
+                          defaultValue: c,
+                        })}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -1439,6 +1447,12 @@ export function TicketsPage() {
                 })}
                 className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all focus:border-[var(--color-imaro-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-imaro-primary)]/10 dark:bg-card"
               />
+              {createForm.description.trim().length > 0 &&
+                createForm.description.trim().length < 10 && (
+                  <p className="text-xs text-destructive">
+                    {t('gestionnaire.tickets.form.descMin')}
+                  </p>
+                )}
             </div>
           </div>
 
@@ -1456,6 +1470,7 @@ export function TicketsPage() {
                 !createForm.residence_id ||
                 !createForm.lot_id ||
                 !createForm.description.trim() ||
+                createForm.description.trim().length < 10 ||
                 createMutation.isPending
               }
             >

@@ -328,7 +328,8 @@
         "interphone": "الإنتركم / الولوج",
         "degat_eaux": "أضرار المياه",
         "autre": "آخر"
-      }
+      },
+      "sujetMin": "الموضوع قصير جدًا (5 أحرف على الأقل)"
     },
     "profil": {
       "title": "ملفي الشخصي",
@@ -1692,7 +1693,8 @@
         "lot": "الوحدة",
         "selectLot": "الوحدة",
         "categorie": "الفئة",
-        "descPlaceholder": "صف المشكلة…"
+        "descPlaceholder": "صف المشكلة…",
+        "descMin": "يجب أن يحتوي الوصف على 10 أحرف على الأقل"
       },
       "audit": {
         "tab": "تدقيق حسب الإقامة",
@@ -1701,6 +1703,21 @@
         "total": "المجموع",
         "most": "الأكثر",
         "least": "الأقل"
+      },
+      "categories": {
+        "parties_communes": "الأجزاء المشتركة",
+        "ascenseur": "المصعد",
+        "plomberie": "الماء / السباكة",
+        "electricite": "الكهرباء",
+        "chauffage": "التدفئة / التكييف",
+        "securite": "الأمن",
+        "proprete": "النظافة",
+        "nuisances": "الإزعاج الصوتي",
+        "espaces_verts": "المساحات الخضراء",
+        "parking": "موقف السيارات / المرآب",
+        "interphone": "الإنتركم / الولوج",
+        "degat_eaux": "أضرار المياه",
+        "autre": "آخر"
       }
     },
     "documents": {

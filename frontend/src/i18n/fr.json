@@ -328,7 +328,8 @@
         "interphone": "Interphone / Accès",
         "degat_eaux": "Dégât des eaux",
         "autre": "Autre"
-      }
+      },
+      "sujetMin": "Sujet trop court (5 caractères minimum)"
     },
     "profil": {
       "title": "Mon profil",
@@ -1692,7 +1693,8 @@
         "lot": "Lot",
         "selectLot": "Lot",
         "categorie": "Catégorie",
-        "descPlaceholder": "Décrivez le problème…"
+        "descPlaceholder": "Décrivez le problème…",
+        "descMin": "La description doit contenir au moins 10 caractères"
       },
       "audit": {
         "tab": "Audit par résidence",
@@ -1701,6 +1703,21 @@
         "total": "Total",
         "most": "Le plus",
         "least": "Le moins"
+      },
+      "categories": {
+        "parties_communes": "Parties communes",
+        "ascenseur": "Ascenseur",
+        "plomberie": "Eau / Plomberie",
+        "electricite": "Électricité",
+        "chauffage": "Chauffage / Climatisation",
+        "securite": "Sécurité",
+        "proprete": "Propreté / Nettoyage",
+        "nuisances": "Nuisances sonores",
+        "espaces_verts": "Espaces verts",
+        "parking": "Parking / Garage",
+        "interphone": "Interphone / Accès",
+        "degat_eaux": "Dégât des eaux",
+        "autre": "Autre"
       }
     },
     "dashboard": {
