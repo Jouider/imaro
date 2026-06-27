@@ -207,7 +207,8 @@
       "inviteVisitorDesc": "Générez un QR à usage unique pour un proche, un livreur ou un intervenant.",
       "urgent": "Urgent",
       "like": "J'aime",
-      "unlike": "Je n'aime plus"
+      "unlike": "Je n'aime plus",
+      "likeError": "Action impossible, réessayez"
     },
     "actualites": {
       "title": "Actualités",

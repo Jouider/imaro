@@ -207,7 +207,8 @@
       "inviteVisitorDesc": "Generate a single-use QR for a relative, courier or contractor.",
       "urgent": "Urgent",
       "like": "Like",
-      "unlike": "Unlike"
+      "unlike": "Unlike",
+      "likeError": "Couldn't complete, try again"
     },
     "actualites": {
       "title": "News",
