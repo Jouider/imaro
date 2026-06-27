@@ -3496,5 +3496,10 @@
       "install": "Installer",
       "later": "Plus tard"
     }
+  },
+  "errors": {
+    "title": "Une erreur est survenue",
+    "message": "Quelque chose s'est mal passé. Réessayez en rechargeant la page.",
+    "reload": "Recharger"
   }
 }
