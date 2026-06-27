@@ -138,7 +138,12 @@ class AssembleeController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => [
-                'status' => $assemblee->convocations_status === 'ready' ? 'ready' : 'pending',
+                // On ne renvoie "pending" QUE si une génération tourne réellement.
+                // Sinon (null = jamais générée, ou "ready"), on renvoie "ready" :
+                // le front affiche alors la liste si elle existe, ou l'état vide
+                // avec le bouton « Générer ». Mapper null → "pending" bloquait
+                // une AG jamais générée sur un spinner infini (bouton masqué).
+                'status' => $assemblee->convocations_status === 'pending' ? 'pending' : 'ready',
                 'generated_at' => $assemblee->convocations_generated_at?->toIso8601String(),
                 'merged_url' => $assemblee->convocations_merged_path
                     ? Storage::disk('public')->url($assemblee->convocations_merged_path)
