@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { RouterProvider } from 'react-router-dom'
 import { QueryProvider } from '@/providers/QueryProvider'
 import { Toaster } from '@/components/ui/sonner'
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
 import { router } from '@/router'
 import { initNative } from '@/lib/native'
 import { initDeepLinks } from '@/lib/deep-links'
@@ -14,9 +15,11 @@ export default function App() {
   }, [])
 
   return (
-    <QueryProvider>
-      <RouterProvider router={router} />
-      <Toaster richColors position="top-center" />
-    </QueryProvider>
+    <ErrorBoundary>
+      <QueryProvider>
+        <RouterProvider router={router} />
+        <Toaster richColors position="top-center" />
+      </QueryProvider>
+    </ErrorBoundary>
   )
 }

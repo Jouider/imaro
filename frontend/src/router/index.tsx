@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { RouteErrorBoundary } from '@/components/shared/ErrorBoundary'
 import { RootEntry } from '@/components/RootEntry'
 import { BiometricGate } from '@/components/BiometricGate'
 import { LoginPage } from '@/pages/LoginPage'
@@ -52,128 +53,138 @@ import { UtilisateursPage } from '@/pages/gestionnaire/UtilisateursPage'
 import { PersonnelPage } from '@/pages/gestionnaire/PersonnelPage'
 
 export const router = createBrowserRouter([
-  { path: '/', element: <RootEntry /> },
-  { path: '/login', element: <LoginPage /> },
-  { path: '/reset-password', element: <ResetPasswordPage /> },
-
-  // ── Public visitor pass (no auth, scanned at the lobby) ──
-  { path: '/v/:token', element: <VisitorPassPage /> },
-
-  // ── Public privacy policy (loi 09-08 / CNDP — required by both stores) ──
-  { path: '/confidentialite', element: <ConfidentialitePage /> },
-
-  // ── Gardien (lobby PWA — scan + walk-in) ──
   {
-    path: '/gardien',
-    element: (
-      <GardienGuard>
-        <GardienPage />
-      </GardienGuard>
-    ),
-  },
-
-  // ── Portail copropriétaire ──────────────────────────────
-  // /portail/login now redirects to the unified /login page
-  { path: '/portail/login', element: <Navigate to="/login" replace /> },
-  {
-    path: '/portail',
-    element: (
-      <PortailGuard>
-        <BiometricGate>
-          <PortailLayout />
-        </BiometricGate>
-      </PortailGuard>
-    ),
+    // App-wide error boundary: any route render/loader error shows the
+    // recovery screen instead of a blank page.
+    errorElement: <RouteErrorBoundary />,
     children: [
-      { index: true, element: <PortailHomePage /> },
-      { path: 'actualites', element: <PortailActualitesPage /> },
-      { path: 'finances', element: <PortailFinancesPage /> },
-      { path: 'reclamations', element: <PortailReclamationsPage /> },
-      { path: 'visiteurs', element: <PortailVisiteursPage /> },
-      { path: 'profil', element: <PortailProfilPage /> },
-    ],
-  },
+      { path: '/', element: <RootEntry /> },
+      { path: '/login', element: <LoginPage /> },
+      { path: '/reset-password', element: <ResetPasswordPage /> },
 
-  // ── Onboarding première connexion (plein écran, sans sidebar) ──
-  {
-    path: '/gestionnaire/onboarding',
-    element: (
-      <GestionnaireGuard>
-        <OnboardingPage />
-      </GestionnaireGuard>
-    ),
-  },
+      // ── Public visitor pass (no auth, scanned at the lobby) ──
+      { path: '/v/:token', element: <VisitorPassPage /> },
 
-  // ── Espace gestionnaire / manager ───────────────────────
-  {
-    path: '/gestionnaire',
-    element: (
-      <GestionnaireGuard>
-        <GestionnaireLayout />
-      </GestionnaireGuard>
-    ),
-    children: [
+      // ── Public privacy policy (loi 09-08 / CNDP — required by both stores) ──
+      { path: '/confidentialite', element: <ConfidentialitePage /> },
+
+      // ── Gardien (lobby PWA — scan + walk-in) ──
       {
-        index: true,
+        path: '/gardien',
+        element: (
+          <GardienGuard>
+            <GardienPage />
+          </GardienGuard>
+        ),
+      },
+
+      // ── Portail copropriétaire ──────────────────────────────
+      // /portail/login now redirects to the unified /login page
+      { path: '/portail/login', element: <Navigate to="/login" replace /> },
+      {
+        path: '/portail',
+        element: (
+          <PortailGuard>
+            <BiometricGate>
+              <PortailLayout />
+            </BiometricGate>
+          </PortailGuard>
+        ),
+        children: [
+          { index: true, element: <PortailHomePage /> },
+          { path: 'actualites', element: <PortailActualitesPage /> },
+          { path: 'finances', element: <PortailFinancesPage /> },
+          { path: 'reclamations', element: <PortailReclamationsPage /> },
+          { path: 'visiteurs', element: <PortailVisiteursPage /> },
+          { path: 'profil', element: <PortailProfilPage /> },
+        ],
+      },
+
+      // ── Onboarding première connexion (plein écran, sans sidebar) ──
+      {
+        path: '/gestionnaire/onboarding',
+        element: (
+          <GestionnaireGuard>
+            <OnboardingPage />
+          </GestionnaireGuard>
+        ),
+      },
+
+      // ── Espace gestionnaire / manager ───────────────────────
+      {
+        path: '/gestionnaire',
+        element: (
+          <GestionnaireGuard>
+            <GestionnaireLayout />
+          </GestionnaireGuard>
+        ),
+        children: [
+          {
+            index: true,
+            element: <Navigate to="/gestionnaire/dashboard" replace />,
+          },
+          { path: 'dashboard', element: <GestDashboardPage /> },
+          { path: 'residences', element: <ResidencesPage /> },
+          { path: 'residences/:id', element: <ResidencePage /> },
+          { path: 'coproprietaires', element: <CoproprietairesPage /> },
+          {
+            path: 'appels-fonds',
+            element: <Navigate to="/gestionnaire/paiements" replace />,
+          },
+          { path: 'paiements', element: <PaiementsPage /> },
+          { path: 'tickets', element: <TicketsPage /> },
+          { path: 'assemblees', element: <AssembleesPage /> },
+          { path: 'annonces', element: <AnnoncesPage /> },
+          { path: 'prestataires', element: <PrestatairesPage /> },
+          { path: 'budgets', element: <BudgetsPage /> },
+          { path: 'documents', element: <DocumentsPage /> },
+          { path: 'comptabilite', element: <ComptabilitePage /> },
+          { path: 'depenses', element: <DepensesPage /> },
+          { path: 'imports', element: <ImportsPage /> },
+          { path: 'recouvrement', element: <RecouvrementPage /> },
+          {
+            path: 'assistance-recouvrement',
+            element: <AssistanceRecouvrementPage />,
+          },
+          { path: 'rappels', element: <RappelsPage /> },
+          { path: 'visites', element: <VisitesPage /> },
+          { path: 'pointage', element: <PointagePage /> },
+          { path: 'occupants', element: <OccupantsPage /> },
+          { path: 'equipements', element: <EquipementsPage /> },
+          { path: 'emprunts', element: <EmpruntsPage /> },
+          {
+            path: 'travaux-exceptionnels',
+            element: <TravauxExceptionnelsPage />,
+          },
+          { path: 'autres-recettes', element: <AutresRecettesPage /> },
+          { path: 'remboursements', element: <RemboursementsPage /> },
+          { path: 'ia', element: <IaAssistantPage /> },
+          { path: 'conformite', element: <ConformitePage /> },
+          { path: 'annexes', element: <AnnexesPage /> },
+          { path: 'audit', element: <AuditTrailPage /> },
+          { path: 'utilisateurs', element: <UtilisateursPage /> },
+          { path: 'personnel', element: <PersonnelPage /> },
+          { path: 'profil', element: <ProfilPage /> },
+        ],
+      },
+
+      // ── Anciennes routes /manager → fusionnées dans /gestionnaire ──
+      {
+        path: '/manager',
         element: <Navigate to="/gestionnaire/dashboard" replace />,
       },
-      { path: 'dashboard', element: <GestDashboardPage /> },
-      { path: 'residences', element: <ResidencesPage /> },
-      { path: 'residences/:id', element: <ResidencePage /> },
-      { path: 'coproprietaires', element: <CoproprietairesPage /> },
       {
-        path: 'appels-fonds',
-        element: <Navigate to="/gestionnaire/paiements" replace />,
+        path: '/manager/gestionnaires',
+        element: <Navigate to="/gestionnaire/utilisateurs" replace />,
       },
-      { path: 'paiements', element: <PaiementsPage /> },
-      { path: 'tickets', element: <TicketsPage /> },
-      { path: 'assemblees', element: <AssembleesPage /> },
-      { path: 'annonces', element: <AnnoncesPage /> },
-      { path: 'prestataires', element: <PrestatairesPage /> },
-      { path: 'budgets', element: <BudgetsPage /> },
-      { path: 'documents', element: <DocumentsPage /> },
-      { path: 'comptabilite', element: <ComptabilitePage /> },
-      { path: 'depenses', element: <DepensesPage /> },
-      { path: 'imports', element: <ImportsPage /> },
-      { path: 'recouvrement', element: <RecouvrementPage /> },
       {
-        path: 'assistance-recouvrement',
-        element: <AssistanceRecouvrementPage />,
+        path: '/manager/residences',
+        element: <Navigate to="/gestionnaire/residences" replace />,
       },
-      { path: 'rappels', element: <RappelsPage /> },
-      { path: 'visites', element: <VisitesPage /> },
-      { path: 'pointage', element: <PointagePage /> },
-      { path: 'occupants', element: <OccupantsPage /> },
-      { path: 'equipements', element: <EquipementsPage /> },
-      { path: 'emprunts', element: <EmpruntsPage /> },
-      { path: 'travaux-exceptionnels', element: <TravauxExceptionnelsPage /> },
-      { path: 'autres-recettes', element: <AutresRecettesPage /> },
-      { path: 'remboursements', element: <RemboursementsPage /> },
-      { path: 'ia', element: <IaAssistantPage /> },
-      { path: 'conformite', element: <ConformitePage /> },
-      { path: 'annexes', element: <AnnexesPage /> },
-      { path: 'audit', element: <AuditTrailPage /> },
-      { path: 'utilisateurs', element: <UtilisateursPage /> },
-      { path: 'personnel', element: <PersonnelPage /> },
-      { path: 'profil', element: <ProfilPage /> },
+      {
+        path: '/manager/dashboard',
+        element: <Navigate to="/gestionnaire/dashboard" replace />,
+      },
     ],
-  },
-
-  // ── Anciennes routes /manager → fusionnées dans /gestionnaire ──
-  {
-    path: '/manager',
-    element: <Navigate to="/gestionnaire/dashboard" replace />,
-  },
-  {
-    path: '/manager/gestionnaires',
-    element: <Navigate to="/gestionnaire/utilisateurs" replace />,
-  },
-  {
-    path: '/manager/residences',
-    element: <Navigate to="/gestionnaire/residences" replace />,
-  },
-  {
-    path: '/manager/dashboard',
-    element: <Navigate to="/gestionnaire/dashboard" replace />,
   },
 ])
