@@ -155,7 +155,9 @@
     "save": "Enregistrer",
     "close": "Fermer",
     "show": "Afficher",
-    "hide": "Masquer"
+    "hide": "Masquer",
+    "continue": "Continuer",
+    "back": "Retour"
   },
   "portail": {
     "nav": {
@@ -404,6 +406,37 @@
       "settingDesc": "Face ID / empreinte à l'ouverture de l'application.",
       "enabled": "Déverrouillage biométrique activé.",
       "enableFailed": "Authentification biométrique échouée."
+    },
+    "bonsPaiement": {
+      "title": "Bons de paiement",
+      "subtitle": "Émettez un ordre de paiement vers le syndic et retrouvez votre historique.",
+      "entryDesc": "Émettre un ordre de paiement et voir l’historique",
+      "empty": "Aucun bon de paiement",
+      "new": "Nouveau bon",
+      "from": "Compte émetteur",
+      "to": "Bénéficiaire",
+      "montant": "Montant",
+      "motif": "Motif",
+      "motifPlaceholder": "Ex. Appel de fonds T1 2026",
+      "delaiNotice": "Validation par le syndic possible après un délai de 24 h.",
+      "validableLe": "Validable le",
+      "validatedWithTicket": "Validé. Ticket de suivi",
+      "download": "Télécharger",
+      "downloadPending": "Disponible après validation",
+      "step1": "Émetteur & bénéficiaire",
+      "step2": "Montant",
+      "step3": "Motif",
+      "step4": "Confirmation",
+      "stepOf": "Étape {{current}} sur {{total}}",
+      "emit": "Émettre le bon",
+      "created": "Bon de paiement émis",
+      "createError": "L’émission a échoué, réessayez",
+      "statut": {
+        "en_attente": "En attente",
+        "valide": "Validé",
+        "rejete": "Rejeté",
+        "expire": "Expiré"
+      }
     }
   },
   "home": {
