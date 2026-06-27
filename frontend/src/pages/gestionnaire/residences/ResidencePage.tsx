@@ -552,6 +552,16 @@ export function ResidencePage() {
       renderCell: (r) => <span className="tabular-nums">{r.tantieme}</span>,
     },
     {
+      key: 'titre_foncier',
+      header: t('gestionnaire.residence.colTitreFoncier'),
+      renderCell: (r) =>
+        r.titre_foncier ? (
+          <span>{r.titre_foncier}</span>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
+    },
+    {
       key: 'coproprietaire',
       header: t('gestionnaire.residence.colProprietaire'),
       renderCell: (r) =>
