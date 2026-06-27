@@ -40,8 +40,9 @@ beforeEach(function () {
 it('POST convocations → 202 accepted + count, dispatch du Job, statut pending', function () {
     $this->withHeaders($this->auth)->postJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations")
         ->assertStatus(202)
-        ->assertJsonPath('status', 'accepted')
-        ->assertJsonPath('count', 1);
+        ->assertJsonPath('status', 'success')
+        ->assertJsonPath('data.status', 'accepted')
+        ->assertJsonPath('data.count', 1);
 
     Queue::assertPushed(GenerateConvocationsJob::class);
     expect($this->assemblee->fresh()->convocations_status)->toBe('pending');
@@ -58,7 +59,7 @@ it('POST count compte aussi les lots sans copro assigné ("Non assigné")', func
 
     $this->withHeaders($this->auth)->postJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations")
         ->assertStatus(202)
-        ->assertJsonPath('count', 2);
+        ->assertJsonPath('data.count', 2);
 });
 
 it('le Job génère une convocation par copro + le PDF fusionné', function () {
@@ -124,8 +125,9 @@ it('GET convocations → ready + merged_url + liste', function () {
 
     $this->withHeaders($this->auth)->getJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations")
         ->assertStatus(200)
-        ->assertJsonPath('status', 'ready')
-        ->assertJsonPath('convocations.0.lot', 'A1')
-        ->assertJsonPath('convocations.0.tantieme', 350)
-        ->assertJsonStructure(['status', 'generated_at', 'merged_url', 'convocations' => [['id', 'coproprietaire_nom', 'lot', 'tantieme', 'url']]]);
+        ->assertJsonPath('status', 'success')
+        ->assertJsonPath('data.status', 'ready')
+        ->assertJsonPath('data.convocations.0.lot', 'A1')
+        ->assertJsonPath('data.convocations.0.tantieme', 350)
+        ->assertJsonStructure(['status', 'data' => ['status', 'generated_at', 'merged_url', 'convocations' => [['id', 'coproprietaire_nom', 'lot', 'tantieme', 'url']]]]);
 });
