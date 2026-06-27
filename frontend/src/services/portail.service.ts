@@ -310,23 +310,20 @@ export async function getAnnonces(): Promise<Annonce[]> {
 }
 
 /**
- * Aimer / ne plus aimer une annonce (KAN-96). Toggle : on envoie l'état
- * souhaité, le backend renvoie le compteur et l'état réels.
- * Endpoint attendu : POST /portail/annonces/{id}/like { liked } (cf. issue backend).
+ * Aimer / ne plus aimer une annonce (KAN-96). Toggle idempotent : on envoie
+ * l'état souhaité, le backend renvoie le compteur et l'état réels.
+ * POST /portail/annonces/{id}/like { liked } → { likes_count, liked }.
+ * Pas de withMock ici : une mutation ne doit pas masquer un échec réseau
+ * (sinon le rollback optimiste du like ne se déclenche jamais).
  */
 export async function toggleAnnonceLike(
   id: number,
   liked: boolean,
 ): Promise<{ likes_count: number; liked: boolean }> {
-  return withMock(
-    async () => {
-      const res = await api.post<
-        ApiEnvelope<{ likes_count: number; liked: boolean }>
-      >(`/portail/annonces/${id}/like`, { liked })
-      return res.data.data
-    },
-    { likes_count: liked ? 1 : 0, liked },
-  )
+  const res = await api.post<
+    ApiEnvelope<{ likes_count: number; liked: boolean }>
+  >(`/portail/annonces/${id}/like`, { liked })
+  return res.data.data
 }
 
 export async function getAssembleesPortail(): Promise<AssembleePortail[]> {

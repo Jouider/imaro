@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { Heart } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { MediaGallery } from '@/components/shared'
@@ -49,6 +50,9 @@ export function AnnoncePostCard({ annonce }: { annonce: Annonce }) {
     onError: (_err, _vars, ctx) => {
       if (ctx?.previous)
         queryClient.setQueryData(['portail-annonces'], ctx.previous)
+      toast.error(
+        t('portail.home.likeError', { defaultValue: 'Action impossible' }),
+      )
     },
     onSuccess: (data) => {
       queryClient.setQueryData<Annonce[]>(['portail-annonces'], (old) =>
