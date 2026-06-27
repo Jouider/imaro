@@ -118,6 +118,30 @@ it('closes a ticket and sets closed_at', function () {
     expect($ticket->fresh()->closed_at)->not->toBeNull();
 });
 
+it('accepts the extended KAN-55 categories (e.g. chauffage)', function () {
+    $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
+        ->postJson('/api/gestionnaire/tickets', [
+            'residence_id' => $this->residence->id,
+            'categorie'    => 'chauffage',
+            'description'  => 'Chauffage collectif en panne au bloc B',
+            'priorite'     => 'normal',
+        ])
+        ->assertStatus(201)
+        ->assertJsonPath('data.ticket.categorie', 'chauffage');
+});
+
+it('rejects an unknown category', function () {
+    $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
+        ->postJson('/api/gestionnaire/tickets', [
+            'residence_id' => $this->residence->id,
+            'categorie'    => 'inexistante',
+            'description'  => 'Description suffisamment longue pour passer',
+            'priorite'     => 'normal',
+        ])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('categorie');
+});
+
 it('returns 422 when closing an already closed ticket', function () {
     $ticket = Ticket::create([
         'tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id,

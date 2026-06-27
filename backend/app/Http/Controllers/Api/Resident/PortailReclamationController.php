@@ -8,15 +8,10 @@ use App\Models\Ticket;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class PortailReclamationController extends Controller
 {
-    /** Catégorie → libellé affiché (la table tickets n'a pas de colonne titre). */
-    private const LABELS = [
-        'plomberie' => 'Plomberie', 'electricite' => 'Électricité', 'ascenseur' => 'Ascenseur',
-        'proprete' => 'Propreté', 'securite' => 'Sécurité', 'autre' => 'Réclamation',
-    ];
-
     /** Priorité front (basse/normale/haute/urgente) → enum tickets (faible/normal/urgent). */
     private const PRIORITE_MAP = [
         'basse' => 'faible', 'faible' => 'faible',
@@ -41,7 +36,7 @@ class PortailReclamationController extends Controller
                     // Référence persistée et partagée avec le gestionnaire (KAN-105).
                     'reference' => $t->reference ?? 'TKT-'.($t->created_at?->format('Y') ?? date('Y')).'-'.str_pad((string) $t->id, 3, '0', STR_PAD_LEFT),
                     'categorie' => $t->categorie,
-                    'sujet' => $sujet !== '' ? Str::limit($sujet, 80) : (self::LABELS[$t->categorie] ?? 'Réclamation'),
+                    'sujet' => $sujet !== '' ? Str::limit($sujet, 80) : (Ticket::CATEGORIE_LABELS[$t->categorie] ?? 'Réclamation'),
                     'statut' => $t->statut,
                     'priorite' => $t->priorite,
                     'created_at' => $t->created_at?->toIso8601String(),
@@ -58,7 +53,7 @@ class PortailReclamationController extends Controller
             'titre' => 'nullable|string|max:255',
             'sujet' => 'nullable|string|max:255',
             'description' => 'required|string',
-            'categorie' => 'nullable|in:plomberie,electricite,ascenseur,proprete,securite,autre',
+            'categorie' => ['nullable', Rule::in(Ticket::CATEGORIES)],
             'priorite' => 'nullable|string',
         ]);
 
