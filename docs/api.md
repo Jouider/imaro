@@ -1530,6 +1530,25 @@ Connexion ensuite via `POST /api/auth/resident/login` (`phone` + `code`) — l'e
 
 ---
 
+## Web push navigateur — VAPID (KAN-68)
+
+`role:resident` · prefix `/portail` · pour le portail web (PWA), distinct du push natif mobile ci-dessous.
+
+### POST /api/portail/push/subscribe
+Enregistre (ou met à jour) la subscription Web Push VAPID du résident. Upsert idempotent par hash de l'`endpoint`.
+
+**Body**
+```json
+{
+  "endpoint": "https://fcm.googleapis.com/fcm/send/abc123…",
+  "keys": { "p256dh": "<clé publique base64url>", "auth": "<secret base64url>" }
+}
+```
+**Response 200** : `{ status, message }`.
+
+### DELETE /api/portail/push/unsubscribe
+Supprime la subscription (opt-out). **Body** : `endpoint` (string, requis).
+
 ## Push natif mobile — FCM / APNs (KAN-68)
 
 `role:resident` · prefix `/portail`
