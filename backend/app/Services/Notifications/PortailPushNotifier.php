@@ -4,6 +4,7 @@ namespace App\Services\Notifications;
 
 use App\Jobs\SendNativePushJob;
 use App\Models\Annonce;
+use App\Models\BonPaiement;
 use App\Models\Coproprietaire;
 use App\Models\Lot;
 use App\Models\Ticket;
@@ -56,6 +57,19 @@ class PortailPushNotifier
         };
 
         SendNativePushJob::dispatch($ticket->user_id, 'Suivi de votre réclamation', $corps, ['route' => '/portail/reclamations']);
+    }
+
+    /** Bon de paiement validé par le syndic → le résident émetteur (KAN-110). */
+    public function bonPaiementValide(BonPaiement $bon): void
+    {
+        $userId = $bon->coproprietaire?->user_id;
+        if (! $userId) {
+            return;
+        }
+
+        $corps = 'Votre bon de paiement '.$bon->reference.' a été validé par le syndic.';
+
+        SendNativePushJob::dispatch($userId, 'Bon de paiement validé', $corps, ['route' => '/portail/finances']);
     }
 
     /** IDs des utilisateurs résidents (copropriétaires liés à un compte). */

@@ -1403,6 +1403,43 @@ SIDs résolus depuis `config('notifications.whatsapp_templates.<name>')`.
 
 ---
 
+## Bons de paiement (résident → validation syndic) — KAN-110
+
+Le résident émet un **bon de paiement** ; le syndic le valide après un **délai légal minimal de 24 h**. À la validation : un **ticket de suivi** (module tickets, accessible au résident) est créé et un **PDF** est généré (téléchargeable façon relevé bancaire).
+
+Forme de la ressource (enveloppe standard `{status:'success', data:{…}}`) :
+```json
+{
+  "id": 1,
+  "reference": "BP-2026-001",
+  "compte_emetteur": "Compte chèque · 000335E000304708",
+  "beneficiaire": "Syndic Résidence Al Blanca",
+  "montant": 1500,
+  "motif": "Appel de fonds T1 2026",
+  "statut": "en_attente",        // en_attente | valide | rejete | expire
+  "created_at": "2026-05-02T10:00:00+00:00",
+  "validable_at": "2026-05-03T10:00:00+00:00",
+  "validated_at": null,
+  "ticket_reference": null,       // réf. du ticket de suivi une fois validé (ex. TKT-2026-014)
+  "pdf_url": null                 // dispo une fois validé + PDF généré
+}
+```
+
+**Résident** (`role:resident`, prefix `/portail`) :
+- `GET /portail/bons-paiement` → `{ data: { bons: BonPaiement[] } }` (les siens uniquement).
+- `POST /portail/bons-paiement` → body `{ compte_emetteur, beneficiaire, montant (>0), motif }`. Crée un bon `en_attente`, `validable_at = now + 24 h`. `201` → `{ data: { bon } }`.
+- `GET /portail/bons-paiement/{id}` → détail (`{ data: { bon } }`, 403 si pas le sien).
+- `GET /portail/bons-paiement/{id}/pdf` → téléchargement du PDF (`404` tant que non validé / PDF non généré).
+
+**Gestionnaire / syndic** (`role:manager|gestionnaire`, permission `finances`) :
+- `GET /gestionnaire/bons-paiement` → liste (résidences accessibles), `en_attente` d'abord.
+- `POST /gestionnaire/bons-paiement/{id}/valider` → **422 avant `validable_at`** (délai 24 h non écoulé) ou si déjà traité ; sinon passe `valide`, crée le ticket de suivi (`ticket_reference`), génère le PDF (async) et notifie le résident.
+- `POST /gestionnaire/bons-paiement/{id}/rejeter` (`motif?`) → passe `rejete`.
+
+> Note : `expire` est prévu dans l'enum statut pour évolution (péremption automatique) — non déclenché actuellement.
+
+---
+
 ## Assistant EMARO — chat IA (KAN-53)
 
 `role:manager|gestionnaire`
