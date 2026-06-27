@@ -204,7 +204,10 @@
       "payer": "Payer →",
       "convoquee": "Convoquée",
       "inviteVisitor": "Inviter un visiteur",
-      "inviteVisitorDesc": "Générez un QR à usage unique pour un proche, un livreur ou un intervenant."
+      "inviteVisitorDesc": "Générez un QR à usage unique pour un proche, un livreur ou un intervenant.",
+      "urgent": "Urgent",
+      "like": "J'aime",
+      "unlike": "Je n'aime plus"
     },
     "actualites": {
       "title": "Actualités",
