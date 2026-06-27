@@ -25,6 +25,8 @@ Route::get('/documents', PortailDocumentController::class);
 
 Route::get('/reclamations', [PortailReclamationController::class, 'index']);
 Route::post('/reclamations', [PortailReclamationController::class, 'store']);
+// Avis de satisfaction après résolution (KAN-90)
+Route::patch('/reclamations/{id}/rating', [PortailReclamationController::class, 'rating']);
 
 Route::get('/profil', [PortailProfilController::class, 'show']);
 Route::put('/profil', [PortailProfilController::class, 'update']);
