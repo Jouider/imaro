@@ -85,7 +85,11 @@ class AssembleeController extends Controller
                 ->where('residence_id', $assemblee->residence_id)
                 ->count();
 
-            return response()->json(['status' => 'accepted', 'count' => $count], 202);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Génération déjà en cours',
+                'data' => ['status' => 'accepted', 'count' => $count],
+            ], 202);
         }
 
         // Le job génère une convocation par lot, copro assigné ou non
@@ -107,7 +111,11 @@ class AssembleeController extends Controller
         ]);
         GenerateConvocationsJob::dispatch($assemblee->id);
 
-        return response()->json(['status' => 'accepted', 'count' => $count], 202);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Génération des convocations lancée',
+            'data' => ['status' => 'accepted', 'count' => $count],
+        ], 202);
     }
 
     /**
@@ -128,12 +136,15 @@ class AssembleeController extends Controller
             ]);
 
         return response()->json([
-            'status' => $assemblee->convocations_status === 'ready' ? 'ready' : 'pending',
-            'generated_at' => $assemblee->convocations_generated_at?->toIso8601String(),
-            'merged_url' => $assemblee->convocations_merged_path
-                ? Storage::disk('public')->url($assemblee->convocations_merged_path)
-                : null,
-            'convocations' => $list,
+            'status' => 'success',
+            'data' => [
+                'status' => $assemblee->convocations_status === 'ready' ? 'ready' : 'pending',
+                'generated_at' => $assemblee->convocations_generated_at?->toIso8601String(),
+                'merged_url' => $assemblee->convocations_merged_path
+                    ? Storage::disk('public')->url($assemblee->convocations_merged_path)
+                    : null,
+                'convocations' => $list,
+            ],
         ]);
     }
 
