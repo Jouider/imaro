@@ -17,8 +17,6 @@ export type PaiementDeclare = {
   methode: 'virement' | 'versement' | 'cheque' | 'especes'
   date: string | null
   statut: PaiementStatut
-  /** Date avant laquelle le syndic ne peut pas valider (déclaration + 24 h). */
-  validable_at: string | null
   validated_at: string | null
   motif_rejet: string | null
   justificatif_url: string | null
