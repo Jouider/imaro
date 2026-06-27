@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Gestionnaire\AssistantController;
 use App\Http\Controllers\Api\Gestionnaire\AuditLogController;
 use App\Http\Controllers\Api\Gestionnaire\AutreRecetteController;
 use App\Http\Controllers\Api\Gestionnaire\BilanOuvertureController;
+use App\Http\Controllers\Api\Gestionnaire\BonPaiementController;
 use App\Http\Controllers\Api\Gestionnaire\BudgetAnnexe5Controller;
 use App\Http\Controllers\Api\Gestionnaire\BudgetController;
 use App\Http\Controllers\Api\Gestionnaire\CategorieLotController;
@@ -390,6 +391,11 @@ Route::middleware(['app.permission:finances'])->group(function () {
     Route::get('/virements-declares', [VirementDeclareController::class, 'index']);
     Route::post('/virements-declares/{id}/valider', [VirementDeclareController::class, 'valider']);
     Route::post('/virements-declares/{id}/rejeter', [VirementDeclareController::class, 'rejeter']);
+
+    // Bons de paiement résident — validation 24 h + ticket + PDF (KAN-110)
+    Route::get('/bons-paiement', [BonPaiementController::class, 'index']);
+    Route::post('/bons-paiement/{id}/valider', [BonPaiementController::class, 'valider']);
+    Route::post('/bons-paiement/{id}/rejeter', [BonPaiementController::class, 'rejeter']);
 
     // Décompte copropriétaire
     Route::get('/decomptes/{coproprietaire}', [DecompteController::class, 'show']);
