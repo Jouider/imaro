@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Annonce extends Model
 {
@@ -31,5 +32,11 @@ class Annonce extends Model
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /** Likes « j'aime » des résidents (KAN-96). */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(AnnonceLike::class);
     }
 }
