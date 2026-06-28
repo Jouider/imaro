@@ -38,6 +38,8 @@ Route::get('/comptes-bancaires', PortailBankAccountController::class);
 // Paiements déclarés par le résident : déclaration + liste/détail (statut, reçu après validation)
 Route::get('/paiements', [PortailPaiementController::class, 'index']);
 Route::post('/paiements', [PortailPaiementController::class, 'store']);
+// OCR offline d'un justificatif → préremplissage du formulaire (KAN-100)
+Route::post('/paiements/ocr', [PortailPaiementController::class, 'ocr']);
 // Paiement en ligne (passerelle) — KAN-72 / #251 ; le retour est public (cf. web.php)
 Route::post('/paiement/initier', [PortailPaiementOnlineController::class, 'initier']);
 

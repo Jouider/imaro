@@ -1400,6 +1400,11 @@ SIDs résolus depuis `config('notifications.whatsapp_templates.<name>')`.
 Le résident déclare un paiement effectué ; le syndic le valide (sans délai imposé — validation immédiate possible). À la validation : un **Paiement réel** est créé (recalcul du solde) et un **reçu PDF** est généré — c'est « le bon » que le résident récupère ensuite dans son détail de paiement.
 
 **Résident** (`role:resident`, prefix `/portail`) :
+- `POST /api/portail/paiements/ocr` *(multipart)* : `justificatif` (pdf/jpg/png/webp, ≤8 Mo) → **OCR offline** (Tesseract, aucune donnée hors VPS) pour préremplir le formulaire. Best-effort — `200` :
+```json
+{ "status": "success", "data": { "ocr_ok": true, "champs": { "montant": 1500, "date": "2026-06-28", "methode": "virement", "reference": "REFWWJ2332" } } }
+```
+  `ocr_ok=false` (ou champs `null`) ⇒ le résident saisit manuellement. **Prérequis serveur** : `tesseract-ocr`, `tesseract-ocr-fra`, `tesseract-ocr-ara`, `poppler-utils`.
 - `POST /api/portail/paiements` *(multipart)* : `montant`, `date`, `methode` (`virement|versement|cheque|especes`), **`reference` (obligatoire — KAN-83, string max 255 ; absent ⇒ 422 `errors.reference`)**, `justificatif?` (pdf/jpg/png, ≤5 Mo) → crée un paiement déclaré **`en_attente`**. `201` → `{ data: { paiement } }`.
 - `GET /api/portail/paiements` → `{ data: { paiements: [...] } }` (les siens, récents d'abord). Chaque entrée :
 ```json

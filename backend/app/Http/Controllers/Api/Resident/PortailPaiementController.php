@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Resident;
 
 use App\Http\Controllers\Controller;
 use App\Models\VirementDeclare;
+use App\Services\Ocr\JustificatifOcrService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -11,8 +12,8 @@ use Illuminate\Support\Facades\Storage;
 /**
  * Paiements déclarés par le copropriétaire (virement, versement, chèque,
  * espèces). Le résident déclare → statut « en_attente » ; le syndic valide
- * après un délai de 24 h (validable_at) → Paiement réel + reçu PDF, que le
- * résident retrouve ensuite ici (KAN-110 revu).
+ * (sans délai imposé) → Paiement réel + reçu PDF, que le résident retrouve
+ * ensuite ici (KAN-110 revu).
  */
 class PortailPaiementController extends Controller
 {
@@ -80,6 +81,26 @@ class PortailPaiementController extends Controller
             'message' => 'Paiement déclaré. Il sera validé par votre syndic.',
             'data' => ['paiement' => $this->present($virement)],
         ], 201);
+    }
+
+    /**
+     * POST /api/portail/paiements/ocr
+     * Extrait (OCR offline) les champs d'un justificatif importé pour préremplir
+     * le formulaire. Best-effort : si l'OCR échoue, renvoie des champs vides
+     * (`ocr_ok=false`) et le résident saisit manuellement.
+     */
+    public function ocr(Request $request, JustificatifOcrService $ocr): JsonResponse
+    {
+        $request->validate([
+            'justificatif' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:8192'],
+        ]);
+
+        $resultat = $ocr->extraire($request->file('justificatif'));
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $resultat, // { ocr_ok: bool, champs: { montant, date, methode, reference } }
+        ]);
     }
 
     /** Forme contractuelle d'un paiement déclaré côté résident. */
