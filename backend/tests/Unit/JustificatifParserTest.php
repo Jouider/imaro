@@ -41,6 +41,32 @@ it('détecte chèque et espèces', function () {
         ->and($this->parser->parse('Règlement en espèces')['methode'])->toBe('especes');
 });
 
+it('ne prend PAS un numéro de compte (« Compte N° ») pour une référence', function () {
+    // Reçus Banque Populaire réels : "Compte N°: 2121180762910008".
+    $champs = $this->parser->parse("Virement de: 1000 MAD\nCompte N°: 2121180762910008\nDate d'execution: 21/04/2026");
+
+    expect($champs['montant'])->toBe(1000.0)
+        ->and($champs['date'])->toBe('2026-04-21')
+        ->and($champs['methode'])->toBe('virement')
+        ->and($champs['reference'])->toBeNull(); // surtout pas 2121180762910008
+});
+
+it('lit les reçus bancaires marocains réels (montant en DHS/MAD)', function () {
+    // Saham Bank : "Montant du virement : 1500.00 DHS" + comptes émetteur/bénéficiaire.
+    $saham = $this->parser->parse(
+        "Montant du virement : 1500.00 DHS\nemis le 14/06/2026\n".
+        "N° de compte de l'emetteur : 022780000260002821891674\n".
+        "N° de compte du beneficiaire : 190780212118076291000836\nMotif : cotisation"
+    );
+    expect($saham['montant'])->toBe(1500.0)
+        ->and($saham['date'])->toBe('2026-06-14')
+        ->and($saham['reference'])->toBeNull(); // aucune réf sur ce reçu
+
+    // CDM : "Montant 1,500.00 MAD".
+    expect($this->parser->parse('VIREMENT Montant 1,500.00 MAD Date d execution 21/04/2026')['montant'])
+        ->toBe(1500.0);
+});
+
 it('renvoie des champs null quand rien n\'est reconnaissable', function () {
     expect($this->parser->parse('texte illisible sans données'))->toBe([
         'montant' => null,
