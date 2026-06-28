@@ -70,4 +70,14 @@ return [
         'production' => env('APNS_PRODUCTION', false), // false = sandbox
     ],
 
+    // OCR offline (auto-hébergé, conformité CNDP : aucune donnée envoyée hors VPS).
+    // Moteur par défaut : Tesseract (CLI) + poppler-utils pour rasteriser les PDF.
+    'ocr' => [
+        'driver' => env('OCR_DRIVER', 'tesseract'),
+        'tesseract_bin' => env('TESSERACT_BIN', 'tesseract'),
+        'pdftoppm_bin' => env('PDFTOPPM_BIN', 'pdftoppm'),
+        'langs' => env('OCR_LANGS', 'fra+ara+eng'),
+        'timeout' => (int) env('OCR_TIMEOUT', 25), // secondes max par extraction
+    ],
+
 ];
