@@ -82,8 +82,11 @@ class JustificatifParser
 
     private function reference(string $text): ?string
     {
-        // Token alphanumérique après un libellé de référence.
-        if (preg_match('/(?:r[ée]f[ée]rence|r[ée]f\.?|bordereau|transaction|op[ée]ration|n[°o]\.?)\s*[:\-]?\s*([A-Z0-9][A-Z0-9\/\-]{3,})/iu', $text, $m)) {
+        // Uniquement de VRAIS libellés de référence (référence, réf., bordereau,
+        // transaction). On NE déclenche PAS sur un « N° » seul : « Compte N° »,
+        // « N° de compte » = numéros de compte/RIB, à ne jamais prendre pour une
+        // référence de virement.
+        if (preg_match('/(?:r[ée]f[ée]rence|r[ée]f\.|bordereau|transaction)\s*(?:n[°o]\.?)?\s*[:\-]?\s*([A-Z0-9][A-Z0-9\/\-]{3,})/iu', $text, $m)) {
             return strtoupper(trim($m[1], '/-'));
         }
 
