@@ -1351,14 +1351,28 @@ export async function getTickets(params?: {
   statut?: string
   priorite?: string
   categorie?: string
+  /** Recherche par référence (TKT-…) ou description — KAN-105. */
+  search?: string
 }): Promise<Ticket[]> {
-  return withMock(async () => {
-    const res = await api.get<ApiEnvelope<{ tickets: Ticket[] }>>(
-      '/gestionnaire/tickets',
-      { params },
-    )
-    return res.data.data.tickets
-  }, MOCK_TICKETS)
+  return withMock(
+    async () => {
+      const res = await api.get<ApiEnvelope<{ tickets: Ticket[] }>>(
+        '/gestionnaire/tickets',
+        { params },
+      )
+      return res.data.data.tickets
+    },
+    // Mock fallback mirrors the backend `search` (réf. ou description).
+    (() => {
+      const q = params?.search?.trim().toLowerCase()
+      if (!q) return MOCK_TICKETS
+      return MOCK_TICKETS.filter(
+        (ticket) =>
+          ticket.reference.toLowerCase().includes(q) ||
+          ticket.description.toLowerCase().includes(q),
+      )
+    })(),
+  )
 }
 
 export async function getTicket(id: number): Promise<Ticket> {

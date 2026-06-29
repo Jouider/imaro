@@ -1697,6 +1697,7 @@
     "tickets": {
       "title": "التذاكر",
       "subtitle": "متابعة الشكاوى والتدخلات",
+      "searchPlaceholder": "البحث بالمرجع (TKT-…) أو الوصف",
       "colRef": "المرجع",
       "colTitre": "الوصف",
       "colResidence": "الإقامة",
