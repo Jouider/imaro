@@ -8,11 +8,14 @@ import {
   BookOpen,
   ChevronDown,
 } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
 import {
   sendChatMessage,
+  getAssistantFaq,
   type ChatMessage,
   type LegalCitation,
+  type FaqItem,
 } from '@/services/ia-chat.service'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -20,6 +23,8 @@ import {
 type DisplayMessage = ChatMessage & {
   id: string
   citations?: LegalCitation[]
+  /** Références légales (FAQ EMARO, KAN-107). */
+  refs?: string[]
 }
 
 // ─── Typing indicator ─────────────────────────────────────────────────────────
@@ -117,6 +122,19 @@ function MessageBubble({
         msg.citations?.map((c, i) => (
           <CitationChip key={i} citation={c} label={citLabel} />
         ))}
+      {!isUser && msg.refs && msg.refs.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {msg.refs.map((ref, i) => (
+            <span
+              key={i}
+              className="flex items-center gap-1 rounded-full border border-[var(--color-imaro-primary)]/20 bg-[var(--color-imaro-primary)]/5 px-2.5 py-1 text-[11px] font-medium text-[var(--color-imaro-primary)]"
+            >
+              <BookOpen className="size-3 shrink-0" />
+              {ref}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -153,6 +171,14 @@ export function AiChatFab({ aboveNav = false }: { aboveNav?: boolean }) {
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const lang = i18n.resolvedLanguage ?? 'fr'
+
+  // FAQ EMARO — 4 réponses figées (KAN-107), chargées à l'ouverture du chat.
+  const { data: faq = [] } = useQuery({
+    queryKey: ['assistant-faq'],
+    queryFn: () => getAssistantFaq(),
+    enabled: open,
+    staleTime: 5 * 60 * 1000,
+  })
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -227,13 +253,31 @@ export function AiChatFab({ aboveNav = false }: { aboveNav?: boolean }) {
     }
   }
 
+  // Réponse figée instantanée à une des 4 questions clés (KAN-107) : on n'appelle
+  // pas l'IA, on affiche directement la réponse autoritative + références légales.
+  function answerFaq(item: FaqItem) {
+    if (thinking) return
+    setMessages((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), role: 'user', content: item.question },
+      {
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: item.answer,
+        refs: item.refs,
+      },
+    ])
+  }
+
   function clearChat() {
     setMessages([])
     setInput('')
     setTimeout(() => inputRef.current?.focus(), 50)
   }
 
-  const suggestions = [
+  // Pills = les 4 questions clés de la FAQ EMARO si disponibles, sinon les
+  // suggestions i18n historiques.
+  const fallbackSuggestions = [
     t('gestionnaire.aiChat.suggestions.s1'),
     t('gestionnaire.aiChat.suggestions.s2'),
     t('gestionnaire.aiChat.suggestions.s3'),
@@ -326,15 +370,23 @@ export function AiChatFab({ aboveNav = false }: { aboveNav?: boolean }) {
               <div className="rounded-2xl rounded-bl-sm bg-muted/60 px-3.5 py-2.5 text-sm leading-relaxed text-foreground dark:bg-muted/30">
                 <MdContent text={t('gestionnaire.aiChat.welcome')} />
               </div>
-              {/* Suggestion pills */}
+              {/* Suggestion pills — FAQ EMARO (KAN-107) si dispo */}
               <div className="grid grid-cols-1 gap-2">
-                {suggestions.map((s, i) => (
-                  <SuggestionPill
-                    key={i}
-                    label={s}
-                    onClick={() => void send(s)}
-                  />
-                ))}
+                {faq.length > 0
+                  ? faq.map((item) => (
+                      <SuggestionPill
+                        key={item.key}
+                        label={item.question}
+                        onClick={() => answerFaq(item)}
+                      />
+                    ))
+                  : fallbackSuggestions.map((s, i) => (
+                      <SuggestionPill
+                        key={i}
+                        label={s}
+                        onClick={() => void send(s)}
+                      />
+                    ))}
               </div>
             </div>
           ) : (
