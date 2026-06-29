@@ -83,7 +83,16 @@ export type Residence = {
   montant_fixe?: number
   /** Jour du mois où les cotisations sont dues (1-28). */
   jour_echeance?: number
+  /** Périodicité de génération des appels de fonds (KAN-86). Défaut: trimestriel. */
+  periodicite_cotisation?: PeriodiciteCotisation
 }
+
+/** Périodicité de cotisation configurable par résidence (KAN-86). */
+export type PeriodiciteCotisation =
+  | 'mensuel'
+  | 'trimestriel'
+  | 'semestriel'
+  | 'annuel'
 
 export type CreateResidenceInput = {
   name: string
@@ -92,6 +101,7 @@ export type CreateResidenceInput = {
   mode_cotisation: 'tantieme' | 'fixe' | 'categorie'
   montant_fixe?: number
   jour_echeance?: number
+  periodicite_cotisation?: PeriodiciteCotisation
 }
 
 /** Catégorie de lot (KAN-93) — cotisation forfaitaire par type de lot. */

@@ -1345,6 +1345,13 @@
         "modeCategorie": "حسب فئة الوحدة",
         "categorieHint": "أنشئ الفئات (التسمية + الاشتراك) في تبويب « الفئات » للإقامة، ثم اربط كل وحدة بفئة.",
         "montantFixe": "المبلغ الثابت (د.م)",
+        "periodicite": "دورية الاشتراك",
+        "periodicites": {
+          "mensuel": "شهري",
+          "trimestriel": "فصلي",
+          "semestriel": "نصف سنوي",
+          "annuel": "سنوي"
+        },
         "createSubmit": "إنشاء الإقامة"
       },
       "categories": {
