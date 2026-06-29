@@ -2407,6 +2407,64 @@ export async function cloturerExercice(
   )
 }
 
+// Exports comptables (KAN-100 / KAN-101)
+export type ExportComptableFormat =
+  | 'journal-xlsx'
+  | 'grand-livre-xlsx'
+  | 'fec'
+  | 'journal-pdf'
+  | 'balance-pdf'
+
+const EXPORT_ENDPOINTS: Record<ExportComptableFormat, string> = {
+  'journal-xlsx': 'journal.xlsx',
+  'grand-livre-xlsx': 'grand-livre.xlsx',
+  fec: 'fec',
+  'journal-pdf': 'journal.pdf',
+  'balance-pdf': 'balance.pdf',
+}
+
+function filenameFromDisposition(
+  disposition: string | undefined,
+  fallback: string,
+): string {
+  if (!disposition) return fallback
+  // RFC 5987 (filename*=UTF-8''…) then plain filename="…"
+  const utf8 = /filename\*=UTF-8''([^;]+)/i.exec(disposition)
+  if (utf8?.[1]) return decodeURIComponent(utf8[1])
+  const plain = /filename="?([^";]+)"?/i.exec(disposition)
+  return plain?.[1] ?? fallback
+}
+
+/**
+ * Downloads a comptabilité export file (Excel/FEC/PDF) for the given exercice
+ * and triggers a browser download. Returns the saved filename.
+ */
+export async function exportComptabilite(
+  exerciceId: number,
+  format: ExportComptableFormat,
+  annee?: number,
+): Promise<string> {
+  const res = await api.get<Blob>(
+    `/gestionnaire/comptabilite/exercices/${exerciceId}/export/${EXPORT_ENDPOINTS[format]}`,
+    { responseType: 'blob' },
+  )
+  const fallbackExt = format === 'fec' ? 'txt' : format.split('-').pop()
+  const fallback = `export-${annee ?? exerciceId}.${fallbackExt}`
+  const filename = filenameFromDisposition(
+    res.headers['content-disposition'] as string | undefined,
+    fallback,
+  )
+  const url = URL.createObjectURL(res.data)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+  return filename
+}
+
 // Plan comptable
 export async function getComptesPcg(params?: {
   utilisable_depense?: boolean
