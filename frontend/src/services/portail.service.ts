@@ -524,3 +524,47 @@ export async function declarePaiement(
     await api.post('/portail/paiements', fd)
   }, undefined)
 }
+
+// ─── OCR justificatif (KAN-84) ────────────────────────────────────────────────
+
+export type OcrChamps = {
+  montant: number | null
+  date: string | null
+  /** Méthode détectée (peut ne pas correspondre aux méthodes connues). */
+  methode: string | null
+  reference: string | null
+}
+
+export type OcrResult = {
+  /** false = OCR indisponible/échec → saisie manuelle. */
+  ocr_ok: boolean
+  champs: OcrChamps
+}
+
+/**
+ * Analyse OCR (offline, best-effort) d'un justificatif importé pour préremplir
+ * le formulaire de déclaration (KAN-84). Les champs à faible confiance
+ * reviennent à `null` — jamais d'invention de valeurs.
+ */
+export async function analyserJustificatifOcr(file: File): Promise<OcrResult> {
+  const fd = new FormData()
+  fd.append('justificatif', file)
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<OcrResult>>(
+        '/portail/paiements/ocr',
+        fd,
+      )
+      return res.data.data
+    },
+    {
+      ocr_ok: true,
+      champs: {
+        montant: 1500,
+        date: new Date().toISOString().slice(0, 10),
+        methode: 'virement',
+        reference: 'VIR-DEMO-2026',
+      },
+    },
+  )
+}
