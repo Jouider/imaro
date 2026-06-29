@@ -27,7 +27,7 @@ type FormState = {
   name: string
   address: string
   city: string
-  mode_cotisation: 'tantieme' | 'fixe'
+  mode_cotisation: 'tantieme' | 'fixe' | 'categorie'
   montant_fixe: string
   jour_echeance: string
 }
@@ -182,7 +182,7 @@ export function ResidenceFormDialog({
                 onValueChange={(v) =>
                   setForm((f) => ({
                     ...f,
-                    mode_cotisation: v as 'tantieme' | 'fixe',
+                    mode_cotisation: v as 'tantieme' | 'fixe' | 'categorie',
                   }))
                 }
               >
@@ -195,6 +195,11 @@ export function ResidenceFormDialog({
                   </SelectItem>
                   <SelectItem value="fixe">
                     {t('gestionnaire.residences.form.modeFixe')}
+                  </SelectItem>
+                  <SelectItem value="categorie">
+                    {t('gestionnaire.residences.form.modeCategorie', {
+                      defaultValue: 'Par catégorie de lot',
+                    })}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -217,6 +222,15 @@ export function ResidenceFormDialog({
               </div>
             )}
           </div>
+
+          {form.mode_cotisation === 'categorie' && (
+            <p className="rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
+              {t('gestionnaire.residences.form.categorieHint', {
+                defaultValue:
+                  'Créez les catégories (libellé + cotisation) dans l’onglet « Catégories » de la résidence, puis rattachez chaque lot à une catégorie.',
+              })}
+            </p>
+          )}
         </div>
 
         <DialogFooter>
