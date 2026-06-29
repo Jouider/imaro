@@ -30,24 +30,24 @@ class Ticket extends Model
      */
     public const CATEGORIE_LABELS = [
         'parties_communes' => 'Parties communes',
-        'ascenseur'        => 'Ascenseur',
-        'plomberie'        => 'Eau / Plomberie',
-        'electricite'      => 'Électricité',
-        'chauffage'        => 'Chauffage / Climatisation',
-        'securite'         => 'Sécurité',
-        'proprete'         => 'Propreté / Nettoyage',
-        'nuisances'        => 'Nuisances sonores',
-        'espaces_verts'    => 'Espaces verts',
-        'parking'          => 'Parking / Garage',
-        'interphone'       => 'Interphone / Accès',
-        'degat_eaux'       => 'Dégât des eaux',
-        'autre'            => 'Autre',
+        'ascenseur' => 'Ascenseur',
+        'plomberie' => 'Eau / Plomberie',
+        'electricite' => 'Électricité',
+        'chauffage' => 'Chauffage / Climatisation',
+        'securite' => 'Sécurité',
+        'proprete' => 'Propreté / Nettoyage',
+        'nuisances' => 'Nuisances sonores',
+        'espaces_verts' => 'Espaces verts',
+        'parking' => 'Parking / Garage',
+        'interphone' => 'Interphone / Accès',
+        'degat_eaux' => 'Dégât des eaux',
+        'autre' => 'Autre',
     ];
 
     protected $fillable = [
         'tenant_id', 'reference', 'residence_id', 'lot_id', 'user_id', 'assigned_to', 'prestataire_id',
         'categorie', 'description', 'priorite', 'statut',
-        'cout_estime', 'cout_reel', 'note_satisfaction', 'images', 'closed_at',
+        'cout_estime', 'cout_reel', 'note_satisfaction', 'images', 'closed_at', 'sla_reminded_at',
     ];
 
     protected static function booted(): void
@@ -68,6 +68,7 @@ class Ticket extends Model
         return [
             'images' => 'array',
             'closed_at' => 'datetime',
+            'sla_reminded_at' => 'datetime',
         ];
     }
 
