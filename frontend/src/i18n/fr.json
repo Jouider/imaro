@@ -1339,6 +1339,8 @@
         "city": "Ville",
         "cityPlaceholder": "ex : Casablanca",
         "jourEcheance": "Jour d'échéance",
+        "dateAnniversaire": "Date de création / anniversaire",
+        "dateAnniversaireHint": "L'exercice (12 mois glissants) et l'AG démarrent à cette date. À défaut : 1er janvier.",
         "modeCotisation": "Mode de cotisation",
         "modeTantieme": "Au tantième",
         "modeFixe": "Montant fixe",

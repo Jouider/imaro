@@ -1339,6 +1339,8 @@
         "city": "المدينة",
         "cityPlaceholder": "مثال: الدار البيضاء",
         "jourEcheance": "يوم الاستحقاق",
+        "dateAnniversaire": "تاريخ الإنشاء / الذكرى السنوية",
+        "dateAnniversaireHint": "تبدأ السنة المالية (12 شهرًا متجددة) والجمع العام من هذا التاريخ. وإلا: 1 يناير.",
         "modeCotisation": "طريقة الاشتراك",
         "modeTantieme": "حسب الحصة",
         "modeFixe": "مبلغ ثابت",

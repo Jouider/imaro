@@ -85,6 +85,11 @@ export type Residence = {
   jour_echeance?: number
   /** Périodicité de génération des appels de fonds (KAN-86). Défaut: trimestriel. */
   periodicite_cotisation?: PeriodiciteCotisation
+  /**
+   * Date de création/anniversaire de la résidence (KAN-95). L'exercice
+   * comptable (12 mois glissants) et l'AG se basent dessus ; à défaut, 1er janvier.
+   */
+  date_anniversaire?: string | null
 }
 
 /** Périodicité de cotisation configurable par résidence (KAN-86). */
@@ -102,6 +107,7 @@ export type CreateResidenceInput = {
   montant_fixe?: number
   jour_echeance?: number
   periodicite_cotisation?: PeriodiciteCotisation
+  date_anniversaire?: string | null
 }
 
 /** Catégorie de lot (KAN-93) — cotisation forfaitaire par type de lot. */
