@@ -45,6 +45,13 @@ export type Encaissement = {
   est_avance: boolean
   recu_path: string | null
   est_rapproche: boolean
+  /**
+   * Statut du paiement (KAN-85). `cheque_rejete` = chèque marqué impayé.
+   * Optionnel : non encore exposé par GET /gestionnaire/encaissements.
+   */
+  statut?: 'valide' | 'cheque_rejete'
+  cheque_rejete_at?: string | null
+  motif_rejet?: string | null
 }
 
 export type VirementMethode = 'virement' | 'versement' | 'cheque' | 'especes'
@@ -578,4 +585,19 @@ export async function relancerTout(): Promise<{ nb_envoye: number }> {
     },
     { nb_envoye: MOCK_CREANCES.filter((c) => c.statut === 'en_retard').length },
   )
+}
+
+/**
+ * Marque un paiement par chèque comme impayé/rejeté par la banque (KAN-85).
+ * 422 si le paiement n'est pas en mode chèque ou est déjà rejeté.
+ * Effet backend : annule la ligne d'appel de fonds, régularise le solde,
+ * notifie le résident et passe une contre-passation comptable.
+ */
+export async function markChequeImpaye(
+  paiementId: number,
+  motif?: string,
+): Promise<void> {
+  await api.post(`/gestionnaire/paiements/${paiementId}/cheque-impaye`, {
+    motif: motif?.trim() || undefined,
+  })
 }

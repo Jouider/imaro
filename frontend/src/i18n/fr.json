@@ -1659,6 +1659,17 @@
         "totalPaye": "Total payé",
         "solde": "Solde"
       },
+      "chequeImpaye": {
+        "title": "Marquer le chèque comme impayé",
+        "action": "Marquer impayé",
+        "confirm": "Marquer impayé",
+        "badge": "Chèque rejeté",
+        "motif": "Motif (optionnel)",
+        "motifPlaceholder": "Ex. chèque sans provision",
+        "warning": "Le solde du copropriétaire sera ré-augmenté et il sera notifié. Une contre-passation comptable sera enregistrée.",
+        "success": "Chèque marqué comme impayé",
+        "error": "Impossible de marquer ce chèque comme impayé"
+      },
       "repartitionTantieme": "Répartition par tantième",
       "notePlaceholder": "Ex : Référence incorrecte...",
       "searchPlaceholder": "Rechercher copropriétaire ou lot...",
