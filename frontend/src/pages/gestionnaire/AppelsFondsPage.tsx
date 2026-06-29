@@ -80,7 +80,7 @@ interface RepartitionPreviewProps {
   lots: Lot[]
   totalTantieme: number
   montantTotal: number
-  mode?: 'tantieme' | 'fixe'
+  mode?: 'tantieme' | 'fixe' | 'categorie'
   montantFixe?: number
 }
 
@@ -93,7 +93,9 @@ function RepartitionPreview({
 }: RepartitionPreviewProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(true)
-  const isFixe = mode === 'fixe'
+  const isCategorie = mode === 'categorie'
+  // Modes « montant par lot » : forfait fixe ou cotisation de catégorie (KAN-93).
+  const isFixe = mode === 'fixe' || isCategorie
 
   return (
     <div className="rounded-lg border bg-muted/30 p-3">
@@ -103,7 +105,11 @@ function RepartitionPreview({
         className="flex w-full items-center justify-between text-sm font-medium"
       >
         <span>
-          {isFixe ? 'Répartition par montant fixe' : 'Répartition par tantième'}
+          {isCategorie
+            ? 'Répartition par catégorie de lot'
+            : isFixe
+              ? 'Répartition par montant fixe'
+              : 'Répartition par tantième'}
         </span>
         {open ? (
           <ChevronUp className="size-4 text-muted-foreground" />
@@ -147,7 +153,11 @@ function RepartitionPreview({
                     >
                       <td className="py-1 font-mono">{lot.numero}</td>
                       <td className="py-1 text-right tabular-nums">
-                        {fmt.format(montantFixe ?? 0)}
+                        {fmt.format(
+                          isCategorie
+                            ? (lot.categorie?.cotisation ?? 0)
+                            : (montantFixe ?? 0),
+                        )}
                       </td>
                     </tr>
                   )
