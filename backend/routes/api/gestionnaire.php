@@ -45,6 +45,7 @@ use App\Http\Controllers\Api\Gestionnaire\RecouvrementController;
 use App\Http\Controllers\Api\Gestionnaire\RemboursementController;
 use App\Http\Controllers\Api\Gestionnaire\ResidenceController;
 use App\Http\Controllers\Api\Gestionnaire\TicketController;
+use App\Http\Controllers\Api\Gestionnaire\TicketSlaConfigController;
 use App\Http\Controllers\Api\Gestionnaire\TravauxExceptionnelController;
 use App\Http\Controllers\Api\Gestionnaire\VirementDeclareController;
 use App\Http\Controllers\Api\Gestionnaire\VisiteController;
@@ -140,6 +141,11 @@ Route::middleware(['app.permission:recouvrement,finances'])->group(function () {
 });
 
 // Tickets (KAN-21)
+// KAN-89 — config SLA des tickets (rappel auto par gravité). Avant la resource
+// pour que /tickets/sla-config ne soit pas capté par /tickets/{ticket}.
+Route::get('tickets/sla-config', [TicketSlaConfigController::class, 'show']);
+Route::put('tickets/sla-config', [TicketSlaConfigController::class, 'update']);
+
 Route::apiResource('tickets', TicketController::class)->only(['index', 'store', 'show', 'update']);
 Route::post('tickets/{ticket}/clos', [TicketController::class, 'clos']);
 // KAN-88 — assignation d'un ticket à un gestionnaire

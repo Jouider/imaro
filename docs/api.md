@@ -941,6 +941,9 @@ Marque un paiement par **chèque** comme rejeté par la banque. Body optionnel :
 
 > **Avis de satisfaction résident (KAN-90)** : `PATCH /api/portail/reclamations/{id}/rating` body `{ rating: "satisfait" | "insatisfait" }`. Autorisé seulement sur **sa propre** réclamation (404 sinon) et si elle est **`resolu`/`clos`** (422 sinon). Stocké dans `note_satisfaction` (satisfait = 5, insatisfait = 1). `GET /portail/reclamations` renvoie `rating` (`note_satisfaction >= 3 → satisfait`, sinon `insatisfait`, `null` si pas encore noté).
 
+> **Rappel SLA (KAN-89)** : un ticket non traité (`ouvert`/`en_cours`) qui dépasse son délai selon sa gravité déclenche une **notification** au(x) manager(s) du tenant + au gestionnaire assigné (notif in-app `type=ticket`, `data.event="sla_breach"`). Détection par la commande planifiée `tickets:sla-reminders` (horaire) ; un ticket n'est relancé qu'une fois (`sla_reminded_at`).
+> **Config (manager uniquement)** : `GET /api/gestionnaire/tickets/sla-config` → `{ data: { sla: { enabled, urgent_hours, normal_hours, faible_hours } } }` (défauts 24 / 72 / 168 h). `PUT` même payload pour modifier (gestionnaire → 403).
+
 **Response 200**
 ```json
 {
