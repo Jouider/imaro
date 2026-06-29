@@ -1697,6 +1697,7 @@
     "tickets": {
       "title": "Tickets",
       "subtitle": "Suivi des réclamations et interventions",
+      "searchPlaceholder": "Rechercher par référence (TKT-…) ou description",
       "colRef": "Référence",
       "colTitre": "Description",
       "colResidence": "Résidence",
