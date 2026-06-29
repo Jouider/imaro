@@ -2254,7 +2254,10 @@
         "excelGrandLivre": "Excel — الأستاذ العام",
         "sageFec": "Sage FEC",
         "pdfJournal": "PDF — اليومية",
-        "pdfBalance": "PDF — ميزان المراجعة"
+        "pdfBalance": "PDF — ميزان المراجعة",
+        "success": "تم تنزيل الملف: {{filename}}",
+        "error": "فشل التصدير. يرجى المحاولة مرة أخرى.",
+        "empty": "لا توجد قيود للتصدير في هذه السنة المالية"
       },
       "seuil": {
         "label": "العتبة المحاسبية",

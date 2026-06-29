@@ -49,6 +49,8 @@ import {
   importFactureIa,
   cloturerExercice,
   getComptesPcg,
+  exportComptabilite,
+  type ExportComptableFormat,
   type ExerciceComptable,
   type EcritureComptable,
   type Depense,
@@ -876,47 +878,106 @@ function EncaisserModal({
 
 // ─── ExportDropdown ───────────────────────────────────────────────────────────
 
-function ExportDropdown() {
+function ExportDropdown({
+  exerciceId,
+  annee,
+  hasEcritures,
+}: {
+  exerciceId: number
+  annee?: number
+  hasEcritures: boolean
+}) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
+  const [pending, setPending] = useState<ExportComptableFormat | null>(null)
 
-  const items = [
+  const items: {
+    icon: string
+    format: ExportComptableFormat
+    label: string
+  }[] = [
     {
       icon: '📊',
+      format: 'journal-xlsx',
       label: t('gestionnaire.comptabilite.export.excelJournal', {
         defaultValue: 'Excel — Journal complet',
       }),
     },
     {
       icon: '📊',
+      format: 'grand-livre-xlsx',
       label: t('gestionnaire.comptabilite.export.excelGrandLivre', {
         defaultValue: 'Excel — Grand-Livre',
       }),
     },
     {
       icon: '📋',
+      format: 'fec',
       label: t('gestionnaire.comptabilite.export.sageFec', {
         defaultValue: 'Sage FEC',
       }),
     },
     {
       icon: '📄',
+      format: 'journal-pdf',
       label: t('gestionnaire.comptabilite.export.pdfJournal', {
         defaultValue: 'PDF — Journal',
       }),
     },
     {
       icon: '📄',
+      format: 'balance-pdf',
       label: t('gestionnaire.comptabilite.export.pdfBalance', {
         defaultValue: 'PDF — Balance',
       }),
     },
   ]
 
+  async function handleExport(format: ExportComptableFormat) {
+    setPending(format)
+    const toastId = toast.loading(t('common.exportInProgress'))
+    try {
+      const filename = await exportComptabilite(exerciceId, format, annee)
+      toast.success(
+        t('gestionnaire.comptabilite.export.success', {
+          defaultValue: 'Export téléchargé : {{filename}}',
+          filename,
+        }),
+        { id: toastId },
+      )
+      setOpen(false)
+    } catch {
+      toast.error(
+        t('gestionnaire.comptabilite.export.error', {
+          defaultValue: "Échec de l'export. Veuillez réessayer.",
+        }),
+        { id: toastId },
+      )
+    } finally {
+      setPending(null)
+    }
+  }
+
   return (
     <div className="relative">
-      <Button variant="outline" size="sm" onClick={() => setOpen((v) => !v)}>
-        <Download className="me-1.5 size-4" />
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setOpen((v) => !v)}
+        disabled={!hasEcritures || pending !== null}
+        title={
+          hasEcritures
+            ? undefined
+            : t('gestionnaire.comptabilite.export.empty', {
+                defaultValue: 'Aucune écriture à exporter pour cet exercice',
+              })
+        }
+      >
+        {pending !== null ? (
+          <Loader2 className="me-1.5 size-4 animate-spin" />
+        ) : (
+          <Download className="me-1.5 size-4" />
+        )}
         {t('gestionnaire.comptabilite.export.title', {
           defaultValue: 'Exporter',
         })}
@@ -933,15 +994,17 @@ function ExportDropdown() {
           <div className="absolute end-0 top-full z-20 mt-1 w-56 rounded-lg border bg-white p-1 shadow-lg dark:bg-card">
             {items.map((item) => (
               <button
-                key={item.label}
+                key={item.format}
                 type="button"
-                onClick={() => {
-                  setOpen(false)
-                  toast.success(t('common.exportInProgress'))
-                }}
-                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-muted"
+                disabled={pending !== null}
+                onClick={() => void handleExport(item.format)}
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <span>{item.icon}</span>
+                {pending === item.format ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <span>{item.icon}</span>
+                )}
                 {item.label}
               </button>
             ))}
@@ -2525,6 +2588,15 @@ export function ComptabilitePage() {
   const currentExercice = exercices.find((e) => e.id === exerciceId)
   const exerciceClos = currentExercice?.statut === 'clos'
 
+  // Lightweight check so the Export button can be disabled when there is
+  // nothing to export (KAN-101). Reuses the same cache key as the Rapports tab.
+  const { data: journalEcritures = [] } = useQuery({
+    queryKey: ['journal', exerciceId],
+    queryFn: () => getJournal(exerciceId),
+    enabled: exerciceId > 0,
+  })
+  const hasEcritures = journalEcritures.length > 0
+
   const currentResidence = residences.find((r) => r.id === residenceId)
   const residenceName =
     currentResidence?.name ?? residences[0]?.name ?? 'Résidence'
@@ -2630,7 +2702,11 @@ export function ComptabilitePage() {
                 defaultValue: 'Import IA',
               })}
             </Button>
-            <ExportDropdown />
+            <ExportDropdown
+              exerciceId={exerciceId}
+              annee={currentExercice?.annee}
+              hasEcritures={hasEcritures}
+            />
           </div>
         }
       />

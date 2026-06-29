@@ -2254,7 +2254,10 @@
         "excelGrandLivre": "Excel — Grand-Livre",
         "sageFec": "Sage FEC",
         "pdfJournal": "PDF — Journal",
-        "pdfBalance": "PDF — Balance"
+        "pdfBalance": "PDF — Balance",
+        "success": "Export téléchargé : {{filename}}",
+        "error": "Échec de l'export. Veuillez réessayer.",
+        "empty": "Aucune écriture à exporter pour cet exercice"
       },
       "seuil": {
         "label": "Seuil comptable",
