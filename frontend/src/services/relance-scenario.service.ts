@@ -31,6 +31,14 @@ export type RelanceScenario = {
   steps: RelanceStep[]
 }
 
+/**
+ * Forme renvoyée par l'API (KAN-87) : le scénario est emballé sous `scenario`
+ * et ne renvoie pas `residence_id` (réinjecté côté client).
+ */
+type RelanceScenarioPayload = {
+  scenario: { enabled: boolean; steps: RelanceStep[] }
+}
+
 // ─── Mock ─────────────────────────────────────────────────────────────────────
 
 const MOCK_SCENARIO: RelanceScenario = {
@@ -55,10 +63,11 @@ export async function getRelanceScenario(
 ): Promise<RelanceScenario> {
   return withMock(
     async () => {
-      const res = await api.get<ApiEnvelope<RelanceScenario>>(
+      const res = await api.get<ApiEnvelope<RelanceScenarioPayload>>(
         `/gestionnaire/residences/${residenceId}/relance-scenario`,
       )
-      return res.data.data
+      const { scenario } = res.data.data
+      return { residence_id: residenceId, ...scenario }
     },
     { ...MOCK_SCENARIO, residence_id: residenceId },
   )
@@ -70,11 +79,12 @@ export async function updateRelanceScenario(
 ): Promise<RelanceScenario> {
   return withMock(
     async () => {
-      const res = await api.put<ApiEnvelope<RelanceScenario>>(
+      const res = await api.put<ApiEnvelope<RelanceScenarioPayload>>(
         `/gestionnaire/residences/${residenceId}/relance-scenario`,
         data,
       )
-      return res.data.data
+      const { scenario } = res.data.data
+      return { residence_id: residenceId, ...scenario }
     },
     {
       residence_id: residenceId,
