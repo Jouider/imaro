@@ -2604,6 +2604,26 @@
       "colOrganisme": "Organisme"
     },
     "recouvrement": {
+      "relance": {
+        "title": "Scénario de relance",
+        "subtitle": "Étapes automatiques après échéance : délai, canal et escalade vers mise en demeure.",
+        "auto": "Automatique",
+        "empty": "Aucune étape. Ajoutez une première relance.",
+        "delai": "Délai (J+)",
+        "canal": "Canal",
+        "type": "Type",
+        "addStep": "Ajouter une étape",
+        "saved": "Scénario de relance enregistré",
+        "canaux": {
+          "whatsapp": "WhatsApp",
+          "sms": "SMS",
+          "email": "E-mail"
+        },
+        "types": {
+          "relance": "Relance",
+          "mise_en_demeure": "Mise en demeure"
+        }
+      },
       "toastConfigSaved": "Configuration enregistrée",
       "recalcError": "Échec du recalcul",
       "penaltyType": "Type de pénalité",
