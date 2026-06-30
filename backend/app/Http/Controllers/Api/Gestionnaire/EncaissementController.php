@@ -48,6 +48,11 @@ class EncaissementController extends Controller
             'est_avance' => false,
             'recu_path' => null,
             'est_rapproche' => false,
+            // Suivi chèque impayé (KAN-85 / #338) — mêmes champs que PaiementResource,
+            // pour que le badge « Chèque rejeté » persiste après refetch.
+            'statut' => $p->statut ?? 'valide',
+            'cheque_rejete_at' => $p->cheque_rejete_at?->toIso8601String(),
+            'motif_rejet' => $p->motif_rejet,
         ]);
 
         return response()->json([
