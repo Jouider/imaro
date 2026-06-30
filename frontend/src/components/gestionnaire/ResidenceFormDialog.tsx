@@ -32,6 +32,7 @@ type FormState = {
   montant_fixe: string
   jour_echeance: string
   periodicite_cotisation: PeriodiciteCotisation
+  date_anniversaire: string
 }
 
 const PERIODICITES: PeriodiciteCotisation[] = [
@@ -49,6 +50,7 @@ const EMPTY: FormState = {
   montant_fixe: '',
   jour_echeance: '1',
   periodicite_cotisation: 'trimestriel',
+  date_anniversaire: '',
 }
 
 type Props = {
@@ -85,6 +87,7 @@ export function ResidenceFormDialog({
             jour_echeance: residence.jour_echeance?.toString() ?? '1',
             periodicite_cotisation:
               residence.periodicite_cotisation ?? 'trimestriel',
+            date_anniversaire: residence.date_anniversaire?.slice(0, 10) ?? '',
           }
         : EMPTY,
     )
@@ -113,6 +116,7 @@ export function ResidenceFormDialog({
         ? Number(form.jour_echeance)
         : undefined,
       periodicite_cotisation: form.periodicite_cotisation,
+      date_anniversaire: form.date_anniversaire || null,
     })
   }
 
@@ -186,6 +190,28 @@ export function ResidenceFormDialog({
                 }
               />
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="res-anniversaire">
+              {t('gestionnaire.residences.form.dateAnniversaire', {
+                defaultValue: 'Date de création / anniversaire',
+              })}
+            </Label>
+            <Input
+              id="res-anniversaire"
+              type="date"
+              value={form.date_anniversaire}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, date_anniversaire: e.target.value }))
+              }
+            />
+            <p className="text-xs text-muted-foreground">
+              {t('gestionnaire.residences.form.dateAnniversaireHint', {
+                defaultValue:
+                  "L'exercice (12 mois glissants) et l'AG démarrent à cette date. À défaut : 1er janvier.",
+              })}
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
