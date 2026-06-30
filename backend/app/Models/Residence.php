@@ -9,16 +9,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Residence extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'tenant_id', 'gestionnaire_id', 'name', 'address',
         'city', 'photo', 'total_tantieme', 'nb_lots', 'status',
-        'mode_cotisation', 'cotisation_mensuelle', 'jour_echeance',
+        'mode_cotisation', 'cotisation_mensuelle', 'jour_echeance', 'periodicite_cotisation',
     ];
 
     protected static function booted(): void
@@ -45,7 +46,7 @@ class Residence extends Model
         return $this->hasMany(Exercice::class);
     }
 
-    public function exerciceActif(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function exerciceActif(): HasOne
     {
         return $this->hasOne(Exercice::class)->where('statut', 'actif')->latestOfMany('annee');
     }
