@@ -349,6 +349,7 @@ celui-ci a le rôle `gestionnaire`.
 | `montant_fixe` | number | si `mode_cotisation='fixe'` | DH, persisté dans `cotisation_mensuelle` |
 | `jour_echeance` | int (1–28) | ✗ | Jour du mois où les cotisations sont dues |
 | `periodicite_cotisation` | `'mensuel' \| 'trimestriel' \| 'semestriel' \| 'annuel'` | ✗ | **KAN-86** — défaut `trimestriel`. Accepté en POST/PUT, renvoyé dans `ResidenceResource`. |
+| `date_anniversaire` | date (`YYYY-MM-DD`) | ✗ | **KAN-95** — date de création/anniversaire. L'exercice (12 mois glissants) démarre dessus ; nullable → cycle au 1er janvier par défaut. Renvoyé dans `ResidenceResource`. |
 
 **Response 201** → `data` = objet Résidence créé (cf. shape ci-dessus, sans wrapper `residence`).
 
@@ -569,6 +570,7 @@ Chaque résidence fonctionne par exercices annuels. Toutes les opérations finan
 ```json
 { "annee": 2027, "date_debut": "2027-01-01", "date_fin": "2027-12-31" }
 ```
+`date_debut`/`date_fin` sont **optionnels** (KAN-95) : si absents, calculés en **12 mois glissants depuis `date_anniversaire`** de la résidence (sinon 1er janvier → 31 décembre).
 
 **Validation :** Un seul exercice par année par résidence.
 
