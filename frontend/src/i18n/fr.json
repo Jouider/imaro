@@ -1345,6 +1345,13 @@
         "modeCategorie": "Par catégorie de lot",
         "categorieHint": "Créez les catégories (libellé + cotisation) dans l'onglet « Catégories » de la résidence, puis rattachez chaque lot à une catégorie.",
         "montantFixe": "Montant fixe (DH)",
+        "periodicite": "Périodicité de cotisation",
+        "periodicites": {
+          "mensuel": "Mensuel",
+          "trimestriel": "Trimestriel",
+          "semestriel": "Semestriel",
+          "annuel": "Annuel"
+        },
         "createSubmit": "Créer la résidence"
       },
       "categories": {

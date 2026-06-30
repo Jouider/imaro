@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   type CreateResidenceInput,
   type Residence,
+  type PeriodiciteCotisation,
 } from '@/services/gestionnaire.service'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -30,7 +31,15 @@ type FormState = {
   mode_cotisation: 'tantieme' | 'fixe' | 'categorie'
   montant_fixe: string
   jour_echeance: string
+  periodicite_cotisation: PeriodiciteCotisation
 }
+
+const PERIODICITES: PeriodiciteCotisation[] = [
+  'mensuel',
+  'trimestriel',
+  'semestriel',
+  'annuel',
+]
 
 const EMPTY: FormState = {
   name: '',
@@ -39,6 +48,7 @@ const EMPTY: FormState = {
   mode_cotisation: 'tantieme',
   montant_fixe: '',
   jour_echeance: '1',
+  periodicite_cotisation: 'trimestriel',
 }
 
 type Props = {
@@ -73,6 +83,8 @@ export function ResidenceFormDialog({
             mode_cotisation: residence.mode_cotisation ?? 'tantieme',
             montant_fixe: residence.montant_fixe?.toString() ?? '',
             jour_echeance: residence.jour_echeance?.toString() ?? '1',
+            periodicite_cotisation:
+              residence.periodicite_cotisation ?? 'trimestriel',
           }
         : EMPTY,
     )
@@ -81,10 +93,11 @@ export function ResidenceFormDialog({
   }
 
   const isEdit = !!residence
+  // Seul le mode « fixe » exige un montant ; tantième et catégorie n'en ont pas.
   const canSubmit =
     form.name.trim() !== '' &&
     form.city.trim() !== '' &&
-    (form.mode_cotisation === 'tantieme' || form.montant_fixe.trim() !== '')
+    (form.mode_cotisation !== 'fixe' || form.montant_fixe.trim() !== '')
 
   function handleSubmit() {
     onSubmit({
@@ -99,6 +112,7 @@ export function ResidenceFormDialog({
       jour_echeance: form.jour_echeance
         ? Number(form.jour_echeance)
         : undefined,
+      periodicite_cotisation: form.periodicite_cotisation,
     })
   }
 
@@ -231,6 +245,36 @@ export function ResidenceFormDialog({
               })}
             </p>
           )}
+
+          <div className="space-y-1.5">
+            <Label>
+              {t('gestionnaire.residences.form.periodicite', {
+                defaultValue: 'Périodicité de cotisation',
+              })}
+            </Label>
+            <Select
+              value={form.periodicite_cotisation}
+              onValueChange={(v) =>
+                setForm((f) => ({
+                  ...f,
+                  periodicite_cotisation: v as PeriodiciteCotisation,
+                }))
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PERIODICITES.map((p) => (
+                  <SelectItem key={p} value={p}>
+                    {t(`gestionnaire.residences.form.periodicites.${p}`, {
+                      defaultValue: p,
+                    })}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <DialogFooter>
