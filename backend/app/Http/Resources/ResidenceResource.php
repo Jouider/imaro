@@ -31,6 +31,7 @@ class ResidenceResource extends JsonResource
             'cotisation_mensuelle' => $this->cotisation_mensuelle,
             'jour_echeance' => $this->jour_echeance,
             'periodicite_cotisation' => $this->periodicite_cotisation,
+            'date_anniversaire' => $this->date_anniversaire?->toDateString(),
             'exercice_actif' => $exerciceActif ? [
                 'id' => $exerciceActif->id,
                 'annee' => $exerciceActif->annee,

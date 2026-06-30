@@ -21,6 +21,7 @@ class StoreResidenceRequest extends FormRequest
             'montant_fixe' => ['nullable', 'required_if:mode_cotisation,fixe', 'numeric', 'min:0'],
             'jour_echeance' => ['nullable', 'integer', 'between:1,28'],
             'periodicite_cotisation' => ['nullable', 'in:mensuel,trimestriel,semestriel,annuel'],
+            'date_anniversaire' => ['nullable', 'date'],
         ];
     }
 
