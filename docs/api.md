@@ -348,6 +348,7 @@ celui-ci a le rôle `gestionnaire`.
 | `mode_cotisation` | `'tantieme' \| 'fixe'` | ✓ | |
 | `montant_fixe` | number | si `mode_cotisation='fixe'` | DH, persisté dans `cotisation_mensuelle` |
 | `jour_echeance` | int (1–28) | ✗ | Jour du mois où les cotisations sont dues |
+| `periodicite_cotisation` | `'mensuel' \| 'trimestriel' \| 'semestriel' \| 'annuel'` | ✗ | **KAN-86** — défaut `trimestriel`. Accepté en POST/PUT, renvoyé dans `ResidenceResource`. |
 
 **Response 201** → `data` = objet Résidence créé (cf. shape ci-dessus, sans wrapper `residence`).
 
