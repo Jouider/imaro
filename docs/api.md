@@ -1521,6 +1521,16 @@ Implémente `docs/feature-visites-backend-brief.md`. Cycle de vie :
 
 ---
 
+## Scénario de relance de recouvrement (KAN-87)
+
+Configurable par résidence (`role:manager|gestionnaire`). Exécution auto par la commande planifiée `relances:run` (quotidienne).
+
+- `GET /api/gestionnaire/residences/{id}/relance-scenario` → `{ data: { scenario: { enabled, steps: [{ id, delai_jours, canal: 'whatsapp'|'sms'|'email', type: 'relance'|'mise_en_demeure' }] } } }`. Défaut si non configuré : `{ enabled:false, steps:[] }`.
+- `PUT` même ressource, body `{ enabled, steps: [{ delai_jours, canal, type }] }` → **remplace** l'ensemble des étapes (ordre = index).
+- **Exécution** : `relances:run` parcourt les résidences avec scénario activé ; pour chaque impayé dont le **retard (jours) == `delai_jours`** d'une étape, déclenche la relance (notification portail) et journalise dans `notifications_log` (`canal`, `template_name=relance_{type}`). L'étape `mise_en_demeure` correspond à la **Loi 18-00 art. 25** (mise en demeure + 30 j → exigibilité des provisions).
+
+> Livraison multi-canal réelle (WhatsApp/SMS/e-mail) : route via les providers `NotificationManager` ; à ce stade le job déclenche la notification portail et journalise le canal prévu.
+
 ## Assistance recouvrement (service optionnel — #179)
 
 `POST /api/gestionnaire/assistance-recouvrement` · `role:manager|gestionnaire`

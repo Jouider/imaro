@@ -42,6 +42,7 @@ use App\Http\Controllers\Api\Gestionnaire\PointageController;
 use App\Http\Controllers\Api\Gestionnaire\PrestataireController;
 use App\Http\Controllers\Api\Gestionnaire\ProfilController;
 use App\Http\Controllers\Api\Gestionnaire\RecouvrementController;
+use App\Http\Controllers\Api\Gestionnaire\RelanceScenarioController;
 use App\Http\Controllers\Api\Gestionnaire\RemboursementController;
 use App\Http\Controllers\Api\Gestionnaire\ResidenceController;
 use App\Http\Controllers\Api\Gestionnaire\TicketController;
@@ -87,6 +88,9 @@ Route::prefix('residences/{residence}')->group(function () {
     Route::get('/exercices', [ExerciceController::class, 'index']);
     Route::post('/exercices', [ExerciceController::class, 'store']);
     Route::post('/exercices/{exercice}/cloture', [ExerciceController::class, 'cloture']);
+    // KAN-87 — scénario de relance de recouvrement (config par résidence)
+    Route::get('/relance-scenario', [RelanceScenarioController::class, 'show']);
+    Route::put('/relance-scenario', [RelanceScenarioController::class, 'update']);
     // Budget Annexe 5 (per exercice)
     Route::get('/exercices/{exercice}/budget-annexe5', [BudgetAnnexe5Controller::class, 'show']);
     Route::get('/exercices/{exercice}/budget', [BudgetAnnexe5Controller::class, 'showSimple']);
