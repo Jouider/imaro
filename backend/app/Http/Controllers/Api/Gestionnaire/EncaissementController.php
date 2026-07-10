@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Gestionnaire;
 
+use App\Http\Controllers\Api\Gestionnaire\Concerns\GuardsClosedExercice;
 use App\Http\Controllers\Controller;
 use App\Jobs\GenerateRecuPaiementJob;
 use App\Models\AppelFondsLigne;
@@ -12,6 +13,8 @@ use Illuminate\Http\Request;
 
 class EncaissementController extends Controller
 {
+    use GuardsClosedExercice;
+
     /**
      * GET /api/gestionnaire/encaissements
      */
@@ -80,6 +83,8 @@ class EncaissementController extends Controller
         if ($validated['creance_id']) {
             $ligne = AppelFondsLigne::with('appelFonds')->find($validated['creance_id']);
         }
+
+        $this->abortIfExerciceCloture($ligne?->appelFonds?->exercice_id);
 
         $paiement = Paiement::create([
             'tenant_id' => config('app.tenant_id'),

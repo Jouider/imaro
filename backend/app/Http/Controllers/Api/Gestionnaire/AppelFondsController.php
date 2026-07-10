@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Gestionnaire;
 
 use App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
+use App\Http\Controllers\Api\Gestionnaire\Concerns\GuardsClosedExercice;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Gestionnaire\StoreAppelFondsRequest;
 use App\Http\Requests\Gestionnaire\UpdateAppelFondsRequest;
@@ -15,7 +16,8 @@ use Illuminate\Http\Request;
 
 class AppelFondsController extends Controller
 {
-    use AuthorizesResidence;
+    use AuthorizesResidence, GuardsClosedExercice;
+
     /**
      * GET /api/gestionnaire/appels-fonds
      */
@@ -56,17 +58,18 @@ class AppelFondsController extends Controller
     {
         $residence = Residence::findOrFail($request->residence_id);
         $this->authorizeResidence($request, $residence);
+        $this->abortIfExerciceCloture($request->exercice_id);
 
         $appelFonds = AppelFonds::create([
-            'tenant_id'    => config('app.tenant_id'),
+            'tenant_id' => config('app.tenant_id'),
             'residence_id' => $request->residence_id,
-            'exercice_id'  => $request->exercice_id,
-            'created_by'   => $request->user()->id,
-            'libelle'      => $request->titre ?? $request->libelle,  // frontend envoie 'titre'
-            'description'  => $request->description,
-            'montant_total'=> $request->montant_total,
-            'date_echeance'=> $request->date_echeance,
-            'statut'       => 'brouillon',
+            'exercice_id' => $request->exercice_id,
+            'created_by' => $request->user()->id,
+            'libelle' => $request->titre ?? $request->libelle,  // frontend envoie 'titre'
+            'description' => $request->description,
+            'montant_total' => $request->montant_total,
+            'date_echeance' => $request->date_echeance,
+            'statut' => 'brouillon',
         ]);
 
         $appelFonds->genererLignes();
