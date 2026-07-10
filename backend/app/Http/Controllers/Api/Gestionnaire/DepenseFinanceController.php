@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Gestionnaire;
 
+use App\Http\Controllers\Api\Gestionnaire\Concerns\GuardsClosedExercice;
 use App\Http\Controllers\Controller;
 use App\Models\Depense;
 use Illuminate\Http\JsonResponse;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 class DepenseFinanceController extends Controller
 {
+    use GuardsClosedExercice;
+
     /**
      * GET /api/gestionnaire/depenses-finance
      */
@@ -32,13 +35,13 @@ class DepenseFinanceController extends Controller
         }
 
         $categorieToCompte = [
-            'gardiennage'   => '6138',
-            'nettoyage'     => '6131',
-            'entretien'     => '6135',
-            'assurance'     => '6136',
+            'gardiennage' => '6138',
+            'nettoyage' => '6131',
+            'entretien' => '6135',
+            'assurance' => '6136',
             'administratif' => '6171',
-            'travaux'       => '6134',
-            'autre'         => '6188',
+            'travaux' => '6134',
+            'autre' => '6188',
         ];
 
         $depenses = $query->get()->map(function (Depense $d) use ($categorieToCompte) {
@@ -54,29 +57,29 @@ class DepenseFinanceController extends Controller
             ];
 
             return [
-                'id'                  => $d->id,
-                'exercice_id'         => $d->exercice_id,
-                'residence_id'        => $d->residence_id,
-                'residence_nom'       => $d->residence?->name ?? '',
-                'titre'               => $d->description,
-                'montant'             => round((float) $d->montant, 2),
-                'date'                => $d->date->toDateString(),
-                'prestataire_id'      => $d->prestataire_id,
-                'prestataire_nom'     => $d->prestataire?->nom ?? null,
-                'compte_charge'       => $compte,
-                'libelle_compte'      => $libellesCompte[$compte] ?? 'Charges diverses',
-                'mode_paiement'       => $d->statut === 'paye' ? 'virement' : 'autre',
-                'justificatif_path'   => null,
-                'ecriture_id'         => $d->id,
-                'est_recurrente'      => false,
-                'statut_approbation'  => $d->statut === 'paye' ? 'approuve' : ($d->statut === 'en_attente' ? 'en_attente' : null),
-                'approuve_par'        => $d->statut === 'paye' ? 'Gestionnaire' : null,
+                'id' => $d->id,
+                'exercice_id' => $d->exercice_id,
+                'residence_id' => $d->residence_id,
+                'residence_nom' => $d->residence?->name ?? '',
+                'titre' => $d->description,
+                'montant' => round((float) $d->montant, 2),
+                'date' => $d->date->toDateString(),
+                'prestataire_id' => $d->prestataire_id,
+                'prestataire_nom' => $d->prestataire?->nom ?? null,
+                'compte_charge' => $compte,
+                'libelle_compte' => $libellesCompte[$compte] ?? 'Charges diverses',
+                'mode_paiement' => $d->statut === 'paye' ? 'virement' : 'autre',
+                'justificatif_path' => null,
+                'ecriture_id' => $d->id,
+                'est_recurrente' => false,
+                'statut_approbation' => $d->statut === 'paye' ? 'approuve' : ($d->statut === 'en_attente' ? 'en_attente' : null),
+                'approuve_par' => $d->statut === 'paye' ? 'Gestionnaire' : null,
             ];
         });
 
         return response()->json([
             'status' => 'success',
-            'data'   => $depenses->values(),
+            'data' => $depenses->values(),
         ]);
     }
 
@@ -86,33 +89,35 @@ class DepenseFinanceController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'exercice_id'    => 'required|exists:exercices,id',
-            'residence_id'   => 'required|exists:residences,id',
-            'titre'          => 'required|string|max:255',
-            'montant'        => 'required|numeric|min:0',
-            'date'           => 'required|date',
+            'exercice_id' => 'required|exists:exercices,id',
+            'residence_id' => 'required|exists:residences,id',
+            'titre' => 'required|string|max:255',
+            'montant' => 'required|numeric|min:0',
+            'date' => 'required|date',
             'prestataire_id' => 'nullable|exists:prestataires,id',
-            'compte_charge'  => 'nullable|string',
-            'mode_paiement'  => 'nullable|string',
+            'compte_charge' => 'nullable|string',
+            'mode_paiement' => 'nullable|string',
         ]);
 
+        $this->abortIfExerciceCloture($validated['exercice_id']);
+
         $depense = Depense::create([
-            'tenant_id'      => config('app.tenant_id'),
-            'exercice_id'    => $validated['exercice_id'],
-            'residence_id'   => $validated['residence_id'],
+            'tenant_id' => config('app.tenant_id'),
+            'exercice_id' => $validated['exercice_id'],
+            'residence_id' => $validated['residence_id'],
             'prestataire_id' => $validated['prestataire_id'] ?? null,
-            'created_by'     => $request->user()->id,
-            'description'    => $validated['titre'],
-            'categorie'      => 'autre',
-            'montant'        => $validated['montant'],
-            'date'           => $validated['date'],
-            'statut'         => 'en_attente',
+            'created_by' => $request->user()->id,
+            'description' => $validated['titre'],
+            'categorie' => 'autre',
+            'montant' => $validated['montant'],
+            'date' => $validated['date'],
+            'statut' => 'en_attente',
         ]);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Dépense créée.',
-            'data'    => $depense,
+            'data' => $depense,
         ], 201);
     }
 
@@ -162,10 +167,10 @@ class DepenseFinanceController extends Controller
             ->limit(5)
             ->get()
             ->map(fn ($d) => [
-                'compte'  => $d->categorie,
+                'compte' => $d->categorie,
                 'libelle' => ucfirst($d->categorie),
                 'montant' => round((float) $d->montant, 2),
-                'pct'     => $total > 0 ? round(($d->montant / $total) * 100, 1) : 0,
+                'pct' => $total > 0 ? round(($d->montant / $total) * 100, 1) : 0,
             ]);
 
         // Top prestataires
@@ -179,21 +184,21 @@ class DepenseFinanceController extends Controller
             ->limit(5)
             ->get()
             ->map(fn ($d) => [
-                'nom'     => $d->prestataire?->nom ?? 'Inconnu',
+                'nom' => $d->prestataire?->nom ?? 'Inconnu',
                 'montant' => round((float) $d->montant, 2),
-                'nb'      => $d->nb,
+                'nb' => $d->nb,
             ]);
 
         return response()->json([
             'status' => 'success',
-            'data'   => [
-                'total_periode'           => round((float) $total, 2),
-                'nb_depenses'             => $count,
-                'montant_moyen'           => $count > 0 ? round((float) $total / $count, 2) : 0,
-                'en_attente_approbation'  => $enAttente,
-                'evolution_mensuelle'     => $evolution,
-                'top_comptes'             => $topComptes,
-                'top_prestataires'        => $topPrest,
+            'data' => [
+                'total_periode' => round((float) $total, 2),
+                'nb_depenses' => $count,
+                'montant_moyen' => $count > 0 ? round((float) $total / $count, 2) : 0,
+                'en_attente_approbation' => $enAttente,
+                'evolution_mensuelle' => $evolution,
+                'top_comptes' => $topComptes,
+                'top_prestataires' => $topPrest,
             ],
         ]);
     }
@@ -206,9 +211,9 @@ class DepenseFinanceController extends Controller
         $depense->update(['statut' => 'paye']);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Dépense approuvée.',
-            'data'    => $depense->fresh(),
+            'data' => $depense->fresh(),
         ]);
     }
 
@@ -220,9 +225,9 @@ class DepenseFinanceController extends Controller
         $depense->update(['statut' => 'annule']);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Dépense rejetée.',
-            'data'    => $depense->fresh(),
+            'data' => $depense->fresh(),
         ]);
     }
 
@@ -233,7 +238,7 @@ class DepenseFinanceController extends Controller
     {
         return response()->json([
             'status' => 'success',
-            'data'   => [],
+            'data' => [],
         ]);
     }
 
@@ -243,9 +248,9 @@ class DepenseFinanceController extends Controller
     public function storeRecurrente(Request $request): JsonResponse
     {
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Dépense récurrente créée.',
-            'data'    => null,
+            'data' => null,
         ], 201);
     }
 
@@ -256,13 +261,13 @@ class DepenseFinanceController extends Controller
     {
         return response()->json([
             'status' => 'success',
-            'data'   => [
-                'titre'                 => 'Facture importée',
-                'montant'               => 0,
-                'date'                  => now()->toDateString(),
-                'fournisseur'           => null,
+            'data' => [
+                'titre' => 'Facture importée',
+                'montant' => 0,
+                'date' => now()->toDateString(),
+                'fournisseur' => null,
                 'compte_charge_suggere' => '6188',
-                'confiance'             => 'faible',
+                'confiance' => 'faible',
             ],
         ]);
     }
@@ -273,9 +278,9 @@ class DepenseFinanceController extends Controller
     public function toggleRecurrente(int $id): JsonResponse
     {
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Modèle récurrent basculé.',
-            'data'    => null,
+            'data' => null,
         ]);
     }
 }

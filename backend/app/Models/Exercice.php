@@ -21,9 +21,15 @@ class Exercice extends Model
     {
         return [
             'date_debut' => 'date',
-            'date_fin'   => 'date',
-            'annee'      => 'integer',
+            'date_fin' => 'date',
+            'annee' => 'integer',
         ];
+    }
+
+    /** Exercice clôturé → aucun mouvement (dépense, appel, encaissement) autorisé (KAN-127). */
+    public function estCloture(): bool
+    {
+        return $this->statut === 'cloture';
     }
 
     protected static function booted(): void
