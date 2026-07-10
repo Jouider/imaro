@@ -183,6 +183,7 @@ Route::get('/prestataires', [PrestataireController::class, 'index']);
 Route::post('/prestataires/bulk', [PrestataireController::class, 'bulkStore']);
 Route::post('/prestataires', [PrestataireController::class, 'store']);
 Route::put('/prestataires/{prestataire}', [PrestataireController::class, 'update']);
+Route::delete('/prestataires/{prestataire}', [PrestataireController::class, 'destroy']);
 
 Route::get('/contrats', [ContratController::class, 'index']);
 Route::post('/contrats', [ContratController::class, 'store']);
