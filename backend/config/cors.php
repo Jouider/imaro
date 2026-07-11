@@ -8,6 +8,10 @@ return [
         env('FRONTEND_URL_LOCAL', 'http://localhost:5173'),
         'http://localhost:5173',
         'http://localhost:3000',
+        // Back-office (Digitoyou super-admin) — Vite dev server
+        env('BACKOFFICE_URL', 'http://localhost:5180'),
+        'http://localhost:5180',
+        'https://admin.imaro.ma',
         'https://imaro.ma',
         'https://www.imaro.ma',
         'https://staging.imaro.ma',
