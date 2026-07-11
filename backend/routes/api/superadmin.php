@@ -15,10 +15,13 @@ Route::get('/metrics', MetricsController::class);
 // Clients (cabinets syndic = tenants)
 Route::get('/tenants', [TenantController::class, 'index']);
 Route::get('/tenants/{tenant}', [TenantController::class, 'show']);
+Route::get('/tenants/{tenant}/activity', [TenantController::class, 'activity']);
 Route::put('/tenants/{tenant}', [TenantController::class, 'update']);
 Route::post('/tenants/{tenant}/suspend', [TenantController::class, 'suspend']);
 Route::post('/tenants/{tenant}/activate', [TenantController::class, 'activate']);
 Route::post('/tenants/{tenant}/extend-trial', [TenantController::class, 'extendTrial']);
+// Impersonation (dépannage) — token court tracé dans l'audit
+Route::post('/tenants/{tenant}/impersonate', [TenantController::class, 'impersonate']);
 
 // Démos & leads (pipeline commercial)
 Route::get('/leads', [LeadController::class, 'index']);
