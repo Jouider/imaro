@@ -10,14 +10,14 @@ Bundle / package: `ma.imaro.portail` · Privacy policy: https://imaro.ma/confide
 
 ## URLs & categories (both stores)
 
-| Field | Value |
-|---|---|
-| Privacy policy URL | https://imaro.ma/confidentialite |
-| Support URL | https://imaro.ma |
-| Marketing URL | https://imaro.ma |
-| Contact e-mail | contact@imaro.ma |
-| Primary category | Lifestyle (App Store) / House & Home (Play) |
-| Secondary category | Productivity / Finance |
+| Field              | Value                                       |
+| ------------------ | ------------------------------------------- |
+| Privacy policy URL | https://imaro.ma/confidentialite            |
+| Support URL        | https://imaro.ma                            |
+| Marketing URL      | https://imaro.ma                            |
+| Contact e-mail     | contact@imaro.ma                            |
+| Primary category   | Lifestyle (App Store) / House & Home (Play) |
+| Secondary category | Productivity / Finance                      |
 
 ---
 
@@ -29,9 +29,11 @@ Bundle / package: `ma.imaro.portail` · Privacy policy: https://imaro.ma/confide
 `copropriété,syndic,charges,paiement,résidence,immeuble,AG,réclamation,QR,visiteur,maroc`
 
 **Promotional text** (≤170) :
+
 > Suivez vos charges, payez en ligne, déclarez vos réclamations et gérez les accès visiteurs — toute votre copropriété dans une seule application.
 
 **Description** (≤4000) :
+
 > Imaro est l’application du copropriétaire pour gérer sa résidence au quotidien, en toute simplicité.
 >
 > • Finances : consultez vos appels de fonds, votre solde et l’historique de vos paiements, et réglez en ligne en quelques secondes.
@@ -50,9 +52,10 @@ Bundle / package: `ma.imaro.portail` · Privacy policy: https://imaro.ma/confide
 
 **App name** (≤30) : `Imaro`
 **Short description** (≤80) :
+
 > Charges, paiements, réclamations et accès visiteurs de votre copropriété.
 
-**Full description** (≤4000) : *(identique à la description App Store ci-dessus)*
+**Full description** (≤4000) : _(identique à la description App Store ci-dessus)_
 
 ---
 
@@ -61,9 +64,11 @@ Bundle / package: `ma.imaro.portail` · Privacy policy: https://imaro.ma/confide
 **اسم التطبيق** : `إيمارو`
 **العنوان الفرعي** : `ملكيتكم المشتركة، ببساطة`
 **الوصف المختصر** :
+
 > التكاليف، الأداءات، الشكايات وولوج الزوار الخاصة بملكيتكم المشتركة.
 
 **الوصف الكامل** :
+
 > إيمارو هو تطبيق المالك المشترك لتدبير إقامته يوميًا بكل سهولة.
 >
 > • المالية: اطّلعوا على طلبات الأموال ورصيدكم وتاريخ أداءاتكم، وادفعوا عبر الإنترنت في ثوانٍ.
@@ -83,9 +88,11 @@ Bundle / package: `ma.imaro.portail` · Privacy policy: https://imaro.ma/confide
 **Name** : `Imaro`
 **Subtitle** : `Your co-ownership, simplified`
 **Short description** :
+
 > Charges, payments, complaints and visitor access for your residence.
 
 **Full description** :
+
 > Imaro is the homeowner app to manage your residence day to day, the simple way.
 >
 > • Finances: view your charge calls, balance and payment history, and pay online in seconds.
