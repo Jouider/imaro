@@ -67,6 +67,7 @@ import {
   generateBalancePdf,
   generateGrandLivrePdf,
 } from '@/lib/pdf-reports'
+import { getPrestataires } from '@/services/prestataires.service'
 import { ResidenceFilter } from '@/components/shared'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { KpiCard } from '@/components/shared/KpiCard'
@@ -227,6 +228,13 @@ function NouvelleDepenseModal({
   const { data: comptes = [] } = useQuery({
     queryKey: ['comptes-pcg'],
     queryFn: () => getComptesPcg(),
+  })
+
+  // Liste des prestataires pour l'autocomplétion (KAN-120).
+  const { data: prestataires = [] } = useQuery({
+    queryKey: ['prestataires'],
+    queryFn: () => getPrestataires(),
+    enabled: open,
   })
 
   const compteClasse6 = comptes.filter(
@@ -536,10 +544,16 @@ function NouvelleDepenseModal({
               onChange={(e) =>
                 setForm((f) => ({ ...f, prestataire: e.target.value }))
               }
+              list="depense-prestataires"
               placeholder={t(
                 'gestionnaire.comptabilite.prestataireNamePlaceholder',
               )}
             />
+            <datalist id="depense-prestataires">
+              {prestataires.map((p) => (
+                <option key={p.id} value={p.name} />
+              ))}
+            </datalist>
           </div>
 
           <div className="space-y-1">
