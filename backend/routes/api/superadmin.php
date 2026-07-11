@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\SuperAdmin\ClientOverviewController;
 use App\Http\Controllers\Api\SuperAdmin\LeadController;
 use App\Http\Controllers\Api\SuperAdmin\MetricsController;
 use App\Http\Controllers\Api\SuperAdmin\TenantController;
@@ -15,6 +16,8 @@ Route::get('/metrics', MetricsController::class);
 // Clients (cabinets syndic = tenants)
 Route::get('/tenants', [TenantController::class, 'index']);
 Route::get('/tenants/{tenant}', [TenantController::class, 'show']);
+// Vue 360° — activité complète du cabinet (usagers, parc, réclamations, finances, abonnement)
+Route::get('/tenants/{tenant}/overview', ClientOverviewController::class);
 Route::get('/tenants/{tenant}/activity', [TenantController::class, 'activity']);
 Route::put('/tenants/{tenant}', [TenantController::class, 'update']);
 Route::post('/tenants/{tenant}/suspend', [TenantController::class, 'suspend']);

@@ -37,6 +37,16 @@ export function Dashboard() {
         <Stat label="Utilisateurs" value={data.parc.utilisateurs} />
       </div>
 
+      <div>
+        <h2 className="mb-2 text-sm font-semibold text-slate-600">Usage plateforme (30 jours)</h2>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <Stat label="Usagers actifs (30j)" value={data.usage.utilisateurs_actifs_30j} />
+          <Stat label="Réclamations ouvertes" value={data.usage.tickets_ouverts} />
+          <Stat label="Notifications (30j)" value={data.usage.notifications_30j} />
+          <Stat label="Nouveaux clients (30j)" value={data.usage.nouveaux_clients_30j} />
+        </div>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-xl border border-slate-200 bg-white p-4">
           <h2 className="mb-3 text-sm font-semibold">Répartition par plan</h2>

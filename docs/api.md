@@ -1301,27 +1301,60 @@ Contenu PDF : en-tête syndic/résidence, date/heure/lieu, ordre du jour, mentio
 
 ---
 
-## 15. Super Admin
+## 15. Back-office Digitoyou (Super Admin)
 
-`auth:sanctum` · `role:super_admin`
+`auth:sanctum` · `role:super_admin` · préfixe `/api/admin`
 
-### GET /api/admin/tenants
-### POST /api/admin/tenants
+Back-office d'administration de la plateforme (app dédiée `admin.imaro.ma`).
+Toutes les routes opèrent **hors scope tenant** (vue transverse sur les clients).
 
-**Body**
+### Métriques & dashboard
+
+#### GET /api/admin/metrics
+Vue d'ensemble : clients (total/actifs/essai/suspendus), répartition par plan,
+parc global, essais expirant < 7j, **bloc `usage`** (usagers actifs 30j,
+réclamations ouvertes, notifications 30j, nouveaux clients 30j), derniers clients.
+
+### Clients (cabinets syndic = tenants)
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| GET | `/api/admin/tenants` | liste + filtres `?search=&status=&plan=` |
+| GET | `/api/admin/tenants/{id}` | fiche (compteurs résidences/users/lots) |
+| GET | `/api/admin/tenants/{id}/overview` | **Vue 360°** (voir ci-dessous) |
+| GET | `/api/admin/tenants/{id}/activity` | 50 derniers logs d'audit |
+| PUT | `/api/admin/tenants/{id}` | maj plan/email/statut/max_logins/trial |
+| POST | `/api/admin/tenants/{id}/suspend` | suspendre |
+| POST | `/api/admin/tenants/{id}/activate` | réactiver |
+| POST | `/api/admin/tenants/{id}/extend-trial` | `{jours}` (1–365) |
+| POST | `/api/admin/tenants/{id}/impersonate` | token dépannage 30 min (tracé audit) |
+
+#### GET /api/admin/tenants/{id}/overview
+Agrège toute l'activité d'un cabinet — `data.overview` :
 ```json
 {
-  "name": "Blanca Syndic",
-  "subdomain": "blanca",
-  "plan": "business",
-  "manager_name": "Mohammed Fikri",
-  "manager_email": "fikri@blancasyndic.ma",
-  "manager_phone": "+212600000001"
+  "tenant": { "id": 1, "name": "...", "plan": "starter", "plan_label": "Starter", "status": "trial" },
+  "usagers": { "total": 5, "actifs_30j": 4, "par_role": { "manager": 1, "gestionnaire": 1, "conseil": 0, "resident": 3, "agent_recouvrement": 0 } },
+  "gestionnaires": { "total": 1, "personnel_terrain": 0, "charge": [{ "name": "...", "residences": 1 }] },
+  "parc": { "residences": 1, "lots": 1, "coproprietaires": 1, "occupants": 0, "exercices_actifs": 1 },
+  "reclamations": { "total": 3, "par_statut": { "ouvert": 1, "en_cours": 1, "resolu": 0, "clos": 1 }, "urgents_ouverts": 1, "delai_resolution_moyen_h": 6.0, "satisfaction_moyenne": 4.0 },
+  "finances": { "exercice_actif": 2026, "appels_total_mad": 18000, "encaisse_mad": 12600, "impayes_mad": 5400, "taux_recouvrement": 70.0 },
+  "engagement": { "derniere_activite": "...", "logins_7j": 4, "notifications_30j": { "whatsapp": 0, "sms": 0, "email": 0, "echecs": 0 } },
+  "abonnement": { "plan": "starter", "plan_label": "Starter", "storage_limit_mb": 1024, "quotas": [{ "ressource": "Utilisateurs", "used": 5, "limit": 3, "pct": 166.7, "warn": true, "over": true }] }
 }
 ```
+> Quotas = consommation vs limites du plan (`config/plans.php`). `over: true` signale un dépassement (upsell).
 
-### PUT /api/admin/tenants/{id}
-### DELETE /api/admin/tenants/{id}
+### Démos & leads (pipeline commercial)
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| GET / POST | `/api/admin/leads` | liste / créer |
+| GET / PUT / DELETE | `/api/admin/leads/{id}` | consulter / maj statut / supprimer |
+| POST | `/api/admin/leads/{id}/convertir` | convertir en client (tenant en essai) |
+
+Statuts lead : `nouveau` · `contacte` · `demo_planifiee` · `gagne` · `perdu`.
+Sources : `site` · `salon` · `recommandation` · `appel` · `autre`.
 
 ---
 

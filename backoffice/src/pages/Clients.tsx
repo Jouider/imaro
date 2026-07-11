@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { api, type Tenant } from '../lib/api'
@@ -97,7 +98,9 @@ export function Clients() {
             {data?.map((t) => (
               <tr key={t.id} className="border-b last:border-0">
                 <td className="px-4 py-2">
-                  <div className="font-medium">{t.name}</div>
+                  <Link to={`/clients/${t.id}`} className="font-medium text-primary hover:underline">
+                    {t.name}
+                  </Link>
                   <div className="text-xs text-slate-400">{t.subdomain}.imaro.ma</div>
                 </td>
                 <td className="px-4 py-2 capitalize">{t.plan}</td>
