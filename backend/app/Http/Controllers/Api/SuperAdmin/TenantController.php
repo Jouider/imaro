@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api\SuperAdmin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Lot;
 use App\Models\Tenant;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -93,6 +95,76 @@ class TenantController extends Controller
             'status' => 'success',
             'message' => "Essai prolongé de {$data['jours']} jours.",
             'data' => ['tenant' => $this->present($tenant->fresh())],
+        ]);
+    }
+
+    /**
+     * GET /api/admin/tenants/{tenant}/activity
+     * Journal d'activité récent du cabinet (support / suivi) — brique 4.
+     */
+    public function activity(Tenant $tenant): JsonResponse
+    {
+        $logs = AuditLog::where('tenant_id', $tenant->id)
+            ->orderByDesc('created_at')
+            ->limit(50)
+            ->get()
+            ->map(fn (AuditLog $l) => [
+                'id' => $l->id,
+                'action' => $l->action,
+                'category' => $l->category,
+                'severity' => $l->severity,
+                'user_email' => $l->user_email,
+                'target_label' => $l->target_label,
+                'created_at' => $l->created_at?->toIso8601String(),
+            ]);
+
+        return response()->json(['status' => 'success', 'data' => ['activity' => $logs]]);
+    }
+
+    /**
+     * POST /api/admin/tenants/{tenant}/impersonate
+     * Émet un token Sanctum court (30 min, ability « impersonation ») pour un
+     * manager du cabinet, afin de dépanner. Tracé dans l'audit (CNDP).
+     */
+    public function impersonate(Request $request, Tenant $tenant): JsonResponse
+    {
+        $manager = User::where('tenant_id', $tenant->id)
+            ->where('role', 'manager')
+            ->where('status', 'active')
+            ->first();
+
+        if (! $manager) {
+            return response()->json(['status' => 'error', 'message' => 'Aucun manager actif pour ce cabinet.'], 422);
+        }
+
+        $expiresAt = now()->addMinutes(30);
+        $token = $manager->createToken('impersonation', ['impersonation'], $expiresAt)->plainTextToken;
+
+        AuditLog::create([
+            'tenant_id' => $tenant->id,
+            'user_id' => $request->user()->id,
+            'user_email' => $request->user()->email,
+            'category' => 'auth',
+            'action' => 'impersonation_start',
+            'severity' => 'sensitive',
+            'target_type' => 'Tenant',
+            'target_id' => $tenant->id,
+            'target_label' => $tenant->name,
+            'payload' => ['impersonated_user_id' => $manager->id, 'expires_at' => $expiresAt->toIso8601String()],
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'created_at' => now(),
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Session de dépannage ouverte (30 min).',
+            'data' => [
+                'token' => $token,
+                'expires_at' => $expiresAt->toIso8601String(),
+                'impersonated_user' => ['id' => $manager->id, 'name' => $manager->name, 'role' => $manager->role],
+                'tenant' => ['id' => $tenant->id, 'name' => $tenant->name, 'subdomain' => $tenant->subdomain],
+            ],
         ]);
     }
 
