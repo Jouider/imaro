@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cahier de recette imaro — Mohammed Fikri / BlancaSyndic</title>
+<style>
+  :root {
+    --navy: #001244;
+    --navy-light: #1a2960;
+    --gold: #d4a35a;
+    --bg: #f7f8fb;
+    --card: #ffffff;
+    --text: #1a1f36;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --success: #16a34a;
+    --warn: #f59e0b;
+    --danger: #dc2626;
+    --shadow: 0 1px 3px rgba(0,18,68,0.06), 0 4px 12px rgba(0,18,68,0.04);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  header.topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--navy);
+    color: #fff;
+    padding: 14px 22px;
+    display: flex; align-items: center; gap: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  header.topbar h1 {
+    margin: 0; font-size: 17px; font-weight: 600;
+  }
+  header.topbar h1 small { opacity: .75; font-weight: 400; margin-left: 8px; font-size: 13px; }
+  .progress-wrap {
+    flex: 1; min-width: 200px; max-width: 400px;
+    background: rgba(255,255,255,0.15);
+    height: 8px; border-radius: 99px; overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%; background: var(--gold);
+    transition: width .3s ease;
+  }
+  .progress-label { font-size: 13px; min-width: 90px; text-align: right; font-variant-numeric: tabular-nums; }
+  .topbar-actions { display: flex; gap: 8px; }
+  .btn {
+    background: rgba(255,255,255,0.12);
+    color: #fff; border: 1px solid rgba(255,255,255,0.2);
+    padding: 7px 12px; border-radius: 6px; font-size: 13px;
+    cursor: pointer; font-family: inherit;
+    transition: background .15s;
+  }
+  .btn:hover { background: rgba(255,255,255,0.22); }
+  .btn-primary { background: var(--gold); border-color: var(--gold); color: var(--navy); font-weight: 600; }
+  .btn-primary:hover { background: #e0b06a; }
+  .btn-danger { background: rgba(220,38,38,0.85); border-color: transparent; }
+  .btn-danger:hover { background: rgba(220,38,38,1); }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 28px;
+    max-width: 1280px;
+    margin: 24px auto;
+    padding: 0 22px;
+  }
+  nav.toc {
+    position: sticky; top: 90px;
+    align-self: start;
+    max-height: calc(100vh - 110px);
+    overflow-y: auto;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 8px;
+    box-shadow: var(--shadow);
+    font-size: 13.5px;
+  }
+  nav.toc h3 {
+    margin: 4px 8px 10px;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted); font-weight: 600;
+  }
+  nav.toc a {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 10px; border-radius: 6px;
+    text-decoration: none; color: var(--text);
+    margin-bottom: 2px;
+    gap: 8px;
+  }
+  nav.toc a:hover { background: var(--bg); }
+  nav.toc a .phase-pct {
+    font-size: 11px; color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  nav.toc a.complete .phase-pct { color: var(--success); font-weight: 600; }
+  nav.toc a.partial .phase-pct { color: var(--warn); font-weight: 600; }
+
+  main { min-width: 0; }
+  .intro {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin-bottom: 22px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .intro h2 { margin: 0 0 8px; color: var(--navy); font-size: 22px; }
+  .intro p { margin: 6px 0; color: var(--muted); }
+  .intro dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 12px 0 0; font-size: 14px; }
+  .intro dt { color: var(--muted); font-weight: 500; }
+  .intro dd { margin: 0; font-weight: 500; }
+  .legend {
+    margin-top: 16px; padding: 12px 14px;
+    background: #fff8eb; border-radius: 8px;
+    font-size: 13.5px; border-left: 3px solid var(--gold);
+  }
+  .legend strong { color: var(--navy); }
+
+  .phase {
+    background: var(--card);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    scroll-margin-top: 90px;
+  }
+  .phase-header {
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #fafbff 0%, #fff 100%);
+  }
+  .phase-title {
+    margin: 0; font-size: 18px; color: var(--navy);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .phase-num {
+    background: var(--navy); color: #fff;
+    font-size: 12px; font-weight: 700;
+    padding: 3px 9px; border-radius: 99px;
+    letter-spacing: 0.04em;
+  }
+  .phase-obj {
+    margin: 8px 0 0; font-size: 14px; color: var(--muted);
+  }
+  .phase-pct-inline {
+    margin-left: auto; font-size: 13px; color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .phase-pct-inline.complete { color: var(--success); font-weight: 600; }
+  .phase-body { padding: 16px 24px 20px; }
+
+  .note {
+    background: #f3f6ff; border-left: 3px solid var(--navy-light);
+    padding: 10px 14px; border-radius: 6px;
+    font-size: 13.5px; margin: 0 0 14px; color: var(--text);
+  }
+  .note strong { color: var(--navy); }
+
+  ul.steps { list-style: none; padding: 0; margin: 0; }
+  ul.steps li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 4px;
+    border-bottom: 1px dashed #eef0f4;
+    font-size: 14.5px;
+  }
+  ul.steps li:last-child { border-bottom: none; }
+  ul.steps li:hover { background: #fafbfd; }
+  ul.steps input[type=checkbox] {
+    margin-top: 4px; width: 17px; height: 17px;
+    accent-color: var(--navy); flex-shrink: 0;
+    cursor: pointer;
+  }
+  ul.steps label {
+    cursor: pointer; flex: 1;
+  }
+  ul.steps li.checked label {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .step-id {
+    color: var(--navy); font-weight: 600;
+    margin-right: 4px; font-variant-numeric: tabular-nums;
+  }
+
+  .feedback-zone {
+    margin-top: 16px;
+    background: #fffbef;
+    border: 1px dashed var(--gold);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .feedback-zone label {
+    display: block; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: #8a6b22; font-weight: 700; margin-bottom: 8px;
+  }
+  .feedback-zone textarea {
+    width: 100%; min-height: 90px;
+    border: 1px solid #f0e0b8; border-radius: 6px;
+    padding: 10px; font-family: inherit; font-size: 14px;
+    resize: vertical; background: #fff;
+  }
+  .feedback-zone textarea:focus {
+    outline: 2px solid var(--gold); outline-offset: 1px;
+  }
+
+  .annex {
+    background: var(--card);
+    border-radius: 10px; border: 1px solid var(--border);
+    padding: 22px 26px; margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+  .annex h2 { margin: 0 0 12px; color: var(--navy); font-size: 19px; }
+  .annex h3 { color: var(--navy); margin: 18px 0 6px; font-size: 15px; }
+  .annex input[type=text], .annex input[type=number], .annex textarea {
+    width: 100%; padding: 9px 11px;
+    border: 1px solid var(--border); border-radius: 6px;
+    font-family: inherit; font-size: 14px;
+    margin-bottom: 8px;
+  }
+  .annex textarea { min-height: 70px; resize: vertical; }
+  .annex .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .annex .rating-row {
+    display: flex; align-items: center; gap: 10px;
+    margin: 6px 0; font-size: 14px;
+  }
+  .annex .rating-row label { flex: 1; }
+  .annex .rating-row input { width: 70px; margin: 0; }
+  .annex .reco-buttons { display: flex; gap: 8px; margin-top: 4px; }
+  .annex .reco-buttons button {
+    background: #f3f4f6; border: 2px solid transparent;
+    padding: 8px 16px; border-radius: 6px; cursor: pointer;
+    font-family: inherit; font-size: 14px;
+  }
+  .annex .reco-buttons button.active {
+    background: var(--navy); color: #fff; border-color: var(--navy);
+  }
+
+  footer {
+    text-align: center;
+    padding: 30px 22px 50px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.toc { position: static; max-height: none; }
+    header.topbar { flex-wrap: wrap; }
+    .progress-wrap { order: 3; flex-basis: 100%; }
+    .annex .grid-2 { grid-template-columns: 1fr; }
+  }
+  @media print {
+    header.topbar, nav.toc, .topbar-actions, .btn { display: none !important; }
+    .layout { grid-template-columns: 1fr; padding: 0; margin: 0; }
+    .phase, .annex, .intro {
+      box-shadow: none; border: 1px solid #999; page-break-inside: avoid;
+    }
+    body { background: #fff; }
+    .feedback-zone textarea { min-height: 120px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <h1>Cahier de recette imaro <small>· Mohammed Fikri / BlancaSyndic</small></h1>
+  <div class="progress-wrap"><div id="progressBar" class="progress-bar" style="width:0%"></div></div>
+  <div class="progress-label" id="progressLabel">0 / 0</div>
+  <div class="topbar-actions">
+    <button class="btn" onclick="window.print()">Imprimer</button>
+    <button class="btn btn-primary" onclick="exportFeedback()">Exporter</button>
+    <button class="btn btn-danger" onclick="resetAll()">Réinitialiser</button>
+  </div>
+</header>
+
+<div class="layout">
+
+<nav class="toc" id="toc">
+  <h3>Phases</h3>
+  <!-- populated by JS -->
+</nav>
+
+<main>
+
+<section class="intro">
+  <h2>Bienvenue Mohammed</h2>
+  <p>Ce document est ton compagnon de test sur <strong>staging.imaro.ma</strong>. Coche les étapes au fur et à mesure, note tes retours dans les zones jaunes, et envoie le tout à la fin (bouton <em>Exporter</em>).</p>
+  <dl>
+    <dt>Environnement</dt><dd>https://staging.imaro.ma</dd>
+    <dt>Durée estimée</dt><dd>~3 semaines (1h par jour)</dd>
+    <dt>Cabinet test</dt><dd>BlancaSyndic SARL</dd>
+    <dt>Contact</dt><dd>Abdellah Jouider — WhatsApp +212 6 XX XX XX XX</dd>
+  </dl>
+  <div class="legend">
+    <strong>Comment utiliser ce cahier :</strong> Une phase = une session. Tes cases cochées et tes commentaires sont sauvegardés <strong>automatiquement dans ce navigateur</strong> (rien n'est envoyé). À la fin, clique <em>Exporter</em> pour télécharger ton rapport et nous l'envoyer.<br>
+    Marqueurs dans tes commentaires : <code>[BUG]</code> = bug clair · <code>[UX]</code> = ça marche mais gênant · <code>[IDÉE]</code> = suggestion.
+  </div>
+</section>
+
+<!-- PHASES -->
+<div id="phases">
+  <!-- populated by JS from phasesData -->
+</div>
+
+<!-- ANNEXE A — Feedback global -->
+<section class="annex" id="annex-global">
+  <h2>Annexe A — Feedback global (à remplir à la fin)</h2>
+
+  <h3>Top 3 des points FORTS</h3>
+  <input type="text" data-key="strong-1" placeholder="1. ..." />
+  <input type="text" data-key="strong-2" placeholder="2. ..." />
+  <input type="text" data-key="strong-3" placeholder="3. ..." />
+
+  <h3>Top 3 des points FAIBLES / à améliorer</h3>
+  <input type="text" data-key="weak-1" placeholder="1. ..." />
+  <input type="text" data-key="weak-2" placeholder="2. ..." />
+  <input type="text" data-key="weak-3" placeholder="3. ..." />
+
+  <h3>Comparaison vs SyndicConnect</h3>
+  <textarea data-key="vs-better" placeholder="imaro est MIEUX que SyndicConnect sur..."></textarea>
+  <textarea data-key="vs-worse" placeholder="imaro est MOINS BIEN sur..."></textarea>
+  <textarea data-key="vs-missing" placeholder="Fonctionnalités SyndicConnect qu'il faudrait ajouter..."></textarea>
+
+  <h3>Note globale</h3>
+  <div class="grid-2">
+    <div>
+      <div class="rating-row"><label>Facilité d'utilisation</label><input type="number" min="0" max="10" data-key="rate-easy" /> / 10</div>
+      <div class="rating-row"><label>Couverture fonctionnelle</label><input type="number" min="0" max="10" data-key="rate-features" /> / 10</div>
+      <div class="rating-row"><label>Vitesse / performance</label><input type="number" min="0" max="10" data-key="rate-perf" /> / 10</div>
+      <div class="rating-row"><label>Stabilité (peu de bugs)</label><input type="number" min="0" max="10" data-key="rate-stable" /> / 10</div>
+    </div>
+    <div>
+      <p style="margin-top:0; font-size:14px;"><strong>Recommanderais-tu imaro à un confrère ?</strong></p>
+      <div class="reco-buttons" id="recoButtons">
+        <button type="button" data-val="oui">Oui</button>
+        <button type="button" data-val="peut-etre">Peut-être</button>
+        <button type="button" data-val="non">Non</button>
+      </div>
+    </div>
+  </div>
+
+  <h3>Bugs bloquants rencontrés</h3>
+  <textarea data-key="bugs-blockers" placeholder="Liste les bugs qui t'ont empêché de continuer..."></textarea>
+
+  <h3>Idées d'évolution</h3>
+  <textarea data-key="ideas" placeholder="Tes suggestions pour les prochaines versions..."></textarea>
+</section>
+
+<!-- ANNEXE B — Grille bug -->
+<section class="annex" id="annex-bugs">
+  <h2>Annexe B — Bugs détaillés</h2>
+  <p style="color:var(--muted); font-size:14px;">Décris chaque bug rencontré dans le détail. Plus c'est précis, plus on le corrige vite.</p>
+  <textarea data-key="bug-details" style="min-height:200px;" placeholder="BUG #1
+Phase : __
+Étape : __
+Date/heure : __
+Navigateur : __
+Mobile/Desktop : __
+Ce que j'ai fait : ...
+Ce qui aurait dû se passer : ...
+Ce qui s'est réellement passé : ...
+URL au moment du bug : ...
+
+BUG #2
+..."></textarea>
+</section>
+
+<footer>
+  Merci Mohammed pour ton temps sur ce test. Chaque retour compte.<br>
+  — L'équipe imaro (Digitoyou)
+</footer>
+
+</main>
+</div>
+
+<script>
+/* =============== DONNÉES DES PHASES =============== */
+const phasesData = [
+  { num: 0, title: "Préparation (Abdellah)", obj: "Faite par Abdellah avant l'arrivée de Fikri. Pour mémoire.",
+    note: "Cette phase est réalisée côté Abdellah. Tu peux la cocher pour suivre l'avancée.",
+    steps: [
+      "Créer le tenant blancasyndic (subdomain, plan business, status active)",
+      "Créer le compte manager Mohammed Fikri (email + password)",
+      "Vérifier que la connexion email+password fonctionne",
+      "Envoyer URL staging.imaro.ma + email + password + ce cahier à Fikri",
+      "Vérifier que la base est vide (aucune résidence pré-créée)"
+    ]},
+  { num: 1, title: "Première connexion & découverte", obj: "Fikri arrive sur staging.imaro.ma et se connecte pour la première fois.",
+    note: "<strong>Tes identifiants :</strong> Email <code>fikri@blancasyndic-test.ma</code> · Mot de passe <code>Imaro2026!</code>",
+    steps: [
+      "Ouvre https://staging.imaro.ma dans Chrome (desktop)",
+      "La landing page s'affiche correctement (logo, textes lisibles)",
+      "Clique sur 'Se connecter'",
+      "Tape l'email : fikri@blancasyndic-test.ma",
+      "Tape le mot de passe : Imaro2026!",
+      "Clique 'Se connecter'",
+      "Tu arrives sur un dashboard / page d'accueil (pas d'OTP, accès direct)",
+      "Ton nom 'Mohammed Fikri' s'affiche en haut à droite",
+      "Le nom de ton cabinet 'BlancaSyndic Beta' est visible",
+      "Déconnecte-toi → reconnecte-toi avec les mêmes identifiants → OK",
+      "[Bonus] Essaie de te connecter avec un mauvais mot de passe → message d'erreur clair"
+    ]},
+  { num: 2, title: "Architecture du cabinet (Équipe)", obj: "Créer ton équipe de gestionnaires.",
+    steps: [
+      "Trouve la section 'Équipe' / 'Utilisateurs' / 'Gestionnaires' dans le menu",
+      "Clique 'Ajouter un gestionnaire'",
+      "Remplis : Nom = 'Ahmed Tazi', téléphone, rôle = gestionnaire",
+      "Valide → tu vois Ahmed Tazi dans la liste",
+      "Crée un 2ᵉ gestionnaire : 'Fatima Benali'",
+      "Modifie le téléphone d'Ahmed Tazi → modification sauvée",
+      "Désactive Fatima Benali → elle apparaît comme inactive",
+      "Réactive Fatima Benali → elle redevient active",
+      "[Optionnel] Crée un compte agent de recouvrement"
+    ]},
+  { num: 3, title: "Créer ta première résidence (Module 2)", obj: "Créer la résidence 'Résidence Al Andalous' à Casablanca.",
+    steps: [
+      "Menu → 'Résidences' → 'Nouvelle résidence'",
+      "Nom = 'Résidence Al Andalous', Ville = 'Casablanca', Adresse = '12 Bd Anfa'",
+      "Mode de cotisation = 'tantième'",
+      "Jour d'échéance = 5",
+      "Assigne le gestionnaire = Ahmed Tazi",
+      "Valide → la résidence apparaît dans la liste",
+      "Clique sur la résidence → tu vois son détail (encore vide)",
+      "Vérifie : 0 lot, 0 copropriétaire, total tantième = 0",
+      "Modifie l'adresse → '15 Bd Anfa, Casablanca' → modification sauvée",
+      "[Tranches] Crée 2 tranches : 'Tranche A' (code TA) et 'Tranche B' (code TB)",
+      "Les 2 tranches s'affichent avec '0 immeubles' chacune",
+      "Crée 1 immeuble 'Bâtiment 1' assigné à Tranche A",
+      "Crée 1 immeuble 'Bâtiment 2' assigné à Tranche B",
+      "Tranche A affiche maintenant '1 immeuble'"
+    ]},
+  { num: 4, title: "Créer les lots (Module 3)", obj: "Créer 10 lots dont la somme des tantièmes = exactement 1000.",
+    note: "<strong>Règle métier critique :</strong> la somme des tantièmes DOIT faire 1000. Si pas le cas, BUG bloquant.",
+    steps: [
+      "Va dans Résidence Al Andalous → onglet 'Lots'",
+      "Crée lot A01 : étage 1, type appartement, tantième = 100, immeuble = Bâtiment 1",
+      "Crée lots A02 à A05 : 100 tantièmes chacun (4 lots, total 400)",
+      "Crée lots B01 à B05 : 100 tantièmes chacun, immeuble = Bâtiment 2",
+      "Vérifie : total des tantièmes = 1000",
+      "Essaie de créer un lot B06 avec tantième = 50 → erreur 'dépasserait 1000'",
+      "Modifie un lot existant : change le tantième de A01 de 100 → 50",
+      "Crée un nouveau lot A06 avec tantième = 50 (total revient à 1000)",
+      "Supprime un lot → vérifier le total tantième baisse",
+      "Tente de supprimer un lot ayant un copropriétaire (revenir après Phase 5)"
+    ]},
+  { num: 5, title: "Copropriétaires (Module 4)", obj: "Ajouter les copropriétaires et les rattacher aux lots.",
+    steps: [
+      "Menu → 'Copropriétaires' → 'Nouveau'",
+      "Crée Hassan Benali (+212600000010, hassan@test.ma, CIN BE123456)",
+      "Assigne Hassan au lot A01",
+      "Crée 9 autres copropriétaires (noms marocains : Fatima Chraibi, Karim Alaoui, etc.)",
+      "Assigne chacun à un lot différent",
+      "Sur le détail d'un lot, tu vois le copropriétaire principal",
+      "Modifie le téléphone d'un copropriétaire → sauvegarde OK",
+      "[Indivision] Ajoute un 2ᵉ copropriétaire sur le lot A02",
+      "Envoie une invitation au portail résident à Hassan",
+      "Hassan reçoit un email/SMS avec lien d'invitation",
+      "[Phase 20] le lien fonctionnera côté Hassan"
+    ]},
+  { num: 6, title: "Exercice comptable", obj: "Créer l'exercice fiscal 2026 (obligatoire avant tout encaissement — Loi 18-00).",
+    steps: [
+      "Menu → 'Exercices' (ou Résidence Al Andalous → onglet Exercices)",
+      "Crée exercice 2026 : 2026-01-01 → 2026-12-31, statut 'actif'",
+      "Tu ne peux pas créer 2 exercices 'actif' simultanés sur la même résidence",
+      "[Bilan d'ouverture] Saisis le solde de banque d'ouverture (ex: 50 000 DH)",
+      "Vérifie que tu peux clôturer un exercice (mais ne le fais pas — on en a besoin)"
+    ]},
+  { num: 7, title: "Appel de fonds (Module 15)", obj: "Générer un appel de fonds auto-calculé selon les tantièmes.",
+    steps: [
+      "Menu → 'Appels de fonds' → 'Nouveau'",
+      "Libellé = 'Charges Q1 2026', montant = 20 000 DH, échéance = 2026-04-05",
+      "Sélectionne l'exercice 2026",
+      "Valide → les 10 lignes se génèrent automatiquement",
+      "Vérifie : lot A01 (100 tantièmes) doit avoir 2 000 DH (20000 × 100/1000)",
+      "Vérifie : somme de toutes les lignes = exactement 20 000 DH",
+      "Télécharge le PDF de l'appel de fonds",
+      "PDF : entête cabinet, logo, mention 'Loi 18-00', coordonnées, ligne par lot, total",
+      "PDF en français, montants en DH/MAD (jamais €)",
+      "Envoie l'appel par WhatsApp à un copropriétaire (test sur un de tes numéros)",
+      "Le copro reçoit un message WhatsApp avec lien vers le PDF"
+    ]},
+  { num: 8, title: "Paiements & encaissements (Module 5)", obj: "Enregistrer les paiements et tester le suivi impayés.",
+    steps: [
+      "Va sur appel Q1 2026 → liste des lignes (impayées par défaut)",
+      "Enregistre paiement complet Hassan Benali (lot A01, 2 000 DH, mode virement)",
+      "La ligne passe en 'Payée' avec date et montant",
+      "Télécharge le reçu PDF → vérifie mention Loi 18-00 + signature cabinet",
+      "Enregistre paiement partiel Fatima Chraibi (1 000 DH sur 2 000 DH)",
+      "La ligne affiche 'Partiellement payée' avec reste à payer = 1 000 DH",
+      "Complète le paiement de Fatima → passe en 'Payée'",
+      "Enregistre 6 autres paiements → laisse 2 lots en impayé",
+      "Menu 'Impayés' / 'Recouvrement' → tu vois les 2 lots impayés",
+      "[Mise en demeure] Envoie une mise en demeure à Karim → PDF généré",
+      "Loi 18-00 Art. 25 : après 30j, toutes provisions deviennent exigibles",
+      "[Pénalités] Si module actif, vérifier calcul automatique",
+      "Annule un paiement par erreur → ligne redevient impayée + audit log"
+    ]},
+  { num: 9, title: "Prestataires (Module 8)", obj: "Gérer ton carnet de prestataires.",
+    steps: [
+      "Menu → 'Prestataires' → 'Nouveau'",
+      "Crée 'Société Ascenseurs Maroc' (maintenance ascenseur, téléphone, ICE)",
+      "Crée 4 autres prestataires (plombier, électricien, jardinier, nettoyage)",
+      "Modifie les coordonnées d'un prestataire",
+      "[Notation] Note un prestataire (1-5 étoiles) avec commentaire",
+      "Recherche un prestataire par nom",
+      "Filtre par type de prestation"
+    ]},
+  { num: 10, title: "Contrats (Module 9)", obj: "Enregistrer les contrats récurrents avec alertes d'expiration.",
+    steps: [
+      "Menu → 'Contrats' → 'Nouveau'",
+      "Contrat = 'Maintenance ascenseur 2026', prestataire Société Ascenseurs Maroc, 800 DH/mois",
+      "Date début = 2026-01-01, fin = 2026-12-31",
+      "Upload le PDF du contrat",
+      "Contrat apparaît dans la liste, statut 'Actif'",
+      "Crée un contrat qui expire dans 25 jours → alerte 'expire bientôt'",
+      "Crée un contrat déjà expiré → statut 'Expiré'",
+      "Renouvelle un contrat expiré → nouvelle période créée"
+    ]},
+  { num: 11, title: "Budgets (Module 6)", obj: "Voter le budget annuel (Décret 2.23.700 — pas de dépense sans budget voté).",
+    steps: [
+      "Menu → 'Budgets' → 'Nouveau budget'",
+      "Type = 'Fonctionnement', exercice = 2026",
+      "Postes : Eau (5000), Électricité (8000), Ménage (12000), Ascenseur (9600), Assurance (3000), Divers (2400)",
+      "Total = 40 000 DH s'affiche automatiquement",
+      "Statut = 'Brouillon'",
+      "Vote le budget → passe en 'Voté'",
+      "Crée un budget 'Investissement' (ex: rénovation hall 50 000 DH)",
+      "Crée un budget 'Exceptionnel' (ex: ravalement façade 80 000 DH)",
+      "[Comparatif] Vérifie que tu vois budget prévu vs réel",
+      "Essaie de saisir une dépense AVANT vote du budget → doit être bloqué"
+    ]},
+  { num: 12, title: "Dépenses (Module 7)", obj: "Saisir les dépenses avec factures + workflow validation 2 niveaux.",
+    steps: [
+      "Menu → 'Dépenses' → 'Nouvelle dépense'",
+      "Libellé = 'Facture eau Janvier 2026', montant = 420 DH, prestataire Lydec, poste Eau",
+      "Upload la facture (PDF ou image)",
+      "Statut initial = 'En attente validation'",
+      "Valide la dépense (niveau 1) → 'Validée niveau 1'",
+      "Validation niveau 2 si elle existe → 'Payable'",
+      "Marque comme payée (date paiement, mode paiement)",
+      "Saisis 5 autres dépenses sur différents postes",
+      "Reviens sur 'Budgets' → comparatif budget vs réel affiche bien tes dépenses",
+      "Essaie de dépasser un poste budgétaire → alerte ou refus",
+      "Télécharge un relevé de dépenses du mois (PDF/Excel)"
+    ]},
+  { num: 13, title: "Tickets / Réclamations (Module 10)", obj: "Gérer les réclamations des copropriétaires (le SAV).",
+    steps: [
+      "Menu → 'Tickets' → 'Nouveau ticket'",
+      "Crée 'Ascenseur bloqué étages 3-4', priorité Urgente, catégorie Ascenseur",
+      "Assigne à Ahmed Tazi + Société Ascenseurs Maroc",
+      "Crée 5 autres tickets (2 normales, 1 basse, 2 urgentes)",
+      "Sur un ticket : ajoute un commentaire (thread)",
+      "Upload une photo dans un ticket",
+      "Change le statut : Ouvert → En cours → Résolu → Clôturé",
+      "Filtre par statut, priorité, gestionnaire assigné",
+      "Recherche un ticket par mot-clé",
+      "Vérifie le temps de résolution affiché"
+    ]},
+  { num: 14, title: "Annonces (Module 11)", obj: "Communiquer en masse aux copropriétaires.",
+    steps: [
+      "Menu → 'Annonces' → 'Nouvelle annonce'",
+      "Titre = 'Coupure d'eau prévue le 15 juin 2026', contenu = texte explicatif",
+      "Ciblage = 'Tous les copropriétaires de Résidence Al Andalous'",
+      "Canal = WhatsApp + push notification",
+      "Publie l'annonce",
+      "Vérifie sur ton numéro de test : tu reçois bien l'annonce",
+      "[Accusé de lecture] Voir qui a lu / qui n'a pas lu",
+      "Crée une annonce ciblée sur 1 seul lot (Bâtiment 1 seulement)",
+      "Programme une annonce pour publication future (1h plus tard)",
+      "Annule l'annonce programmée avant sa publication"
+    ]},
+  { num: 15, title: "Suivi des travaux (Module 12)", obj: "Suivre les chantiers en cours.",
+    steps: [
+      "Menu → 'Travaux' → 'Nouveau chantier'",
+      "Crée 'Ravalement façade Bât 1' (80 000 DH, prestataire, dates)",
+      "Lie ce chantier au budget exceptionnel (Phase 11)",
+      "Avancement = 0% au départ",
+      "Mets à 30%, upload 3 photos d'étape",
+      "Ajoute un commentaire de chantier",
+      "Mets à 100% → statut 'Terminé'",
+      "Génère un rapport de chantier PDF"
+    ]},
+  { num: 16, title: "Échéances & Rappels (Module 13)", obj: "Ne plus oublier les dates importantes.",
+    steps: [
+      "Menu → 'Échéances' ou 'Calendrier'",
+      "Échéances auto déjà présentes : contrats qui expirent, AG annuelle, etc.",
+      "Crée échéance manuelle : 'Déclaration CNSS gardien', 2026-07-15",
+      "Définis un rappel : 7 jours avant",
+      "Rappel apparaît dans tes notifications le moment venu",
+      "Marque une échéance comme 'Faite'",
+      "Vue calendrier mensuelle/annuelle fonctionne"
+    ]},
+  { num: 17, title: "GED — Documents (Module 14)", obj: "Archiver tous les documents du syndic.",
+    steps: [
+      "Menu → 'Documents' ou 'GED'",
+      "Crée un dossier 'Documents juridiques'",
+      "Crée sous-dossier 'Règlement de copropriété'",
+      "Upload un PDF dans ce sous-dossier",
+      "Crée dossier 'Factures 2026' → upload 3 factures",
+      "Définis droits d'accès : 'Conseil syndical peut voir Documents juridiques'",
+      "Recherche un document par nom",
+      "Télécharge un document",
+      "Renomme un document",
+      "Supprime un document → va dans une corbeille (rétention 5 ans — Décret 2.23.700)"
+    ]},
+  { num: 18, title: "Assemblées Générales (Module 16)", obj: "Organiser une AG annuelle avec convocations, vote, PV.",
+    note: "<strong>Règles Loi 18-00 à vérifier :</strong> convocation 15j min (Art. 16quinquies) · quorum 50% (Art. 18) · syndic majorité 3/4 (Art. 19).",
+    steps: [
+      "Menu → 'Assemblées Générales' → 'Nouvelle AG'",
+      "Type 'Ordinaire annuelle', date dans 20 jours, lieu 'Salle Al Mounia'",
+      "Ordre du jour : 5 résolutions (comptes, budget, syndic, travaux, divers)",
+      "Essaie de convoquer avec moins de 15 jours → bloqué (Art. 16quinquies)",
+      "Envoie les convocations (WhatsApp + email PDF)",
+      "Chaque copropriétaire reçoit sa convocation avec ordre du jour",
+      "Donne pouvoir : copro X donne pouvoir à Y → enregistré",
+      "Jour de l'AG : feuille de présence → marque les présents",
+      "Vérifie : quorum 50% affiché atteint ou non",
+      "Lance vote sur 'Renouvellement syndic' → vote chaque copro",
+      "Vérifie : seuil 3/4 s'applique pour cette résolution",
+      "Résolutions ordinaires : majorité relative",
+      "Génère le PV de l'AG (PDF avec résultats détaillés)",
+      "Le PV est archivé automatiquement dans la GED",
+      "[Vote online] Test vote à distance par un copropriétaire absent"
+    ]},
+  { num: 19, title: "Dashboard final & KPIs (Module 1)", obj: "Vérifier que le dashboard reflète tout ce qui a été créé.",
+    steps: [
+      "Retourne à l'accueil / Dashboard",
+      "Nombre de résidences = 1",
+      "Nombre de lots = 11 (10 + A06 créé en Phase 4)",
+      "Taux de recouvrement reflète tes paiements (Phase 8)",
+      "Montant recouvré vs restant cohérent",
+      "Tickets ouverts / urgents corrects",
+      "Appels de fonds actifs = 1",
+      "Graphique d'évolution trésorerie cohérent",
+      "Dashboard se charge en moins de 3 secondes",
+      "Clic sur un KPI → redirige vers la liste correspondante"
+    ]},
+  { num: 20, title: "Portail Résident (vue copropriétaire)", obj: "Se mettre dans la peau de Hassan Benali sur mobile.",
+    steps: [
+      "Sur ton mobile, ouvre le lien d'invitation reçu en Phase 5",
+      "Hassan se crée un mot de passe / valide son OTP",
+      "Il arrive sur SON dashboard (vue copropriétaire)",
+      "Il voit SON lot A01 (et rien d'autre — pas les lots des autres)",
+      "Il voit l'appel de fonds Q1 2026 marqué 'Payé'",
+      "Il télécharge son reçu PDF",
+      "Il voit les annonces de Phase 14",
+      "Il crée un ticket 'Lumière du couloir grillée'",
+      "Le ticket apparaît côté gestionnaire (vérifie sur compte Fikri)",
+      "Hassan ouvre les PV d'AG de Phase 18",
+      "Hassan vote en ligne sur une résolution (si AG ouverte)",
+      "Sécurité : Hassan essaie de voir le lot A02 → 403/refusé",
+      "Sécurité : aucun mot de passe affiché en clair nulle part"
+    ]},
+  { num: 21, title: "Conformité légale (Loi 18-00 & Décret 2.23.700)", obj: "Vérifier que les obligations marocaines sont respectées partout.",
+    steps: [
+      "Tous les PDF (appels fonds, reçus, mises en demeure, PV AG) mentionnent 'Loi 18-00'",
+      "Compte bancaire du syndicat séparé (jamais mélangé — Art. 26)",
+      "Comptabilité d'engagement (pas caisse simple — Décret 2.23.700)",
+      "Documents conservés 5 ans minimum (Décret 2.23.700)",
+      "Plan comptable 7 classes visible (Classes 1,3,4,5,6,7)",
+      "Si recettes simulées > 1 000 000 DH : alerte audit expert-comptable",
+      "Audit log (historique des actions) : qui, quoi, quand",
+      "Prescription 5 ans sur les charges (Art. 43) visible sur vieux impayés",
+      "Toutes les pages backoffice en français (langue principale)",
+      "Test mode arabe (RTL) si disponible"
+    ]},
+  { num: 22, title: "Test multi-résidences (montée en charge)", obj: "Valider que ça reste fluide avec plusieurs résidences.",
+    steps: [
+      "Crée 'Résidence Yasmine' (Rabat, 5 lots) et 'Résidence Marina' (Tanger, 8 lots)",
+      "Assigne Yasmine à Ahmed Tazi, Marina à Fatima Benali",
+      "Connecte-toi en tant que Ahmed Tazi → il ne voit QUE Yasmine",
+      "Fatima Benali → ne voit QUE Marina",
+      "Fikri (toi) → vois les 3 résidences",
+      "Dashboard agrégé : 3 résidences, 24 lots, taux recouvrement consolidé",
+      "Bascule rapide entre résidences (sélecteur) — fluide ?",
+      "Recherche globale : trouve un copropriétaire dans n'importe quelle résidence"
+    ]},
+  { num: 23, title: "Cas limites & sécurité", obj: "Essayer de 'casser' l'app pour trouver les bugs cachés.",
+    steps: [
+      "Tente de te connecter avec un mauvais mot de passe 5 fois → blocage temporaire (rate limit)",
+      "Attends le délai → tu peux te reconnecter normalement",
+      "Ouvre l'app en arabe / RTL — pas d'élément cassé",
+      "Tente d'uploader un fichier de 100 Mo → message d'erreur clair (pas 500)",
+      "Tente d'uploader un .exe ou .sh → refusé",
+      "Crée 3 fenêtres / onglets connectés simultanément → cohérent",
+      "Mode hors ligne (coupe wifi en plein formulaire) → message clair",
+      "Tablet (iPad) : layout responsive ?",
+      "Mobile (Safari iOS + Chrome Android) : tout marche ?",
+      "URL avec ID inexistant (/residences/99999) → 404 propre",
+      "Montant avec virgule (1 234,56) → accepté ou message clair",
+      "Numéro de téléphone marocain mal formé → validation correcte"
+    ]}
+];
+
+/* =============== RENDU =============== */
+const STORAGE_KEY = "fikri-beta-test-v1";
+const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function renderPhases() {
+  const container = document.getElementById("phases");
+  const toc = document.getElementById("toc");
+
+  phasesData.forEach(phase => {
+    const phaseId = `phase-${phase.num}`;
+
+    // TOC entry
+    const tocLink = document.createElement("a");
+    tocLink.href = `#${phaseId}`;
+    tocLink.dataset.phase = phase.num;
+    tocLink.innerHTML = `<span>${phase.num}. ${phase.title}</span><span class="phase-pct" id="toc-pct-${phase.num}">0/${phase.steps.length}</span>`;
+    toc.appendChild(tocLink);
+
+    // Phase card
+    const section = document.createElement("section");
+    section.className = "phase";
+    section.id = phaseId;
+
+    let stepsHtml = phase.steps.map((s, i) => {
+      const stepKey = `p${phase.num}-s${i}`;
+      const checked = state[stepKey] ? "checked" : "";
+      const liClass = state[stepKey] ? "checked" : "";
+      return `<li class="${liClass}">
+        <input type="checkbox" id="${stepKey}" data-step="${stepKey}" ${checked} />
+        <label for="${stepKey}"><span class="step-id">${phase.num}.${i+1}</span> ${s}</label>
+      </li>`;
+    }).join("");
+
+    const noteHtml = phase.note ? `<div class="note">${phase.note}</div>` : "";
+    const fbKey = `fb-${phase.num}`;
+    const fbValue = state[fbKey] || "";
+
+    section.innerHTML = `
+      <div class="phase-header">
+        <h3 class="phase-title">
+          <span class="phase-num">PHASE ${phase.num}</span>
+          ${phase.title}
+          <span class="phase-pct-inline" id="phase-pct-${phase.num}">0 / ${phase.steps.length}</span>
+        </h3>
+        <p class="phase-obj"><strong>Objectif :</strong> ${phase.obj}</p>
+      </div>
+      <div class="phase-body">
+        ${noteHtml}
+        <ul class="steps">${stepsHtml}</ul>
+        <div class="feedback-zone">
+          <label>✏️ Feedback Phase ${phase.num}</label>
+          <textarea data-fb="${fbKey}" placeholder="Bugs, lenteurs, points pas clairs, suggestions...">${fbValue.replace(/</g,"&lt;")}</textarea>
+        </div>
+      </div>
+    `;
+    container.appendChild(section);
+  });
+
+  // Bind checkboxes
+  document.querySelectorAll('input[type=checkbox][data-step]').forEach(cb => {
+    cb.addEventListener("change", e => {
+      const key = e.target.dataset.step;
+      if (e.target.checked) state[key] = true;
+      else delete state[key];
+      e.target.closest("li").classList.toggle("checked", e.target.checked);
+      saveState();
+      updateAllProgress();
+    });
+  });
+
+  // Bind feedback textareas
+  document.querySelectorAll('textarea[data-fb]').forEach(ta => {
+    ta.addEventListener("input", e => {
+      const key = e.target.dataset.fb;
+      if (e.target.value) state[key] = e.target.value;
+      else delete state[key];
+      saveState();
+    });
+  });
+
+  // Bind annex fields
+  document.querySelectorAll('.annex input[data-key], .annex textarea[data-key]').forEach(el => {
+    const key = `annex-${el.dataset.key}`;
+    if (state[key]) el.value = state[key];
+    el.addEventListener("input", e => {
+      const k = `annex-${e.target.dataset.key}`;
+      if (e.target.value) state[k] = e.target.value;
+      else delete state[k];
+      saveState();
+    });
+  });
+
+  // Reco buttons
+  document.querySelectorAll("#recoButtons button").forEach(btn => {
+    if (state["annex-reco"] === btn.dataset.val) btn.classList.add("active");
+    btn.addEventListener("click", e => {
+      document.querySelectorAll("#recoButtons button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      state["annex-reco"] = btn.dataset.val;
+      saveState();
+    });
+  });
+
+  updateAllProgress();
+}
+
+function updateAllProgress() {
+  let totalSteps = 0, totalDone = 0;
+  phasesData.forEach(phase => {
+    const total = phase.steps.length;
+    let done = 0;
+    for (let i = 0; i < total; i++) {
+      if (state[`p${phase.num}-s${i}`]) done++;
+    }
+    totalSteps += total; totalDone += done;
+    const pctEl = document.getElementById(`phase-pct-${phase.num}`);
+    const tocEl = document.getElementById(`toc-pct-${phase.num}`);
+    if (pctEl) {
+      pctEl.textContent = `${done} / ${total}`;
+      pctEl.classList.toggle("complete", done === total && total > 0);
+    }
+    if (tocEl) {
+      tocEl.textContent = `${done}/${total}`;
+      const link = tocEl.closest("a");
+      link.classList.toggle("complete", done === total && total > 0);
+      link.classList.toggle("partial", done > 0 && done < total);
+    }
+  });
+  const pct = totalSteps ? Math.round(totalDone / totalSteps * 100) : 0;
+  document.getElementById("progressBar").style.width = pct + "%";
+  document.getElementById("progressLabel").textContent = `${totalDone} / ${totalSteps} (${pct}%)`;
+}
+
+/* =============== ACTIONS =============== */
+function exportFeedback() {
+  let txt = "=========================================\n";
+  txt += "RAPPORT DE BETA TEST imaro — Mohammed Fikri / BlancaSyndic\n";
+  txt += "Exporté le : " + new Date().toLocaleString("fr-FR") + "\n";
+  txt += "=========================================\n\n";
+
+  let totalSteps = 0, totalDone = 0;
+  phasesData.forEach(phase => {
+    const total = phase.steps.length;
+    let done = 0;
+    for (let i = 0; i < total; i++) if (state[`p${phase.num}-s${i}`]) done++;
+    totalSteps += total; totalDone += done;
+  });
+  txt += `Progression globale : ${totalDone} / ${totalSteps} (${Math.round(totalDone/totalSteps*100)}%)\n\n`;
+
+  phasesData.forEach(phase => {
+    const total = phase.steps.length;
+    let done = 0;
+    const stepLines = [];
+    phase.steps.forEach((s, i) => {
+      const isDone = !!state[`p${phase.num}-s${i}`];
+      if (isDone) done++;
+      stepLines.push(`  [${isDone ? "x" : " "}] ${phase.num}.${i+1} ${s}`);
+    });
+    txt += `\n--- PHASE ${phase.num} : ${phase.title} (${done}/${total}) ---\n`;
+    txt += `Objectif : ${phase.obj}\n`;
+    txt += stepLines.join("\n") + "\n";
+    const fb = state[`fb-${phase.num}`];
+    if (fb && fb.trim()) {
+      txt += `\nFeedback Phase ${phase.num} :\n${fb}\n`;
+    }
+  });
+
+  txt += "\n\n========= ANNEXE A — FEEDBACK GLOBAL =========\n\n";
+  txt += "Points FORTS :\n";
+  [1,2,3].forEach(i => { if (state[`annex-strong-${i}`]) txt += `  ${i}. ${state[`annex-strong-${i}`]}\n`; });
+  txt += "\nPoints FAIBLES :\n";
+  [1,2,3].forEach(i => { if (state[`annex-weak-${i}`]) txt += `  ${i}. ${state[`annex-weak-${i}`]}\n`; });
+  txt += "\nVS SyndicConnect — Mieux :\n" + (state["annex-vs-better"] || "(rien)") + "\n";
+  txt += "\nVS SyndicConnect — Moins bien :\n" + (state["annex-vs-worse"] || "(rien)") + "\n";
+  txt += "\nFonctionnalités manquantes :\n" + (state["annex-vs-missing"] || "(rien)") + "\n";
+  txt += "\nNotes /10 :\n";
+  txt += `  Facilité : ${state["annex-rate-easy"] || "-"}/10\n`;
+  txt += `  Couverture : ${state["annex-rate-features"] || "-"}/10\n`;
+  txt += `  Performance : ${state["annex-rate-perf"] || "-"}/10\n`;
+  txt += `  Stabilité : ${state["annex-rate-stable"] || "-"}/10\n`;
+  txt += `  Recommanderais-tu ? : ${state["annex-reco"] || "(non répondu)"}\n`;
+  txt += "\nBugs bloquants :\n" + (state["annex-bugs-blockers"] || "(aucun)") + "\n";
+  txt += "\nIdées d'évolution :\n" + (state["annex-ideas"] || "(aucune)") + "\n";
+
+  txt += "\n========= ANNEXE B — BUGS DÉTAILLÉS =========\n\n";
+  txt += (state["annex-bug-details"] || "(aucun bug détaillé)") + "\n";
+
+  const blob = new Blob([txt], {type: "text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const ts = new Date().toISOString().slice(0,10);
+  a.href = url; a.download = `fikri-beta-test-${ts}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function resetAll() {
+  if (!confirm("Effacer TOUT (cases cochées + commentaires) ? Cette action est définitive.")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  Object.keys(state).forEach(k => delete state[k]);
+  document.querySelectorAll("input[type=checkbox]").forEach(cb => { cb.checked = false; cb.closest("li")?.classList.remove("checked"); });
+  document.querySelectorAll("textarea, .annex input").forEach(el => el.value = "");
+  document.querySelectorAll("#recoButtons button").forEach(b => b.classList.remove("active"));
+  updateAllProgress();
+}
+
+renderPhases();
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+export { lotsConfig } from './lots.config'
+export { coproprietairesConfig } from './coproprietaires.config'
+export { soldesConfig } from './soldes.config'
+export { paiementsConfig } from './paiements.config'
+export { prestatairesConfig } from './prestataires.config'
+export { bilanOuvertureConfig } from './bilan-ouverture.config'

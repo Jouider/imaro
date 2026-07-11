@@ -1,0 +1,58 @@
+name: Deploy Backend (Staging)
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+# Sérialise les déploiements : un merge rapproché attend la fin du déploiement en
+# cours (évite les sessions SSH qui se chevauchent et les timeouts).
+concurrency:
+  group: deploy-staging-backend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            set -e
+            cd /var/www/imaro-staging
+
+            echo "🧹 Clean stale locks..."
+            rm -f .git/index.lock
+
+            echo "📦 Pull latest code..."
+            git fetch origin develop
+            git reset --hard origin/develop
+            git clean -fd
+
+            echo "📚 Install dependencies..."
+            cd backend
+            composer install --no-dev --optimize-autoloader
+
+            echo "🗄️ Run migrations..."
+            sudo -u www-data php artisan migrate --force
+
+            echo "⚙️ Clear & rebuild caches..."
+            sudo -u www-data php artisan config:cache
+            sudo -u www-data php artisan route:cache
+            sudo -u www-data php artisan view:cache
+
+            echo "🔄 Restart Horizon..."
+            sudo supervisorctl restart horizon-staging
+
+            echo "✅ Staging backend deployed!"

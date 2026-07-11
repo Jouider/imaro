@@ -1,0 +1,51 @@
+name: Deploy Frontend (Staging)
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'frontend/**'
+  workflow_dispatch:
+
+# Sérialise les déploiements : un merge rapproché attend la fin du déploiement en
+# cours (évite les sessions SSH qui se chevauchent et les timeouts).
+concurrency:
+  group: deploy-staging-frontend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            set -e
+            cd /var/www/imaro-staging
+
+            echo "🧹 Clean stale locks..."
+            rm -f .git/index.lock
+
+            echo "📦 Pull latest code..."
+            git fetch origin develop
+            git reset --hard origin/develop
+            git clean -fd
+
+            echo "📚 Install dependencies..."
+            cd frontend
+            rm -rf node_modules
+            npm ci
+
+            echo "🔨 Build..."
+            VITE_API_URL=https://api-staging.imaro.ma/api npm run build
+
+            echo "✅ Staging frontend deployed!"

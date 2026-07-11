@@ -1,0 +1,3606 @@
+{
+  "app": {
+    "name": "Imaro",
+    "tagline": "Gestion de copropriété — Maroc"
+  },
+  "nav": {
+    "home": "Accueil",
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "dashboard": "Tableau de bord"
+  },
+  "language": {
+    "fr": "Français",
+    "ar": "العربية",
+    "switch": "Changer de langue",
+    "en": "English"
+  },
+  "auth": {
+    "title": "Connexion à Imaro",
+    "subtitle": "Recevez un code à 6 chiffres sur WhatsApp",
+    "phone": "Téléphone",
+    "phonePlaceholder": "+212 6XX XX XX XX",
+    "requestOtp": "Recevoir le code",
+    "otp": "Code OTP",
+    "otpPlaceholder": "123456",
+    "verifyOtp": "Vérifier",
+    "back": "Retour",
+    "backToSite": "Retour au site",
+    "brand": {
+      "taglineLine1": "La gestion de",
+      "taglineLine2": "copropriété",
+      "taglineLine3": "simplifiée.",
+      "subtitle": "Syndics, charges, assemblées et documents — tout en un seul endroit.",
+      "feature1": "Connexion instantanée par WhatsApp",
+      "feature2": "Conforme à la loi 18-00 sur la copropriété",
+      "feature3": "Interface disponible en français et arabe",
+      "footer": "© {{year}} Imaro · Gestion de Syndic au Maroc"
+    },
+    "role": {
+      "welcomeTitle": "Bienvenue sur Imaro",
+      "welcomeSubtitle": "Choisissez votre espace pour continuer",
+      "gestionnaireTitle": "Syndic / Gestionnaire",
+      "gestionnaireDesc": "Gérez vos résidences, budgets, travaux et copropriétaires",
+      "residentTitle": "Copropriétaire",
+      "residentDesc": "Consultez vos charges, signalez des incidents et suivez vos paiements",
+      "footnote": "Connexion sécurisée — syndics par email, copropriétaires par code d'accès"
+    },
+    "gestionnaire": {
+      "title": "Espace Syndic",
+      "subtitle": "Connectez-vous avec vos identifiants",
+      "email": "Adresse email",
+      "emailPlaceholder": "votre@email.com",
+      "password": "Mot de passe",
+      "passwordHint": "Identifiants fournis par l'équipe Imaro",
+      "submit": "Se connecter",
+      "submitting": "Connexion…"
+    },
+    "admin": {
+      "activateTitle": "Créez votre mot de passe",
+      "activateSubtitle": "Définissez un mot de passe personnel de 8 caractères minimum",
+      "activateHint": "Première connexion — votre compte a été créé par votre cabinet. Choisissez un mot de passe personnel pour sécuriser votre accès.",
+      "newPassword": "Nouveau mot de passe",
+      "newPasswordPlaceholder": "8 caractères minimum",
+      "confirmPassword": "Confirmer le mot de passe",
+      "confirmPasswordPlaceholder": "Répétez votre mot de passe",
+      "activateSubmit": "Confirmer et accéder",
+      "activating": "Activation…",
+      "mismatch": "Les mots de passe ne correspondent pas",
+      "tooShort": "Mot de passe trop court (8 caractères minimum)"
+    },
+    "resident": {
+      "title": "Espace Copropriétaire",
+      "subtitle": "Entrez votre numéro de téléphone marocain",
+      "phoneLabel": "Numéro de téléphone",
+      "phonePlaceholder": "6XX XX XX XX",
+      "phoneHint": "Ex : 6XX XX XX XX ou 7XX XX XX XX",
+      "continue": "Continuer",
+      "codeTitle": "Code d'accès",
+      "codeSubtitle": "Entrez le code fourni par votre syndic pour +212 {{digits}}",
+      "codeLabel": "Code d'accès",
+      "codePlaceholder": "Code fourni par votre syndic",
+      "codeHint": "Ce code vous a été communiqué par votre gestionnaire via WhatsApp.",
+      "codeSubmit": "Accéder à mon espace",
+      "codeVerifying": "Vérification…",
+      "activateTitle": "Créez votre code personnel",
+      "activateSubtitle": "Définissez un code personnel de 6 caractères minimum",
+      "activateHint": "Première connexion — choisissez un code personnel que vous utiliserez à chaque connexion.",
+      "newCode": "Nouveau code",
+      "newCodePlaceholder": "6 caractères minimum",
+      "confirmCode": "Confirmer le code",
+      "confirmCodePlaceholder": "Répétez votre code",
+      "activateSubmit": "Confirmer et se connecter",
+      "activating": "Activation…",
+      "codesMismatch": "Les codes ne correspondent pas",
+      "codeTooShort": "Code trop court (6 caractères minimum)"
+    },
+    "devBypass": "Dev mode — accès direct",
+    "networkError": "Erreur réseau",
+    "forgot": {
+      "link": "Mot de passe oublié ?",
+      "title": "Réinitialiser le mot de passe",
+      "subtitle": "Choisissez comment recevoir vos instructions de réinitialisation.",
+      "method": {
+        "email": "Par email",
+        "otp": "Par SMS / WhatsApp"
+      },
+      "submit": "Envoyer",
+      "sending": "Envoi…",
+      "emailSentTitle": "Vérifiez votre boîte mail",
+      "emailSentBody": "Si un compte existe pour {{email}}, un lien de réinitialisation vient d'être envoyé.",
+      "backToLogin": "Retour à la connexion",
+      "otpTitle": "Entrez le code reçu",
+      "otpSubtitle": "Un code a été envoyé au +212 {{phone}}. Entrez-le et choisissez un nouveau mot de passe.",
+      "code": "Code de vérification",
+      "resetSubmit": "Réinitialiser le mot de passe",
+      "resetting": "Réinitialisation…",
+      "resetDone": "Mot de passe réinitialisé. Vous pouvez vous connecter.",
+      "resetTitle": "Nouveau mot de passe",
+      "resetSubtitle": "Définissez un nouveau mot de passe pour {{email}}.",
+      "linkInvalid": "Lien invalide ou expiré",
+      "linkInvalidBody": "Ce lien de réinitialisation n'est plus valable. Refaites une demande depuis la page de connexion."
+    },
+    "demo": {
+      "eyebrow": "Créer un compte",
+      "title": "Demander une démo",
+      "subtitle": "Dites-nous en plus, on vous recontacte sous 24 h.",
+      "name": "Nom complet",
+      "cabinet": "Cabinet / Syndic",
+      "email": "Email professionnel",
+      "phone": "Téléphone",
+      "message": "Message (optionnel)",
+      "messagePlaceholder": "Nombre de résidences, besoins particuliers…",
+      "submit": "Envoyer ma demande",
+      "privacy": "Vos données ne servent qu'à vous recontacter. Aucun engagement.",
+      "sentTitle": "Demande envoyée ✅",
+      "sentBody": "Merci ! Notre équipe vous recontacte très vite pour planifier votre démo.",
+      "error": "Échec de l'envoi. Réessayez ou écrivez-nous à contact@imaro.ma.",
+      "noAccount": "Pas encore de compte ?",
+      "cta": "Demander une démo"
+    }
+  },
+  "statut": {
+    "paye": "Payé",
+    "impaye": "Impayé",
+    "partiel": "Partiel",
+    "retard": "En retard"
+  },
+  "actions": {
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "loading": "Chargement…",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "save": "Enregistrer",
+    "close": "Fermer",
+    "show": "Afficher",
+    "hide": "Masquer",
+    "continue": "Continuer",
+    "back": "Retour"
+  },
+  "portail": {
+    "nav": {
+      "home": "Accueil",
+      "actualites": "Actualités",
+      "finances": "Finances",
+      "reclamations": "Réclamations",
+      "profil": "Profil",
+      "qr": "Inviter",
+      "notifications": "Notifications",
+      "bottomBar": "Navigation principale"
+    },
+    "installPrompt": {
+      "title": "Installer Imaro",
+      "desc": "Ajoutez Imaro à votre écran d'accueil pour un accès rapide hors-ligne.",
+      "install": "Installer",
+      "later": "Plus tard"
+    },
+    "pullToRefresh": {
+      "release": "Relâcher pour actualiser",
+      "pull": "Tirer pour actualiser",
+      "refreshing": "Actualisation…"
+    },
+    "push": {
+      "title": "Notifications push",
+      "desc": "Recevez une alerte instantanée pour vos paiements et réclamations.",
+      "enable": "Activer",
+      "disable": "Désactiver",
+      "enabled": "Notifications activées",
+      "unsupported": "Non supporté sur ce navigateur"
+    },
+    "home": {
+      "balance": "Mon solde",
+      "aJour": "À jour",
+      "enRetard": "En retard",
+      "prochainAppel": "Prochain appel",
+      "le": "le",
+      "annonces": "Annonces",
+      "voirTout": "Voir tout",
+      "noAnnonces": "Aucune annonce",
+      "kpiPaidYear": "Payé cette année",
+      "kpiPending": "Reste à payer",
+      "assemblees": "Prochaines assemblées",
+      "noAssemblees": "Aucune assemblée prévue",
+      "prochainPaiement": "Prochain paiement",
+      "payer": "Payer →",
+      "convoquee": "Convoquée",
+      "inviteVisitor": "Inviter un visiteur",
+      "inviteVisitorDesc": "Générez un QR à usage unique pour un proche, un livreur ou un intervenant.",
+      "urgent": "Urgent",
+      "like": "J'aime",
+      "unlike": "Je n'aime plus",
+      "likeError": "Action impossible, réessayez"
+    },
+    "actualites": {
+      "title": "Actualités",
+      "tabAnnonces": "Annonces",
+      "tabAssemblees": "Assemblées",
+      "tabCalendrier": "Calendrier",
+      "noAnnonces": "Aucune annonce pour votre résidence",
+      "noAssemblees": "Aucune assemblée programmée",
+      "urgente": "Urgent",
+      "lectures": "{{n}} lecture{{s}}",
+      "quorum": "Quorum : {{n}} %",
+      "participants": "{{n}} participant(s)",
+      "agNonTenue": "AG non encore tenue",
+      "ordreDuJour": "Ordre du jour",
+      "convoquee": "Convoquée",
+      "tenue": "Tenue",
+      "annulee": "Annulée",
+      "ordinaire": "Ordinaire",
+      "extraordinaire": "Extraordinaire",
+      "calendarHint": "Cliquez sur un jour marqué pour voir les événements",
+      "calendarEmpty": "Aucun événement ce mois",
+      "aVenir": "À venir",
+      "passees": "Passées"
+    },
+    "finances": {
+      "title": "Mes finances",
+      "tabFinances": "Finances",
+      "tabDocuments": "Documents",
+      "filter": {
+        "all": "Tout",
+        "appels": "Appels de fonds",
+        "paiements": "Paiements"
+      },
+      "empty": "Aucune opération",
+      "recu": "Télécharger le reçu",
+      "documents": {
+        "title": "Mes documents",
+        "empty": "Aucun document disponible",
+        "download": "Télécharger",
+        "groupReglement": "Règlement de copropriété",
+        "groupPvAg": "PV Assemblées",
+        "groupContratFacture": "Contrats / Factures",
+        "groupAutre": "Autres documents"
+      },
+      "pay": "Payer ma cotisation",
+      "amountDue": "Solde à régler"
+    },
+    "paiement": {
+      "howTitle": "Comment payer",
+      "declareTitle": "Déclarer mon paiement",
+      "howIntro": "Effectuez un virement ou un versement vers l'un des comptes du syndic, puis déclarez votre paiement avec un justificatif.",
+      "noAccounts": "Aucun compte bancaire n'est encore configuré pour votre résidence. Contactez votre syndic.",
+      "recommended": "Recommandé",
+      "copyRib": "Copier le RIB",
+      "ribCopied": "RIB copié",
+      "copyError": "Impossible de copier le RIB",
+      "showQr": "Afficher le QR de paiement",
+      "qrHint": "Scannez ce code avec votre application bancaire pour pré-remplir le virement.",
+      "instructions": "Après votre virement, déclarez le paiement ci-dessous et joignez la capture d'écran ou le relevé. Votre syndic le rapprochera de son relevé bancaire.",
+      "iPaid": "J'ai effectué le paiement",
+      "backToHow": "Revenir aux coordonnées",
+      "montant": "Montant payé (DH)",
+      "date": "Date du paiement",
+      "methode": "Méthode de paiement",
+      "methodes": {
+        "virement": "Virement bancaire",
+        "versement": "Versement en agence",
+        "cheque": "Chèque",
+        "especes": "Espèces"
+      },
+      "reference": "Référence (optionnel)",
+      "referencePlaceholder": "Réf. du virement, n° de bordereau…",
+      "justificatif": "Justificatif (capture / relevé)",
+      "justificatifHint": "Ajouter une photo ou un PDF",
+      "payOnline": "Payer en ligne",
+      "submit": "Déclarer le paiement",
+      "toast": {
+        "declared": "Paiement déclaré. Votre syndic va le vérifier.",
+        "error": "Une erreur est survenue. Réessayez."
+      },
+      "referenceRequired": "La référence est obligatoire (ex. n° de virement ou bordereau).",
+      "ocr": {
+        "analyzing": "Analyse du justificatif…",
+        "prefilled": "Champs pré-remplis depuis le justificatif"
+      }
+    },
+    "reclamations": {
+      "title": "Mes réclamations",
+      "categorie": "Catégorie",
+      "sujet": "Sujet",
+      "description": "Description",
+      "submit": "Signaler le problème",
+      "success": "Réclamation envoyée",
+      "hint": "Vos réclamations sont traitées dans un délai de 48h ouvrées.",
+      "addPhoto": "Ajouter une photo",
+      "removePhoto": "Supprimer la photo",
+      "photoHint": "JPEG, PNG ou WebP · max 5 photos · 5 Mo/photo",
+      "photoSizeError": "Fichier trop grand (max 5 Mo par photo)",
+      "empty": "Aucune réclamation",
+      "emptyHint": "Vos réclamations soumises apparaîtront ici.",
+      "sendError": "Erreur lors de l'envoi",
+      "customLabel": "Précisez le type",
+      "customPlaceholder": "Ex : Antenne collective, vide-ordures…",
+      "customRequired": "Précisez le type de réclamation",
+      "ratingPrompt": "Comment s'est passée la résolution ?",
+      "ratingSatisfait": "Satisfait",
+      "ratingInsatisfait": "Pas satisfait",
+      "ratingThanks": "Merci pour votre avis !",
+      "ratingChange": "Modifier mon avis",
+      "categories": {
+        "parties_communes": "Parties communes",
+        "ascenseur": "Ascenseur",
+        "plomberie": "Eau / Plomberie",
+        "electricite": "Électricité",
+        "chauffage": "Chauffage / Climatisation",
+        "securite": "Sécurité",
+        "proprete": "Propreté / Nettoyage",
+        "nuisances": "Nuisances sonores",
+        "espaces_verts": "Espaces verts",
+        "parking": "Parking / Garage",
+        "interphone": "Interphone / Accès",
+        "degat_eaux": "Dégât des eaux",
+        "autre": "Autre"
+      },
+      "sujetMin": "Sujet trop court (5 caractères minimum)"
+    },
+    "profil": {
+      "title": "Mon profil",
+      "apparence": "Apparence",
+      "darkMode": "Mode sombre",
+      "logout": "Se déconnecter",
+      "contact": "Mes coordonnées",
+      "preferences": "Préférences",
+      "account": "Compte",
+      "privacy": "Confidentialité",
+      "cndpNotice": "Vos données personnelles sont conservées et traitées de manière sécurisée, conformément à la loi 09-08 (CNDP) relative à la protection des données à caractère personnel.",
+      "logoutConfirmTitle": "Se déconnecter ?",
+      "logoutConfirmDesc": "Vous devrez à nouveau saisir votre OTP WhatsApp pour revenir."
+    },
+    "login": {
+      "title": "Portail copropriétaire",
+      "subtitle": "Recevez un code à 6 chiffres sur WhatsApp",
+      "phone": "Numéro de téléphone",
+      "phonePlaceholder": "6XX XX XX XX",
+      "sendCode": "Recevoir le code WhatsApp",
+      "sending": "Envoi en cours…",
+      "otp": "Code de vérification",
+      "otpHint": "Entrez le code à 6 chiffres reçu sur WhatsApp",
+      "verify": "Accéder à mon espace",
+      "verifying": "Vérification…",
+      "resend": "Renvoyer le code",
+      "resendIn": "Renvoyer dans {{s}}s",
+      "changePhone": "Changer de numéro",
+      "noCode": "Vous n'avez pas reçu le code ?",
+      "smsFallback": "Recevoir par SMS"
+    },
+    "dashboard": {
+      "welcome": "Bonjour, {{name}} !",
+      "subtitle": "Portail copropriétaire"
+    },
+    "visiteurs": {
+      "title": "Mes visiteurs",
+      "subtitle": "Invitez un visiteur, livreur ou prestataire — il recevra un QR à présenter à l'entrée.",
+      "newInvite": "Inviter un visiteur",
+      "empty": "Aucun visiteur invité",
+      "emptyDesc": "Créez votre première invitation — votre visiteur recevra un lien à scanner à l'entrée.",
+      "form": {
+        "title": "Nouvelle invitation",
+        "desc": "Le QR est envoyé directement par WhatsApp / SMS au visiteur.",
+        "shareLater": "Vous pourrez le partager après création.",
+        "submit": "Créer & partager",
+        "submitting": "Création…",
+        "success": "Invitation créée"
+      },
+      "share": {
+        "title": "Partager le QR",
+        "shareNative": "Partager",
+        "orVia": "ou via :",
+        "copyLink": "Copier le lien",
+        "whatsapp": "WhatsApp",
+        "sms": "SMS",
+        "waMessage": "Bonjour {{name}}, votre laissez-passer Imaro : {{url}}"
+      },
+      "list": {
+        "upcoming": "À venir",
+        "past": "Passées"
+      },
+      "back": "Retour à l'accueil"
+    },
+    "biometric": {
+      "reason": "Déverrouillez votre espace Imaro",
+      "lockTitle": "Espace verrouillé",
+      "lockSubtitle": "Authentifiez-vous pour accéder à votre espace.",
+      "unlock": "Déverrouiller",
+      "useCode": "Utiliser le code d'accès",
+      "settingLabel": "Déverrouillage biométrique",
+      "settingDesc": "Face ID / empreinte à l'ouverture de l'application.",
+      "enabled": "Déverrouillage biométrique activé.",
+      "enableFailed": "Authentification biométrique échouée."
+    },
+    "bonsPaiement": {
+      "title": "Bons de paiement",
+      "subtitle": "Émettez un ordre de paiement vers le syndic et retrouvez votre historique.",
+      "entryDesc": "Émettre un ordre de paiement et voir l’historique",
+      "empty": "Aucun bon de paiement",
+      "new": "Nouveau bon",
+      "from": "Compte émetteur",
+      "to": "Bénéficiaire",
+      "montant": "Montant",
+      "motif": "Motif",
+      "motifPlaceholder": "Ex. Appel de fonds T1 2026",
+      "delaiNotice": "Validation par le syndic possible après un délai de 24 h.",
+      "validableLe": "Validable le",
+      "validatedWithTicket": "Validé. Ticket de suivi",
+      "download": "Télécharger",
+      "downloadPending": "Disponible après validation",
+      "step1": "Émetteur & bénéficiaire",
+      "step2": "Montant",
+      "step3": "Motif",
+      "step4": "Confirmation",
+      "stepOf": "Étape {{current}} sur {{total}}",
+      "emit": "Émettre le bon",
+      "created": "Bon de paiement émis",
+      "createError": "L’émission a échoué, réessayez",
+      "statut": {
+        "en_attente": "En attente",
+        "valide": "Validé",
+        "rejete": "Rejeté",
+        "expire": "Expiré"
+      }
+    }
+  },
+  "home": {
+    "title": "Bienvenue sur Imaro",
+    "subtitle": "Plateforme marocaine de gestion de copropriété — conforme à la Loi 18-00",
+    "ctaLogin": "Se connecter",
+    "stackHeading": "Stack",
+    "cards": {
+      "residences": {
+        "title": "Copropriétés",
+        "desc": "Lots, tantièmes, copropriétaires"
+      },
+      "appelsFonds": {
+        "title": "Appels de fonds",
+        "desc": "Calcul auto par tantième + relances"
+      },
+      "loi": {
+        "title": "Loi 18-00",
+        "desc": "PDF conformes & multi-tenant"
+      }
+    },
+    "nav": {
+      "gestionnaire": "Gestionnaire",
+      "coproprietaire": "Copropriétaire"
+    },
+    "hero": {
+      "headline1": "La gestion de",
+      "headline2": "copropriété réinventée",
+      "sub": "Plateforme tout-en-un pour syndics et copropriétaires marocains — conforme Loi 18-00.",
+      "ctaGestionnaire": "Accès Gestionnaire",
+      "ctaCoproprietaire": "Accès Copropriétaire",
+      "badge": "Loi 18-00 ✓"
+    },
+    "stats": {
+      "residences": "Copropriétés",
+      "coproprietaires": "Copropriétaires",
+      "dispo": "Disponibilité",
+      "loi": "Loi 18-00 Conforme"
+    },
+    "features": {
+      "title": "Tout ce dont vous avez besoin",
+      "sub": "Une solution complète pour la gestion moderne de copropriété",
+      "residences": {
+        "title": "Gestion des résidences",
+        "desc": "Lots, tantièmes et copropriétaires centralisés"
+      },
+      "appels": {
+        "title": "Appels de fonds automatisés",
+        "desc": "Calcul par tantième, envoi WhatsApp instantané"
+      },
+      "paiements": {
+        "title": "Suivi des paiements",
+        "desc": "Historique complet et impayés en temps réel"
+      },
+      "tickets": {
+        "title": "Tickets & réclamations",
+        "desc": "Traitement avec photos et suivi de statut"
+      },
+      "assemblees": {
+        "title": "Assemblées générales",
+        "desc": "Convocations, ordres du jour et procès-verbaux"
+      },
+      "portail": {
+        "title": "Portail copropriétaire",
+        "desc": "Application mobile pour chaque résident"
+      }
+    },
+    "howItWorks": {
+      "title": "Opérationnel en 3 étapes",
+      "sub": "Démarrez en quelques minutes, sans formation technique",
+      "step1": {
+        "title": "Créez votre résidence",
+        "desc": "Ajoutez vos lots, tantièmes et copropriétaires en quelques clics"
+      },
+      "step2": {
+        "title": "Invitez vos copropriétaires",
+        "desc": "Ils reçoivent un accès WhatsApp à leur portail personnel"
+      },
+      "step3": {
+        "title": "Gérez en temps réel",
+        "desc": "Tableau de bord, relances automatiques, rapports instantanés"
+      }
+    },
+    "portals": {
+      "gestionnaire": {
+        "title": "Espace Gestionnaire",
+        "desc": "Gérez votre portefeuille de copropriétés depuis un tableau de bord unifié.",
+        "cta": "Accès Gestionnaire →"
+      },
+      "coproprietaire": {
+        "title": "Espace Copropriétaire",
+        "desc": "Consultez vos charges, payez en ligne et signalez des problèmes.",
+        "cta": "Accès Copropriétaire →"
+      }
+    },
+    "footer": {
+      "tagline": "La gestion de copropriété simplifiée pour le Maroc",
+      "legal": "Conforme Loi 18-00 · Maroc",
+      "copyright": "© 2026 Imaro. Tous droits réservés."
+    }
+  },
+  "landing": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "ia": "IA",
+      "conformite": "Conformité",
+      "pricing": "Tarifs",
+      "faq": "FAQ",
+      "login": "Connexion",
+      "cta": "Demander une démo"
+    },
+    "hero": {
+      "eyebrow": "Décret 2.23.700 · 100 % conforme",
+      "title1": "Le syndic,",
+      "title2": "simplifié.",
+      "subtitle": "Imaro réunit comptabilité, conformité, recouvrement et IA dans une seule plateforme — pensée pour le marché marocain.",
+      "ctaPrimary": "Essayer gratuitement",
+      "ctaSecondary": "Voir le produit",
+      "trust1": "OTP WhatsApp natif",
+      "trust2": "Plan Comptable Marocain",
+      "trust3": "Conforme Loi 18-00",
+      "impayes": "Impayés",
+      "tresorerie": "Trésorerie",
+      "pointageDone": "Pointage Attijariwafa terminé"
+    },
+    "logoBar": {
+      "title": "Ils nous font confiance"
+    },
+    "stats": {
+      "residences": "Résidences gérées",
+      "copros": "Copropriétaires actifs",
+      "uptime": "Disponibilité",
+      "compliance": "Décret 2.23.700"
+    },
+    "features": {
+      "eyebrow": "Modules métier",
+      "title": "Tout ce dont un syndic a besoin",
+      "subtitle": "Huit modules intégrés, plus de 60 fonctionnalités, zéro Excel à maintenir.",
+      "learnMore": "En savoir plus",
+      "recouvrement": {
+        "title": "Recouvrement intelligent",
+        "desc": "Pilotage des impayés, mises en demeure automatiques et alertes prescription quinquennale (Loi 18-00 art. 25)."
+      },
+      "conformite": {
+        "title": "Conformité légale",
+        "desc": "Calendrier annuel, 12 annexes du Décret 2.23.700 générées en un clic, journal d'audit conservé 7 ans."
+      },
+      "pointage": {
+        "title": "Pointage bancaire",
+        "desc": "10 banques marocaines supportées. Auto-match du relevé bancaire avec vos paiements et dépenses en quelques secondes."
+      },
+      "comptabilite": {
+        "title": "Comptabilité partie double",
+        "desc": "Journal, grand-livre, balance, clôture d'exercice — aux normes du Plan Comptable Marocain (CGNC)."
+      },
+      "patrimoine": {
+        "title": "Suivi du patrimoine",
+        "desc": "Équipements amortis, emprunts collectifs, travaux exceptionnels votés en AG — tout est tracé."
+      },
+      "ia": {
+        "title": "Assistant IA",
+        "desc": "Audit de conformité automatisé, OCR des factures, suggestions de budget basées sur l'inflation HCP."
+      }
+    },
+    "modules": {
+      "eyebrow": "La plateforme complète",
+      "title": "Tout le métier de syndic, réuni",
+      "subtitle": "De la première cotisation à la clôture annuelle — chaque opération d'un syndic professionnel marocain, dans une seule plateforme.",
+      "badges": {
+        "new": "Nouveau",
+        "killer": "Populaire",
+        "mobile": "Mobile"
+      },
+      "items": {
+        "comptabilite": {
+          "title": "Comptabilité en partie double",
+          "desc": "Journal, grand-livre, balance, bilan et compte de gestion aux normes CGNC. Clôture d'exercice guidée en 4 étapes.",
+          "tag1": "Plan comptable marocain",
+          "tag2": "Clôture annuelle",
+          "tag3": "Bilan & balance"
+        },
+        "pointage": {
+          "title": "Pointage bancaire",
+          "desc": "Importez le relevé de 10 banques marocaines. L'auto-matching réconcilie paiements et dépenses en secondes.",
+          "tag1": "10 banques",
+          "tag2": "Auto-matching"
+        },
+        "recouvrement": {
+          "title": "Recouvrement & relances",
+          "desc": "Impayés, pénalités de retard, relances multicanal et alerte de prescription quinquennale.",
+          "tag1": "Pénalités auto",
+          "tag2": "Prescription"
+        },
+        "appels": {
+          "title": "Appels de fonds & budgets",
+          "desc": "Génération mensuelle automatique, répartition par tantième, budgets prévisionnels et fonds de réserve.",
+          "tag1": "Par tantième",
+          "tag2": "Génération auto"
+        },
+        "patrimoine": {
+          "title": "Patrimoine & contrats",
+          "desc": "Immeubles, lots, tranches, équipements amortis, prestataires et contrats — tout le patrimoine tracé.",
+          "tag1": "Équipements",
+          "tag2": "Prestataires"
+        },
+        "assemblees": {
+          "title": "Assemblées Générales",
+          "desc": "Convocations conformes à la Loi 18-00, ordre du jour, vote pondéré par tantième et procès-verbaux archivés.",
+          "tag1": "Convocations légales",
+          "tag2": "Vote pondéré"
+        },
+        "portail": {
+          "title": "Portail résident mobile",
+          "desc": "Application installable (PWA) : charges, paiement en ligne, réclamations et notifications push.",
+          "tag1": "PWA installable",
+          "tag2": "Paiement en ligne"
+        },
+        "conformite": {
+          "title": "Conformité Décret 2.23.700",
+          "desc": "12 annexes réglementaires générées en un clic et calendrier de conformité annuel.",
+          "tag1": "12 annexes",
+          "tag2": "Calendrier"
+        },
+        "documents": {
+          "title": "Documents & communication",
+          "desc": "GED centralisée, annonces aux résidents et historique partagé — chaque pièce à portée de lien.",
+          "tag1": "GED",
+          "tag2": "Annonces"
+        },
+        "imports": {
+          "title": "Import intelligent",
+          "desc": "Reprenez vos données existantes : 5 types de fichiers, mapping automatique et validation croisée.",
+          "tag1": "Excel & CSV",
+          "tag2": "Mapping auto"
+        }
+      }
+    },
+    "conformite": {
+      "eyebrow": "Conformité légale",
+      "title": "Conforme au Décret 2.23.700",
+      "subtitle": "Imaro est construit autour du cadre légal marocain : Loi 18-00 et Décret 2.23.700. La conformité n'est pas une option, c'est le socle.",
+      "points": {
+        "regime": {
+          "title": "Régime simplifié ou normal",
+          "desc": "Imaro adapte automatiquement vos obligations selon le seuil de 200 000 MAD de charges annuelles."
+        },
+        "annexes": {
+          "title": "12 annexes générées",
+          "desc": "Toutes les annexes réglementaires (3 à 13-2) produites en PDF, prêtes pour l'assemblée et l'archivage."
+        },
+        "calendrier": {
+          "title": "Calendrier de conformité",
+          "desc": "Opérations mensuelles, clôture, AG, archivage : chaque échéance légale suivie et rappelée."
+        }
+      },
+      "card": {
+        "title": "Dossier conforme",
+        "subtitle": "Décret 2.23.700 · Loi 18-00",
+        "cycleLabel": "Cycle annuel",
+        "annexesLabel": "Annexes générées",
+        "annexePrefix": "Annexe"
+      },
+      "phases": {
+        "operations": "Opérations mensuelles",
+        "cloture": "Clôture d'exercice",
+        "ag": "Assemblée Générale",
+        "archivage": "Archivage légal"
+      }
+    },
+    "ia": {
+      "eyebrow": "Notre moat différenciateur",
+      "title": "L'IA qui rend votre syndic intelligent",
+      "subtitle": "Trois assistants propulsés par Claude qui vous font gagner des heures chaque semaine.",
+      "audit": {
+        "title": "Audit conformité en 30 secondes",
+        "desc": "Vérifie 30+ points légaux et opérationnels, produit un score et des findings actionables."
+      },
+      "ocr": {
+        "title": "OCR factures intelligent",
+        "desc": "Drop une facture PDF ou photo, l'IA extrait fournisseur, ICE, HT/TVA/TTC, et propose le compte PCM."
+      },
+      "budget": {
+        "title": "Suggestions budget basées sur les données",
+        "desc": "Analyse vos exercices passés + inflation HCP + hausses Lydec/Redal pour proposer le budget N+1."
+      },
+      "report": {
+        "title": "Rapport d'audit",
+        "subtitle": "Résidence Atlas · 2026",
+        "status": "Bon",
+        "f1": "Findings critiques",
+        "f2": "Recommandations",
+        "f3": "Points forts",
+        "finding1": {
+          "title": "Pénalités configurées",
+          "desc": "Vote AG non trouvé dans les PV — vérifier conformité Loi 18-00 art. 25"
+        },
+        "finding2": {
+          "title": "Annexes 10, 13-1, 13-2 générées",
+          "desc": "Cycle de conformité à jour pour l'exercice en cours"
+        }
+      }
+    },
+    "pointage": {
+      "eyebrow": "Pointage bancaire",
+      "title": "Adieu le rapprochement manuel",
+      "subtitle": "Connectez n'importe quelle banque marocaine. Imaro fait le reste.",
+      "banksTitle": "Banques supportées",
+      "fileSize": "32 KB · 124 opérations",
+      "benefit1": "10 banques marocaines + format générique pour le reste",
+      "benefit2": "Auto-matching sur montant, date et libellé avec fuzzy matching",
+      "benefit3": "Confirmation en masse en un clic — fini les heures sur Excel",
+      "summary": "Auto-matché",
+      "timeGain": "de gain par mois sur le pointage",
+      "suggested": "Suggéré"
+    },
+    "comparison": {
+      "eyebrow": "Pourquoi changer",
+      "title": "Excel & courrier vs Imaro",
+      "subtitle": "Pour chaque tâche du syndic, Imaro élimine la saisie manuelle et les erreurs.",
+      "colExcel": "Excel + courrier",
+      "colImaro": "Imaro",
+      "row": {
+        "recouvrement": {
+          "label": "Recouvrement",
+          "excel": "Suivi manuel en tableur, lettres papier",
+          "imaro": "Pénalités auto, mises en demeure générées"
+        },
+        "annexes": {
+          "label": "Annexes Décret 2.23.700",
+          "excel": "Excel + formatage Word à chaque exercice",
+          "imaro": "12 annexes PDF générées en un clic"
+        },
+        "pointage": {
+          "label": "Pointage bancaire",
+          "excel": "2 heures par mois à pointer ligne par ligne",
+          "imaro": "Auto-match 80 % en moins de 10 minutes"
+        },
+        "reporting": {
+          "label": "Reporting AG",
+          "excel": "Compilation manuelle de 5+ documents",
+          "imaro": "Bilan complet + comptes générés automatiquement"
+        },
+        "archivage": {
+          "label": "Archivage",
+          "excel": "Classeurs papier dans le bureau",
+          "imaro": "GED chiffrée + rétention 7 ans automatique"
+        },
+        "ia": {
+          "label": "Saisie factures",
+          "excel": "Re-typer chaque facture à la main",
+          "imaro": "OCR IA en 3 secondes par facture"
+        }
+      }
+    },
+    "testimonials": {
+      "eyebrow": "Témoignages",
+      "title": "Ce qu'en disent les syndics",
+      "residences": "résidences",
+      "t1": {
+        "quote": "On a fait passer notre cabinet de 8 à 24 résidences sans embaucher. Imaro a remplacé 3 outils différents et nous a fait gagner 2 jours par mois en pointage.",
+        "name": "Hassan Alaoui",
+        "role": "Syndic Owner, Atlas Promotion"
+      },
+      "t2": {
+        "quote": "L'audit IA m'a évité une non-conformité majeure avant une AG. Le rapport est livré en 30 secondes, c'est bluffant.",
+        "name": "Salma Bennani",
+        "role": "Gestionnaire, Anfa Gestion"
+      },
+      "t3": {
+        "quote": "Nos copropriétaires adorent le portail mobile. Le taux d'impayés a baissé de 18 % en 6 mois grâce aux notifications WhatsApp.",
+        "name": "Karim El Fassi",
+        "role": "Conseil syndical, Marina Tower"
+      }
+    },
+    "pricing": {
+      "eyebrow": "Tarifs",
+      "title": "Chaque copropriété est unique",
+      "subtitle": "Pas de grille rigide. Votre tarif dépend du nombre de résidences, de lots et des modules activés — on construit l'offre avec vous.",
+      "popular": "Le plus choisi",
+      "from": "à partir de",
+      "currency": "DH",
+      "perMonth": "par mois, HT",
+      "onQuote": "Sur devis",
+      "ctaStart": "Commencer",
+      "ctaContact": "Nous contacter",
+      "features": {
+        "residences": "Résidences illimitées",
+        "copros": "Copropriétaires illimités",
+        "support": "Support email + WhatsApp",
+        "ia": "Assistant IA (audit, OCR, budget)",
+        "pointage": "Pointage bancaire 10 banques",
+        "multitenant": "Multi-tenant + équipes"
+      },
+      "starter": {
+        "name": "Starter",
+        "tagline": "Pour les petits cabinets jusqu'à 5 résidences"
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "Pour les cabinets en croissance"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "tagline": "Pour les grands portefeuilles et groupes immobiliers"
+      },
+      "cardEyebrow": "Offre sur mesure",
+      "cardPrice": "Sur devis",
+      "cardDesc": "Un seul plan : le vôtre. Toutes les fonctionnalités, ajustées à la taille de votre cabinet.",
+      "includedTitle": "Inclus dans chaque offre",
+      "included1": "Tous les modules métier & comptables",
+      "included2": "Conformité Décret 2.23.700 complète",
+      "included3": "Assistant IA — audit, OCR, budget",
+      "included4": "Portail résident illimité (FR + AR)",
+      "included5": "Onboarding & reprise de vos données",
+      "included6": "Support dédié par WhatsApp",
+      "ctaQuote": "Demander un devis",
+      "ctaExpert": "Parler à un expert",
+      "note": "Sans engagement · 14 jours d'essai gratuit"
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Vos questions, nos réponses",
+      "subtitle": "Si la vôtre n'est pas listée, écrivez-nous à support@imaro.ma.",
+      "q1": {
+        "question": "Imaro est-il conforme au Décret 2.23.700 et à la Loi 18-00 ?",
+        "answer": "Oui — totalement. Les 12 annexes obligatoires sont générables en PDF signés. Le calendrier de conformité suit le cycle annuel automatiquement. Le journal d'audit est conservé 7 ans comme l'exige l'article 12."
+      },
+      "q2": {
+        "question": "Combien coûte Imaro pour mon cabinet ?",
+        "answer": "Tarification par tranches de lots gérés. Plan Starter à partir de 299 DH/mois, Pro à 599 DH/mois, Enterprise sur devis. Pas de frais d'installation, pas d'engagement annuel — sans contrainte."
+      },
+      "q3": {
+        "question": "Mes données sont-elles sécurisées ?",
+        "answer": "Multi-tenant strict : votre cabinet est totalement isolé. Aucun autre syndic ne peut voir vos données. Hébergement EU avec sauvegardes quotidiennes. L'IA traite les données via Claude (Anthropic) sans les stocker ni les utiliser pour entraîner les modèles."
+      },
+      "q4": {
+        "question": "Combien de temps prend la migration depuis Excel ?",
+        "answer": "Moins de 30 minutes pour une copropriété moyenne. Le wizard d'import accepte vos fichiers Excel existants, auto-mappe les colonnes et valide chaque ligne avant import. Vous gardez tout votre historique."
+      },
+      "q5": {
+        "question": "Le portail résident est-il vraiment utilisé par les copropriétaires ?",
+        "answer": "Oui — taux d'activation moyen de 78 % dans nos cabinets clients. Connexion par OTP WhatsApp (pas de mot de passe à retenir), interface mobile-first 16 px minimum. Les notifications WhatsApp tiennent le résident au courant en temps réel."
+      },
+      "q6": {
+        "question": "Et si je suis arabophone ?",
+        "answer": "L'interface bascule intégralement en arabe avec layout RTL (droite-à-gauche) en un clic. Tous les modules sont traduits. Les annexes PDF restent en français (langue officielle de l'administration marocaine)."
+      }
+    },
+    "cta": {
+      "eyebrow": "Prêt à passer au syndic moderne ?",
+      "title": "Imaro vous attend.",
+      "subtitle": "Essayez gratuitement pendant 14 jours. Aucun engagement, aucune carte bancaire requise.",
+      "primary": "Démarrer l'essai gratuit",
+      "secondary": "Parler à un expert",
+      "fineprint": "Configuration en moins de 30 minutes · Migration depuis Excel offerte"
+    },
+    "footer": {
+      "tagline": "La plateforme de gestion de copropriété pensée pour le Maroc.",
+      "address": "Casablanca, Maroc",
+      "copyright": "© 2026 Imaro. Tous droits réservés.",
+      "compliance": "✓ Conforme Décret 2.23.700",
+      "maroc": "🇲🇦 Made in Maroc",
+      "col": {
+        "product": "Produit",
+        "company": "Société",
+        "resources": "Ressources",
+        "legal": "Légal"
+      },
+      "link": {
+        "features": "Fonctionnalités",
+        "pricing": "Tarifs",
+        "ia": "Assistant IA",
+        "security": "Sécurité",
+        "about": "À propos",
+        "careers": "Carrières",
+        "contact": "Contact",
+        "blog": "Blog",
+        "docs": "Documentation",
+        "manual": "Manuel utilisateur",
+        "help": "Centre d'aide",
+        "status": "Statut",
+        "terms": "Conditions générales",
+        "privacy": "Confidentialité",
+        "compliance": "Conformité",
+        "cookies": "Cookies"
+      }
+    }
+  },
+  "equipe": {
+    "optional": "optionnel",
+    "statusActive": "Actif",
+    "statusInactive": "Inactif",
+    "actions": {
+      "menu": "Plus d'options",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    },
+    "permissions": {
+      "residences": "Résidences",
+      "coproprietaires": "Copropriétaires",
+      "finances": "Finances & paiements",
+      "depenses": "Dépenses",
+      "recouvrement": "Recouvrement",
+      "assemblees": "Assemblées",
+      "documents": "Documents",
+      "personnel": "Personnel",
+      "parametres": "Paramètres"
+    },
+    "staffPerm": {
+      "acces_residence": "Accès résidence",
+      "gestion_visiteurs": "Gestion des visiteurs",
+      "pointage": "Pointage / présence",
+      "incidents": "Signalement d'incidents",
+      "cles": "Gestion des clés",
+      "livraisons": "Réception des livraisons"
+    },
+    "utilisateurs": {
+      "title": "Utilisateurs",
+      "subtitle": "Membres qui gèrent l'application : syndic, comptable, gestionnaire…",
+      "add": "Nouvel utilisateur",
+      "searchPlaceholder": "Rechercher un utilisateur…",
+      "empty": "Aucun utilisateur",
+      "emptyDesc": "Ajoutez les membres qui opèrent Imaro avec leurs permissions.",
+      "createTitle": "Nouvel utilisateur",
+      "editTitle": "Modifier l'utilisateur",
+      "formDesc": "Renseignez l'email, générez un mot de passe et accordez les permissions.",
+      "deleteTitle": "Supprimer l'utilisateur ?",
+      "deleteDesc": "Cette action est irréversible. L'utilisateur",
+      "toggleAria": "Activer ou désactiver l'utilisateur",
+      "allAccess": "Accès complet",
+      "nbPermissions": "{{count}} permission",
+      "nbPermissions_other": "{{count}} permissions",
+      "allResidences": "Toutes",
+      "nbResidences": "{{count}} copropriété",
+      "nbResidences_other": "{{count}} copropriétés",
+      "role": {
+        "administrateur": "Administrateur",
+        "gestionnaire": "Gestionnaire",
+        "assistant": "Assistant",
+        "comptable": "Comptable"
+      },
+      "col": {
+        "name": "Utilisateur",
+        "role": "Rôle",
+        "residences": "Copropriétés",
+        "permissions": "Permissions",
+        "status": "Statut"
+      },
+      "form": {
+        "name": "Nom complet",
+        "namePh": "Hassan Alaoui",
+        "email": "Email",
+        "role": "Rôle",
+        "password": "Mot de passe",
+        "resetPassword": "Réinitialiser le mot de passe",
+        "passwordKeep": "Laisser vide pour conserver l'actuel",
+        "passwordHint": "Mot de passe généré automatiquement — communiquez-le à l'utilisateur.",
+        "regenerate": "Régénérer",
+        "copy": "Copier",
+        "residences": "Copropriétés gérées",
+        "residencesHint": "Aucune sélection = toutes les copropriétés.",
+        "noResidences": "Aucune copropriété disponible.",
+        "permissions": "Permissions accordées"
+      },
+      "toast": {
+        "created": "Utilisateur créé",
+        "createFailed": "Échec de la création",
+        "updated": "Utilisateur mis à jour",
+        "updateFailed": "Échec de la mise à jour",
+        "deleted": "Utilisateur supprimé",
+        "deleteFailed": "Échec de la suppression",
+        "toggled": "Statut mis à jour",
+        "toggleFailed": "Échec du changement de statut",
+        "copyFailed": "Impossible de copier"
+      }
+    },
+    "personnel": {
+      "title": "Personnel",
+      "subtitle": "Personnel de terrain affecté aux résidences : sécurité, ménage, gardiennage…",
+      "add": "Nouveau personnel",
+      "searchPlaceholder": "Rechercher un membre du personnel…",
+      "empty": "Aucun personnel",
+      "emptyDesc": "Ajoutez le personnel de terrain et affectez-le à une résidence.",
+      "createTitle": "Nouveau personnel",
+      "editTitle": "Modifier le personnel",
+      "formDesc": "Affectez le membre à une résidence et accordez ses permissions.",
+      "deleteTitle": "Supprimer ce membre ?",
+      "deleteDesc": "Cette action est irréversible. Le membre",
+      "toggleAria": "Activer ou désactiver le membre",
+      "nbPermissions": "{{count}} permission",
+      "nbPermissions_other": "{{count}} permissions",
+      "poste": {
+        "securite": "Agent de sécurité",
+        "menage": "Femme de ménage",
+        "gardien": "Gardien",
+        "jardinier": "Jardinier",
+        "technicien": "Technicien",
+        "concierge": "Concierge"
+      },
+      "col": {
+        "name": "Nom",
+        "poste": "Poste",
+        "residence": "Résidence",
+        "contact": "Contact",
+        "permissions": "Permissions",
+        "status": "Statut"
+      },
+      "form": {
+        "name": "Nom complet",
+        "namePh": "Mohammed Ouahbi",
+        "poste": "Poste",
+        "residence": "Résidence affectée",
+        "residencePh": "Choisir une résidence",
+        "phone": "Téléphone",
+        "permissions": "Permissions accordées",
+        "phoneHint": "Le code d'accès sera généré et envoyé à ce numéro par WhatsApp / SMS."
+      },
+      "toast": {
+        "created": "Personnel ajouté",
+        "createFailed": "Échec de l'ajout",
+        "updated": "Personnel mis à jour",
+        "updateFailed": "Échec de la mise à jour",
+        "deleted": "Personnel supprimé",
+        "deleteFailed": "Échec de la suppression",
+        "toggled": "Statut mis à jour",
+        "toggleFailed": "Échec du changement de statut"
+      },
+      "credentialsSent": {
+        "title": "Identifiants envoyés",
+        "desc": "Le compte de {{name}} a été créé et son code d’accès lui a été envoyé.",
+        "sentVia": "Code envoyé par WhatsApp / SMS au {{phone}}.",
+        "codeLabel": "Code d'accès",
+        "note": "Communiquez ce code au membre du personnel. Il devra le changer à sa première connexion.",
+        "deliveredConfirmed": "Code envoyé via {{channel}} au {{phone}} — livraison confirmée.",
+        "deliveredUnconfirmed": "Code envoyé via {{channel}} au {{phone}} — livraison non confirmée.",
+        "deliveryFailed": "Échec de l'envoi au {{phone}}. Communiquez le code manuellement ou réessayez.",
+        "copy": "Copier le code",
+        "resend": "Renvoyer le code",
+        "resent": "Nouveau code envoyé",
+        "resendError": "Échec de l'envoi du code",
+        "copyError": "Impossible de copier le code"
+      }
+    },
+    "cin": "CIN",
+    "cinPlaceholder": "Ex. AB123456"
+  },
+  "gestionnaire": {
+    "pointage": {
+      "title": "Pointage bancaire",
+      "subtitle": "Rapprochement automatique du relevé bancaire avec vos paiements et dépenses",
+      "declaredBadge": "Déclaré par résident",
+      "matchConfirmed": "Rapprochement confirmé",
+      "declaredConfirmed": "Paiement du résident validé — argent confirmé reçu",
+      "declaredError": "Impossible de valider le paiement déclaré",
+      "allConfirmed": "{{count}} rapprochements confirmés",
+      "toastMatchRejected": "Match rejeté — ligne marquée non rapprochée",
+      "colLibelleBancaire": "Libellé bancaire",
+      "newPointage": "Nouveau pointage",
+      "dropHint": "Glissez votre relevé ici, ou cliquez pour parcourir",
+      "formatsHint": "Formats acceptés : .csv, .xlsx, .xls — taille max 10 Mo",
+      "supportedBanks": "Banques supportées",
+      "noLineFilter": "Aucune ligne pour ce filtre.",
+      "confirmed": "Confirmé",
+      "noMatch": "Sans rapprochement",
+      "credits": "Crédits",
+      "debits": "Débits",
+      "autoMatched": "Auto-matchées",
+      "toCheck": "À vérifier",
+      "confirmMatch": "Confirmer le match",
+      "rejectMatch": "Rejeter le match",
+      "autoMatchedCount": "Auto-matchées ({{n}})",
+      "parseError": "Erreur de parsing",
+      "importedMsg": "{{total}} lignes importées. {{auto}} auto-matchées.",
+      "demoLoaded": "Démo chargée: {{n}} lignes Attijariwafa",
+      "demo": "Démo",
+      "bankSource": "Banque source",
+      "confirmAll": "Tout confirmer",
+      "uploadHint": "Importez le relevé bancaire au format CSV ou Excel exporté depuis votre espace bancaire en ligne. Imaro détecte automatiquement les colonnes (date, libellé, débit, crédit).",
+      "chooseFile": "Choisir un fichier",
+      "demoBanner": "Pas de fichier sous la main ? Chargez le jeu de démo (relevé Attijariwafa avec 10 lignes pour résidence Atlas)"
+    },
+    "cmdk": {
+      "title": "Recherche rapide",
+      "description": "Tapez pour rechercher une page, lancer une action ou retrouver un copropriétaire",
+      "placeholder": "Rechercher pages, actions, données…",
+      "empty": "Aucun résultat. Essayez un autre mot-clé.",
+      "trigger": "Recherche rapide",
+      "navHeading": "Navigation",
+      "actionsHeading": "Actions rapides",
+      "newTicket": "Créer un ticket",
+      "recordPayment": "Encaisser un paiement",
+      "runAudit": "Lancer l'audit IA",
+      "generateAnnexe": "Générer une annexe",
+      "import": "Importer des données"
+    },
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "ia": "Assistant IA",
+      "sectionCopropriete": "Copropriété",
+      "residences": "Résidences",
+      "coproprietaires": "Copropriétaires",
+      "occupants": "Occupants",
+      "prestataires": "Prestataires",
+      "sectionFinances": "Finances",
+      "appelsFonds": "Appels de fonds",
+      "paiements": "Paiements",
+      "depenses": "Dépenses",
+      "budgets": "Budgets",
+      "comptabilite": "Comptabilité",
+      "sectionOperations": "Opérations",
+      "tickets": "Tickets",
+      "assemblees": "Assemblées",
+      "annonces": "Annonces",
+      "documents": "Documents",
+      "profil": "Mon Profil",
+      "imports": "Import données",
+      "recouvrement": "Recouvrement",
+      "assistanceRecouvrement": "Assistance recouvrement",
+      "badgePro": "Pro",
+      "pointage": "Pointage bancaire",
+      "autresRecettes": "Autres recettes",
+      "remboursements": "Remboursements",
+      "sectionPatrimoine": "Patrimoine",
+      "equipements": "Équipements",
+      "emprunts": "Emprunts",
+      "travauxExceptionnels": "Travaux exceptionnels",
+      "sectionConformite": "Conformité",
+      "conformite": "Calendrier conformité",
+      "annexes": "Annexes comptables",
+      "audit": "Journal d'audit",
+      "sectionAdministration": "Administration",
+      "utilisateurs": "Utilisateurs",
+      "personnel": "Personnel",
+      "rappels": "Rappels",
+      "visites": "Visites"
+    },
+    "residenceSwitcher": {
+      "all": "Toutes les résidences",
+      "aria": "Filtrer par résidence"
+    },
+    "assistanceRecouvrement": {
+      "breadcrumb": "Finances",
+      "title": "Assistance recouvrement",
+      "subtitle": "Déléguez le recouvrement de vos impayés à notre équipe, des appels de fonds jusqu'au tribunal.",
+      "hero": {
+        "eyebrow": "Service optionnel payant",
+        "title": "Confiez votre recouvrement à des experts, en toute conformité avec la loi 18-00",
+        "desc": "Un accompagnement complet et structuré du recouvrement amiable jusqu'à l'action judiciaire. Idéal lorsque vous n'avez pas d'équipe dédiée pour gérer les impayés et les procédures légales.",
+        "target1": "Syndics bénévoles",
+        "target2": "Nouvelles sociétés de gestion",
+        "cta": "Demander l'assistance"
+      },
+      "legal": {
+        "title": "Les étapes légales du recouvrement (loi 18-00)",
+        "subtitle": "Une procédure rigoureuse et conforme, qui peut aller jusqu'au tribunal de première instance."
+      },
+      "steps": {
+        "appel": {
+          "title": "Appel de fonds",
+          "desc": "Émission et notification des appels de fonds aux copropriétaires, avec justificatifs conformes."
+        },
+        "relance": {
+          "title": "Relance amiable",
+          "desc": "Relances graduées par SMS, WhatsApp et e-mail pour obtenir un règlement à l'amiable."
+        },
+        "miseEnDemeure": {
+          "title": "Mise en demeure",
+          "desc": "Envoi d'une mise en demeure officielle par lettre recommandée avec accusé de réception."
+        },
+        "injonction": {
+          "title": "Injonction de payer",
+          "desc": "Constitution et dépôt du dossier d'injonction de payer auprès de la juridiction compétente."
+        },
+        "tribunal": {
+          "title": "Tribunal de première instance",
+          "desc": "Représentation et suivi de la procédure judiciaire jusqu'au jugement, avec notre réseau d'avocats."
+        },
+        "execution": {
+          "title": "Exécution du jugement",
+          "desc": "Mise en œuvre des voies d'exécution pour le recouvrement effectif des sommes dues."
+        }
+      },
+      "plans": {
+        "title": "Formules d'abonnement",
+        "subtitle": "Choisissez le niveau d'accompagnement adapté à votre copropriété.",
+        "popular": "Recommandé",
+        "selected": "Formule sélectionnée",
+        "choose": "Choisir cette formule",
+        "essentiel": {
+          "name": "Essentiel",
+          "price": "À partir de 490 DH / mois",
+          "desc": "Le recouvrement amiable géré pour vous, jusqu'à la mise en demeure.",
+          "features": [
+            "Appels de fonds et relances automatisées",
+            "Relances multicanal (SMS, WhatsApp, e-mail)",
+            "Mise en demeure officielle",
+            "Suivi mensuel des impayés"
+          ]
+        },
+        "complet": {
+          "name": "Complet",
+          "price": "À partir de 990 DH / mois",
+          "desc": "L'amiable et le judiciaire, jusqu'à l'injonction de payer.",
+          "features": [
+            "Tout de la formule Essentiel",
+            "Constitution du dossier judiciaire",
+            "Injonction de payer",
+            "Réseau d'avocats partenaires",
+            "Tableau de bord de suivi structuré"
+          ]
+        },
+        "sur_mesure": {
+          "name": "Sur mesure",
+          "price": "Sur devis",
+          "desc": "Accompagnement intégral jusqu'au tribunal et à l'exécution du jugement.",
+          "features": [
+            "Tout de la formule Complet",
+            "Représentation au tribunal de première instance",
+            "Exécution du jugement",
+            "Interlocuteur juridique dédié"
+          ]
+        }
+      },
+      "form": {
+        "title": "Demander l'assistance recouvrement",
+        "subtitle": "Remplissez ce formulaire : notre équipe vous recontacte sous 48 h pour cadrer l'abonnement.",
+        "syndicName": "Nom du syndic / société",
+        "contactName": "Personne à contacter",
+        "contactPhone": "Téléphone",
+        "contactEmail": "E-mail",
+        "residencesCount": "Nombre de résidences",
+        "residencesPlaceholder": "ex : 3",
+        "impayesEstimate": "Montant estimé des impayés",
+        "impayesPlaceholder": "ex : 120 000 DH",
+        "plan": "Formule souhaitée",
+        "message": "Précisions sur votre situation",
+        "messagePlaceholder": "Décrivez brièvement votre besoin (nombre de copropriétaires concernés, ancienneté des impayés, procédures déjà engagées…).",
+        "submit": "Envoyer la demande",
+        "submitting": "Envoi en cours…",
+        "mailtoHint": "Ou contactez-nous directement à",
+        "disclaimer": "Toutes les procédures sont menées en stricte conformité avec la loi 18-00 relative au statut de la copropriété. Le recouvrement peut aller jusqu'à l'action judiciaire devant le tribunal de première instance."
+      },
+      "success": {
+        "title": "Demande envoyée à l'équipe Imaro",
+        "desc": "Votre demande d'assistance recouvrement a bien été transmise. Notre équipe IT vous recontactera sous 48 h pour finaliser l'abonnement et démarrer la procédure.",
+        "reference": "Référence",
+        "newRequest": "Nouvelle demande",
+        "mailtoFallback": "Nous écrire par e-mail"
+      },
+      "mailto": {
+        "subject": "Demande d'assistance recouvrement — {{syndic}}"
+      },
+      "toast": {
+        "success": "Demande envoyée. Notre équipe vous recontacte sous 48 h.",
+        "error": "Échec de l'envoi. Réessayez ou écrivez-nous par e-mail."
+      }
+    },
+    "residences": {
+      "title": "Résidences",
+      "subtitle": "Toutes les copropriétés gérées",
+      "searchPlaceholder": "Rechercher par nom, adresse ou ville…",
+      "colNom": "Nom",
+      "colAdresse": "Adresse",
+      "colVille": "Ville",
+      "colLots": "Lots",
+      "colRecouvrement": "Recouvrement",
+      "add": "Ajouter une résidence",
+      "allCities": "Toutes les villes",
+      "sortName": "Trier par nom",
+      "sortLots": "Trier par lots",
+      "sortRecouvrement": "Trier par recouvrement",
+      "noMatch": "Aucune résidence ne correspond à votre recherche.",
+      "manage": "Gérer",
+      "statusActif": "Active",
+      "statusInactif": "Inactive",
+      "deleteTitle": "Supprimer la résidence",
+      "deleteDesc": "La résidence « {{name}} » et toutes ses données seront supprimées définitivement.",
+      "empty": "Aucune résidence",
+      "emptyDesc": "Votre compte ne gère aucune résidence pour l'instant.",
+      "toast": {
+        "created": "Résidence créée",
+        "createError": "Erreur lors de la création de la résidence",
+        "updated": "Résidence modifiée",
+        "updateError": "Erreur lors de la modification",
+        "deleted": "Résidence supprimée",
+        "deleteError": "Erreur lors de la suppression"
+      },
+      "form": {
+        "createTitle": "Nouvelle résidence",
+        "editTitle": "Modifier la résidence",
+        "subtitle": "Renseignez les informations de la copropriété.",
+        "name": "Nom",
+        "namePlaceholder": "ex : Résidence Al Boustane",
+        "address": "Adresse",
+        "addressPlaceholder": "ex : 12 rue des Orangers",
+        "city": "Ville",
+        "cityPlaceholder": "ex : Casablanca",
+        "jourEcheance": "Jour d'échéance",
+        "dateAnniversaire": "Date de création / anniversaire",
+        "dateAnniversaireHint": "L'exercice (12 mois glissants) et l'AG démarrent à cette date. À défaut : 1er janvier.",
+        "modeCotisation": "Mode de cotisation",
+        "modeTantieme": "Au tantième",
+        "modeFixe": "Montant fixe",
+        "modeCategorie": "Par catégorie de lot",
+        "categorieHint": "Créez les catégories (libellé + cotisation) dans l'onglet « Catégories » de la résidence, puis rattachez chaque lot à une catégorie.",
+        "montantFixe": "Montant fixe (DH)",
+        "periodicite": "Périodicité de cotisation",
+        "periodicites": {
+          "mensuel": "Mensuel",
+          "trimestriel": "Trimestriel",
+          "semestriel": "Semestriel",
+          "annuel": "Annuel"
+        },
+        "createSubmit": "Créer la résidence"
+      },
+      "categories": {
+        "subtitle": "Définissez la cotisation par catégorie de lot, puis rattachez chaque lot à une catégorie.",
+        "add": "Nouvelle catégorie",
+        "editTitle": "Modifier la catégorie",
+        "nom": "Libellé",
+        "cotisation": "Cotisation (DH / période)",
+        "nbLots": "{{count}} lot(s) rattaché(s)",
+        "saved": "Catégorie enregistrée",
+        "deleted": "Catégorie supprimée",
+        "empty": "Aucune catégorie",
+        "emptyDesc": "Créez une première catégorie de lot.",
+        "deleteTitle": "Supprimer la catégorie",
+        "deleteDesc": "Les lots rattachés seront détachés de cette catégorie. Continuer ?"
+      },
+      "toastLotAdded": "Lot ajouté",
+      "toastLotUpdated": "Lot modifié",
+      "toastLotDeleted": "Lot supprimé",
+      "noLotInImmeuble": "Aucun lot dans cet immeuble",
+      "addLotsHint": "Ajoutez des lots un par un ou générez-en plusieurs",
+      "generateLots": "Générer des lots",
+      "addLotError": "Erreur lors de l'ajout du lot",
+      "modifyError": "Erreur lors de la modification",
+      "delete": {
+        "intro": "La suppression d'une résidence est définitive et efface ses lots, copropriétaires et écritures. Pour des raisons de sécurité, un code de validation va vous être envoyé.",
+        "sendCode": "Envoyer le code",
+        "codeSent": "Code de validation envoyé",
+        "codeError": "Échec de l'envoi du code",
+        "sentVia": {
+          "email": "Un code a été envoyé à votre adresse email.",
+          "sms": "Un code a été envoyé par SMS à votre téléphone."
+        },
+        "codeLabel": "Code de validation",
+        "resend": "Renvoyer le code",
+        "confirmDelete": "Supprimer définitivement",
+        "wrongCode": "Code invalide ou expiré"
+      }
+    },
+    "residence": {
+      "tabOverview": "Vue d'ensemble",
+      "tabLots": "Lots",
+      "tabCoproprietaires": "Copropriétaires",
+      "tabExercices": "Exercices",
+      "tabImmeubles": "Immeubles",
+      "tabTranches": "Tranches",
+      "tabEncaissement": "Encaissement",
+      "tabCategories": "Catégories",
+      "categorieLot": "Catégorie de lot",
+      "categorieLotPh": "Choisir une catégorie",
+      "categorieLotNone": "Aucune",
+      "tranches": {
+        "add": "Ajouter une tranche",
+        "edit": "Modifier la tranche",
+        "delete": "Supprimer la tranche",
+        "deleteDesc": "Supprimer la tranche « {{nom}} » ? Les immeubles rattachés ne seront plus liés à aucune tranche.",
+        "colNom": "Nom de la tranche",
+        "colCode": "Code",
+        "colNbImmeubles": "Nb immeubles",
+        "colTranche": "Tranche",
+        "nomPlaceholder": "ex : Tranche A",
+        "codePlaceholder": "ex : TA",
+        "codeOptional": "facultatif",
+        "noneOption": "Aucune tranche",
+        "emptyTitle": "Aucune tranche définie",
+        "emptyDesc": "Les tranches (groupes d'habitation) servent aux grandes copropriétés multi-bâtiments où chaque tranche a son propre budget et ses propres appels de fonds. Optionnel — laissez vide si votre copropriété est unifiée.",
+        "added": "Tranche ajoutée",
+        "addError": "Erreur lors de l'ajout de la tranche",
+        "updated": "Tranche modifiée",
+        "updateError": "Erreur lors de la modification de la tranche",
+        "deleted": "Tranche supprimée",
+        "deleteError": "Erreur lors de la suppression de la tranche"
+      },
+      "encaissement": {
+        "intro": "Les comptes bancaires sur lesquels les copropriétaires règlent leurs cotisations.",
+        "add": "Ajouter un compte",
+        "emptyTitle": "Aucun compte bancaire",
+        "emptyDesc": "Ajoutez un compte pour permettre aux copropriétaires de payer par virement.",
+        "primaryBadge": "Principal",
+        "setPrimary": "Définir principal",
+        "showQr": "Afficher le QR de paiement",
+        "copy": "Copier le RIB",
+        "copied": "RIB copié",
+        "copyError": "Impossible de copier le RIB",
+        "createTitle": "Ajouter un compte bancaire",
+        "editTitle": "Modifier le compte bancaire",
+        "subtitle": "Renseignez les coordonnées bancaires de la copropriété.",
+        "banque": "Banque",
+        "titulaire": "Titulaire du compte",
+        "titulairePlaceholder": "Syndic Résidence Al Andalous",
+        "rib": "RIB (24 chiffres)",
+        "iban": "IBAN (optionnel)",
+        "isPrimary": "Compte principal pour les encaissements",
+        "createSubmit": "Ajouter le compte",
+        "qrTitle": "QR de paiement",
+        "deleteTitle": "Supprimer le compte",
+        "deleteDesc": "Supprimer le compte {{banque}} ? Cette action est irréversible.",
+        "toast": {
+          "created": "Compte bancaire ajouté",
+          "updated": "Compte bancaire mis à jour",
+          "deleted": "Compte bancaire supprimé",
+          "primarySet": "Compte principal défini",
+          "error": "Une erreur est survenue"
+        }
+      },
+      "generateLots": "Générer des lots",
+      "lotsCount_one": "{{count}} lot",
+      "lotsCount_other": "{{count}} lots",
+      "echeanceChip": "Échéance le {{day}}",
+      "checklist": {
+        "title": "Configurez votre copropriété",
+        "subtitle": "Quelques étapes pour démarrer la gestion.",
+        "progress": "{{done}}/{{total}}",
+        "immeuble": "Ajouter un immeuble",
+        "lots": "Ajouter des lots",
+        "coproprietaires": "Affecter des copropriétaires",
+        "cotisation": "Définir le mode de cotisation"
+      },
+      "overview": {
+        "kpiLots": "Lots",
+        "kpiCopros": "Copropriétaires",
+        "kpiRecouvrement": "Recouvrement",
+        "kpiTresorerie": "Trésorerie",
+        "paymentsTitle": "Paiements",
+        "payeCeMois": "Payé ce mois",
+        "enAttente": "En attente",
+        "enRetard": "En retard",
+        "nbImpayes": "Lots en impayé",
+        "treasuryTitle": "Trésorerie",
+        "tresorerie": "Solde courant",
+        "fondsReserve": "Fonds de réserve",
+        "viewCopros": "Voir les copropriétaires"
+      },
+      "immeubles": {
+        "add": "Ajouter un immeuble",
+        "edit": "Modifier l'immeuble",
+        "delete": "Supprimer l'immeuble",
+        "deleteDesc": "Supprimer l'immeuble « {{nom}} » ?",
+        "colNom": "Nom",
+        "colNbLots": "Nb lots",
+        "nomPlaceholder": "ex : Bâtiment A",
+        "added": "Immeuble ajouté",
+        "addError": "Erreur lors de l'ajout de l'immeuble",
+        "updated": "Immeuble modifié",
+        "updateError": "Erreur lors de la modification de l'immeuble",
+        "deleted": "Immeuble supprimé",
+        "deleteError": "Erreur lors de la suppression de l'immeuble"
+      },
+      "lots": {
+        "immeuble": "Immeuble",
+        "selectImmeuble": "Sélectionner un immeuble"
+      },
+      "colNumero": "N°",
+      "colType": "Type",
+      "colEtage": "Étage",
+      "colSuperficie": "Superficie",
+      "colTantieme": "Tantième",
+      "colProprietaire": "Propriétaire",
+      "colNom": "Nom",
+      "colTelephone": "Téléphone",
+      "colSolde": "Solde",
+      "colAnnee": "Année",
+      "colStatut": "Statut",
+      "addLot": "Ajouter un lot",
+      "editLot": "Modifier le lot",
+      "deleteLot": "Supprimer le lot",
+      "deleteLotDesc": "Le lot {{numero}} sera supprimé définitivement.",
+      "addExercice": "Nouvel exercice",
+      "lotTypes": {
+        "appartement": "Appartement",
+        "commerce": "Commerce",
+        "parking": "Parking",
+        "cave": "Cave",
+        "bureau": "Bureau",
+        "autre": "Autre"
+      },
+      "exerciceStatut": {
+        "actif": "Actif",
+        "cloture": "Clôturé"
+      },
+      "totalTantieme": "Total tantièmes : {{val}} / 1000",
+      "backToList": "Résidences",
+      "colTitreFoncier": "Titre foncier",
+      "titreFoncierPh": "Ex. TF 12345/06"
+    },
+    "coproprietaires": {
+      "title": "Copropriétaires",
+      "subtitle": "Sélectionnez une résidence pour afficher ses copropriétaires",
+      "selectResidence": "Choisir une résidence",
+      "allResidences": "Toutes les résidences",
+      "colNom": "Nom",
+      "colTelephone": "Téléphone",
+      "colLot": "Lot",
+      "colSolde": "Solde",
+      "colResidence": "Résidence",
+      "empty": "Aucun copropriétaire",
+      "emptyDesc": "Sélectionnez une résidence ci-dessus pour afficher ses copropriétaires.",
+      "addCopro": "Ajouter un copropriétaire",
+      "dialogDesc": "Ceci créera un nouveau copropriétaire et lui générera un compte pour accéder à son espace.",
+      "createAccountError": "Erreur lors de la création du compte",
+      "selectResidencePlaceholder": "Sélectionner une résidence...",
+      "lotSelectFirst": "Sélectionnez d'abord une résidence",
+      "noLotAvailable": "Aucun lot disponible",
+      "selectLot": "Sélectionner un lot...",
+      "fullNamePlaceholder": "Nom complet",
+      "emailOptional": "Email (optionnel)",
+      "creating": "Création en cours…",
+      "createCopro": "Créer le copropriétaire",
+      "lotCreatedAssigned": "Lot {{numero}} créé et assigné à {{name}}",
+      "createLotError": "Erreur lors de la création du lot",
+      "lotNumeroExists": "Ce numéro de lot existe déjà dans cette résidence. Chaque numéro doit être unique.",
+      "createLotTitle": "Créer un lot",
+      "lotAssignDescPre": "Ce lot sera automatiquement assigné à ",
+      "creatingShort": "Création…",
+      "createAssignLot": "Créer et assigner le lot",
+      "codeCopied": "Code copié !",
+      "ownerCreated": "Propriétaire créé !",
+      "createdSuccess": "Le copropriétaire a été créé avec succès.",
+      "accessCode": "Code d'accès :",
+      "copyCodeAria": "Copier le code",
+      "codeAutoSent": "Le code d'accès a été envoyé automatiquement au copropriétaire par SMS, WhatsApp et e-mail. Le code ci-dessus reste affiché en secours, si besoin de le communiquer oralement.",
+      "createLotPrompt": "Souhaitez-vous créer un lot pour ce nouveau propriétaire ?",
+      "yesCreateLot": "Oui, créer un lot",
+      "noFinish": "Non, terminer",
+      "lotType": {
+        "appartement": "Appartement",
+        "commerce": "Commerce",
+        "parking": "Parking",
+        "cave": "Cave"
+      },
+      "editTitle": "Modifier le copropriétaire",
+      "editDesc": "Corrigez le nom, le téléphone ou l'email du copropriétaire.",
+      "editSuccess": "Copropriétaire mis à jour"
+    },
+    "appelsFonds": {
+      "title": "Appels de fonds",
+      "subtitle": "Gérez les appels de fonds et suivez le recouvrement",
+      "newAppel": "Nouvel appel",
+      "colTitre": "Titre",
+      "colResidence": "Résidence",
+      "colMontant": "Montant total",
+      "colRecouvre": "Recouvré",
+      "colEcheance": "Échéance",
+      "colStatut": "Statut",
+      "colActions": "Actions",
+      "statut": {
+        "brouillon": "Brouillon",
+        "publie": "Publié",
+        "cloture": "Clôturé"
+      },
+      "envoyer": "Envoyer",
+      "envoyerConfirm": "Envoyer l'appel de fonds aux copropriétaires ?",
+      "envoyerDesc": "Cette action enverra une notification WhatsApp à tous les copropriétaires.",
+      "envoyerSuccess": "Appel de fonds envoyé",
+      "form": {
+        "titre": "Titre",
+        "residence": "Résidence",
+        "montant": "Montant total (DH)",
+        "echeance": "Date d'échéance",
+        "description": "Description (optionnel)"
+      },
+      "empty": "Aucun appel de fonds",
+      "emptyDesc": "Créez votre premier appel de fonds.",
+      "toastCreated": "Appel de fonds créé",
+      "toastSent": "Appel de fonds envoyé",
+      "createTitle": "Créer un appel de fonds",
+      "allTranches": "Toutes les tranches",
+      "calcRepartition": "Calcul de la répartition…",
+      "sendError": "Erreur lors de l'envoi"
+    },
+    "paiements": {
+      "title": "Suivi des paiements",
+      "tabs": {
+        "creances": "Créances",
+        "appels": "Appels de fonds",
+        "historique": "Historique",
+        "decomptes": "Décomptes",
+        "virements": "Virements"
+      },
+      "creances": {
+        "enRetard": "en retard",
+        "aPayer": "à payer",
+        "tauxRecouvrement": "Taux recouvrement",
+        "relancerTout": "Relancer tous les impayés",
+        "relanceSuccess": "Relance envoyée",
+        "statuts": {
+          "a_payer": "À payer",
+          "en_retard": "En retard",
+          "paye": "Payé",
+          "partiellement_paye": "Partiel",
+          "annulee": "Annulée"
+        },
+        "colCreance": "Copropriétaire",
+        "colSolde": "Solde",
+        "colEcheance": "Échéance",
+        "colAnciennete": "Ancienneté",
+        "colRelance": "Dernière relance",
+        "jourRetard": "j de retard"
+      },
+      "encaisser": "Encaisser",
+      "avance": {
+        "title": "Paiement en avance",
+        "info": "Ce paiement sera affecté automatiquement aux prochains appels de fonds",
+        "success": "Paiement en avance enregistré"
+      },
+      "virements": {
+        "title": "Virements déclarés",
+        "valider": "Valider",
+        "rejeter": "Rejeter",
+        "motif": "Motif du rejet",
+        "valideSuccess": "Virement validé",
+        "rejeteSuccess": "Virement rejeté",
+        "methode": "Méthode",
+        "justificatif": "Justificatif",
+        "voir": "Voir",
+        "openProof": "Ouvrir",
+        "previewUnavailable": "Aperçu non disponible",
+        "methodes": {
+          "virement": "Virement",
+          "versement": "Versement",
+          "cheque": "Chèque",
+          "especes": "Espèces"
+        },
+        "statuts": {
+          "en_attente": "En attente",
+          "valide": "Validé",
+          "rejete": "Rejeté"
+        }
+      },
+      "decompte": {
+        "title": "Décompte individuel",
+        "recherche": "Rechercher un copropriétaire",
+        "generer": "Générer",
+        "exporter": "Exporter PDF",
+        "totalAppele": "Total appelé",
+        "totalPaye": "Total payé",
+        "solde": "Solde"
+      },
+      "chequeImpaye": {
+        "title": "Marquer le chèque comme impayé",
+        "action": "Marquer impayé",
+        "confirm": "Marquer impayé",
+        "badge": "Chèque rejeté",
+        "motif": "Motif (optionnel)",
+        "motifPlaceholder": "Ex. chèque sans provision",
+        "warning": "Le solde du copropriétaire sera ré-augmenté et il sera notifié. Une contre-passation comptable sera enregistrée.",
+        "success": "Chèque marqué comme impayé",
+        "error": "Impossible de marquer ce chèque comme impayé"
+      },
+      "repartitionTantieme": "Répartition par tantième",
+      "notePlaceholder": "Ex : Référence incorrecte...",
+      "searchPlaceholder": "Rechercher copropriétaire ou lot...",
+      "allMethods": "Toutes méthodes",
+      "relanceAll": "Relancer tous les impayés",
+      "dueDate": "Date d'échéance",
+      "createAppel": "Créer appel de fonds",
+      "noCreance": "Aucune créance à encaisser",
+      "allStatuses": "Tous les statuts",
+      "calcRepartition": "Calcul de la répartition…",
+      "sendAppelTitle": "Envoyer l'appel de fonds",
+      "sendAppelDesc": "Cette action enverra une notification WhatsApp à tous les copropriétaires.",
+      "saveError": "Erreur lors de l'enregistrement",
+      "relancesSent": "{{n}} relance(s) envoyée(s)",
+      "noAppel": "Aucun appel de fonds",
+      "noEncaissement": "Aucun encaissement",
+      "titrePlaceholder": "Charges Q2 2026",
+      "justificatifPlaceholder": "justificatif",
+      "envoyer": "Envoyer",
+      "colLot": "Lot",
+      "encaisserPaiement": "Encaisser un paiement",
+      "envoyerRappels": "Envoyer rappels",
+      "decompteEmpty": "Saisissez un nom et cliquez sur Générer pour afficher le décompte individuel"
+    },
+    "tickets": {
+      "title": "Tickets",
+      "subtitle": "Suivi des réclamations et interventions",
+      "searchPlaceholder": "Rechercher par référence (TKT-…) ou description",
+      "colRef": "Référence",
+      "colTitre": "Description",
+      "colResidence": "Résidence",
+      "colPriorite": "Priorité",
+      "colStatut": "Statut",
+      "colDate": "Date",
+      "colActions": "Actions",
+      "filterAll": "Tous",
+      "filterStatut": "Statut",
+      "filterPriorite": "Priorité",
+      "statut": {
+        "ouvert": "Ouvert",
+        "en_cours": "En cours",
+        "resolu": "Résolu",
+        "clos": "Clôturé"
+      },
+      "priorite": {
+        "urgent": "Urgent",
+        "normal": "Normal",
+        "faible": "Faible"
+      },
+      "detail": "Détail du ticket",
+      "closeTicket": "Clore le ticket",
+      "closeConfirm": "Clore définitivement ce ticket ?",
+      "closeDesc": "Cette action est irréversible. Le ticket passera en statut 'Clôturé'.",
+      "closeSuccess": "Ticket clôturé",
+      "updateSuccess": "Ticket mis à jour",
+      "images": "Photos",
+      "noImages": "Aucune photo",
+      "empty": "Aucun ticket",
+      "emptyDesc": "Aucun ticket ne correspond aux filtres sélectionnés.",
+      "viewKanban": "Kanban",
+      "viewTable": "Tableau",
+      "toastClotureError": "Erreur lors de la clôture",
+      "create": "Nouveau ticket",
+      "createSuccess": "Ticket créé — {{ref}}",
+      "form": {
+        "lot": "Lot",
+        "selectLot": "Lot",
+        "categorie": "Catégorie",
+        "descPlaceholder": "Décrivez le problème…",
+        "descMin": "La description doit contenir au moins 10 caractères"
+      },
+      "audit": {
+        "tab": "Audit par résidence",
+        "title": "Réclamations par résidence",
+        "subtitle": "Volume de tickets par immeuble — du plus sollicité au moins sollicité.",
+        "total": "Total",
+        "most": "Le plus",
+        "least": "Le moins"
+      },
+      "categories": {
+        "parties_communes": "Parties communes",
+        "ascenseur": "Ascenseur",
+        "plomberie": "Eau / Plomberie",
+        "electricite": "Électricité",
+        "chauffage": "Chauffage / Climatisation",
+        "securite": "Sécurité",
+        "proprete": "Propreté / Nettoyage",
+        "nuisances": "Nuisances sonores",
+        "espaces_verts": "Espaces verts",
+        "parking": "Parking / Garage",
+        "interphone": "Interphone / Accès",
+        "degat_eaux": "Dégât des eaux",
+        "autre": "Autre"
+      }
+    },
+    "dashboard": {
+      "title": "Tableau de bord",
+      "greeting": {
+        "morning": "Bonjour",
+        "morningWithName": "Bonjour, {{name}}",
+        "afternoon": "Bon après-midi",
+        "afternoonWithName": "Bon après-midi, {{name}}",
+        "evening": "Bonsoir",
+        "eveningWithName": "Bonsoir, {{name}}"
+      },
+      "residencesSg": "résidence",
+      "residencesPl": "résidences",
+      "actionsSg": "action urgente",
+      "actionsPl": "actions urgentes",
+      "filterAll": "Toutes les résidences",
+      "kpi": {
+        "residences": "Résidences",
+        "coproprietaires": "Copropriétaires",
+        "caMensuel": "Recouvré ce mois",
+        "impayes": "Total impayés"
+      },
+      "chart": {
+        "title": "Recouvrement mensuel",
+        "recouvre": "Recouvré",
+        "restant": "Restant"
+      },
+      "topImpayes": {
+        "title": "Top impayés",
+        "jours": "{{n}}j"
+      },
+      "ticketsUrgents": {
+        "title": "Tickets urgents",
+        "empty": "Aucun ticket urgent"
+      },
+      "assemblees": {
+        "title": "Assemblées à venir",
+        "empty": "Aucune assemblée programmée"
+      },
+      "actions": {
+        "title": "Actions rapides",
+        "appelFonds": "Créer appel de fonds",
+        "paiement": "Saisir un paiement",
+        "ticket": "Nouveau ticket",
+        "ag": "Convoquer une AG",
+        "soon": "Bientôt disponible"
+      },
+      "iaSubtitle": "Audit conformité · OCR factures · Suggestions budget",
+      "conformite": "Conformité",
+      "conformiteCycle": "Cycle Décret 2.23.700 · Régime simplifié"
+    },
+    "assemblees": {
+      "title": "Assemblées générales",
+      "subtitle": "Convocations, procès-verbaux et suivi des AG",
+      "newAG": "Nouvelle AG",
+      "tabAVenir": "À venir",
+      "tabPassees": "Passées",
+      "colTitre": "Titre",
+      "colType": "Type",
+      "colResidence": "Résidence",
+      "colDate": "Date & Heure",
+      "colLieu": "Lieu",
+      "colStatut": "Statut",
+      "type": {
+        "ordinaire": "Ordinaire",
+        "extraordinaire": "Extraordinaire"
+      },
+      "statut": {
+        "convoquee": "Convoquée",
+        "tenue": "Tenue",
+        "annulee": "Annulée"
+      },
+      "form": {
+        "titre": "Titre",
+        "type": "Type",
+        "residence": "Résidence",
+        "date": "Date",
+        "heure": "Heure",
+        "lieu": "Lieu",
+        "quorum": "Quorum requis",
+        "ordreDuJour": "Ordre du jour",
+        "titrePlaceholder": "AG Ordinaire 2026",
+        "lieuPlaceholder": "Salle de réunion, RDC",
+        "ordrePlaceholder": "1. Approbation des comptes\n2. Budget prévisionnel\n3. Questions diverses",
+        "delaiHint": "Délai légal minimum : 15 jours (loi 18-00).",
+        "delaiError": "La convocation doit partir au moins 15 jours avant l’AG (loi 18-00, art. 16 quinquies)."
+      },
+      "empty": "Aucune assemblée",
+      "emptyDesc": "Aucune assemblée générale programmée pour le moment.",
+      "toastCreated": "Assemblée créée",
+      "detailQuorum": "Quorum requis : {{n}} %",
+      "detailParticipants": "{{n}} participants présents",
+      "detailNotHeld": "AG non encore tenue",
+      "docs": {
+        "title": "Documents requis",
+        "subtitle": "Loi 18-00, art. 16 quinquies",
+        "progress": "{{done}} / {{total}} documents confirmés",
+        "requiredHint": "Les documents marqués * sont obligatoires",
+        "cat": {
+          "exercice": "Exercice comptable",
+          "comptabilite": "Comptabilité",
+          "pmo": "Travaux & PMO",
+          "recouvrement": "Recouvrement"
+        },
+        "items": {
+          "rapport_gestion": "Rapport annuel de gestion",
+          "bilan_exercice": "Bilan de l'exercice clôturé",
+          "budget_previsionnel": "Budget prévisionnel N+1",
+          "recettes_depenses": "État des recettes et dépenses",
+          "releve_bancaire": "Relevé bancaire du compte syndic",
+          "justificatifs_charges": "Justificatifs des charges communes",
+          "plan_maintenance": "Plan de maintenance préventive",
+          "pv_travaux": "PV de réception des travaux",
+          "etat_impayes": "État des impayés par copropriétaire",
+          "historique_relances": "Historique des relances"
+        }
+      },
+      "convocations": {
+        "title": "Convocations",
+        "generate": "Générer les convocations",
+        "regenerate": "Régénérer",
+        "generating": "Génération des convocations en cours…",
+        "generated": "{{n}} convocation(s) générée(s)",
+        "empty": "Aucune convocation générée pour cette assemblée.",
+        "printAll": "Imprimer tout",
+        "download": "Télécharger la convocation",
+        "lotTantieme": "Lot {{lot}} · {{tantieme}}/1000 tantièmes",
+        "delaiWarning": "La date de l'AG ne respecte pas le préavis légal de {{n}} jours (loi 18-00)."
+      }
+    },
+    "annonces": {
+      "title": "Annonces",
+      "subtitle": "Communiquez avec les copropriétaires de vos résidences",
+      "newAnnonce": "Nouvelle annonce",
+      "formDesc": "Rédigez votre annonce, ajoutez des photos ou vidéos, puis publiez-la.",
+      "tabToutes": "Toutes",
+      "tabPubliees": "Publiées",
+      "tabBrouillons": "Brouillons",
+      "tabArchivees": "Archivées",
+      "colTitre": "Titre",
+      "colResidence": "Résidence",
+      "colStatut": "Statut",
+      "colPriorite": "Priorité",
+      "colDate": "Date",
+      "colLectures": "Lectures",
+      "statut": {
+        "brouillon": "Brouillon",
+        "publiee": "Publiée",
+        "archivee": "Archivée"
+      },
+      "priorite": {
+        "normale": "Normale",
+        "urgente": "Urgente"
+      },
+      "toutes": "Toutes résidences",
+      "publier": "Publier",
+      "archiver": "Archiver",
+      "publishConfirm": "Publier cette annonce ?",
+      "publishDesc": "Les copropriétaires concernés pourront voir cette annonce dès maintenant.",
+      "publishSuccess": "Annonce publiée",
+      "archiveConfirm": "Archiver cette annonce ?",
+      "archiveDesc": "L'annonce ne sera plus visible par les copropriétaires.",
+      "archiveSuccess": "Annonce archivée",
+      "deleteConfirm": "Supprimer cette annonce ?",
+      "deleteDesc": "Cette action est irréversible.",
+      "deleteSuccess": "Annonce supprimée",
+      "form": {
+        "titre": "Titre",
+        "contenu": "Contenu",
+        "priorite": "Priorité",
+        "residence": "Résidence (laisser vide = toutes)"
+      },
+      "empty": "Aucune annonce",
+      "emptyDesc": "Créez votre première annonce pour informer les copropriétaires.",
+      "toastCreated": "Annonce créée",
+      "titlePlaceholder": "Travaux ascenseur — interruption de service",
+      "descPlaceholder": "Décrivez l'annonce…",
+      "media": {
+        "label": "Photos et vidéos",
+        "add": "Ajouter",
+        "hint": "Photos (≤ 5 Mo) et vidéos (≤ 30 Mo) — {{n}} médias maximum.",
+        "uploading": "Envoi des médias…",
+        "remove": "Retirer",
+        "maxReached": "Maximum {{n}} médias par annonce.",
+        "invalidType": "« {{name}} » : format non supporté (images JPEG/PNG/WebP, vidéos MP4/MOV/WebM).",
+        "imageTooLarge": "« {{name}} » : image trop lourde (5 Mo maximum).",
+        "videoTooLarge": "« {{name}} » : vidéo trop lourde (30 Mo maximum)."
+      }
+    },
+    "prestataires": {
+      "title": "Prestataires & Contrats",
+      "subtitle": "Gérez vos fournisseurs et les contrats de maintenance",
+      "tabPrestataires": "Prestataires",
+      "tabContrats": "Contrats",
+      "newPrestataire": "Nouveau prestataire",
+      "newContrat": "Nouveau contrat",
+      "colNom": "Nom",
+      "colSpecialite": "Spécialité",
+      "colTelephone": "Téléphone",
+      "colNote": "Note",
+      "colInterventions": "Interventions",
+      "colStatut": "Statut",
+      "colTitre": "Titre",
+      "colPrestataire": "Prestataire",
+      "colResidence": "Résidence",
+      "colMontant": "Montant/an",
+      "colDebut": "Début",
+      "colFin": "Fin",
+      "colRenouvellement": "Auto",
+      "statut": {
+        "actif": "Actif",
+        "blackliste": "Blacklisté",
+        "expire": "Expiré",
+        "resilie": "Résilié"
+      },
+      "specialite": {
+        "ascenseurs": "Ascenseurs",
+        "electricite": "Électricité",
+        "proprete": "Propreté",
+        "plomberie": "Plomberie",
+        "securite": "Sécurité",
+        "autre": "Autre"
+      },
+      "typeContrat": {
+        "maintenance": "Maintenance",
+        "nettoyage": "Nettoyage",
+        "gardiennage": "Gardiennage",
+        "autre": "Autre"
+      },
+      "expiresIn": "Expire dans {{n}} j",
+      "expired": "Expiré",
+      "form": {
+        "nom": "Nom",
+        "specialite": "Spécialité",
+        "telephone": "Téléphone",
+        "email": "Email",
+        "adresse": "Adresse",
+        "titre": "Titre du contrat",
+        "prestataire": "Prestataire",
+        "residence": "Résidence",
+        "typeContrat": "Type de contrat",
+        "montant": "Montant annuel (DH)",
+        "dateDebut": "Date de début",
+        "dateFin": "Date de fin",
+        "renouvellementAuto": "Renouvellement automatique"
+      },
+      "emptyPrestataires": "Aucun prestataire",
+      "emptyPrestatairesDesc": "Ajoutez votre premier prestataire.",
+      "emptyContrats": "Aucun contrat",
+      "emptyContratsDesc": "Créez votre premier contrat de maintenance.",
+      "toastCreated": "Prestataire créé",
+      "toastContratCreated": "Contrat créé"
+    },
+    "budgets": {
+      "title": "Budgets",
+      "subtitle": "Budget prévisionnel et suivi des dépenses par résidence",
+      "selectResidence": "Choisir une résidence",
+      "selectExercice": "Choisir l'exercice",
+      "newPoste": "Ajouter un poste",
+      "editPoste": "Modifier le poste",
+      "deletePoste": "Supprimer le poste",
+      "deletePosteDesc": "Ce poste sera supprimé définitivement.",
+      "colCategorie": "Catégorie",
+      "colDescription": "Description",
+      "colPrevu": "Prévu (DH)",
+      "colRealise": "Réalisé (DH)",
+      "colEcart": "Écart",
+      "colExecution": "Exécution",
+      "totalPrevu": "Total prévu",
+      "totalRealise": "Total réalisé",
+      "tauxExecution": "Taux d'exécution",
+      "categories": {
+        "maintenance": "Maintenance",
+        "nettoyage": "Nettoyage",
+        "gardiennage": "Gardiennage",
+        "electricite": "Électricité",
+        "eau": "Eau",
+        "assurance": "Assurance",
+        "administratif": "Administratif",
+        "travaux": "Travaux",
+        "autre": "Autre"
+      },
+      "statut": {
+        "brouillon": "Brouillon",
+        "approuve": "Approuvé"
+      },
+      "approve": "Approuver le budget",
+      "approveConfirm": "Approuver ce budget ?",
+      "approveDesc": "Une fois approuvé, les postes ne pourront plus être modifiés.",
+      "approveSuccess": "Budget approuvé",
+      "form": {
+        "categorie": "Catégorie",
+        "description": "Description",
+        "montantPrevu": "Montant prévu (DH)",
+        "montantRealise": "Montant réalisé (DH)"
+      },
+      "empty": "Aucun budget pour cette sélection",
+      "emptyDesc": "Sélectionnez une résidence et un exercice pour afficher ou créer le budget.",
+      "noExercice": "Aucun exercice actif",
+      "toastLineAdded": "Ligne ajoutée",
+      "toastLineDeleted": "Ligne supprimée",
+      "selectPrestataire": "Sélectionner un prestataire",
+      "saveError": "Erreur lors de la sauvegarde",
+      "bulkUpdated": "{{n}} ligne(s) mise(s) à jour",
+      "consommationPoste": "Consommation par poste",
+      "noData": "Aucune donnée",
+      "submitApprovalDesc": "Le budget sera soumis pour approbation lors de la prochaine Assemblée Générale.",
+      "lockDesc": "Le budget sera verrouillé et ne pourra plus être modifié.",
+      "deleteLineTitle": "Supprimer la ligne",
+      "deleteLineDesc": "Cette ligne budgétaire sera supprimée définitivement.",
+      "addLineTitle": "Ajouter une ligne",
+      "lineDescPlaceholder": "Description de la ligne",
+      "linkPrestataire": "Lier un prestataire (optionnel)",
+      "dateFin": "Date fin"
+    },
+    "documents": {
+      "title": "Documents",
+      "subtitle": "Centralisez les documents de vos copropriétés",
+      "add": "Ajouter un document",
+      "filterType": "Type",
+      "filterResidence": "Résidence",
+      "filterAll": "Tous",
+      "colNom": "Nom",
+      "colType": "Type",
+      "colResidence": "Résidence",
+      "colDate": "Date",
+      "colTaille": "Taille",
+      "download": "Télécharger",
+      "delete": "Supprimer",
+      "deleteConfirm": {
+        "title": "Supprimer le document ?"
+      },
+      "deleteDesc": "Ce document sera supprimé définitivement.",
+      "toutes": "Toutes les résidences",
+      "empty": "Aucun document",
+      "emptyDesc": "Ajoutez votre premier document pour le partager avec les copropriétaires.",
+      "addSuccess": "Document ajouté",
+      "deleteSuccess": "Document supprimé",
+      "form": {
+        "nom": "Nom du document",
+        "type": "Type",
+        "residence": "Résidence (optionnel)",
+        "date": "Date",
+        "file": "Fichier",
+        "nomPlaceholder": "Ex: Règlement de copropriété 2026",
+        "customCategory": "Catégorie personnalisée",
+        "customCategoryPlaceholder": "Ex: Manuel, Plan, Attestation…"
+      },
+      "types": {
+        "reglement": "Règlement",
+        "pv_ag": "PV Assemblée",
+        "contrat": "Contrat",
+        "facture": "Facture",
+        "autre": "Autre"
+      },
+      "edit": "Renommer / modifier",
+      "editDialog": {
+        "title": "Modifier le document"
+      },
+      "updateSuccess": "Document modifié",
+      "updateError": "Erreur lors de la modification",
+      "addError": "Erreur lors de l'ajout",
+      "deleteError": "Erreur lors de la suppression",
+      "col": {
+        "nom": "Nom",
+        "type": "Type",
+        "residence": "Résidence",
+        "date": "Date",
+        "taille": "Taille"
+      },
+      "allResidences": "Toutes",
+      "filterAllTypes": "Tous les types",
+      "filterAllResidences": "Toutes les résidences",
+      "searchPlaceholder": "Rechercher un document…",
+      "emptyTitle": "Aucun document",
+      "addDialog": {
+        "title": "Ajouter un document"
+      }
+    },
+    "comptabilite": {
+      "title": "Comptabilité",
+      "exercice": "Exercice",
+      "statut": {
+        "ouvert": "Ouvert",
+        "clos": "Clôturé 🔒"
+      },
+      "tabs": {
+        "dashboard": "Tableau de bord",
+        "journal": "Journal comptable",
+        "grandLivre": "Grand-Livre",
+        "balance": "Balance des comptes",
+        "depenses": "Dépenses",
+        "rapports": "Rapports financiers",
+        "cloture": "Clôture"
+      },
+      "kpi": {
+        "produits": "Produits",
+        "charges": "Charges",
+        "resultat": "Résultat net",
+        "tresorerie": "Trésorerie",
+        "creances": "Créances"
+      },
+      "tresorerie": {
+        "title": "Détail trésorerie",
+        "banque": "Banques (5121)",
+        "cheque": "Chèques (5122)",
+        "caisse": "Caisse (5161)",
+        "depot": "Dépôt",
+        "retrait": "Retrait",
+        "remise": "Remise"
+      },
+      "recouvrement": "Taux de recouvrement",
+      "couverture": "Couverture trésorerie",
+      "mois": "mois",
+      "journal": {
+        "date": "Date",
+        "compte": "Compte",
+        "description": "Description",
+        "type": "Type",
+        "debit": "Débit",
+        "credit": "Crédit",
+        "piece": "Pièce",
+        "types": {
+          "depense": "Dépense",
+          "encaissement": "Encaissement"
+        }
+      },
+      "grandLivre": {
+        "title": "Compte PCG",
+        "selectCompte": "Sélectionner un compte...",
+        "hint": "Sélectionnez un compte PCG pour afficher le détail des écritures."
+      },
+      "depenses": {
+        "title": "Dépenses",
+        "add": "Nouvelle dépense",
+        "colDate": "Date",
+        "colTitre": "Titre",
+        "colCompte": "Compte",
+        "colPrestataire": "Prestataire",
+        "colMode": "Mode",
+        "colMontant": "Montant",
+        "modes": {
+          "virement": "Virement",
+          "cheque": "Chèque",
+          "especes": "Espèces",
+          "cb": "CB",
+          "prelevement": "Prélèvement",
+          "autre": "Autre"
+        },
+        "form": {
+          "titre": "Titre",
+          "montant": "Montant (MAD)",
+          "date": "Date",
+          "compte": "Compte de charge",
+          "mode": "Mode de paiement",
+          "prestataire": "Prestataire (optionnel)",
+          "justificatif": "Pièce justificative",
+          "importIa": "Import IA",
+          "analyser": "Analyser",
+          "utiliser": "Utiliser ces données",
+          "confiance": "Confiance"
+        }
+      },
+      "encaissement": {
+        "title": "Encaisser un paiement",
+        "recherche": "Rechercher copropriétaire ou N° lot",
+        "step1": "Sélectionner créance",
+        "step2": "Saisir paiement",
+        "soldeImpaye": "Solde impayé",
+        "montant": "Montant",
+        "date": "Date",
+        "mode": "Mode de paiement",
+        "compteDestination": "Compte destination",
+        "refCheque": "Référence chèque",
+        "comptes": {
+          "5121": "Banque principale (5121)",
+          "5122": "Compte chèques (5122)",
+          "5161": "Caisse (5161)"
+        }
+      },
+      "cloture": {
+        "title": "Clôture de l'exercice",
+        "checklist": "Checklist pré-clôture",
+        "equilibre": "Écritures équilibrées (Débit = Crédit)",
+        "classe6": "Comptes de charges (cl. 6) mouvementés",
+        "classe7": "Comptes de produits (cl. 7) mouvementés",
+        "hasEcritures": "Au moins une écriture enregistrée",
+        "totalDebit": "Total Débit",
+        "totalCredit": "Total Crédit",
+        "btn": "Clôturer l'exercice",
+        "confirmTitle": "Confirmer la clôture",
+        "confirmMsg": "Cette action est irréversible. Toutes les écritures seront verrouillées. Continuer ?",
+        "warning": "Attention — après clôture, aucune écriture ne peut être modifiée.",
+        "already_clos": "Exercice clôturé",
+        "clos_msg": "Cet exercice a été clôturé le"
+      },
+      "export": {
+        "title": "Exporter",
+        "excelJournal": "Excel — Journal complet",
+        "excelGrandLivre": "Excel — Grand-Livre",
+        "sageFec": "Sage FEC",
+        "pdfJournal": "PDF — Journal",
+        "pdfBalance": "PDF — Balance",
+        "success": "Export téléchargé : {{filename}}",
+        "error": "Échec de l'export. Veuillez réessayer.",
+        "empty": "Aucune écriture à exporter pour cet exercice"
+      },
+      "seuil": {
+        "label": "Seuil comptable",
+        "moins200": "≤ 200 000 MAD — Régime simplifié (Annexes 10, 13)",
+        "entre200et500": "200–500 k MAD — Régime normal (Annexes 10-12)",
+        "plus500": "≥ 500 000 MAD — Régime complet (Annexes 3-10)"
+      },
+      "suggestedAccount": "Compte suggéré :",
+      "selectAccount": "Sélectionner un compte...",
+      "noEntries": "Aucune écriture comptable",
+      "toastClosed": "Exercice clôturé avec succès",
+      "toastCloseError": "Erreur lors de la clôture",
+      "montantColon": "Montant:",
+      "noCreance": "Aucune créance",
+      "entree": "Entrée",
+      "sortie": "Sortie",
+      "searchAccount": "Rechercher un compte...",
+      "prestataireNamePlaceholder": "Nom du prestataire",
+      "filterAccounts": "Filtrer les comptes...",
+      "balanceAutoHint": "La balance se construira automatiquement à partir des écritures de l'exercice.",
+      "legalDocsTitle": "Documents Légaux et Officiels",
+      "annexesRegTitle": "Annexes réglementaires (Décret 2.23.700)",
+      "annexesRegDesc": "Annexes 10, 13-1, 13-2 et autres documents légaux obligatoires",
+      "viewAnnexes": "Voir les annexes",
+      "iaError": "Erreur analyse IA",
+      "balanceEq": "Total Débit = Total Crédit = {{debit}} DH · Écart soldes : {{ecart}} DH",
+      "balanceNeq": "Écart débits/crédits : {{ecart}} DH — vérifier les écritures",
+      "noEcritureCompte": "Aucune écriture pour ce compte",
+      "classes": {
+        "1": "Classe 1 — Capitaux propres",
+        "2": "Classe 2 — Immobilisations",
+        "3": "Classe 3 — Créances actif circulant",
+        "4": "Classe 4 — Dettes passif circulant",
+        "5": "Classe 5 — Trésorerie",
+        "6": "Classe 6 — Charges",
+        "7": "Classe 7 — Produits"
+      },
+      "balance": {
+        "totalDebit": "Total Débit",
+        "totalCredit": "Total Crédit",
+        "soldeDebiteur": "Soldes débiteurs",
+        "soldeCrediteur": "Soldes créditeurs"
+      },
+      "balanceEquilibree": "Balance équilibrée",
+      "balanceDesequilibree": "Balance déséquilibrée",
+      "exportPdf": "Export PDF",
+      "rapportsFinanciers": "Rapports financiers",
+      "rapportFinancierAnnuel": "Rapport Financier Annuel",
+      "rapportFinancier": "Rapport Financier",
+      "syntheseFinanciere": "Synthèse financière, répartition des charges, analyse des impayés — 3 pages",
+      "registresObligatoires": "Registres obligatoires (Art. 8 & 10)",
+      "balanceLabel": "Balance",
+      "journalLabel": "Journal comptable",
+      "grandLivreLabel": "Grand-Livre",
+      "legalNote": "Ce rapport est établi conformément à la Loi 18-00 (Dahir n° 1-02-298 du 3 octobre 2002) relative au statut de la copropriété des immeubles bâtis. Tout copropriétaire peut en demander copie au syndic selon l'article 8 de ladite loi. Les documents générés ont valeur informative et sont certifiés par le gestionnaire de la copropriété.",
+      "filterTo": "Au"
+    },
+    "depenses": {
+      "title": "Dépenses",
+      "subtitle": "Suivi des charges de copropriété",
+      "add": "Ajouter une dépense",
+      "importIa": "Import IA...",
+      "recurrentes": "Récurrentes",
+      "saveSuccess": "Dépense enregistrée",
+      "kpi": {
+        "total": "Total période",
+        "nb": "Nb dépenses",
+        "moyen": "Montant moyen",
+        "enAttente": "En attente approbation"
+      },
+      "cols": {
+        "date": "Date",
+        "titre": "Titre",
+        "prestataire": "Prestataire",
+        "compte": "Compte PCG",
+        "montant": "Montant",
+        "mode": "Mode",
+        "approbation": "Approbation"
+      },
+      "approbation": {
+        "approuve": "Approuvé",
+        "en_attente": "En attente",
+        "rejete": "Rejeté"
+      },
+      "form": {
+        "titre": "Titre",
+        "montant": "Montant (MAD)",
+        "date": "Date",
+        "compte": "Compte de charge",
+        "mode": "Mode de paiement",
+        "prestataire": "Prestataire (optionnel)",
+        "justificatif": "Pièce justificative",
+        "scanner": "Analyser avec l'IA",
+        "utiliser": "Utiliser ces données",
+        "seuilWarning": "Cette dépense nécessite une approbation du conseil syndical"
+      },
+      "recurrentModal": {
+        "title": "Dépenses récurrentes",
+        "nouveau": "Nouveau modèle",
+        "frequences": {
+          "mensuelle": "Mensuelle",
+          "trimestrielle": "Trimestrielle",
+          "semestrielle": "Semestrielle",
+          "annuelle": "Annuelle"
+        },
+        "jourEmission": "Jour d'émission",
+        "prochaine": "Prochaine émission"
+      },
+      "selectAccount": "Sélectionner un compte",
+      "beneficiaryPlaceholder": "Sécurité Atlas SARL",
+      "toastModelCreated": "Modèle créé",
+      "newModel": "Nouveau modèle",
+      "frequency": "Fréquence",
+      "toastDeleted": "Dépense supprimée",
+      "toastApproved": "Dépense approuvée",
+      "toastRejected": "Dépense rejetée",
+      "downloading": "Téléchargement...",
+      "deleteTitle": "Supprimer la dépense",
+      "rejectTitle": "Rejeter la dépense",
+      "analyzeError": "Erreur lors de l'analyse",
+      "noModele": "Aucun modèle récurrent",
+      "compteCharge": "Compte de charge",
+      "dateFinOptional": "Date fin (optionnel)",
+      "evolutionMensuelle": "Évolution mensuelle",
+      "repartitionPcg": "Répartition par compte PCG",
+      "totalMad": "Total MAD",
+      "searchTitle": "Rechercher titre ou prestataire...",
+      "allAccounts": "Tous comptes",
+      "allStatuses": "Tous statuts",
+      "motifRejet": "Motif du rejet"
+    },
+    "budget": {
+      "title": "Budget Prévisionnel",
+      "statuts": {
+        "brouillon": "Brouillon",
+        "soumis_ag": "Soumis à l'AG",
+        "approuve": "Approuvé",
+        "verrouille": "Verrouillé"
+      },
+      "kpi": {
+        "prevu": "Budget prévu",
+        "engage": "Engagé / Émis",
+        "realise": "Réalisé",
+        "reste": "Reste à dépenser"
+      },
+      "annexe5": {
+        "title": "Tableau Annexe 5",
+        "colCompte": "Compte",
+        "colLibelle": "Libellé",
+        "colRealiseN1": "Réal. N-1",
+        "colBudgetN": "Budget N",
+        "colEngage": "Engagé",
+        "colRealise": "Réalisé",
+        "colPct": "% Cons.",
+        "sections": {
+          "chargesCourantes": "I — Charges courantes",
+          "chargesTravaux": "II — Charges travaux",
+          "totalCharges": "III — Total charges",
+          "produitsCourants": "IV — Produits courants",
+          "produitsTravaux": "V — Produits travaux",
+          "totalProduits": "VI — Total produits",
+          "resultat": "VII — Résultat"
+        },
+        "saved": "Sauvegardé"
+      },
+      "simulation": {
+        "title": "Simulateur de cotisations",
+        "budgetTotal": "Budget charges total",
+        "tantiemesTotal": "Tantièmes totaux",
+        "colLot": "Lot",
+        "colCopro": "Copropriétaire",
+        "colTantieme": "Tantième",
+        "colPct": "Quote-part",
+        "colAnnuelle": "Cotis. annuelle",
+        "colMensuelle": "Cotis. mensuelle",
+        "colVariation": "Variation vs N-1",
+        "exporter": "Exporter PDF"
+      },
+      "ia": {
+        "title": "Suggestions IA",
+        "appliquer": "Appliquer les suggestions sélectionnées",
+        "justification": "Justification"
+      },
+      "soumettre": "Soumettre à l'AG",
+      "verrouiller": "Verrouiller le budget",
+      "exporter": "Export PDF Annexe 5",
+      "creer": "Créer le budget"
+    },
+    "imports": {
+      "title": "Import de données",
+      "description": "Importez vos données existantes pour démarrer rapidement",
+      "selectResidence": "Sélectionnez une résidence",
+      "tabs": {
+        "lots": "Lots",
+        "coproprietaires": "Copropriétaires",
+        "soldes": "Soldes initiaux",
+        "paiements": "Historique paiements",
+        "prestataires": "Prestataires",
+        "bilanOuverture": "Bilan d'ouverture"
+      },
+      "steps": {
+        "upload": "Téléverser",
+        "mapping": "Mapper les colonnes",
+        "preview": "Aperçu",
+        "execute": "Importer"
+      },
+      "upload": {
+        "dropzone": "Glissez votre fichier Excel ici",
+        "or": "ou cliquer pour sélectionner",
+        "accepted": "Formats acceptés : .xlsx, .csv",
+        "downloadTemplate": "Télécharger le modèle"
+      },
+      "mapping": {
+        "source": "Colonne source",
+        "target": "Champ cible",
+        "confidence": "Confiance",
+        "auto": "Auto",
+        "manual": "Manuel",
+        "unmapped": "Non mappé",
+        "requiredMissing": "Champs requis non mappés"
+      },
+      "preview": {
+        "summary": "{valid} lignes valides · {errors} erreurs",
+        "skipErrors": "Ignorer les lignes en erreur",
+        "importButton": "Importer {count} lignes"
+      },
+      "execute": {
+        "inProgress": "Importation en cours... {done}/{total} lignes",
+        "success": "{count} lignes importées avec succès",
+        "failed": "{count} lignes échouées",
+        "done": "Terminé"
+      },
+      "order": "Ordre recommandé : Lots → Copropriétaires → Soldes → Paiements → Prestataires",
+      "selectFile": "Sélectionner un fichier",
+      "importDone": "Import terminé",
+      "reimport": "Ré-importer",
+      "removeFile": "Retirer le fichier"
+    },
+    "autresRecettes": {
+      "toastAdded": "Recette ajoutée",
+      "toastUpdated": "Recette mise à jour",
+      "toastDeleted": "Recette supprimée",
+      "emptyRow": "Aucune recette pour cet exercice.",
+      "title": "Autres recettes",
+      "subtitle": "Recettes hors appels de fonds — locations, subventions, indemnités, produits financiers",
+      "totalRecettes": "Total recettes {{year}}",
+      "operations": "{{n}} opérations",
+      "colPayeur": "Payeur"
+    },
+    "remboursements": {
+      "toastCreated": "Remboursement créé",
+      "toastUpdated": "Remboursement mis à jour",
+      "toastDeleted": "Remboursement supprimé",
+      "totalRequested": "Total demandé",
+      "subtitle": "Trop-perçus, indemnités et restitutions aux copropriétaires",
+      "newRemboursement": "Nouveau remboursement",
+      "colPaiement": "Paiement",
+      "emptyRow": "Aucun remboursement enregistré.",
+      "dateDemande": "Date de demande",
+      "datePaiement": "Date paiement",
+      "modalEdit": "Modifier le remboursement",
+      "descPlaceholder": "ex: Double versement appel Q1 2026",
+      "statut": {
+        "demande": "Demandé",
+        "approuve": "Approuvé",
+        "paye": "Payé",
+        "rejete": "Rejeté"
+      },
+      "title": "Remboursements",
+      "kpiEnAttente": "En attente",
+      "kpiPayes": "Payés",
+      "colMotif": "Motif",
+      "colDemande": "Demande"
+    },
+    "emprunts": {
+      "toastCreated": "Emprunt enregistré",
+      "toastUpdated": "Emprunt mis à jour",
+      "toastDeleted": "Emprunt supprimé",
+      "colMensualite": "Mensualité",
+      "colResteDu": "Reste dû",
+      "libellePlaceholder": "ex : Réfection toiture 2023",
+      "organisme": "Organisme prêteur",
+      "duree": "Durée (mois)",
+      "mensualiteDh": "Mensualité (DH)",
+      "bannerTitle": "Annexe 8 — Décret 2.23.700",
+      "bannerBody": "· Tout emprunt collectif doit être voté en AG (Loi 18-00 art. 17). Le tableau d'amortissement est fourni par l'organisme prêteur.",
+      "emptyRow": "Aucun emprunt enregistré.",
+      "dateFin": "Date de fin",
+      "totalEmprunte": "Total emprunté",
+      "payeCumul": "Payé cumul",
+      "payeExercice": "Payé cet exercice",
+      "resteAPayer": "Reste à payer",
+      "montantInitialDh": "Montant initial (DH)",
+      "amountInitialPositive": "Montant initial > 0",
+      "newEmprunt": "Nouvel emprunt",
+      "editEmprunt": "Modifier l'emprunt",
+      "bankPlaceholder": "ex: Banque Populaire",
+      "title": "Emprunts",
+      "subtitle": "Suivi des emprunts contractés par la copropriété — Annexe 8 du Décret 2.23.700",
+      "colInitial": "Initial",
+      "colOrganisme": "Organisme"
+    },
+    "recouvrement": {
+      "relance": {
+        "title": "Scénario de relance",
+        "subtitle": "Étapes automatiques après échéance : délai, canal et escalade vers mise en demeure.",
+        "auto": "Automatique",
+        "empty": "Aucune étape. Ajoutez une première relance.",
+        "delai": "Délai (J+)",
+        "canal": "Canal",
+        "type": "Type",
+        "addStep": "Ajouter une étape",
+        "saved": "Scénario de relance enregistré",
+        "canaux": {
+          "whatsapp": "WhatsApp",
+          "sms": "SMS",
+          "email": "E-mail"
+        },
+        "types": {
+          "relance": "Relance",
+          "mise_en_demeure": "Mise en demeure"
+        }
+      },
+      "toastConfigSaved": "Configuration enregistrée",
+      "recalcError": "Échec du recalcul",
+      "penaltyType": "Type de pénalité",
+      "penalties": "Pénalités",
+      "age": "Ancienneté",
+      "bannerTitle": "Décision d'AG requise",
+      "bannerBody": "— Les pénalités doivent être votées en assemblée générale avant d'être légalement applicables (Loi 18-00 art. 25).",
+      "recalcPenalites": "Recalculer pénalités",
+      "configTitle": "Configuration des pénalités de retard",
+      "penalitesActivees": "Pénalités activées",
+      "penalitesAutoDesc": "Calcul automatique sur tout impayé après période de grâce",
+      "graceDays": "Période de grâce (jours)",
+      "graceHint": "Délai avant application des pénalités",
+      "plafondHint": "Pénalité plafonnée. Laisser vide pour aucun plafond.",
+      "totalImpaye": "Total impayé",
+      "penalites": "Pénalités",
+      "prescriptionRisk": "Risque de prescription",
+      "prescriptionBadge": "Loi 18-00 · Prescription quinquennale",
+      "allLateLots": "Tous les lots en retard",
+      "saveError": "Échec de l'enregistrement",
+      "severity": {
+        "low": "Faible",
+        "medium": "Modéré",
+        "high": "Élevé",
+        "critical": "Critique"
+      },
+      "riskPrescription": "Risque prescription",
+      "penaltiesRecalc": "{{n}} pénalités recalculées ({{amount}} DH)",
+      "title": "Recouvrement",
+      "subtitle": "Suivi des impayés, pénalités et mises en demeure",
+      "configPenalites": "Configuration pénalités",
+      "lotsEnRetard": "Lots en retard",
+      "prescriptionBanner": "Les créances de charges de copropriété sont prescrites après 5 ans sans interruption. Une action légale immédiate est requise pour les créances à statut critique.",
+      "colEcheance": "Échéance",
+      "colJoursRestants": "Jours restants",
+      "colOrigine": "Origine"
+    },
+    "equipements": {
+      "toastAdded": "Équipement ajouté",
+      "toastUpdated": "Équipement mis à jour",
+      "toastDeleted": "Équipement supprimé",
+      "designationRequired": "Désignation requise",
+      "dureeAmort": "Durée amortissement (mois)",
+      "bannerTitle": "Annexe 9 — Décret 2.23.700",
+      "bannerBody": "· Le registre des équipements communs doit être à jour pour la convocation d'AG et le bilan annuel. L'amortissement linéaire est calculé sur la durée renseignée.",
+      "title": "Équipements",
+      "subtitle": "Registre des équipements et immobilisations — Annexe 9 du Décret 2.23.700",
+      "nbArticles": "Nombre d'articles",
+      "valeurAcquisition": "Valeur d'acquisition",
+      "valeurNette": "Valeur nette (après amort. {{pct}}%)",
+      "colAcquisLe": "Acquis le",
+      "colVAcq": "V. acquisition",
+      "colVNette": "V. nette",
+      "statutActif": "Actif",
+      "statutHorsService": "Hors service",
+      "emptyRow": "Aucun équipement enregistré.",
+      "confirmDelete": "Supprimer l'équipement « {{designation}} » ?",
+      "modalEdit": "Modifier un équipement",
+      "modalNew": "Ajouter un équipement",
+      "designationPlaceholder": "ex: Ascenseur principal Otis",
+      "dateAcquisition": "Date d'acquisition",
+      "valeurAcquisitionDh": "Valeur d'acquisition (DH)",
+      "enService": "Équipement en service",
+      "enServiceHint": "Décocher si hors service / déclassé",
+      "notesOptional": "Notes (optionnel)",
+      "addError": "Échec de l'ajout",
+      "valeurPositive": "Valeur d'acquisition doit être > 0"
+    },
+    "travaux": {
+      "toastCreated": "Travaux enregistrés",
+      "toastUpdated": "Travaux mis à jour",
+      "toastDeleted": "Travaux supprimés",
+      "montantVote": "Montant voté",
+      "montantEngage": "Montant engagé",
+      "montantRegle": "Montant réglé",
+      "resteARegler": "Reste à régler",
+      "colVote": "Voté",
+      "colEngage": "Engagé",
+      "colRegle": "Réglé",
+      "libellePlaceholder": "ex : Ravalement façade nord",
+      "montantVoteDh": "Montant voté (DH)",
+      "engageDh": "Engagé (DH)",
+      "regleDh": "Réglé (DH)",
+      "debut": "Début",
+      "finPrevue": "Fin prévue",
+      "bannerTitle": "Annexe 6 — Décret 2.23.700",
+      "bannerBody": "· Les travaux non courants (gros entretien, transformation, amélioration) doivent être votés en AG (Loi 18-00 art. 17) à la majorité requise selon le type de travaux.",
+      "title": "Travaux exceptionnels",
+      "subtitle": "Suivi des travaux non courants votés en AG — Annexe 6 du Décret 2.23.700",
+      "newTravaux": "Nouveaux travaux",
+      "colVoteAg": "Vote AG",
+      "dateVoteAg": "Date vote AG",
+      "emptyRow": "Aucun travaux exceptionnel pour cet exercice.",
+      "confirmDelete": "Supprimer « {{libelle}} » ?",
+      "modalEdit": "Modifier les travaux",
+      "modalNew": "Nouveaux travaux exceptionnels",
+      "statut": {
+        "vote": "Voté",
+        "en_cours": "En cours",
+        "termine": "Terminé",
+        "annule": "Annulé"
+      }
+    },
+    "audit": {
+      "allCategories": "Toutes catégories",
+      "colBy": "Effectué par",
+      "colDetails": "Détails",
+      "empty": "Aucun événement pour cette période ou ce filtre.",
+      "totalEvents": "Total événements",
+      "searchPlaceholder": "Rechercher action, utilisateur, cible...",
+      "exportCsv": "Exporter CSV",
+      "sensitiveActions": "Actions sensibles",
+      "errorRate": "Taux d'erreur",
+      "categoryLabels": {
+        "immeuble": "Immeuble",
+        "lot": "Lot",
+        "coproprietaire": "Copropriétaire",
+        "paiement": "Paiement",
+        "depense": "Dépense",
+        "budget": "Budget",
+        "ag": "Assemblée",
+        "document": "Document",
+        "user": "Utilisateur",
+        "auth": "Authentification",
+        "system": "Système"
+      },
+      "title": "Journal d'audit",
+      "subtitle": "Traçabilité complète des actions sur la plateforme",
+      "refresh": "Actualiser",
+      "errors": "Erreurs",
+      "colHorodatage": "Horodatage",
+      "colCible": "Cible",
+      "allFilter": "Toutes"
+    },
+    "generateLots": {
+      "genError": "Erreur lors de la génération des lots",
+      "tantiemePerLot": "Tantième par lot",
+      "startNumber": "Numéro de départ",
+      "floorsCount": "Nombre d'étages",
+      "lotsPerFloorWing": "Lots par étage / aile",
+      "lotsPerFloor": "Lots par étage",
+      "prefix": "Préfixe",
+      "entries": "Entrées",
+      "unitTypes": "Types d'unités",
+      "quantity": "Quantité",
+      "generateTitle": "Générer des lots",
+      "typeLot": "Type de lot",
+      "totalLots": "Total lots",
+      "addWing": "Ajouter une aile",
+      "wingsBlocks": "Ailes / Blocs",
+      "removeWingAria": "Supprimer l'aile {{wing}}",
+      "startFloor": "Étage de départ",
+      "startFloorHint": "(négatif pour sous-sols)",
+      "totalVillas": "Total villas",
+      "phase": "Phase",
+      "phasePlaceholder": "Phase 1 (optionnel)",
+      "nbLots": "Nb lots",
+      "removeEntryAria": "Supprimer l'entrée",
+      "addEntry": "Ajouter une entrée",
+      "removeTypeAria": "Supprimer le type",
+      "addType": "Ajouter un type",
+      "quickTemplates": "Modèles rapides",
+      "configuration": "Configuration",
+      "previewTitle": "Aperçu — premiers {{shown}} lots sur {{total}}",
+      "emptyPreview": "Aucun lot à générer avec cette configuration.",
+      "previewTantieme": "• Tantième : {{n}}",
+      "moreLots": "… et {{n}} lots supplémentaires",
+      "generating": "Génération en cours...",
+      "generateN": "Générer {{n}} lots",
+      "templates": {
+        "residence_ensemble": {
+          "title": "Résidence / Ensemble immobilier",
+          "subtitle": "Définir des entrées avec des comptages différents (Ex: E1=12, Bloc B=8)"
+        },
+        "simple_sequential": {
+          "title": "Numérotation simple",
+          "subtitle": "Exemple : 1, 2, 3, 4, 5"
+        },
+        "wings_floors": {
+          "title": "Immeuble (Ailes + Étages)",
+          "subtitle": "Exemple : A101, A102, B201, B202"
+        },
+        "floor_based": {
+          "title": "Par étage (sans aile)",
+          "subtitle": "Exemple : 101, 102, 201, 202"
+        },
+        "villa_townhouse": {
+          "title": "Villa / Maison",
+          "subtitle": "Exemple : Villa 1, Villa 2, Phase 1-Villa 1"
+        },
+        "commercial_mixed": {
+          "title": "Commercial / Usage mixte",
+          "subtitle": "Exemple : Boutique 1, Bureau A"
+        }
+      }
+    },
+    "profil": {
+      "title": "Mon Profil",
+      "toastSaved": "Profil mis à jour avec succès",
+      "editAria": "Modifier le profil",
+      "roleManager": "Manager",
+      "roleGestionnaire": "Gestionnaire",
+      "fullName": "Nom complet",
+      "namePlaceholder": "Votre nom",
+      "cndpConsent": "J'ai pris connaissance et j'accepte la gestion des données personnelles conformément à la loi 09-08 (CNDP) relative à la protection des données à caractère personnel.",
+      "logoSection": "Logo du Syndic",
+      "logoHint": "Affiché dans la barre de navigation. PNG ou JPG, 2 Mo max.",
+      "logoAlt": "Logo syndic",
+      "logoTooBig": "Le logo ne doit pas dépasser 2 Mo",
+      "logoUpdated": "Logo mis à jour — visible dans la barre de navigation",
+      "logoRemoved": "Logo supprimé",
+      "changeLogo": "Changer le logo",
+      "importLogo": "Importer un logo",
+      "subSection": "Syndic & Abonnement",
+      "plan": "Plan",
+      "upgradePro": "Passer au Pro →",
+      "comingSoon": "Fonctionnalité bientôt disponible",
+      "notifSection": "Préférences de Notification",
+      "notifHint": "Choisissez les alertes WhatsApp que vous souhaitez recevoir",
+      "notifMaster": "Activer les notifications WhatsApp",
+      "notifPaiementLabel": "Nouveau paiement reçu",
+      "notifPaiementDesc": "Un copropriétaire effectue un paiement",
+      "notifTicketLabel": "Nouveau ticket d'incident",
+      "notifTicketDesc": "Un résident signale un incident",
+      "notifAssembleeLabel": "Assemblée programmée",
+      "notifAssembleeDesc": "Une assemblée générale est planifiée",
+      "notifRetardLabel": "Retard de paiement",
+      "notifRetardDesc": "Un copropriétaire dépasse la date d'échéance",
+      "appearance": "Apparence",
+      "darkMode": "Mode sombre",
+      "dataSection": "Mes Données Personnelles",
+      "dataRightsPre": "Vos droits conformément à la ",
+      "dataLaw": "loi 09-08 relative à la protection des données personnelles",
+      "accessTitle": "Droit d'accès (Article 7)",
+      "accessDesc": "Demandez une copie de toutes vos données. L'export sera disponible sous 48h.",
+      "requestExport": "Demander l'export",
+      "exportRequested": "Demande enregistrée. Vous recevrez votre export sous 48h.",
+      "rectifTitle": "Droit de rectification (Article 8)",
+      "rectifDesc": "Modifiez vos informations personnelles dans la section ci-dessus.",
+      "deleteTitle": "Droit de suppression (Article 8)",
+      "deleteDesc": "Demandez la suppression de votre compte. Un administrateur examinera votre demande.",
+      "deleteAccount": "Supprimer mon compte",
+      "deleteWarn": "Cette action est irréversible. Contactez support@imaro.ma",
+      "retentionNote": "Certaines données comptables peuvent être conservées 10 ans conformément aux obligations légales marocaines.",
+      "loggingOut": "Déconnexion…",
+      "logout": "Se déconnecter"
+    },
+    "occupants": {
+      "title": "Occupants",
+      "subtitle": "Registre des occupants par lot — propriétaires, locataires, usufruitiers",
+      "toastAdded": "Occupant ajouté",
+      "toastUpdated": "Occupant mis à jour",
+      "toastDeleted": "Occupant supprimé",
+      "kpiOwners": "Propriétaires occupants",
+      "kpiTenants": "Locataires",
+      "kpiOthers": "Usufruitiers / autres",
+      "bannerTitle": "Art. 11 Loi 18-00",
+      "bannerBody": "— Le registre des occupants doit être à jour pour la convocation des AG et la communication des charges. Un seul «propriétaire occupant» actif par lot à la fois.",
+      "colLot": "Lot",
+      "colNom": "Nom complet",
+      "emptyRow": "Aucun occupant enregistré.",
+      "confirmDelete": "Supprimer l'occupant « {{nom}} » ?",
+      "modalEdit": "Modifier un occupant",
+      "modalNew": "Ajouter un occupant",
+      "chooseLot": "Choisir un lot",
+      "dateFinOptional": "Date de fin (optionnelle)",
+      "type": {
+        "proprietaire_occupant": "Propriétaire occupant",
+        "locataire": "Locataire",
+        "usufruitier": "Usufruitier",
+        "autre": "Autre"
+      }
+    },
+    "ia": {
+      "title": "Assistant IA",
+      "subtitle": "Audit conformité automatisé · Extraction de factures · Suggestions budgétaires intelligentes",
+      "poweredBy": "Propulsé par Claude — vos données restent privées et chiffrées.",
+      "toolAuditTitle": "Audit conformité",
+      "toolAuditDesc": "Scan complet · risque légal · recommandations",
+      "toolInvoiceTitle": "Extraction facture",
+      "toolInvoiceDesc": "OCR · classification comptable · pré-remplissage",
+      "toolBudgetTitle": "Suggestions budget",
+      "toolBudgetDesc": "Historique · inflation · prévisions par poste",
+      "analyzing": "Analyse en cours...",
+      "severity": {
+        "critical": "Critique",
+        "high": "Élevé",
+        "medium": "Modéré",
+        "low": "Faible",
+        "info": "Info"
+      },
+      "conf": {
+        "high": "Élevée",
+        "medium": "Moyenne",
+        "low": "Faible"
+      },
+      "auditDone": "Audit terminé — score {{score}}/100",
+      "auditError": "Échec de l'audit",
+      "auditEmptyTitle": "Audit conformité IA",
+      "auditEmptyDesc": "Lancez une analyse complète de votre dossier copropriété : charges manquantes, créances proches de prescription, annexes non générées, conformité Décret 2.23.700, etc.",
+      "runAudit": "Lancer l'audit IA",
+      "auditHint": "~ 30 secondes · Le résultat reste privé sur votre tenant.",
+      "auditReport": "Rapport d'audit · {{name}}",
+      "exerciceBadge": "Exercice {{n}}",
+      "rerunAudit": "Relancer l'audit",
+      "strengths": "Points forts détectés",
+      "attentionPoints": "Points d'attention ({{n}})",
+      "recommendedAction": "Action recommandée",
+      "auditMeta": "Analyse · {{model}} · {{ms}}ms · {{tokens}} tokens · généré le {{date}}",
+      "invoiceDone": "Facture extraite — confiance {{pct}}%",
+      "invoiceError": "Échec de l'extraction",
+      "invoiceEmptyTitle": "Extraction de facture IA",
+      "invoiceEmptyDesc": "Glissez une facture (PDF ou image). L'IA extrait fournisseur, ICE, montant, TVA, date, et suggère automatiquement la catégorie + le compte comptable.",
+      "chooseInvoice": "Choisir une facture",
+      "acceptedFormats": "Formats acceptés : PDF · JPG · PNG · taille max 10 Mo",
+      "analyzingInvoice": "{{fileName}} · vision IA + classification comptable",
+      "confidence": "Confiance {{pct}}%",
+      "newInvoice": "Nouvelle facture",
+      "fournisseur": "Fournisseur",
+      "numeroFacture": "N° facture",
+      "detectedLines": "Lignes détectées",
+      "classification": "Classification IA suggérée",
+      "compteComptable": "Compte comptable",
+      "createExpense": "Créer la dépense",
+      "invoiceMeta": "{{model}} · {{ms}}ms · {{count}} page",
+      "invoiceMeta_plural": "{{model}} · {{ms}}ms · {{count}} pages",
+      "budgetDone": "Suggestions générées · variation globale {{variation}}",
+      "budgetError": "Échec de la suggestion",
+      "budgetEmptyTitle": "Suggestions de budget IA",
+      "budgetEmptyDesc": "L'IA analyse vos dépenses des 2 derniers exercices, l'inflation marocaine et vos contrats en cours pour proposer un budget prévisionnel ligne par ligne avec justification.",
+      "exerciceCible": "Exercice cible",
+      "generateSuggestions": "Générer les suggestions",
+      "budgetNMinus1": "Budget N-1",
+      "suggestionBudget": "Suggestion IA — Budget {{n}}",
+      "variationGlobale": "Variation globale",
+      "hypotheses": "Hypothèses retenues par l'IA",
+      "colCompte": "Compte",
+      "colRealise": "Réalisé N-1",
+      "colSuggere": "Suggéré {{n}}",
+      "colJustif": "Justification IA",
+      "colConf": "Conf.",
+      "regenerate": "Régénérer",
+      "applyBudget": "Appliquer au budget {{n}}",
+      "budgetMeta": "{{model}} · {{ms}}ms · {{tokens}} tokens"
+    },
+    "annexes": {
+      "complementaires": "Annexes complémentaires",
+      "regenerate": "Régénérer",
+      "downloaded": "Annexe {{num}} téléchargée",
+      "obligatoires": "Annexes obligatoires",
+      "exerciceClos": "Exercice clos le 31 décembre {{year}}",
+      "title": "Annexes Comptables",
+      "subtitle": "Annexes réglementaires selon le Décret 2.23.700",
+      "regimeSimplifie": "Régime simplifié (≤ 200 000 MAD/an)",
+      "regimeNormal": "Régime normal"
+    },
+    "layout": {
+      "deleteNotif": "Supprimer cette notification",
+      "closeMenu": "Fermer le menu",
+      "openMenu": "Ouvrir le menu"
+    },
+    "conformite": {
+      "timeline": "Chronologie des phases",
+      "exerciceLabel": "Exercice {{n}}",
+      "phaseLabel": {
+        "operations_mensuelles": "Opérations mensuelles",
+        "cloture_exercice": "Clôture d'exercice",
+        "preparation_ag": "Préparation de l'AG",
+        "archivage": "Archivage"
+      },
+      "phaseDesc": {
+        "operations_mensuelles": "Appels de fonds, encaissements et dépenses du mois.",
+        "cloture_exercice": "Arrêté des comptes et préparation des annexes comptables.",
+        "preparation_ag": "Convocation de l'assemblée générale (délai légal 15 j, loi 18-00) et documents à présenter.",
+        "archivage": "Conservation légale des pièces et procès-verbaux."
+      },
+      "agLink": "Gérer les assemblées",
+      "phaseStatut": {
+        "pending": "À faire",
+        "in_progress": "En cours",
+        "done": "Terminé",
+        "skipped": "Ignoré",
+        "overdue": "En retard"
+      },
+      "title": "Calendrier de conformité",
+      "subtitle": "Cycle annuel de conformité — Décret 2.23.700"
+    },
+    "autres": {
+      "newRecette": "Nouvelle recette"
+    },
+    "rappels": {
+      "title": "Rappels",
+      "subtitle": "Configurez les rappels automatiques de paiement. Chaque message suit la langue préférée du résident.",
+      "lots": "lots",
+      "residents": "résidents",
+      "totalDu": "total dû",
+      "autoTitle": "Rappels automatiques",
+      "autoDesc": "Envoyez automatiquement les rappels programmés. Les notifications push sont toujours utilisées ; les autres canaux suivent votre configuration.",
+      "enabled": "Activé",
+      "disabled": "Désactivé",
+      "nextRun": "Prochaine exécution",
+      "never": "—",
+      "sendAll": "Tout envoyer maintenant",
+      "toastEnabled": "Rappels automatiques activés",
+      "toastDisabled": "Rappels automatiques désactivés",
+      "toastSentAll": "{{n}} rappel(s) mis en file d'envoi",
+      "toastConfigSaved": "Configuration enregistrée",
+      "toastStageSent": "Rappel « {{stage}} » envoyé à {{n}} résident(s)",
+      "toastTest": "Message de test envoyé",
+      "kpiDeliveryRate": "Taux de livraison",
+      "kpiDelivered": "Livré avec succès",
+      "kpiFailed": "Non livré",
+      "kpiSentMonth": "Envoyés ce mois",
+      "timelineTitle": "Chronologie des rappels",
+      "timelineSubtitle": "Configurez le calendrier des relances",
+      "globalSettings": "Paramètres globaux",
+      "pushNote": "Tous les rappels partent toujours en notification push. Les canaux externes sont optionnels.",
+      "appliesAll": "Les paramètres de rappel s'appliquent à tous vos immeubles",
+      "remaining": "{{n}}/{{max}} envois manuels restants",
+      "stageJ3": "3 jours avant l'échéance",
+      "stageJ2": "2 jours avant l'échéance",
+      "stageJ1": "1 jour avant l'échéance",
+      "stageJourJ": "Le jour de l'échéance",
+      "stageRetard": "En retard (rappels quotidiens)",
+      "stageDescJ3": "Rappel doux envoyé aux résidents qui n'ont pas encore réglé.",
+      "stageDescJ2": "Rappel de suivi pour les résidents toujours en attente.",
+      "stageDescJ1": "Rappel urgent la veille de l'échéance.",
+      "stageDescJourJ": "Rappel final le jour de l'échéance.",
+      "stageDescRetard": "Rappels quotidiens jusqu'à réception du paiement.",
+      "pushAlways": "Notification push",
+      "pushAlwaysHint": "Toujours envoyée via l'application",
+      "extraChannels": "Canaux supplémentaires",
+      "send": "Envoyer",
+      "pendingCount": "{{n}} en attente",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "sms": "SMS",
+      "free": "Gratuit",
+      "previewTitle": "Aperçu",
+      "active": "Actif",
+      "activeDesc": "Les rappels sont actifs. Les messages partent automatiquement selon le planning.",
+      "alwaysActive": "Toujours actif",
+      "test": "Test",
+      "emailSubject": "Sujet",
+      "langTitle": "Langue personnalisée",
+      "langDesc": "Chaque rappel est envoyé dans la langue préférée du résident.",
+      "recentTitle": "Rappels récents",
+      "recentSubtitle": "Historique des rappels envoyés aux résidents",
+      "recentEmpty": "Aucun rappel envoyé pour le moment",
+      "recentEmptyDesc": "L'historique des rappels apparaîtra ici.",
+      "colResident": "Résident",
+      "colChannel": "Canal",
+      "colTrigger": "Déclencheur",
+      "statusDelivered": "Livré",
+      "statusFailed": "Échec",
+      "statusPending": "En attente",
+      "statusSent": "Envoyé",
+      "triggerAuto": "Automatique",
+      "triggerManual": "Manuel",
+      "howTitle": "Comment fonctionnent les rappels",
+      "howDaily": "Programme quotidien",
+      "howDailyDesc": "Rappels automatiques envoyés à {{hour}}h00 chaque jour.",
+      "howOverdue": "Fréquence des retards",
+      "howOverdueDesc": "Envoyés quotidiennement jusqu'à réception du paiement (max {{n}} jours).",
+      "howLimits": "Limites quotidiennes",
+      "howLimitsDesc": "{{max}} envois manuels par jour — automatiques illimités.",
+      "howMultilang": "Multi-langue",
+      "howMultilangDesc": "{{n}} langues prises en charge.",
+      "selectResidence": "Sélectionner une résidence",
+      "colDate": "Date",
+      "colType": "Type",
+      "colStatus": "Statut"
+    },
+    "visites": {
+      "title": "Visites",
+      "subtitle": "Suivi des visiteurs, livreurs et prestataires via QR code à usage unique",
+      "newVisite": "Nouvelle visite",
+      "scanQr": "Scanner un QR",
+      "kpiToday": "Visites aujourd'hui",
+      "kpiInside": "Actuellement à l'intérieur",
+      "kpiPlanned": "À venir",
+      "kpiExpired": "Expirées (24h)",
+      "selectResidence": "Sélectionner une résidence",
+      "allResidences": "Toutes les résidences",
+      "filterStatus": "Statut",
+      "filterType": "Type",
+      "filterAll": "Tous",
+      "type": {
+        "visitor": "Visiteur",
+        "delivery": "Livraison",
+        "contractor": "Intervenant",
+        "prestataire": "Prestataire"
+      },
+      "status": {
+        "planned": "Planifiée",
+        "arrived": "À l'intérieur",
+        "departed": "Sortie",
+        "expired": "Expirée",
+        "cancelled": "Annulée"
+      },
+      "colVisitor": "Visiteur",
+      "colType": "Type",
+      "colHost": "Hôte",
+      "colPlanned": "Prévue",
+      "colArrived": "Entrée",
+      "colLeft": "Sortie",
+      "colStatus": "Statut",
+      "colActions": "Actions",
+      "empty": "Aucune visite enregistrée",
+      "emptyDesc": "Créez une nouvelle visite pour générer un QR code à transmettre au visiteur.",
+      "form": {
+        "title": "Nouvelle visite",
+        "desc": "Génère un QR code à usage unique. Le visiteur reçoit un lien à scanner à l'entrée.",
+        "visitorName": "Nom du visiteur",
+        "visitorNamePlaceholder": "Ex: Ahmed Ouazzani",
+        "visitorPhone": "Téléphone",
+        "phonePlaceholder": "+212 6XX XX XX XX",
+        "type": "Type de visite",
+        "purpose": "Motif",
+        "purposePlaceholder": "Ex: Visite familiale, livraison Glovo, intervention plombier",
+        "host": "Lot hôte (optionnel)",
+        "hostPlaceholder": "Sélectionner un lot",
+        "plannedAt": "Date et heure prévues",
+        "plannedAtHint": "Laisser vide pour une visite immédiate (walk-in)",
+        "submit": "Créer & générer QR",
+        "submitting": "Création…",
+        "validationName": "Nom requis",
+        "validationPhone": "Téléphone requis",
+        "recurring": "Pass récurrent (prestataire régulier)",
+        "recurringHint": "QR réutilisable — pour un prestataire qui revient régulièrement (ménage hebdo, jardinier, etc.)",
+        "recurrence": "Périodicité",
+        "recurrencePlaceholder": "Mardi & vendredi · 9h-12h"
+      },
+      "detail": {
+        "title": "Détail de la visite",
+        "qrLabel": "QR de la visite",
+        "qrHint": "À scanner par le gardien à l'entrée / sortie",
+        "linkLabel": "Lien public",
+        "linkCopied": "Lien copié",
+        "copyLink": "Copier le lien",
+        "shareWa": "Partager par WhatsApp",
+        "shareSms": "Partager par SMS",
+        "waMessage": "Bonjour {{name}}, votre laissez-passer Imaro est prêt : {{url}}",
+        "createdBy": "Créé par {{name}}",
+        "createdOn": "Créé le {{date}}",
+        "cancel": "Annuler la visite",
+        "cancelConfirm": "Annuler cette visite ?",
+        "cancelled": "Visite annulée",
+        "scanCheckIn": "Marquer entrée",
+        "scanCheckOut": "Marquer sortie",
+        "alreadyCheckedIn": "Entrée déjà enregistrée",
+        "alreadyCheckedOut": "Visite terminée",
+        "recurringBadge": "Pass récurrent",
+        "recurrenceLabel": "Périodicité",
+        "photoCaptured": "Photo capturée à l'entrée"
+      },
+      "scan": {
+        "title": "Scanner le QR",
+        "desc": "Placez le QR du visiteur devant la caméra ou collez le token manuellement.",
+        "manualToken": "Token QR",
+        "manualPlaceholder": "vst_xxxxxxxxxxx",
+        "manualSubmit": "Valider le scan",
+        "cameraDenied": "Accès caméra refusé. Saisissez le token manuellement.",
+        "cameraNotSupported": "Caméra non disponible sur cet appareil.",
+        "successCheckIn": "{{name}} a été enregistré(e) à l'entrée",
+        "successCheckOut": "Sortie de {{name}} enregistrée",
+        "rejected": "QR invalide ou expiré"
+      },
+      "create": {
+        "success": "Visite créée — QR généré"
+      }
+    },
+    "aiChat": {
+      "fabLabel": "Assistant",
+      "title": "Assistant Imaro",
+      "subtitle": "Loi 18-00 · Décret 2.23.700",
+      "placeholder": "Posez votre question…",
+      "welcome": "Bonjour ! Je suis l'assistant Imaro. Je peux répondre à vos questions sur la gestion de copropriété, la comptabilité et vous citer les articles de la **Loi 18-00** et du **Décret 2.23.700**.",
+      "disclaimer": "L'IA ne remplace pas un conseil juridique professionnel.",
+      "send": "Envoyer",
+      "thinking": "Analyse en cours…",
+      "errorMsg": "Une erreur s'est produite. Réessayez.",
+      "clearChat": "Nouvelle conversation",
+      "poweredBy": "Propulsé par Claude",
+      "you": "Vous",
+      "legalRef": "Référence légale",
+      "suggestions": {
+        "s1": "Comment calculer les pénalités de retard ?",
+        "s2": "Quelles annexes dois-je générer ?",
+        "s3": "Quel est le délai légal de convocation d'une AG ?",
+        "s4": "Comment clôturer l'exercice comptable ?"
+      }
+    }
+  },
+  "onboarding": {
+    "eyebrow": "Configuration",
+    "welcomeTitle": "Bienvenue, {{name}} 👋",
+    "continue": "Continuer",
+    "back": "Retour",
+    "later": "Plus tard",
+    "team": {
+      "title": "Votre équipe",
+      "intro": "Gérez-vous seul votre syndic, ou souhaitez-vous ajouter un gestionnaire à votre équipe ?",
+      "selfTitle": "Je gère moi-même",
+      "selfDesc": "Vous serez le seul à accéder à l'espace pour l'instant.",
+      "addTitle": "Ajouter un gestionnaire",
+      "addDesc": "Invitez un collaborateur avec un accès dédié.",
+      "name": "Nom complet",
+      "namePlaceholder": "Karim Idrissi",
+      "email": "Email",
+      "hint": "Un mot de passe temporaire lui sera envoyé ; il le changera à sa première connexion.",
+      "required": "Renseignez le nom et l'email du gestionnaire.",
+      "created": "Gestionnaire créé",
+      "error": "Impossible de créer le gestionnaire.",
+      "credentialsTitle": "Gestionnaire créé",
+      "copy": "Copier les identifiants",
+      "copied": "Identifiants copiés",
+      "credentialsHint": "Communiquez ces identifiants au gestionnaire. Il changera son mot de passe à sa première connexion."
+    },
+    "residence": {
+      "title": "Votre première résidence",
+      "intro": "Créons la résidence que vous gérez. Vous pourrez en ajouter d'autres ensuite.",
+      "name": "Nom de la résidence",
+      "namePlaceholder": "Résidence Al Majd",
+      "address": "Adresse",
+      "city": "Ville",
+      "echeance": "Jour d'échéance",
+      "required": "Nom, adresse et ville sont requis.",
+      "error": "Impossible de créer la résidence."
+    },
+    "lots": {
+      "title": "Les lots de la résidence",
+      "intro": "Générez les lots en une fois. Vous pourrez les modifier individuellement après.",
+      "count": "Nombre de lots",
+      "start": "Numéro de départ",
+      "type": "Type de lot",
+      "types": {
+        "appartement": "Appartement",
+        "commerce": "Commerce",
+        "bureau": "Bureau",
+        "parking": "Parking",
+        "villa": "Villa"
+      },
+      "preview": "Aperçu ({{count}} lots)",
+      "advancedHint": "Besoin d'ailes, d'étages ou de tranches ? Configurez-les ensuite sur la fiche résidence.",
+      "generate": "Générer {{count}} lots",
+      "required": "Indiquez au moins un lot à générer.",
+      "error": "Impossible de générer les lots.",
+      "defaultBuilding": "Bâtiment principal"
+    },
+    "done": {
+      "title": "Tout est prêt",
+      "heading": "{{name}} est configurée 🎉",
+      "body": "{{count}} lots créés. Voici les prochaines étapes pour compléter votre dossier :",
+      "next": {
+        "copros": "Ajouter les copropriétaires et leurs lots",
+        "banque": "Renseigner le RIB d'encaissement",
+        "budget": "Définir le budget et les appels de fonds"
+      },
+      "cta": "Continuer vers la résidence"
+    },
+    "checklist": {
+      "title": "Terminez votre configuration",
+      "subtitle": "Quelques étapes pour rendre votre espace pleinement opérationnel.",
+      "progress": "{{done}} sur {{total}} étapes",
+      "step": {
+        "residence": "Créer une résidence",
+        "lots": "Ajouter des lots",
+        "copros": "Inviter les copropriétaires"
+      },
+      "resume": "Reprendre la configuration",
+      "start": "Démarrer la configuration"
+    }
+  },
+  "common": {
+    "residence": "Résidence",
+    "selectResidence": "Sélectionner une résidence",
+    "selectExercice": "Sélectionner un exercice",
+    "select": "Sélectionner",
+    "coproprietaire": "Copropriétaire",
+    "selectCopro": "Choisir un copropriétaire",
+    "tantieme": "Tantième",
+    "libelle": "Libellé",
+    "categorie": "Catégorie",
+    "reference": "Référence",
+    "phone": "Téléphone",
+    "periode": "Période",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "paye": "Payé",
+    "societe": "Société",
+    "methode": "Méthode",
+    "amount": "Montant",
+    "designation": "Désignation",
+    "createError": "Erreur lors de la création",
+    "updateError": "Erreur lors de la mise à jour",
+    "deleteError": "Erreur lors de la suppression",
+    "saved": "Enregistré",
+    "created": "Créé",
+    "updated": "Mis à jour",
+    "deleted": "Supprimé",
+    "copied": "Copié !",
+    "error": "Erreur",
+    "debit": "Débit",
+    "credit": "Crédit",
+    "libelleRequired": "Libellé requis",
+    "cheque": "Chèque",
+    "especes": "Espèces",
+    "severity": "Sévérité",
+    "amountDue": "Montant dû",
+    "view": "Voir",
+    "type": "Type",
+    "date": "Date",
+    "name": "Nom",
+    "status": "Statut",
+    "choose": "Choisir",
+    "description": "Description",
+    "actions": "Actions",
+    "create": "Créer",
+    "update": "Mettre à jour",
+    "prestataire": "Prestataire",
+    "email": "Email",
+    "etage": "Étage",
+    "superficie": "Superficie (m²)",
+    "numero": "Numéro",
+    "createFailed": "Échec de la création",
+    "updateFailed": "Échec de la mise à jour",
+    "deleteFailed": "Échec de la suppression",
+    "nameRequired": "Nom requis",
+    "lotRequired": "Lot requis",
+    "lot": "Lot",
+    "total": "Total",
+    "montantMad": "Montant (MAD)",
+    "du": "Du",
+    "exportInProgress": "Export en cours...",
+    "saveError": "Erreur lors de l'enregistrement",
+    "nouveau": "Nouveau",
+    "amountPositive": "Montant > 0",
+    "searchPlaceholder": "Rechercher...",
+    "echeance": "Échéance",
+    "appelDeFonds": "Appel de fonds",
+    "chooseLanguage": "Choisir la langue",
+    "exercice": "Exercice",
+    "titre": "Titre",
+    "virement": "Virement",
+    "compte": "Compte",
+    "recouvre": "Recouvré",
+    "restant": "Restant",
+    "rapproche": "Rapproché",
+    "recu": "Reçu",
+    "dateDeclaration": "Date déclaration",
+    "justificatif": "Justificatif",
+    "montantTotal": "Montant total",
+    "solde": "Solde",
+    "soldeD": "Solde D",
+    "soldeC": "Solde C",
+    "piece": "Pièce",
+    "action": "Action",
+    "chargement": "Chargement…",
+    "loi1800Art25": "Loi 18-00 · Art. 25",
+    "lotsEnRetard": "Lots en retard",
+    "origine": "Origine",
+    "horodatage": "Horodatage",
+    "cible": "Cible",
+    "erreurs": "Erreurs",
+    "actualiser": "Actualiser",
+    "toutes": "Toutes",
+    "payeur": "Payeur",
+    "motif": "Motif",
+    "demande": "Demande",
+    "initial": "Initial",
+    "organisme": "Organisme",
+    "mensualite": "Mensualité",
+    "media": {
+      "playVideo": "Lire la vidéo",
+      "viewImage": "Voir l'image"
+    }
+  },
+  "public": {
+    "visitorPass": {
+      "title": "Laissez-passer visiteur",
+      "subtitle": "Imaro · accès copropriété",
+      "showAtEntrance": "Présentez ce QR à l'entrée",
+      "scanByGuardian": "Le gardien le scanne à votre arrivée et à votre départ",
+      "visitor": "Visiteur",
+      "host": "Hôte",
+      "scheduled": "Prévue",
+      "purpose": "Motif",
+      "expiresAfterScan": "Code à usage unique — expire après le scan de sortie",
+      "notFound": "Laissez-passer introuvable",
+      "notFoundDesc": "Ce lien est invalide, déjà utilisé ou expiré.",
+      "saveToPhone": "Enregistrer ce QR",
+      "contactHost": "Contacter l'hôte",
+      "statusPlanned": "En attente d'arrivée",
+      "statusArrived": "Entré · en cours de visite",
+      "statusDeparted": "Visite terminée",
+      "statusExpired": "Lien expiré",
+      "statusCancelled": "Visite annulée",
+      "addToAppleWallet": "Ajouter à Apple Wallet",
+      "addToGoogleWallet": "Ajouter à Google Wallet",
+      "recurringPass": "Pass récurrent"
+    },
+    "confidentialite": {
+      "title": "Politique de confidentialité",
+      "brand": "Imaro",
+      "updated": "Dernière mise à jour : 18 juin 2026",
+      "intro": "La présente politique décrit comment l’application Imaro collecte, utilise et protège vos données personnelles, conformément à la loi marocaine 09-08 relative à la protection des personnes physiques à l’égard du traitement des données à caractère personnel.",
+      "back": "Retour",
+      "sections": [
+        {
+          "h": "1. Responsable du traitement",
+          "p": [
+            "Imaro édite et exploite l’application de gestion de copropriété « Imaro ».",
+            "Pour toute question relative à vos données : contact@imaro.ma — https://imaro.ma."
+          ]
+        },
+        {
+          "h": "2. Données que nous collectons",
+          "p": [
+            "Données d’identité : nom, prénom, numéro de téléphone, adresse e-mail.",
+            "Données de copropriété : lot, résidence, tantièmes, soldes et historique de paiements.",
+            "Données techniques : modèle d’appareil, système, journaux de connexion et identifiants de session.",
+            "Données biométriques : Face ID / Touch ID / empreinte sont gérées localement par votre appareil (iOS/Android) ; Imaro ne reçoit ni ne stocke jamais vos données biométriques.",
+            "Photos et QR codes : photos de visiteurs et QR d’accès, lorsque vous utilisez ces fonctionnalités."
+          ]
+        },
+        {
+          "h": "3. Finalités du traitement",
+          "p": [
+            "Gérer votre copropriété (appels de fonds, charges, réclamations, assemblées).",
+            "Vous authentifier et sécuriser l’accès à votre espace.",
+            "Vous envoyer des notifications utiles (paiements, annonces, accès visiteurs).",
+            "Faciliter les paiements en ligne et la gestion des accès."
+          ]
+        },
+        {
+          "h": "4. Base légale",
+          "p": [
+            "Exécution du contrat de syndic et de la relation de copropriété.",
+            "Votre consentement, pour les fonctionnalités optionnelles (biométrie, notifications).",
+            "Le respect d’obligations légales, notamment comptables (loi 18-00 relative à la copropriété)."
+          ]
+        },
+        {
+          "h": "5. Destinataires des données",
+          "p": [
+            "Votre syndic / gestionnaire de copropriété.",
+            "Nos prestataires techniques (hébergement, envoi WhatsApp/SMS, prestataires de paiement), strictement pour fournir le service.",
+            "Imaro ne vend ni ne loue jamais vos données personnelles à des tiers."
+          ]
+        },
+        {
+          "h": "6. Stockage local et sécurité",
+          "p": [
+            "Votre jeton d’authentification est stocké de façon sécurisée dans le Trousseau (Keychain) iOS ou le Keystore Android.",
+            "Les échanges avec nos serveurs sont chiffrés via HTTPS.",
+            "La vérification biométrique est effectuée localement par votre appareil."
+          ]
+        },
+        {
+          "h": "7. Durée de conservation",
+          "p": [
+            "Vos données sont conservées pendant la durée de la relation de copropriété, puis pendant les durées imposées par les obligations légales et comptables applicables."
+          ]
+        },
+        {
+          "h": "8. Vos droits (loi 09-08)",
+          "p": [
+            "Vous disposez d’un droit d’accès, de rectification, d’opposition et de suppression de vos données.",
+            "Pour exercer ces droits : contact@imaro.ma.",
+            "Vous pouvez également saisir la Commission Nationale de contrôle de la protection des Données à caractère Personnel (CNDP) — https://www.cndp.ma."
+          ]
+        },
+        {
+          "h": "9. Appareil photo et photos",
+          "p": [
+            "L’appareil photo n’est utilisé que pour scanner les QR codes d’accès et photographier les visiteurs, à votre initiative. Aucune image n’est capturée sans action de votre part."
+          ]
+        },
+        {
+          "h": "10. Notifications push",
+          "p": [
+            "Les notifications sont facultatives et soumises à votre autorisation. Vous pouvez les désactiver à tout moment dans les réglages de votre appareil."
+          ]
+        },
+        {
+          "h": "11. Mineurs",
+          "p": [
+            "L’application s’adresse aux copropriétaires et n’est pas destinée aux personnes mineures."
+          ]
+        },
+        {
+          "h": "12. Modifications",
+          "p": [
+            "Cette politique peut être mise à jour. Toute modification sera publiée sur cette page avec une nouvelle date de mise à jour."
+          ]
+        },
+        {
+          "h": "13. Contact",
+          "p": ["Pour toute question : contact@imaro.ma."]
+        }
+      ]
+    }
+  },
+  "gardien": {
+    "title": "Mode gardien",
+    "subtitle": "Scan QR à l'entrée · sortie · walk-in",
+    "hint": "Pointez la caméra vers le QR du visiteur",
+    "scanAction": "Scanner un QR",
+    "walkInAction": "Walk-in (visiteur sans QR)",
+    "activeCount": "{{n}} à l'intérieur",
+    "activeCountZero": "Personne à l'intérieur",
+    "activeListTitle": "Visiteurs actuellement à l'intérieur",
+    "since": "depuis {{time}}",
+    "logout": "Se déconnecter du mode gardien",
+    "scanResult": {
+      "checkInTitle": "Entrée enregistrée",
+      "checkOutTitle": "Sortie enregistrée",
+      "rejectedTitle": "QR refusé",
+      "reason": {
+        "too_early": "Trop tôt — hors de la fenêtre d'arrivée prévue",
+        "expired": "Laissez-passer expiré",
+        "cancelled": "Laissez-passer annulé",
+        "already_departed": "Visiteur déjà sorti",
+        "unknown": "QR inconnu ou expiré",
+        "network": "Échec réseau — réessayez"
+      },
+      "newScan": "Nouveau scan",
+      "manualCheckOut": "Forcer la sortie"
+    },
+    "scanner": {
+      "starting": "Démarrage de la caméra…",
+      "permissionNeeded": "Autorisation caméra requise",
+      "permissionDesc": "Imaro a besoin d'accéder à la caméra pour scanner les QR codes.",
+      "permissionAllow": "Autoriser la caméra",
+      "noCamera": "Aucune caméra détectée sur cet appareil.",
+      "manualEntry": "Saisir manuellement",
+      "switchCamera": "Caméra alternative",
+      "scanFromImage": "Charger depuis une image",
+      "cancelScan": "Annuler"
+    },
+    "walkIn": {
+      "title": "Walk-in visiteur",
+      "desc": "Enregistrer immédiatement un visiteur sans QR pré-généré.",
+      "submit": "Enregistrer & marquer entrée",
+      "submitting": "Enregistrement…",
+      "success": "{{name}} enregistré(e) à l'entrée"
+    },
+    "guard": {
+      "notLoggedIn": "Connectez-vous pour accéder au mode gardien",
+      "goToLogin": "Aller au login",
+      "wrongRole": "Votre compte n'a pas le rôle gardien. Contactez le gestionnaire."
+    },
+    "photo": {
+      "title": "Photo du visiteur",
+      "desc": "Capturez une photo pour l'audit de sécurité (recommandé).",
+      "capture": "Prendre la photo",
+      "retake": "Reprendre",
+      "skip": "Ignorer",
+      "confirm": "Confirmer l'entrée",
+      "starting": "Activation caméra…",
+      "permissionDenied": "Caméra refusée — photo ignorée",
+      "uploaded": "Photo enregistrée",
+      "skipped": "Entrée enregistrée sans photo"
+    },
+    "install": {
+      "title": "Installer Imaro Gardien",
+      "desc": "Ajoutez à l'écran d'accueil pour un accès rapide hors-ligne.",
+      "install": "Installer",
+      "later": "Plus tard"
+    }
+  },
+  "errors": {
+    "title": "Une erreur est survenue",
+    "message": "Quelque chose s'est mal passé. Réessayez en rechargeant la page.",
+    "reload": "Recharger"
+  }
+}

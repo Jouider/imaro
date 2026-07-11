@@ -1,0 +1,94 @@
+<?php
+
+namespace App\Http\Controllers\Api\Gestionnaire;
+
+use App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
+use App\Http\Controllers\Controller;
+use App\Models\Exercice;
+use App\Models\Residence;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
+class ExerciceController extends Controller
+{
+    use AuthorizesResidence;
+
+    public function index(Request $request, Residence $residence): JsonResponse
+    {
+        $this->authorizeResidence($request, $residence);
+
+        $exercices = $residence->exercices()
+            ->orderByDesc('annee')
+            ->get()
+            ->map(fn ($e) => [
+                'id' => $e->id,
+                'residence_id' => $e->residence_id,
+                'annee' => $e->annee,
+                'statut' => $e->statut,                        // 'actif' | 'cloture'
+                'date_debut' => $e->date_debut?->toDateString(),
+                'date_fin' => $e->date_fin?->toDateString(),
+            ]);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $exercices,
+        ]);
+    }
+
+    public function store(Request $request, Residence $residence): JsonResponse
+    {
+        $this->authorizeResidence($request, $residence);
+
+        $data = $request->validate([
+            'annee' => 'required|integer|min:2000|max:2100',
+            // KAN-95 : dates optionnelles → si absentes, fenêtre 12 mois glissants
+            // calculée depuis la date d'anniversaire de la résidence (sinon 1er janvier).
+            'date_debut' => 'nullable|date',
+            'date_fin' => 'nullable|date|after:date_debut',
+        ]);
+
+        if ($residence->exercices()->where('annee', $data['annee'])->exists()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Un exercice {$data['annee']} existe déjà pour cette résidence.",
+            ], 422);
+        }
+
+        [$debut, $fin] = $residence->exerciceWindow($data['annee']);
+
+        $exercice = $residence->exercices()->create([
+            'tenant_id' => $residence->tenant_id,
+            'annee' => $data['annee'],
+            'date_debut' => $data['date_debut'] ?? $debut,
+            'date_fin' => $data['date_fin'] ?? $fin,
+            'statut' => 'actif',
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => "Exercice {$exercice->annee} créé.",
+            'data' => $exercice,
+        ], 201);
+    }
+
+    public function cloture(Request $request, Residence $residence, Exercice $exercice): JsonResponse
+    {
+        $this->authorizeResidence($request, $residence);
+        abort_if($exercice->residence_id !== $residence->id, 404);
+
+        if ($exercice->statut !== 'actif') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Seul un exercice actif peut être clôturé.',
+            ], 422);
+        }
+
+        $exercice->update(['statut' => 'cloture']);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => "Exercice {$exercice->annee} clôturé.",
+            'data' => $exercice,
+        ]);
+    }
+}

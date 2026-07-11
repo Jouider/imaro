@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Annonce extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'tenant_id', 'residence_id', 'created_by',
+        'titre', 'contenu', 'media', 'priorite', 'statut', 'publiee_at',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'publiee_at' => 'datetime',
+            'media' => 'array',
+        ];
+    }
+
+    public function residence(): BelongsTo
+    {
+        return $this->belongsTo(Residence::class);
+    }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /** Likes « j'aime » des résidents (KAN-96). */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(AnnonceLike::class);
+    }
+}
