@@ -65,6 +65,7 @@ import {
 import { useMutation } from '@tanstack/react-query'
 import { CommandPalette } from '@/components/gestionnaire/CommandPalette'
 import { AiChatFab } from '@/components/gestionnaire/AiChatFab'
+import { AI_FEATURES_ENABLED } from '@/lib/features'
 import { ResidenceSwitcher } from '@/components/gestionnaire/ResidenceSwitcher'
 import { canAccessRoute } from '@/lib/navAccess'
 import { cn } from '@/lib/utils'
@@ -95,11 +96,16 @@ const NAV_SECTIONS: NavSection[] = [
         icon: <LayoutDashboard className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.dashboard',
       },
-      {
-        to: '/gestionnaire/ia',
-        icon: <Sparkles className="size-[18px]" aria-hidden="true" />,
-        labelKey: 'gestionnaire.nav.ia',
-      },
+      // IA masquée temporairement (KAN-111)
+      ...(AI_FEATURES_ENABLED
+        ? [
+            {
+              to: '/gestionnaire/ia',
+              icon: <Sparkles className="size-[18px]" aria-hidden="true" />,
+              labelKey: 'gestionnaire.nav.ia',
+            },
+          ]
+        : []),
     ],
   },
   {
@@ -763,8 +769,8 @@ export function GestionnaireLayout() {
       {/* Global Command Palette (Cmd+K) */}
       <CommandPalette />
 
-      {/* Floating AI assistant (KAN-53) */}
-      <AiChatFab />
+      {/* Floating AI assistant (KAN-53) — masqué temporairement (KAN-111) */}
+      {AI_FEATURES_ENABLED && <AiChatFab />}
 
       {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 start-0 hidden w-[240px] lg:block shadow-xl shadow-black/10">

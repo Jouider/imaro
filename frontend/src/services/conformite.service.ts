@@ -682,11 +682,7 @@ export async function sendMiseEnDemeure(
 
 // ─── Occupants (Art. 11 Loi 18-00) ────────────────────────────────────────────
 
-export type OccupantType =
-  | 'proprietaire_occupant'
-  | 'locataire'
-  | 'usufruitier'
-  | 'autre'
+export type OccupantType = 'proprietaire_occupant' | 'usufruitier' | 'autre'
 
 export type Occupant = {
   id: number
@@ -719,7 +715,7 @@ const MOCK_OCCUPANTS: Occupant[] = [
     lot_id: 2,
     nom: 'Mohammed Tazi',
     telephone: '+212600000020',
-    type: 'locataire',
+    type: 'usufruitier',
     date_debut: '2024-09-01',
     date_fin: '2026-08-31',
   },

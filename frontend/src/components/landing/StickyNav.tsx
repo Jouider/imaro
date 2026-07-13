@@ -29,7 +29,6 @@ export function StickyNav() {
 
   const links: NavLink[] = [
     { href: '#modules', label: t('landing.nav.features') },
-    { href: '#ia', label: t('landing.nav.ia') },
     { href: '#conformite', label: t('landing.nav.conformite') },
     { href: '#pricing', label: t('landing.nav.pricing') },
     { href: '#faq', label: t('landing.nav.faq') },

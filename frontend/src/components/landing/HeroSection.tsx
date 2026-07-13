@@ -354,13 +354,6 @@ function HeroMockup() {
       <div className="mb-2.5 grid grid-cols-3 gap-1.5">
         {[
           {
-            label: 'IA',
-            stat: '87/100',
-            sub: 'Score',
-            color: 'from-violet-500 to-violet-600',
-            pulse: true,
-          },
-          {
             label: 'Conformité',
             stat: '11/12',
             sub: 'Tâches',
@@ -402,9 +395,6 @@ function HeroMockup() {
               {m.stat}
             </p>
             <p className="text-[7px] opacity-70">{m.sub}</p>
-            {m.pulse && (
-              <span className="l-pulse-ring absolute right-1 top-1 size-1.5 rounded-full bg-white" />
-            )}
           </div>
         ))}
       </div>

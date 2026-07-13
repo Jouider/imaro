@@ -1379,7 +1379,9 @@
       "addLotError": "Erreur lors de l'ajout du lot",
       "modifyError": "Erreur lors de la modification",
       "delete": {
-        "intro": "La suppression d'une résidence est définitive et efface ses lots, copropriétaires et écritures. Pour des raisons de sécurité, un code de validation va vous être envoyé.",
+        "intro": "La suppression d'une résidence est définitive et efface ses lots, copropriétaires et écritures. Pour éviter toute suppression par erreur, saisissez le nom exact de la résidence ci-dessous.",
+        "typeToConfirm": "Pour confirmer, saisissez le nom de la résidence :",
+        "error": "Échec de la suppression. Veuillez réessayer.",
         "sendCode": "Envoyer le code",
         "codeSent": "Code de validation envoyé",
         "codeError": "Échec de l'envoi du code",
@@ -2875,12 +2877,11 @@
     },
     "occupants": {
       "title": "Occupants",
-      "subtitle": "Registre des occupants par lot — propriétaires, locataires, usufruitiers",
+      "subtitle": "Registre des occupants par lot — propriétaires occupants, usufruitiers",
       "toastAdded": "Occupant ajouté",
       "toastUpdated": "Occupant mis à jour",
       "toastDeleted": "Occupant supprimé",
       "kpiOwners": "Propriétaires occupants",
-      "kpiTenants": "Locataires",
       "kpiOthers": "Usufruitiers / autres",
       "bannerTitle": "Art. 11 Loi 18-00",
       "bannerBody": "— Le registre des occupants doit être à jour pour la convocation des AG et la communication des charges. Un seul «propriétaire occupant» actif par lot à la fois.",
@@ -2894,7 +2895,6 @@
       "dateFinOptional": "Date de fin (optionnelle)",
       "type": {
         "proprietaire_occupant": "Propriétaire occupant",
-        "locataire": "Locataire",
         "usufruitier": "Usufruitier",
         "autre": "Autre"
       }

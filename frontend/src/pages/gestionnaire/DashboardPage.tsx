@@ -46,6 +46,7 @@ import {
   type DashboardAssemblee,
 } from '@/services/gestionnaire.service'
 import { formatMontant } from '@/lib/utils'
+import { AI_FEATURES_ENABLED } from '@/lib/features'
 
 function getInitials(name: string): string {
   return name
@@ -482,25 +483,27 @@ export function DashboardPage() {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Assistant IA — featured top-left, gradient */}
-          <button
-            onClick={() => void navigate('/gestionnaire/ia')}
-            className="group relative overflow-hidden rounded-xl border-2 border-purple-300 bg-gradient-to-br from-[var(--color-imaro-primary)] via-[var(--color-imaro-primary)]/90 to-purple-600 p-4 text-left text-white shadow-md transition-all hover:shadow-lg dark:border-purple-900/40"
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex size-9 items-center justify-center rounded-lg bg-white/20 backdrop-blur">
-                <Sparkles className="size-4" />
+          {/* Assistant IA masqué temporairement (KAN-111) */}
+          {AI_FEATURES_ENABLED && (
+            <button
+              onClick={() => void navigate('/gestionnaire/ia')}
+              className="group relative overflow-hidden rounded-xl border-2 border-purple-300 bg-gradient-to-br from-[var(--color-imaro-primary)] via-[var(--color-imaro-primary)]/90 to-purple-600 p-4 text-left text-white shadow-md transition-all hover:shadow-lg dark:border-purple-900/40"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex size-9 items-center justify-center rounded-lg bg-white/20 backdrop-blur">
+                  <Sparkles className="size-4" />
+                </div>
+                <Badge className="border-0 bg-white/20 text-[10px] text-white backdrop-blur">
+                  BETA
+                </Badge>
               </div>
-              <Badge className="border-0 bg-white/20 text-[10px] text-white backdrop-blur">
-                BETA
-              </Badge>
-            </div>
-            <p className="mt-3 text-sm font-bold">Assistant IA</p>
-            <p className="mt-0.5 text-xs text-white/80">
-              {t('gestionnaire.dashboard.iaSubtitle')}
-            </p>
-            <ArrowRight className="absolute bottom-3 right-3 size-4 text-white/60 transition-transform group-hover:translate-x-1" />
-          </button>
+              <p className="mt-3 text-sm font-bold">Assistant IA</p>
+              <p className="mt-0.5 text-xs text-white/80">
+                {t('gestionnaire.dashboard.iaSubtitle')}
+              </p>
+              <ArrowRight className="absolute bottom-3 right-3 size-4 text-white/60 transition-transform group-hover:translate-x-1" />
+            </button>
+          )}
 
           {/* Conformité — progress */}
           <ModuleCard
@@ -731,16 +734,19 @@ export function DashboardPage() {
             <div className="mx-1 hidden h-9 w-px bg-border md:block" />
 
             {/* New shortcuts to Sprint 4-8 modules */}
-            <Button
-              variant="outline"
-              className="gap-2"
-              onClick={() => void navigate('/gestionnaire/ia')}
-            >
-              <Sparkles className="size-4 text-purple-600" />
-              {t('gestionnaire.dashboard.actions.iaAudit', {
-                defaultValue: 'Audit IA',
-              })}
-            </Button>
+            {/* Audit IA masqué temporairement (KAN-111) */}
+            {AI_FEATURES_ENABLED && (
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={() => void navigate('/gestionnaire/ia')}
+              >
+                <Sparkles className="size-4 text-purple-600" />
+                {t('gestionnaire.dashboard.actions.iaAudit', {
+                  defaultValue: 'Audit IA',
+                })}
+              </Button>
+            )}
             <Button
               variant="outline"
               className="gap-2"

@@ -1347,7 +1347,9 @@
       "addLotError": "Error adding the unit",
       "modifyError": "Error during update",
       "delete": {
-        "intro": "Deleting a building is permanent and erases its units, owners and entries. For security reasons, a validation code will be sent to you.",
+        "intro": "Deleting a building is permanent and erases its units, owners and entries. To prevent accidental deletion, type the building's exact name below.",
+        "typeToConfirm": "To confirm, type the building name:",
+        "error": "Deletion failed. Please try again.",
         "sendCode": "Send the code",
         "codeSent": "Validation code sent",
         "codeError": "Failed to send the code",
@@ -2780,12 +2782,11 @@
     },
     "occupants": {
       "title": "Occupants",
-      "subtitle": "Register of occupants by unit — owners, tenants, usufructuaries",
+      "subtitle": "Register of occupants by unit — resident owners, usufructuaries",
       "toastAdded": "Occupant added",
       "toastUpdated": "Occupant updated",
       "toastDeleted": "Occupant deleted",
       "kpiOwners": "Resident owners",
-      "kpiTenants": "Tenants",
       "kpiOthers": "Usufructuaries / others",
       "bannerTitle": "Art. 11 Law 18-00",
       "bannerBody": "— The occupant register must be up to date for meeting notices and charge communications. Only one active 'resident owner' per unit at a time.",
@@ -2799,7 +2800,6 @@
       "dateFinOptional": "End date (optional)",
       "type": {
         "proprietaire_occupant": "Resident owner",
-        "locataire": "Tenant",
         "usufruitier": "Usufructuary",
         "autre": "Other"
       }
