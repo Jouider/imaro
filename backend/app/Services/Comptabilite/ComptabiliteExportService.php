@@ -2,6 +2,7 @@
 
 namespace App\Services\Comptabilite;
 
+use App\Models\AutreRecette;
 use App\Models\Depense;
 use App\Models\Exercice;
 use App\Models\Paiement;
@@ -33,6 +34,7 @@ class ComptabiliteExportService
                 'montant' => round($p->montant, 2),
                 'piece' => $p->reference ?? 'PAY-'.$p->id,
                 'exercice_id' => $exercice->id,
+                'type' => 'encaissement',
             ]);
 
             // Chèque rejeté (KAN-85) : contre-passation (annule l'encaissement).
@@ -46,6 +48,7 @@ class ComptabiliteExportService
                     'montant' => round($p->montant, 2),
                     'piece' => 'REJ-'.$p->id,
                     'exercice_id' => $exercice->id,
+                    'type' => 'depense',
                 ]);
             }
         }
@@ -78,6 +81,42 @@ class ComptabiliteExportService
                 'montant' => round($d->montant, 2),
                 'piece' => 'DEP-'.$d->id,
                 'exercice_id' => $exercice->id,
+                'type' => 'depense',
+            ]);
+        }
+
+        // Autres recettes (KAN-130) : encaissement produit → débit banque, crédit
+        // le compte de produit (classe 7) correspondant à la catégorie. La table
+        // porte l'exercice par année (colonne `exercice`), pas par FK.
+        $categorieToProduit = [
+            'location_parking' => '7082',
+            'location_salle' => '7082',
+            'location_antenne' => '7082',
+            'subvention' => '7500',
+            'indemnite_assurance' => '7181',
+            'penalite_retard' => '7111',
+            'produits_financiers' => '7381',
+            'autre' => '7081',
+        ];
+
+        $recettes = AutreRecette::where('residence_id', $exercice->residence_id)
+            ->where('exercice', $exercice->annee)
+            ->orderBy('date')
+            ->get();
+
+        foreach ($recettes as $r) {
+            $compteProduit = $categorieToProduit[$r->categorie] ?? '7081';
+
+            $entries->push([
+                'id' => 'AR'.$r->id,
+                'date' => $r->date->toDateString(),
+                'libelle' => $r->libelle,
+                'compte_debit' => '5121',
+                'compte_credit' => $compteProduit,
+                'montant' => round($r->montant, 2),
+                'piece' => $r->reference ?? 'REC-'.$r->id,
+                'exercice_id' => $exercice->id,
+                'type' => 'encaissement',
             ]);
         }
 
@@ -199,9 +238,9 @@ class ComptabiliteExportService
 
         foreach ($this->rawEntries($exercice) as $e) {
             $num++;
-            $isPaiement = str_starts_with($e['id'], 'P');
-            $journalCode = $isPaiement ? 'BQ' : 'AC';
-            $journalLib = $isPaiement ? 'Banque' : 'Achats';
+            $isBanque = ($e['type'] ?? (str_starts_with($e['id'], 'P') ? 'encaissement' : 'depense')) === 'encaissement';
+            $journalCode = $isBanque ? 'BQ' : 'AC';
+            $journalLib = $isBanque ? 'Banque' : 'Achats';
             $date = str_replace('-', '', $e['date']); // YYYYMMDD
 
             foreach (['compte_debit' => true, 'compte_credit' => false] as $side => $isDebit) {

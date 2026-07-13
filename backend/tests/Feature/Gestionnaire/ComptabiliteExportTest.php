@@ -4,9 +4,11 @@
  * KAN-100 — exports comptables (Journal/Grand-Livre .xlsx, FEC, Journal/Balance PDF).
  */
 
+use App\Models\AutreRecette;
 use App\Models\Coproprietaire;
 use App\Models\Depense;
 use App\Models\Exercice;
+use App\Services\Comptabilite\ComptabiliteExportService;
 use App\Models\Immeuble;
 use App\Models\Lot;
 use App\Models\Paiement;
@@ -80,6 +82,29 @@ it('exporte la Balance en PDF', function () {
     $res = $this->withHeaders($this->auth)->get("{$this->base}/balance.pdf")->assertStatus(200);
     $res->assertHeader('content-type', 'application/pdf');
     expect($res->getContent())->toStartWith('%PDF');
+});
+
+it('intègre une autre recette au journal — débit banque / crédit produit (KAN-130)', function () {
+    AutreRecette::create([
+        'tenant_id' => $this->tenant->id,
+        'residence_id' => $this->residence->id,
+        'exercice' => 2026,
+        'date' => '2026-05-10',
+        'libelle' => 'Location parking visiteurs',
+        'categorie' => 'location_parking',
+        'montant' => 1200,
+        'reference' => 'REC-P1',
+    ]);
+
+    $entries = app(ComptabiliteExportService::class)->rawEntries($this->ex);
+
+    // Le compte 7082 (produits de location) ne provient que de l'autre recette.
+    $recette = $entries->firstWhere('compte_credit', '7082');
+    expect($recette)->not->toBeNull();
+    expect($recette['compte_debit'])->toBe('5121');
+    expect($recette['montant'])->toBe(1200.0);
+    expect($recette['type'])->toBe('encaissement');
+    expect($recette['libelle'])->toBe('Location parking visiteurs');
 });
 
 it('refuse (403) un gestionnaire non assigné à la résidence', function () {

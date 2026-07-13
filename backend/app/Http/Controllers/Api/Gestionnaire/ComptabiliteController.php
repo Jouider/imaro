@@ -125,7 +125,7 @@ class ComptabiliteController extends Controller
         $ecritures = collect();
         $seqId = 1;
         foreach ($rawEntries as $e) {
-            $type = str_starts_with($e['id'], 'P') ? 'encaissement' : 'depense';
+            $type = $e['type'] ?? (str_starts_with($e['id'], 'P') ? 'encaissement' : 'depense');
 
             // Debit line
             $ecritures->push([
