@@ -2229,6 +2229,7 @@
       "grandLivre": {
         "title": "الحساب PCG",
         "selectCompte": "اختر حسابًا...",
+        "noCompte": "لم يتم العثور على أي حساب.",
         "hint": "اختر حسابًا PCG لعرض تفاصيل القيود."
       },
       "depenses": {
