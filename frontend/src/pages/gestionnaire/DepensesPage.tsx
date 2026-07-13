@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { AxiosError } from 'axios'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -238,6 +238,19 @@ function NouvelleDepenseModal({
 
   const montantNum = Number(form.montant) || 0
   const needsApproval = montantNum > 5000
+
+  // KAN-121: aperçu du justificatif sélectionné (avant enregistrement) via une
+  // URL objet locale — révoquée quand le fichier change / à la fermeture.
+  const justificatifPreview = useMemo(
+    () => (form.justificatif ? URL.createObjectURL(form.justificatif) : null),
+    [form.justificatif],
+  )
+  useEffect(() => {
+    return () => {
+      if (justificatifPreview) URL.revokeObjectURL(justificatifPreview)
+    }
+  }, [justificatifPreview])
+  const justificatifIsImage = form.justificatif?.type.startsWith('image/')
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -523,6 +536,37 @@ function NouvelleDepenseModal({
                 }))
               }
             />
+            {/* Aperçu du justificatif sélectionné (KAN-121) */}
+            {justificatifPreview && (
+              <div className="mt-2 flex items-center gap-3 rounded-md border bg-muted/30 p-2">
+                {justificatifIsImage ? (
+                  <img
+                    src={justificatifPreview}
+                    alt={form.justificatif?.name ?? ''}
+                    className="size-14 rounded object-cover"
+                  />
+                ) : (
+                  <div className="flex size-14 items-center justify-center rounded bg-background">
+                    <Receipt className="size-6 text-muted-foreground" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-medium">
+                    {form.justificatif?.name}
+                  </p>
+                  <a
+                    href={justificatifPreview}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-medium text-[var(--color-imaro-primary)] hover:underline"
+                  >
+                    {t('gestionnaire.depenses.form.previewJustificatif', {
+                      defaultValue: 'Ouvrir l’aperçu',
+                    })}
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -1034,16 +1078,42 @@ export function DepensesPage() {
     {
       key: 'justificatif_path',
       header: 'Justificatif',
+      // KAN-121 : ouvrir l'aperçu du justificatif dans un nouvel onglet quand le
+      // backend fournit `justificatif_url`. Sinon bouton désactivé (fichier pas
+      // encore servi côté API).
       renderCell: (r) =>
         r.justificatif_path ? (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-6 px-2"
-            onClick={() => toast.info(t('gestionnaire.depenses.downloading'))}
-          >
-            <Download className="size-3.5" />
-          </Button>
+          r.justificatif_url ? (
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2"
+              title={t('gestionnaire.depenses.form.previewJustificatif', {
+                defaultValue: 'Ouvrir l’aperçu',
+              })}
+            >
+              <a
+                href={r.justificatif_url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Download className="size-3.5" />
+              </a>
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2"
+              disabled
+              title={t('gestionnaire.depenses.justificatifUnavailable', {
+                defaultValue: 'Aperçu indisponible',
+              })}
+            >
+              <Download className="size-3.5" />
+            </Button>
+          )
         ) : (
           <span className="text-muted-foreground">—</span>
         ),

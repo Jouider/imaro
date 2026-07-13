@@ -33,6 +33,11 @@ export type DepenseFinance = {
     | 'prelevement'
     | 'autre'
   justificatif_path: string | null
+  /**
+   * URL publique/signée du justificatif pour l'aperçu (KAN-121). À renvoyer par
+   * le backend une fois le fichier stocké ; absent tant que ce n'est pas fait.
+   */
+  justificatif_url?: string | null
   ecriture_id: number
   est_recurrente: boolean
   statut_approbation: 'approuve' | 'en_attente' | 'rejete' | null
