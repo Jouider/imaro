@@ -7,6 +7,7 @@ use App\Models\Annonce;
 use App\Models\Coproprietaire;
 use App\Models\Lot;
 use App\Models\Ticket;
+use App\Models\Visite;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -70,6 +71,35 @@ class PortailPushNotifier
             : 'Votre paiement a été validé. Reçu disponible.';
 
         SendNativePushJob::dispatch($copro->user_id, 'Paiement validé', $corps, ['route' => '/portail/finances']);
+    }
+
+    /**
+     * Visiteur arrivé (check-in / walk-in) → notifie l'hôte, le copropriétaire
+     * concerné (KAN-135). L'hôte est résolu via host_user_id, sinon via le
+     * copropriétaire principal du lot hôte. Best-effort : silencieux si aucun
+     * compte résident n'est rattaché.
+     */
+    public function visiteurArrive(Visite $visite): void
+    {
+        $hostUserId = $visite->host_user_id
+            ?? $visite->hostLot?->coproprietairePrincipal?->user_id;
+
+        if (! $hostUserId) {
+            return;
+        }
+
+        $qui = match ($visite->type) {
+            'delivery' => 'Une livraison',
+            'contractor', 'prestataire' => 'Un prestataire',
+            default => 'Un visiteur',
+        };
+
+        $nom = $visite->visitor_name ? ' ('.$visite->visitor_name.')' : '';
+        $corps = $qui.$nom." vient d'arriver à l'accueil de votre résidence.";
+
+        SendNativePushJob::dispatch($hostUserId, 'Visiteur à l’accueil', $corps, [
+            'route' => '/portail',
+        ]);
     }
 
     /** IDs des utilisateurs résidents (copropriétaires liés à un compte). */
