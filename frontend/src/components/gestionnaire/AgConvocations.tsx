@@ -52,7 +52,9 @@ export function AgConvocations({ ag }: { ag: Assemblee }) {
   // Préavis légal : la convocation doit partir au moins 15 jours avant l'AG.
   // `now` capturé une fois (lazy state) pour rester pur au rendu.
   const [nowMs] = useState(() => Date.now())
-  const daysUntil = Math.ceil((new Date(ag.date).getTime() - nowMs) / 86_400_000)
+  const daysUntil = Math.ceil(
+    (new Date(ag.date).getTime() - nowMs) / 86_400_000,
+  )
   const delaiTropCourt = daysUntil >= 0 && daysUntil < AG_MIN_DELAY_DAYS
 
   const convocations = data?.convocations ?? []
