@@ -28,9 +28,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import {
   getAuditLogs,
+  type AuditLog,
   type AuditLogCategory,
   type AuditLogSeverity,
 } from '@/services/conformite.service'
@@ -81,6 +90,7 @@ export function AuditTrailPage() {
   const [category, setCategory] = useState<AuditLogCategory | ''>('')
   const [severity, setSeverity] = useState<AuditLogSeverity | ''>('')
   const [search, setSearch] = useState('')
+  const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null)
 
   const auditQ = useQuery({
     queryKey: ['audit-logs', { category, severity, search }],
@@ -98,6 +108,55 @@ export function AuditTrailPage() {
     errors: 0,
     sensitive: 0,
     error_rate: 0,
+  }
+
+  // KAN-131 : export CSV des lignes actuellement filtrées (généré côté client).
+  function handleExportCsv() {
+    if (logs.length === 0) {
+      toast.info(
+        t('gestionnaire.audit.exportEmpty', {
+          defaultValue: 'Aucune ligne à exporter',
+        }),
+      )
+      return
+    }
+    const headers = [
+      t('gestionnaire.audit.colDate', { defaultValue: 'Date' }),
+      t('gestionnaire.audit.colCategory', { defaultValue: 'Catégorie' }),
+      t('gestionnaire.audit.colAction', { defaultValue: 'Action' }),
+      t('gestionnaire.audit.colSeverity', { defaultValue: 'Sévérité' }),
+      t('gestionnaire.audit.colUser', { defaultValue: 'Utilisateur' }),
+      t('gestionnaire.audit.colTarget', { defaultValue: 'Cible' }),
+      'IP',
+    ]
+    const esc = (v: string) => `"${v.replace(/"/g, '""')}"`
+    const rows = logs.map((l) =>
+      [
+        dt.format(new Date(l.created_at)),
+        l.category,
+        l.action,
+        SEVERITY_LABELS[l.severity],
+        l.user_email ?? '',
+        l.target_label ?? '',
+        l.ip_address ?? '',
+      ]
+        .map((c) => esc(String(c)))
+        .join(';'),
+    )
+    // BOM UTF-8 pour qu'Excel lise correctement les accents.
+    const csv = '﻿' + [headers.map(esc).join(';'), ...rows].join('\r\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `journal-audit-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+    toast.success(
+      t('gestionnaire.audit.exportDone', {
+        defaultValue: 'Export CSV téléchargé',
+      }),
+    )
   }
 
   return (
@@ -119,7 +178,12 @@ export function AuditTrailPage() {
           </p>
         </div>
         <ResidenceFilter />
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={handleExportCsv}
+        >
           <Download className="size-4" />
           {t('gestionnaire.audit.exportCsv')}
         </Button>
@@ -277,7 +341,15 @@ export function AuditTrailPage() {
                     {log.target_label ?? '—'}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" className="size-7">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-7"
+                      onClick={() => setSelectedLog(log)}
+                      title={t('gestionnaire.audit.view', {
+                        defaultValue: 'Voir',
+                      })}
+                    >
                       <Eye className="size-4" />
                     </Button>
                   </TableCell>
@@ -287,6 +359,84 @@ export function AuditTrailPage() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Détail d'une ligne (KAN-131) */}
+      <Dialog
+        open={!!selectedLog}
+        onOpenChange={(o) => !o && setSelectedLog(null)}
+      >
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-mono text-base">
+              {selectedLog?.action}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedLog && dt.format(new Date(selectedLog.created_at))}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedLog && (
+            <dl className="grid grid-cols-3 gap-x-3 gap-y-2 text-sm">
+              <dt className="text-muted-foreground">
+                {t('gestionnaire.audit.colSeverity', {
+                  defaultValue: 'Sévérité',
+                })}
+              </dt>
+              <dd className="col-span-2">
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    'text-[11px]',
+                    SEVERITY_STYLES[selectedLog.severity],
+                  )}
+                >
+                  {SEVERITY_LABELS[selectedLog.severity]}
+                </Badge>
+              </dd>
+              <dt className="text-muted-foreground">
+                {t('gestionnaire.audit.colCategory', {
+                  defaultValue: 'Catégorie',
+                })}
+              </dt>
+              <dd className="col-span-2">{selectedLog.category}</dd>
+              <dt className="text-muted-foreground">
+                {t('gestionnaire.audit.colUser', {
+                  defaultValue: 'Utilisateur',
+                })}
+              </dt>
+              <dd className="col-span-2 break-all">
+                {selectedLog.user_email ?? '—'}
+              </dd>
+              <dt className="text-muted-foreground">
+                {t('gestionnaire.audit.colTarget', { defaultValue: 'Cible' })}
+              </dt>
+              <dd className="col-span-2">
+                {selectedLog.target_label ??
+                  (selectedLog.target_type
+                    ? `${selectedLog.target_type} #${selectedLog.target_id ?? ''}`
+                    : '—')}
+              </dd>
+              <dt className="text-muted-foreground">IP</dt>
+              <dd className="col-span-2 font-mono text-xs">
+                {selectedLog.ip_address ?? '—'}
+              </dd>
+              {selectedLog.payload && (
+                <>
+                  <dt className="text-muted-foreground">
+                    {t('gestionnaire.audit.colDetails', {
+                      defaultValue: 'Détails',
+                    })}
+                  </dt>
+                  <dd className="col-span-2">
+                    <pre className="max-h-48 overflow-auto rounded-md bg-muted/50 p-2 text-xs">
+                      {JSON.stringify(selectedLog.payload, null, 2)}
+                    </pre>
+                  </dd>
+                </>
+              )}
+            </dl>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

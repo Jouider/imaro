@@ -2229,6 +2229,7 @@
       "grandLivre": {
         "title": "Compte PCG",
         "selectCompte": "Sélectionner un compte...",
+        "noCompte": "Aucun compte trouvé.",
         "hint": "Sélectionnez un compte PCG pour afficher le détail des écritures."
       },
       "depenses": {
@@ -2739,6 +2740,15 @@
       "totalEvents": "Total événements",
       "searchPlaceholder": "Rechercher action, utilisateur, cible...",
       "exportCsv": "Exporter CSV",
+      "exportEmpty": "Aucune ligne à exporter",
+      "exportDone": "Export CSV téléchargé",
+      "view": "Voir",
+      "colDate": "Date",
+      "colCategory": "Catégorie",
+      "colAction": "Action",
+      "colSeverity": "Sévérité",
+      "colUser": "Utilisateur",
+      "colTarget": "Cible",
       "sensitiveActions": "Actions sensibles",
       "errorRate": "Taux d'erreur",
       "categoryLabels": {

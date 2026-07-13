@@ -2157,6 +2157,7 @@
       "grandLivre": {
         "title": "GL account",
         "selectCompte": "Select an account...",
+        "noCompte": "No account found.",
         "hint": "Select a GL account to display the entry detail."
       },
       "depenses": {
@@ -2644,6 +2645,15 @@
       "totalEvents": "Total events",
       "searchPlaceholder": "Search action, user, target...",
       "exportCsv": "Export CSV",
+      "exportEmpty": "No rows to export",
+      "exportDone": "CSV export downloaded",
+      "view": "View",
+      "colDate": "Date",
+      "colCategory": "Category",
+      "colAction": "Action",
+      "colSeverity": "Severity",
+      "colUser": "User",
+      "colTarget": "Target",
       "sensitiveActions": "Sensitive actions",
       "errorRate": "Error rate",
       "categoryLabels": {
