@@ -7,7 +7,6 @@ const ROWS = [
   'pointage',
   'reporting',
   'archivage',
-  'ia',
 ] as const
 
 /**
