@@ -589,6 +589,14 @@ function ModelesRecurrentsModal({
   })
   const compteClasse6 = comptes.filter((c) => c.classe === 6)
 
+  // KAN-119: prestataires existants proposés en autocomplétion (texte libre
+  // toujours autorisé), pour pouvoir rattacher un prestataire au modèle récurrent.
+  const { data: prestataires = [] } = useQuery({
+    queryKey: ['prestataires', 'actif'],
+    queryFn: () => getPrestataires({ statut: 'actif' }),
+    enabled: open,
+  })
+
   const toggleMutation = useMutation({
     mutationFn: (id: number) => toggleModeleRecurrent(id),
     onSuccess: () =>
@@ -756,6 +764,29 @@ function ModelesRecurrentsModal({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-1">
+              <Label>
+                {t('gestionnaire.depenses.form.prestataire', {
+                  defaultValue: 'Prestataire',
+                })}
+              </Label>
+              <Input
+                list="modele-prestataires"
+                value={form.prestataire_nom}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, prestataire_nom: e.target.value }))
+                }
+                placeholder={t('gestionnaire.depenses.form.prestatairePh', {
+                  defaultValue: 'Nom du prestataire (optionnel)',
+                })}
+              />
+              {/* Prestataires existants proposés — texte libre autorisé (KAN-119). */}
+              <datalist id="modele-prestataires">
+                {prestataires.map((p) => (
+                  <option key={p.id} value={p.name} />
+                ))}
+              </datalist>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
@@ -1087,19 +1118,22 @@ export function DepensesPage() {
         actions={
           <div className="flex gap-2">
             <ResidenceFilter />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                toast.info(t('gestionnaire.depenses.importIa'))
-                setAddOpen(true)
-              }}
-            >
-              <Sparkles className="me-1.5 size-4 text-amber-500" />
-              {t('gestionnaire.depenses.importIa', {
-                defaultValue: 'Import IA',
-              })}
-            </Button>
+            {/* Import IA masqué temporairement (KAN-111) */}
+            {AI_FEATURES_ENABLED && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  toast.info(t('gestionnaire.depenses.importIa'))
+                  setAddOpen(true)
+                }}
+              >
+                <Sparkles className="me-1.5 size-4 text-amber-500" />
+                {t('gestionnaire.depenses.importIa', {
+                  defaultValue: 'Import IA',
+                })}
+              </Button>
+            )}
             <Button size="sm" onClick={() => setAddOpen(true)}>
               <Receipt className="me-1.5 size-4" />
               {t('gestionnaire.depenses.add', {

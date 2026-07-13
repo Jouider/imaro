@@ -2706,20 +2706,23 @@ export function ComptabilitePage() {
                 defaultValue: 'Encaisser',
               })}
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="border-purple-300 text-purple-700 hover:bg-purple-50"
-              onClick={() => {
-                setDepenseModalOpen(true)
-              }}
-              disabled={exerciceClos}
-            >
-              <Sparkles className="me-1.5 size-4" />
-              {t('gestionnaire.comptabilite.depenses.form.importIa', {
-                defaultValue: 'Import IA',
-              })}
-            </Button>
+            {/* Bouton « Import IA » masqué temporairement (KAN-111) */}
+            {AI_FEATURES_ENABLED && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-purple-300 text-purple-700 hover:bg-purple-50"
+                onClick={() => {
+                  setDepenseModalOpen(true)
+                }}
+                disabled={exerciceClos}
+              >
+                <Sparkles className="me-1.5 size-4" />
+                {t('gestionnaire.comptabilite.depenses.form.importIa', {
+                  defaultValue: 'Import IA',
+                })}
+              </Button>
+            )}
             <ExportDropdown
               exerciceId={exerciceId}
               annee={currentExercice?.annee}
