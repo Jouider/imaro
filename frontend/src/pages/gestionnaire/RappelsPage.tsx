@@ -106,10 +106,10 @@ const STAGE_META: Record<ReminderStageId, StageMeta> = {
   },
 }
 
+// SMS et WhatsApp désactivés (KAN-128) — on ne garde que la notification
+// in-app (push, toujours active) + l'email.
 const EXTRA_CHANNELS: { id: ExtraChannel; icon: typeof Mail }[] = [
-  { id: 'whatsapp', icon: MessageCircle },
   { id: 'email', icon: Mail },
-  { id: 'sms', icon: MessageSquare },
 ]
 
 const STATUS_META: Record<
@@ -643,21 +643,6 @@ export function RappelsPage() {
                 </p>
               )}
             </div>
-
-            {/* WhatsApp bubble */}
-            <ChannelBlock
-              icon={MessageCircle}
-              name={t('gestionnaire.rappels.whatsapp')}
-              free={t('gestionnaire.rappels.free')}
-              testLabel={t('gestionnaire.rappels.test')}
-              onTest={() => toast.success(t('gestionnaire.rappels.toastTest'))}
-            >
-              {templatesQ.data && (
-                <div className="rounded-lg rounded-tl-none bg-[#dcf8c6] p-2.5 text-xs text-slate-800 shadow-sm dark:bg-emerald-900/40 dark:text-emerald-50">
-                  {templatesQ.data.whatsapp.body}
-                </div>
-              )}
-            </ChannelBlock>
 
             {/* Email */}
             <ChannelBlock
