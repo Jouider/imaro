@@ -23,6 +23,8 @@ import {
   ChevronRight,
   ArrowDownToLine,
   ArrowUpFromLine,
+  Check,
+  ChevronsUpDown,
 } from 'lucide-react'
 import {
   BarChart,
@@ -79,6 +81,19 @@ import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -1509,24 +1524,20 @@ type GrandLivreLigne = GrandLivreCompte['lignes'][number]
 function TabGrandLivre({ exerciceId }: { exerciceId: number }) {
   const { t } = useTranslation()
   const [selectedCompte, setSelectedCompte] = useState<string>('')
-  const [compteSearch, setCompteSearch] = useState('')
+  const [comboOpen, setComboOpen] = useState(false)
 
   const { data: comptes = [] } = useQuery({
     queryKey: ['comptes-pcg'],
     queryFn: () => getComptesPcg(),
   })
 
+  const selectedCompteObj = comptes.find((c) => c.numero === selectedCompte)
+
   const { data: grandLivre, isLoading } = useQuery({
     queryKey: ['grand-livre', exerciceId, selectedCompte],
     queryFn: () => getGrandLivre(exerciceId, selectedCompte),
     enabled: !!selectedCompte,
   })
-
-  const filteredComptes = comptes.filter(
-    (c) =>
-      c.numero.includes(compteSearch) ||
-      c.libelle.toLowerCase().includes(compteSearch.toLowerCase()),
-  )
 
   const glColumns: Column<GrandLivreLigne>[] = [
     {
@@ -1590,31 +1601,64 @@ function TabGrandLivre({ exerciceId }: { exerciceId: number }) {
               defaultValue: 'Compte PCG',
             })}
           </Label>
-          <Input
-            value={compteSearch}
-            onChange={(e) => setCompteSearch(e.target.value)}
-            placeholder={t('gestionnaire.comptabilite.filterAccounts')}
-            className="mb-1 w-52"
-          />
-          <Select value={selectedCompte} onValueChange={setSelectedCompte}>
-            <SelectTrigger className="w-72">
-              <SelectValue
-                placeholder={t(
-                  'gestionnaire.comptabilite.grandLivre.selectCompte',
-                  {
-                    defaultValue: 'Sélectionner un compte...',
-                  },
-                )}
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {filteredComptes.map((c) => (
-                <SelectItem key={c.numero} value={c.numero}>
-                  {c.numero} — {c.libelle}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Combobox recherchable : le filtre est intégré au menu (KAN-126). */}
+          <Popover open={comboOpen} onOpenChange={setComboOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={comboOpen}
+                className="w-72 justify-between font-normal"
+              >
+                <span className="truncate">
+                  {selectedCompteObj
+                    ? `${selectedCompteObj.numero} — ${selectedCompteObj.libelle}`
+                    : t('gestionnaire.comptabilite.grandLivre.selectCompte', {
+                        defaultValue: 'Sélectionner un compte...',
+                      })}
+                </span>
+                <ChevronsUpDown className="ms-2 size-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72 p-0" align="start">
+              <Command>
+                <CommandInput
+                  placeholder={t('gestionnaire.comptabilite.filterAccounts')}
+                />
+                <CommandList>
+                  <CommandEmpty>
+                    {t('gestionnaire.comptabilite.grandLivre.noCompte', {
+                      defaultValue: 'Aucun compte trouvé.',
+                    })}
+                  </CommandEmpty>
+                  <CommandGroup>
+                    {comptes.map((c) => (
+                      <CommandItem
+                        key={c.numero}
+                        value={`${c.numero} ${c.libelle}`}
+                        onSelect={() => {
+                          setSelectedCompte(c.numero)
+                          setComboOpen(false)
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            'me-2 size-4',
+                            selectedCompte === c.numero
+                              ? 'opacity-100'
+                              : 'opacity-0',
+                          )}
+                        />
+                        <span className="truncate">
+                          {c.numero} — {c.libelle}
+                        </span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 

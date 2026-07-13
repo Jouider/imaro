@@ -2229,6 +2229,7 @@
       "grandLivre": {
         "title": "Compte PCG",
         "selectCompte": "Sélectionner un compte...",
+        "noCompte": "Aucun compte trouvé.",
         "hint": "Sélectionnez un compte PCG pour afficher le détail des écritures."
       },
       "depenses": {

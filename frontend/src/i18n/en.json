@@ -2157,6 +2157,7 @@
       "grandLivre": {
         "title": "GL account",
         "selectCompte": "Select an account...",
+        "noCompte": "No account found.",
         "hint": "Select a GL account to display the entry detail."
       },
       "depenses": {
