@@ -8,7 +8,6 @@ import {
   Pencil,
   Trash2,
   Home,
-  KeyRound,
   AlertCircle,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -59,11 +58,6 @@ const TYPE_META: Record<
     cls: 'border-[var(--color-imaro-primary)]/30 bg-[var(--color-imaro-primary)]/5 text-[var(--color-imaro-primary)]',
     icon: Home,
   },
-  locataire: {
-    label: 'Locataire',
-    cls: 'border-amber-200 bg-amber-50 text-amber-700',
-    icon: KeyRound,
-  },
   usufruitier: {
     label: 'Usufruitier',
     cls: 'border-purple-200 bg-purple-50 text-purple-700',
@@ -95,7 +89,7 @@ export function OccupantsPage() {
     nom: '',
     telephone: '',
     email: '',
-    type: 'locataire',
+    type: 'proprietaire_occupant',
     date_debut: new Date().toISOString().slice(0, 10),
     date_fin: '',
   })
@@ -175,7 +169,7 @@ export function OccupantsPage() {
       nom: '',
       telephone: '',
       email: '',
-      type: 'locataire',
+      type: 'proprietaire_occupant',
       date_debut: new Date().toISOString().slice(0, 10),
       date_fin: '',
     })
@@ -217,7 +211,6 @@ export function OccupantsPage() {
     proprietaire_occupant: occupants.filter(
       (o) => o.type === 'proprietaire_occupant',
     ).length,
-    locataire: occupants.filter((o) => o.type === 'locataire').length,
     other: occupants.filter(
       (o) => o.type === 'usufruitier' || o.type === 'autre',
     ).length,
@@ -270,7 +263,7 @@ export function OccupantsPage() {
       </div>
 
       {/* KPI strip */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div className="rounded-xl border bg-card p-4">
           <div className="mb-2 flex items-center gap-2">
             <Home className="size-4 text-[var(--color-imaro-primary)]" />
@@ -280,17 +273,6 @@ export function OccupantsPage() {
           </div>
           <p className="text-2xl font-bold tracking-tight">
             {byType.proprietaire_occupant}
-          </p>
-        </div>
-        <div className="rounded-xl border bg-card p-4">
-          <div className="mb-2 flex items-center gap-2">
-            <KeyRound className="size-4 text-amber-600" />
-            <p className="text-xs text-muted-foreground">
-              {t('gestionnaire.occupants.kpiTenants')}
-            </p>
-          </div>
-          <p className="text-2xl font-bold tracking-tight">
-            {byType.locataire}
           </p>
         </div>
         <div className="rounded-xl border bg-card p-4">
@@ -349,7 +331,7 @@ export function OccupantsPage() {
               </TableRow>
             ) : (
               occupants.map((o) => {
-                const meta = TYPE_META[o.type]
+                const meta = TYPE_META[o.type] ?? TYPE_META.autre
                 const lot = lots.find((l) => l.id === o.lot_id)
                 const Icon = meta.icon
                 return (

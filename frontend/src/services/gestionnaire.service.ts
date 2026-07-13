@@ -215,7 +215,7 @@ export type CreateCoproprietaireInput = {
   email?: string
   residence_id: number
   lot_id: number
-  type?: 'proprietaire' | 'locataire'
+  type?: 'proprietaire'
   date_entree?: string
 }
 

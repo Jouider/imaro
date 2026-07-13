@@ -2782,12 +2782,11 @@
     },
     "occupants": {
       "title": "Occupants",
-      "subtitle": "Register of occupants by unit — owners, tenants, usufructuaries",
+      "subtitle": "Register of occupants by unit — resident owners, usufructuaries",
       "toastAdded": "Occupant added",
       "toastUpdated": "Occupant updated",
       "toastDeleted": "Occupant deleted",
       "kpiOwners": "Resident owners",
-      "kpiTenants": "Tenants",
       "kpiOthers": "Usufructuaries / others",
       "bannerTitle": "Art. 11 Law 18-00",
       "bannerBody": "— The occupant register must be up to date for meeting notices and charge communications. Only one active 'resident owner' per unit at a time.",
@@ -2801,7 +2800,6 @@
       "dateFinOptional": "End date (optional)",
       "type": {
         "proprietaire_occupant": "Resident owner",
-        "locataire": "Tenant",
         "usufruitier": "Usufructuary",
         "autre": "Other"
       }
