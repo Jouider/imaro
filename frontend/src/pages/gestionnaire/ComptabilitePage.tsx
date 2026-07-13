@@ -96,6 +96,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { AI_FEATURES_ENABLED } from '@/lib/features'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -311,18 +312,21 @@ function NouvelleDepenseModal({
                 defaultValue: 'Nouvelle dépense',
               })}
             </DialogTitle>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setShowIa((v) => !v)}
-              className="flex items-center gap-1.5 text-xs"
-            >
-              <Sparkles className="size-3.5 text-purple-500" />
-              {t('gestionnaire.comptabilite.depenses.form.importIa', {
-                defaultValue: 'Import IA',
-              })}
-            </Button>
+            {/* Import IA masqué temporairement (KAN-111) */}
+            {AI_FEATURES_ENABLED && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowIa((v) => !v)}
+                className="flex items-center gap-1.5 text-xs"
+              >
+                <Sparkles className="size-3.5 text-purple-500" />
+                {t('gestionnaire.comptabilite.depenses.form.importIa', {
+                  defaultValue: 'Import IA',
+                })}
+              </Button>
+            )}
           </div>
         </DialogHeader>
 

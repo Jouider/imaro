@@ -13,6 +13,7 @@ import { PricingTable } from '@/components/landing/PricingTable'
 import { FaqAccordion } from '@/components/landing/FaqAccordion'
 import { FooterCta } from '@/components/landing/FooterCta'
 import { LandingFooter } from '@/components/landing/LandingFooter'
+import { AI_FEATURES_ENABLED } from '@/lib/features'
 
 /**
  * Imaro landing page — "Moroccan fintech editorial" edition.
@@ -45,7 +46,8 @@ export function HomePage() {
         <LogoBar />
         <StatsCounter />
         <ModulesShowcase />
-        <IaSpotlight />
+        {/* Section IA masquée temporairement (KAN-111) */}
+        {AI_FEATURES_ENABLED && <IaSpotlight />}
         <PointageSpotlight />
         <ConformiteSpotlight />
         <ComparisonTable />

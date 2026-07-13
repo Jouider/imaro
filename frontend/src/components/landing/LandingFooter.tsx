@@ -14,7 +14,6 @@ export function LandingFooter() {
       links: [
         { label: t('landing.footer.link.features'), href: '#modules' },
         { label: t('landing.footer.link.pricing'), href: '#pricing' },
-        { label: t('landing.footer.link.ia'), href: '#ia' },
         { label: t('landing.footer.link.security'), href: '#' },
       ],
     },

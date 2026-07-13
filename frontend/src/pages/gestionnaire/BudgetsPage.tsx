@@ -71,6 +71,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { AI_FEATURES_ENABLED } from '@/lib/features'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -776,16 +777,19 @@ export function BudgetsPage() {
                   })}
                 </Badge>
               )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIaOpen(true)}
-              >
-                <Sparkles className="me-1.5 size-4 text-amber-500" />
-                {t('gestionnaire.budget.ia.title', {
-                  defaultValue: 'Suggestion IA',
-                })}
-              </Button>
+              {/* Suggestion IA masquée temporairement (KAN-111) */}
+              {AI_FEATURES_ENABLED && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIaOpen(true)}
+                >
+                  <Sparkles className="me-1.5 size-4 text-amber-500" />
+                  {t('gestionnaire.budget.ia.title', {
+                    defaultValue: 'Suggestion IA',
+                  })}
+                </Button>
+              )}
               <Button
                 variant="outline"
                 size="sm"

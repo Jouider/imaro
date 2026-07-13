@@ -75,6 +75,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { AI_FEATURES_ENABLED } from '@/lib/features'
 
 // ─── Colors ───────────────────────────────────────────────────────────────────
 
@@ -250,77 +251,80 @@ function NouvelleDepenseModal({
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          {/* IA Section */}
-          <div className="rounded-lg border border-dashed border-muted-foreground/30">
-            <button
-              type="button"
-              onClick={() => setIaExpanded((v) => !v)}
-              className="flex w-full items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Sparkles className="size-4 text-amber-500" />
-              {t('gestionnaire.depenses.form.scanner', {
-                defaultValue: "Analyser avec l'IA",
-              })}
-            </button>
+          {/* Analyse IA masquée temporairement (KAN-111) */}
+          {AI_FEATURES_ENABLED && (
+            <div className="rounded-lg border border-dashed border-muted-foreground/30">
+              <button
+                type="button"
+                onClick={() => setIaExpanded((v) => !v)}
+                className="flex w-full items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Sparkles className="size-4 text-amber-500" />
+                {t('gestionnaire.depenses.form.scanner', {
+                  defaultValue: "Analyser avec l'IA",
+                })}
+              </button>
 
-            {iaExpanded && (
-              <div className="border-t px-4 pb-4 pt-3 space-y-3">
-                <div className="flex gap-2">
-                  <Input
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={(e) => setIaFile(e.target.files?.[0] ?? null)}
-                    className="flex-1"
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleAnalyseIa}
-                    disabled={!iaFile || iaLoading}
-                  >
-                    {iaLoading ? (
-                      <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                      'Analyser'
-                    )}
-                  </Button>
-                </div>
-
-                {iaResult && (
-                  <div className="rounded-md bg-muted/40 p-3 space-y-1.5 text-sm">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{iaResult.titre}</span>
-                      <Badge
-                        className={cn(
-                          'border-0 text-xs',
-                          iaResult.confiance === 'haute'
-                            ? 'bg-green-100 text-green-800'
-                            : iaResult.confiance === 'moyenne'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-red-100 text-red-800',
-                        )}
-                      >
-                        {iaResult.confiance}
-                      </Badge>
-                    </div>
-                    <p className="text-muted-foreground">
-                      {iaResult.montant.toLocaleString('fr-MA')} MAD ·{' '}
-                      {iaResult.date} · Compte {iaResult.compte_charge_suggere}
-                    </p>
+              {iaExpanded && (
+                <div className="border-t px-4 pb-4 pt-3 space-y-3">
+                  <div className="flex gap-2">
+                    <Input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) => setIaFile(e.target.files?.[0] ?? null)}
+                      className="flex-1"
+                    />
                     <Button
                       size="sm"
-                      className="w-full mt-2"
-                      onClick={handleUseIaData}
+                      variant="outline"
+                      onClick={handleAnalyseIa}
+                      disabled={!iaFile || iaLoading}
                     >
-                      {t('gestionnaire.depenses.form.utiliser', {
-                        defaultValue: 'Utiliser ces données',
-                      })}
+                      {iaLoading ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        'Analyser'
+                      )}
                     </Button>
                   </div>
-                )}
-              </div>
-            )}
-          </div>
+
+                  {iaResult && (
+                    <div className="rounded-md bg-muted/40 p-3 space-y-1.5 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{iaResult.titre}</span>
+                        <Badge
+                          className={cn(
+                            'border-0 text-xs',
+                            iaResult.confiance === 'haute'
+                              ? 'bg-green-100 text-green-800'
+                              : iaResult.confiance === 'moyenne'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-red-100 text-red-800',
+                          )}
+                        >
+                          {iaResult.confiance}
+                        </Badge>
+                      </div>
+                      <p className="text-muted-foreground">
+                        {iaResult.montant.toLocaleString('fr-MA')} MAD ·{' '}
+                        {iaResult.date} · Compte{' '}
+                        {iaResult.compte_charge_suggere}
+                      </p>
+                      <Button
+                        size="sm"
+                        className="w-full mt-2"
+                        onClick={handleUseIaData}
+                      >
+                        {t('gestionnaire.depenses.form.utiliser', {
+                          defaultValue: 'Utiliser ces données',
+                        })}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {needsApproval && (
             <div className="flex items-start gap-2 rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-sm text-orange-800">

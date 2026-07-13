@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { AI_FEATURES_ENABLED } from '@/lib/features'
 import { RouteErrorBoundary } from '@/components/shared/ErrorBoundary'
 import { RootEntry } from '@/components/RootEntry'
 import { BiometricGate } from '@/components/BiometricGate'
@@ -158,7 +159,16 @@ export const router = createBrowserRouter([
           },
           { path: 'autres-recettes', element: <AutresRecettesPage /> },
           { path: 'remboursements', element: <RemboursementsPage /> },
-          { path: 'ia', element: <IaAssistantPage /> },
+          // Assistant IA masqué temporairement (KAN-111) — les liens obsolètes
+          // (bookmarks) sont redirigés vers le dashboard tant qu'il est désactivé.
+          {
+            path: 'ia',
+            element: AI_FEATURES_ENABLED ? (
+              <IaAssistantPage />
+            ) : (
+              <Navigate to="/gestionnaire/dashboard" replace />
+            ),
+          },
           { path: 'conformite', element: <ConformitePage /> },
           { path: 'annexes', element: <AnnexesPage /> },
           { path: 'audit', element: <AuditTrailPage /> },
