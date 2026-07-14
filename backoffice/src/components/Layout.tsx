@@ -1,10 +1,11 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { LayoutDashboard, Building2, Contact, LogOut } from 'lucide-react'
+import { LayoutDashboard, Building2, Users, Contact, LogOut } from 'lucide-react'
 import { logout } from '../lib/api'
 
 const nav = [
   { to: '/', label: 'Tableau de bord', icon: LayoutDashboard, end: true },
   { to: '/clients', label: 'Clients', icon: Building2, end: false },
+  { to: '/utilisateurs', label: 'Utilisateurs', icon: Users, end: false },
   { to: '/leads', label: 'Démos & leads', icon: Contact, end: false },
 ]
 
