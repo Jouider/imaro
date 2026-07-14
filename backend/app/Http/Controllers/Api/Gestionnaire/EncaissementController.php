@@ -108,9 +108,16 @@ class EncaissementController extends Controller
         }
 
         // Rafraîchit le solde du copropriétaire + génère le reçu PDF (async).
+        // Best-effort (KAN-116) : un échec du recalcul de solde ou de la file de
+        // génération du reçu ne doit PAS faire échouer l'encaissement lui-même
+        // (le paiement est déjà enregistré). On journalise et on continue.
         if ($paiement->coproprietaire_id) {
-            Coproprietaire::find($paiement->coproprietaire_id)?->recalculerSolde();
-            GenerateRecuPaiementJob::dispatch($paiement->id);
+            try {
+                Coproprietaire::find($paiement->coproprietaire_id)?->recalculerSolde();
+                GenerateRecuPaiementJob::dispatch($paiement->id);
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         $paiement->load(['coproprietaire.user:id,name', 'coproprietaire.lot:id,numero']);
