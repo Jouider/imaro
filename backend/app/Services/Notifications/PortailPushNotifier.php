@@ -6,6 +6,7 @@ use App\Jobs\SendNativePushJob;
 use App\Models\Annonce;
 use App\Models\Coproprietaire;
 use App\Models\Lot;
+use App\Models\Notification;
 use App\Models\Ticket;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -24,6 +25,7 @@ class PortailPushNotifier
         $corps = Str::limit(trim(strip_tags((string) $annonce->contenu)), 120);
 
         foreach ($this->residentUserIds($annonce->tenant_id, $annonce->residence_id) as $userId) {
+            $this->persist($annonce->tenant_id, $userId, 'info', $titre, $corps, ['annonce_id' => $annonce->id]);
             SendNativePushJob::dispatch($userId, $titre, $corps, ['route' => '/portail']);
         }
     }
@@ -39,6 +41,7 @@ class PortailPushNotifier
             ? 'Vous avez un solde de '.number_format($montant, 2, ',', ' ').' DH à régler.'
             : 'Vous avez des charges en attente de règlement.';
 
+        $this->persist($copro->tenant_id, $copro->user_id, 'paiement', 'Rappel de paiement', $corps);
         SendNativePushJob::dispatch($copro->user_id, 'Rappel de paiement', $corps, ['route' => '/portail/finances']);
     }
 
@@ -69,7 +72,28 @@ class PortailPushNotifier
             ? 'Votre paiement '.$reference.' a été validé. Reçu disponible.'
             : 'Votre paiement a été validé. Reçu disponible.';
 
+        $this->persist($copro->tenant_id, $copro->user_id, 'paiement', 'Paiement validé', $corps, $reference ? ['reference' => $reference] : []);
         SendNativePushJob::dispatch($copro->user_id, 'Paiement validé', $corps, ['route' => '/portail/finances']);
+    }
+
+    /**
+     * Persiste une notification in-app (centre de notifications) en plus du push
+     * natif (KAN-133). Le push est best-effort et no-op sans provider FCM/APNs
+     * configuré (#316) ; la notification in-app, elle, s'affiche toujours dans le
+     * portail. Les événements ticket/paiement rejeté sont déjà persistés par leurs
+     * contrôleurs — on ne double pas ici.
+     */
+    private function persist(int $tenantId, int $userId, string $type, string $title, string $body, array $data = []): void
+    {
+        Notification::create([
+            'tenant_id' => $tenantId,
+            'user_id' => $userId,
+            'type' => $type,
+            'title' => $title,
+            'message' => $body,
+            'read' => false,
+            'data' => $data,
+        ]);
     }
 
     /** IDs des utilisateurs résidents (copropriétaires liés à un compte). */
