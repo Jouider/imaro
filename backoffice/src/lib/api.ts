@@ -233,3 +233,95 @@ export async function toggleUserActive(id: number, active: boolean) {
 export async function forceUserLogout(id: number) {
   await api.post(`/admin/users/${id}/logout`)
 }
+
+// ── Journal d'audit global cross-tenant (KAN-144) ────────────────────────────
+export type AdminAuditLog = {
+  id: number
+  tenant: { id: number; name: string } | null
+  category: string
+  action: string
+  severity: 'info' | 'warning' | 'sensitive' | 'error'
+  target_label: string | null
+  user_email: string | null
+  ip_address: string | null
+  created_at: string
+}
+
+export type AuditFilters = {
+  tenant_id?: number
+  category?: string
+  severity?: string
+  from?: string
+  to?: string
+  search?: string
+}
+
+const MOCK_AUDIT: AdminAuditLog[] = [
+  {
+    id: 1,
+    tenant: { id: 1, name: 'Gest Syndic SARL' },
+    category: 'auth',
+    action: 'Auth.failed_login',
+    severity: 'warning',
+    target_label: null,
+    user_email: 'unknown@attacker.fake',
+    ip_address: '197.230.45.12',
+    created_at: '2026-07-14T03:45:09Z',
+  },
+  {
+    id: 2,
+    tenant: null,
+    category: 'system',
+    action: 'Backoffice.impersonate',
+    severity: 'sensitive',
+    target_label: 'Cabinet Anfa',
+    user_email: 'm.fikri@digitoyou.ma',
+    ip_address: '105.66.12.34',
+    created_at: '2026-07-13T18:20:00Z',
+  },
+  {
+    id: 3,
+    tenant: { id: 2, name: 'Cabinet Anfa' },
+    category: 'facturation',
+    action: 'Tenant.suspended',
+    severity: 'sensitive',
+    target_label: 'Cabinet Anfa',
+    user_email: 'admin@digitoyou.ma',
+    ip_address: '105.66.12.34',
+    created_at: '2026-07-12T11:02:18Z',
+  },
+  {
+    id: 4,
+    tenant: { id: 1, name: 'Gest Syndic SARL' },
+    category: 'paiement',
+    action: 'Payment.created',
+    severity: 'info',
+    target_label: 'Lot A-01 · 850,00 DH',
+    user_email: 'salma.bennani@gestsyndic.ma',
+    ip_address: '41.92.10.7',
+    created_at: '2026-07-12T10:14:22Z',
+  },
+]
+
+export async function getAdminAuditLogs(
+  filters: AuditFilters = {},
+): Promise<AdminAuditLog[]> {
+  try {
+    const res = await api.get<{ data: AdminAuditLog[] }>('/admin/audit', {
+      params: filters,
+    })
+    return res.data.data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    const q = filters.search?.trim().toLowerCase()
+    return MOCK_AUDIT.filter(
+      (l) =>
+        (!filters.category || l.category === filters.category) &&
+        (!filters.severity || l.severity === filters.severity) &&
+        (!q ||
+          [l.action, l.user_email, l.target_label, l.tenant?.name]
+            .filter(Boolean)
+            .some((v) => v!.toLowerCase().includes(q))),
+    )
+  }
+}
