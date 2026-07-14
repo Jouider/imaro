@@ -1083,9 +1083,7 @@
         "resendError": "فشل إرسال الرمز",
         "copyError": "تعذّر نسخ الرمز"
       }
-    },
-    "cin": "بطاقة التعريف الوطنية",
-    "cinPlaceholder": "مثال: AB123456"
+    }
   },
   "gestionnaire": {
     "pointage": {

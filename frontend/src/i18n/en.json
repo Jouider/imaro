@@ -1076,9 +1076,7 @@
         "resendError": "Failed to send the code",
         "copyError": "Couldn't copy the code"
       }
-    },
-    "cin": "National ID",
-    "cinPlaceholder": "e.g. AB123456"
+    }
   },
   "gestionnaire": {
     "pointage": {
