@@ -153,3 +153,83 @@ export type Lead = {
   converted_tenant: { id: number; name: string; subdomain: string } | null
   created_at: string | null
 }
+
+// ── Utilisateurs (recherche globale cross-tenant, KAN-141) ───────────────────
+export type AdminUser = {
+  id: number
+  name: string
+  email: string | null
+  phone: string | null
+  role: string
+  tenant: { id: number; name: string } | null
+  status: 'active' | 'inactive'
+  last_login_at: string | null
+}
+
+const MOCK_USERS: AdminUser[] = [
+  {
+    id: 1,
+    name: 'Mohammed Fikri',
+    email: 'm.fikri@gestsyndic.ma',
+    phone: '+212600000001',
+    role: 'manager',
+    tenant: { id: 1, name: 'Gest Syndic SARL' },
+    status: 'active',
+    last_login_at: '2026-07-13T09:12:00Z',
+  },
+  {
+    id: 2,
+    name: 'Salma Bennani',
+    email: 'salma.bennani@gestsyndic.ma',
+    phone: '+212600000002',
+    role: 'gestionnaire',
+    tenant: { id: 1, name: 'Gest Syndic SARL' },
+    status: 'active',
+    last_login_at: '2026-07-12T15:40:00Z',
+  },
+  {
+    id: 3,
+    name: 'Hassan Benali',
+    email: 'hassan.benali@anfa.ma',
+    phone: '+212611223344',
+    role: 'resident',
+    tenant: { id: 2, name: 'Cabinet Anfa' },
+    status: 'inactive',
+    last_login_at: null,
+  },
+]
+
+/** Recherche globale d'utilisateurs (repli mock en dev si l'API n'est pas prête). */
+export async function searchUsers(q: string): Promise<AdminUser[]> {
+  try {
+    const res = await api.get<{ data: AdminUser[] }>('/admin/users', {
+      params: { q: q || undefined },
+    })
+    return res.data.data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    const needle = q.trim().toLowerCase()
+    return needle
+      ? MOCK_USERS.filter((u) =>
+          [u.name, u.email, u.phone, u.tenant?.name]
+            .filter(Boolean)
+            .some((v) => v!.toLowerCase().includes(needle)),
+        )
+      : MOCK_USERS
+  }
+}
+
+export async function resetUserPassword(id: number): Promise<string> {
+  const res = await api.post<{ data: { temp_password: string } }>(
+    `/admin/users/${id}/reset-password`,
+  )
+  return res.data.data.temp_password
+}
+
+export async function toggleUserActive(id: number, active: boolean) {
+  await api.post(`/admin/users/${id}/toggle`, { is_active: active })
+}
+
+export async function forceUserLogout(id: number) {
+  await api.post(`/admin/users/${id}/logout`)
+}
