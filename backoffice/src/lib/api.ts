@@ -59,12 +59,84 @@ export type Tenant = {
   created_at: string | null
 }
 
+export type MetricPoint = { label: string; value: number }
+
 export type Metrics = {
   clients: { total: number; actifs: number; essai: number; suspendus: number }
   par_plan: Record<string, number>
   parc: { residences: number; lots: number; utilisateurs: number }
   essais_expirant_7j: number
   derniers_clients: { id: number; name: string; plan: string; status: string }[]
+  // KPIs business (KAN-139) — optionnels tant que MetricsController ne les
+  // expose pas ; complétés par un mock en dev (voir getMetrics).
+  mrr?: number
+  arr?: number
+  mrr_precedent?: number
+  revenus_mois?: number
+  churn_pct?: number
+  conversion_pct?: number
+  evolution_mrr?: MetricPoint[]
+  nouveaux_tenants?: MetricPoint[]
+}
+
+/**
+ * KPIs business simulés tant que `GET /admin/metrics` (KAN-139, back) ne les
+ * renvoie pas. Les vraies valeurs de l'API priment (voir getMetrics).
+ */
+const MOCK_BUSINESS_METRICS: Partial<Metrics> = {
+  mrr: 48600,
+  arr: 583200,
+  mrr_precedent: 45200,
+  revenus_mois: 51200,
+  churn_pct: 2.4,
+  conversion_pct: 31,
+  evolution_mrr: [
+    { label: 'Jan', value: 32000 },
+    { label: 'Fév', value: 35500 },
+    { label: 'Mar', value: 38200 },
+    { label: 'Avr', value: 41000 },
+    { label: 'Mai', value: 45200 },
+    { label: 'Jun', value: 48600 },
+  ],
+  nouveaux_tenants: [
+    { label: 'Jan', value: 3 },
+    { label: 'Fév', value: 2 },
+    { label: 'Mar', value: 4 },
+    { label: 'Avr', value: 3 },
+    { label: 'Mai', value: 5 },
+    { label: 'Jun', value: 4 },
+  ],
+}
+
+/** Mock complet (base + business) — repli dev quand l'API n'est pas joignable. */
+const MOCK_METRICS: Metrics = {
+  clients: { total: 24, actifs: 18, essai: 4, suspendus: 2 },
+  par_plan: { starter: 9, business: 12, premium: 3 },
+  parc: { residences: 86, lots: 1420, utilisateurs: 512 },
+  essais_expirant_7j: 2,
+  derniers_clients: [
+    { id: 1, name: 'Gest Syndic SARL', plan: 'business', status: 'active' },
+    { id: 2, name: 'Cabinet Anfa', plan: 'premium', status: 'active' },
+    { id: 3, name: 'Syndic Marina', plan: 'starter', status: 'trial' },
+  ],
+  ...MOCK_BUSINESS_METRICS,
+}
+
+/**
+ * Récupère les métriques du dashboard. Complète les KPIs business absents avec
+ * un mock en dev (bascule automatique dès que le back les renvoie — les champs
+ * réels de l'API écrasent le mock). En dev, si l'API est injoignable, renvoie un
+ * mock complet pour permettre le développement hors-ligne du back-office.
+ */
+export async function getMetrics(): Promise<Metrics> {
+  try {
+    const data = (await api.get<{ data: Metrics }>('/admin/metrics')).data.data
+    if (!import.meta.env.DEV) return data
+    return { ...MOCK_BUSINESS_METRICS, ...data }
+  } catch (err) {
+    if (import.meta.env.DEV) return MOCK_METRICS
+    throw err
+  }
 }
 
 export type Lead = {
