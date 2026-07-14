@@ -460,10 +460,16 @@ class ComptabiliteController extends Controller
                 $ligne->save();
             }
 
-            $copro->recalculerSolde();
-
             return $paiement;
         });
+
+        // Best-effort hors transaction (KAN-116) : un échec du recalcul de solde
+        // ne doit pas faire échouer (ni annuler) l'encaissement déjà enregistré.
+        try {
+            $copro->recalculerSolde();
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return response()->json([
             'status' => 'success',
