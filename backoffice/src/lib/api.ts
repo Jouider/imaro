@@ -325,3 +325,72 @@ export async function getAdminAuditLogs(
     )
   }
 }
+
+// ── Diffusion / broadcast aux cabinets (KAN-145) ─────────────────────────────
+export type BroadcastTarget = 'all' | 'plan' | 'tenant'
+
+export type Broadcast = {
+  id: number
+  title: string
+  message: string
+  target: BroadcastTarget
+  target_value: string | null
+  channels: string[]
+  scheduled_at: string | null
+  sent_at: string | null
+  recipients_count: number
+  read_count: number
+  created_at: string
+}
+
+export type BroadcastInput = {
+  title: string
+  message: string
+  target: BroadcastTarget
+  target_value?: string | null
+  channels: string[]
+  scheduled_at?: string | null
+}
+
+const MOCK_BROADCASTS: Broadcast[] = [
+  {
+    id: 1,
+    title: 'Maintenance planifiée',
+    message: 'Une maintenance aura lieu dimanche de 2h à 4h.',
+    target: 'all',
+    target_value: null,
+    channels: ['app', 'email'],
+    scheduled_at: null,
+    sent_at: '2026-07-10T08:00:00Z',
+    recipients_count: 24,
+    read_count: 17,
+    created_at: '2026-07-10T07:50:00Z',
+  },
+  {
+    id: 2,
+    title: 'Nouveauté : module budgets',
+    message: 'Le module Budgets est disponible pour le plan Business.',
+    target: 'plan',
+    target_value: 'business',
+    channels: ['app'],
+    scheduled_at: null,
+    sent_at: '2026-07-05T10:00:00Z',
+    recipients_count: 12,
+    read_count: 9,
+    created_at: '2026-07-05T09:40:00Z',
+  },
+]
+
+export async function getBroadcasts(): Promise<Broadcast[]> {
+  try {
+    return (await api.get<{ data: Broadcast[] }>('/admin/broadcasts')).data.data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    return MOCK_BROADCASTS
+  }
+}
+
+export async function sendBroadcast(input: BroadcastInput): Promise<Broadcast> {
+  const res = await api.post<{ data: Broadcast }>('/admin/broadcasts', input)
+  return res.data.data
+}
