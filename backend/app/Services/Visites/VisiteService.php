@@ -6,6 +6,7 @@ use App\Models\Residence;
 use App\Models\User;
 use App\Models\Visite;
 use App\Models\VisiteScanLog;
+use App\Services\Notifications\PortailPushNotifier;
 use Illuminate\Support\Carbon;
 
 /**
@@ -16,6 +17,8 @@ class VisiteService
 {
     /** Fenêtre de tolérance autour de planned_at pour autoriser le check-in. */
     private const WINDOW_HOURS = 2;
+
+    public function __construct(private readonly PortailPushNotifier $push) {}
 
     public function eagerLoad(): array
     {
@@ -30,7 +33,7 @@ class VisiteService
     {
         $walkIn = empty($data['planned_at']);
 
-        return Visite::create([
+        $visite = Visite::create([
             'tenant_id' => $residence->tenant_id,
             'residence_id' => $residence->id,
             'qr_token' => Visite::generateToken(),
@@ -47,6 +50,13 @@ class VisiteService
             'recurrence' => $data['recurrence'] ?? null,
             'created_by_id' => $createdBy?->id,
         ]);
+
+        // Walk-in = arrivée immédiate → prévenir l'hôte (KAN-135).
+        if ($walkIn) {
+            $this->push->visiteurArrive($visite);
+        }
+
+        return $visite;
     }
 
     /**
@@ -59,6 +69,8 @@ class VisiteService
 
         if ($action === 'check_in') {
             $visite->update(['status' => 'arrived', 'arrived_at' => now(), 'left_at' => null]);
+            // Arrivée confirmée → prévenir l'hôte (KAN-135).
+            $this->push->visiteurArrive($visite);
         } elseif ($action === 'check_out') {
             $visite->update(['status' => 'departed', 'left_at' => now()]);
         }
