@@ -4,8 +4,12 @@ namespace App\Services\Comptabilite;
 
 use App\Models\AutreRecette;
 use App\Models\Depense;
+use App\Models\Emprunt;
+use App\Models\Equipement;
 use App\Models\Exercice;
 use App\Models\Paiement;
+use App\Models\Remboursement;
+use App\Models\TravauxExceptionnel;
 use Illuminate\Support\Collection;
 
 /**
@@ -118,6 +122,121 @@ class ComptabiliteExportService
                 'exercice_id' => $exercice->id,
                 'type' => 'encaissement',
             ]);
+        }
+
+        // ── Opérations diverses → journal (KAN-130, 2..5/5) ───────────────────
+        // Ces tables ne portent pas d'exercice_id : rattachement par résidence +
+        // date dans la fenêtre de l'exercice. Comptes conventionnels (Décret
+        // 2.23.700 / CGNC) — à faire valider par la comptabilité.
+        $debut = $exercice->date_debut?->toDateString();
+        $fin = $exercice->date_fin?->toDateString();
+        $inExercice = fn (?string $date): bool => $date !== null
+            && ($debut === null || $date >= $debut)
+            && ($fin === null || $date <= $fin);
+
+        // Remboursements payés → sortie de banque (débit 4411 copro créditeur / crédit 5121).
+        $remboursements = Remboursement::where('residence_id', $exercice->residence_id)
+            ->where('statut', 'paye')
+            ->whereNotNull('date_paiement')
+            ->orderBy('date_paiement')
+            ->get();
+
+        foreach ($remboursements as $rb) {
+            $date = $rb->date_paiement?->toDateString();
+            if (! $inExercice($date)) {
+                continue;
+            }
+            $entries->push([
+                'id' => 'RB'.$rb->id,
+                'date' => $date,
+                'libelle' => 'Remboursement — '.($rb->coproprietaire_nom ?: ($rb->description ?: $rb->motif)),
+                'compte_debit' => '4411',
+                'compte_credit' => '5121',
+                'montant' => round($rb->montant, 2),
+                'piece' => $rb->reference ?? 'RMB-'.$rb->id,
+                'exercice_id' => $exercice->id,
+                'type' => 'depense',
+            ]);
+        }
+
+        // Travaux exceptionnels réglés → charge non courante (débit 6500 / crédit 5121).
+        $travaux = TravauxExceptionnel::where('residence_id', $exercice->residence_id)
+            ->where('montant_regle', '>', 0)
+            ->get();
+
+        foreach ($travaux as $tx) {
+            $date = ($tx->date_fin_reelle ?? $tx->date_debut)?->toDateString();
+            if (! $inExercice($date)) {
+                continue;
+            }
+            $entries->push([
+                'id' => 'TX'.$tx->id,
+                'date' => $date,
+                'libelle' => 'Travaux exceptionnels — '.$tx->libelle,
+                'compte_debit' => '6500',
+                'compte_credit' => '5121',
+                'montant' => round($tx->montant_regle, 2),
+                'piece' => 'TRX-'.$tx->id,
+                'exercice_id' => $exercice->id,
+                'type' => 'depense',
+            ]);
+        }
+
+        // Équipements acquis → immobilisation (débit 2300 / crédit 5121). La dotation
+        // aux amortissements n'est pas encore comptabilisée — à cadrer avec la compta.
+        $equipements = Equipement::where('residence_id', $exercice->residence_id)->get();
+
+        foreach ($equipements as $eq) {
+            $date = $eq->date_acquisition?->toDateString();
+            if (! $inExercice($date)) {
+                continue;
+            }
+            $entries->push([
+                'id' => 'EQ'.$eq->id,
+                'date' => $date,
+                'libelle' => 'Acquisition équipement — '.$eq->designation,
+                'compte_debit' => '2300',
+                'compte_credit' => '5121',
+                'montant' => round($eq->valeur_acquisition, 2),
+                'piece' => 'EQP-'.$eq->id,
+                'exercice_id' => $exercice->id,
+                'type' => 'depense',
+            ]);
+        }
+
+        // Emprunts : déblocage (débit 5121 / crédit 1481) si contracté dans l'exercice ;
+        // remboursements cumulés de l'exercice (débit 1481 / crédit 5121). La ventilation
+        // capital / intérêts (6311) n'est pas séparée ici — à affiner avec la compta.
+        $emprunts = Emprunt::where('residence_id', $exercice->residence_id)->get();
+
+        foreach ($emprunts as $emp) {
+            $dateDebut = $emp->date_debut?->toDateString();
+            if ($inExercice($dateDebut) && $emp->montant_initial > 0) {
+                $entries->push([
+                    'id' => 'EMP'.$emp->id,
+                    'date' => $dateDebut,
+                    'libelle' => 'Déblocage emprunt — '.($emp->organisme ?: $emp->libelle),
+                    'compte_debit' => '5121',
+                    'compte_credit' => '1481',
+                    'montant' => round($emp->montant_initial, 2),
+                    'piece' => 'EMP-'.$emp->id,
+                    'exercice_id' => $exercice->id,
+                    'type' => 'encaissement',
+                ]);
+            }
+            if (($emp->paye_exercice ?? 0) > 0) {
+                $entries->push([
+                    'id' => 'EMR'.$emp->id,
+                    'date' => $fin ?? $dateDebut,
+                    'libelle' => 'Remboursement emprunt — '.($emp->organisme ?: $emp->libelle),
+                    'compte_debit' => '1481',
+                    'compte_credit' => '5121',
+                    'montant' => round($emp->paye_exercice, 2),
+                    'piece' => 'EMR-'.$emp->id,
+                    'exercice_id' => $exercice->id,
+                    'type' => 'depense',
+                ]);
+            }
         }
 
         return $entries;
@@ -289,6 +408,8 @@ class ComptabiliteExportService
             ['numero' => '1481', 'libelle' => 'Emprunts auprès des établissements de crédit', 'classe' => 1, 'type' => 'capitaux', 'nature' => 'non_courant'],
             ['numero' => '1500', 'libelle' => 'Provisions pour charges', 'classe' => 1, 'type' => 'capitaux', 'nature' => 'both'],
             ['numero' => '1750', 'libelle' => 'Avances reçues des copropriétaires', 'classe' => 1, 'type' => 'capitaux', 'nature' => 'both'],
+            ['numero' => '2300', 'libelle' => 'Installations techniques, matériel et équipements', 'classe' => 2, 'type' => 'actif', 'nature' => 'non_courant'],
+            ['numero' => '2832', 'libelle' => 'Amortissements des équipements', 'classe' => 2, 'type' => 'actif', 'nature' => 'non_courant'],
             ['numero' => '3421', 'libelle' => 'Avances et acomptes versés', 'classe' => 3, 'type' => 'actif', 'nature' => 'courant'],
             ['numero' => '3431', 'libelle' => 'Avances et acomptes versés aux fournisseurs', 'classe' => 3, 'type' => 'actif', 'nature' => 'courant'],
             ['numero' => '3488', 'libelle' => 'Débiteurs divers', 'classe' => 3, 'type' => 'actif', 'nature' => 'courant'],
