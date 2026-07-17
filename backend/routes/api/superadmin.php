@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\SuperAdmin\BillingController;
 use App\Http\Controllers\Api\SuperAdmin\ClientOverviewController;
+use App\Http\Controllers\Api\SuperAdmin\HealthController;
 use App\Http\Controllers\Api\SuperAdmin\LeadController;
 use App\Http\Controllers\Api\SuperAdmin\MetricsController;
 use App\Http\Controllers\Api\SuperAdmin\PlanController;
@@ -27,6 +28,11 @@ Route::post('/tenants/{tenant}/activate', [TenantController::class, 'activate'])
 Route::post('/tenants/{tenant}/extend-trial', [TenantController::class, 'extendTrial']);
 // Impersonation (dépannage) — token court tracé dans l'audit
 Route::post('/tenants/{tenant}/impersonate', [TenantController::class, 'impersonate']);
+
+// Supervision technique (santé, files, jobs en échec) — KAN-143
+Route::get('/health', [HealthController::class, 'health']);
+Route::get('/failed-jobs', [HealthController::class, 'failedJobs']);
+Route::post('/failed-jobs/{id}/retry', [HealthController::class, 'retry']);
 
 // Abonnements & facturation (KAN-140)
 Route::get('/invoices', [BillingController::class, 'index']);

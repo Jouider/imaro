@@ -10,6 +10,7 @@ import { Users } from './pages/Users'
 import { Audit } from './pages/Audit'
 import { Broadcast } from './pages/Broadcast'
 import { FeatureFlags } from './pages/FeatureFlags'
+import { Systeme } from './pages/Systeme'
 import { Plans } from './pages/Plans'
 import { Leads } from './pages/Leads'
 
@@ -36,6 +37,7 @@ export default function App() {
         <Route path="/audit" element={<Audit />} />
         <Route path="/diffusion" element={<Broadcast />} />
         <Route path="/fonctionnalites" element={<FeatureFlags />} />
+        <Route path="/systeme" element={<Systeme />} />
         <Route path="/plans" element={<Plans />} />
         <Route path="/leads" element={<Leads />} />
       </Route>
