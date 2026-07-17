@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\Lead;
 use App\Models\Lot;
+use App\Models\NotificationLog;
 use App\Models\Residence;
 use App\Models\Tenant;
+use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -105,6 +107,13 @@ class MetricsController extends Controller
                     ->whereNotNull('trial_ends_at')
                     ->whereBetween('trial_ends_at', [now(), now()->addDays(7)])
                     ->count(),
+                // Usage plateforme — activité réelle des 30 derniers jours.
+                'usage' => [
+                    'utilisateurs_actifs_30j' => User::where('last_login_at', '>=', now()->subDays(30))->count(),
+                    'tickets_ouverts' => Ticket::whereIn('statut', ['ouvert', 'en_cours'])->count(),
+                    'notifications_30j' => NotificationLog::where('created_at', '>=', now()->subDays(30))->count(),
+                    'nouveaux_clients_30j' => Tenant::where('created_at', '>=', now()->subDays(30))->count(),
+                ],
                 'derniers_clients' => Tenant::orderByDesc('created_at')->limit(5)->get()
                     ->map(fn (Tenant $t) => [
                         'id' => $t->id, 'name' => $t->name, 'plan' => $t->plan,

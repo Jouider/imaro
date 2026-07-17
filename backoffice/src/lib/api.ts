@@ -66,6 +66,14 @@ export type Metrics = {
   par_plan: Record<string, number>
   parc: { residences: number; lots: number; utilisateurs: number }
   essais_expirant_7j: number
+  // Usage plateforme (30j) exposé par le back — optionnel côté front (non rendu
+  // sur le dashboard business, et absent du mock dev).
+  usage?: {
+    utilisateurs_actifs_30j: number
+    tickets_ouverts: number
+    notifications_30j: number
+    nouveaux_clients_30j: number
+  }
   derniers_clients: { id: number; name: string; plan: string; status: string }[]
   // KPIs business (KAN-139) — optionnels tant que MetricsController ne les
   // expose pas ; complétés par un mock en dev (voir getMetrics).
@@ -136,6 +144,68 @@ export async function getMetrics(): Promise<Metrics> {
   } catch (err) {
     if (import.meta.env.DEV) return MOCK_METRICS
     throw err
+  }
+}
+
+export type Quota = {
+  ressource: string
+  used: number
+  limit: number | null
+  pct: number | null
+  warn: boolean
+  over: boolean
+}
+
+export type ClientOverview = {
+  tenant: {
+    id: number
+    name: string
+    subdomain: string
+    plan: string
+    plan_label: string
+    status: 'trial' | 'active' | 'suspended'
+    trial_ends_at: string | null
+    created_at: string | null
+  }
+  usagers: { total: number; actifs_30j: number; par_role: Record<string, number> }
+  gestionnaires: {
+    total: number
+    personnel_terrain: number
+    charge: { name: string; residences: number }[]
+  }
+  parc: {
+    residences: number
+    lots: number
+    coproprietaires: number
+    occupants: number
+    exercices_actifs: number
+  }
+  reclamations: {
+    total: number
+    par_statut: { ouvert: number; en_cours: number; resolu: number; clos: number }
+    urgents_ouverts: number
+    delai_resolution_moyen_h: number | null
+    satisfaction_moyenne: number | null
+  }
+  finances: {
+    exercice_actif: number | null
+    appels_total_mad: number
+    encaisse_mad: number
+    impayes_mad: number
+    taux_recouvrement: number | null
+  }
+  engagement: {
+    derniere_activite: string | null
+    logins_7j: number
+    notifications_30j: { whatsapp: number; sms: number; email: number; echecs: number }
+  }
+  abonnement: {
+    plan: string
+    plan_label: string
+    status: string
+    trial_ends_at: string | null
+    storage_limit_mb: number | null
+    quotas: Quota[]
   }
 }
 

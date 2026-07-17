@@ -4,6 +4,7 @@ import { Layout } from './components/Layout'
 import { Login } from './pages/Login'
 import { Dashboard } from './pages/Dashboard'
 import { Clients } from './pages/Clients'
+import { ClientDetail } from './pages/ClientDetail'
 import { Facturation } from './pages/Facturation'
 import { Users } from './pages/Users'
 import { Audit } from './pages/Audit'
@@ -30,6 +31,7 @@ export default function App() {
       >
         <Route path="/" element={<Dashboard />} />
         <Route path="/clients" element={<Clients />} />
+        <Route path="/clients/:id" element={<ClientDetail />} />
         <Route path="/facturation" element={<Facturation />} />
         <Route path="/utilisateurs" element={<Users />} />
         <Route path="/audit" element={<Audit />} />
