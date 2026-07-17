@@ -3,6 +3,7 @@
 use App\Models\AppelFonds;
 use App\Models\AppelFondsLigne;
 use App\Models\Coproprietaire;
+use App\Models\Immeuble;
 use App\Models\Lot;
 use App\Models\Residence;
 use App\Models\Tenant;
@@ -40,8 +41,9 @@ beforeEach(function () {
     $resident1 = User::create(['tenant_id' => $this->tenant->id, 'name' => 'Hassan Benali', 'phone' => '+212611000010', 'role' => 'resident', 'status' => 'active']);
     $resident2 = User::create(['tenant_id' => $this->tenant->id, 'name' => 'Fatima Chraibi', 'phone' => '+212611000011', 'role' => 'resident', 'status' => 'active']);
 
-    $lot1 = Lot::create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'numero' => 'A01', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 600]);
-    $lot2 = Lot::create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'numero' => 'A02', 'type' => 'appartement', 'etage' => 2, 'tantieme' => 400]);
+    $immeuble = Immeuble::withoutGlobalScopes()->create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'nom' => 'Immeuble Principal']);
+    $lot1 = Lot::create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'immeuble_id' => $immeuble->id, 'numero' => 'A01', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 600]);
+    $lot2 = Lot::create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'immeuble_id' => $immeuble->id, 'numero' => 'A02', 'type' => 'appartement', 'etage' => 2, 'tantieme' => 400]);
 
     $this->copro1 = Coproprietaire::create(['tenant_id' => $this->tenant->id, 'user_id' => $resident1->id, 'lot_id' => $lot1->id, 'type' => 'proprietaire', 'solde_actuel' => 0]);
     $this->copro2 = Coproprietaire::create(['tenant_id' => $this->tenant->id, 'user_id' => $resident2->id, 'lot_id' => $lot2->id, 'type' => 'proprietaire', 'solde_actuel' => 0]);
@@ -54,8 +56,8 @@ beforeEach(function () {
 it('creates an appel de fonds and generates lines by tantieme', function () {
     $response = $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->postJson('/api/gestionnaire/appels-fonds', [
-            'libelle'       => 'Charges Q2 2026',
-            'residence_id'  => $this->residence->id,
+            'libelle' => 'Charges Q2 2026',
+            'residence_id' => $this->residence->id,
             'montant_total' => 10000,
             'date_echeance' => Carbon::now()->addMonths(2)->toDateString(),
         ])
