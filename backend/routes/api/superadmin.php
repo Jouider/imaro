@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\SuperAdmin\BillingController;
 use App\Http\Controllers\Api\SuperAdmin\LeadController;
 use App\Http\Controllers\Api\SuperAdmin\MetricsController;
 use App\Http\Controllers\Api\SuperAdmin\TenantController;
@@ -22,6 +23,13 @@ Route::post('/tenants/{tenant}/activate', [TenantController::class, 'activate'])
 Route::post('/tenants/{tenant}/extend-trial', [TenantController::class, 'extendTrial']);
 // Impersonation (dépannage) — token court tracé dans l'audit
 Route::post('/tenants/{tenant}/impersonate', [TenantController::class, 'impersonate']);
+
+// Abonnements & facturation (KAN-140)
+Route::get('/invoices', [BillingController::class, 'index']);
+Route::post('/tenants/{tenant}/invoices', [BillingController::class, 'store']);
+Route::put('/tenants/{tenant}/subscription', [BillingController::class, 'updateSubscription']);
+Route::post('/invoices/{invoice}/mark-paid', [BillingController::class, 'markPaid']);
+Route::post('/invoices/{invoice}/cancel', [BillingController::class, 'cancel']);
 
 // Démos & leads (pipeline commercial)
 Route::get('/leads', [LeadController::class, 'index']);
