@@ -49,6 +49,19 @@ it('métriques globales', function () {
         ->assertJsonPath('data.essais_expirant_7j', 1);
 });
 
+it('expose les KPIs business (MRR/ARR/conversion/évolution) — KAN-139', function () {
+    // Actifs : digitoyou (enterprise=5000) + clientA (business=1200) = 6200.
+    // clientB est en essai → non compté dans le MRR.
+    $res = $this->withHeaders($this->auth)->getJson('/api/admin/metrics')
+        ->assertStatus(200)
+        ->assertJsonPath('data.mrr', 6200)
+        ->assertJsonPath('data.arr', 74400)
+        ->assertJsonPath('data.conversion_pct', 0); // aucun lead
+
+    expect($res->json('data.evolution_mrr'))->toHaveCount(6);
+    expect($res->json('data.nouveaux_tenants'))->toHaveCount(6);
+});
+
 it('suspend puis réactive un client', function () {
     $this->withHeaders($this->auth)->postJson("/api/admin/tenants/{$this->clientA->id}/suspend")
         ->assertStatus(200)->assertJsonPath('data.tenant.status', 'suspended');
