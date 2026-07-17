@@ -394,3 +394,70 @@ export async function sendBroadcast(input: BroadcastInput): Promise<Broadcast> {
   const res = await api.post<{ data: Broadcast }>('/admin/broadcasts', input)
   return res.data.data
 }
+
+// ── Feature flags / droits par plan (KAN-142) ────────────────────────────────
+export type FeatureFlag = {
+  key: string
+  label: string
+  description: string
+  /** Plans où la fonctionnalité est activée par défaut. */
+  enabled_plans: string[]
+}
+
+export const PLANS = ['starter', 'business', 'premium'] as const
+
+const MOCK_FLAGS: FeatureFlag[] = [
+  {
+    key: 'ai',
+    label: 'Assistant IA (EMARO)',
+    description:
+      'Chat IA, import IA de factures, suggestions. Désactivé pour l’instant (coût, KAN-111).',
+    enabled_plans: [],
+  },
+  {
+    key: 'mobile',
+    label: 'Application mobile',
+    description: 'Accès au portail résident via l’app iOS/Android.',
+    enabled_plans: ['business', 'premium'],
+  },
+  {
+    key: 'budgets_avances',
+    label: 'Budgets avancés',
+    description: 'Comparatif budget/réel, budgets pluriannuels.',
+    enabled_plans: ['business', 'premium'],
+  },
+  {
+    key: 'ocr_factures',
+    label: 'OCR des factures',
+    description: 'Pré-remplissage des dépenses par lecture de facture.',
+    enabled_plans: ['premium'],
+  },
+  {
+    key: 'exports_comptables',
+    label: 'Exports comptables (FEC, xlsx)',
+    description: 'Journal, grand-livre, balance, FEC.',
+    enabled_plans: ['starter', 'business', 'premium'],
+  },
+]
+
+export async function getFeatureFlags(): Promise<FeatureFlag[]> {
+  try {
+    return (await api.get<{ data: FeatureFlag[] }>('/admin/feature-flags')).data
+      .data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    return MOCK_FLAGS
+  }
+}
+
+export async function updateFeatureFlag(
+  key: string,
+  enabled_plans: string[],
+): Promise<void> {
+  try {
+    await api.put(`/admin/feature-flags/${key}`, { enabled_plans })
+  } catch (err) {
+    // En dev sans backend, on conserve l'état optimiste (repli mock).
+    if (!import.meta.env.DEV) throw err
+  }
+}

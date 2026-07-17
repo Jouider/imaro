@@ -5,6 +5,7 @@ import {
   Users,
   ShieldCheck,
   Megaphone,
+  ToggleRight,
   Contact,
   LogOut,
 } from 'lucide-react'
@@ -16,6 +17,7 @@ const nav = [
   { to: '/utilisateurs', label: 'Utilisateurs', icon: Users, end: false },
   { to: '/audit', label: 'Audit', icon: ShieldCheck, end: false },
   { to: '/diffusion', label: 'Diffusion', icon: Megaphone, end: false },
+  { to: '/fonctionnalites', label: 'Fonctionnalités', icon: ToggleRight, end: false },
   { to: '/leads', label: 'Démos & leads', icon: Contact, end: false },
 ]
 
