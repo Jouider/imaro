@@ -15,15 +15,18 @@ class Tenant extends Model
         'name', 'email', 'phone', 'logo', 'plan', 'max_logins',
         'rc', 'if_number', 'rib', 'subdomain', 'status', 'trial_ends_at',
         'onboarding_completed_at', 'onboarding_step',
+        'renewal_at', 'discount_pct',
     ];
 
     protected function casts(): array
     {
         return [
-            'trial_ends_at'           => 'datetime',
-            'max_logins'              => 'integer',
+            'trial_ends_at' => 'datetime',
+            'max_logins' => 'integer',
             'onboarding_completed_at' => 'datetime',
-            'onboarding_step'         => 'integer',
+            'onboarding_step' => 'integer',
+            'renewal_at' => 'date',
+            'discount_pct' => 'integer',
         ];
     }
 
