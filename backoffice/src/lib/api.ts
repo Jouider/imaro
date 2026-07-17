@@ -462,6 +462,74 @@ export async function updateFeatureFlag(
   }
 }
 
+// ── Supervision technique (KAN-143) ──────────────────────────────────────────
+export type Health = {
+  services: Record<'database' | 'redis' | 'cache' | 'storage', boolean>
+  queue: { failed: number; pending: number }
+  integrations: Record<
+    'whatsapp_twilio' | 'email_brevo' | 'push_fcm' | 'push_apns' | 'paiement_cmi',
+    boolean
+  >
+  version: string
+  environment: string
+  last_migration: string | null
+}
+
+export type FailedJob = {
+  id: string
+  connection: string | null
+  queue: string | null
+  exception: string
+  failed_at: string | null
+}
+
+const MOCK_HEALTH: Health = {
+  services: { database: true, redis: true, cache: true, storage: true },
+  queue: { failed: 1, pending: 4 },
+  integrations: {
+    whatsapp_twilio: false,
+    email_brevo: true,
+    push_fcm: false,
+    push_apns: false,
+    paiement_cmi: false,
+  },
+  version: 'dev',
+  environment: 'local',
+  last_migration: '2026_07_17_110002_create_invoices_table',
+}
+
+const MOCK_FAILED_JOBS: FailedJob[] = [
+  {
+    id: '9f1c-mock',
+    connection: 'redis',
+    queue: 'default',
+    exception: 'App\\Jobs\\SendNativePushJob — FCM credentials missing',
+    failed_at: '2026-07-16T22:14:00Z',
+  },
+]
+
+export async function getHealth(): Promise<Health> {
+  try {
+    return (await api.get<{ data: Health }>('/admin/health')).data.data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    return MOCK_HEALTH
+  }
+}
+
+export async function getFailedJobs(): Promise<FailedJob[]> {
+  try {
+    return (await api.get<{ data: FailedJob[] }>('/admin/failed-jobs')).data.data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    return MOCK_FAILED_JOBS
+  }
+}
+
+export async function retryFailedJob(id: string): Promise<void> {
+  await api.post(`/admin/failed-jobs/${id}/retry`)
+}
+
 // ── Abonnements & facturation (KAN-140) ──────────────────────────────────────
 export type Invoice = {
   id: number

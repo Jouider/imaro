@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   Megaphone,
   ToggleRight,
+  Activity,
   Tags,
   Contact,
   LogOut,
@@ -21,6 +22,7 @@ const nav = [
   { to: '/audit', label: 'Audit', icon: ShieldCheck, end: false },
   { to: '/diffusion', label: 'Diffusion', icon: Megaphone, end: false },
   { to: '/fonctionnalites', label: 'Fonctionnalités', icon: ToggleRight, end: false },
+  { to: '/systeme', label: 'Système', icon: Activity, end: false },
   { to: '/plans', label: 'Plans & tarifs', icon: Tags, end: false },
   { to: '/leads', label: 'Démos & leads', icon: Contact, end: false },
 ]
