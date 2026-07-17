@@ -61,9 +61,8 @@ it('returns dashboard KPIs for gestionnaire', function () {
         ->assertStatus(200)
         ->assertJsonPath('status', 'success')
         ->assertJsonStructure(['data' => [
-            'residences_count', 'lots_count', 'taux_recouvrement',
-            'montant_recouvre', 'montant_restant', 'tickets_ouverts',
-            'tickets_urgents', 'appels_fonds_actifs',
+            'kpi' => ['nb_residences', 'nb_coproprietaires', 'ca_mensuel', 'total_impayes'],
+            'top_impayes', 'tickets_urgents', 'assemblees_a_venir',
         ]]);
 });
 
@@ -112,7 +111,7 @@ it('shows a residence detail with lots', function () {
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->getJson("/api/gestionnaire/residences/{$this->residence->id}")
         ->assertStatus(200)
-        ->assertJsonPath('data.residence.name', 'Résidence Test');
+        ->assertJsonPath('data.name', 'Résidence Test');
 });
 
 it('returns 403 when accessing a residence not assigned to gestionnaire', function () {
@@ -218,6 +217,7 @@ it('forbids overview access to a non-assigned gestionnaire', function () {
 it('creates a lot and validates tantieme budget', function () {
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->postJson("/api/gestionnaire/residences/{$this->residence->id}/lots", [
+            'immeuble_id' => $this->immeuble->id,
             'numero' => 'A01',
             'titre_foncier' => 'TF/A01',
             'type' => 'appartement',
@@ -244,6 +244,7 @@ it('rejects lot creation when tantieme would exceed total', function () {
 
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->postJson("/api/gestionnaire/residences/{$this->residence->id}/lots", [
+            'immeuble_id' => $this->immeuble->id,
             'numero' => 'A02',
             'titre_foncier' => 'TF/A02',
             'type' => 'appartement',

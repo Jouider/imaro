@@ -10,15 +10,15 @@ use App\Models\Depense;
 use App\Models\Emprunt;
 use App\Models\Equipement;
 use App\Models\Exercice;
-use App\Models\Remboursement;
-use App\Models\TravauxExceptionnel;
-use App\Services\Comptabilite\ComptabiliteExportService;
 use App\Models\Immeuble;
 use App\Models\Lot;
 use App\Models\Paiement;
+use App\Models\Remboursement;
 use App\Models\Residence;
 use App\Models\Tenant;
+use App\Models\TravauxExceptionnel;
 use App\Models\User;
+use App\Services\Comptabilite\ComptabiliteExportService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 
@@ -42,10 +42,10 @@ beforeEach(function () {
     $imm = Immeuble::withoutGlobalScope('tenant')->create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'nom' => 'A', 'nb_etages' => 1, 'nb_lots' => 1]);
     $lot = Lot::withoutGlobalScope('tenant')->create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'immeuble_id' => $imm->id, 'numero' => 'A1', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 1000]);
     $resident = User::create(['tenant_id' => $this->tenant->id, 'name' => 'Hassan', 'phone' => '+212611111111', 'role' => 'resident', 'status' => 'active']);
-    $copro = Coproprietaire::create(['tenant_id' => $this->tenant->id, 'user_id' => $resident->id, 'lot_id' => $lot->id, 'type' => 'proprietaire', 'solde_actuel' => 0]);
+    $this->copro = Coproprietaire::create(['tenant_id' => $this->tenant->id, 'user_id' => $resident->id, 'lot_id' => $lot->id, 'type' => 'proprietaire', 'solde_actuel' => 0]);
 
     $this->ex = Exercice::withoutGlobalScope('tenant')->create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'annee' => 2026, 'date_debut' => '2026-01-01', 'date_fin' => '2026-12-31', 'statut' => 'actif']);
-    Paiement::create(['tenant_id' => $this->tenant->id, 'exercice_id' => $this->ex->id, 'coproprietaire_id' => $copro->id, 'saisi_par' => $this->manager->id, 'montant' => 600, 'mode' => 'virement', 'reference' => 'VIR-001', 'date_paiement' => '2026-04-01']);
+    Paiement::create(['tenant_id' => $this->tenant->id, 'exercice_id' => $this->ex->id, 'coproprietaire_id' => $this->copro->id, 'saisi_par' => $this->manager->id, 'montant' => 600, 'mode' => 'virement', 'reference' => 'VIR-001', 'date_paiement' => '2026-04-01']);
     Depense::create(['tenant_id' => $this->tenant->id, 'exercice_id' => $this->ex->id, 'residence_id' => $this->residence->id, 'created_by' => $this->manager->id, 'categorie' => 'nettoyage', 'description' => 'Ménage avril', 'montant' => 250, 'statut' => 'paye', 'date' => '2026-04-05']);
 
     $this->auth = ['Authorization' => 'Bearer '.$this->manager->createToken('t')->plainTextToken];
@@ -114,13 +114,13 @@ it('intègre une autre recette au journal — débit banque / crédit produit (K
 it('intègre remboursements, travaux, équipements et emprunts au journal (KAN-130 2..5)', function () {
     Remboursement::create([
         'tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id,
-        'coproprietaire_nom' => 'Hassan', 'motif' => 'trop_percu', 'description' => 'Trop-perçu Q1',
+        'coproprietaire_id' => $this->copro->id, 'coproprietaire_nom' => 'Hassan', 'motif' => 'trop_percu', 'description' => 'Trop-perçu Q1',
         'montant' => 300, 'date_demande' => '2026-05-20', 'date_paiement' => '2026-06-01',
         'mode_paiement' => 'virement', 'statut' => 'paye', 'reference' => 'RMB-X',
     ]);
     TravauxExceptionnel::create([
         'tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id,
-        'libelle' => 'Ravalement façade', 'montant_vote' => 5000, 'montant_engage' => 5000,
+        'libelle' => 'Ravalement façade', 'date_vote_ag' => '2026-02-15', 'montant_vote' => 5000, 'montant_engage' => 5000,
         'montant_regle' => 5000, 'date_debut' => '2026-03-01', 'date_fin_reelle' => '2026-05-01',
         'statut' => 'termine',
     ]);
