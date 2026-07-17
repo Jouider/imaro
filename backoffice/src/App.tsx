@@ -9,6 +9,7 @@ import { Users } from './pages/Users'
 import { Audit } from './pages/Audit'
 import { Broadcast } from './pages/Broadcast'
 import { FeatureFlags } from './pages/FeatureFlags'
+import { Plans } from './pages/Plans'
 import { Leads } from './pages/Leads'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -33,6 +34,7 @@ export default function App() {
         <Route path="/audit" element={<Audit />} />
         <Route path="/diffusion" element={<Broadcast />} />
         <Route path="/fonctionnalites" element={<FeatureFlags />} />
+        <Route path="/plans" element={<Plans />} />
         <Route path="/leads" element={<Leads />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

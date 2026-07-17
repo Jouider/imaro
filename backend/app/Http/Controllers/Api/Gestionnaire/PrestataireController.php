@@ -69,7 +69,7 @@ class PrestataireController extends Controller
         $request->validate([
             'prestataires' => ['required', 'array', 'min:1', 'max:50'],
             'prestataires.*.nom' => ['required', 'string', 'max:255'],
-            'prestataires.*.metier' => ['nullable', 'string', 'max:100'],
+            'prestataires.*.metier' => ['required', 'string', 'max:100'],
             'prestataires.*.specialite' => ['nullable', 'string', 'max:100'],
             'prestataires.*.telephone' => ['nullable', 'string', 'max:20'],
             'prestataires.*.email' => ['nullable', 'email', 'max:255'],

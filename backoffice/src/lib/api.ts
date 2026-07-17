@@ -557,3 +557,101 @@ export const markInvoicePaid = (id: number) =>
   patchInvoiceStatut(id, 'mark-paid', 'payee')
 export const cancelInvoice = (id: number) =>
   patchInvoiceStatut(id, 'cancel', 'annulee')
+
+// ── Plans commerciaux (offres, tarifs, quotas) — KAN-146 ─────────────────────
+export type Plan = {
+  id: number
+  slug: string
+  name: string
+  price_dh: number
+  period: 'mensuel' | 'annuel'
+  quota_residences: number | null
+  quota_lots: number | null
+  quota_users: number | null
+  features: string[] | null
+  is_active: boolean
+  ordre: number
+}
+
+export type PlanInput = Omit<Plan, 'id'>
+
+const MOCK_PLANS: Plan[] = [
+  {
+    id: 1,
+    slug: 'starter',
+    name: 'Starter',
+    price_dh: 199,
+    period: 'mensuel',
+    quota_residences: 3,
+    quota_lots: 60,
+    quota_users: 2,
+    features: ['exports_comptables'],
+    is_active: true,
+    ordre: 1,
+  },
+  {
+    id: 2,
+    slug: 'business',
+    name: 'Business',
+    price_dh: 1200,
+    period: 'mensuel',
+    quota_residences: 20,
+    quota_lots: 500,
+    quota_users: 10,
+    features: ['exports_comptables', 'mobile', 'budgets_avances'],
+    is_active: true,
+    ordre: 2,
+  },
+  {
+    id: 3,
+    slug: 'premium',
+    name: 'Premium',
+    price_dh: 2500,
+    period: 'mensuel',
+    quota_residences: null,
+    quota_lots: null,
+    quota_users: null,
+    features: ['exports_comptables', 'mobile', 'budgets_avances', 'ocr_factures'],
+    is_active: true,
+    ordre: 3,
+  },
+]
+
+let mockPlans = [...MOCK_PLANS]
+
+export async function getPlans(): Promise<Plan[]> {
+  try {
+    return (await api.get<{ data: Plan[] }>('/admin/plans')).data.data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    return mockPlans
+  }
+}
+
+export async function savePlan(input: PlanInput, id?: number): Promise<Plan> {
+  try {
+    const res = id
+      ? await api.put<{ data: Plan }>(`/admin/plans/${id}`, input)
+      : await api.post<{ data: Plan }>('/admin/plans', input)
+    return res.data.data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    // Repli dev : mute la liste mock en mémoire.
+    if (id) {
+      mockPlans = mockPlans.map((p) => (p.id === id ? { ...p, ...input, id } : p))
+      return { ...input, id }
+    }
+    const created = { ...input, id: Date.now() }
+    mockPlans = [...mockPlans, created]
+    return created
+  }
+}
+
+export async function deletePlan(id: number): Promise<void> {
+  try {
+    await api.delete(`/admin/plans/${id}`)
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    mockPlans = mockPlans.filter((p) => p.id !== id)
+  }
+}

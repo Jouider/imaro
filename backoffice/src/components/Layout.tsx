@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   Megaphone,
   ToggleRight,
+  Tags,
   Contact,
   LogOut,
 } from 'lucide-react'
@@ -20,6 +21,7 @@ const nav = [
   { to: '/audit', label: 'Audit', icon: ShieldCheck, end: false },
   { to: '/diffusion', label: 'Diffusion', icon: Megaphone, end: false },
   { to: '/fonctionnalites', label: 'Fonctionnalités', icon: ToggleRight, end: false },
+  { to: '/plans', label: 'Plans & tarifs', icon: Tags, end: false },
   { to: '/leads', label: 'Démos & leads', icon: Contact, end: false },
 ]
 
