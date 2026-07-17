@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Gestionnaire;
 
+use App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Gestionnaire\StoreCoproprietaireRequest;
 use App\Http\Resources\CoproprietaireResource;
@@ -18,7 +19,8 @@ use Illuminate\Support\Str;
 
 class CoproprietaireController extends Controller
 {
-    use \App\Http\Controllers\Api\Gestionnaire\Concerns\AuthorizesResidence;
+    use AuthorizesResidence;
+
     /**
      * POST /api/gestionnaire/coproprietaires
      * Crée un user résident + un coproprietaire lié au lot.
@@ -30,7 +32,7 @@ class CoproprietaireController extends Controller
             ? Lot::findOrFail($request->lot_id)
             : Lot::where('residence_id', $request->residence_id)->firstOrFail();
 
-        $isManager      = $request->user()->role === 'manager';
+        $isManager = $request->user()->role === 'manager';
         $isGestionnaire = $lot->residence->gestionnaire_id === $request->user()->id;
 
         abort_if(! $isManager && ! $isGestionnaire, 403, 'Accès refusé.');
@@ -64,15 +66,15 @@ class CoproprietaireController extends Controller
                 $user = $existing;
             } else {
                 $user = User::create([
-                    'tenant_id'        => $tenantId,
-                    'name'             => $request->name,
-                    'phone'            => $request->phone,
-                    'email'            => $request->email,
-                    'role'             => 'resident',
-                    'password'         => Hash::make(Str::random(16)),
-                    'access_code'      => Hash::make($tempCode),
+                    'tenant_id' => $tenantId,
+                    'name' => $request->name,
+                    'phone' => $request->phone,
+                    'email' => $request->email,
+                    'role' => 'resident',
+                    'password' => Hash::make(Str::random(16)),
+                    'access_code' => Hash::make($tempCode),
                     'must_change_code' => true,
-                    'status'           => 'active',
+                    'status' => 'active',
                 ]);
             }
 
@@ -83,11 +85,11 @@ class CoproprietaireController extends Controller
             }
 
             return Coproprietaire::create([
-                'tenant_id'    => $tenantId,
-                'user_id'      => $user->id,
-                'lot_id'       => $lot->id,
-                'type'         => $request->type ?? 'proprietaire',
-                'date_entree'  => $request->date_entree ?? now()->toDateString(),
+                'tenant_id' => $tenantId,
+                'user_id' => $user->id,
+                'lot_id' => $lot->id,
+                'type' => $request->type ?? 'proprietaire',
+                'date_entree' => $request->date_entree ?? now()->toDateString(),
                 'solde_actuel' => 0,
             ]);
         });
@@ -98,12 +100,12 @@ class CoproprietaireController extends Controller
         }
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => $existing ? 'Copropriétaire existant rattaché au lot.' : 'Copropriétaire créé.',
-            'data'    => [
+            'data' => [
                 'coproprietaire' => new CoproprietaireResource($coproprietaire->load(['user', 'lot'])),
-                'temp_password'  => $tempCode,   // null when an existing account was re-used
-                'reused'         => (bool) $existing,
+                'temp_password' => $tempCode,   // null when an existing account was re-used
+                'reused' => (bool) $existing,
             ],
         ], 201);
     }
@@ -143,9 +145,9 @@ class CoproprietaireController extends Controller
     private function error422(string $message, string $field): JsonResponse
     {
         return response()->json([
-            'status'  => 'error',
+            'status' => 'error',
             'message' => $message,
-            'errors'  => [$field => [$message]],
+            'errors' => [$field => [$message]],
         ], 422);
     }
 
@@ -157,7 +159,7 @@ class CoproprietaireController extends Controller
     {
         $residence = $coproprietaire->lot->residence;
 
-        $isManager     = $request->user()->role === 'manager';
+        $isManager = $request->user()->role === 'manager';
         $isGestionnaire = $residence->gestionnaire_id === $request->user()->id;
 
         abort_if(! $isManager && ! $isGestionnaire, 403, 'Accès refusé.');
@@ -167,19 +169,19 @@ class CoproprietaireController extends Controller
 
         $user = $coproprietaire->user;
         $user->update([
-            'access_code'      => Hash::make($code),
+            'access_code' => Hash::make($code),
             'must_change_code' => true,
         ]);
 
         app(CoproprietaireWelcomeNotifier::class)->send($user, $code, $residence);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => "Code d'accès généré pour {$user->name}.",
-            'data'    => [
-                'code'  => $code,   // Affiché une seule fois au gestionnaire
+            'data' => [
+                'code' => $code,   // Affiché une seule fois au gestionnaire
                 'phone' => $user->phone,
-                'name'  => $user->name,
+                'name' => $user->name,
             ],
         ]);
     }
@@ -192,27 +194,29 @@ class CoproprietaireController extends Controller
     public function bulkStore(Request $request): JsonResponse
     {
         $request->validate([
-            'coproprietaires'                  => ['required', 'array', 'min:1', 'max:50'],
-            'coproprietaires.*.name'           => ['required', 'string', 'max:255'],
-            'coproprietaires.*.phone'          => ['required', 'string', 'max:20'],
-            'coproprietaires.*.email'          => ['nullable', 'email', 'max:255'],
-            'coproprietaires.*.lot_id'         => ['nullable', 'integer'],
-            'coproprietaires.*.lot_numero'     => ['nullable', 'string', 'max:20'],
-            'coproprietaires.*.residence_id'   => ['nullable', 'integer'],
-            'coproprietaires.*.cin'            => ['nullable', 'string', 'max:20'],
+            'coproprietaires' => ['required', 'array', 'min:1', 'max:50'],
+            'coproprietaires.*.name' => ['required', 'string', 'max:255'],
+            'coproprietaires.*.phone' => ['required', 'string', 'max:20'],
+            'coproprietaires.*.email' => ['nullable', 'email', 'max:255'],
+            // Chaque copropriétaire doit être rattaché à un lot, identifié par id OU numéro.
+            'coproprietaires.*.lot_id' => ['required_without:coproprietaires.*.lot_numero', 'integer'],
+            'coproprietaires.*.lot_numero' => ['required_without:coproprietaires.*.lot_id', 'string', 'max:20'],
+            'coproprietaires.*.residence_id' => ['nullable', 'integer'],
+            'coproprietaires.*.cin' => ['nullable', 'string', 'max:20'],
         ]);
 
         $created = 0;
-        $errors  = [];
+        $errors = [];
 
         foreach ($request->coproprietaires as $index => $data) {
-            $line = 'Ligne ' . ($index + 1);
+            $line = 'Ligne '.($index + 1);
             try {
                 // Résoudre le lot par ID ou par numéro
                 if (! empty($data['lot_id'])) {
                     $lot = Lot::with('residence')->find($data['lot_id']);
                     if (! $lot) {
                         $errors[] = "{$line}: Lot ID {$data['lot_id']} introuvable.";
+
                         continue;
                     }
                 } elseif (! empty($data['lot_numero']) && ! empty($data['residence_id'])) {
@@ -223,23 +227,27 @@ class CoproprietaireController extends Controller
 
                     if (! $lot) {
                         $errors[] = "{$line}: Lot \"{$data['lot_numero']}\" introuvable dans cette résidence.";
+
                         continue;
                     }
                 } else {
                     $errors[] = "{$line}: lot_id ou (lot_numero + residence_id) requis.";
+
                     continue;
                 }
 
-                $isManager      = $request->user()->role === 'manager';
+                $isManager = $request->user()->role === 'manager';
                 $isGestionnaire = $lot->residence->gestionnaire_id === $request->user()->id;
                 if (! $isManager && ! $isGestionnaire) {
                     $errors[] = "{$line}: accès refusé pour la résidence du lot.";
+
                     continue;
                 }
 
                 // Idempotence : lot déjà occupé par un propriétaire ?
                 if ($lot->coproprietairePrincipal()->exists()) {
                     $errors[] = "{$line}: le lot '{$lot->numero}' a déjà un copropriétaire principal (ignoré).";
+
                     continue;
                 }
 
@@ -252,10 +260,12 @@ class CoproprietaireController extends Controller
 
                 if (! $existing && $this->identityUsedInOtherTenant($tenantId, $data['phone'], $email)) {
                     $errors[] = "{$line}: numéro/email déjà utilisé par un autre cabinet (ignoré).";
+
                     continue;
                 }
                 if ($existing && $existing->role !== 'resident') {
                     $errors[] = "{$line}: numéro/email d'un membre de l'équipe (ignoré).";
+
                     continue;
                 }
 
@@ -269,15 +279,15 @@ class CoproprietaireController extends Controller
                         $user = $existing;
                     } else {
                         $user = User::create([
-                            'tenant_id'        => $tenantId,
-                            'name'             => $data['name'],
-                            'phone'            => $data['phone'],
-                            'email'            => $email,
-                            'role'             => 'resident',
-                            'password'         => Hash::make(Str::random(16)),
-                            'access_code'      => Hash::make($tempCode),
+                            'tenant_id' => $tenantId,
+                            'name' => $data['name'],
+                            'phone' => $data['phone'],
+                            'email' => $email,
+                            'role' => 'resident',
+                            'password' => Hash::make(Str::random(16)),
+                            'access_code' => Hash::make($tempCode),
                             'must_change_code' => true,
-                            'status'           => 'active',
+                            'status' => 'active',
                         ]);
                     }
 
@@ -287,12 +297,12 @@ class CoproprietaireController extends Controller
                     }
 
                     Coproprietaire::create([
-                        'tenant_id'   => $tenantId,
-                        'user_id'     => $user->id,
-                        'lot_id'      => $lot->id,
-                        'type'        => 'proprietaire',
+                        'tenant_id' => $tenantId,
+                        'user_id' => $user->id,
+                        'lot_id' => $lot->id,
+                        'type' => 'proprietaire',
                         'date_entree' => now()->toDateString(),
-                        'solde_actuel'=> 0,
+                        'solde_actuel' => 0,
                     ]);
 
                     return $user;
@@ -305,13 +315,13 @@ class CoproprietaireController extends Controller
 
                 $created++;
             } catch (\Throwable $e) {
-                $errors[] = "{$line}: " . $e->getMessage();
+                $errors[] = "{$line}: ".$e->getMessage();
             }
         }
 
         return response()->json([
             'status' => 'success',
-            'data'   => ['created' => $created, 'errors' => $errors],
+            'data' => ['created' => $created, 'errors' => $errors],
         ]);
     }
 
@@ -328,7 +338,7 @@ class CoproprietaireController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => ['coproprietaires' => CoproprietaireResource::collection($coproprietaires)],
+            'data' => ['coproprietaires' => CoproprietaireResource::collection($coproprietaires)],
         ]);
     }
 

@@ -529,3 +529,197 @@ export async function getFailedJobs(): Promise<FailedJob[]> {
 export async function retryFailedJob(id: string): Promise<void> {
   await api.post(`/admin/failed-jobs/${id}/retry`)
 }
+
+// ── Abonnements & facturation (KAN-140) ──────────────────────────────────────
+export type Invoice = {
+  id: number
+  tenant: { id: number; name: string } | null
+  numero: string
+  montant_dh: number
+  remise_pct: number
+  statut: 'envoyee' | 'payee' | 'impayee' | 'annulee'
+  periode_label: string | null
+  date_emission: string | null
+  date_echeance: string | null
+  date_paiement: string | null
+}
+
+const MOCK_INVOICES: Invoice[] = [
+  {
+    id: 1,
+    tenant: { id: 1, name: 'Gest Syndic SARL' },
+    numero: 'FA-2026-00001',
+    montant_dh: 1200,
+    remise_pct: 0,
+    statut: 'payee',
+    periode_label: 'Juin 2026',
+    date_emission: '2026-06-01',
+    date_echeance: '2026-07-01',
+    date_paiement: '2026-06-12',
+  },
+  {
+    id: 2,
+    tenant: { id: 2, name: 'Cabinet Anfa' },
+    numero: 'FA-2026-00002',
+    montant_dh: 2500,
+    remise_pct: 0,
+    statut: 'envoyee',
+    periode_label: 'Juillet 2026',
+    date_emission: '2026-07-01',
+    date_echeance: '2026-07-31',
+    date_paiement: null,
+  },
+  {
+    id: 3,
+    tenant: { id: 3, name: 'Syndic Marina' },
+    numero: 'FA-2026-00003',
+    montant_dh: 199,
+    remise_pct: 0,
+    statut: 'impayee',
+    periode_label: 'Juin 2026',
+    date_emission: '2026-06-01',
+    date_echeance: '2026-07-01',
+    date_paiement: null,
+  },
+]
+
+let mockInvoices = [...MOCK_INVOICES]
+
+export async function getInvoices(statut?: string): Promise<Invoice[]> {
+  try {
+    const res = await api.get<{ data: Invoice[] }>('/admin/invoices', {
+      params: { statut: statut || undefined },
+    })
+    return res.data.data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    return statut ? mockInvoices.filter((i) => i.statut === statut) : mockInvoices
+  }
+}
+
+async function patchInvoiceStatut(
+  id: number,
+  path: string,
+  statut: Invoice['statut'],
+): Promise<void> {
+  try {
+    await api.post(`/admin/invoices/${id}/${path}`)
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    mockInvoices = mockInvoices.map((i) =>
+      i.id === id
+        ? {
+            ...i,
+            statut,
+            date_paiement:
+              statut === 'payee'
+                ? new Date().toISOString().slice(0, 10)
+                : i.date_paiement,
+          }
+        : i,
+    )
+  }
+}
+
+export const markInvoicePaid = (id: number) =>
+  patchInvoiceStatut(id, 'mark-paid', 'payee')
+export const cancelInvoice = (id: number) =>
+  patchInvoiceStatut(id, 'cancel', 'annulee')
+
+// ── Plans commerciaux (offres, tarifs, quotas) — KAN-146 ─────────────────────
+export type Plan = {
+  id: number
+  slug: string
+  name: string
+  price_dh: number
+  period: 'mensuel' | 'annuel'
+  quota_residences: number | null
+  quota_lots: number | null
+  quota_users: number | null
+  features: string[] | null
+  is_active: boolean
+  ordre: number
+}
+
+export type PlanInput = Omit<Plan, 'id'>
+
+const MOCK_PLANS: Plan[] = [
+  {
+    id: 1,
+    slug: 'starter',
+    name: 'Starter',
+    price_dh: 199,
+    period: 'mensuel',
+    quota_residences: 3,
+    quota_lots: 60,
+    quota_users: 2,
+    features: ['exports_comptables'],
+    is_active: true,
+    ordre: 1,
+  },
+  {
+    id: 2,
+    slug: 'business',
+    name: 'Business',
+    price_dh: 1200,
+    period: 'mensuel',
+    quota_residences: 20,
+    quota_lots: 500,
+    quota_users: 10,
+    features: ['exports_comptables', 'mobile', 'budgets_avances'],
+    is_active: true,
+    ordre: 2,
+  },
+  {
+    id: 3,
+    slug: 'premium',
+    name: 'Premium',
+    price_dh: 2500,
+    period: 'mensuel',
+    quota_residences: null,
+    quota_lots: null,
+    quota_users: null,
+    features: ['exports_comptables', 'mobile', 'budgets_avances', 'ocr_factures'],
+    is_active: true,
+    ordre: 3,
+  },
+]
+
+let mockPlans = [...MOCK_PLANS]
+
+export async function getPlans(): Promise<Plan[]> {
+  try {
+    return (await api.get<{ data: Plan[] }>('/admin/plans')).data.data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    return mockPlans
+  }
+}
+
+export async function savePlan(input: PlanInput, id?: number): Promise<Plan> {
+  try {
+    const res = id
+      ? await api.put<{ data: Plan }>(`/admin/plans/${id}`, input)
+      : await api.post<{ data: Plan }>('/admin/plans', input)
+    return res.data.data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    // Repli dev : mute la liste mock en mémoire.
+    if (id) {
+      mockPlans = mockPlans.map((p) => (p.id === id ? { ...p, ...input, id } : p))
+      return { ...input, id }
+    }
+    const created = { ...input, id: Date.now() }
+    mockPlans = [...mockPlans, created]
+    return created
+  }
+}
+
+export async function deletePlan(id: number): Promise<void> {
+  try {
+    await api.delete(`/admin/plans/${id}`)
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    mockPlans = mockPlans.filter((p) => p.id !== id)
+  }
+}

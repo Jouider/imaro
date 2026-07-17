@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\SuperAdmin\BillingController;
 use App\Http\Controllers\Api\SuperAdmin\HealthController;
 use App\Http\Controllers\Api\SuperAdmin\LeadController;
 use App\Http\Controllers\Api\SuperAdmin\MetricsController;
+use App\Http\Controllers\Api\SuperAdmin\PlanController;
 use App\Http\Controllers\Api\SuperAdmin\TenantController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +30,19 @@ Route::post('/tenants/{tenant}/impersonate', [TenantController::class, 'imperson
 Route::get('/health', [HealthController::class, 'health']);
 Route::get('/failed-jobs', [HealthController::class, 'failedJobs']);
 Route::post('/failed-jobs/{id}/retry', [HealthController::class, 'retry']);
+
+// Abonnements & facturation (KAN-140)
+Route::get('/invoices', [BillingController::class, 'index']);
+Route::post('/tenants/{tenant}/invoices', [BillingController::class, 'store']);
+Route::put('/tenants/{tenant}/subscription', [BillingController::class, 'updateSubscription']);
+Route::post('/invoices/{invoice}/mark-paid', [BillingController::class, 'markPaid']);
+Route::post('/invoices/{invoice}/cancel', [BillingController::class, 'cancel']);
+
+// Plans commerciaux (offres, tarifs, quotas) — KAN-146
+Route::get('/plans', [PlanController::class, 'index']);
+Route::post('/plans', [PlanController::class, 'store']);
+Route::put('/plans/{plan}', [PlanController::class, 'update']);
+Route::delete('/plans/{plan}', [PlanController::class, 'destroy']);
 
 // Démos & leads (pipeline commercial)
 Route::get('/leads', [LeadController::class, 'index']);

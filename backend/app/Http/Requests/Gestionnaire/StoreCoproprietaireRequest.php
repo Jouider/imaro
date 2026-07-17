@@ -14,17 +14,18 @@ class StoreCoproprietaireRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'         => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             // No `unique` here: an existing copropriétaire (same cabinet) must be
             // re-usable on a new lot. The controller does find-or-link and returns
             // a clear 422 for a cross-tenant collision (phone/email are globally
             // unique at the DB level).
-            'phone'        => 'nullable|string|max:20',
-            'email'        => 'nullable|email|max:255',
-            'lot_id'       => 'nullable|integer|exists:lots,id',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'lot_id' => 'nullable|integer|exists:lots,id',
             'residence_id' => 'nullable|integer|exists:residences,id',
-            'type'         => 'nullable|in:proprietaire,locataire',
-            'date_entree'  => 'nullable|date',
+            // KAN-114 — on ne gère plus que le copropriétaire (option « locataire » retirée).
+            'type' => 'nullable|in:proprietaire',
+            'date_entree' => 'nullable|date',
         ];
     }
 
