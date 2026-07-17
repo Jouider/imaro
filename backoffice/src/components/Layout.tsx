@@ -2,9 +2,12 @@ import { NavLink, Outlet } from 'react-router-dom'
 import {
   LayoutDashboard,
   Building2,
+  Receipt,
   Users,
   ShieldCheck,
   Megaphone,
+  ToggleRight,
+  Tags,
   Contact,
   LogOut,
 } from 'lucide-react'
@@ -13,9 +16,12 @@ import { logout } from '../lib/api'
 const nav = [
   { to: '/', label: 'Tableau de bord', icon: LayoutDashboard, end: true },
   { to: '/clients', label: 'Clients', icon: Building2, end: false },
+  { to: '/facturation', label: 'Facturation', icon: Receipt, end: false },
   { to: '/utilisateurs', label: 'Utilisateurs', icon: Users, end: false },
   { to: '/audit', label: 'Audit', icon: ShieldCheck, end: false },
   { to: '/diffusion', label: 'Diffusion', icon: Megaphone, end: false },
+  { to: '/fonctionnalites', label: 'Fonctionnalités', icon: ToggleRight, end: false },
+  { to: '/plans', label: 'Plans & tarifs', icon: Tags, end: false },
   { to: '/leads', label: 'Démos & leads', icon: Contact, end: false },
 ]
 

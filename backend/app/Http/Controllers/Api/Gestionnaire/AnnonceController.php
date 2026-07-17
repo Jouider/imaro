@@ -167,6 +167,9 @@ class AnnonceController extends Controller
      */
     private function mediaRules(): array
     {
+        $imageMimes = ['image/jpeg', 'image/png', 'image/webp'];
+        $videoExtensions = ['mp4', 'mov', 'webm'];
+
         return [
             'media' => 'nullable|array|max:6',
             'media.*' => [
@@ -174,12 +177,27 @@ class AnnonceController extends Controller
                 // (sinon $file est un array → fatal sur getMimeType()).
                 'bail',
                 'file',
-                'mimetypes:image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm',
-                function ($attribute, $file, $fail) {
+                function ($attribute, $file, $fail) use ($imageMimes, $videoExtensions) {
                     if (! $file instanceof UploadedFile) {
                         return;
                     }
-                    $isVideo = str_starts_with((string) $file->getMimeType(), 'video/');
+
+                    $mime = (string) $file->getMimeType();
+                    $ext = strtolower((string) $file->getClientOriginalExtension());
+                    $isImage = in_array($mime, $imageMimes, true);
+                    // Le sniffing par contenu (finfo) détecte certains mp4 réels avec un
+                    // variant de conteneur différent de "video/mp4" pur (ex: M4V Apple →
+                    // video/x-m4v, 3GPP → video/3gpp). On accepte tout type "video/*" tant
+                    // que l'extension déclarée reste mp4/mov/webm, sinon des vidéos valides
+                    // étaient rejetées en 422 (KAN-96).
+                    $isVideo = str_starts_with($mime, 'video/') && in_array($ext, $videoExtensions, true);
+
+                    if (! $isImage && ! $isVideo) {
+                        $fail('Type de fichier non autorisé (images jpg/png/webp, vidéos mp4/mov/webm uniquement).');
+
+                        return;
+                    }
+
                     $maxKb = $isVideo ? 30720 : 5120;
                     if ($file->getSize() / 1024 > $maxKb) {
                         $fail($isVideo ? 'Vidéo trop volumineuse (max 30 Mo).' : 'Image trop volumineuse (max 5 Mo).');

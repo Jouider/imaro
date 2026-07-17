@@ -48,6 +48,23 @@ it('refuse une vidéo de plus de 30 Mo (422)', function () {
     ])->assertStatus(422)->assertJsonValidationErrors(['media.0']);
 });
 
+it('accepte un .mp4 réel dont finfo détecte un variant (M4V) au lieu de video/mp4 strict', function () {
+    // Régression KAN-96 : certaines vraies vidéos mp4 (brand "M4V " côté conteneur,
+    // export iOS/itunes courant) sont sniffées par finfo comme video/x-m4v, pas
+    // video/mp4 — la règle mimetypes stricte les rejetait en 422 à tort.
+    $path = tempnam(sys_get_temp_dir(), 'm4v').'.mp4';
+    $ftypM4v = hex2bin('0000001c667479704d345620000002004d3456202020');
+    file_put_contents($path, $ftypM4v.str_repeat("\0", 2000));
+    $file = new UploadedFile($path, 'clip.mp4', null, null, true);
+
+    $this->withHeaders($this->auth)->post('/api/gestionnaire/annonces', [
+        'titre' => 'X', 'contenu' => 'Y',
+        'media' => [$file],
+    ])->assertStatus(201)->assertJsonPath('data.annonce.media.0.type', 'video');
+
+    unlink($path);
+});
+
 it('refuse un type de fichier non autorisé (422)', function () {
     $this->withHeaders($this->auth)->post('/api/gestionnaire/annonces', [
         'titre' => 'X', 'contenu' => 'Y',

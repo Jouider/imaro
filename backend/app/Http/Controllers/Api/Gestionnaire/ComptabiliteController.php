@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ComptabiliteController extends Controller
 {
@@ -353,7 +354,7 @@ class ComptabiliteController extends Controller
                     'compte_charge' => $compte,
                     'libelle_compte' => $libellesCompte[$compte] ?? 'Charges diverses',
                     'mode_paiement' => $d->statut === 'paye' ? 'virement' : 'autre',
-                    'justificatif_path' => null,
+                    'justificatif_path' => $d->facture_path ? Storage::url($d->facture_path) : null,
                     'ecriture_id' => $d->id,
                 ];
             });
@@ -395,7 +396,7 @@ class ComptabiliteController extends Controller
                     'description' => $depense->description,
                     'categorie' => $depense->categorie,
                     'montant' => round($depense->montant, 2),
-                    'prestataire' => $depense->prestataire?->name ?? $depense->description,
+                    'prestataire' => $depense->prestataire?->nom ?? $depense->description,
                     'statut' => $depense->statut,
                     'exercice_id' => $depense->exercice_id,
                 ],

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Immeuble;
 use App\Models\Lot;
 use App\Models\Residence;
 use App\Models\Tenant;
@@ -15,32 +16,38 @@ beforeEach(function () {
     }
 
     $this->tenant = Tenant::create([
-        'name'      => 'Test Syndic',
-        'email'     => 'test@syndic.ma',
+        'name' => 'Test Syndic',
+        'email' => 'test@syndic.ma',
         'subdomain' => 'test',
-        'plan'      => 'starter',
-        'status'    => 'active',
+        'plan' => 'starter',
+        'status' => 'active',
     ]);
     config(['app.tenant_id' => $this->tenant->id]);
 
     $this->gestionnaire = User::create([
         'tenant_id' => $this->tenant->id,
-        'name'      => 'Youssef Gestionnaire',
-        'phone'     => '+212611000001',
-        'role'      => 'gestionnaire',
-        'status'    => 'active',
+        'name' => 'Youssef Gestionnaire',
+        'phone' => '+212611000001',
+        'role' => 'gestionnaire',
+        'status' => 'active',
     ]);
     $this->gestionnaire->assignRole('gestionnaire');
 
     $this->residence = Residence::withoutGlobalScopes()->create([
-        'tenant_id'        => $this->tenant->id,
-        'gestionnaire_id'  => $this->gestionnaire->id,
-        'name'             => 'Résidence Test',
-        'address'          => 'Bd Mohammed V',
-        'city'             => 'Casablanca',
-        'total_tantieme'   => 1000,
-        'nb_lots'          => 0,
-        'status'           => 'active',
+        'tenant_id' => $this->tenant->id,
+        'gestionnaire_id' => $this->gestionnaire->id,
+        'name' => 'Résidence Test',
+        'address' => 'Bd Mohammed V',
+        'city' => 'Casablanca',
+        'total_tantieme' => 1000,
+        'nb_lots' => 0,
+        'status' => 'active',
+    ]);
+
+    $this->immeuble = Immeuble::withoutGlobalScopes()->create([
+        'tenant_id' => $this->tenant->id,
+        'residence_id' => $this->residence->id,
+        'nom' => 'Immeuble Principal',
     ]);
 
     $this->token = $this->gestionnaire->createToken('test')->plainTextToken;
@@ -54,9 +61,8 @@ it('returns dashboard KPIs for gestionnaire', function () {
         ->assertStatus(200)
         ->assertJsonPath('status', 'success')
         ->assertJsonStructure(['data' => [
-            'residences_count', 'lots_count', 'taux_recouvrement',
-            'montant_recouvre', 'montant_restant', 'tickets_ouverts',
-            'tickets_urgents', 'appels_fonds_actifs',
+            'kpi' => ['nb_residences', 'nb_coproprietaires', 'ca_mensuel', 'total_impayes'],
+            'top_impayes', 'tickets_urgents', 'assemblees_a_venir',
         ]]);
 });
 
@@ -66,20 +72,20 @@ it('lists only residences assigned to the gestionnaire', function () {
     // Another gestionnaire — should not see this residence
     $other = User::create([
         'tenant_id' => $this->tenant->id,
-        'name'      => 'Autre Gestionnaire',
-        'phone'     => '+212611000002',
-        'role'      => 'gestionnaire',
-        'status'    => 'active',
+        'name' => 'Autre Gestionnaire',
+        'phone' => '+212611000002',
+        'role' => 'gestionnaire',
+        'status' => 'active',
     ]);
     Residence::withoutGlobalScopes()->create([
-        'tenant_id'       => $this->tenant->id,
+        'tenant_id' => $this->tenant->id,
         'gestionnaire_id' => $other->id,
-        'name'            => 'Résidence Autre',
-        'address'         => 'Rue X',
-        'city'            => 'Rabat',
-        'total_tantieme'  => 1000,
-        'nb_lots'         => 0,
-        'status'          => 'active',
+        'name' => 'Résidence Autre',
+        'address' => 'Rue X',
+        'city' => 'Rabat',
+        'total_tantieme' => 1000,
+        'nb_lots' => 0,
+        'status' => 'active',
     ]);
 
     $response = $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
@@ -93,37 +99,38 @@ it('lists only residences assigned to the gestionnaire', function () {
 
 it('shows a residence detail with lots', function () {
     Lot::create([
-        'tenant_id'    => $this->tenant->id,
+        'tenant_id' => $this->tenant->id,
         'residence_id' => $this->residence->id,
-        'numero'       => 'A01',
-        'type'         => 'appartement',
-        'etage'        => 1,
-        'tantieme'     => 50,
+        'immeuble_id' => $this->immeuble->id,
+        'numero' => 'A01',
+        'type' => 'appartement',
+        'etage' => 1,
+        'tantieme' => 50,
     ]);
 
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->getJson("/api/gestionnaire/residences/{$this->residence->id}")
         ->assertStatus(200)
-        ->assertJsonPath('data.residence.name', 'Résidence Test');
+        ->assertJsonPath('data.name', 'Résidence Test');
 });
 
 it('returns 403 when accessing a residence not assigned to gestionnaire', function () {
     $other = User::create([
         'tenant_id' => $this->tenant->id,
-        'name'      => 'Autre',
-        'phone'     => '+212611000003',
-        'role'      => 'gestionnaire',
-        'status'    => 'active',
+        'name' => 'Autre',
+        'phone' => '+212611000003',
+        'role' => 'gestionnaire',
+        'status' => 'active',
     ]);
     $otherResidence = Residence::withoutGlobalScopes()->create([
-        'tenant_id'       => $this->tenant->id,
+        'tenant_id' => $this->tenant->id,
         'gestionnaire_id' => $other->id,
-        'name'            => 'Résidence Autre',
-        'address'         => 'Rue Y',
-        'city'            => 'Fès',
-        'total_tantieme'  => 1000,
-        'nb_lots'         => 0,
-        'status'          => 'active',
+        'name' => 'Résidence Autre',
+        'address' => 'Rue Y',
+        'city' => 'Fès',
+        'total_tantieme' => 1000,
+        'nb_lots' => 0,
+        'status' => 'active',
     ]);
 
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
@@ -143,12 +150,12 @@ it('updates residence info', function () {
 it('creates a residence with mode_cotisation fixe', function () {
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->postJson('/api/gestionnaire/residences', [
-            'name'            => 'Résidence Nouvelle',
-            'city'            => 'Tanger',
-            'address'         => '12 Av. Mohamed VI',
+            'name' => 'Résidence Nouvelle',
+            'city' => 'Tanger',
+            'address' => '12 Av. Mohamed VI',
             'mode_cotisation' => 'fixe',
-            'montant_fixe'    => 1500,
-            'jour_echeance'   => 5,
+            'montant_fixe' => 1500,
+            'jour_echeance' => 5,
         ])
         ->assertStatus(201)
         ->assertJsonPath('data.name', 'Résidence Nouvelle')
@@ -161,8 +168,8 @@ it('creates a residence with mode_cotisation fixe', function () {
 it('rejects residence creation when mode_cotisation=fixe and montant_fixe missing', function () {
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->postJson('/api/gestionnaire/residences', [
-            'name'            => 'Résidence Invalide',
-            'city'            => 'Tanger',
+            'name' => 'Résidence Invalide',
+            'city' => 'Tanger',
             'mode_cotisation' => 'fixe',
         ])
         ->assertStatus(422)
@@ -192,10 +199,10 @@ it('returns overview KPIs for a residence', function () {
 it('forbids overview access to a non-assigned gestionnaire', function () {
     $other = User::create([
         'tenant_id' => $this->tenant->id,
-        'name'      => 'Autre',
-        'phone'     => '+212611000099',
-        'role'      => 'gestionnaire',
-        'status'    => 'active',
+        'name' => 'Autre',
+        'phone' => '+212611000099',
+        'role' => 'gestionnaire',
+        'status' => 'active',
     ]);
     $other->assignRole('gestionnaire');
     $otherToken = $other->createToken('t')->plainTextToken;
@@ -210,11 +217,12 @@ it('forbids overview access to a non-assigned gestionnaire', function () {
 it('creates a lot and validates tantieme budget', function () {
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->postJson("/api/gestionnaire/residences/{$this->residence->id}/lots", [
-            'numero'    => 'A01',
+            'immeuble_id' => $this->immeuble->id,
+            'numero' => 'A01',
             'titre_foncier' => 'TF/A01',
-            'type'      => 'appartement',
-            'etage'     => 1,
-            'tantieme'  => 500,
+            'type' => 'appartement',
+            'etage' => 1,
+            'tantieme' => 500,
         ])
         ->assertStatus(201)
         ->assertJsonPath('data.lot.numero', 'A01');
@@ -225,20 +233,22 @@ it('creates a lot and validates tantieme budget', function () {
 it('rejects lot creation when tantieme would exceed total', function () {
     // Fill 900 / 1000
     Lot::create([
-        'tenant_id'    => $this->tenant->id,
+        'tenant_id' => $this->tenant->id,
         'residence_id' => $this->residence->id,
-        'numero'       => 'A01',
-        'type'         => 'appartement',
-        'etage'        => 0,
-        'tantieme'     => 900,
+        'immeuble_id' => $this->immeuble->id,
+        'numero' => 'A01',
+        'type' => 'appartement',
+        'etage' => 0,
+        'tantieme' => 900,
     ]);
 
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->postJson("/api/gestionnaire/residences/{$this->residence->id}/lots", [
-            'numero'   => 'A02',
+            'immeuble_id' => $this->immeuble->id,
+            'numero' => 'A02',
             'titre_foncier' => 'TF/A02',
-            'type'     => 'appartement',
-            'etage'    => 1,
+            'type' => 'appartement',
+            'etage' => 1,
             'tantieme' => 200, // would make 1100 > 1000
         ])
         ->assertStatus(422)
@@ -247,12 +257,13 @@ it('rejects lot creation when tantieme would exceed total', function () {
 
 it('updates a lot tantieme', function () {
     $lot = Lot::create([
-        'tenant_id'    => $this->tenant->id,
+        'tenant_id' => $this->tenant->id,
         'residence_id' => $this->residence->id,
-        'numero'       => 'B01',
-        'type'         => 'parking',
-        'etage'        => 0,
-        'tantieme'     => 50,
+        'immeuble_id' => $this->immeuble->id,
+        'numero' => 'B01',
+        'type' => 'parking',
+        'etage' => 0,
+        'tantieme' => 50,
     ]);
 
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
@@ -264,8 +275,8 @@ it('updates a lot tantieme', function () {
 });
 
 it('lists lots for a residence', function () {
-    Lot::create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'numero' => 'C01', 'type' => 'appartement', 'etage' => 2, 'tantieme' => 45]);
-    Lot::create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'numero' => 'C02', 'type' => 'appartement', 'etage' => 2, 'tantieme' => 55]);
+    Lot::create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'immeuble_id' => $this->immeuble->id, 'numero' => 'C01', 'type' => 'appartement', 'etage' => 2, 'tantieme' => 45]);
+    Lot::create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'immeuble_id' => $this->immeuble->id, 'numero' => 'C02', 'type' => 'appartement', 'etage' => 2, 'tantieme' => 55]);
 
     $response = $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->getJson("/api/gestionnaire/residences/{$this->residence->id}/lots")

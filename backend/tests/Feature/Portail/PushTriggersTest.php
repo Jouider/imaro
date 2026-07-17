@@ -116,3 +116,20 @@ it('un walk-in sans hôte rattaché ne pousse aucune notification (KAN-135)', fu
 
     Queue::assertNotPushed(SendNativePushJob::class);
 });
+
+it('publier une annonce crée aussi une notification in-app (KAN-133)', function () {
+    $annonce = Annonce::create([
+        'tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'created_by' => $this->manager->id,
+        'titre' => 'Coupure eau', 'contenu' => 'Demain matin', 'priorite' => 'urgente', 'statut' => 'brouillon',
+    ]);
+
+    $this->withHeaders($this->auth)->postJson("/api/gestionnaire/annonces/{$annonce->id}/publier")->assertStatus(200);
+
+    // Le push est best-effort (no-op sans FCM/APNs) mais la notification in-app
+    // doit toujours être persistée pour alimenter le centre de notifications.
+    $this->assertDatabaseHas('notifications', [
+        'user_id' => $this->resident->id,
+        'type' => 'info',
+        'read' => false,
+    ]);
+});
