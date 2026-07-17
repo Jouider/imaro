@@ -462,6 +462,102 @@ export async function updateFeatureFlag(
   }
 }
 
+// ── Abonnements & facturation (KAN-140) ──────────────────────────────────────
+export type Invoice = {
+  id: number
+  tenant: { id: number; name: string } | null
+  numero: string
+  montant_dh: number
+  remise_pct: number
+  statut: 'envoyee' | 'payee' | 'impayee' | 'annulee'
+  periode_label: string | null
+  date_emission: string | null
+  date_echeance: string | null
+  date_paiement: string | null
+}
+
+const MOCK_INVOICES: Invoice[] = [
+  {
+    id: 1,
+    tenant: { id: 1, name: 'Gest Syndic SARL' },
+    numero: 'FA-2026-00001',
+    montant_dh: 1200,
+    remise_pct: 0,
+    statut: 'payee',
+    periode_label: 'Juin 2026',
+    date_emission: '2026-06-01',
+    date_echeance: '2026-07-01',
+    date_paiement: '2026-06-12',
+  },
+  {
+    id: 2,
+    tenant: { id: 2, name: 'Cabinet Anfa' },
+    numero: 'FA-2026-00002',
+    montant_dh: 2500,
+    remise_pct: 0,
+    statut: 'envoyee',
+    periode_label: 'Juillet 2026',
+    date_emission: '2026-07-01',
+    date_echeance: '2026-07-31',
+    date_paiement: null,
+  },
+  {
+    id: 3,
+    tenant: { id: 3, name: 'Syndic Marina' },
+    numero: 'FA-2026-00003',
+    montant_dh: 199,
+    remise_pct: 0,
+    statut: 'impayee',
+    periode_label: 'Juin 2026',
+    date_emission: '2026-06-01',
+    date_echeance: '2026-07-01',
+    date_paiement: null,
+  },
+]
+
+let mockInvoices = [...MOCK_INVOICES]
+
+export async function getInvoices(statut?: string): Promise<Invoice[]> {
+  try {
+    const res = await api.get<{ data: Invoice[] }>('/admin/invoices', {
+      params: { statut: statut || undefined },
+    })
+    return res.data.data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    return statut ? mockInvoices.filter((i) => i.statut === statut) : mockInvoices
+  }
+}
+
+async function patchInvoiceStatut(
+  id: number,
+  path: string,
+  statut: Invoice['statut'],
+): Promise<void> {
+  try {
+    await api.post(`/admin/invoices/${id}/${path}`)
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    mockInvoices = mockInvoices.map((i) =>
+      i.id === id
+        ? {
+            ...i,
+            statut,
+            date_paiement:
+              statut === 'payee'
+                ? new Date().toISOString().slice(0, 10)
+                : i.date_paiement,
+          }
+        : i,
+    )
+  }
+}
+
+export const markInvoicePaid = (id: number) =>
+  patchInvoiceStatut(id, 'mark-paid', 'payee')
+export const cancelInvoice = (id: number) =>
+  patchInvoiceStatut(id, 'cancel', 'annulee')
+
 // ── Plans commerciaux (offres, tarifs, quotas) — KAN-146 ─────────────────────
 export type Plan = {
   id: number
