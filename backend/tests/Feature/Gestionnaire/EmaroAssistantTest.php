@@ -21,6 +21,8 @@ beforeEach(function () {
 
     $this->tenant = Tenant::create(['name' => 'T', 'email' => 't@t.ma', 'subdomain' => 't', 'plan' => 'business', 'status' => 'active']);
     config(['app.tenant_id' => $this->tenant->id]);
+    // KAN-111 — l'IA est désactivée par défaut ; ce test valide le service quand elle est active.
+    config(['features.ia' => true]);
 
     $this->manager = User::create(['tenant_id' => $this->tenant->id, 'name' => 'Fikri', 'phone' => '+212600000001', 'role' => 'manager', 'status' => 'active']);
     $this->manager->assignRole('manager');
