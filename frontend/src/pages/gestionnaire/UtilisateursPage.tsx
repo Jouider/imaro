@@ -68,7 +68,6 @@ import { getResidences } from '@/services/gestionnaire.service'
 type FormState = {
   name: string
   email: string
-  cin: string
   role: AppRole
   password: string
   permissions: AppPermission[]
@@ -78,7 +77,6 @@ type FormState = {
 const EMPTY_FORM: FormState = {
   name: '',
   email: '',
-  cin: '',
   role: 'gestionnaire',
   password: '',
   permissions: [...ROLE_PERMISSION_PRESETS.gestionnaire],
@@ -132,7 +130,6 @@ export function UtilisateursPage() {
       updateAppUser(input.id, {
         name: input.data.name,
         email: input.data.email,
-        cin: input.data.cin,
         role: input.data.role,
         permissions: input.data.permissions,
         residence_ids: input.data.residence_ids,
@@ -183,7 +180,6 @@ export function UtilisateursPage() {
     setForm({
       name: u.name,
       email: u.email,
-      cin: u.cin,
       role: u.role,
       password: '',
       permissions: [...u.permissions],
@@ -235,7 +231,6 @@ export function UtilisateursPage() {
       createMut.mutate({
         name: form.name,
         email: form.email,
-        cin: form.cin,
         password: form.password,
         role: form.role,
         permissions: form.permissions,
@@ -467,20 +462,6 @@ export function UtilisateursPage() {
               />
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="u-cin">
-                {t('equipe.cin')}{' '}
-                <span className="text-[var(--color-imaro-danger)]">*</span>
-              </Label>
-              <Input
-                id="u-cin"
-                value={form.cin}
-                onChange={(e) => setForm({ ...form, cin: e.target.value })}
-                placeholder={t('equipe.cinPlaceholder')}
-                aria-invalid={form.cin.trim() === ''}
-              />
-            </div>
-
             {/* Password — auto-generated, copyable, regenerable */}
             <div className="space-y-1.5">
               <Label htmlFor="u-password">
@@ -596,7 +577,6 @@ export function UtilisateursPage() {
               disabled={
                 !form.name ||
                 !form.email ||
-                !form.cin.trim() ||
                 (!isEdit && !form.password) ||
                 createMut.isPending ||
                 updateMut.isPending

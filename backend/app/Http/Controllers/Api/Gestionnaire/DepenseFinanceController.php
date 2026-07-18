@@ -8,6 +8,7 @@ use App\Models\Depense;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class DepenseFinanceController extends Controller
 {
@@ -69,7 +70,7 @@ class DepenseFinanceController extends Controller
                 'compte_charge' => $compte,
                 'libelle_compte' => $libellesCompte[$compte] ?? 'Charges diverses',
                 'mode_paiement' => $d->statut === 'paye' ? 'virement' : 'autre',
-                'justificatif_path' => null,
+                'justificatif_path' => $d->facture_path ? Storage::url($d->facture_path) : null,
                 'ecriture_id' => $d->id,
                 'est_recurrente' => false,
                 'statut_approbation' => $d->statut === 'paye' ? 'approuve' : ($d->statut === 'en_attente' ? 'en_attente' : null),
@@ -97,12 +98,20 @@ class DepenseFinanceController extends Controller
             'prestataire_id' => 'nullable|exists:prestataires,id',
             'compte_charge' => 'nullable|string',
             'mode_paiement' => 'nullable|string',
+            // Pièce justificative (facture) — optionnelle, pdf ou image ≤ 5 Mo.
+            'justificatif' => 'nullable|file|mimes:pdf,jpeg,jpg,png,webp|max:5120',
         ]);
 
         $this->abortIfExerciceCloture($validated['exercice_id']);
 
+        $tenantId = config('app.tenant_id');
+
+        $facturePath = $request->hasFile('justificatif')
+            ? $request->file('justificatif')->store("depenses/{$tenantId}", 'public')
+            : null;
+
         $depense = Depense::create([
-            'tenant_id' => config('app.tenant_id'),
+            'tenant_id' => $tenantId,
             'exercice_id' => $validated['exercice_id'],
             'residence_id' => $validated['residence_id'],
             'prestataire_id' => $validated['prestataire_id'] ?? null,
@@ -112,12 +121,16 @@ class DepenseFinanceController extends Controller
             'montant' => $validated['montant'],
             'date' => $validated['date'],
             'statut' => 'en_attente',
+            'facture_path' => $facturePath,
         ]);
 
         return response()->json([
             'status' => 'success',
             'message' => 'Dépense créée.',
-            'data' => $depense,
+            'data' => [
+                'id' => $depense->id,
+                'justificatif_path' => $facturePath ? Storage::url($facturePath) : null,
+            ] + $depense->toArray(),
         ], 201);
     }
 

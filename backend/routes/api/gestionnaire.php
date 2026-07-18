@@ -56,7 +56,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/dashboard', [DashboardController::class, 'index']);
 
 // Assistant EMARO — FAQ syndic (KAN-107)
-Route::get('/assistant/faq', [AssistantController::class, 'faq']);
+Route::get('/assistant/faq', [AssistantController::class, 'faq'])->middleware('feature.ia');
 
 // Assistance recouvrement (service optionnel — demande d'accompagnement) — #179
 Route::post('/assistance-recouvrement', [AssistanceRecouvrementController::class, 'store']);
@@ -206,7 +206,7 @@ Route::middleware(['app.permission:finances'])->group(function () {
     Route::post('/budgets/{budget}/soumettre-ag', [BudgetAnnexe5Controller::class, 'soumettreAg']);
     Route::post('/budgets/{budget}/verrouiller', [BudgetAnnexe5Controller::class, 'verrouiller']);
     Route::get('/budgets/{budget}/simulation', [BudgetAnnexe5Controller::class, 'simulation']);
-    Route::get('/budgets/{budget}/suggestions-ia', [BudgetAnnexe5Controller::class, 'suggestionsIa']);
+    Route::get('/budgets/{budget}/suggestions-ia', [BudgetAnnexe5Controller::class, 'suggestionsIa'])->middleware('feature.ia');
 });
 
 // Documents (Sprint 2)
@@ -385,7 +385,7 @@ Route::middleware(['app.permission:depenses,finances'])->group(function () {
     Route::get('/depenses-finance/stats', [DepenseFinanceController::class, 'stats']);
     Route::get('/depenses-finance/recurrentes', [DepenseFinanceController::class, 'recurrentes']);
     Route::post('/depenses-finance/recurrentes', [DepenseFinanceController::class, 'storeRecurrente']);
-    Route::post('/depenses-finance/import-ia', [DepenseFinanceController::class, 'importIa']);
+    Route::post('/depenses-finance/import-ia', [DepenseFinanceController::class, 'importIa'])->middleware('feature.ia');
     Route::post('/depenses-finance/recurrentes/{id}/toggle', [DepenseFinanceController::class, 'toggleRecurrente']);
     Route::post('/depenses-finance/{depense}/approuver', [DepenseFinanceController::class, 'approuver']);
     Route::post('/depenses-finance/{depense}/rejeter', [DepenseFinanceController::class, 'rejeter']);
@@ -410,7 +410,7 @@ Route::middleware(['app.permission:finances'])->group(function () {
 Route::delete('/comptabilite/depenses/{depense}', [ComptabiliteController::class, 'depensesDestroy']);
 
 // Import IA comptabilite
-Route::post('/comptabilite/exercices/{exercice}/import-ia', [ComptabiliteController::class, 'importIa']);
+Route::post('/comptabilite/exercices/{exercice}/import-ia', [ComptabiliteController::class, 'importIa'])->middleware('feature.ia');
 
 // ========================================
 // Onboarding wizard (manager-only — enforced in controller)

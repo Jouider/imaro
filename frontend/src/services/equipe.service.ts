@@ -81,8 +81,6 @@ export type AppUser = {
   id: number
   name: string
   email: string
-  /** CIN (carte d'identité nationale) — obligatoire (KAN-92). */
-  cin: string
   role: AppRole
   permissions: AppPermission[]
   /** Résidences gérées par le membre. Vide = toutes les copropriétés. */
@@ -132,8 +130,6 @@ export const STAFF_PERMISSIONS: StaffPermission[] = [
 export type ResidenceStaff = {
   id: number
   name: string
-  /** CIN (carte d'identité nationale) — obligatoire (KAN-92). */
-  cin: string
   poste: StaffPoste
   residence_id: number
   residence_nom: string
@@ -172,7 +168,6 @@ const MOCK_USERS: AppUser[] = [
     id: 1,
     name: 'Hassan Alaoui',
     email: 'hassan.alaoui@imaro.ma',
-    cin: 'AB100001',
     role: 'administrateur',
     permissions: [...APP_PERMISSIONS],
     residence_ids: [],
@@ -183,7 +178,6 @@ const MOCK_USERS: AppUser[] = [
     id: 2,
     name: 'Salma Bennani',
     email: 'salma.bennani@imaro.ma',
-    cin: 'AB100002',
     role: 'gestionnaire',
     permissions: ['residences', 'coproprietaires', 'finances', 'assemblees'],
     residence_ids: [1, 2],
@@ -194,7 +188,6 @@ const MOCK_USERS: AppUser[] = [
     id: 3,
     name: 'Karim El Fassi',
     email: 'karim.elfassi@imaro.ma',
-    cin: 'AB100003',
     role: 'comptable',
     permissions: ['finances', 'depenses', 'recouvrement', 'documents'],
     residence_ids: [],
@@ -205,7 +198,6 @@ const MOCK_USERS: AppUser[] = [
     id: 4,
     name: 'Nadia Tazi',
     email: 'nadia.tazi@imaro.ma',
-    cin: 'AB100004',
     role: 'assistant',
     permissions: ['residences', 'coproprietaires', 'assemblees', 'documents'],
     residence_ids: [3],
@@ -218,7 +210,6 @@ const MOCK_STAFF: ResidenceStaff[] = [
   {
     id: 1,
     name: 'Mohammed Ouahbi',
-    cin: 'BK200001',
     poste: 'securite',
     residence_id: 1,
     residence_nom: 'Résidence Atlas',
@@ -230,7 +221,6 @@ const MOCK_STAFF: ResidenceStaff[] = [
   {
     id: 2,
     name: 'Fatima Zahra',
-    cin: 'BK200002',
     poste: 'menage',
     residence_id: 1,
     residence_nom: 'Résidence Atlas',
@@ -242,7 +232,6 @@ const MOCK_STAFF: ResidenceStaff[] = [
   {
     id: 3,
     name: 'Brahim Sefraoui',
-    cin: 'BK200003',
     poste: 'gardien',
     residence_id: 2,
     residence_nom: 'Résidence Anfa',
@@ -254,7 +243,6 @@ const MOCK_STAFF: ResidenceStaff[] = [
   {
     id: 4,
     name: 'Youssef Amrani',
-    cin: 'BK200004',
     poste: 'technicien',
     residence_id: 3,
     residence_nom: 'Marina Tower',
@@ -277,7 +265,6 @@ export async function getAppUsers(): Promise<AppUser[]> {
 export type CreateAppUserInput = {
   name: string
   email: string
-  cin: string
   password: string
   role: AppRole
   permissions: AppPermission[]
@@ -299,7 +286,6 @@ export async function createAppUser(
       id: Date.now(),
       name: input.name,
       email: input.email,
-      cin: input.cin,
       role: input.role,
       permissions: input.permissions,
       residence_ids: input.residence_ids,
@@ -312,7 +298,6 @@ export async function createAppUser(
 export type UpdateAppUserInput = {
   name?: string
   email?: string
-  cin?: string
   role?: AppRole
   permissions?: AppPermission[]
   residence_ids?: number[]
@@ -368,8 +353,6 @@ export async function getResidenceStaff(): Promise<ResidenceStaff[]> {
 
 export type CreateStaffInput = {
   name: string
-  /** CIN obligatoire (KAN-92). */
-  cin: string
   poste: StaffPoste
   /** Required + unique — the backend generates the access code and sends it. */
   phone: string
@@ -415,7 +398,6 @@ export async function createResidenceStaff(
     {
       id: Date.now(),
       name: input.name,
-      cin: input.cin,
       poste: input.poste,
       residence_id: input.residence_id,
       residence_nom: residenceNom,
@@ -454,7 +436,6 @@ export async function sendStaffCode(id: number): Promise<SendCodeResult> {
 
 export type UpdateStaffInput = {
   name?: string
-  cin?: string
   poste?: StaffPoste
   residence_id?: number
   phone?: string | null
