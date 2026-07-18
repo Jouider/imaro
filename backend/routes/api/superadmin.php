@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\SuperAdmin\LeadController;
 use App\Http\Controllers\Api\SuperAdmin\MetricsController;
 use App\Http\Controllers\Api\SuperAdmin\PlanController;
 use App\Http\Controllers\Api\SuperAdmin\TenantController;
+use App\Http\Controllers\Api\SuperAdmin\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -46,6 +47,12 @@ Route::get('/plans', [PlanController::class, 'index']);
 Route::post('/plans', [PlanController::class, 'store']);
 Route::put('/plans/{plan}', [PlanController::class, 'update']);
 Route::delete('/plans/{plan}', [PlanController::class, 'destroy']);
+
+// Gestion globale des utilisateurs (cross-tenant, support) — KAN-141
+Route::get('/users', [UserController::class, 'index']);
+Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword']);
+Route::post('/users/{user}/toggle', [UserController::class, 'toggle']);
+Route::post('/users/{user}/logout', [UserController::class, 'forceLogout']);
 
 // Démos & leads (pipeline commercial)
 Route::get('/leads', [LeadController::class, 'index']);
