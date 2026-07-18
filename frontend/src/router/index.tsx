@@ -43,7 +43,6 @@ import { ConfidentialitePage } from '@/pages/public/ConfidentialitePage'
 import { GardienPage } from '@/pages/gardien/GardienPage'
 import { GardienGuard } from './GardienGuard'
 import { PointagePage } from '@/pages/gestionnaire/PointagePage'
-import { OccupantsPage } from '@/pages/gestionnaire/OccupantsPage'
 import { EquipementsPage } from '@/pages/gestionnaire/EquipementsPage'
 import { EmpruntsPage } from '@/pages/gestionnaire/EmpruntsPage'
 import { TravauxExceptionnelsPage } from '@/pages/gestionnaire/TravauxExceptionnelsPage'
@@ -128,6 +127,12 @@ export const router = createBrowserRouter([
           { path: 'residences', element: <ResidencesPage /> },
           { path: 'residences/:id', element: <ResidencePage /> },
           { path: 'coproprietaires', element: <CoproprietairesPage /> },
+          // Section « Occupants » retirée (KAN-114) — on ne gère que le
+          // copropriétaire. Redirige les anciens liens vers Copropriétaires.
+          {
+            path: 'occupants',
+            element: <Navigate to="/gestionnaire/coproprietaires" replace />,
+          },
           {
             path: 'appels-fonds',
             element: <Navigate to="/gestionnaire/paiements" replace />,
@@ -150,7 +155,6 @@ export const router = createBrowserRouter([
           { path: 'rappels', element: <RappelsPage /> },
           { path: 'visites', element: <VisitesPage /> },
           { path: 'pointage', element: <PointagePage /> },
-          { path: 'occupants', element: <OccupantsPage /> },
           { path: 'equipements', element: <EquipementsPage /> },
           { path: 'emprunts', element: <EmpruntsPage /> },
           {

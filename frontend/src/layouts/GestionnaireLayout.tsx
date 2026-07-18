@@ -17,7 +17,6 @@ import {
   Upload,
   Scale,
   Landmark,
-  UserCheck,
   Sparkles,
   Banknote,
   HardHat,
@@ -120,11 +119,6 @@ const NAV_SECTIONS: NavSection[] = [
         to: '/gestionnaire/coproprietaires',
         icon: <Users className="size-[18px]" aria-hidden="true" />,
         labelKey: 'gestionnaire.nav.coproprietaires',
-      },
-      {
-        to: '/gestionnaire/occupants',
-        icon: <UserCheck className="size-[18px]" aria-hidden="true" />,
-        labelKey: 'gestionnaire.nav.occupants',
       },
       {
         to: '/gestionnaire/prestataires',
