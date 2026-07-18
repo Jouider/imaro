@@ -2010,7 +2010,8 @@
         "actif": "Actif",
         "blackliste": "Blacklisté",
         "expire": "Expiré",
-        "resilie": "Résilié"
+        "resilie": "Résilié",
+        "inactif": "Terminé"
       },
       "specialite": {
         "ascenseurs": "Ascenseurs",
@@ -2048,7 +2049,15 @@
       "emptyContrats": "Aucun contrat",
       "emptyContratsDesc": "Créez votre premier contrat de maintenance.",
       "toastCreated": "Prestataire créé",
-      "toastContratCreated": "Contrat créé"
+      "toastContratCreated": "Contrat créé",
+      "toastUpdated": "Prestataire mis à jour",
+      "toastStatut": "Statut mis à jour",
+      "toastDeleted": "Prestataire supprimé",
+      "markTermine": "Marquer terminé",
+      "markActif": "Réactiver",
+      "editPrestataire": "Modifier le prestataire",
+      "deleteTitle": "Supprimer le prestataire ?",
+      "deleteDesc": "Cette action est définitive. Un prestataire lié à des dépenses ou contrats ne peut pas être supprimé — passez-le plutôt en « Terminé »."
     },
     "budgets": {
       "title": "Budgets",

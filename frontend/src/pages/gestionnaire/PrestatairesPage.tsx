@@ -2,10 +2,20 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Plus, Hammer, Star } from 'lucide-react'
+import {
+  Plus,
+  Hammer,
+  Star,
+  Pencil,
+  Trash2,
+  Power,
+  RotateCcw,
+} from 'lucide-react'
 import {
   getPrestataires,
   storePrestataire,
+  updatePrestataire,
+  deletePrestataire,
   getContrats,
   storeContrat,
   type Prestataire,
@@ -14,6 +24,7 @@ import {
 import { getResidences } from '@/services/gestionnaire.service'
 import { useResidenceStore } from '@/stores/residenceStore'
 import { ResidenceFilter } from '@/components/shared'
+import { ConfirmModal } from '@/components/shared/ConfirmModal'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
 import { Button } from '@/components/ui/button'
@@ -40,7 +51,7 @@ type Tab = 'prestataires' | 'contrats'
 
 const STATUT_PRESTATAIRE: Record<string, string> = {
   actif: 'bg-green-100 text-green-800',
-  blackliste: 'bg-red-100 text-red-700',
+  inactif: 'bg-gray-100 text-gray-600',
 }
 
 const STATUT_CONTRAT: Record<string, string> = {
@@ -91,7 +102,11 @@ export function PrestatairesPage() {
   const { t } = useTranslation()
   const qc = useQueryClient()
   const [activeTab, setActiveTab] = useState<Tab>('prestataires')
-  const [createPrestaOpen, setCreatePrestaOpen] = useState(false)
+  const [prestaDialogOpen, setPrestaDialogOpen] = useState(false)
+  // null = création ; sinon édition du prestataire ciblé (KAN-115).
+  const [editingPrestaId, setEditingPrestaId] = useState<number | null>(null)
+  const [deletePrestaTarget, setDeletePrestaTarget] =
+    useState<Prestataire | null>(null)
   const [createContratOpen, setCreateContratOpen] = useState(false)
   const [prestaForm, setPrestaForm] =
     useState<PrestataireForm>(EMPTY_PRESTA_FORM)
@@ -115,22 +130,88 @@ export function PrestatairesPage() {
     queryFn: () => getResidences(),
   })
 
-  const createPrestaMutation = useMutation({
-    mutationFn: () =>
-      storePrestataire({
+  const openCreatePresta = () => {
+    setEditingPrestaId(null)
+    setPrestaForm(EMPTY_PRESTA_FORM)
+    setPrestaDialogOpen(true)
+  }
+
+  const openEditPresta = (p: Prestataire) => {
+    setEditingPrestaId(p.id)
+    setPrestaForm({
+      name: p.name,
+      specialite: p.specialite,
+      phone: p.phone,
+      email: p.email ?? '',
+      adresse: p.adresse ?? '',
+    })
+    setPrestaDialogOpen(true)
+  }
+
+  const savePrestaMutation = useMutation({
+    mutationFn: () => {
+      const payload = {
         name: prestaForm.name,
         specialite: prestaForm.specialite,
         phone: prestaForm.phone,
         email: prestaForm.email,
         adresse: prestaForm.adresse,
+      }
+      return editingPrestaId
+        ? updatePrestataire(editingPrestaId, payload)
+        : storePrestataire(payload)
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['prestataires'] })
+      toast.success(
+        editingPrestaId
+          ? t('gestionnaire.prestataires.toastUpdated', {
+              defaultValue: 'Prestataire mis à jour',
+            })
+          : t('gestionnaire.prestataires.toastCreated'),
+      )
+      setPrestaDialogOpen(false)
+      setPrestaForm(EMPTY_PRESTA_FORM)
+      setEditingPrestaId(null)
+    },
+    onError: () => toast.error(t('common.createError')),
+  })
+
+  // Bascule actif ↔ terminé (statut `inactif` côté backend) — KAN-115.
+  const toggleStatutMutation = useMutation({
+    mutationFn: (p: Prestataire) =>
+      updatePrestataire(p.id, {
+        statut: p.statut === 'actif' ? 'inactif' : 'actif',
       }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['prestataires'] })
-      setCreatePrestaOpen(false)
-      setPrestaForm(EMPTY_PRESTA_FORM)
-      toast.success(t('gestionnaire.prestataires.toastCreated'))
+      toast.success(
+        t('gestionnaire.prestataires.toastStatut', {
+          defaultValue: 'Statut mis à jour',
+        }),
+      )
     },
-    onError: () => toast.error(t('common.createError')),
+    onError: () => toast.error(t('common.error')),
+  })
+
+  const deletePrestaMutation = useMutation({
+    mutationFn: (id: number) => deletePrestataire(id),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['prestataires'] })
+      setDeletePrestaTarget(null)
+      toast.success(
+        t('gestionnaire.prestataires.toastDeleted', {
+          defaultValue: 'Prestataire supprimé',
+        }),
+      )
+    },
+    onError: (err: unknown) => {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? t('common.error')
+      toast.error(message)
+      setDeletePrestaTarget(null)
+    },
   })
 
   const createContratMutation = useMutation({
@@ -223,6 +304,55 @@ export function PrestatairesPage() {
         )
       },
     },
+    {
+      key: 'id',
+      header: '',
+      className: 'w-28 text-right',
+      renderCell: (r) => (
+        <div className="flex justify-end gap-0.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-8"
+            title={t('actions.edit', { defaultValue: 'Modifier' })}
+            onClick={() => openEditPresta(r)}
+          >
+            <Pencil className="size-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-8"
+            title={
+              r.statut === 'actif'
+                ? t('gestionnaire.prestataires.markTermine', {
+                    defaultValue: 'Marquer terminé',
+                  })
+                : t('gestionnaire.prestataires.markActif', {
+                    defaultValue: 'Réactiver',
+                  })
+            }
+            disabled={toggleStatutMutation.isPending}
+            onClick={() => toggleStatutMutation.mutate(r)}
+          >
+            {r.statut === 'actif' ? (
+              <Power className="size-4 text-muted-foreground" />
+            ) : (
+              <RotateCcw className="size-4 text-green-600" />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hover:text-red-700 size-8 text-red-600"
+            title={t('actions.delete', { defaultValue: 'Supprimer' })}
+            onClick={() => setDeletePrestaTarget(r)}
+          >
+            <Trash2 className="size-4" />
+          </Button>
+        </div>
+      ),
+    },
   ]
 
   const contratColumns: Column<Contrat>[] = [
@@ -314,7 +444,7 @@ export function PrestatairesPage() {
           <div className="flex items-center gap-2">
             <ResidenceFilter />
             {activeTab === 'prestataires' ? (
-              <Button onClick={() => setCreatePrestaOpen(true)} size="sm">
+              <Button onClick={openCreatePresta} size="sm">
                 <Plus className="me-1.5 size-4" />
                 {t('gestionnaire.prestataires.newPrestataire')}
               </Button>
@@ -372,12 +502,16 @@ export function PrestatairesPage() {
         />
       )}
 
-      {/* Create Prestataire dialog */}
-      <Dialog open={createPrestaOpen} onOpenChange={setCreatePrestaOpen}>
+      {/* Create / edit Prestataire dialog (KAN-115) */}
+      <Dialog open={prestaDialogOpen} onOpenChange={setPrestaDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>
-              {t('gestionnaire.prestataires.newPrestataire')}
+              {editingPrestaId
+                ? t('gestionnaire.prestataires.editPrestataire', {
+                    defaultValue: 'Modifier le prestataire',
+                  })
+                : t('gestionnaire.prestataires.newPrestataire')}
             </DialogTitle>
           </DialogHeader>
 
@@ -452,22 +586,46 @@ export function PrestatairesPage() {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setCreatePrestaOpen(false)}
-              disabled={createPrestaMutation.isPending}
+              onClick={() => setPrestaDialogOpen(false)}
+              disabled={savePrestaMutation.isPending}
             >
               {t('actions.cancel')}
             </Button>
             <Button
-              onClick={() => createPrestaMutation.mutate()}
-              disabled={!isPrestaFormValid || createPrestaMutation.isPending}
+              onClick={() => savePrestaMutation.mutate()}
+              disabled={!isPrestaFormValid || savePrestaMutation.isPending}
             >
-              {createPrestaMutation.isPending
+              {savePrestaMutation.isPending
                 ? t('actions.loading')
                 : t('actions.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Prestataire confirm (KAN-115) */}
+      <ConfirmModal
+        open={!!deletePrestaTarget}
+        onOpenChange={(o) => !o && setDeletePrestaTarget(null)}
+        title={t('gestionnaire.prestataires.deleteTitle', {
+          defaultValue: 'Supprimer le prestataire ?',
+        })}
+        description={
+          <>
+            {t('gestionnaire.prestataires.deleteDesc', {
+              defaultValue:
+                'Cette action est définitive. Un prestataire lié à des dépenses ou contrats ne peut pas être supprimé — passez-le plutôt en « Terminé ».',
+            })}
+          </>
+        }
+        confirmLabel={t('actions.delete', { defaultValue: 'Supprimer' })}
+        variant="destructive"
+        isLoading={deletePrestaMutation.isPending}
+        onConfirm={() =>
+          deletePrestaTarget &&
+          deletePrestaMutation.mutate(deletePrestaTarget.id)
+        }
+      />
 
       {/* Create Contrat dialog */}
       <Dialog open={createContratOpen} onOpenChange={setCreateContratOpen}>
