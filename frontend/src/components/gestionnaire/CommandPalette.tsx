@@ -9,7 +9,6 @@ import {
   Sparkles,
   Building2,
   Users,
-  UserSquare,
   Wrench,
   Upload,
   Wallet,
@@ -124,13 +123,6 @@ export function CommandPalette() {
       label: t('gestionnaire.nav.coproprietaires'),
       icon: Users,
       to: '/gestionnaire/coproprietaires',
-    },
-    {
-      key: 'nav-occupants',
-      group: 'nav',
-      label: t('gestionnaire.nav.occupants'),
-      icon: UserSquare,
-      to: '/gestionnaire/occupants',
     },
     {
       key: 'nav-prestataires',
