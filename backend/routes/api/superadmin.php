@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\SuperAdmin\HealthController;
 use App\Http\Controllers\Api\SuperAdmin\LeadController;
 use App\Http\Controllers\Api\SuperAdmin\MetricsController;
 use App\Http\Controllers\Api\SuperAdmin\PlanController;
+use App\Http\Controllers\Api\SuperAdmin\SecurityController;
 use App\Http\Controllers\Api\SuperAdmin\TenantController;
 use App\Http\Controllers\Api\SuperAdmin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -63,6 +64,11 @@ Route::get('/users', [UserController::class, 'index']);
 Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword']);
 Route::post('/users/{user}/toggle', [UserController::class, 'toggle']);
 Route::post('/users/{user}/logout', [UserController::class, 'forceLogout']);
+
+// Sécurité back-office — membres super_admin (KAN-147)
+Route::get('/security/members', [SecurityController::class, 'members']);
+Route::post('/security/members', [SecurityController::class, 'invite']);
+Route::delete('/security/members/{user}', [SecurityController::class, 'revoke']);
 
 // Démos & leads (pipeline commercial)
 Route::get('/leads', [LeadController::class, 'index']);

@@ -793,3 +793,86 @@ export async function deletePlan(id: number): Promise<void> {
     mockPlans = mockPlans.filter((p) => p.id !== id)
   }
 }
+
+// ── Sécurité back-office — membres super_admin (KAN-147) ──────────────────────
+export type SecurityMember = {
+  id: number
+  name: string
+  email: string | null
+  status: 'active' | 'inactive'
+  last_login_at: string | null
+  created_at: string | null
+  two_factor_enabled: boolean
+}
+
+const MOCK_MEMBERS: SecurityMember[] = [
+  {
+    id: 1,
+    name: 'Abdellah Jouider',
+    email: 'abdellah@imaro.ma',
+    status: 'active',
+    last_login_at: '2026-07-17T08:30:00Z',
+    created_at: '2026-05-13T09:00:00Z',
+    two_factor_enabled: false,
+  },
+  {
+    id: 2,
+    name: 'Mouad Baamrane',
+    email: 'mouad@imaro.ma',
+    status: 'active',
+    last_login_at: '2026-07-17T10:05:00Z',
+    created_at: '2026-05-13T09:00:00Z',
+    two_factor_enabled: false,
+  },
+]
+
+let mockMembers = [...MOCK_MEMBERS]
+
+export async function getMembers(): Promise<SecurityMember[]> {
+  try {
+    return (await api.get<{ data: SecurityMember[] }>('/admin/security/members'))
+      .data.data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    return mockMembers
+  }
+}
+
+export async function inviteMember(
+  name: string,
+  email: string,
+): Promise<string> {
+  try {
+    const res = await api.post<{ data: { temp_password: string } }>(
+      '/admin/security/members',
+      { name, email },
+    )
+    return res.data.data.temp_password
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    mockMembers = [
+      ...mockMembers,
+      {
+        id: Date.now(),
+        name,
+        email,
+        status: 'active',
+        last_login_at: null,
+        created_at: new Date().toISOString(),
+        two_factor_enabled: false,
+      },
+    ]
+    return 'Temp' + Math.random().toString(36).slice(2, 10)
+  }
+}
+
+export async function revokeMember(id: number): Promise<void> {
+  try {
+    await api.delete(`/admin/security/members/${id}`)
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    mockMembers = mockMembers.map((m) =>
+      m.id === id ? { ...m, status: 'inactive' } : m,
+    )
+  }
+}

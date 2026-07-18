@@ -9,6 +9,7 @@ import {
   ToggleRight,
   Activity,
   Tags,
+  Lock,
   Contact,
   LogOut,
 } from 'lucide-react'
@@ -24,6 +25,7 @@ const nav = [
   { to: '/fonctionnalites', label: 'Fonctionnalités', icon: ToggleRight, end: false },
   { to: '/systeme', label: 'Système', icon: Activity, end: false },
   { to: '/plans', label: 'Plans & tarifs', icon: Tags, end: false },
+  { to: '/securite', label: 'Sécurité', icon: Lock, end: false },
   { to: '/leads', label: 'Démos & leads', icon: Contact, end: false },
 ]
 
