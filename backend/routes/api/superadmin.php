@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\SuperAdmin\AuditController;
 use App\Http\Controllers\Api\SuperAdmin\BillingController;
 use App\Http\Controllers\Api\SuperAdmin\ClientOverviewController;
 use App\Http\Controllers\Api\SuperAdmin\HealthController;
@@ -47,6 +48,10 @@ Route::get('/plans', [PlanController::class, 'index']);
 Route::post('/plans', [PlanController::class, 'store']);
 Route::put('/plans/{plan}', [PlanController::class, 'update']);
 Route::delete('/plans/{plan}', [PlanController::class, 'destroy']);
+
+// Journal d'audit global cross-tenant (sécurité) — KAN-144
+Route::get('/audit', [AuditController::class, 'index']);
+Route::get('/audit/export', [AuditController::class, 'export']);
 
 // Gestion globale des utilisateurs (cross-tenant, support) — KAN-141
 Route::get('/users', [UserController::class, 'index']);
