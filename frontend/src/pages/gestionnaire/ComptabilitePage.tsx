@@ -126,6 +126,22 @@ const TYPE_BADGE_STYLES: Record<EcritureComptable['type'], string> = {
   report: 'bg-purple-100 text-purple-700',
 }
 
+/**
+ * Le backend (`StoreDepenseRequest`) exige `description` + `categorie` ; le
+ * formulaire comptable travaille avec un compte PCG (`compte_charge`). On
+ * reconstruit la catégorie à partir du compte pour que la création passe la
+ * validation ET que la ventilation au journal reste correcte (KAN-124).
+ */
+const COMPTE_TO_CATEGORIE: Record<string, string> = {
+  '6135': 'entretien',
+  '6138': 'gardiennage',
+  '6131': 'nettoyage',
+  '6136': 'assurance',
+  '6171': 'administratif',
+  '6134': 'travaux',
+  '6188': 'autre',
+}
+
 const MODE_BADGE_STYLES: Record<Depense['mode_paiement'], string> = {
   virement: 'bg-blue-100 text-blue-700',
   cheque: 'bg-purple-100 text-purple-700',
@@ -262,10 +278,13 @@ function NouvelleDepenseModal({
   const mutation = useMutation({
     mutationFn: () => {
       const fd = new FormData()
+      // Champs attendus par le backend : `description` + `categorie`.
       fd.append('titre', form.titre)
+      fd.append('description', form.titre)
       fd.append('montant', form.montant)
       fd.append('date', form.date)
       fd.append('compte_charge', form.compte_charge)
+      fd.append('categorie', COMPTE_TO_CATEGORIE[form.compte_charge] ?? 'autre')
       fd.append('mode_paiement', form.mode_paiement)
       if (form.prestataire) fd.append('prestataire', form.prestataire)
       if (form.justificatif) fd.append('justificatif', form.justificatif)
