@@ -2888,6 +2888,7 @@
       "complementaires": "Additional annexes",
       "regenerate": "Regenerate",
       "downloaded": "Annexe {{num}} downloaded",
+      "preview": "Preview",
       "obligatoires": "Mandatory annexes",
       "exerciceClos": "Fiscal year ended 31 December {{year}}",
       "title": "Accounting annexes",
