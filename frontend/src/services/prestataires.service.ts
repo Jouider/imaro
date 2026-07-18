@@ -21,7 +21,8 @@ export type Prestataire = {
   adresse: string
   note_satisfaction: number | null
   nb_interventions: number
-  statut: 'actif' | 'blackliste'
+  /** `inactif` = collaboration terminée (KAN-115). */
+  statut: 'actif' | 'inactif'
 }
 
 export type Contrat = {
@@ -83,7 +84,7 @@ const MOCK_PRESTATAIRES: Prestataire[] = [
     adresse: 'Zone Industrielle, Agadir',
     note_satisfaction: 2,
     nb_interventions: 3,
-    statut: 'blackliste',
+    statut: 'inactif',
   },
   {
     id: 5,
@@ -206,11 +207,30 @@ export async function updatePrestataire(
   id: number,
   data: Partial<Prestataire>,
 ): Promise<Prestataire> {
-  const res = await api.put<ApiEnvelope<{ prestataire: Prestataire }>>(
-    `/gestionnaire/prestataires/${id}`,
-    data,
+  return withMock(
+    async () => {
+      const res = await api.put<ApiEnvelope<{ prestataire: Prestataire }>>(
+        `/gestionnaire/prestataires/${id}`,
+        data,
+      )
+      return res.data.data.prestataire
+    },
+    {
+      ...(MOCK_PRESTATAIRES.find((p) => p.id === id) ?? MOCK_PRESTATAIRES[0]),
+      ...data,
+      id,
+    },
   )
-  return res.data.data.prestataire
+}
+
+/**
+ * Supprime un prestataire (KAN-115). Le backend renvoie 422 s'il est lié à des
+ * dépenses/contrats → l'appelant affiche le message et suggère « Terminé ».
+ */
+export async function deletePrestataire(id: number): Promise<void> {
+  return withMock(async () => {
+    await api.delete(`/gestionnaire/prestataires/${id}`)
+  }, undefined)
 }
 
 export async function getContrats(params?: {
