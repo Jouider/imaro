@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\SuperAdmin\AuditController;
 use App\Http\Controllers\Api\SuperAdmin\BillingController;
+use App\Http\Controllers\Api\SuperAdmin\BroadcastController;
 use App\Http\Controllers\Api\SuperAdmin\ClientOverviewController;
 use App\Http\Controllers\Api\SuperAdmin\HealthController;
 use App\Http\Controllers\Api\SuperAdmin\LeadController;
@@ -48,6 +49,10 @@ Route::get('/plans', [PlanController::class, 'index']);
 Route::post('/plans', [PlanController::class, 'store']);
 Route::put('/plans/{plan}', [PlanController::class, 'update']);
 Route::delete('/plans/{plan}', [PlanController::class, 'destroy']);
+
+// Diffusions produit vers les cabinets (broadcast) — KAN-145
+Route::get('/broadcasts', [BroadcastController::class, 'index']);
+Route::post('/broadcasts', [BroadcastController::class, 'store']);
 
 // Journal d'audit global cross-tenant (sécurité) — KAN-144
 Route::get('/audit', [AuditController::class, 'index']);
