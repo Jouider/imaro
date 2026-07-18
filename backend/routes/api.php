@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\Auth\TwoFactorController;
 use App\Http\Controllers\Api\IaChatController;
 use App\Http\Controllers\Api\Public\VisitePublicController;
 use App\Http\Controllers\Api\VisiteScanController;
@@ -37,8 +38,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
 
-    // Super Admin
-    Route::middleware('role:super_admin')
+    // 2FA back-office (KAN-147) — tokens limités (challenge/enroll) acceptés ici,
+    // échangés contre un token complet après vérification.
+    Route::post('/auth/2fa/setup', [TwoFactorController::class, 'setup']);
+    Route::post('/auth/2fa/confirm', [TwoFactorController::class, 'confirm']);
+    Route::post('/auth/2fa/verify', [TwoFactorController::class, 'verify']);
+    Route::post('/auth/2fa/disable', [TwoFactorController::class, 'disable']);
+
+    // Super Admin — 2FA obligatoire (token complet requis)
+    Route::middleware(['role:super_admin', 'ensure.2fa'])
         ->prefix('admin')
         ->group(base_path('routes/api/superadmin.php'));
 

@@ -33,8 +33,7 @@ class SecurityController extends Controller
                 'status' => $u->status,
                 'last_login_at' => $u->last_login_at?->toIso8601String(),
                 'created_at' => $u->created_at?->toIso8601String(),
-                // Placeholder tant que la 2FA n'est pas branchée (voir en-tête).
-                'two_factor_enabled' => false,
+                'two_factor_enabled' => $u->hasTwoFactorEnabled(), // KAN-147
             ]);
 
         return response()->json(['status' => 'success', 'data' => $members]);

@@ -25,6 +25,7 @@ class User extends Authenticatable
 
     protected $hidden = [
         'password', 'access_code', 'remember_token', 'otp_code',
+        'two_factor_secret', 'two_factor_recovery_codes',
     ];
 
     protected function casts(): array
@@ -38,7 +39,22 @@ class User extends Authenticatable
             'app_permissions' => 'array',
             'equipe_residence_ids' => 'array',
             'cndp_consent_at' => 'datetime',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_recovery_codes' => 'encrypted:array',
+            'two_factor_confirmed_at' => 'datetime',
         ];
+    }
+
+    /** La 2FA est-elle activée et confirmée pour ce compte ? */
+    public function hasTwoFactorEnabled(): bool
+    {
+        return $this->two_factor_confirmed_at !== null && $this->two_factor_secret !== null;
+    }
+
+    /** La 2FA est-elle obligatoire pour ce compte ? (tous les super_admin — KAN-147) */
+    public function requiresTwoFactor(): bool
+    {
+        return $this->role === 'super_admin';
     }
 
     public function tenant(): BelongsTo
