@@ -25,7 +25,9 @@ import {
 
 type DraftStep = Omit<RelanceStep, 'id'>
 
-const CANAUX: RelanceCanal[] = ['whatsapp', 'sms', 'email']
+// WhatsApp et SMS retirés (KAN-118) — canaux payants désactivés côté backend
+// (PR #352). On ne propose plus que l'email ; réactivables plus tard.
+const CANAUX: RelanceCanal[] = ['email']
 const TYPES: RelanceStepType[] = ['relance', 'mise_en_demeure']
 
 /**
@@ -54,7 +56,8 @@ export function RelanceScenarioCard({ residenceId }: { residenceId: number }) {
     setSteps(
       data.steps.map(({ delai_jours, canal, type }) => ({
         delai_jours,
-        canal,
+        // Normalise les anciens canaux payants (whatsapp/sms) vers email — KAN-118.
+        canal: canal === 'email' ? canal : 'email',
         type,
       })),
     )
@@ -78,10 +81,7 @@ export function RelanceScenarioCard({ residenceId }: { residenceId: number }) {
   })
 
   function addStep() {
-    setSteps((s) => [
-      ...s,
-      { delai_jours: 7, canal: 'whatsapp', type: 'relance' },
-    ])
+    setSteps((s) => [...s, { delai_jours: 7, canal: 'email', type: 'relance' }])
   }
 
   function updateStep(index: number, patch: Partial<DraftStep>) {

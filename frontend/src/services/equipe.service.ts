@@ -441,7 +441,8 @@ export async function createResidenceStaff(
       statut: 'actif',
       created_at: new Date().toISOString(),
       code: 'AB12CD34',
-      delivery: { delivered: true, channel: 'whatsapp', confirmed: true },
+      // WhatsApp/SMS désactivés (KAN-118) → livraison par email (Resend).
+      delivery: { delivered: true, channel: 'resend', confirmed: true },
     },
   )
 }

@@ -553,7 +553,7 @@ function SuccessDialog({
               </div>
             </div>
 
-            {/* Auto-send notice — code already sent by backend (SMS + WhatsApp + Email) */}
+            {/* Auto-send notice — code already sent by backend by email (SMS/WhatsApp désactivés, KAN-118) */}
             <div className="mt-3 flex items-start gap-2">
               <Send className="size-3.5 shrink-0 mt-0.5 text-green-600 dark:text-green-400" />
               <p className="text-xs text-green-700 dark:text-green-400">
