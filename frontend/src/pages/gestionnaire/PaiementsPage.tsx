@@ -2141,8 +2141,14 @@ export function PaiementsPage() {
         open={relancerAllOpen}
         onOpenChange={setRelancerAllOpen}
         title={t('gestionnaire.paiements.relanceAll')}
-        description={`Envoyer une relance WhatsApp à ${nbImpayes} copropriétaire(s) avec des créances impayées ?`}
-        confirmLabel="Envoyer les relances"
+        description={t('gestionnaire.paiements.relanceAllConfirm', {
+          count: nbImpayes,
+          defaultValue:
+            'Envoyer une relance à {{count}} copropriétaire(s) avec des créances impayées ?',
+        })}
+        confirmLabel={t('gestionnaire.paiements.relanceAllAction', {
+          defaultValue: 'Envoyer les relances',
+        })}
         variant="default"
         onConfirm={() => relancerToutMutation.mutate()}
         isLoading={relancerToutMutation.isPending}

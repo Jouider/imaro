@@ -45,8 +45,9 @@ const MOCK_SCENARIO: RelanceScenario = {
   residence_id: 1,
   enabled: true,
   steps: [
-    { id: 1, delai_jours: 3, canal: 'whatsapp', type: 'relance' },
-    { id: 2, delai_jours: 10, canal: 'sms', type: 'relance' },
+    // Canaux payants (whatsapp/sms) retirés — email uniquement (KAN-118).
+    { id: 1, delai_jours: 3, canal: 'email', type: 'relance' },
+    { id: 2, delai_jours: 10, canal: 'email', type: 'relance' },
     { id: 3, delai_jours: 30, canal: 'email', type: 'mise_en_demeure' },
   ],
 }
