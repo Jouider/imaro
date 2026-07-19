@@ -12,6 +12,7 @@ use App\Services\Notifications\PortailPushNotifier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Virements/paiements déclarés par les résidents, à valider par le gestionnaire.
@@ -33,7 +34,7 @@ class VirementDeclareController extends Controller
         $residenceIds = $this->accessibleResidenceIds($request);
 
         $virements = VirementDeclare::whereIn('residence_id', $residenceIds)
-            ->with(['coproprietaire.user', 'coproprietaire.lot', 'validePar'])
+            ->with(['coproprietaire.user', 'coproprietaire.lot', 'validePar', 'paiement'])
             ->orderByRaw("FIELD(statut,'en_attente','valide','rejete')")
             ->orderByDesc('date_declaration')
             ->get();
@@ -85,7 +86,7 @@ class VirementDeclareController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Virement validé — paiement enregistré.',
-            'data' => $this->present($virement->fresh(['coproprietaire.user', 'coproprietaire.lot', 'validePar'])),
+            'data' => $this->present($virement->fresh(['coproprietaire.user', 'coproprietaire.lot', 'validePar', 'paiement'])),
         ]);
     }
 
@@ -106,7 +107,7 @@ class VirementDeclareController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Virement rejeté.',
-            'data' => $this->present($virement->fresh(['coproprietaire.user', 'coproprietaire.lot', 'validePar'])),
+            'data' => $this->present($virement->fresh(['coproprietaire.user', 'coproprietaire.lot', 'validePar', 'paiement'])),
         ]);
     }
 
@@ -129,10 +130,18 @@ class VirementDeclareController extends Controller
             'date_declaration' => $v->date_declaration?->toDateString(),
             'methode' => $v->methode,
             'reference' => $v->reference,
-            'justificatif_path' => $v->justificatif_path,
+            // URL publique complète (et non le chemin de stockage brut) pour que
+            // l'aperçu « Voir » s'affiche côté front — KAN-117.
+            'justificatif_path' => $v->justificatif_path
+                ? Storage::disk('public')->url($v->justificatif_path)
+                : null,
             'statut' => $v->statut,
             'valide_par' => $v->validePar?->name,
             'date_validation' => $v->date_validation?->toDateTimeString(),
+            // Paiement réel créé à la validation — permet le toggle chèque
+            // payé/impayé côté gestionnaire (KAN-117).
+            'paiement_id' => $v->paiement_id,
+            'paiement_statut' => $v->paiement?->statut,
         ];
     }
 }
