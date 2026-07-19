@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\SuperAdmin\BillingController;
 use App\Http\Controllers\Api\SuperAdmin\BroadcastController;
 use App\Http\Controllers\Api\SuperAdmin\ClientOverviewController;
 use App\Http\Controllers\Api\SuperAdmin\HealthController;
+use App\Http\Controllers\Api\SuperAdmin\ImpersonationController;
 use App\Http\Controllers\Api\SuperAdmin\LeadController;
 use App\Http\Controllers\Api\SuperAdmin\MetricsController;
 use App\Http\Controllers\Api\SuperAdmin\PlanController;
@@ -66,6 +67,10 @@ Route::post('/users/{user}/toggle', [UserController::class, 'toggle']);
 Route::post('/users/{user}/logout', [UserController::class, 'forceLogout']);
 
 // Sécurité back-office — membres super_admin (KAN-147)
+// Historique des sessions de dépannage + révocation (KAN-147)
+Route::get('/impersonations', [ImpersonationController::class, 'index']);
+Route::post('/impersonations/{session}/terminate', [ImpersonationController::class, 'terminate']);
+
 Route::get('/security/members', [SecurityController::class, 'members']);
 Route::post('/security/members', [SecurityController::class, 'invite']);
 Route::delete('/security/members/{user}', [SecurityController::class, 'revoke']);
