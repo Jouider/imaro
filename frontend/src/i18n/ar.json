@@ -936,7 +936,8 @@
     "actions": {
       "menu": "خيارات أخرى",
       "edit": "تعديل",
-      "delete": "حذف"
+      "delete": "حذف",
+      "sendCredentials": "إرسال بيانات الدخول"
     },
     "permissions": {
       "residences": "الإقامات",
@@ -1014,7 +1015,13 @@
         "deleteFailed": "فشل الحذف",
         "toggled": "تم تحديث الحالة",
         "toggleFailed": "فشل تغيير الحالة",
-        "copyFailed": "تعذّر النسخ"
+        "copyFailed": "تعذّر النسخ",
+        "credentialsSent": "تم إرسال بيانات الدخول عبر البريد الإلكتروني",
+        "credentialsFailed": "فشل إرسال بيانات الدخول"
+      },
+      "credentials": {
+        "title": "تم إرسال بيانات الدخول",
+        "desc": "تم إرسال بريد إلكتروني يحتوي على بيانات الدخول إلى {{email}}. يمكنك أيضًا نسخ كلمة المرور المؤقتة أدناه لمشاركتها يدويًا."
       }
     },
     "personnel": {
@@ -2024,7 +2031,8 @@
         "actif": "نشط",
         "blackliste": "محظور",
         "expire": "منتهي",
-        "resilie": "مُنهى"
+        "resilie": "مُنهى",
+        "inactif": "منتهٍ"
       },
       "specialite": {
         "ascenseurs": "المصاعد",
@@ -2062,7 +2070,15 @@
       "emptyContrats": "لا توجد عقود",
       "emptyContratsDesc": "أنشئ أول عقد صيانة.",
       "toastCreated": "تم إنشاء المزود",
-      "toastContratCreated": "تم إنشاء العقد"
+      "toastContratCreated": "تم إنشاء العقد",
+      "toastUpdated": "تم تحديث المزود",
+      "toastStatut": "تم تحديث الحالة",
+      "toastDeleted": "تم حذف المزود",
+      "markTermine": "وضع علامة منتهٍ",
+      "markActif": "إعادة التفعيل",
+      "editPrestataire": "تعديل المزود",
+      "deleteTitle": "حذف المزود؟",
+      "deleteDesc": "هذا الإجراء نهائي. لا يمكن حذف مزود مرتبط بمصاريف أو عقود — ضعه بدل ذلك في حالة «منتهٍ»."
     },
     "budgets": {
       "title": "الميزانية",
@@ -2983,6 +2999,7 @@
       "complementaires": "ملاحق تكميلية",
       "regenerate": "إعادة التوليد",
       "downloaded": "تم تحميل الملحق {{num}}",
+      "preview": "معاينة",
       "obligatoires": "الملاحق الإلزامية",
       "exerciceClos": "السنة المالية المنتهية في 31 ديسمبر {{year}}",
       "title": "الملاحق المحاسبية",

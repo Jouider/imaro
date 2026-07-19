@@ -929,7 +929,8 @@
     "actions": {
       "menu": "More options",
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "sendCredentials": "Send credentials"
     },
     "permissions": {
       "residences": "Buildings",
@@ -1007,7 +1008,13 @@
         "deleteFailed": "Deletion failed",
         "toggled": "Status updated",
         "toggleFailed": "Status change failed",
-        "copyFailed": "Could not copy"
+        "copyFailed": "Could not copy",
+        "credentialsSent": "Credentials sent by email",
+        "credentialsFailed": "Failed to send credentials"
+      },
+      "credentials": {
+        "title": "Credentials sent",
+        "desc": "An email with the credentials was sent to {{email}}. You can also copy the temporary password below to share it manually."
       }
     },
     "personnel": {
@@ -1938,7 +1945,8 @@
         "actif": "Active",
         "blackliste": "Blacklisted",
         "expire": "Expired",
-        "resilie": "Terminated"
+        "resilie": "Terminated",
+        "inactif": "Ended"
       },
       "specialite": {
         "ascenseurs": "Elevators",
@@ -1976,7 +1984,15 @@
       "emptyContrats": "No contract",
       "emptyContratsDesc": "Create your first maintenance contract.",
       "toastCreated": "Provider created",
-      "toastContratCreated": "Contract created"
+      "toastContratCreated": "Contract created",
+      "toastUpdated": "Provider updated",
+      "toastStatut": "Status updated",
+      "toastDeleted": "Provider deleted",
+      "markTermine": "Mark as ended",
+      "markActif": "Reactivate",
+      "editPrestataire": "Edit provider",
+      "deleteTitle": "Delete provider?",
+      "deleteDesc": "This action is permanent. A provider linked to expenses or contracts cannot be deleted — set it to “Ended” instead."
     },
     "budgets": {
       "title": "Budgets",
@@ -2888,6 +2904,7 @@
       "complementaires": "Additional annexes",
       "regenerate": "Regenerate",
       "downloaded": "Annexe {{num}} downloaded",
+      "preview": "Preview",
       "obligatoires": "Mandatory annexes",
       "exerciceClos": "Fiscal year ended 31 December {{year}}",
       "title": "Accounting annexes",

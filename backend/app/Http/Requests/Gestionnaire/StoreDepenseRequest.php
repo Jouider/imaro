@@ -21,6 +21,7 @@ class StoreDepenseRequest extends FormRequest
             'prestataire'    => 'nullable|string|max:255',
             'prestataire_id' => 'nullable|integer|exists:prestataires,id',
             'statut'         => 'nullable|in:paye,en_attente,annule',
+            'justificatif'   => 'nullable|file|mimes:pdf,jpeg,jpg,png,webp|max:5120',
         ];
     }
 }

@@ -12,6 +12,7 @@ import {
   Copy,
   Check,
   Building2,
+  Mail,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -55,6 +56,7 @@ import {
   createAppUser,
   updateAppUser,
   deleteAppUser,
+  sendCredentials,
   generatePassword,
   APP_ROLES,
   APP_PERMISSIONS,
@@ -108,6 +110,12 @@ export function UtilisateursPage() {
   const [deleteTarget, setDeleteTarget] = useState<AppUser | null>(null)
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
   const [copied, setCopied] = useState(false)
+  // Résultat de l'envoi des identifiants par email (KAN-137) → modal de copie.
+  const [credentialsResult, setCredentialsResult] = useState<{
+    user: AppUser
+    password: string
+  } | null>(null)
+  const [credCopied, setCredCopied] = useState(false)
 
   const isEdit = editTarget !== null
   const dialogOpen = createOpen || isEdit
@@ -162,6 +170,40 @@ export function UtilisateursPage() {
     },
     onError: () => toast.error(t('equipe.utilisateurs.toast.deleteFailed')),
   })
+
+  // Envoi des identifiants par email + récupération du mot de passe à copier (KAN-137).
+  const sendCredentialsMut = useMutation({
+    mutationFn: (user: AppUser) => sendCredentials(user.id),
+    onSuccess: (res, user) => {
+      setCredentialsResult({ user, password: res.temp_password })
+      setCredCopied(false)
+      toast.success(
+        t('equipe.utilisateurs.toast.credentialsSent', {
+          defaultValue: 'Identifiants envoyés par email',
+        }),
+      )
+    },
+    onError: (err: unknown) => {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ??
+        t('equipe.utilisateurs.toast.credentialsFailed', {
+          defaultValue: "Échec de l'envoi des identifiants",
+        })
+      toast.error(message)
+    },
+  })
+
+  async function copyCredentials() {
+    if (!credentialsResult) return
+    try {
+      await navigator.clipboard.writeText(credentialsResult.password)
+      setCredCopied(true)
+      setTimeout(() => setCredCopied(false), 1500)
+    } catch {
+      toast.error(t('equipe.utilisateurs.toast.copyFailed'))
+    }
+  }
 
   function closeDialog() {
     setCreateOpen(false)
@@ -348,6 +390,15 @@ export function UtilisateursPage() {
             <DropdownMenuItem onClick={() => openEdit(u)}>
               <Pencil className="size-4" />
               {t('equipe.actions.edit')}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => sendCredentialsMut.mutate(u)}
+              disabled={sendCredentialsMut.isPending}
+            >
+              <Mail className="size-4" />
+              {t('equipe.actions.sendCredentials', {
+                defaultValue: 'Envoyer les identifiants',
+              })}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -603,6 +654,56 @@ export function UtilisateursPage() {
         onConfirm={() => deleteTarget && deleteMut.mutate(deleteTarget.id)}
         isLoading={deleteMut.isPending}
       />
+
+      {/* Identifiants envoyés — mot de passe à copier (KAN-137) */}
+      <Dialog
+        open={credentialsResult !== null}
+        onOpenChange={(o) => !o && setCredentialsResult(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {t('equipe.utilisateurs.credentials.title', {
+                defaultValue: 'Identifiants envoyés',
+              })}
+            </DialogTitle>
+            <DialogDescription>
+              {t('equipe.utilisateurs.credentials.desc', {
+                defaultValue:
+                  'Un email contenant les identifiants a été envoyé à {{email}}. Vous pouvez aussi copier le mot de passe temporaire ci-dessous pour le communiquer manuellement.',
+                email: credentialsResult?.user.email ?? '',
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center gap-2">
+            <Input
+              readOnly
+              value={credentialsResult?.password ?? ''}
+              className="font-mono"
+              aria-label={t('equipe.utilisateurs.form.password')}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={copyCredentials}
+              aria-label={t('equipe.utilisateurs.form.copy')}
+              title={t('equipe.utilisateurs.form.copy')}
+            >
+              {credCopied ? (
+                <Check className="size-4 text-emerald-600" />
+              ) : (
+                <Copy className="size-4" />
+              )}
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setCredentialsResult(null)}>
+              {t('actions.close', { defaultValue: 'Fermer' })}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

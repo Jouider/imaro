@@ -34,7 +34,7 @@ class AuthController extends Controller
             $seconds = RateLimiter::availableIn($key);
 
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => "Trop de tentatives. Réessayez dans {$seconds} secondes.",
             ], 429);
         }
@@ -49,21 +49,21 @@ class AuthController extends Controller
             RateLimiter::hit($key, 600);
 
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Email ou mot de passe incorrect.',
             ], 401);
         }
 
         if ($user->role === 'resident') {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Les résidents utilisent le portail mobile.',
             ], 403);
         }
 
         if ($user->status === 'inactive') {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Compte désactivé. Contactez votre administrateur.',
             ], 403);
         }
@@ -73,11 +73,34 @@ class AuthController extends Controller
         // Première connexion — l'utilisateur doit créer son propre mot de passe
         if ($user->must_change_password) {
             return response()->json([
-                'status'  => 'first_login',
+                'status' => 'first_login',
                 'message' => 'Première connexion. Veuillez créer votre mot de passe personnel.',
-                'data'    => [
+                'data' => [
                     'email' => $user->email,
                 ],
+            ]);
+        }
+
+        // 2FA obligatoire pour le back-office (super_admin — KAN-147). On n'émet
+        // PAS de token complet : on renvoie un token limité selon l'état 2FA.
+        if ($user->requiresTwoFactor()) {
+            if ($user->hasTwoFactorEnabled()) {
+                $challenge = $user->createToken('2fa-challenge', ['2fa:challenge'], Carbon::now()->addMinutes(5))->plainTextToken;
+
+                return response()->json([
+                    'status' => '2fa_required',
+                    'message' => 'Vérification en deux étapes requise.',
+                    'data' => ['challenge_token' => $challenge],
+                ]);
+            }
+
+            // super_admin sans 2FA configurée → enrôlement obligatoire avant tout accès.
+            $enroll = $user->createToken('2fa-enroll', ['2fa:enroll'], Carbon::now()->addMinutes(15))->plainTextToken;
+
+            return response()->json([
+                'status' => '2fa_setup_required',
+                'message' => 'Configuration de la 2FA requise.',
+                'data' => ['enroll_token' => $enroll, 'user' => new UserResource($user)],
             ]);
         }
 
@@ -89,14 +112,14 @@ class AuthController extends Controller
         )->plainTextToken;
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Connexion réussie',
-            'data'    => [
-                'token'      => $token,
+            'data' => [
+                'token' => $token,
                 'token_type' => 'Bearer',
                 'expires_in' => self::TOKEN_TTL_DAYS * 86400,
-                'user'       => new UserResource($user),
-                'tenant'     => $this->tenantData($user),
+                'user' => new UserResource($user),
+                'tenant' => $this->tenantData($user),
             ],
         ]);
     }
@@ -114,15 +137,15 @@ class AuthController extends Controller
             $seconds = RateLimiter::availableIn($key);
 
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => "Trop de tentatives. Réessayez dans {$seconds} secondes.",
             ], 429);
         }
 
         $validated = $request->validate([
-            'email'            => 'required|email',
+            'email' => 'required|email',
             'current_password' => 'required|string',
-            'new_password'     => 'required|string|min:8|confirmed',
+            'new_password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = User::withoutGlobalScopes()
@@ -135,36 +158,36 @@ class AuthController extends Controller
             RateLimiter::hit($key, 600);
 
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Email ou mot de passe temporaire incorrect.',
             ], 401);
         }
 
         if ($user->role === 'resident') {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Les résidents utilisent le portail mobile.',
             ], 403);
         }
 
         if ($user->status === 'inactive') {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Compte désactivé. Contactez votre administrateur.',
             ], 403);
         }
 
         if (! $user->must_change_password) {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Ce compte est déjà activé. Connectez-vous normalement.',
             ], 422);
         }
 
         $user->update([
-            'password'             => Hash::make($validated['new_password']),
+            'password' => Hash::make($validated['new_password']),
             'must_change_password' => false,
-            'last_login_at'        => Carbon::now(),
+            'last_login_at' => Carbon::now(),
         ]);
 
         RateLimiter::clear($key);
@@ -175,14 +198,14 @@ class AuthController extends Controller
         )->plainTextToken;
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Mot de passe créé. Bienvenue sur imaro !',
-            'data'    => [
-                'token'      => $token,
+            'data' => [
+                'token' => $token,
                 'token_type' => 'Bearer',
                 'expires_in' => self::TOKEN_TTL_DAYS * 86400,
-                'user'       => new UserResource($user->fresh('tenant')),
-                'tenant'     => $this->tenantData($user),
+                'user' => new UserResource($user->fresh('tenant')),
+                'tenant' => $this->tenantData($user),
             ],
         ]);
     }
@@ -200,7 +223,7 @@ class AuthController extends Controller
             $seconds = RateLimiter::availableIn($key);
 
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => "Trop de tentatives. Réessayez dans {$seconds} secondes.",
             ], 429);
         }
@@ -216,14 +239,14 @@ class AuthController extends Controller
             RateLimiter::hit($key, 600);
 
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Numéro ou code d\'accès incorrect.',
             ], 401);
         }
 
         if ($user->status === 'inactive') {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Compte désactivé. Contactez votre syndic.',
             ], 403);
         }
@@ -231,9 +254,9 @@ class AuthController extends Controller
         // Première connexion — le résident doit créer son propre code
         if ($user->must_change_code) {
             return response()->json([
-                'status'  => 'first_login',
+                'status' => 'first_login',
                 'message' => 'Première connexion. Veuillez créer votre code d\'accès personnel.',
-                'data'    => [
+                'data' => [
                     'phone' => $request->phone,
                 ],
             ]);
@@ -248,14 +271,14 @@ class AuthController extends Controller
         )->plainTextToken;
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Connexion réussie',
-            'data'    => [
-                'token'      => $token,
+            'data' => [
+                'token' => $token,
                 'token_type' => 'Bearer',
                 'expires_in' => self::TOKEN_TTL_DAYS * 86400,
-                'user'       => new UserResource($user),
-                'tenant'     => $this->tenantData($user),
+                'user' => new UserResource($user),
+                'tenant' => $this->tenantData($user),
             ],
         ]);
     }
@@ -273,7 +296,7 @@ class AuthController extends Controller
             $seconds = RateLimiter::availableIn($key);
 
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => "Trop de tentatives. Réessayez dans {$seconds} secondes.",
             ], 429);
         }
@@ -289,22 +312,22 @@ class AuthController extends Controller
             RateLimiter::hit($key, 600);
 
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Numéro ou code temporaire incorrect.',
             ], 401);
         }
 
         if (! $user->must_change_code) {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'Ce compte est déjà activé.',
             ], 422);
         }
 
         $user->update([
-            'access_code'      => Hash::make($request->new_code),
+            'access_code' => Hash::make($request->new_code),
             'must_change_code' => false,
-            'last_login_at'    => Carbon::now(),
+            'last_login_at' => Carbon::now(),
         ]);
 
         RateLimiter::clear($key);
@@ -315,14 +338,14 @@ class AuthController extends Controller
         )->plainTextToken;
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Code créé. Bienvenue sur imaro !',
-            'data'    => [
-                'token'      => $token,
+            'data' => [
+                'token' => $token,
                 'token_type' => 'Bearer',
                 'expires_in' => self::TOKEN_TTL_DAYS * 86400,
-                'user'       => new UserResource($user),
-                'tenant'     => $this->tenantData($user),
+                'user' => new UserResource($user),
+                'tenant' => $this->tenantData($user),
             ],
         ]);
     }
@@ -341,28 +364,28 @@ class AuthController extends Controller
         $current = $request->user()->currentAccessToken();
 
         $data = [
-            'user'   => new UserResource($user),
+            'user' => new UserResource($user),
             'tenant' => $this->tenantData($user),
         ];
 
         if ($this->shouldRefresh($current)) {
             $newToken = $user->createToken(
-                name:      $current->name,
+                name: $current->name,
                 expiresAt: Carbon::now()->addDays(self::TOKEN_TTL_DAYS),
             )->plainTextToken;
 
             // Drop the soon-to-expire token so the client can't reuse it.
             $current->delete();
 
-            $data['token']      = $newToken;
+            $data['token'] = $newToken;
             $data['token_type'] = 'Bearer';
             $data['expires_in'] = self::TOKEN_TTL_DAYS * 86400;
-            $data['refreshed']  = true;
+            $data['refreshed'] = true;
         }
 
         return response()->json([
             'status' => 'success',
-            'data'   => $data,
+            'data' => $data,
         ]);
     }
 
@@ -389,12 +412,12 @@ class AuthController extends Controller
         }
 
         return [
-            'id'                      => $user->tenant->id,
-            'name'                    => $user->tenant->name,
-            'subdomain'               => $user->tenant->subdomain,
-            'plan'                    => $user->tenant->plan,
+            'id' => $user->tenant->id,
+            'name' => $user->tenant->name,
+            'subdomain' => $user->tenant->subdomain,
+            'plan' => $user->tenant->plan,
             'onboarding_completed_at' => $user->tenant->onboarding_completed_at?->toIso8601String(),
-            'onboarding_step'         => $user->tenant->onboarding_step,
+            'onboarding_step' => $user->tenant->onboarding_step,
         ];
     }
 
@@ -406,7 +429,7 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Déconnecté avec succès.',
         ]);
     }

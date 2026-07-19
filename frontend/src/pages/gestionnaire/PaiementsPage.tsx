@@ -772,12 +772,12 @@ function RejeterVirementModal({
 // ─── ChequeImpayeModal (KAN-85) ──────────────────────────────────────────────
 
 function ChequeImpayeModal({
-  encaissement,
+  open,
   onClose,
   onConfirm,
   isLoading,
 }: {
-  encaissement: Encaissement | null
+  open: boolean
   onClose: () => void
   onConfirm: (motif: string) => void
   isLoading: boolean
@@ -787,7 +787,7 @@ function ChequeImpayeModal({
 
   return (
     <Dialog
-      open={!!encaissement}
+      open={open}
       onOpenChange={(o) => {
         if (!o) {
           setMotif('')
@@ -869,6 +869,9 @@ export function PaiementsPage() {
     useState<VirementDeclare | null>(null)
   const [chequeImpayeTarget, setChequeImpayeTarget] =
     useState<Encaissement | null>(null)
+  // Chèque déclaré (onglet Virements) à marquer impayé — KAN-117.
+  const [virementChequeTarget, setVirementChequeTarget] =
+    useState<VirementDeclare | null>(null)
   const [relancerAllOpen, setRelancerAllOpen] = useState(false)
 
   // Créances tab filters
@@ -1008,6 +1011,34 @@ export function PaiementsPage() {
       void qc.invalidateQueries({ queryKey: ['creances'] })
       void qc.invalidateQueries({ queryKey: ['decompte'] })
       setChequeImpayeTarget(null)
+      toast.success(
+        t('gestionnaire.paiements.chequeImpaye.success', {
+          defaultValue: 'Chèque marqué comme impayé',
+        }),
+      )
+    },
+    onError: (err: unknown) => {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ??
+        t('gestionnaire.paiements.chequeImpaye.error', {
+          defaultValue: 'Impossible de marquer ce chèque comme impayé',
+        })
+      toast.error(message)
+    },
+  })
+
+  // Chèque déclaré marqué impayé depuis l'onglet Virements (KAN-117). Réutilise
+  // l'endpoint KAN-85 via le `paiement_id` créé à la validation.
+  const virementChequeImpayeMutation = useMutation({
+    mutationFn: ({ id, motif }: { id: number; motif: string }) =>
+      markChequeImpaye(id, motif),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['virements-declares'] })
+      void qc.invalidateQueries({ queryKey: ['encaissements'] })
+      void qc.invalidateQueries({ queryKey: ['creances'] })
+      void qc.invalidateQueries({ queryKey: ['decompte'] })
+      setVirementChequeTarget(null)
       toast.success(
         t('gestionnaire.paiements.chequeImpaye.success', {
           defaultValue: 'Chèque marqué comme impayé',
@@ -1508,6 +1539,26 @@ export function PaiementsPage() {
               })}
             </Button>
           </div>
+        ) : r.statut === 'valide' && r.methode === 'cheque' && r.paiement_id ? (
+          r.paiement_statut === 'cheque_rejete' ? (
+            <Badge className="border-0 bg-red-100 text-xs text-red-700">
+              {t('gestionnaire.paiements.chequeImpaye.badge', {
+                defaultValue: 'Chèque impayé',
+              })}
+            </Badge>
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 border-red-300 text-xs text-red-600 hover:bg-red-50"
+              onClick={() => setVirementChequeTarget(r)}
+            >
+              <Ban className="me-1 size-3" />
+              {t('gestionnaire.paiements.chequeImpaye.action', {
+                defaultValue: 'Marquer impayé',
+              })}
+            </Button>
+          )
         ) : null,
     },
   ]
@@ -2063,13 +2114,27 @@ export function PaiementsPage() {
       />
 
       <ChequeImpayeModal
-        encaissement={chequeImpayeTarget}
+        open={!!chequeImpayeTarget}
         onClose={() => setChequeImpayeTarget(null)}
         onConfirm={(motif) =>
           chequeImpayeTarget &&
           chequeImpayeMutation.mutate({ id: chequeImpayeTarget.id, motif })
         }
         isLoading={chequeImpayeMutation.isPending}
+      />
+
+      {/* Chèque déclaré (onglet Virements) marqué impayé — KAN-117. */}
+      <ChequeImpayeModal
+        open={!!virementChequeTarget}
+        onClose={() => setVirementChequeTarget(null)}
+        onConfirm={(motif) =>
+          virementChequeTarget?.paiement_id &&
+          virementChequeImpayeMutation.mutate({
+            id: virementChequeTarget.paiement_id,
+            motif,
+          })
+        }
+        isLoading={virementChequeImpayeMutation.isPending}
       />
 
       <ConfirmModal

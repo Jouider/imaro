@@ -936,7 +936,8 @@
     "actions": {
       "menu": "Plus d'options",
       "edit": "Modifier",
-      "delete": "Supprimer"
+      "delete": "Supprimer",
+      "sendCredentials": "Envoyer les identifiants"
     },
     "permissions": {
       "residences": "Résidences",
@@ -1014,7 +1015,13 @@
         "deleteFailed": "Échec de la suppression",
         "toggled": "Statut mis à jour",
         "toggleFailed": "Échec du changement de statut",
-        "copyFailed": "Impossible de copier"
+        "copyFailed": "Impossible de copier",
+        "credentialsSent": "Identifiants envoyés par email",
+        "credentialsFailed": "Échec de l'envoi des identifiants"
+      },
+      "credentials": {
+        "title": "Identifiants envoyés",
+        "desc": "Un email contenant les identifiants a été envoyé à {{email}}. Vous pouvez aussi copier le mot de passe temporaire ci-dessous pour le communiquer manuellement."
       }
     },
     "personnel": {
@@ -2010,7 +2017,8 @@
         "actif": "Actif",
         "blackliste": "Blacklisté",
         "expire": "Expiré",
-        "resilie": "Résilié"
+        "resilie": "Résilié",
+        "inactif": "Terminé"
       },
       "specialite": {
         "ascenseurs": "Ascenseurs",
@@ -2048,7 +2056,15 @@
       "emptyContrats": "Aucun contrat",
       "emptyContratsDesc": "Créez votre premier contrat de maintenance.",
       "toastCreated": "Prestataire créé",
-      "toastContratCreated": "Contrat créé"
+      "toastContratCreated": "Contrat créé",
+      "toastUpdated": "Prestataire mis à jour",
+      "toastStatut": "Statut mis à jour",
+      "toastDeleted": "Prestataire supprimé",
+      "markTermine": "Marquer terminé",
+      "markActif": "Réactiver",
+      "editPrestataire": "Modifier le prestataire",
+      "deleteTitle": "Supprimer le prestataire ?",
+      "deleteDesc": "Cette action est définitive. Un prestataire lié à des dépenses ou contrats ne peut pas être supprimé — passez-le plutôt en « Terminé »."
     },
     "budgets": {
       "title": "Budgets",
@@ -2983,6 +2999,7 @@
       "complementaires": "Annexes complémentaires",
       "regenerate": "Régénérer",
       "downloaded": "Annexe {{num}} téléchargée",
+      "preview": "Aperçu",
       "obligatoires": "Annexes obligatoires",
       "exerciceClos": "Exercice clos le 31 décembre {{year}}",
       "title": "Annexes Comptables",

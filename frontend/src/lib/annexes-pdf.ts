@@ -13,6 +13,27 @@ import QRCode from 'qrcode'
 import { loadLogo } from './annexes-pdf-assets'
 
 /**
+ * Mode de sortie des générateurs d'annexes (KAN-123). Par défaut « download »
+ * (téléchargement du fichier) ; en mode « preview » le PDF s'ouvre dans un
+ * nouvel onglet (aperçu) au lieu d'être enregistré.
+ */
+let annexeOutputMode: 'download' | 'preview' = 'download'
+
+export function setAnnexeOutputMode(mode: 'download' | 'preview'): void {
+  annexeOutputMode = mode
+}
+
+/** Émet le PDF : téléchargement ou aperçu (nouvel onglet) selon le mode. */
+function emitPdf(doc: jsPDF, filename: string): void {
+  if (annexeOutputMode === 'preview') {
+    const url = doc.output('bloburl')
+    window.open(url, '_blank', 'noopener,noreferrer')
+  } else {
+    doc.save(filename)
+  }
+}
+
+/**
  * Base URL where annexe PDFs link to for verification.
  * Override via VITE_VERIFY_BASE_URL in production.
  */
@@ -644,7 +665,7 @@ export async function generateAnnexe10Pdf(data: Annexe10Input): Promise<void> {
     drawFooter(doc, p, totalPages, qrDataUri, verifyUrl)
   }
 
-  doc.save(`annexe10_${data.exercice}.pdf`)
+  emitPdf(doc, `annexe10_${data.exercice}.pdf`)
 }
 
 // ─── Annexe 13-1 — État de la situation financière (très simplifié) ──────────
@@ -760,7 +781,7 @@ export async function generateAnnexe131Pdf(
   drawSignatureBox(doc, 195)
   drawFooter(doc, 1, 1, qrDataUri, verifyUrl)
 
-  doc.save(`annexe13-1_${data.exercice}.pdf`)
+  emitPdf(doc, `annexe13-1_${data.exercice}.pdf`)
 }
 
 // ─── Annexe 13-2 — Compte des produits et charges et budget ──────────────────
@@ -1002,7 +1023,7 @@ export async function generateAnnexe132Pdf(
   drawSignatureBox(doc, Math.max(y, 215))
   drawFooter(doc, 1, 1, qrDataUri, verifyUrl)
 
-  doc.save(`annexe13-2_${data.exercice}.pdf`)
+  emitPdf(doc, `annexe13-2_${data.exercice}.pdf`)
 }
 
 // ─── Shared table helpers (used by annexes 3, 4, 6, 7, 8, 9, 11, 12) ─────────
@@ -1363,7 +1384,7 @@ export async function generateAnnexe3Pdf(data: Annexe3Input): Promise<void> {
   drawSignatureBox(doc, y2 + 20)
   drawFooter(doc, 2, totalPages, qrDataUri, verifyUrl)
 
-  doc.save(`annexe3_${data.exercice}.pdf`)
+  emitPdf(doc, `annexe3_${data.exercice}.pdf`)
 }
 
 // ─── Annexe 4 — COMPTE DE RÉSULTAT (complet) ─────────────────────────────────
@@ -1550,7 +1571,7 @@ export async function generateAnnexe4Pdf(data: Annexe4Input): Promise<void> {
     verifyUrl,
   )
 
-  doc.save(`annexe4_${data.exercice}.pdf`)
+  emitPdf(doc, `annexe4_${data.exercice}.pdf`)
 }
 
 // ─── Annexe 5 — Suivi du Budget Prévisionnel vs Réalisé ──────────────────────
@@ -1665,7 +1686,7 @@ export async function generateAnnexe5Pdf(data: Annexe5Input): Promise<void> {
   drawSignatureBox(doc, Math.max(y + 6, 215))
   drawFooter(doc, 1, 1, qrDataUri, verifyUrl)
 
-  doc.save(`annexe5_${data.exercice}.pdf`)
+  emitPdf(doc, `annexe5_${data.exercice}.pdf`)
 }
 
 // ─── Annexe 6 — Travaux Non Courants ─────────────────────────────────────────
@@ -1765,7 +1786,7 @@ export async function generateAnnexe6Pdf(data: Annexe6Input): Promise<void> {
   drawSignatureBox(doc, Math.max(y + 6, 215))
   drawFooter(doc, 1, 1, qrDataUri, verifyUrl)
 
-  doc.save(`annexe6_${data.exercice}.pdf`)
+  emitPdf(doc, `annexe6_${data.exercice}.pdf`)
 }
 
 // ─── Annexe 7 — Mouvements de trésorerie ─────────────────────────────────────
@@ -1877,7 +1898,7 @@ export async function generateAnnexe7Pdf(data: Annexe7Input): Promise<void> {
   drawSignatureBox(doc, Math.max(y + 6, 215))
   drawFooter(doc, 1, 1, qrDataUri, verifyUrl)
 
-  doc.save(`annexe7_${data.exercice}.pdf`)
+  emitPdf(doc, `annexe7_${data.exercice}.pdf`)
 }
 
 // ─── Annexe 8 — Suivi des Emprunts ───────────────────────────────────────────
@@ -1975,7 +1996,7 @@ export async function generateAnnexe8Pdf(data: Annexe8Input): Promise<void> {
   drawSignatureBox(doc, Math.max(y + 6, 215))
   drawFooter(doc, 1, 1, qrDataUri, verifyUrl)
 
-  doc.save(`annexe8_${data.exercice}.pdf`)
+  emitPdf(doc, `annexe8_${data.exercice}.pdf`)
 }
 
 // ─── Annexe 9 — Suivi des Équipements ────────────────────────────────────────
@@ -2075,7 +2096,7 @@ export async function generateAnnexe9Pdf(data: Annexe9Input): Promise<void> {
   drawSignatureBox(doc, Math.max(y + 6, 215))
   drawFooter(doc, 1, 1, qrDataUri, verifyUrl)
 
-  doc.save(`annexe9_${data.exercice}.pdf`)
+  emitPdf(doc, `annexe9_${data.exercice}.pdf`)
 }
 
 // ─── Annexe 11 — État simplifié de la situation financière ───────────────────
@@ -2165,7 +2186,7 @@ export async function generateAnnexe11Pdf(data: Annexe11Input): Promise<void> {
   drawSignatureBox(doc, Math.max(y + 6, 215))
   drawFooter(doc, 1, 1, qrDataUri, verifyUrl)
 
-  doc.save(`annexe11_${data.exercice}.pdf`)
+  emitPdf(doc, `annexe11_${data.exercice}.pdf`)
 }
 
 // ─── Annexe 12 — Compte de Résultat Simplifié ────────────────────────────────
@@ -2388,7 +2409,7 @@ export async function generateAnnexe12Pdf(data: Annexe12Input): Promise<void> {
   drawSignatureBox(doc, Math.max(y + 6, 215))
   drawFooter(doc, 1, 1, qrDataUri, verifyUrl)
 
-  doc.save(`annexe12_${data.exercice}.pdf`)
+  emitPdf(doc, `annexe12_${data.exercice}.pdf`)
 }
 
 // ─── Public helper: route by annexe number ───────────────────────────────────

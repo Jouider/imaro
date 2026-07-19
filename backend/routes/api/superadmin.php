@@ -1,12 +1,16 @@
 <?php
 
+use App\Http\Controllers\Api\SuperAdmin\AuditController;
 use App\Http\Controllers\Api\SuperAdmin\BillingController;
+use App\Http\Controllers\Api\SuperAdmin\BroadcastController;
 use App\Http\Controllers\Api\SuperAdmin\ClientOverviewController;
 use App\Http\Controllers\Api\SuperAdmin\HealthController;
 use App\Http\Controllers\Api\SuperAdmin\LeadController;
 use App\Http\Controllers\Api\SuperAdmin\MetricsController;
 use App\Http\Controllers\Api\SuperAdmin\PlanController;
+use App\Http\Controllers\Api\SuperAdmin\SecurityController;
 use App\Http\Controllers\Api\SuperAdmin\TenantController;
+use App\Http\Controllers\Api\SuperAdmin\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -46,6 +50,25 @@ Route::get('/plans', [PlanController::class, 'index']);
 Route::post('/plans', [PlanController::class, 'store']);
 Route::put('/plans/{plan}', [PlanController::class, 'update']);
 Route::delete('/plans/{plan}', [PlanController::class, 'destroy']);
+
+// Diffusions produit vers les cabinets (broadcast) — KAN-145
+Route::get('/broadcasts', [BroadcastController::class, 'index']);
+Route::post('/broadcasts', [BroadcastController::class, 'store']);
+
+// Journal d'audit global cross-tenant (sécurité) — KAN-144
+Route::get('/audit', [AuditController::class, 'index']);
+Route::get('/audit/export', [AuditController::class, 'export']);
+
+// Gestion globale des utilisateurs (cross-tenant, support) — KAN-141
+Route::get('/users', [UserController::class, 'index']);
+Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword']);
+Route::post('/users/{user}/toggle', [UserController::class, 'toggle']);
+Route::post('/users/{user}/logout', [UserController::class, 'forceLogout']);
+
+// Sécurité back-office — membres super_admin (KAN-147)
+Route::get('/security/members', [SecurityController::class, 'members']);
+Route::post('/security/members', [SecurityController::class, 'invite']);
+Route::delete('/security/members/{user}', [SecurityController::class, 'revoke']);
 
 // Démos & leads (pipeline commercial)
 Route::get('/leads', [LeadController::class, 'index']);
