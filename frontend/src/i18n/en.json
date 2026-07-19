@@ -79,7 +79,7 @@
       "codeSubtitle": "Enter the code provided by your syndic for +212 {{digits}}",
       "codeLabel": "Access code",
       "codePlaceholder": "Code provided by your syndic",
-      "codeHint": "This code was sent to you by your manager via WhatsApp.",
+      "codeHint": "This code was given to you by your manager.",
       "codeSubmit": "Access my space",
       "codeVerifying": "Verifying…",
       "activateTitle": "Create your personal code",
@@ -374,7 +374,7 @@
       "emptyDesc": "Create your first invitation — your visitor will get a link to scan at the entrance.",
       "form": {
         "title": "New invitation",
-        "desc": "The QR is sent directly by WhatsApp / SMS to the visitor.",
+        "desc": "The QR is sent directly to the visitor (share or email).",
         "shareLater": "You'll be able to share it after creation.",
         "submit": "Create & share",
         "submitting": "Creating…",
@@ -510,7 +510,7 @@
       },
       "step2": {
         "title": "Invite your owners",
-        "desc": "They get WhatsApp access to their personal portal"
+        "desc": "They get access to their personal portal"
       },
       "step3": {
         "title": "Manage in real time",
@@ -1056,7 +1056,7 @@
         "residencePh": "Choose a building",
         "phone": "Phone",
         "permissions": "Granted permissions",
-        "phoneHint": "The access code will be generated and sent to this number via WhatsApp / SMS."
+        "phoneHint": "The access code will be generated and sent to the member automatically."
       },
       "toast": {
         "created": "Staff added",
@@ -1071,7 +1071,7 @@
       "credentialsSent": {
         "title": "Credentials sent",
         "desc": "{{name}}'s account was created and their access code was sent.",
-        "sentVia": "Code sent via WhatsApp / SMS to {{phone}}.",
+        "sentVia": "Code sent to {{phone}}.",
         "codeLabel": "Access code",
         "note": "Share this code with the staff member. They must change it on first login.",
         "deliveredConfirmed": "Code sent via {{channel}} to {{phone}} — delivery confirmed.",
@@ -1202,7 +1202,7 @@
         },
         "relance": {
           "title": "Amicable reminder",
-          "desc": "Graduated reminders by SMS, WhatsApp and email to obtain an amicable settlement."
+          "desc": "Graduated reminders by email to obtain an amicable settlement."
         },
         "miseEnDemeure": {
           "title": "Formal notice",
@@ -1233,7 +1233,7 @@
           "desc": "Amicable collection handled for you, up to the formal notice.",
           "features": [
             "Automated funds calls and reminders",
-            "Multichannel reminders (SMS, WhatsApp, email)",
+            "Email reminders",
             "Official formal notice",
             "Monthly tracking of unpaid amounts"
           ]
@@ -1545,7 +1545,7 @@
       "createdSuccess": "The owner was created successfully.",
       "accessCode": "Access code:",
       "copyCodeAria": "Copy the code",
-      "codeAutoSent": "The access code was automatically sent to the owner by SMS, WhatsApp and email. The code above remains shown as a backup, in case you need to communicate it verbally.",
+      "codeAutoSent": "The access code was automatically sent to the owner by email. The code above remains shown as a backup, in case you need to communicate it verbally.",
       "createLotPrompt": "Would you like to create a unit for this new owner?",
       "yesCreateLot": "Yes, create a unit",
       "noFinish": "No, finish",
@@ -1577,7 +1577,7 @@
       },
       "envoyer": "Send",
       "envoyerConfirm": "Send the funds call to the owners?",
-      "envoyerDesc": "This action will send a WhatsApp notification to all owners.",
+      "envoyerDesc": "This action will send a notification (app + email) to all owners.",
       "envoyerSuccess": "Funds call sent",
       "form": {
         "titre": "Title",
@@ -1674,7 +1674,7 @@
       "allStatuses": "All statuses",
       "calcRepartition": "Calculating the breakdown…",
       "sendAppelTitle": "Send the funds call",
-      "sendAppelDesc": "This action will send a WhatsApp notification to all owners.",
+      "sendAppelDesc": "This action will send a notification (app + email) to all owners.",
       "saveError": "Error while saving",
       "relancesSent": "{{n}} reminder(s) sent",
       "noAppel": "No funds call",
@@ -1685,7 +1685,9 @@
       "colLot": "Unit",
       "encaisserPaiement": "Record a payment",
       "envoyerRappels": "Send reminders",
-      "decompteEmpty": "Enter a name and click Generate to display the individual statement"
+      "decompteEmpty": "Enter a name and click Generate to display the individual statement",
+      "relanceAllConfirm": "Send a reminder to {{count}} owner(s) with unpaid dues?",
+      "relanceAllAction": "Send reminders"
     },
     "tickets": {
       "title": "Tickets",
@@ -2583,7 +2585,12 @@
       "prescriptionBanner": "Co-ownership charge debts lapse after 5 years without interruption. Immediate legal action is required for critical-status debts.",
       "colEcheance": "Due date",
       "colJoursRestants": "Days left",
-      "colOrigine": "Origin"
+      "colOrigine": "Origin",
+      "relance": {
+        "canaux": {
+          "email": "Email"
+        }
+      }
     },
     "equipements": {
       "toastAdded": "Equipment added",
@@ -2775,8 +2782,8 @@
       "upgradePro": "Upgrade to Pro →",
       "comingSoon": "Feature coming soon",
       "notifSection": "Notification preferences",
-      "notifHint": "Choose the WhatsApp alerts you want to receive",
-      "notifMaster": "Enable WhatsApp notifications",
+      "notifHint": "Choose the alerts you want to receive",
+      "notifMaster": "Enable notifications",
       "notifPaiementLabel": "New payment received",
       "notifPaiementDesc": "An owner makes a payment",
       "notifTicketLabel": "New incident ticket",
