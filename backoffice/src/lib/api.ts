@@ -29,14 +29,106 @@ api.interceptors.response.use(
 )
 
 // ── Auth ────────────────────────────────────────────────────────────────────
-export async function login(email: string, password: string) {
-  const res = await api.post('/auth/login', { email, password })
-  const token = res.data?.data?.token as string | undefined
-  const user = res.data?.data?.user
-  if (!token) throw new Error('Réponse de connexion invalide')
+/**
+ * L'API a quatre issues possibles à la connexion (cf. AuthController + KAN-147) :
+ * succès, création du mot de passe, enrôlement 2FA, vérification 2FA. Les trois
+ * dernières ne portent PAS de token complet — l'UI doit les traiter comme des
+ * étapes, pas comme des erreurs.
+ */
+export type AuthStep =
+  | { step: 'done'; user: BoUser }
+  | { step: 'first_login'; email: string }
+  | { step: '2fa_setup'; enrollToken: string }
+  | { step: '2fa_verify'; challengeToken: string }
+
+export type BoUser = { id: number; name: string; email: string; role: string }
+
+/** Le back-office est réservé à Digitoyou : on refuse tout autre rôle. */
+function assertSuperAdmin(user: BoUser | undefined): BoUser {
   if (user?.role !== 'super_admin')
     throw new Error('Accès réservé aux administrateurs Digitoyou')
-  setToken(token)
+  return user
+}
+
+type AuthPayload = {
+  status?: string
+  data?: {
+    token?: string
+    user?: BoUser
+    enroll_token?: string
+    challenge_token?: string
+  }
+}
+
+/** Interprète une réponse d'auth (login ou activate) en étape de parcours. */
+function toAuthStep(payload: AuthPayload, email: string): AuthStep {
+  const d = payload?.data
+  // Un statut annoncé sans le jeton correspondant est une réponse cassée :
+  // on préfère une erreur explicite à une étape muette qui tournerait dans le vide.
+  const required = <T,>(v: T | undefined | null): T => {
+    if (v === undefined || v === null) throw new Error('Réponse de connexion invalide')
+    return v
+  }
+
+  switch (payload?.status) {
+    case 'first_login':
+      return { step: 'first_login', email }
+    case '2fa_setup_required':
+      return { step: '2fa_setup', enrollToken: required(d?.enroll_token) }
+    case '2fa_required':
+      return { step: '2fa_verify', challengeToken: required(d?.challenge_token) }
+    case 'success': {
+      const user = assertSuperAdmin(d?.user)
+      setToken(required(d?.token))
+      return { step: 'done', user }
+    }
+    default:
+      throw new Error('Réponse de connexion invalide')
+  }
+}
+
+export async function login(email: string, password: string): Promise<AuthStep> {
+  const res = await api.post('/auth/login', { email, password })
+  return toAuthStep(res.data, email)
+}
+
+/** Première connexion : échange le mot de passe temporaire contre un mot de passe choisi. */
+export async function activate(
+  email: string,
+  currentPassword: string,
+  newPassword: string,
+): Promise<AuthStep> {
+  const res = await api.post('/auth/activate', {
+    email,
+    current_password: currentPassword,
+    new_password: newPassword,
+    new_password_confirmation: newPassword,
+  })
+  return toAuthStep(res.data, email)
+}
+
+/** Les tokens 2FA sont limités et éphémères : on les passe explicitement,
+ *  sans jamais les stocker comme token de session. */
+const bearer = (t: string) => ({ headers: { Authorization: `Bearer ${t}` } })
+
+export async function twoFactorSetup(enrollToken: string) {
+  const res = await api.post('/auth/2fa/setup', {}, bearer(enrollToken))
+  return res.data.data as { secret: string; otpauth_url: string }
+}
+
+export async function twoFactorConfirm(enrollToken: string, code: string) {
+  const res = await api.post('/auth/2fa/confirm', { code }, bearer(enrollToken))
+  const d = res.data.data
+  const user = assertSuperAdmin(d?.user)
+  setToken(d.token)
+  return { user, recoveryCodes: d.recovery_codes as string[] }
+}
+
+export async function twoFactorVerify(challengeToken: string, code: string) {
+  const res = await api.post('/auth/2fa/verify', { code }, bearer(challengeToken))
+  const d = res.data.data
+  const user = assertSuperAdmin(d?.user)
+  setToken(d.token)
   return user
 }
 
