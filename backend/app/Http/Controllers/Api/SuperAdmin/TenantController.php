@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Models\ImpersonationSession;
 use App\Models\Lot;
 use App\Models\Tenant;
 use App\Models\User;
@@ -138,7 +139,19 @@ class TenantController extends Controller
         }
 
         $expiresAt = now()->addMinutes(30);
-        $token = $manager->createToken('impersonation', ['impersonation'], $expiresAt)->plainTextToken;
+        $newToken = $manager->createToken('impersonation', ['impersonation'], $expiresAt);
+        $token = $newToken->plainTextToken;
+
+        // Trace la session pour l'historique + la révocation manuelle (KAN-147).
+        ImpersonationSession::create([
+            'admin_id' => $request->user()->id,
+            'tenant_id' => $tenant->id,
+            'impersonated_user_id' => $manager->id,
+            'token_id' => $newToken->accessToken->getKey(),
+            'started_at' => now(),
+            'expires_at' => $expiresAt,
+            'ip_address' => $request->ip(),
+        ]);
 
         AuditLog::create([
             'tenant_id' => $tenant->id,
