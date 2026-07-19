@@ -1,7 +1,13 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { api, type Lead } from '../lib/api'
+import {
+  getLeads,
+  createLead,
+  updateLeadStatus,
+  convertLead,
+  type Lead,
+} from '../lib/api'
 
 const STATUTS = ['nouveau', 'contacte', 'demo_planifiee', 'gagne', 'perdu']
 const SOURCES = ['site', 'salon', 'recommandation', 'appel', 'autre']
@@ -20,7 +26,7 @@ export function Leads() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['leads'],
-    queryFn: async () => (await api.get<{ data: { leads: Lead[] } }>('/admin/leads')).data.data.leads,
+    queryFn: () => getLeads(),
   })
 
   function invalidate() {
@@ -31,7 +37,7 @@ export function Leads() {
     e.preventDefault()
     if (!form.cabinet_nom.trim()) return
     try {
-      await api.post('/admin/leads', form)
+      await createLead(form)
       setForm({ cabinet_nom: '', contact_email: '', ville: '', source: 'site' })
       toast.success('Lead ajouté')
       invalidate()
@@ -41,18 +47,19 @@ export function Leads() {
   }
 
   async function changeStatut(l: Lead, statut: string) {
-    await api.put(`/admin/leads/${l.id}`, { statut })
+    await updateLeadStatus(l.id, statut)
     invalidate()
   }
 
   async function convertir(l: Lead) {
     try {
-      await api.post(`/admin/leads/${l.id}/convertir`)
+      await convertLead(l.id)
       toast.success('Lead converti en client (essai)')
       invalidate()
     } catch (e) {
       toast.error(
-        (e as { response?: { data?: { message?: string } } })?.response?.data?.message ?? 'Échec',
+        (e as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? 'Échec',
       )
     }
   }

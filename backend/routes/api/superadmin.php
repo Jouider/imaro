@@ -24,7 +24,9 @@ Route::get('/metrics', MetricsController::class);
 
 // Clients (cabinets syndic = tenants)
 Route::get('/tenants', [TenantController::class, 'index']);
+Route::post('/tenants', [TenantController::class, 'store']);            // création manuelle (KAN-138)
 Route::get('/tenants/{tenant}', [TenantController::class, 'show']);
+Route::delete('/tenants/{tenant}', [TenantController::class, 'destroy']); // suppression soft (KAN-138)
 // Vue 360° — activité complète du cabinet (usagers, parc, réclamations, finances, abonnement)
 Route::get('/tenants/{tenant}/overview', ClientOverviewController::class);
 Route::get('/tenants/{tenant}/activity', [TenantController::class, 'activity']);
@@ -63,6 +65,8 @@ Route::get('/audit/export', [AuditController::class, 'export']);
 
 // Gestion globale des utilisateurs (cross-tenant, support) — KAN-141
 Route::get('/users', [UserController::class, 'index']);
+Route::post('/users', [UserController::class, 'store']);                 // création (KAN-138)
+Route::delete('/users/{user}', [UserController::class, 'destroy']);      // suppression soft (KAN-138)
 Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword']);
 Route::post('/users/{user}/toggle', [UserController::class, 'toggle']);
 Route::post('/users/{user}/logout', [UserController::class, 'forceLogout']);

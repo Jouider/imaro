@@ -5,11 +5,16 @@ import QRCode from 'qrcode'
 import {
   activate,
   login,
+  setToken,
   twoFactorConfirm,
   twoFactorSetup,
   twoFactorVerify,
   type AuthStep,
 } from '../lib/api'
+
+// En dev, on pré-remplit le compte super_admin seedé (SuperAdminSeeder) pour
+// tester rapidement contre un backend local.
+const isDev = import.meta.env.DEV
 
 const card = 'w-full max-w-sm space-y-4 rounded-2xl bg-white p-8 shadow-sm'
 const field =
@@ -31,8 +36,14 @@ export function Login() {
   const [loading, setLoading] = useState(false)
 
   // Étape 1 — identifiants
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState(isDev ? 'admin@imaro.ma' : '')
+  const [password, setPassword] = useState(isDev ? 'Imaro@2026' : '')
+
+  // Repli sans backend : jeton factice + données mock (dev uniquement).
+  function demoBypass() {
+    setToken('dev-bo-token')
+    navigate('/', { replace: true })
+  }
   // Étape 2 — création du mot de passe
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -246,6 +257,20 @@ export function Login() {
           <button type="submit" disabled={loading} className={button}>
             {loading ? 'Connexion…' : 'Se connecter'}
           </button>
+          {isDev && (
+            <div className="space-y-2 border-t pt-3">
+              <button
+                type="button"
+                onClick={demoBypass}
+                className="w-full rounded-lg border border-primary py-2 text-sm font-medium text-primary hover:bg-primary/5"
+              >
+                Entrer en mode démo (dev, données mock)
+              </button>
+              <p className="text-center text-xs text-slate-400">
+                Identifiants seedés : admin@imaro.ma / Imaro@2026
+              </p>
+            </div>
+          )}
         </form>
       )}
     </div>
