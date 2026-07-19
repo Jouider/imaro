@@ -193,6 +193,30 @@ class AuthController extends Controller
 
         RateLimiter::clear($key);
 
+        // 2FA obligatoire (super_admin — KAN-147) : l'activation ne doit PAS être
+        // une porte dérobée. Sans ce garde-fou, un super_admin créant son mot de
+        // passe recevait un token complet ['*'] — accepté par EnsureTwoFactorVerified —
+        // et entrait dans le back-office sans jamais enrôler de 2FA.
+        if ($user->requiresTwoFactor()) {
+            if ($user->hasTwoFactorEnabled()) {
+                $challenge = $user->createToken('2fa-challenge', ['2fa:challenge'], Carbon::now()->addMinutes(5))->plainTextToken;
+
+                return response()->json([
+                    'status' => '2fa_required',
+                    'message' => 'Mot de passe créé. Vérification en deux étapes requise.',
+                    'data' => ['challenge_token' => $challenge],
+                ]);
+            }
+
+            $enroll = $user->createToken('2fa-enroll', ['2fa:enroll'], Carbon::now()->addMinutes(15))->plainTextToken;
+
+            return response()->json([
+                'status' => '2fa_setup_required',
+                'message' => 'Mot de passe créé. Configuration de la 2FA requise.',
+                'data' => ['enroll_token' => $enroll, 'user' => new UserResource($user)],
+            ]);
+        }
+
         $token = $user->createToken(
             name: 'syndikpro-app',
             expiresAt: Carbon::now()->addDays(self::TOKEN_TTL_DAYS)
