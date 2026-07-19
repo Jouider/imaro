@@ -929,7 +929,8 @@
     "actions": {
       "menu": "More options",
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "sendCredentials": "Send credentials"
     },
     "permissions": {
       "residences": "Buildings",
@@ -1007,7 +1008,13 @@
         "deleteFailed": "Deletion failed",
         "toggled": "Status updated",
         "toggleFailed": "Status change failed",
-        "copyFailed": "Could not copy"
+        "copyFailed": "Could not copy",
+        "credentialsSent": "Credentials sent by email",
+        "credentialsFailed": "Failed to send credentials"
+      },
+      "credentials": {
+        "title": "Credentials sent",
+        "desc": "An email with the credentials was sent to {{email}}. You can also copy the temporary password below to share it manually."
       }
     },
     "personnel": {

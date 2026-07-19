@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Api\Gestionnaire;
 
+use App\Contracts\Notifications\NotificationResult;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\Notifications\TeamMemberCredentialsNotifier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class EquipeUtilisateurController extends Controller
@@ -141,5 +144,49 @@ class EquipeUtilisateurController extends Controller
         $user->delete();
 
         return response()->json(['status' => 'success', 'message' => 'Utilisateur supprimé.']);
+    }
+
+    /**
+     * POST /api/gestionnaire/equipe/utilisateurs/{id}/send-credentials (KAN-137)
+     * Bouton « Envoyer par email » : régénère un mot de passe temporaire et
+     * l'envoie par email au membre. L'ancien mot de passe étant haché (donc
+     * irrécupérable), on en génère un nouveau. Le mot de passe en clair est aussi
+     * renvoyé pour le bouton « copier » (partage manuel).
+     */
+    public function sendCredentials(int $id): JsonResponse
+    {
+        $user = User::where('tenant_id', $this->tenantId())
+            ->whereHas('roles', fn ($q) => $q->where('name', 'gestionnaire'))
+            ->findOrFail($id);
+
+        abort_unless($user->email, 422, "Cet utilisateur n'a pas d'adresse email.");
+
+        $password = Str::password(14);
+        $user->update([
+            'password' => Hash::make($password),
+            'must_change_password' => true,
+        ]);
+
+        $result = app(TeamMemberCredentialsNotifier::class)->send($user, $password);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Identifiants régénérés et envoyés par email.',
+            'data' => [
+                'temp_password' => $password,
+                'delivery' => $this->deliveryStatus($result),
+            ],
+        ]);
+    }
+
+    /** Statut de livraison lisible par le front (bouton « Envoyer » + badge). */
+    private function deliveryStatus(NotificationResult $result): array
+    {
+        return [
+            'delivered' => $result->success && $result->confirmed,
+            'channel' => $result->provider,       // resend | none
+            'confirmed' => $result->confirmed,    // false = accepté mais livraison non garantie
+            'error' => $result->error,
+        ];
     }
 }
