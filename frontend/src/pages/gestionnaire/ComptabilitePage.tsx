@@ -9,6 +9,8 @@ import {
   Wallet,
   AlertCircle,
   Plus,
+  Pencil,
+  RotateCcw,
   Download,
   Sparkles,
   BookOpen,
@@ -50,6 +52,9 @@ import {
   storeEncaissement,
   importFactureIa,
   cloturerExercice,
+  createExercice,
+  updateExercice,
+  reopenExercice,
   getComptesPcg,
   exportComptabilite,
   type ExportComptableFormat,
@@ -2245,13 +2250,38 @@ function CheckItem({ ok, label }: { ok: boolean; label: string }) {
 function TabCloture({
   exercice,
   exerciceId,
+  residenceId,
 }: {
   exercice: ExerciceComptable | undefined
   exerciceId: number
+  residenceId: number
 }) {
   const { t } = useTranslation()
   const qc = useQueryClient()
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [reopenOpen, setReopenOpen] = useState(false)
+
+  const reopenMutation = useMutation({
+    mutationFn: () => reopenExercice(residenceId, exerciceId),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['exercices-comptabilite'] })
+      setReopenOpen(false)
+      toast.success(
+        t('gestionnaire.comptabilite.cloture.toastReopened', {
+          defaultValue: 'Exercice rouvert',
+        }),
+      )
+    },
+    onError: (err: unknown) => {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ??
+        t('gestionnaire.comptabilite.cloture.reopenError', {
+          defaultValue: "Impossible de rouvrir l'exercice",
+        })
+      toast.error(message)
+    },
+  })
 
   const { data: ecritures = [] } = useQuery({
     queryKey: ['journal', exerciceId],
@@ -2281,26 +2311,61 @@ function TabCloture({
   const hasEcritures = ecritures.length > 0
   const allChecksPass = isBalanced && hasClasse6 && hasClasse7 && hasEcritures
 
-  if (exercice?.statut === 'clos') {
+  if (exercice && exercice.statut !== 'actif') {
     return (
-      <Card className="border-green-200 bg-green-50 dark:bg-green-950/20">
-        <CardContent className="pt-6">
-          <div className="flex flex-col items-center gap-3 text-center">
-            <CheckCircle2 className="size-12 text-green-600" />
-            <p className="text-lg font-semibold text-green-800 dark:text-green-200">
-              {t('gestionnaire.comptabilite.cloture.already_clos', {
-                defaultValue: 'Exercice clôturé',
-              })}
-            </p>
-            <p className="text-sm text-green-700 dark:text-green-300">
-              {t('gestionnaire.comptabilite.cloture.clos_msg', {
-                defaultValue: 'Cet exercice a été clôturé le',
-              })}{' '}
-              <strong>{exercice.date_cloture ?? '—'}</strong>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <>
+        <Card className="border-green-200 bg-green-50 dark:bg-green-950/20">
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center gap-3 text-center">
+              <CheckCircle2 className="size-12 text-green-600" />
+              <p className="text-lg font-semibold text-green-800 dark:text-green-200">
+                {t('gestionnaire.comptabilite.cloture.already_clos', {
+                  defaultValue: 'Exercice clôturé',
+                })}
+              </p>
+              <p className="text-sm text-green-700 dark:text-green-300">
+                {t('gestionnaire.comptabilite.cloture.clos_msg_range', {
+                  defaultValue: 'Exercice clôturé — période du',
+                })}{' '}
+                <strong>{exercice.date_debut}</strong>{' '}
+                {t('common.to', { defaultValue: 'au' })}{' '}
+                <strong>{exercice.date_fin}</strong>.
+              </p>
+              {/* Réouverture (KAN-148) — corrections après clôture */}
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={() => setReopenOpen(true)}
+                disabled={reopenMutation.isPending}
+              >
+                <RotateCcw className="me-1.5 size-4" />
+                {t('gestionnaire.comptabilite.cloture.reopen', {
+                  defaultValue: "Rouvrir l'exercice",
+                })}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <ConfirmModal
+          open={reopenOpen}
+          onOpenChange={setReopenOpen}
+          title={t('gestionnaire.comptabilite.cloture.reopenTitle', {
+            defaultValue: "Rouvrir l'exercice ?",
+          })}
+          description={t('gestionnaire.comptabilite.cloture.reopenMsg', {
+            defaultValue:
+              "L'exercice redeviendra modifiable. Un seul exercice peut être actif à la fois : clôturez l'exercice courant au préalable si nécessaire.",
+          })}
+          confirmLabel={t('gestionnaire.comptabilite.cloture.reopen', {
+            defaultValue: "Rouvrir l'exercice",
+          })}
+          variant="default"
+          onConfirm={() => reopenMutation.mutate()}
+          isLoading={reopenMutation.isPending}
+        />
+      </>
     )
   }
 
@@ -2635,9 +2700,153 @@ function TabRapports({
 
 // ─── ComptabilitePage ─────────────────────────────────────────────────────────
 
+// ─── Exercice — création / modification (KAN-148) ─────────────────────────────
+
+function ExerciceFormModal({
+  open,
+  onOpenChange,
+  residenceId,
+  exercice,
+}: {
+  open: boolean
+  onOpenChange: (o: boolean) => void
+  residenceId: number
+  exercice?: ExerciceComptable
+}) {
+  const { t } = useTranslation()
+  const qc = useQueryClient()
+  const isEdit = !!exercice
+  const thisYear = new Date().getFullYear()
+  const [annee, setAnnee] = useState(String(exercice?.annee ?? thisYear))
+  const [dateDebut, setDateDebut] = useState(
+    exercice?.date_debut ?? `${thisYear}-01-01`,
+  )
+  const [dateFin, setDateFin] = useState(
+    exercice?.date_fin ?? `${thisYear}-12-31`,
+  )
+
+  const mutation = useMutation({
+    mutationFn: () => {
+      const payload = {
+        annee: Number(annee),
+        date_debut: dateDebut,
+        date_fin: dateFin,
+      }
+      return isEdit
+        ? updateExercice(residenceId, exercice.id, payload)
+        : createExercice(residenceId, payload)
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['exercices-comptabilite'] })
+      onOpenChange(false)
+      toast.success(
+        isEdit
+          ? t('gestionnaire.comptabilite.exercices.toastUpdated', {
+              defaultValue: 'Exercice mis à jour',
+            })
+          : t('gestionnaire.comptabilite.exercices.toastCreated', {
+              defaultValue: 'Exercice créé',
+            }),
+      )
+    },
+    onError: (err: unknown) => {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? t('common.error')
+      toast.error(message)
+    },
+  })
+
+  const valid =
+    Number(annee) >= 2000 &&
+    Number(annee) <= 2100 &&
+    !!dateDebut &&
+    !!dateFin &&
+    dateFin > dateDebut
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>
+            {isEdit
+              ? t('gestionnaire.comptabilite.exercices.editTitle', {
+                  defaultValue: "Modifier l'exercice",
+                })
+              : t('gestionnaire.comptabilite.exercices.newTitle', {
+                  defaultValue: 'Nouvel exercice',
+                })}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3 py-2">
+          <div className="space-y-1">
+            <Label>
+              {t('gestionnaire.comptabilite.exercices.annee', {
+                defaultValue: 'Année',
+              })}
+            </Label>
+            <Input
+              type="number"
+              min={2000}
+              max={2100}
+              value={annee}
+              onChange={(e) => setAnnee(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label>
+              {t('gestionnaire.comptabilite.exercices.dateDebut', {
+                defaultValue: 'Date de début',
+              })}
+            </Label>
+            <Input
+              type="date"
+              value={dateDebut}
+              onChange={(e) => setDateDebut(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label>
+              {t('gestionnaire.comptabilite.exercices.dateFin', {
+                defaultValue: 'Date de fin',
+              })}
+            </Label>
+            <Input
+              type="date"
+              value={dateFin}
+              onChange={(e) => setDateFin(e.target.value)}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={mutation.isPending}
+          >
+            {t('actions.cancel', { defaultValue: 'Annuler' })}
+          </Button>
+          <Button
+            onClick={() => mutation.mutate()}
+            disabled={!valid || mutation.isPending}
+          >
+            {mutation.isPending
+              ? t('actions.loading', { defaultValue: '…' })
+              : t('actions.save', { defaultValue: 'Enregistrer' })}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export function ComptabilitePage() {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard')
+  // Exercice lifecycle modal (KAN-148) — 'create' | edit target.
+  const [exerciceModal, setExerciceModal] = useState<
+    { mode: 'create' } | { mode: 'edit'; exercice: ExerciceComptable } | null
+  >(null)
   const [depenseModalOpen, setDepenseModalOpen] = useState(false)
   const [encaisserModalOpen, setEncaisserModalOpen] = useState(false)
 
@@ -2658,16 +2867,16 @@ export function ComptabilitePage() {
     queryFn: () => getExercicesComptabilite(residenceId),
   })
 
-  // Default to first open exercice, else first one
+  // Default to the active exercice, else the most recent one
   const defaultExercice =
-    exercices.find((e) => e.statut === 'ouvert') ?? exercices[0]
+    exercices.find((e) => e.statut === 'actif') ?? exercices[0]
   const [selectedExerciceId, setSelectedExerciceId] = useState<number | null>(
     null,
   )
 
   const exerciceId = selectedExerciceId ?? defaultExercice?.id ?? 1
   const currentExercice = exercices.find((e) => e.id === exerciceId)
-  const exerciceClos = currentExercice?.statut === 'clos'
+  const exerciceClos = currentExercice?.statut !== 'actif'
 
   // Lightweight check so the Export button can be disabled when there is
   // nothing to export (KAN-101). Reuses the same cache key as the Rapports tab.
@@ -2826,6 +3035,32 @@ export function ComptabilitePage() {
           </SelectContent>
         </Select>
 
+        {/* Gestion du cycle de vie de l'exercice (KAN-148) */}
+        {currentExercice && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8"
+            onClick={() =>
+              setExerciceModal({ mode: 'edit', exercice: currentExercice })
+            }
+          >
+            <Pencil className="me-1.5 size-3.5" />
+            {t('actions.edit', { defaultValue: 'Modifier' })}
+          </Button>
+        )}
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8"
+          onClick={() => setExerciceModal({ mode: 'create' })}
+        >
+          <Plus className="me-1.5 size-3.5" />
+          {t('gestionnaire.comptabilite.exercices.newTitle', {
+            defaultValue: 'Nouvel exercice',
+          })}
+        </Button>
+
         {/* Residence is scoped globally via the sidebar selector (KAN-47). */}
       </div>
 
@@ -2877,7 +3112,11 @@ export function ComptabilitePage() {
         />
       )}
       {activeTab === 'cloture' && (
-        <TabCloture exercice={currentExercice} exerciceId={exerciceId} />
+        <TabCloture
+          exercice={currentExercice}
+          exerciceId={exerciceId}
+          residenceId={residenceId}
+        />
       )}
 
       {/* Modals */}
@@ -2892,6 +3131,23 @@ export function ComptabilitePage() {
         onOpenChange={setEncaisserModalOpen}
         exerciceId={exerciceId}
       />
+      {/* Création / modification d'exercice (KAN-148) — remount via key pour
+          réinitialiser les champs selon le mode/l'exercice ciblé. */}
+      {exerciceModal && (
+        <ExerciceFormModal
+          key={
+            exerciceModal.mode === 'edit'
+              ? `edit-${exerciceModal.exercice.id}`
+              : 'create'
+          }
+          open
+          onOpenChange={(o) => !o && setExerciceModal(null)}
+          residenceId={residenceId}
+          exercice={
+            exerciceModal.mode === 'edit' ? exerciceModal.exercice : undefined
+          }
+        />
+      )}
     </div>
   )
 }

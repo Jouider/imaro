@@ -370,6 +370,9 @@ Route::prefix('comptabilite/exercices/{exercice}')->group(function () {
 // Frontend calls /residences/{id}/comptabilite/exercices
 Route::get('/residences/{residence}/comptabilite/exercices', [ExerciceController::class, 'index']);
 Route::post('/residences/{residence}/comptabilite/exercices', [ExerciceController::class, 'store']);
+// KAN-148 — modification des dates/année + réouverture d'un exercice clôturé
+Route::put('/residences/{residence}/comptabilite/exercices/{exercice}', [ExerciceController::class, 'update']);
+Route::post('/residences/{residence}/comptabilite/exercices/{exercice}/reopen', [ExerciceController::class, 'reopen']);
 
 // Créances (frontend calls /creances)
 Route::middleware(['app.permission:recouvrement,finances'])->group(function () {

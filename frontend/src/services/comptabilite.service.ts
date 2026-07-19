@@ -13,14 +13,18 @@ async function withMock<T>(call: () => Promise<T>, mock: T): Promise<T> {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+/**
+ * Exercice comptable — aligné sur le contrat backend réel (KAN-148) :
+ * `statut ∈ {actif, cloture, archive}` et bornes `date_debut`/`date_fin`
+ * (anciennement `ouvert/clos` + `date_ouverture`, désynchronisés du back).
+ */
 export type ExerciceComptable = {
   id: number
   residence_id: number
   annee: number
-  statut: 'ouvert' | 'clos'
-  date_ouverture: string
-  date_cloture: string | null
-  seuil_comptable: number
+  statut: 'actif' | 'cloture' | 'archive'
+  date_debut: string
+  date_fin: string
 }
 
 export type EcritureComptable = {
@@ -146,19 +150,17 @@ const MOCK_EXERCICES: ExerciceComptable[] = [
     id: 1,
     residence_id: 1,
     annee: 2026,
-    statut: 'ouvert',
-    date_ouverture: '2026-01-01',
-    date_cloture: null,
-    seuil_comptable: 72000,
+    statut: 'actif',
+    date_debut: '2026-01-01',
+    date_fin: '2026-12-31',
   },
   {
     id: 2,
     residence_id: 1,
     annee: 2025,
-    statut: 'clos',
-    date_ouverture: '2025-01-01',
-    date_cloture: '2025-12-31',
-    seuil_comptable: 68000,
+    statut: 'cloture',
+    date_debut: '2025-01-01',
+    date_fin: '2025-12-31',
   },
 ]
 
@@ -2185,7 +2187,7 @@ export async function getExercicesComptabilite(
 
 export async function createExercice(
   residenceId: number,
-  data: { annee: number; date_ouverture: string },
+  data: { annee: number; date_debut: string; date_fin: string },
 ): Promise<ExerciceComptable> {
   return withMock(
     async () => {
@@ -2199,10 +2201,55 @@ export async function createExercice(
       id: Math.floor(Math.random() * 1000) + 100,
       residence_id: residenceId,
       annee: data.annee,
-      statut: 'ouvert' as const,
-      date_ouverture: data.date_ouverture,
-      date_cloture: null,
-      seuil_comptable: 0,
+      statut: 'actif' as const,
+      date_debut: data.date_debut,
+      date_fin: data.date_fin,
+    },
+  )
+}
+
+/**
+ * Modifie l'année et/ou les bornes d'un exercice (KAN-148).
+ * Débloque la « modification » d'un exercice signalée cassée.
+ */
+export async function updateExercice(
+  residenceId: number,
+  exerciceId: number,
+  data: { annee?: number; date_debut?: string; date_fin?: string },
+): Promise<ExerciceComptable> {
+  return withMock(
+    async () => {
+      const res = await api.put<ApiEnvelope<ExerciceComptable>>(
+        `/gestionnaire/residences/${residenceId}/comptabilite/exercices/${exerciceId}`,
+        data,
+      )
+      return res.data.data
+    },
+    {
+      ...(MOCK_EXERCICES.find((e) => e.id === exerciceId) ?? MOCK_EXERCICES[0]),
+      ...data,
+    },
+  )
+}
+
+/**
+ * Rouvre un exercice clôturé (cloture → actif) — KAN-148.
+ * Le backend refuse (422) s'il existe déjà un autre exercice actif.
+ */
+export async function reopenExercice(
+  residenceId: number,
+  exerciceId: number,
+): Promise<ExerciceComptable> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<ExerciceComptable>>(
+        `/gestionnaire/residences/${residenceId}/comptabilite/exercices/${exerciceId}/reopen`,
+      )
+      return res.data.data
+    },
+    {
+      ...(MOCK_EXERCICES.find((e) => e.id === exerciceId) ?? MOCK_EXERCICES[0]),
+      statut: 'actif' as const,
     },
   )
 }
@@ -2401,8 +2448,7 @@ export async function cloturerExercice(
     },
     {
       ...(MOCK_EXERCICES.find((e) => e.id === exerciceId) ?? MOCK_EXERCICES[0]),
-      statut: 'clos' as const,
-      date_cloture: new Date().toISOString().slice(0, 10),
+      statut: 'cloture' as const,
     },
   )
 }
