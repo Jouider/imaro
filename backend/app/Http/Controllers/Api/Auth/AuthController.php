@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\ResidentActivateRequest;
 use App\Http\Requests\Auth\ResidentLoginRequest;
 use App\Http\Resources\UserResource;
+use App\Models\FeatureFlag;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -366,6 +367,9 @@ class AuthController extends Controller
         $data = [
             'user' => new UserResource($user),
             'tenant' => $this->tenantData($user),
+            // KAN-142 — droits réels du cabinet selon son plan (remplace les
+            // flags en dur côté front, ex. AI_FEATURES_ENABLED).
+            'features' => FeatureFlag::enabledKeysForPlan($user->tenant?->plan),
         ];
 
         if ($this->shouldRefresh($current)) {
