@@ -427,6 +427,7 @@ Route::middleware(['app.permission:personnel'])->group(function () {
     Route::get('/equipe/utilisateurs', [EquipeUtilisateurController::class, 'index']);
     Route::post('/equipe/utilisateurs', [EquipeUtilisateurController::class, 'store']);
     Route::put('/equipe/utilisateurs/{id}', [EquipeUtilisateurController::class, 'update']);
+    Route::post('/equipe/utilisateurs/{id}/send-credentials', [EquipeUtilisateurController::class, 'sendCredentials']);
     Route::delete('/equipe/utilisateurs/{id}', [EquipeUtilisateurController::class, 'destroy']);
 
     Route::get('/equipe/personnel', [EquipePersonnelController::class, 'index']);

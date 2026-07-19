@@ -341,6 +341,41 @@ export async function deleteAppUser(id: number): Promise<void> {
   }, undefined)
 }
 
+/**
+ * Résultat de l'envoi des identifiants (KAN-137). `temp_password` = nouveau mot
+ * de passe temporaire en clair (à afficher/copier) ; `delivery` = statut d'envoi
+ * email. L'ancien mot de passe étant haché, un nouveau est généré à chaque envoi.
+ */
+export type SendCredentialsResult = {
+  temp_password: string
+  delivery?: {
+    delivered: boolean
+    channel?: string | null
+    error?: string | null
+  }
+}
+
+/**
+ * (Re)génère un mot de passe temporaire et l'envoie par email au membre
+ * (`POST /equipe/utilisateurs/{id}/send-credentials`). KAN-137.
+ */
+export async function sendCredentials(
+  id: number,
+): Promise<SendCredentialsResult> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<SendCredentialsResult>>(
+        `/equipe/utilisateurs/${id}/send-credentials`,
+      )
+      return res.data.data
+    },
+    {
+      temp_password: generatePassword(),
+      delivery: { delivered: true, channel: 'resend' },
+    },
+  )
+}
+
 // ─── Personnel de résidence — CRUD ──────────────────────────────────────────
 
 export async function getResidenceStaff(): Promise<ResidenceStaff[]> {
