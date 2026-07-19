@@ -2127,7 +2127,10 @@
       "exercice": "Fiscal year",
       "statut": {
         "ouvert": "Open",
-        "clos": "Closed 🔒"
+        "clos": "Closed 🔒",
+        "actif": "Active",
+        "cloture": "Closed 🔒",
+        "archive": "Archived"
       },
       "tabs": {
         "dashboard": "Dashboard",
@@ -2238,7 +2241,13 @@
         "confirmMsg": "This action is irreversible. All entries will be locked. Continue?",
         "warning": "Warning — after closing, no entry can be edited.",
         "already_clos": "Fiscal year closed",
-        "clos_msg": "This fiscal year was closed on"
+        "clos_msg": "This fiscal year was closed on",
+        "clos_msg_range": "Fiscal year closed — period from",
+        "reopen": "Reopen fiscal year",
+        "reopenTitle": "Reopen fiscal year?",
+        "reopenMsg": "The fiscal year will become editable again. Only one fiscal year can be active at a time: close the current one first if needed.",
+        "toastReopened": "Fiscal year reopened",
+        "reopenError": "Could not reopen the fiscal year"
       },
       "export": {
         "title": "Export",
@@ -2302,7 +2311,16 @@
       "journalLabel": "Accounting journal",
       "grandLivreLabel": "General ledger",
       "legalNote": "This report is prepared in accordance with Law 18-00 (Dahir no. 1-02-298 of 3 October 2002) on the status of co-ownership of built properties. Any owner may request a copy from the syndic under article 8 of that law. The generated documents are informational and certified by the co-ownership manager.",
-      "filterTo": "To"
+      "filterTo": "To",
+      "exercices": {
+        "newTitle": "New fiscal year",
+        "editTitle": "Edit fiscal year",
+        "annee": "Year",
+        "dateDebut": "Start date",
+        "dateFin": "End date",
+        "toastCreated": "Fiscal year created",
+        "toastUpdated": "Fiscal year updated"
+      }
     },
     "depenses": {
       "title": "Expenses",
@@ -3339,7 +3357,8 @@
     "media": {
       "playVideo": "Play video",
       "viewImage": "View image"
-    }
+    },
+    "to": "to"
   },
   "public": {
     "visitorPass": {

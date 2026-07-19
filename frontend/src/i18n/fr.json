@@ -2199,7 +2199,10 @@
       "exercice": "Exercice",
       "statut": {
         "ouvert": "Ouvert",
-        "clos": "Clôturé 🔒"
+        "clos": "Clôturé 🔒",
+        "actif": "Actif",
+        "cloture": "Clôturé 🔒",
+        "archive": "Archivé"
       },
       "tabs": {
         "dashboard": "Tableau de bord",
@@ -2310,7 +2313,13 @@
         "confirmMsg": "Cette action est irréversible. Toutes les écritures seront verrouillées. Continuer ?",
         "warning": "Attention — après clôture, aucune écriture ne peut être modifiée.",
         "already_clos": "Exercice clôturé",
-        "clos_msg": "Cet exercice a été clôturé le"
+        "clos_msg": "Cet exercice a été clôturé le",
+        "clos_msg_range": "Exercice clôturé — période du",
+        "reopen": "Rouvrir l'exercice",
+        "reopenTitle": "Rouvrir l'exercice ?",
+        "reopenMsg": "L'exercice redeviendra modifiable. Un seul exercice peut être actif à la fois : clôturez l'exercice courant au préalable si nécessaire.",
+        "toastReopened": "Exercice rouvert",
+        "reopenError": "Impossible de rouvrir l'exercice"
       },
       "export": {
         "title": "Exporter",
@@ -2377,7 +2386,16 @@
       "journalLabel": "Journal comptable",
       "grandLivreLabel": "Grand-Livre",
       "legalNote": "Ce rapport est établi conformément à la Loi 18-00 (Dahir n° 1-02-298 du 3 octobre 2002) relative au statut de la copropriété des immeubles bâtis. Tout copropriétaire peut en demander copie au syndic selon l'article 8 de ladite loi. Les documents générés ont valeur informative et sont certifiés par le gestionnaire de la copropriété.",
-      "filterTo": "Au"
+      "filterTo": "Au",
+      "exercices": {
+        "newTitle": "Nouvel exercice",
+        "editTitle": "Modifier l'exercice",
+        "annee": "Année",
+        "dateDebut": "Date de début",
+        "dateFin": "Date de fin",
+        "toastCreated": "Exercice créé",
+        "toastUpdated": "Exercice mis à jour"
+      }
     },
     "depenses": {
       "title": "Dépenses",
@@ -3429,7 +3447,8 @@
     "media": {
       "playVideo": "Lire la vidéo",
       "viewImage": "Voir l'image"
-    }
+    },
+    "to": "au"
   },
   "public": {
     "visitorPass": {
