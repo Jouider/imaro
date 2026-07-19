@@ -9,7 +9,9 @@ import {
   tenantAction,
   impersonateTenant,
   type Tenant,
+  type TenantCreateResult,
 } from '../lib/api'
+import { CredentialsResult } from '../components/CredentialsResult'
 
 const STATUT_STYLE: Record<string, string> = {
   active: 'bg-green-100 text-green-700',
@@ -32,6 +34,8 @@ export function Clients() {
   const [status, setStatus] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Tenant | null>(null)
+  // Identifiants du responsable à afficher après création (KAN-138).
+  const [credResult, setCredResult] = useState<TenantCreateResult | null>(null)
 
   const { data, isLoading } = useQuery({
     queryKey: ['tenants', search, status],
@@ -206,10 +210,19 @@ export function Clients() {
       {createOpen && (
         <CreateTenantModal
           onClose={() => setCreateOpen(false)}
-          onCreated={() => {
+          onCreated={(result) => {
             setCreateOpen(false)
+            setCredResult(result)
             refresh()
           }}
+        />
+      )}
+
+      {credResult && (
+        <CredentialsResult
+          owner={credResult.owner}
+          tempPassword={credResult.temp_password}
+          onClose={() => setCredResult(null)}
         />
       )}
 
@@ -247,7 +260,7 @@ function CreateTenantModal({
   onCreated,
 }: {
   onClose: () => void
-  onCreated: () => void
+  onCreated: (result: TenantCreateResult) => void
 }) {
   const [form, setForm] = useState({
     name: '',
@@ -255,26 +268,32 @@ function CreateTenantModal({
     subdomain: '',
     plan: 'starter',
     phone: '',
+    owner_name: '',
+    owner_email: '',
   })
   const [saving, setSaving] = useState(false)
 
   const valid =
     form.name.trim() &&
     /.+@.+\..+/.test(form.email) &&
-    /^[a-z0-9-]+$/.test(form.subdomain)
+    /^[a-z0-9-]+$/.test(form.subdomain) &&
+    form.owner_name.trim() &&
+    /.+@.+\..+/.test(form.owner_email)
 
   async function submit() {
     setSaving(true)
     try {
-      await createTenant({
+      const result = await createTenant({
         name: form.name,
         email: form.email,
         subdomain: form.subdomain,
         plan: form.plan,
         phone: form.phone || undefined,
+        owner_name: form.owner_name,
+        owner_email: form.owner_email,
       })
-      toast.success('Cabinet créé')
-      onCreated()
+      toast.success('Cabinet créé — identifiants envoyés')
+      onCreated(result)
     } catch (e) {
       toast.error(apiError(e, 'Création impossible'))
     } finally {
@@ -344,6 +363,36 @@ function CreateTenantModal({
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary"
               />
             </Field>
+          </div>
+
+          {/* Responsable — reçoit ses identifiants par email (KAN-138) */}
+          <div className="border-t pt-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Responsable du cabinet
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Nom du responsable">
+                <input
+                  value={form.owner_name}
+                  onChange={(e) =>
+                    setForm({ ...form, owner_name: e.target.value })
+                  }
+                  placeholder="Mohammed Fikri"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary"
+                />
+              </Field>
+              <Field label="Email du responsable">
+                <input
+                  type="email"
+                  value={form.owner_email}
+                  onChange={(e) =>
+                    setForm({ ...form, owner_email: e.target.value })
+                  }
+                  placeholder="responsable@cabinet.ma"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary"
+                />
+              </Field>
+            </div>
           </div>
         </div>
         <div className="mt-5 flex justify-end gap-2">

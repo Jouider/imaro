@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\TwoFactorController;
 use App\Http\Controllers\Api\IaChatController;
+use App\Http\Controllers\Api\Public\DemoRequestController;
 use App\Http\Controllers\Api\Public\VisitePublicController;
 use App\Http\Controllers\Api\VisiteScanController;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,9 @@ Route::prefix('auth')->group(function () {
 // Laissez-passer visiteur — page publique /v/:token (KAN-102, AUCUNE auth)
 Route::get('/public/visites/{token}', [VisitePublicController::class, 'show']);
 Route::get('/public/visites/{token}/wallet', [VisitePublicController::class, 'wallet']);
+
+// Demande de démo depuis le site vitrine → crée un lead (KAN-138). Débit limité.
+Route::post('/demo-requests', [DemoRequestController::class, 'store'])->middleware('throttle:10,1');
 
 /*
 |--------------------------------------------------------------------------

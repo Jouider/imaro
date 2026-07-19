@@ -7,7 +7,9 @@ import {
   updateLeadStatus,
   convertLead,
   type Lead,
+  type LeadConvertResult,
 } from '../lib/api'
+import { CredentialsResult } from '../components/CredentialsResult'
 
 const STATUTS = ['nouveau', 'contacte', 'demo_planifiee', 'gagne', 'perdu']
 const SOURCES = ['site', 'salon', 'recommandation', 'appel', 'autre']
@@ -23,6 +25,8 @@ const STATUT_STYLE: Record<string, string> = {
 export function Leads() {
   const qc = useQueryClient()
   const [form, setForm] = useState({ cabinet_nom: '', contact_email: '', ville: '', source: 'site' })
+  // Identifiants du responsable à afficher après conversion (KAN-138).
+  const [credResult, setCredResult] = useState<LeadConvertResult | null>(null)
 
   const { data, isLoading } = useQuery({
     queryKey: ['leads'],
@@ -53,8 +57,9 @@ export function Leads() {
 
   async function convertir(l: Lead) {
     try {
-      await convertLead(l.id)
-      toast.success('Lead converti en client (essai)')
+      const result = await convertLead(l.id)
+      toast.success('Lead converti — identifiants envoyés au responsable')
+      setCredResult(result)
       invalidate()
     } catch (e) {
       toast.error(
@@ -168,6 +173,14 @@ export function Leads() {
           </tbody>
         </table>
       </div>
+
+      {credResult && (
+        <CredentialsResult
+          owner={credResult.owner}
+          tempPassword={credResult.temp_password}
+          onClose={() => setCredResult(null)}
+        />
+      )}
     </div>
   )
 }

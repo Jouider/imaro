@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Api\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\Lead;
 use App\Models\Tenant;
+use App\Models\User;
+use App\Services\TenantOnboarding;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -75,7 +78,7 @@ class LeadController extends Controller
      * POST /api/admin/leads/{lead}/convertir — crée un client (Tenant) en essai
      * à partir du lead et marque le lead « gagné ».
      */
-    public function convertir(Request $request, Lead $lead): JsonResponse
+    public function convertir(Request $request, Lead $lead, TenantOnboarding $onboarding): JsonResponse
     {
         if ($lead->converted_tenant_id) {
             return response()->json(['status' => 'error', 'message' => 'Ce lead a déjà été converti.'], 422);
@@ -86,27 +89,44 @@ class LeadController extends Controller
         if (Tenant::where('email', $lead->contact_email)->exists()) {
             return response()->json(['status' => 'error', 'message' => 'Un client avec cet email existe déjà.'], 422);
         }
+        // Le compte responsable est créé avec cet email → il doit être unique.
+        if (User::where('email', $lead->contact_email)->exists()) {
+            return response()->json(['status' => 'error', 'message' => 'Un utilisateur avec cet email existe déjà.'], 422);
+        }
 
         $data = $request->validate(['plan' => ['sometimes', Rule::in(['starter', 'growth', 'pro', 'business', 'large', 'enterprise'])]]);
 
-        $tenant = Tenant::create([
-            'name' => $lead->cabinet_nom,
-            'email' => $lead->contact_email,
-            'phone' => $lead->contact_telephone,
-            'subdomain' => $this->subdomainUnique($lead->cabinet_nom),
-            'plan' => $data['plan'] ?? 'starter',
-            'status' => 'trial',
-            'trial_ends_at' => now()->addDays(self::TRIAL_DAYS),
-        ]);
+        [$tenant, $onboard] = DB::transaction(function () use ($lead, $data, $onboarding) {
+            $tenant = Tenant::create([
+                'name' => $lead->cabinet_nom,
+                'email' => $lead->contact_email,
+                'phone' => $lead->contact_telephone,
+                'subdomain' => $this->subdomainUnique($lead->cabinet_nom),
+                'plan' => $data['plan'] ?? 'starter',
+                'status' => 'trial',
+                'trial_ends_at' => now()->addDays(self::TRIAL_DAYS),
+            ]);
 
-        $lead->update(['statut' => 'gagne', 'converted_tenant_id' => $tenant->id]);
+            // Compte responsable (manager) + email de bienvenue avec identifiants.
+            $onboard = $onboarding->createOwner(
+                $tenant,
+                $lead->contact_nom ?: $lead->cabinet_nom,
+                $lead->contact_email,
+            );
+
+            $lead->update(['statut' => 'gagne', 'converted_tenant_id' => $tenant->id]);
+
+            return [$tenant, $onboard];
+        });
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Lead converti en client (essai).',
+            'message' => 'Lead converti en client — identifiants envoyés au responsable.',
             'data' => [
                 'lead' => $this->present($lead->fresh()->load('convertedTenant:id,name,subdomain')),
                 'tenant' => ['id' => $tenant->id, 'name' => $tenant->name, 'subdomain' => $tenant->subdomain, 'plan' => $tenant->plan, 'status' => $tenant->status],
+                'owner' => ['name' => $onboard['user']->name, 'email' => $onboard['user']->email],
+                'temp_password' => $onboard['temp_password'],
             ],
         ], 201);
     }

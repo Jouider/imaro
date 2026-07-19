@@ -8,8 +8,10 @@ use App\Models\ImpersonationSession;
 use App\Models\Lot;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Services\TenantOnboarding;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 /**
@@ -54,7 +56,7 @@ class TenantController extends Controller
      * POST /api/admin/tenants — création manuelle d'un cabinet (KAN-138).
      * Onboarding direct depuis le back-office (hors pipeline lead). Tracé audit.
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request, TenantOnboarding $onboarding): JsonResponse
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -63,26 +65,41 @@ class TenantController extends Controller
             'subdomain' => ['required', 'string', 'max:63', 'regex:/^[a-z0-9-]+$/', Rule::unique('tenants', 'subdomain')->whereNull('deleted_at')],
             'plan' => ['required', Rule::in(self::PLANS)],
             'status' => ['sometimes', Rule::in(self::STATUTS)],
+            // Responsable du cabinet (compte manager créé + email de bienvenue) — KAN-138.
+            'owner_name' => ['required', 'string', 'max:255'],
+            'owner_email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->whereNull('deleted_at')],
         ]);
 
         $statut = $data['status'] ?? 'trial';
-        $tenant = Tenant::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'phone' => $data['phone'] ?? null,
-            'subdomain' => $data['subdomain'],
-            'plan' => $data['plan'],
-            'status' => $statut,
-            'max_logins' => 5,
-            'trial_ends_at' => $statut === 'trial' ? now()->addDays(14) : null,
-        ]);
+
+        [$tenant, $onboard] = DB::transaction(function () use ($data, $statut, $onboarding) {
+            $tenant = Tenant::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'] ?? null,
+                'subdomain' => $data['subdomain'],
+                'plan' => $data['plan'],
+                'status' => $statut,
+                'max_logins' => 5,
+                'trial_ends_at' => $statut === 'trial' ? now()->addDays(14) : null,
+            ]);
+
+            $onboard = $onboarding->createOwner($tenant, $data['owner_name'], $data['owner_email']);
+
+            return [$tenant, $onboard];
+        });
 
         $this->audit($request, $tenant, 'tenant_create', "Cabinet créé : {$tenant->name}");
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Cabinet créé.',
-            'data' => ['tenant' => $this->present($tenant->loadCount(['residences', 'users']), detail: true)],
+            'message' => 'Cabinet créé — identifiants envoyés au responsable.',
+            'data' => [
+                'tenant' => $this->present($tenant->loadCount(['residences', 'users']), detail: true),
+                // Mot de passe temporaire en clair pour affichage/copie (partage manuel).
+                'owner' => ['name' => $onboard['user']->name, 'email' => $onboard['user']->email],
+                'temp_password' => $onboard['temp_password'],
+            ],
         ], 201);
     }
 

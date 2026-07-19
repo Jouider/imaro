@@ -478,27 +478,42 @@ export type CreateTenantInput = {
   plan: string
   phone?: string
   status?: string
+  /** Responsable du cabinet — compte manager créé + email de bienvenue. */
+  owner_name: string
+  owner_email: string
 }
-export async function createTenant(input: CreateTenantInput): Promise<Tenant> {
+/** Réponse de création : le cabinet + les identifiants du responsable (KAN-138). */
+export type TenantCreateResult = {
+  tenant: Tenant
+  owner: { name: string; email: string }
+  temp_password: string
+}
+export async function createTenant(
+  input: CreateTenantInput,
+): Promise<TenantCreateResult> {
   try {
-    const res = await api.post<{ data: { tenant: Tenant } }>(
+    const res = await api.post<{ data: TenantCreateResult }>(
       '/admin/tenants',
       input,
     )
-    return res.data.data.tenant
+    return res.data.data
   } catch (err) {
     if (!import.meta.env.DEV) throw err
     return {
-      id: Math.floor(Math.random() * 1000) + 100,
-      name: input.name,
-      email: input.email,
-      subdomain: input.subdomain,
-      plan: input.plan,
-      status: (input.status as Tenant['status']) ?? 'trial',
-      trial_ends_at: null,
-      nb_residences: 0,
-      nb_users: 0,
-      created_at: new Date().toISOString(),
+      tenant: {
+        id: Math.floor(Math.random() * 1000) + 100,
+        name: input.name,
+        email: input.email,
+        subdomain: input.subdomain,
+        plan: input.plan,
+        status: (input.status as Tenant['status']) ?? 'trial',
+        trial_ends_at: null,
+        nb_residences: 0,
+        nb_users: 1,
+        created_at: new Date().toISOString(),
+      },
+      owner: { name: input.owner_name, email: input.owner_email },
+      temp_password: 'Xy7#Kp2mVn9q',
     }
   }
 }
@@ -566,7 +581,7 @@ export async function getClientOverview(id: number): Promise<ClientOverview> {
 
 // ── Démos & leads — repli mock en dev ────────────────────────────────────────
 const MOCK_LEADS: Lead[] = [
-  { id: 1, cabinet_nom: 'Syndic Villes Nouvelles', contact_nom: 'Karim Idrissi', contact_email: 'k.idrissi@svn.ma', contact_telephone: '+212661000111', ville: 'Rabat', source: 'site_web', statut: 'nouveau', date_demo: null, notes: null, converted_tenant: null, created_at: '2026-07-10T10:00:00Z' },
+  { id: 1, cabinet_nom: 'Syndic Villes Nouvelles', contact_nom: 'Karim Idrissi', contact_email: 'k.idrissi@svn.ma', contact_telephone: '+212661000111', ville: 'Rabat', source: 'site', statut: 'nouveau', date_demo: null, notes: null, converted_tenant: null, created_at: '2026-07-10T10:00:00Z' },
   { id: 2, cabinet_nom: 'Cabinet Océan', contact_nom: 'Nadia Alaoui', contact_email: 'contact@ocean-syndic.ma', contact_telephone: '+212662000222', ville: 'Casablanca', source: 'recommandation', statut: 'demo_planifiee', date_demo: '2026-07-22T14:00:00Z', notes: 'Intéressé par le plan Pro', converted_tenant: null, created_at: '2026-07-08T09:00:00Z' },
   { id: 3, cabinet_nom: 'Habitat Gestion', contact_nom: 'Younes Berrada', contact_email: 'y.berrada@habitat.ma', contact_telephone: '+212663000333', ville: 'Tanger', source: 'salon', statut: 'gagne', date_demo: '2026-06-30T11:00:00Z', notes: null, converted_tenant: { id: 2, name: 'Cabinet Anfa', subdomain: 'anfa' }, created_at: '2026-06-20T09:00:00Z' },
 ]
@@ -603,11 +618,27 @@ export async function updateLeadStatus(id: number, statut: string): Promise<void
     if (!import.meta.env.DEV) throw err
   }
 }
-export async function convertLead(id: number): Promise<void> {
+/** Résultat de conversion : cabinet créé + identifiants du responsable (KAN-138). */
+export type LeadConvertResult = {
+  owner: { name: string; email: string }
+  temp_password: string
+}
+export async function convertLead(id: number): Promise<LeadConvertResult> {
   try {
-    await api.post(`/admin/leads/${id}/convertir`)
+    const res = await api.post<{ data: LeadConvertResult }>(
+      `/admin/leads/${id}/convertir`,
+    )
+    return res.data.data
   } catch (err) {
     if (!import.meta.env.DEV) throw err
+    const lead = MOCK_LEADS.find((l) => l.id === id)
+    return {
+      owner: {
+        name: lead?.contact_nom ?? lead?.cabinet_nom ?? 'Responsable',
+        email: lead?.contact_email ?? 'responsable@cabinet.ma',
+      },
+      temp_password: 'Xy7#Kp2mVn9q',
+    }
   }
 }
 
