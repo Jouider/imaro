@@ -6,8 +6,13 @@ import {
   resetUserPassword,
   toggleUserActive,
   forceUserLogout,
+  createAdminUser,
+  deleteAdminUser,
+  getTenants,
   type AdminUser,
 } from '../lib/api'
+
+const ROLES = ['manager', 'gestionnaire', 'agent_recouvrement', 'conseil']
 
 const ROLE_LABEL: Record<string, string> = {
   super_admin: 'Super admin',
@@ -36,6 +41,8 @@ function apiError(e: unknown, fallback: string): string {
 export function Users() {
   const qc = useQueryClient()
   const [search, setSearch] = useState('')
+  const [createOpen, setCreateOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null)
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['admin-users', search],
@@ -74,9 +81,30 @@ export function Users() {
     }
   }
 
+  async function remove() {
+    if (!deleteTarget) return
+    try {
+      await deleteAdminUser(deleteTarget.id)
+      toast.success('Utilisateur supprimé')
+      setDeleteTarget(null)
+      refresh()
+    } catch (e) {
+      toast.error(apiError(e, 'Suppression impossible'))
+      setDeleteTarget(null)
+    }
+  }
+
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Utilisateurs (tous cabinets)</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold">Utilisateurs (tous cabinets)</h1>
+        <button
+          onClick={() => setCreateOpen(true)}
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white"
+        >
+          + Nouvel utilisateur
+        </button>
+      </div>
 
       <input
         placeholder="Rechercher par nom, email, téléphone ou cabinet…"
@@ -161,6 +189,12 @@ export function Users() {
                       >
                         Déconnecter
                       </button>
+                      <button
+                        onClick={() => setDeleteTarget(u)}
+                        className="rounded-md border border-red-200 px-2 py-1 text-red-600 hover:bg-red-50"
+                      >
+                        Supprimer
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -175,6 +209,171 @@ export function Users() {
         affiché ; le mot de passe temporaire n'apparaît qu'une fois à la
         réinitialisation.
       </p>
+
+      {createOpen && (
+        <CreateUserModal
+          onClose={() => setCreateOpen(false)}
+          onCreated={() => {
+            setCreateOpen(false)
+            refresh()
+          }}
+        />
+      )}
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl">
+            <h2 className="text-base font-semibold">
+              Supprimer l'utilisateur ?
+            </h2>
+            <p className="mt-2 text-sm text-slate-500">
+              <strong>{deleteTarget.name}</strong> ({deleteTarget.email}) sera
+              supprimé (réversible) et ses sessions révoquées.
+            </p>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="rounded-lg border px-4 py-2 text-sm"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={remove}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white"
+              >
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function CreateUserModal({
+  onClose,
+  onCreated,
+}: {
+  onClose: () => void
+  onCreated: () => void
+}) {
+  const { data: tenants = [] } = useQuery({
+    queryKey: ['tenants-all'],
+    queryFn: () => getTenants(),
+  })
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'gestionnaire',
+    tenant_id: '',
+    phone: '',
+  })
+  const [saving, setSaving] = useState(false)
+
+  const valid =
+    form.name.trim() &&
+    /.+@.+\..+/.test(form.email) &&
+    form.password.length >= 8 &&
+    form.tenant_id
+
+  async function submit() {
+    setSaving(true)
+    try {
+      await createAdminUser({
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        role: form.role,
+        tenant_id: Number(form.tenant_id),
+        phone: form.phone || undefined,
+      })
+      toast.success('Utilisateur créé')
+      onCreated()
+    } catch (e) {
+      toast.error(apiError(e, 'Création impossible'))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const inputCls =
+    'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary'
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">
+        <h2 className="text-base font-semibold">Nouvel utilisateur</h2>
+        <div className="mt-4 space-y-3">
+          <input
+            placeholder="Nom complet"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className={inputCls}
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            className={inputCls}
+          />
+          <input
+            placeholder="Mot de passe temporaire (min. 8)"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            className={inputCls}
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <select
+              value={form.role}
+              onChange={(e) => setForm({ ...form, role: e.target.value })}
+              className={inputCls}
+            >
+              {ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {ROLE_LABEL[r] ?? r}
+                </option>
+              ))}
+            </select>
+            <select
+              value={form.tenant_id}
+              onChange={(e) => setForm({ ...form, tenant_id: e.target.value })}
+              className={inputCls}
+            >
+              <option value="">Cabinet…</option>
+              {tenants.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <input
+            placeholder="Téléphone (opt.)"
+            value={form.phone}
+            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            className={inputCls}
+          />
+        </div>
+        <div className="mt-5 flex justify-end gap-2">
+          <button
+            onClick={onClose}
+            disabled={saving}
+            className="rounded-lg border px-4 py-2 text-sm"
+          >
+            Annuler
+          </button>
+          <button
+            onClick={submit}
+            disabled={!valid || saving}
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          >
+            {saving ? '…' : 'Créer'}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

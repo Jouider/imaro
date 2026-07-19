@@ -8,8 +8,10 @@ use App\Models\ImpersonationSession;
 use App\Models\Lot;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Services\TenantOnboarding;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 /**
@@ -48,6 +50,74 @@ class TenantController extends Controller
         $tenant->loadCount(['residences', 'users']);
 
         return response()->json(['status' => 'success', 'data' => ['tenant' => $this->present($tenant, detail: true)]]);
+    }
+
+    /**
+     * POST /api/admin/tenants — création manuelle d'un cabinet (KAN-138).
+     * Onboarding direct depuis le back-office (hors pipeline lead). Tracé audit.
+     */
+    public function store(Request $request, TenantOnboarding $onboarding): JsonResponse
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('tenants', 'email')->whereNull('deleted_at')],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'subdomain' => ['required', 'string', 'max:63', 'regex:/^[a-z0-9-]+$/', Rule::unique('tenants', 'subdomain')->whereNull('deleted_at')],
+            'plan' => ['required', Rule::in(self::PLANS)],
+            'status' => ['sometimes', Rule::in(self::STATUTS)],
+            // Responsable du cabinet (compte manager créé + email de bienvenue) — KAN-138.
+            'owner_name' => ['required', 'string', 'max:255'],
+            'owner_email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->whereNull('deleted_at')],
+        ]);
+
+        $statut = $data['status'] ?? 'trial';
+
+        [$tenant, $onboard] = DB::transaction(function () use ($data, $statut, $onboarding) {
+            $tenant = Tenant::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'] ?? null,
+                'subdomain' => $data['subdomain'],
+                'plan' => $data['plan'],
+                'status' => $statut,
+                'max_logins' => 5,
+                'trial_ends_at' => $statut === 'trial' ? now()->addDays(14) : null,
+            ]);
+
+            $onboard = $onboarding->createOwner($tenant, $data['owner_name'], $data['owner_email']);
+
+            return [$tenant, $onboard];
+        });
+
+        $this->audit($request, $tenant, 'tenant_create', "Cabinet créé : {$tenant->name}");
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Cabinet créé — identifiants envoyés au responsable.',
+            'data' => [
+                'tenant' => $this->present($tenant->loadCount(['residences', 'users']), detail: true),
+                // Mot de passe temporaire en clair pour affichage/copie (partage manuel).
+                'owner' => ['name' => $onboard['user']->name, 'email' => $onboard['user']->email],
+                'temp_password' => $onboard['temp_password'],
+            ],
+        ], 201);
+    }
+
+    /**
+     * DELETE /api/admin/tenants/{tenant} — suppression (soft delete) d'un cabinet.
+     * Réversible (SoftDeletes) ; les tokens des utilisateurs sont révoqués pour
+     * couper immédiatement l'accès. Tracé audit.
+     */
+    public function destroy(Request $request, Tenant $tenant): JsonResponse
+    {
+        $label = $tenant->name;
+
+        User::where('tenant_id', $tenant->id)->each(fn (User $u) => $u->tokens()->delete());
+        $tenant->delete();
+
+        $this->audit($request, $tenant, 'tenant_delete', "Cabinet supprimé : {$label}");
+
+        return response()->json(['status' => 'success', 'message' => 'Cabinet supprimé.']);
     }
 
     public function update(Request $request, Tenant $tenant): JsonResponse
@@ -178,6 +248,24 @@ class TenantController extends Controller
                 'impersonated_user' => ['id' => $manager->id, 'name' => $manager->name, 'role' => $manager->role],
                 'tenant' => ['id' => $tenant->id, 'name' => $tenant->name, 'subdomain' => $tenant->subdomain],
             ],
+        ]);
+    }
+
+    private function audit(Request $request, Tenant $tenant, string $action, string $label): void
+    {
+        AuditLog::create([
+            'tenant_id' => $tenant->id,
+            'user_id' => $request->user()->id,
+            'user_email' => $request->user()->email,
+            'category' => 'tenant',
+            'action' => $action,
+            'severity' => 'sensitive',
+            'target_type' => 'Tenant',
+            'target_id' => $tenant->id,
+            'target_label' => $label,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'created_at' => now(),
         ]);
     }
 

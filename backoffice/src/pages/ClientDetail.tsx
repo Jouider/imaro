@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft } from 'lucide-react'
-import { api, type ClientOverview } from '../lib/api'
+import { getClientOverview } from '../lib/api'
 
 const STATUT_STYLE: Record<string, string> = {
   active: 'bg-green-100 text-green-700',
@@ -46,8 +46,7 @@ export function ClientDetail() {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['overview', id],
-    queryFn: async () =>
-      (await api.get<{ data: { overview: ClientOverview } }>(`/admin/tenants/${id}/overview`)).data.data.overview,
+    queryFn: () => getClientOverview(Number(id)),
     enabled: !!id,
   })
 

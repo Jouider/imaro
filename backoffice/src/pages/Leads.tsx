@@ -1,7 +1,15 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { api, type Lead } from '../lib/api'
+import {
+  getLeads,
+  createLead,
+  updateLeadStatus,
+  convertLead,
+  type Lead,
+  type LeadConvertResult,
+} from '../lib/api'
+import { CredentialsResult } from '../components/CredentialsResult'
 
 const STATUTS = ['nouveau', 'contacte', 'demo_planifiee', 'gagne', 'perdu']
 const SOURCES = ['site', 'salon', 'recommandation', 'appel', 'autre']
@@ -17,10 +25,12 @@ const STATUT_STYLE: Record<string, string> = {
 export function Leads() {
   const qc = useQueryClient()
   const [form, setForm] = useState({ cabinet_nom: '', contact_email: '', ville: '', source: 'site' })
+  // Identifiants du responsable à afficher après conversion (KAN-138).
+  const [credResult, setCredResult] = useState<LeadConvertResult | null>(null)
 
   const { data, isLoading } = useQuery({
     queryKey: ['leads'],
-    queryFn: async () => (await api.get<{ data: { leads: Lead[] } }>('/admin/leads')).data.data.leads,
+    queryFn: () => getLeads(),
   })
 
   function invalidate() {
@@ -31,7 +41,7 @@ export function Leads() {
     e.preventDefault()
     if (!form.cabinet_nom.trim()) return
     try {
-      await api.post('/admin/leads', form)
+      await createLead(form)
       setForm({ cabinet_nom: '', contact_email: '', ville: '', source: 'site' })
       toast.success('Lead ajouté')
       invalidate()
@@ -41,18 +51,20 @@ export function Leads() {
   }
 
   async function changeStatut(l: Lead, statut: string) {
-    await api.put(`/admin/leads/${l.id}`, { statut })
+    await updateLeadStatus(l.id, statut)
     invalidate()
   }
 
   async function convertir(l: Lead) {
     try {
-      await api.post(`/admin/leads/${l.id}/convertir`)
-      toast.success('Lead converti en client (essai)')
+      const result = await convertLead(l.id)
+      toast.success('Lead converti — identifiants envoyés au responsable')
+      setCredResult(result)
       invalidate()
     } catch (e) {
       toast.error(
-        (e as { response?: { data?: { message?: string } } })?.response?.data?.message ?? 'Échec',
+        (e as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? 'Échec',
       )
     }
   }
@@ -161,6 +173,14 @@ export function Leads() {
           </tbody>
         </table>
       </div>
+
+      {credResult && (
+        <CredentialsResult
+          owner={credResult.owner}
+          tempPassword={credResult.temp_password}
+          onClose={() => setCredResult(null)}
+        />
+      )}
     </div>
   )
 }

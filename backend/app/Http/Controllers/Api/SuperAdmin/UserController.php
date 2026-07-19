@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 /**
  * Back-office Digitoyou — gestion globale des utilisateurs, tous cabinets (KAN-141).
@@ -38,6 +39,56 @@ class UserController extends Controller
             ->map(fn (User $u) => $this->present($u));
 
         return response()->json(['status' => 'success', 'data' => $users]);
+    }
+
+    /**
+     * POST /api/admin/users — création globale d'un utilisateur (KAN-141).
+     * Le super_admin rattache l'utilisateur à un cabinet et lui affecte un rôle.
+     * Mot de passe temporaire imposé (changement à la première connexion). Audit.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->whereNull('deleted_at')],
+            'password' => ['required', 'string', 'min:8'],
+            'role' => ['required', Rule::in(['manager', 'gestionnaire', 'agent_recouvrement', 'conseil'])],
+            'tenant_id' => ['required', 'integer', 'exists:tenants,id'],
+            'phone' => ['nullable', 'string', 'max:30'],
+        ]);
+
+        $user = User::create([
+            'tenant_id' => $data['tenant_id'],
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'] ?? null,
+            'password' => Hash::make($data['password']),
+            'role' => $data['role'],
+            'status' => 'active',
+            'must_change_password' => true,
+        ]);
+        $user->assignRole($data['role']);
+
+        $this->audit($request, $user, 'user_create', "Utilisateur créé : {$user->email}");
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Utilisateur créé.',
+            'data' => $this->present($user->load('tenant:id,name')),
+        ], 201);
+    }
+
+    /**
+     * DELETE /api/admin/users/{user} — suppression (soft delete) d'un utilisateur.
+     * Révoque ses tokens pour couper l'accès immédiatement. Tracé audit.
+     */
+    public function destroy(Request $request, User $user): JsonResponse
+    {
+        $user->tokens()->delete();
+        $this->audit($request, $user, 'user_delete', "Utilisateur supprimé : {$user->email}");
+        $user->delete();
+
+        return response()->json(['status' => 'success', 'message' => 'Utilisateur supprimé.']);
     }
 
     /** POST /api/admin/users/{user}/reset-password — génère un mot de passe temporaire. */

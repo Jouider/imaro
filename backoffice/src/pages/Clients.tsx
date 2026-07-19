@@ -2,7 +2,16 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { api, type Tenant } from '../lib/api'
+import {
+  getTenants,
+  createTenant,
+  deleteTenant,
+  tenantAction,
+  impersonateTenant,
+  type Tenant,
+  type TenantCreateResult,
+} from '../lib/api'
+import { CredentialsResult } from '../components/CredentialsResult'
 
 const STATUT_STYLE: Record<string, string> = {
   active: 'bg-green-100 text-green-700',
@@ -10,51 +19,81 @@ const STATUT_STYLE: Record<string, string> = {
   suspended: 'bg-red-100 text-red-700',
 }
 
+const PLANS = ['starter', 'growth', 'pro', 'business', 'large', 'enterprise']
+
+function apiError(e: unknown, fallback: string): string {
+  return (
+    (e as { response?: { data?: { message?: string } } })?.response?.data
+      ?.message ?? fallback
+  )
+}
+
 export function Clients() {
   const qc = useQueryClient()
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('')
+  const [createOpen, setCreateOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<Tenant | null>(null)
+  // Identifiants du responsable à afficher après création (KAN-138).
+  const [credResult, setCredResult] = useState<TenantCreateResult | null>(null)
 
   const { data, isLoading } = useQuery({
     queryKey: ['tenants', search, status],
-    queryFn: async () =>
-      (
-        await api.get<{ data: { tenants: Tenant[] } }>('/admin/tenants', {
-          params: { search: search || undefined, status: status || undefined },
-        })
-      ).data.data.tenants,
+    queryFn: () =>
+      getTenants({ search: search || undefined, status: status || undefined }),
   })
 
-  async function act(t: Tenant, action: string, body?: unknown) {
+  const refresh = () => void qc.invalidateQueries({ queryKey: ['tenants'] })
+
+  async function act(
+    t: Tenant,
+    action: 'suspend' | 'activate' | 'extend-trial',
+    body?: Record<string, unknown>,
+  ) {
     try {
-      await api.post(`/admin/tenants/${t.id}/${action}`, body)
+      await tenantAction(t.id, action, body)
       toast.success('Action effectuée')
-      void qc.invalidateQueries({ queryKey: ['tenants'] })
+      refresh()
     } catch (e) {
-      toast.error(
-        (e as { response?: { data?: { message?: string } } })?.response?.data?.message ??
-          'Échec',
-      )
+      toast.error(apiError(e, 'Échec'))
     }
   }
 
   async function impersonate(t: Tenant) {
     try {
-      const res = await api.post(`/admin/tenants/${t.id}/impersonate`)
-      const url = `https://${t.subdomain}.imaro.ma/gestionnaire?impersonate=${res.data.data.token}`
+      const res = await impersonateTenant(t.id)
+      const url = `https://${res.tenant.subdomain}.imaro.ma/gestionnaire?impersonate=${res.token}`
       window.open(url, '_blank')
       toast.success('Session de dépannage ouverte (30 min)')
     } catch (e) {
-      toast.error(
-        (e as { response?: { data?: { message?: string } } })?.response?.data?.message ??
-          'Impossible d’ouvrir la session',
-      )
+      toast.error(apiError(e, 'Impossible d’ouvrir la session'))
+    }
+  }
+
+  async function remove() {
+    if (!deleteTarget) return
+    try {
+      await deleteTenant(deleteTarget.id)
+      toast.success('Cabinet supprimé')
+      setDeleteTarget(null)
+      refresh()
+    } catch (e) {
+      toast.error(apiError(e, 'Suppression impossible'))
+      setDeleteTarget(null)
     }
   }
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Clients (cabinets syndic)</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold">Clients (cabinets syndic)</h1>
+        <button
+          onClick={() => setCreateOpen(true)}
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white"
+        >
+          + Nouveau cabinet
+        </button>
+      </div>
 
       <div className="flex gap-2">
         <input
@@ -98,14 +137,21 @@ export function Clients() {
             {data?.map((t) => (
               <tr key={t.id} className="border-b last:border-0">
                 <td className="px-4 py-2">
-                  <Link to={`/clients/${t.id}`} className="font-medium text-primary hover:underline">
+                  <Link
+                    to={`/clients/${t.id}`}
+                    className="font-medium text-primary hover:underline"
+                  >
                     {t.name}
                   </Link>
-                  <div className="text-xs text-slate-400">{t.subdomain}.imaro.ma</div>
+                  <div className="text-xs text-slate-400">
+                    {t.subdomain}.imaro.ma
+                  </div>
                 </td>
                 <td className="px-4 py-2 capitalize">{t.plan}</td>
                 <td className="px-4 py-2">
-                  <span className={`rounded-full px-2 py-0.5 text-xs ${STATUT_STYLE[t.status] ?? ''}`}>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs ${STATUT_STYLE[t.status] ?? ''}`}
+                  >
                     {t.status}
                   </span>
                 </td>
@@ -114,19 +160,37 @@ export function Clients() {
                 <td className="px-4 py-2">
                   <div className="flex justify-end gap-1.5 text-xs">
                     {t.status === 'suspended' ? (
-                      <button onClick={() => act(t, 'activate')} className="rounded bg-green-600 px-2 py-1 text-white">
+                      <button
+                        onClick={() => act(t, 'activate')}
+                        className="rounded bg-green-600 px-2 py-1 text-white"
+                      >
                         Activer
                       </button>
                     ) : (
-                      <button onClick={() => act(t, 'suspend')} className="rounded bg-red-600 px-2 py-1 text-white">
+                      <button
+                        onClick={() => act(t, 'suspend')}
+                        className="rounded bg-red-600 px-2 py-1 text-white"
+                      >
                         Suspendre
                       </button>
                     )}
-                    <button onClick={() => act(t, 'extend-trial', { jours: 14 })} className="rounded border px-2 py-1">
+                    <button
+                      onClick={() => act(t, 'extend-trial', { jours: 14 })}
+                      className="rounded border px-2 py-1"
+                    >
                       +14j essai
                     </button>
-                    <button onClick={() => impersonate(t)} className="rounded bg-primary px-2 py-1 text-white">
+                    <button
+                      onClick={() => impersonate(t)}
+                      className="rounded bg-primary px-2 py-1 text-white"
+                    >
                       Dépanner
+                    </button>
+                    <button
+                      onClick={() => setDeleteTarget(t)}
+                      className="rounded border border-red-300 px-2 py-1 text-red-600 hover:bg-red-50"
+                    >
+                      Supprimer
                     </button>
                   </div>
                 </td>
@@ -142,6 +206,229 @@ export function Clients() {
           </tbody>
         </table>
       </div>
+
+      {createOpen && (
+        <CreateTenantModal
+          onClose={() => setCreateOpen(false)}
+          onCreated={(result) => {
+            setCreateOpen(false)
+            setCredResult(result)
+            refresh()
+          }}
+        />
+      )}
+
+      {credResult && (
+        <CredentialsResult
+          owner={credResult.owner}
+          tempPassword={credResult.temp_password}
+          onClose={() => setCredResult(null)}
+        />
+      )}
+
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-sm rounded-xl bg-white p-5 shadow-xl">
+            <h2 className="text-base font-semibold">Supprimer le cabinet ?</h2>
+            <p className="mt-2 text-sm text-slate-500">
+              <strong>{deleteTarget.name}</strong> sera supprimé (réversible).
+              Les sessions de ses utilisateurs seront révoquées.
+            </p>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="rounded-lg border px-4 py-2 text-sm"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={remove}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white"
+              >
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+  )
+}
+
+function CreateTenantModal({
+  onClose,
+  onCreated,
+}: {
+  onClose: () => void
+  onCreated: (result: TenantCreateResult) => void
+}) {
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    subdomain: '',
+    plan: 'starter',
+    phone: '',
+    owner_name: '',
+    owner_email: '',
+  })
+  const [saving, setSaving] = useState(false)
+
+  const valid =
+    form.name.trim() &&
+    /.+@.+\..+/.test(form.email) &&
+    /^[a-z0-9-]+$/.test(form.subdomain) &&
+    form.owner_name.trim() &&
+    /.+@.+\..+/.test(form.owner_email)
+
+  async function submit() {
+    setSaving(true)
+    try {
+      const result = await createTenant({
+        name: form.name,
+        email: form.email,
+        subdomain: form.subdomain,
+        plan: form.plan,
+        phone: form.phone || undefined,
+        owner_name: form.owner_name,
+        owner_email: form.owner_email,
+      })
+      toast.success('Cabinet créé — identifiants envoyés')
+      onCreated(result)
+    } catch (e) {
+      toast.error(apiError(e, 'Création impossible'))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">
+        <h2 className="text-base font-semibold">Nouveau cabinet</h2>
+        <div className="mt-4 space-y-3">
+          <Field label="Nom du cabinet">
+            <input
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="Gest Syndic SARL"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary"
+            />
+          </Field>
+          <Field label="Email">
+            <input
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="contact@cabinet.ma"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary"
+            />
+          </Field>
+          <Field label="Sous-domaine (a-z, 0-9, -)">
+            <div className="flex items-center gap-1">
+              <input
+                value={form.subdomain}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    subdomain: e.target.value.toLowerCase(),
+                  })
+                }
+                placeholder="gestsyndic"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+              <span className="whitespace-nowrap text-xs text-slate-400">
+                .imaro.ma
+              </span>
+            </div>
+          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Plan">
+              <select
+                value={form.plan}
+                onChange={(e) => setForm({ ...form, plan: e.target.value })}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm capitalize"
+              >
+                {PLANS.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Téléphone (opt.)">
+              <input
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                placeholder="+2125…"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </Field>
+          </div>
+
+          {/* Responsable — reçoit ses identifiants par email (KAN-138) */}
+          <div className="border-t pt-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              Responsable du cabinet
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Nom du responsable">
+                <input
+                  value={form.owner_name}
+                  onChange={(e) =>
+                    setForm({ ...form, owner_name: e.target.value })
+                  }
+                  placeholder="Mohammed Fikri"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary"
+                />
+              </Field>
+              <Field label="Email du responsable">
+                <input
+                  type="email"
+                  value={form.owner_email}
+                  onChange={(e) =>
+                    setForm({ ...form, owner_email: e.target.value })
+                  }
+                  placeholder="responsable@cabinet.ma"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary"
+                />
+              </Field>
+            </div>
+          </div>
+        </div>
+        <div className="mt-5 flex justify-end gap-2">
+          <button
+            onClick={onClose}
+            disabled={saving}
+            className="rounded-lg border px-4 py-2 text-sm"
+          >
+            Annuler
+          </button>
+          <button
+            onClick={submit}
+            disabled={!valid || saving}
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          >
+            {saving ? '…' : 'Créer'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Field({
+  label,
+  children,
+}: {
+  label: string
+  children: React.ReactNode
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs font-medium text-slate-600">
+        {label}
+      </span>
+      {children}
+    </label>
   )
 }
