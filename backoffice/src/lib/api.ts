@@ -29,14 +29,106 @@ api.interceptors.response.use(
 )
 
 // ── Auth ────────────────────────────────────────────────────────────────────
-export async function login(email: string, password: string) {
-  const res = await api.post('/auth/login', { email, password })
-  const token = res.data?.data?.token as string | undefined
-  const user = res.data?.data?.user
-  if (!token) throw new Error('Réponse de connexion invalide')
+/**
+ * L'API a quatre issues possibles à la connexion (cf. AuthController + KAN-147) :
+ * succès, création du mot de passe, enrôlement 2FA, vérification 2FA. Les trois
+ * dernières ne portent PAS de token complet — l'UI doit les traiter comme des
+ * étapes, pas comme des erreurs.
+ */
+export type AuthStep =
+  | { step: 'done'; user: BoUser }
+  | { step: 'first_login'; email: string }
+  | { step: '2fa_setup'; enrollToken: string }
+  | { step: '2fa_verify'; challengeToken: string }
+
+export type BoUser = { id: number; name: string; email: string; role: string }
+
+/** Le back-office est réservé à Digitoyou : on refuse tout autre rôle. */
+function assertSuperAdmin(user: BoUser | undefined): BoUser {
   if (user?.role !== 'super_admin')
     throw new Error('Accès réservé aux administrateurs Digitoyou')
-  setToken(token)
+  return user
+}
+
+type AuthPayload = {
+  status?: string
+  data?: {
+    token?: string
+    user?: BoUser
+    enroll_token?: string
+    challenge_token?: string
+  }
+}
+
+/** Interprète une réponse d'auth (login ou activate) en étape de parcours. */
+function toAuthStep(payload: AuthPayload, email: string): AuthStep {
+  const d = payload?.data
+  // Un statut annoncé sans le jeton correspondant est une réponse cassée :
+  // on préfère une erreur explicite à une étape muette qui tournerait dans le vide.
+  const required = <T,>(v: T | undefined | null): T => {
+    if (v === undefined || v === null) throw new Error('Réponse de connexion invalide')
+    return v
+  }
+
+  switch (payload?.status) {
+    case 'first_login':
+      return { step: 'first_login', email }
+    case '2fa_setup_required':
+      return { step: '2fa_setup', enrollToken: required(d?.enroll_token) }
+    case '2fa_required':
+      return { step: '2fa_verify', challengeToken: required(d?.challenge_token) }
+    case 'success': {
+      const user = assertSuperAdmin(d?.user)
+      setToken(required(d?.token))
+      return { step: 'done', user }
+    }
+    default:
+      throw new Error('Réponse de connexion invalide')
+  }
+}
+
+export async function login(email: string, password: string): Promise<AuthStep> {
+  const res = await api.post('/auth/login', { email, password })
+  return toAuthStep(res.data, email)
+}
+
+/** Première connexion : échange le mot de passe temporaire contre un mot de passe choisi. */
+export async function activate(
+  email: string,
+  currentPassword: string,
+  newPassword: string,
+): Promise<AuthStep> {
+  const res = await api.post('/auth/activate', {
+    email,
+    current_password: currentPassword,
+    new_password: newPassword,
+    new_password_confirmation: newPassword,
+  })
+  return toAuthStep(res.data, email)
+}
+
+/** Les tokens 2FA sont limités et éphémères : on les passe explicitement,
+ *  sans jamais les stocker comme token de session. */
+const bearer = (t: string) => ({ headers: { Authorization: `Bearer ${t}` } })
+
+export async function twoFactorSetup(enrollToken: string) {
+  const res = await api.post('/auth/2fa/setup', {}, bearer(enrollToken))
+  return res.data.data as { secret: string; otpauth_url: string }
+}
+
+export async function twoFactorConfirm(enrollToken: string, code: string) {
+  const res = await api.post('/auth/2fa/confirm', { code }, bearer(enrollToken))
+  const d = res.data.data
+  const user = assertSuperAdmin(d?.user)
+  setToken(d.token)
+  return { user, recoveryCodes: d.recovery_codes as string[] }
+}
+
+export async function twoFactorVerify(challengeToken: string, code: string) {
+  const res = await api.post('/auth/2fa/verify', { code }, bearer(challengeToken))
+  const d = res.data.data
+  const user = assertSuperAdmin(d?.user)
+  setToken(d.token)
   return user
 }
 
@@ -302,6 +394,252 @@ export async function toggleUserActive(id: number, active: boolean) {
 
 export async function forceUserLogout(id: number) {
   await api.post(`/admin/users/${id}/logout`)
+}
+
+/** Création globale d'un utilisateur (KAN-138). */
+export type CreateUserInput = {
+  name: string
+  email: string
+  password: string
+  role: string
+  tenant_id: number
+  phone?: string
+}
+export async function createAdminUser(
+  input: CreateUserInput,
+): Promise<AdminUser> {
+  try {
+    const res = await api.post<{ data: AdminUser }>('/admin/users', input)
+    return res.data.data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    return {
+      id: Math.floor(Math.random() * 1000) + 100,
+      name: input.name,
+      email: input.email,
+      phone: input.phone ?? null,
+      role: input.role,
+      tenant: {
+        id: input.tenant_id,
+        name:
+          MOCK_TENANTS.find((t) => t.id === input.tenant_id)?.name ?? 'Cabinet',
+      },
+      status: 'active',
+      last_login_at: null,
+    }
+  }
+}
+export async function deleteAdminUser(id: number): Promise<void> {
+  try {
+    await api.delete(`/admin/users/${id}`)
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+  }
+}
+
+// ── Clients / cabinets (tenants) — repli mock en dev ─────────────────────────
+const MOCK_TENANTS: Tenant[] = [
+  { id: 1, name: 'Gest Syndic SARL', email: 'contact@gestsyndic.ma', subdomain: 'gestsyndic', plan: 'business', status: 'active', trial_ends_at: null, nb_residences: 4, nb_users: 9, created_at: '2026-01-10T08:00:00Z' },
+  { id: 2, name: 'Cabinet Anfa', email: 'contact@anfa.ma', subdomain: 'anfa', plan: 'pro', status: 'active', trial_ends_at: null, nb_residences: 2, nb_users: 5, created_at: '2026-03-02T08:00:00Z' },
+  { id: 3, name: 'Syndic Marina', email: 'hello@marina.ma', subdomain: 'marina', plan: 'starter', status: 'trial', trial_ends_at: '2026-08-01T00:00:00Z', nb_residences: 1, nb_users: 2, created_at: '2026-07-05T08:00:00Z' },
+  { id: 4, name: 'Résidences Atlas', email: 'contact@atlas.ma', subdomain: 'atlas', plan: 'growth', status: 'suspended', trial_ends_at: null, nb_residences: 3, nb_users: 6, created_at: '2025-11-20T08:00:00Z' },
+]
+
+export async function getTenants(params?: {
+  status?: string
+  plan?: string
+  search?: string
+}): Promise<Tenant[]> {
+  try {
+    const res = await api.get<{ data: { tenants: Tenant[] } }>(
+      '/admin/tenants',
+      { params },
+    )
+    return res.data.data.tenants
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    let list = MOCK_TENANTS
+    if (params?.status) list = list.filter((t) => t.status === params.status)
+    if (params?.plan) list = list.filter((t) => t.plan === params.plan)
+    if (params?.search) {
+      const n = params.search.toLowerCase()
+      list = list.filter((t) =>
+        [t.name, t.email, t.subdomain].some((v) => v.toLowerCase().includes(n)),
+      )
+    }
+    return list
+  }
+}
+
+export type CreateTenantInput = {
+  name: string
+  email: string
+  subdomain: string
+  plan: string
+  phone?: string
+  status?: string
+  /** Responsable du cabinet — compte manager créé + email de bienvenue. */
+  owner_name: string
+  owner_email: string
+}
+/** Réponse de création : le cabinet + les identifiants du responsable (KAN-138). */
+export type TenantCreateResult = {
+  tenant: Tenant
+  owner: { name: string; email: string }
+  temp_password: string
+}
+export async function createTenant(
+  input: CreateTenantInput,
+): Promise<TenantCreateResult> {
+  try {
+    const res = await api.post<{ data: TenantCreateResult }>(
+      '/admin/tenants',
+      input,
+    )
+    return res.data.data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    return {
+      tenant: {
+        id: Math.floor(Math.random() * 1000) + 100,
+        name: input.name,
+        email: input.email,
+        subdomain: input.subdomain,
+        plan: input.plan,
+        status: (input.status as Tenant['status']) ?? 'trial',
+        trial_ends_at: null,
+        nb_residences: 0,
+        nb_users: 1,
+        created_at: new Date().toISOString(),
+      },
+      owner: { name: input.owner_name, email: input.owner_email },
+      temp_password: 'Xy7#Kp2mVn9q',
+    }
+  }
+}
+
+export async function deleteTenant(id: number): Promise<void> {
+  try {
+    await api.delete(`/admin/tenants/${id}`)
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+  }
+}
+
+export async function tenantAction(
+  id: number,
+  action: 'suspend' | 'activate' | 'extend-trial',
+  body?: Record<string, unknown>,
+): Promise<void> {
+  try {
+    await api.post(`/admin/tenants/${id}/${action}`, body)
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+  }
+}
+
+export async function impersonateTenant(
+  id: number,
+): Promise<{ token: string; tenant: { subdomain: string } }> {
+  const res = await api.post<{
+    data: { token: string; tenant: { subdomain: string } }
+  }>(`/admin/tenants/${id}/impersonate`)
+  return res.data.data
+}
+
+/** Vue 360° d'un cabinet — repli mock en dev (KAN-138). */
+export async function getClientOverview(id: number): Promise<ClientOverview> {
+  try {
+    const res = await api.get<{ data: { overview: ClientOverview } }>(
+      `/admin/tenants/${id}/overview`,
+    )
+    return res.data.data.overview
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    const t = MOCK_TENANTS.find((x) => x.id === id) ?? MOCK_TENANTS[0]
+    return {
+      tenant: {
+        id: t.id,
+        name: t.name,
+        subdomain: t.subdomain,
+        plan: t.plan,
+        plan_label: t.plan,
+        status: t.status,
+        trial_ends_at: t.trial_ends_at,
+        created_at: t.created_at,
+      },
+      usagers: { total: t.nb_users, actifs_30j: Math.max(1, t.nb_users - 1), par_role: { manager: 1, gestionnaire: 2, resident: Math.max(0, t.nb_users - 3) } },
+      gestionnaires: { total: 2, personnel_terrain: 3, charge: [{ name: 'Salma Bennani', residences: 2 }] },
+      parc: { residences: t.nb_residences, lots: t.nb_residences * 20, coproprietaires: t.nb_residences * 18, occupants: t.nb_residences * 22, exercices_actifs: t.nb_residences },
+      reclamations: { total: 12, par_statut: { ouvert: 2, en_cours: 3, resolu: 5, clos: 2 }, urgents_ouverts: 1, delai_resolution_moyen_h: 36, satisfaction_moyenne: 4.1 },
+      finances: { exercice_actif: 2026, appels_total_mad: 180000, encaisse_mad: 156000, impayes_mad: 24000, taux_recouvrement: 0.87 },
+      engagement: { derniere_activite: '2026-07-18T14:00:00Z', logins_7j: 23, notifications_30j: { whatsapp: 0, sms: 0, email: 48, echecs: 1 } },
+      abonnement: { plan: t.plan, plan_label: t.plan, status: t.status, trial_ends_at: t.trial_ends_at, storage_limit_mb: 5120, quotas: [] },
+    }
+  }
+}
+
+// ── Démos & leads — repli mock en dev ────────────────────────────────────────
+const MOCK_LEADS: Lead[] = [
+  { id: 1, cabinet_nom: 'Syndic Villes Nouvelles', contact_nom: 'Karim Idrissi', contact_email: 'k.idrissi@svn.ma', contact_telephone: '+212661000111', ville: 'Rabat', source: 'site', statut: 'nouveau', date_demo: null, notes: null, converted_tenant: null, created_at: '2026-07-10T10:00:00Z' },
+  { id: 2, cabinet_nom: 'Cabinet Océan', contact_nom: 'Nadia Alaoui', contact_email: 'contact@ocean-syndic.ma', contact_telephone: '+212662000222', ville: 'Casablanca', source: 'recommandation', statut: 'demo_planifiee', date_demo: '2026-07-22T14:00:00Z', notes: 'Intéressé par le plan Pro', converted_tenant: null, created_at: '2026-07-08T09:00:00Z' },
+  { id: 3, cabinet_nom: 'Habitat Gestion', contact_nom: 'Younes Berrada', contact_email: 'y.berrada@habitat.ma', contact_telephone: '+212663000333', ville: 'Tanger', source: 'salon', statut: 'gagne', date_demo: '2026-06-30T11:00:00Z', notes: null, converted_tenant: { id: 2, name: 'Cabinet Anfa', subdomain: 'anfa' }, created_at: '2026-06-20T09:00:00Z' },
+]
+
+export async function getLeads(): Promise<Lead[]> {
+  try {
+    return (await api.get<{ data: { leads: Lead[] } }>('/admin/leads')).data.data
+      .leads
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    return MOCK_LEADS
+  }
+}
+
+export type CreateLeadInput = {
+  cabinet_nom: string
+  contact_nom?: string
+  contact_email?: string
+  contact_telephone?: string
+  ville?: string
+  source?: string
+}
+export async function createLead(input: CreateLeadInput): Promise<void> {
+  try {
+    await api.post('/admin/leads', input)
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+  }
+}
+export async function updateLeadStatus(id: number, statut: string): Promise<void> {
+  try {
+    await api.put(`/admin/leads/${id}`, { statut })
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+  }
+}
+/** Résultat de conversion : cabinet créé + identifiants du responsable (KAN-138). */
+export type LeadConvertResult = {
+  owner: { name: string; email: string }
+  temp_password: string
+}
+export async function convertLead(id: number): Promise<LeadConvertResult> {
+  try {
+    const res = await api.post<{ data: LeadConvertResult }>(
+      `/admin/leads/${id}/convertir`,
+    )
+    return res.data.data
+  } catch (err) {
+    if (!import.meta.env.DEV) throw err
+    const lead = MOCK_LEADS.find((l) => l.id === id)
+    return {
+      owner: {
+        name: lead?.contact_nom ?? lead?.cabinet_nom ?? 'Responsable',
+        email: lead?.contact_email ?? 'responsable@cabinet.ma',
+      },
+      temp_password: 'Xy7#Kp2mVn9q',
+    }
+  }
 }
 
 // ── Journal d'audit global cross-tenant (KAN-144) ────────────────────────────

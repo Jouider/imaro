@@ -95,6 +95,78 @@ Login email + mot de passe pour : **manager, gestionnaire, conseil, super_admin*
 - `403` — compte désactivé, ou rôle `resident` (utiliser le portail)
 - `429` — trop de tentatives (5 max / 10 min)
 
+**Response 200 — première connexion** *(pas de token — enchaîner sur `/api/auth/activate`)*
+```json
+{
+  "status": "first_login",
+  "message": "Première connexion. Veuillez créer votre mot de passe personnel.",
+  "data": { "email": "fikri@digitoyou.ma" }
+}
+```
+
+**Response 200 — super_admin, 2FA à configurer** *(KAN-147, pas de token complet)*
+```json
+{
+  "status": "2fa_setup_required",
+  "message": "Configuration de la 2FA requise.",
+  "data": { "enroll_token": "3|...", "user": { ... } }
+}
+```
+
+**Response 200 — super_admin, 2FA déjà active**
+```json
+{
+  "status": "2fa_required",
+  "message": "Vérification en deux étapes requise.",
+  "data": { "challenge_token": "4|..." }
+}
+```
+
+> ⚠️ Un client qui ne traite que `status: "success"` casse sur ces trois états.
+> Les tokens `enroll_token` / `challenge_token` portent les abilities limitées
+> `2fa:enroll` / `2fa:challenge` : ils n'ouvrent **aucune** route `/api/admin/*`
+> (403 `two_factor_required` via le middleware `ensure.2fa`).
+
+---
+
+### POST /api/auth/activate
+Première connexion **admin** — échange le mot de passe temporaire contre un mot de passe choisi.
+
+**Body**
+```json
+{
+  "email": "fikri@digitoyou.ma",
+  "current_password": "temporaire",
+  "new_password": "monMotDePasse",
+  "new_password_confirmation": "monMotDePasse"
+}
+```
+
+**Response 200** — mêmes statuts que `/auth/login` : `success` (token complet) pour un
+manager/gestionnaire/conseil, mais `2fa_setup_required` ou `2fa_required` pour un
+**super_admin**. L'activation n'est pas une porte dérobée : la 2FA reste obligatoire
+avant tout accès au back-office.
+
+**Erreurs**
+- `401` — email ou mot de passe temporaire incorrect
+- `403` — compte désactivé, ou rôle `resident`
+- `422` — compte déjà activé, ou `new_password` invalide (min. 8, confirmation)
+- `429` — trop de tentatives (5 max / 10 min)
+
+---
+
+### 2FA back-office (super_admin — KAN-147)
+
+| Méthode | Endpoint | Token accepté | Retour |
+|---|---|---|---|
+| POST | `/api/auth/2fa/setup` | `2fa:enroll` | `secret` + `otpauth_url` (à afficher en QR) |
+| POST | `/api/auth/2fa/confirm` | `2fa:enroll` | `recovery_codes` (affichés **une seule fois**) + token complet |
+| POST | `/api/auth/2fa/verify` | `2fa:challenge` | token complet (accepte un code TOTP **ou** un code de secours) |
+| POST | `/api/auth/2fa/disable` | complet | force un ré-enrôlement à la prochaine connexion |
+
+`confirm` et `verify` révoquent le token limité et le remplacent par un token complet.
+`verify` est limité à 5 tentatives / 10 min (429 au-delà).
+
 ---
 
 ### POST /api/auth/resident/login

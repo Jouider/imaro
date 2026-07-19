@@ -108,3 +108,47 @@ it('un non super_admin se connecte normalement, sans 2FA', function () {
         ->assertStatus(200)->assertJsonPath('status', 'success')
         ->assertJsonPath('data.token_type', 'Bearer');
 });
+
+/*
+ * Régression : l'activation du mot de passe (première connexion) délivrait un
+ * token complet ['*'], accepté par EnsureTwoFactorVerified — un super_admin
+ * entrait donc dans le back-office sans jamais enrôler de 2FA.
+ */
+it("l'activation d'un super_admin n'ouvre pas le back-office sans 2FA", function () {
+    $this->admin->update(['password' => Hash::make('temporaire123'), 'must_change_password' => true]);
+
+    $res = bo()->postJson('/api/auth/activate', [
+        'email' => 'admin@digitoyou.ma',
+        'current_password' => 'temporaire123',
+        'new_password' => 'nouveauPass123',
+        'new_password_confirmation' => 'nouveauPass123',
+    ])->assertStatus(200)->assertJsonPath('status', '2fa_setup_required');
+
+    // Le mot de passe est bien changé…
+    expect($this->admin->fresh()->must_change_password)->toBeFalse();
+
+    // …mais le token délivré ne donne AUCUN accès back-office avant enrôlement.
+    $enroll = $res->json('data.enroll_token');
+    expect($enroll)->not->toBeNull();
+    bo($enroll)->getJson('/api/admin/metrics')->assertStatus(403)
+        ->assertJsonPath('code', 'two_factor_required');
+
+    // Après enrôlement, l'accès s'ouvre.
+    $secret = bo($enroll)->postJson('/api/auth/2fa/setup')->json('data.secret');
+    $full = bo($enroll)->postJson('/api/auth/2fa/confirm', ['code' => (new Google2FA)->getCurrentOtp($secret)])->json('data.token');
+    bo($full)->getJson('/api/admin/metrics')->assertStatus(200);
+});
+
+it('un manager active son mot de passe normalement (pas de 2FA imposée)', function () {
+    $tenant = Tenant::create(['name' => 'B', 'email' => 'b@b.ma', 'subdomain' => 'b', 'plan' => 'business', 'status' => 'active']);
+    $mgr = User::create(['tenant_id' => $tenant->id, 'name' => 'Mgr', 'email' => 'mgr@b.ma', 'phone' => '+212611000002', 'role' => 'manager', 'status' => 'active', 'password' => Hash::make('temporaire123'), 'must_change_password' => true]);
+    $mgr->assignRole('manager');
+
+    bo()->postJson('/api/auth/activate', [
+        'email' => 'mgr@b.ma',
+        'current_password' => 'temporaire123',
+        'new_password' => 'nouveauPass123',
+        'new_password_confirmation' => 'nouveauPass123',
+    ])->assertStatus(200)->assertJsonPath('status', 'success')
+        ->assertJsonPath('data.token_type', 'Bearer');
+});
