@@ -373,6 +373,12 @@ class ComptabiliteController extends Controller
         $this->authorizeExercice($request, $exercice);
         abort_if($exercice->statut === 'cloture', 422, 'Exercice clôturé.');
 
+        // Stocke la pièce justificative uploadée (KAN-125) — même convention que
+        // DepenseFinanceController (disque public, dossier depenses/{tenant}).
+        $facturePath = $request->hasFile('justificatif')
+            ? $request->file('justificatif')->store("depenses/{$request->user()->tenant_id}", 'public')
+            : null;
+
         $depense = Depense::create([
             'tenant_id' => $request->user()->tenant_id,
             'exercice_id' => $exercice->id,
@@ -384,6 +390,7 @@ class ComptabiliteController extends Controller
             'montant' => $request->montant,
             'date' => $request->date,
             'statut' => $request->statut ?? 'en_attente',
+            'facture_path' => $facturePath,
         ]);
 
         return response()->json([
@@ -399,6 +406,7 @@ class ComptabiliteController extends Controller
                     'prestataire' => $depense->prestataire?->nom ?? $depense->description,
                     'statut' => $depense->statut,
                     'exercice_id' => $depense->exercice_id,
+                    'justificatif_path' => $facturePath ? Storage::url($facturePath) : null,
                 ],
             ],
         ], 201);
