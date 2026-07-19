@@ -123,7 +123,12 @@ export function Login() {
 
   const header = (title: string, subtitle: string) => (
     <div className="text-center">
-      <h1 className="text-xl font-bold text-primary">{title}</h1>
+      <img
+        src="/logo-stacked.png"
+        alt="imaro"
+        className="mx-auto mb-4 h-16 w-auto object-contain"
+      />
+      <h1 className="font-display text-2xl text-primary">{title}</h1>
       <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
     </div>
   )
@@ -233,7 +238,7 @@ export function Login() {
         </form>
       ) : (
         <form onSubmit={submitCredentials} className={card}>
-          {header('imaro — Back-office', 'Espace Digitoyou')}
+          {header('Back-office', 'Espace Digitoyou')}
           <div className="space-y-1">
             <label className="text-sm font-medium">Email</label>
             <input
