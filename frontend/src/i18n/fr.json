@@ -301,6 +301,7 @@
       "title": "Mes réclamations",
       "categorie": "Catégorie",
       "sujet": "Sujet",
+      "sujetMin": "Sujet trop court (5 caractères minimum)",
       "description": "Description",
       "submit": "Signaler le problème",
       "success": "Réclamation envoyée",
