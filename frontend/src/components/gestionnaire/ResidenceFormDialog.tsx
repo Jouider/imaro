@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   type CreateResidenceInput,
   type Residence,
+  type PeriodiciteCotisation,
 } from '@/services/gestionnaire.service'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -27,10 +28,19 @@ type FormState = {
   name: string
   address: string
   city: string
-  mode_cotisation: 'tantieme' | 'fixe'
+  mode_cotisation: 'tantieme' | 'fixe' | 'categorie'
   montant_fixe: string
   jour_echeance: string
+  periodicite_cotisation: PeriodiciteCotisation
+  date_anniversaire: string
 }
+
+const PERIODICITES: PeriodiciteCotisation[] = [
+  'mensuel',
+  'trimestriel',
+  'semestriel',
+  'annuel',
+]
 
 const EMPTY: FormState = {
   name: '',
@@ -39,6 +49,8 @@ const EMPTY: FormState = {
   mode_cotisation: 'tantieme',
   montant_fixe: '',
   jour_echeance: '1',
+  periodicite_cotisation: 'trimestriel',
+  date_anniversaire: '',
 }
 
 type Props = {
@@ -73,6 +85,9 @@ export function ResidenceFormDialog({
             mode_cotisation: residence.mode_cotisation ?? 'tantieme',
             montant_fixe: residence.montant_fixe?.toString() ?? '',
             jour_echeance: residence.jour_echeance?.toString() ?? '1',
+            periodicite_cotisation:
+              residence.periodicite_cotisation ?? 'trimestriel',
+            date_anniversaire: residence.date_anniversaire?.slice(0, 10) ?? '',
           }
         : EMPTY,
     )
@@ -81,10 +96,11 @@ export function ResidenceFormDialog({
   }
 
   const isEdit = !!residence
+  // Seul le mode « fixe » exige un montant ; tantième et catégorie n'en ont pas.
   const canSubmit =
     form.name.trim() !== '' &&
     form.city.trim() !== '' &&
-    (form.mode_cotisation === 'tantieme' || form.montant_fixe.trim() !== '')
+    (form.mode_cotisation !== 'fixe' || form.montant_fixe.trim() !== '')
 
   function handleSubmit() {
     onSubmit({
@@ -99,6 +115,8 @@ export function ResidenceFormDialog({
       jour_echeance: form.jour_echeance
         ? Number(form.jour_echeance)
         : undefined,
+      periodicite_cotisation: form.periodicite_cotisation,
+      date_anniversaire: form.date_anniversaire || null,
     })
   }
 
@@ -174,6 +192,28 @@ export function ResidenceFormDialog({
             </div>
           </div>
 
+          <div className="space-y-1.5">
+            <Label htmlFor="res-anniversaire">
+              {t('gestionnaire.residences.form.dateAnniversaire', {
+                defaultValue: 'Date de création / anniversaire',
+              })}
+            </Label>
+            <Input
+              id="res-anniversaire"
+              type="date"
+              value={form.date_anniversaire}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, date_anniversaire: e.target.value }))
+              }
+            />
+            <p className="text-xs text-muted-foreground">
+              {t('gestionnaire.residences.form.dateAnniversaireHint', {
+                defaultValue:
+                  "L'exercice (12 mois glissants) et l'AG démarrent à cette date. À défaut : 1er janvier.",
+              })}
+            </p>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>{t('gestionnaire.residences.form.modeCotisation')}</Label>
@@ -182,7 +222,7 @@ export function ResidenceFormDialog({
                 onValueChange={(v) =>
                   setForm((f) => ({
                     ...f,
-                    mode_cotisation: v as 'tantieme' | 'fixe',
+                    mode_cotisation: v as 'tantieme' | 'fixe' | 'categorie',
                   }))
                 }
               >
@@ -195,6 +235,11 @@ export function ResidenceFormDialog({
                   </SelectItem>
                   <SelectItem value="fixe">
                     {t('gestionnaire.residences.form.modeFixe')}
+                  </SelectItem>
+                  <SelectItem value="categorie">
+                    {t('gestionnaire.residences.form.modeCategorie', {
+                      defaultValue: 'Par catégorie de lot',
+                    })}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -216,6 +261,45 @@ export function ResidenceFormDialog({
                 />
               </div>
             )}
+          </div>
+
+          {form.mode_cotisation === 'categorie' && (
+            <p className="rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
+              {t('gestionnaire.residences.form.categorieHint', {
+                defaultValue:
+                  'Créez les catégories (libellé + cotisation) dans l’onglet « Catégories » de la résidence, puis rattachez chaque lot à une catégorie.',
+              })}
+            </p>
+          )}
+
+          <div className="space-y-1.5">
+            <Label>
+              {t('gestionnaire.residences.form.periodicite', {
+                defaultValue: 'Périodicité de cotisation',
+              })}
+            </Label>
+            <Select
+              value={form.periodicite_cotisation}
+              onValueChange={(v) =>
+                setForm((f) => ({
+                  ...f,
+                  periodicite_cotisation: v as PeriodiciteCotisation,
+                }))
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PERIODICITES.map((p) => (
+                  <SelectItem key={p} value={p}>
+                    {t(`gestionnaire.residences.form.periodicites.${p}`, {
+                      defaultValue: p,
+                    })}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\Gestionnaire;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PrestataireResource;
+use App\Models\Contrat;
+use App\Models\Depense;
 use App\Models\Prestataire;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,33 +29,33 @@ class PrestataireController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data'   => ['prestataires' => PrestataireResource::collection($prestataires)],
+            'data' => ['prestataires' => PrestataireResource::collection($prestataires)],
         ]);
     }
 
     public function store(Request $request): JsonResponse
     {
         $request->validate([
-            'nom'        => 'required_without:name|string|max:255',
-            'name'       => 'required_without:nom|string|max:255',
-            'telephone'  => 'required_without:phone|string|max:20',
-            'phone'      => 'required_without:telephone|string|max:20',
+            'nom' => 'required_without:name|string|max:255',
+            'name' => 'required_without:nom|string|max:255',
+            'telephone' => 'required_without:phone|string|max:20',
+            'phone' => 'required_without:telephone|string|max:20',
             'specialite' => 'required|string|max:100',
-            'email'      => 'nullable|email|max:255',
+            'email' => 'nullable|email|max:255',
         ]);
 
         $prestataire = Prestataire::create([
-            'tenant_id'  => config('app.tenant_id'),
-            'nom'        => $request->input('nom') ?? $request->input('name'),
-            'telephone'  => $request->input('telephone') ?? $request->input('phone'),
+            'tenant_id' => config('app.tenant_id'),
+            'nom' => $request->input('nom') ?? $request->input('name'),
+            'telephone' => $request->input('telephone') ?? $request->input('phone'),
             'specialite' => $request->input('specialite'),
-            'email'      => $request->input('email'),
+            'email' => $request->input('email'),
         ]);
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Prestataire créé',
-            'data'    => ['prestataire' => new PrestataireResource($prestataire)],
+            'data' => ['prestataire' => new PrestataireResource($prestataire)],
         ], 201);
     }
 
@@ -65,48 +67,49 @@ class PrestataireController extends Controller
     public function bulkStore(Request $request): JsonResponse
     {
         $request->validate([
-            'prestataires'              => ['required', 'array', 'min:1', 'max:50'],
-            'prestataires.*.nom'        => ['required', 'string', 'max:255'],
-            'prestataires.*.metier'     => ['nullable', 'string', 'max:100'],
+            'prestataires' => ['required', 'array', 'min:1', 'max:50'],
+            'prestataires.*.nom' => ['required', 'string', 'max:255'],
+            'prestataires.*.metier' => ['required', 'string', 'max:100'],
             'prestataires.*.specialite' => ['nullable', 'string', 'max:100'],
-            'prestataires.*.telephone'  => ['nullable', 'string', 'max:20'],
-            'prestataires.*.email'      => ['nullable', 'email', 'max:255'],
-            'prestataires.*.ville'      => ['nullable', 'string', 'max:100'],
-            'prestataires.*.adresse'    => ['nullable', 'string', 'max:255'],
+            'prestataires.*.telephone' => ['nullable', 'string', 'max:20'],
+            'prestataires.*.email' => ['nullable', 'email', 'max:255'],
+            'prestataires.*.ville' => ['nullable', 'string', 'max:100'],
+            'prestataires.*.adresse' => ['nullable', 'string', 'max:255'],
         ]);
 
         $tenantId = config('app.tenant_id');
-        $created  = 0;
-        $errors   = [];
+        $created = 0;
+        $errors = [];
 
         foreach ($request->prestataires as $index => $data) {
-            $line = 'Ligne ' . ($index + 1);
+            $line = 'Ligne '.($index + 1);
             try {
                 $telephone = $data['telephone'] ?? null;
 
                 // Idempotence : même téléphone dans le même tenant
                 if ($telephone && Prestataire::where('tenant_id', $tenantId)->where('telephone', $telephone)->exists()) {
                     $errors[] = "{$line}: prestataire avec le téléphone '{$telephone}' existe déjà (ignoré).";
+
                     continue;
                 }
 
                 Prestataire::create([
-                    'tenant_id'  => $tenantId,
-                    'nom'        => $data['nom'],
+                    'tenant_id' => $tenantId,
+                    'nom' => $data['nom'],
                     'specialite' => $data['specialite'] ?? $data['metier'] ?? null,
-                    'telephone'  => $telephone,
-                    'email'      => $data['email'] ?? null,
+                    'telephone' => $telephone,
+                    'email' => $data['email'] ?? null,
                 ]);
 
                 $created++;
             } catch (\Throwable $e) {
-                $errors[] = "{$line}: " . $e->getMessage();
+                $errors[] = "{$line}: ".$e->getMessage();
             }
         }
 
         return response()->json([
             'status' => 'success',
-            'data'   => ['created' => $created, 'errors' => $errors],
+            'data' => ['created' => $created, 'errors' => $errors],
         ]);
     }
 
@@ -115,27 +118,51 @@ class PrestataireController extends Controller
         abort_if($prestataire->tenant_id !== config('app.tenant_id'), 403);
 
         $request->validate([
-            'nom'        => 'sometimes|string|max:255',
-            'name'       => 'sometimes|string|max:255',
-            'telephone'  => 'sometimes|string|max:20',
-            'phone'      => 'sometimes|string|max:20',
+            'nom' => 'sometimes|string|max:255',
+            'name' => 'sometimes|string|max:255',
+            'telephone' => 'sometimes|string|max:20',
+            'phone' => 'sometimes|string|max:20',
             'specialite' => 'sometimes|string|max:100',
-            'email'      => 'nullable|email|max:255',
-            'statut'     => ['sometimes', Rule::in(['actif', 'inactif'])],
+            'email' => 'nullable|email|max:255',
+            'statut' => ['sometimes', Rule::in(['actif', 'inactif'])],
         ]);
 
         $prestataire->update(array_filter([
-            'nom'        => $request->input('nom') ?? $request->input('name'),
-            'telephone'  => $request->input('telephone') ?? $request->input('phone'),
+            'nom' => $request->input('nom') ?? $request->input('name'),
+            'telephone' => $request->input('telephone') ?? $request->input('phone'),
             'specialite' => $request->input('specialite'),
-            'email'      => $request->input('email'),
-            'statut'     => $request->input('statut'),
-        ], fn($v) => $v !== null));
+            'email' => $request->input('email'),
+            'statut' => $request->input('statut'),
+        ], fn ($v) => $v !== null));
 
         return response()->json([
-            'status'  => 'success',
+            'status' => 'success',
             'message' => 'Prestataire mis à jour',
-            'data'    => ['prestataire' => new PrestataireResource($prestataire)],
+            'data' => ['prestataire' => new PrestataireResource($prestataire)],
         ]);
+    }
+
+    /**
+     * DELETE /api/gestionnaire/prestataires/{prestataire} (KAN-115)
+     * Bloqué si le prestataire est lié à des dépenses/contrats (sinon perte de
+     * données par cascade) → l'utilisateur le passe plutôt en « inactif ».
+     */
+    public function destroy(Prestataire $prestataire): JsonResponse
+    {
+        abort_if($prestataire->tenant_id !== config('app.tenant_id'), 403);
+
+        $used = Depense::where('prestataire_id', $prestataire->id)->exists()
+            || Contrat::where('prestataire_id', $prestataire->id)->exists();
+
+        if ($used) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Prestataire lié à des dépenses ou contrats — suppression impossible. Passez-le plutôt en « inactif ».',
+            ], 422);
+        }
+
+        $prestataire->delete();
+
+        return response()->json(['status' => 'success', 'message' => 'Prestataire supprimé.']);
     }
 }

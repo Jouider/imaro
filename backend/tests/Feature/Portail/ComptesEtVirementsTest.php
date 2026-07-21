@@ -100,6 +100,48 @@ it('valider un virement (copro à jour) crédite le solde + génère le reçu', 
     Queue::assertPushed(GenerateRecuPaiementJob::class);
 });
 
+it('le gestionnaire peut valider un paiement déclaré immédiatement (pas de délai 24 h)', function () {
+    // Déclaration fraîche (à l'instant) : aucune attente imposée.
+    $v = VirementDeclare::create([
+        'tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'coproprietaire_id' => $this->copro->id,
+        'montant' => 300, 'date_declaration' => now()->toDateString(), 'methode' => 'virement',
+        'reference' => 'VIR-024', 'statut' => 'en_attente',
+    ]);
+
+    $this->withHeaders($this->gestAuth)->postJson("/api/gestionnaire/virements-declares/{$v->id}/valider")
+        ->assertStatus(200)
+        ->assertJsonPath('data.statut', 'valide');
+});
+
+it('le résident liste ses paiements déclarés ; le reçu apparaît après validation', function () {
+    Storage::fake('public');
+    $v = VirementDeclare::create([
+        'tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'coproprietaire_id' => $this->copro->id,
+        'montant' => 300, 'date_declaration' => '2026-06-27', 'methode' => 'virement', 'reference' => 'VIR-025',
+        'statut' => 'en_attente',
+    ]);
+
+    // En attente → pas de reçu.
+    $this->withHeaders($this->resAuth)->getJson('/api/portail/paiements')
+        ->assertStatus(200)
+        ->assertJsonPath('data.paiements.0.statut', 'en_attente')
+        ->assertJsonPath('data.paiements.0.recu_url', null);
+
+    // Simule la validation (le flux HTTP /valider est couvert par les tests ci-dessus ;
+    // ici on isole la vue résident pour éviter le cache de guard entre users).
+    $paiement = Paiement::create([
+        'tenant_id' => $this->tenant->id, 'coproprietaire_id' => $this->copro->id, 'saisi_par' => $this->gest->id,
+        'montant' => 300, 'date_paiement' => '2026-06-27', 'mode' => 'virement', 'reference' => 'VIR-025',
+    ]);
+    (new GenerateRecuPaiementJob($paiement->id))->handle();
+    $v->update(['statut' => 'valide', 'paiement_id' => $paiement->id, 'date_validation' => now()]);
+
+    $this->withHeaders($this->resAuth)->getJson('/api/portail/paiements')
+        ->assertStatus(200)
+        ->assertJsonPath('data.paiements.0.statut', 'valide')
+        ->assertJsonPath('data.paiements.0.recu_url', fn ($url) => is_string($url) && str_contains($url, '.pdf'));
+});
+
 it('le tableau de bord reflète une avance (paiement non alloué) en crédit', function () {
     // Paiement sans ligne d'appel (avance / copro à jour) → balance positive.
     Paiement::create([

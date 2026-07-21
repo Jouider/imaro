@@ -34,6 +34,7 @@ import {
 } from '@/services/portail.service'
 import { StickyCta } from '@/components/portail/StickyCta'
 import { PaiementSheet } from '@/components/portail/PaiementSheet'
+import { MesPaiementsDeclares } from '@/components/portail/MesPaiementsDeclares'
 import { cn } from '@/lib/utils'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -546,6 +547,9 @@ export function PortailFinancesPage() {
 
       {activeTab === 'finances' && (
         <>
+          {/* Paiements déclarés par le résident (clic → détail + reçu après validation) */}
+          <MesPaiementsDeclares />
+
           {/* Filter pills */}
           <div className="flex gap-2 overflow-x-auto pb-1">
             {filterOptions.map((opt) => (
@@ -615,6 +619,9 @@ export function PortailFinancesPage() {
         onSuccess={() => {
           void qc.invalidateQueries({ queryKey: ['portail-operations'] })
           void qc.invalidateQueries({ queryKey: ['portail-dashboard'] })
+          void qc.invalidateQueries({
+            queryKey: ['portail-paiements-declares'],
+          })
         }}
       />
     </div>

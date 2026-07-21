@@ -75,8 +75,15 @@ return [
 
     /*
      * This key will be used to bind the current tenant in the container.
+     *
+     * NB : l'app gère elle-même le tenant courant via `app()->instance('currentTenant', …)`
+     * (App\Models\Tenant) + `config('app.tenant_id')` + global scopes — elle n'utilise PAS
+     * le switching Spatie. On donne donc à Spatie une clé DÉDIÉE et jamais bindée, sinon son
+     * listener de queue (MakeQueueTenantAwareAction) lit notre binding App\Models\Tenant et
+     * lève un TypeError (Tenant::current() attend un Spatie\...\Tenant) — crash intermittent
+     * du flux push (KAN-135). Clé distincte ⇒ Spatie::current() renvoie null, aucun conflit.
      */
-    'current_tenant_container_key' => 'currentTenant',
+    'current_tenant_container_key' => 'spatieCurrentTenant',
 
     /*
      * Set it to `true` if you like to cache the tenant(s) routes

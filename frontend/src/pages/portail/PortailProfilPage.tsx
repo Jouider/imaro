@@ -23,7 +23,7 @@ import { setStoredToken } from '@/lib/axios'
 import { logout } from '@/services/auth.service'
 import { getProfile } from '@/services/portail.service'
 import { ConfirmModal } from '@/components/shared'
-import { usePush } from '@/hooks/usePush'
+import { usePushPreference } from '@/hooks/usePushPreference'
 import { unregisterNativePush } from '@/lib/push-native'
 import { isBiometricAvailable, authenticateBiometric } from '@/lib/biometric'
 import { useBiometricStore } from '@/stores/biometricStore'
@@ -46,7 +46,12 @@ export function PortailProfilPage() {
   const navigate = useNavigate()
   const { user, clear } = useAuthStore()
   const { theme, toggle: toggleTheme } = useThemeStore()
-  const { permission, isSubscribed, subscribe, unsubscribe } = usePush()
+  const {
+    supported: pushSupported,
+    enabled: pushEnabled,
+    busy: pushBusy,
+    toggle: togglePushPref,
+  } = usePushPreference()
   const [logoutOpen, setLogoutOpen] = useState(false)
 
   // Biometric unlock (native only, when hardware is enrolled).
@@ -98,14 +103,9 @@ export function PortailProfilPage() {
   const lot = profile?.lot ?? '—'
   const residence = profile?.residence ?? '—'
   const isDark = theme === 'dark'
-  const pushSupported = permission !== 'unsupported'
 
   async function togglePush() {
-    if (isSubscribed) {
-      await unsubscribe()
-    } else {
-      await subscribe()
-    }
+    await togglePushPref(!pushEnabled)
   }
 
   return (
@@ -171,9 +171,9 @@ export function PortailProfilPage() {
               ? t('portail.push.desc')
               : t('portail.push.unsupported')
           }
-          checked={isSubscribed}
+          checked={pushEnabled}
           onCheckedChange={togglePush}
-          disabled={!pushSupported}
+          disabled={!pushSupported || pushBusy}
         />
 
         {/* Biometric unlock — native only */}

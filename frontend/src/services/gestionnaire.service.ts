@@ -79,19 +79,44 @@ export type Residence = {
   total_tantieme: number
   status: string
   taux_recouvrement: number
-  mode_cotisation?: 'tantieme' | 'fixe'
+  mode_cotisation?: 'tantieme' | 'fixe' | 'categorie'
   montant_fixe?: number
   /** Jour du mois où les cotisations sont dues (1-28). */
   jour_echeance?: number
+  /** Périodicité de génération des appels de fonds (KAN-86). Défaut: trimestriel. */
+  periodicite_cotisation?: PeriodiciteCotisation
+  /**
+   * Date de création/anniversaire de la résidence (KAN-95). L'exercice
+   * comptable (12 mois glissants) et l'AG se basent dessus ; à défaut, 1er janvier.
+   */
+  date_anniversaire?: string | null
 }
+
+/** Périodicité de cotisation configurable par résidence (KAN-86). */
+export type PeriodiciteCotisation =
+  | 'mensuel'
+  | 'trimestriel'
+  | 'semestriel'
+  | 'annuel'
 
 export type CreateResidenceInput = {
   name: string
   address: string
   city: string
-  mode_cotisation: 'tantieme' | 'fixe'
+  mode_cotisation: 'tantieme' | 'fixe' | 'categorie'
   montant_fixe?: number
   jour_echeance?: number
+  periodicite_cotisation?: PeriodiciteCotisation
+  date_anniversaire?: string | null
+}
+
+/** Catégorie de lot (KAN-93) — cotisation forfaitaire par type de lot. */
+export type CategorieLot = {
+  id: number
+  residence_id: number
+  nom: string
+  cotisation: number
+  nb_lots: number
 }
 
 export type UpdateResidenceInput = Partial<CreateResidenceInput>
@@ -168,6 +193,9 @@ export type Lot = {
   titre_foncier?: string
   immeuble_id?: number
   immeuble?: { id: number; nom: string }
+  /** Catégorie de lot (KAN-93) — requis si mode_cotisation = categorie. */
+  categorie_lot_id?: number | null
+  categorie?: { id: number; nom: string; cotisation: number } | null
   coproprietaire: { id: number; name: string; phone: string } | null
 }
 
@@ -187,7 +215,7 @@ export type CreateCoproprietaireInput = {
   email?: string
   residence_id: number
   lot_id: number
-  type?: 'proprietaire' | 'locataire'
+  type?: 'proprietaire'
   date_entree?: string
 }
 
@@ -1064,6 +1092,7 @@ export async function storeLot(
     'numero' | 'type' | 'etage' | 'superficie' | 'tantieme' | 'titre_foncier'
   > & {
     immeuble_id?: number
+    categorie_lot_id?: number | null
   },
 ): Promise<Lot> {
   const mockLot: Lot = {
@@ -1075,6 +1104,7 @@ export async function storeLot(
     tantieme: data.tantieme,
     titre_foncier: data.titre_foncier,
     immeuble_id: data.immeuble_id,
+    categorie_lot_id: data.categorie_lot_id ?? null,
     coproprietaire: null,
   }
   return withMock(async () => {
@@ -1094,7 +1124,7 @@ export async function updateLot(
       Lot,
       'numero' | 'type' | 'etage' | 'superficie' | 'tantieme' | 'titre_foncier'
     >
-  > & { immeuble_id?: number },
+  > & { immeuble_id?: number; categorie_lot_id?: number | null },
 ): Promise<Lot> {
   return withMock(
     async () => {
@@ -1106,6 +1136,74 @@ export async function updateLot(
     },
     { ...MOCK_LOTS[0], ...data, id: lotId },
   )
+}
+
+// ─── Catégories de lot (KAN-93) ───────────────────────────────────────────────
+
+const MOCK_CATEGORIES_LOT: CategorieLot[] = [
+  { id: 1, residence_id: 1, nom: '3C+S', cotisation: 1500, nb_lots: 4 },
+  { id: 2, residence_id: 1, nom: '2C+S', cotisation: 1100, nb_lots: 6 },
+  { id: 3, residence_id: 1, nom: 'Commerce', cotisation: 2500, nb_lots: 2 },
+]
+
+export async function getCategoriesLot(
+  residenceId: number,
+): Promise<CategorieLot[]> {
+  return withMock(async () => {
+    const res = await api.get<ApiEnvelope<CategorieLot[]>>(
+      `/gestionnaire/residences/${residenceId}/categories-lot`,
+    )
+    return res.data.data
+  }, MOCK_CATEGORIES_LOT)
+}
+
+export async function createCategorieLot(
+  residenceId: number,
+  data: { nom: string; cotisation: number },
+): Promise<CategorieLot> {
+  return withMock(
+    async () => {
+      const res = await api.post<ApiEnvelope<CategorieLot>>(
+        `/gestionnaire/residences/${residenceId}/categories-lot`,
+        data,
+      )
+      return res.data.data
+    },
+    {
+      id: Date.now(),
+      residence_id: residenceId,
+      nom: data.nom,
+      cotisation: data.cotisation,
+      nb_lots: 0,
+    },
+  )
+}
+
+export async function updateCategorieLot(
+  categorieId: number,
+  data: { nom?: string; cotisation?: number },
+): Promise<CategorieLot> {
+  return withMock(
+    async () => {
+      const res = await api.put<ApiEnvelope<CategorieLot>>(
+        `/gestionnaire/categories-lot/${categorieId}`,
+        data,
+      )
+      return res.data.data
+    },
+    {
+      ...(MOCK_CATEGORIES_LOT.find((c) => c.id === categorieId) ??
+        MOCK_CATEGORIES_LOT[0]),
+      ...data,
+      id: categorieId,
+    },
+  )
+}
+
+export async function deleteCategorieLot(categorieId: number): Promise<void> {
+  return withMock(async () => {
+    await api.delete(`/gestionnaire/categories-lot/${categorieId}`)
+  }, undefined)
 }
 
 export async function deleteLot(
@@ -1351,14 +1449,28 @@ export async function getTickets(params?: {
   statut?: string
   priorite?: string
   categorie?: string
+  /** Recherche par référence (TKT-…) ou description — KAN-105. */
+  search?: string
 }): Promise<Ticket[]> {
-  return withMock(async () => {
-    const res = await api.get<ApiEnvelope<{ tickets: Ticket[] }>>(
-      '/gestionnaire/tickets',
-      { params },
-    )
-    return res.data.data.tickets
-  }, MOCK_TICKETS)
+  return withMock(
+    async () => {
+      const res = await api.get<ApiEnvelope<{ tickets: Ticket[] }>>(
+        '/gestionnaire/tickets',
+        { params },
+      )
+      return res.data.data.tickets
+    },
+    // Mock fallback mirrors the backend `search` (réf. ou description).
+    (() => {
+      const q = params?.search?.trim().toLowerCase()
+      if (!q) return MOCK_TICKETS
+      return MOCK_TICKETS.filter(
+        (ticket) =>
+          ticket.reference.toLowerCase().includes(q) ||
+          ticket.description.toLowerCase().includes(q),
+      )
+    })(),
+  )
 }
 
 export async function getTicket(id: number): Promise<Ticket> {

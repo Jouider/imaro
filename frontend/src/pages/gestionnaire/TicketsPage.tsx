@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -17,6 +17,7 @@ import {
   ThumbsUp,
   Inbox,
   UserCheck,
+  Search,
 } from 'lucide-react'
 import {
   PieChart,
@@ -49,6 +50,7 @@ import { ConfirmModal } from '@/components/shared/ConfirmModal'
 import { useResidenceStore } from '@/stores/residenceStore'
 import { ResidenceFilter } from '@/components/shared'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -90,12 +92,20 @@ const PRIORITE_STYLES: Record<string, string> = {
 const STATUTS = ['ouvert', 'en_cours', 'resolu', 'clos'] as const
 const PRIORITES = ['urgent', 'normal', 'faible'] as const
 
+// Clés d'énumération backend (Ticket::CATEGORIES, KAN-55/#311) — libellés via i18n.
 const CATEGORIES = [
+  'parties_communes',
+  'ascenseur',
   'plomberie',
   'electricite',
-  'ascenseur',
-  'proprete',
+  'chauffage',
   'securite',
+  'proprete',
+  'nuisances',
+  'espaces_verts',
+  'parking',
+  'interphone',
+  'degat_eaux',
   'autre',
 ] as const
 
@@ -913,6 +923,13 @@ export function TicketsPage() {
 
   const [filterStatut, setFilterStatut] = useState<string>('all')
   const [filterPriorite, setFilterPriorite] = useState<string>('all')
+  // Recherche par référence / description (KAN-105) — débounce serveur.
+  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch] = useState('')
+  useEffect(() => {
+    const id = setTimeout(() => setSearch(searchInput.trim()), 300)
+    return () => clearTimeout(id)
+  }, [searchInput])
   const [detailTicket, setDetailTicket] = useState<Ticket | null>(null)
   const [closeTarget, setCloseTarget] = useState<Ticket | null>(null)
   const [newStatut, setNewStatut] = useState<string>('')
@@ -935,11 +952,12 @@ export function TicketsPage() {
   const residenceId = useResidenceStore((s) => s.residenceId)
 
   const { data: tickets = [], isLoading } = useQuery({
-    queryKey: ['tickets', filterStatut, filterPriorite],
+    queryKey: ['tickets', filterStatut, filterPriorite, search],
     queryFn: () =>
       getTickets({
         statut: filterStatut !== 'all' ? filterStatut : undefined,
         priorite: filterPriorite !== 'all' ? filterPriorite : undefined,
+        search: search || undefined,
       }),
   })
 
@@ -1160,6 +1178,18 @@ export function TicketsPage() {
 
       {/* Filters + view toggle */}
       <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className="relative w-64 max-w-full">
+          <Search className="pointer-events-none absolute start-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder={t('gestionnaire.tickets.searchPlaceholder', {
+              defaultValue: 'Rechercher par référence (TKT-…) ou description',
+            })}
+            className="ps-8"
+          />
+        </div>
+
         <Select value={filterStatut} onValueChange={setFilterStatut}>
           <SelectTrigger className="w-40">
             <SelectValue />
@@ -1292,7 +1322,6 @@ export function TicketsPage() {
           columns={columns}
           rowKey="id"
           isLoading={isLoading}
-          searchable
           emptyIcon={<Wrench className="size-12 text-muted-foreground" />}
           emptyTitle={t('gestionnaire.tickets.empty')}
           emptyDescription={t('gestionnaire.tickets.emptyDesc')}
@@ -1439,6 +1468,12 @@ export function TicketsPage() {
                 })}
                 className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all focus:border-[var(--color-imaro-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-imaro-primary)]/10 dark:bg-card"
               />
+              {createForm.description.trim().length > 0 &&
+                createForm.description.trim().length < 10 && (
+                  <p className="text-xs text-destructive">
+                    {t('gestionnaire.tickets.form.descMin')}
+                  </p>
+                )}
             </div>
           </div>
 

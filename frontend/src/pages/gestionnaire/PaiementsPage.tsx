@@ -14,6 +14,7 @@ import {
   ChevronDown,
   ChevronUp,
   Loader2,
+  Ban,
 } from 'lucide-react'
 import {
   getCreances,
@@ -25,6 +26,7 @@ import {
   relancerCreance,
   relancerTout,
   getDecompte,
+  markChequeImpaye,
   type Creance,
   type Encaissement,
   type VirementDeclare,
@@ -767,6 +769,87 @@ function RejeterVirementModal({
   )
 }
 
+// ─── ChequeImpayeModal (KAN-85) ──────────────────────────────────────────────
+
+function ChequeImpayeModal({
+  open,
+  onClose,
+  onConfirm,
+  isLoading,
+}: {
+  open: boolean
+  onClose: () => void
+  onConfirm: (motif: string) => void
+  isLoading: boolean
+}) {
+  const { t } = useTranslation()
+  const [motif, setMotif] = useState('')
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        if (!o) {
+          setMotif('')
+          onClose()
+        }
+      }}
+    >
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>
+            {t('gestionnaire.paiements.chequeImpaye.title', {
+              defaultValue: 'Marquer le chèque comme impayé',
+            })}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3 py-2">
+          <p className="text-sm text-muted-foreground">
+            {t('gestionnaire.paiements.chequeImpaye.warning', {
+              defaultValue:
+                'Le solde du copropriétaire sera ré-augmenté et il sera notifié. Une contre-passation comptable sera enregistrée.',
+            })}
+          </p>
+          <div>
+            <Label>
+              {t('gestionnaire.paiements.chequeImpaye.motif', {
+                defaultValue: 'Motif (optionnel)',
+              })}
+            </Label>
+            <Input
+              className="mt-1"
+              value={motif}
+              onChange={(e) => setMotif(e.target.value)}
+              placeholder={t(
+                'gestionnaire.paiements.chequeImpaye.motifPlaceholder',
+                {
+                  defaultValue: 'Ex. chèque sans provision',
+                },
+              )}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} disabled={isLoading}>
+            {t('actions.cancel')}
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => onConfirm(motif)}
+            disabled={isLoading}
+          >
+            {isLoading
+              ? t('actions.loading')
+              : t('gestionnaire.paiements.chequeImpaye.confirm', {
+                  defaultValue: 'Marquer impayé',
+                })}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export function PaiementsPage() {
@@ -783,6 +866,11 @@ export function PaiementsPage() {
   const [rejeterVirementTarget, setRejeterVirementTarget] =
     useState<VirementDeclare | null>(null)
   const [justificatifTarget, setJustificatifTarget] =
+    useState<VirementDeclare | null>(null)
+  const [chequeImpayeTarget, setChequeImpayeTarget] =
+    useState<Encaissement | null>(null)
+  // Chèque déclaré (onglet Virements) à marquer impayé — KAN-117.
+  const [virementChequeTarget, setVirementChequeTarget] =
     useState<VirementDeclare | null>(null)
   const [relancerAllOpen, setRelancerAllOpen] = useState(false)
 
@@ -913,6 +1001,59 @@ export function PaiementsPage() {
       )
     },
     onError: () => toast.error(t('common.error')),
+  })
+
+  const chequeImpayeMutation = useMutation({
+    mutationFn: ({ id, motif }: { id: number; motif: string }) =>
+      markChequeImpaye(id, motif),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['encaissements'] })
+      void qc.invalidateQueries({ queryKey: ['creances'] })
+      void qc.invalidateQueries({ queryKey: ['decompte'] })
+      setChequeImpayeTarget(null)
+      toast.success(
+        t('gestionnaire.paiements.chequeImpaye.success', {
+          defaultValue: 'Chèque marqué comme impayé',
+        }),
+      )
+    },
+    onError: (err: unknown) => {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ??
+        t('gestionnaire.paiements.chequeImpaye.error', {
+          defaultValue: 'Impossible de marquer ce chèque comme impayé',
+        })
+      toast.error(message)
+    },
+  })
+
+  // Chèque déclaré marqué impayé depuis l'onglet Virements (KAN-117). Réutilise
+  // l'endpoint KAN-85 via le `paiement_id` créé à la validation.
+  const virementChequeImpayeMutation = useMutation({
+    mutationFn: ({ id, motif }: { id: number; motif: string }) =>
+      markChequeImpaye(id, motif),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['virements-declares'] })
+      void qc.invalidateQueries({ queryKey: ['encaissements'] })
+      void qc.invalidateQueries({ queryKey: ['creances'] })
+      void qc.invalidateQueries({ queryKey: ['decompte'] })
+      setVirementChequeTarget(null)
+      toast.success(
+        t('gestionnaire.paiements.chequeImpaye.success', {
+          defaultValue: 'Chèque marqué comme impayé',
+        }),
+      )
+    },
+    onError: (err: unknown) => {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ??
+        t('gestionnaire.paiements.chequeImpaye.error', {
+          defaultValue: 'Impossible de marquer ce chèque comme impayé',
+        })
+      toast.error(message)
+    },
   })
 
   const createAppelMutation = useMutation({
@@ -1251,6 +1392,38 @@ export function PaiementsPage() {
           <span className="text-muted-foreground">—</span>
         ),
     },
+    {
+      key: 'id',
+      header: '',
+      className: 'w-36 text-right',
+      renderCell: (r) => {
+        if (r.statut === 'cheque_rejete') {
+          return (
+            <Badge className="border-0 bg-red-100 text-xs text-red-700">
+              {t('gestionnaire.paiements.chequeImpaye.badge', {
+                defaultValue: 'Chèque rejeté',
+              })}
+            </Badge>
+          )
+        }
+        if (r.methode !== 'cheque') {
+          return <span className="text-muted-foreground">—</span>
+        }
+        return (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 border-red-300 text-xs text-red-600 hover:bg-red-50"
+            onClick={() => setChequeImpayeTarget(r)}
+          >
+            <Ban className="me-1 size-3" />
+            {t('gestionnaire.paiements.chequeImpaye.action', {
+              defaultValue: 'Marquer impayé',
+            })}
+          </Button>
+        )
+      },
+    },
   ]
 
   const virementsColumns: Column<VirementDeclare>[] = [
@@ -1366,6 +1539,26 @@ export function PaiementsPage() {
               })}
             </Button>
           </div>
+        ) : r.statut === 'valide' && r.methode === 'cheque' && r.paiement_id ? (
+          r.paiement_statut === 'cheque_rejete' ? (
+            <Badge className="border-0 bg-red-100 text-xs text-red-700">
+              {t('gestionnaire.paiements.chequeImpaye.badge', {
+                defaultValue: 'Chèque impayé',
+              })}
+            </Badge>
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 border-red-300 text-xs text-red-600 hover:bg-red-50"
+              onClick={() => setVirementChequeTarget(r)}
+            >
+              <Ban className="me-1 size-3" />
+              {t('gestionnaire.paiements.chequeImpaye.action', {
+                defaultValue: 'Marquer impayé',
+              })}
+            </Button>
+          )
         ) : null,
     },
   ]
@@ -1920,12 +2113,42 @@ export function PaiementsPage() {
         onClose={() => setJustificatifTarget(null)}
       />
 
+      <ChequeImpayeModal
+        open={!!chequeImpayeTarget}
+        onClose={() => setChequeImpayeTarget(null)}
+        onConfirm={(motif) =>
+          chequeImpayeTarget &&
+          chequeImpayeMutation.mutate({ id: chequeImpayeTarget.id, motif })
+        }
+        isLoading={chequeImpayeMutation.isPending}
+      />
+
+      {/* Chèque déclaré (onglet Virements) marqué impayé — KAN-117. */}
+      <ChequeImpayeModal
+        open={!!virementChequeTarget}
+        onClose={() => setVirementChequeTarget(null)}
+        onConfirm={(motif) =>
+          virementChequeTarget?.paiement_id &&
+          virementChequeImpayeMutation.mutate({
+            id: virementChequeTarget.paiement_id,
+            motif,
+          })
+        }
+        isLoading={virementChequeImpayeMutation.isPending}
+      />
+
       <ConfirmModal
         open={relancerAllOpen}
         onOpenChange={setRelancerAllOpen}
         title={t('gestionnaire.paiements.relanceAll')}
-        description={`Envoyer une relance WhatsApp à ${nbImpayes} copropriétaire(s) avec des créances impayées ?`}
-        confirmLabel="Envoyer les relances"
+        description={t('gestionnaire.paiements.relanceAllConfirm', {
+          count: nbImpayes,
+          defaultValue:
+            'Envoyer une relance à {{count}} copropriétaire(s) avec des créances impayées ?',
+        })}
+        confirmLabel={t('gestionnaire.paiements.relanceAllAction', {
+          defaultValue: 'Envoyer les relances',
+        })}
         variant="default"
         onConfirm={() => relancerToutMutation.mutate()}
         isLoading={relancerToutMutation.isPending}

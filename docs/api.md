@@ -95,6 +95,78 @@ Login email + mot de passe pour : **manager, gestionnaire, conseil, super_admin*
 - `403` — compte désactivé, ou rôle `resident` (utiliser le portail)
 - `429` — trop de tentatives (5 max / 10 min)
 
+**Response 200 — première connexion** *(pas de token — enchaîner sur `/api/auth/activate`)*
+```json
+{
+  "status": "first_login",
+  "message": "Première connexion. Veuillez créer votre mot de passe personnel.",
+  "data": { "email": "fikri@digitoyou.ma" }
+}
+```
+
+**Response 200 — super_admin, 2FA à configurer** *(KAN-147, pas de token complet)*
+```json
+{
+  "status": "2fa_setup_required",
+  "message": "Configuration de la 2FA requise.",
+  "data": { "enroll_token": "3|...", "user": { ... } }
+}
+```
+
+**Response 200 — super_admin, 2FA déjà active**
+```json
+{
+  "status": "2fa_required",
+  "message": "Vérification en deux étapes requise.",
+  "data": { "challenge_token": "4|..." }
+}
+```
+
+> ⚠️ Un client qui ne traite que `status: "success"` casse sur ces trois états.
+> Les tokens `enroll_token` / `challenge_token` portent les abilities limitées
+> `2fa:enroll` / `2fa:challenge` : ils n'ouvrent **aucune** route `/api/admin/*`
+> (403 `two_factor_required` via le middleware `ensure.2fa`).
+
+---
+
+### POST /api/auth/activate
+Première connexion **admin** — échange le mot de passe temporaire contre un mot de passe choisi.
+
+**Body**
+```json
+{
+  "email": "fikri@digitoyou.ma",
+  "current_password": "temporaire",
+  "new_password": "monMotDePasse",
+  "new_password_confirmation": "monMotDePasse"
+}
+```
+
+**Response 200** — mêmes statuts que `/auth/login` : `success` (token complet) pour un
+manager/gestionnaire/conseil, mais `2fa_setup_required` ou `2fa_required` pour un
+**super_admin**. L'activation n'est pas une porte dérobée : la 2FA reste obligatoire
+avant tout accès au back-office.
+
+**Erreurs**
+- `401` — email ou mot de passe temporaire incorrect
+- `403` — compte désactivé, ou rôle `resident`
+- `422` — compte déjà activé, ou `new_password` invalide (min. 8, confirmation)
+- `429` — trop de tentatives (5 max / 10 min)
+
+---
+
+### 2FA back-office (super_admin — KAN-147)
+
+| Méthode | Endpoint | Token accepté | Retour |
+|---|---|---|---|
+| POST | `/api/auth/2fa/setup` | `2fa:enroll` | `secret` + `otpauth_url` (à afficher en QR) |
+| POST | `/api/auth/2fa/confirm` | `2fa:enroll` | `recovery_codes` (affichés **une seule fois**) + token complet |
+| POST | `/api/auth/2fa/verify` | `2fa:challenge` | token complet (accepte un code TOTP **ou** un code de secours) |
+| POST | `/api/auth/2fa/disable` | complet | force un ré-enrôlement à la prochaine connexion |
+
+`confirm` et `verify` révoquent le token limité et le remplacent par un token complet.
+`verify` est limité à 5 tentatives / 10 min (429 au-delà).
+
 ---
 
 ### POST /api/auth/resident/login
@@ -348,6 +420,8 @@ celui-ci a le rôle `gestionnaire`.
 | `mode_cotisation` | `'tantieme' \| 'fixe'` | ✓ | |
 | `montant_fixe` | number | si `mode_cotisation='fixe'` | DH, persisté dans `cotisation_mensuelle` |
 | `jour_echeance` | int (1–28) | ✗ | Jour du mois où les cotisations sont dues |
+| `periodicite_cotisation` | `'mensuel' \| 'trimestriel' \| 'semestriel' \| 'annuel'` | ✗ | **KAN-86** — défaut `trimestriel`. Accepté en POST/PUT, renvoyé dans `ResidenceResource`. |
+| `date_anniversaire` | date (`YYYY-MM-DD`) | ✗ | **KAN-95** — date de création/anniversaire. L'exercice (12 mois glissants) démarre dessus ; nullable → cycle au 1er janvier par défaut. Renvoyé dans `ResidenceResource`. |
 
 **Response 201** → `data` = objet Résidence créé (cf. shape ci-dessus, sans wrapper `residence`).
 
@@ -568,6 +642,7 @@ Chaque résidence fonctionne par exercices annuels. Toutes les opérations finan
 ```json
 { "annee": 2027, "date_debut": "2027-01-01", "date_fin": "2027-12-31" }
 ```
+`date_debut`/`date_fin` sont **optionnels** (KAN-95) : si absents, calculés en **12 mois glissants depuis `date_anniversaire`** de la résidence (sinon 1er janvier → 31 décembre).
 
 **Validation :** Un seul exercice par année par résidence.
 
@@ -939,6 +1014,11 @@ Marque un paiement par **chèque** comme rejeté par la banque. Body optionnel :
 
 > **Assignation (KAN-88)** : `PATCH /api/gestionnaire/tickets/{ticket}/assign` body `{ gestionnaire_id: number|null }` (null = désassigner). `gestionnaire_id` doit être un user du tenant de rôle `gestionnaire`/`manager` (sinon 422). Notifie le gestionnaire assigné. `TicketResource` expose `assigned_to` + `assignee {id,name}`. **Inbox** : `GET /tickets?assigned_to=me` (ou un id) filtre les tickets assignés.
 
+> **Avis de satisfaction résident (KAN-90)** : `PATCH /api/portail/reclamations/{id}/rating` body `{ rating: "satisfait" | "insatisfait" }`. Autorisé seulement sur **sa propre** réclamation (404 sinon) et si elle est **`resolu`/`clos`** (422 sinon). Stocké dans `note_satisfaction` (satisfait = 5, insatisfait = 1). `GET /portail/reclamations` renvoie `rating` (`note_satisfaction >= 3 → satisfait`, sinon `insatisfait`, `null` si pas encore noté).
+
+> **Rappel SLA (KAN-89)** : un ticket non traité (`ouvert`/`en_cours`) qui dépasse son délai selon sa gravité déclenche une **notification** au(x) manager(s) du tenant + au gestionnaire assigné (notif in-app `type=ticket`, `data.event="sla_breach"`). Détection par la commande planifiée `tickets:sla-reminders` (horaire) ; un ticket n'est relancé qu'une fois (`sla_reminded_at`).
+> **Config (manager uniquement)** : `GET /api/gestionnaire/tickets/sla-config` → `{ data: { sla: { enabled, urgent_hours, normal_hours, faible_hours } } }` (défauts 24 / 72 / 168 h). `PUT` même payload pour modifier (gestionnaire → 403).
+
 **Response 200**
 ```json
 {
@@ -973,7 +1053,7 @@ Marque un paiement par **chèque** comme rejeté par la banque. Body optionnel :
 |---|---|---|---|
 | `residence_id` | integer | ✅ | |
 | `lot_id` | integer | — | |
-| `categorie` | string | ✅ | `plomberie` \| `electricite` \| `ascenseur` \| `proprete` \| `securite` \| `autre` |
+| `categorie` | string | ✅ | KAN-55 — `parties_communes` \| `ascenseur` \| `plomberie` \| `electricite` \| `chauffage` \| `securite` \| `proprete` \| `nuisances` \| `espaces_verts` \| `parking` \| `interphone` \| `degat_eaux` \| `autre` |
 | `description` | string | ✅ | Min 10, max 2000 chars |
 | `priorite` | string | ✅ | `urgent` \| `normal` \| `faible` |
 | `images[]` | file | — | Max 5 · jpeg/png/webp · max 5 MB/photo |
@@ -1025,6 +1105,30 @@ La réponse expose `data.annonce.media: [{ type: image|video, url, taille_ko }]`
 ### POST /api/gestionnaire/annonces/{id}/publier
 ### POST /api/gestionnaire/annonces/{id}/archiver
 ### DELETE /api/gestionnaire/annonces/{id}
+
+---
+
+### POST /api/portail/annonces/{annonce}/like
+
+`auth:sanctum` · `role:resident` — KAN-96. Toggle idempotent du « j'aime » du
+résident courant sur une annonce (visible : même tenant, publiée, sa résidence
+ou globale).
+
+**Body**
+```json
+{ "liked": true }
+```
+
+**Response 200**
+```json
+{ "status": "success", "data": { "likes_count": 12, "liked": true } }
+```
+
+- `404` — annonce introuvable ou non visible par ce résident.
+
+> **Exposition** : `GET /api/portail/annonces` renvoie pour chaque annonce
+> `likes_count` (int) et `liked` (bool, pour l'utilisateur courant).
+> `AnnonceResource` (gestionnaire) expose `likes_count`.
 
 ---
 
@@ -1241,45 +1345,88 @@ Types valides : `ordinaire` | `extraordinaire`
 
 ### POST /api/gestionnaire/assemblees/{id}/convocations  *(KAN-98)*
 Déclenche la génération **asynchrone** (Job) d'une convocation PDF par copropriétaire de la résidence (Loi 18-00 art. 16quinquies) + un PDF fusionné « Imprimer tout ».
-**Response 202** : `{ "status": "accepted", "count": <nb_copro> }`
-
-### GET /api/gestionnaire/assemblees/{id}/convocations  *(KAN-98)*
-**Response 200**
+**Response 202**
 ```json
 {
-  "status": "ready",            // "pending" tant que le Job tourne (le front poll)
-  "generated_at": "2026-06-19T10:00:00+00:00",
-  "merged_url": "https://.../storage/convocations/12/merged.pdf",
-  "convocations": [
-    { "id": 1, "coproprietaire_nom": "Hassan Benali", "lot": "A-102", "tantieme": 350, "url": "https://.../conv-1.pdf" }
-  ]
+  "status": "success",
+  "message": "Génération des convocations lancée",
+  "data": { "status": "accepted", "count": 75 }
+}
+```
+
+### GET /api/gestionnaire/assemblees/{id}/convocations  *(KAN-98)*
+**Response 200** (enveloppe standard ; le statut du Job est dans `data.status`)
+```json
+{
+  "status": "success",
+  "data": {
+    "status": "ready",            // "pending" tant que le Job tourne (le front poll)
+    "generated_at": "2026-06-19T10:00:00+00:00",
+    "merged_url": "https://.../storage/convocations/12/merged.pdf",
+    "convocations": [
+      { "id": 1, "coproprietaire_nom": "Hassan Benali", "lot": "A-102", "tantieme": 350, "url": "https://.../conv-1.pdf" }
+    ]
+  }
 }
 ```
 Contenu PDF : en-tête syndic/résidence, date/heure/lieu, ordre du jour, mention préavis 15 j, nom + lot + tantièmes, **formulaire de pouvoir** pré-rempli. Conservation 5 ans (Décret 2.23.700).
 
 ---
 
-## 15. Super Admin
+## 15. Back-office Digitoyou (Super Admin)
 
-`auth:sanctum` · `role:super_admin`
+`auth:sanctum` · `role:super_admin` · préfixe `/api/admin`
 
-### GET /api/admin/tenants
-### POST /api/admin/tenants
+Back-office d'administration de la plateforme (app dédiée `admin.imaro.ma`).
+Toutes les routes opèrent **hors scope tenant** (vue transverse sur les clients).
 
-**Body**
+### Métriques & dashboard
+
+#### GET /api/admin/metrics
+Vue d'ensemble : clients (total/actifs/essai/suspendus), répartition par plan,
+parc global, essais expirant < 7j, **bloc `usage`** (usagers actifs 30j,
+réclamations ouvertes, notifications 30j, nouveaux clients 30j), derniers clients.
+
+### Clients (cabinets syndic = tenants)
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| GET | `/api/admin/tenants` | liste + filtres `?search=&status=&plan=` |
+| GET | `/api/admin/tenants/{id}` | fiche (compteurs résidences/users/lots) |
+| GET | `/api/admin/tenants/{id}/overview` | **Vue 360°** (voir ci-dessous) |
+| GET | `/api/admin/tenants/{id}/activity` | 50 derniers logs d'audit |
+| PUT | `/api/admin/tenants/{id}` | maj plan/email/statut/max_logins/trial |
+| POST | `/api/admin/tenants/{id}/suspend` | suspendre |
+| POST | `/api/admin/tenants/{id}/activate` | réactiver |
+| POST | `/api/admin/tenants/{id}/extend-trial` | `{jours}` (1–365) |
+| POST | `/api/admin/tenants/{id}/impersonate` | token dépannage 30 min (tracé audit) |
+
+#### GET /api/admin/tenants/{id}/overview
+Agrège toute l'activité d'un cabinet — `data.overview` :
 ```json
 {
-  "name": "Blanca Syndic",
-  "subdomain": "blanca",
-  "plan": "business",
-  "manager_name": "Mohammed Fikri",
-  "manager_email": "fikri@blancasyndic.ma",
-  "manager_phone": "+212600000001"
+  "tenant": { "id": 1, "name": "...", "plan": "starter", "plan_label": "Starter", "status": "trial" },
+  "usagers": { "total": 5, "actifs_30j": 4, "par_role": { "manager": 1, "gestionnaire": 1, "conseil": 0, "resident": 3, "agent_recouvrement": 0 } },
+  "gestionnaires": { "total": 1, "personnel_terrain": 0, "charge": [{ "name": "...", "residences": 1 }] },
+  "parc": { "residences": 1, "lots": 1, "coproprietaires": 1, "occupants": 0, "exercices_actifs": 1 },
+  "reclamations": { "total": 3, "par_statut": { "ouvert": 1, "en_cours": 1, "resolu": 0, "clos": 1 }, "urgents_ouverts": 1, "delai_resolution_moyen_h": 6.0, "satisfaction_moyenne": 4.0 },
+  "finances": { "exercice_actif": 2026, "appels_total_mad": 18000, "encaisse_mad": 12600, "impayes_mad": 5400, "taux_recouvrement": 70.0 },
+  "engagement": { "derniere_activite": "...", "logins_7j": 4, "notifications_30j": { "whatsapp": 0, "sms": 0, "email": 0, "echecs": 0 } },
+  "abonnement": { "plan": "starter", "plan_label": "Starter", "storage_limit_mb": 1024, "quotas": [{ "ressource": "Utilisateurs", "used": 5, "limit": 3, "pct": 166.7, "warn": true, "over": true }] }
 }
 ```
+> Quotas = consommation vs limites du plan (`config/plans.php`). `over: true` signale un dépassement (upsell).
 
-### PUT /api/admin/tenants/{id}
-### DELETE /api/admin/tenants/{id}
+### Démos & leads (pipeline commercial)
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| GET / POST | `/api/admin/leads` | liste / créer |
+| GET / PUT / DELETE | `/api/admin/leads/{id}` | consulter / maj statut / supprimer |
+| POST | `/api/admin/leads/{id}/convertir` | convertir en client (tenant en essai) |
+
+Statuts lead : `nouveau` · `contacte` · `demo_planifiee` · `gagne` · `perdu`.
+Sources : `site` · `salon` · `recommandation` · `appel` · `autre`.
 
 ---
 
@@ -1359,13 +1506,32 @@ SIDs résolus depuis `config('notifications.whatsapp_templates.<name>')`.
 **Résident** :
 - `GET /api/portail/comptes-bancaires` → `{ comptes: [...] }` (RIB/IBAN du syndicat de sa résidence, principal en premier)
 
-## Virements déclarés (résident → validation gestionnaire)
+## Paiements déclarés (résident → validation syndic) — KAN-110
 
-- **Résident** `POST /api/portail/paiements` *(multipart)* : `montant`, `date`, `methode` (`virement|versement|cheque|especes`), **`reference` (obligatoire — KAN-83, string max 255 ; absent ⇒ 422 `errors.reference`)**, `justificatif?` (pdf/jpg/png, ≤5 Mo) → crée un virement **`en_attente`**. `201`.
-- **Gestionnaire** :
-  - `GET /api/gestionnaire/virements-declares` → liste (`coproprietaire_nom`, `lot_numero`, `montant`, `methode`, `statut`, `justificatif_path`…), en_attente d'abord.
-  - `POST /virements-declares/{id}/valider` → crée un **Paiement réel** (exercice actif, `methode→mode`, `versement→virement`) + recalcule le solde + passe `valide`.
-  - `POST /virements-declares/{id}/rejeter` (`motif?`) → passe `rejete`.
+Le résident déclare un paiement effectué ; le syndic le valide (sans délai imposé — validation immédiate possible). À la validation : un **Paiement réel** est créé (recalcul du solde) et un **reçu PDF** est généré — c'est « le bon » que le résident récupère ensuite dans son détail de paiement.
+
+**Résident** (`role:resident`, prefix `/portail`) :
+- `POST /api/portail/paiements/ocr` *(multipart)* : `justificatif` (pdf/jpg/png/webp, ≤8 Mo) → **OCR offline** (Tesseract, aucune donnée hors VPS) pour préremplir le formulaire. Best-effort — `200` :
+```json
+{ "status": "success", "data": { "ocr_ok": true, "champs": { "montant": 1500, "date": "2026-06-28", "methode": "virement", "reference": "REFWWJ2332" } } }
+```
+  `ocr_ok=false` (ou champs `null`) ⇒ le résident saisit manuellement. **Prérequis serveur** : `tesseract-ocr`, `tesseract-ocr-fra`, `tesseract-ocr-ara`, `poppler-utils`.
+- `POST /api/portail/paiements` *(multipart)* : `montant`, `date`, `methode` (`virement|versement|cheque|especes`), **`reference` (obligatoire — KAN-83, string max 255 ; absent ⇒ 422 `errors.reference`)**, `justificatif?` (pdf/jpg/png, ≤5 Mo) → crée un paiement déclaré **`en_attente`**. `201` → `{ data: { paiement } }`.
+- `GET /api/portail/paiements` → `{ data: { paiements: [...] } }` (les siens, récents d'abord). Chaque entrée :
+```json
+{
+  "id": 1, "reference": "VIR-001", "montant": 300, "methode": "virement",
+  "date": "2026-06-27", "statut": "en_attente",   // en_attente | valide | rejete
+  "validated_at": null, "motif_rejet": null,
+  "justificatif_url": null,
+  "recu_url": null                                  // « le bon » : reçu PDF, dispo une fois validé
+}
+```
+
+**Gestionnaire** (`role:manager|gestionnaire`, permission `finances`) :
+- `GET /api/gestionnaire/virements-declares` → liste (`coproprietaire_nom`, `lot_numero`, `montant`, `methode`, `statut`, `justificatif_path`…), `en_attente` d'abord.
+- `POST /virements-declares/{id}/valider` → 422 si déjà traité ; sinon crée un **Paiement réel** (exercice actif, `methode→mode`, `versement→virement`) + recalcule le solde + passe `valide`, génère le reçu PDF (async) et notifie le résident.
+- `POST /virements-declares/{id}/rejeter` (`motif?`) → passe `rejete`.
 
 ---
 
@@ -1460,6 +1626,16 @@ Implémente `docs/feature-visites-backend-brief.md`. Cycle de vie :
 
 ---
 
+## Scénario de relance de recouvrement (KAN-87)
+
+Configurable par résidence (`role:manager|gestionnaire`). Exécution auto par la commande planifiée `relances:run` (quotidienne).
+
+- `GET /api/gestionnaire/residences/{id}/relance-scenario` → `{ data: { scenario: { enabled, steps: [{ id, delai_jours, canal: 'whatsapp'|'sms'|'email', type: 'relance'|'mise_en_demeure' }] } } }`. Défaut si non configuré : `{ enabled:false, steps:[] }`.
+- `PUT` même ressource, body `{ enabled, steps: [{ delai_jours, canal, type }] }` → **remplace** l'ensemble des étapes (ordre = index).
+- **Exécution** : `relances:run` parcourt les résidences avec scénario activé ; pour chaque impayé dont le **retard (jours) == `delai_jours`** d'une étape, déclenche la relance (notification portail) et journalise dans `notifications_log` (`canal`, `template_name=relance_{type}`). L'étape `mise_en_demeure` correspond à la **Loi 18-00 art. 25** (mise en demeure + 30 j → exigibilité des provisions).
+
+> Livraison multi-canal réelle (WhatsApp/SMS/e-mail) : route via les providers `NotificationManager` ; à ce stade le job déclenche la notification portail et journalise le canal prévu.
+
 ## Assistance recouvrement (service optionnel — #179)
 
 `POST /api/gestionnaire/assistance-recouvrement` · `role:manager|gestionnaire`
@@ -1495,6 +1671,25 @@ Bouton « **Envoyer** » — **régénère** un code (l'ancien est haché, irré
 Connexion ensuite via `POST /api/auth/resident/login` (`phone` + `code`) — l'endpoint accepte les rôles `resident` **et** `personnel`. Première connexion → `must_change_code` → écran d'activation.
 
 ---
+
+## Web push navigateur — VAPID (KAN-68)
+
+`role:resident` · prefix `/portail` · pour le portail web (PWA), distinct du push natif mobile ci-dessous.
+
+### POST /api/portail/push/subscribe
+Enregistre (ou met à jour) la subscription Web Push VAPID du résident. Upsert idempotent par hash de l'`endpoint`.
+
+**Body**
+```json
+{
+  "endpoint": "https://fcm.googleapis.com/fcm/send/abc123…",
+  "keys": { "p256dh": "<clé publique base64url>", "auth": "<secret base64url>" }
+}
+```
+**Response 200** : `{ status, message }`.
+
+### DELETE /api/portail/push/unsubscribe
+Supprime la subscription (opt-out). **Body** : `endpoint` (string, requis).
 
 ## Push natif mobile — FCM / APNs (KAN-68)
 

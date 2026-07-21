@@ -3,6 +3,7 @@
 use App\Models\AppelFonds;
 use App\Models\AppelFondsLigne;
 use App\Models\Coproprietaire;
+use App\Models\Immeuble;
 use App\Models\Lot;
 use App\Models\Paiement;
 use App\Models\Residence;
@@ -38,7 +39,8 @@ beforeEach(function () {
     ]);
 
     $resident = User::create(['tenant_id' => $this->tenant->id, 'name' => 'Hassan Benali', 'phone' => '+212611000010', 'role' => 'resident', 'status' => 'active']);
-    $lot = Lot::create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'numero' => 'A01', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 1000]);
+    $immeuble = Immeuble::withoutGlobalScopes()->create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'nom' => 'Immeuble Principal']);
+    $lot = Lot::create(['tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'immeuble_id' => $immeuble->id, 'numero' => 'A01', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 1000]);
     $this->copro = Coproprietaire::create(['tenant_id' => $this->tenant->id, 'user_id' => $resident->id, 'lot_id' => $lot->id, 'type' => 'proprietaire', 'solde_actuel' => 0]);
 
     $this->af = AppelFonds::withoutGlobalScopes()->create([
@@ -49,11 +51,11 @@ beforeEach(function () {
     ]);
 
     $this->ligne = AppelFondsLigne::create([
-        'appel_fonds_id'   => $this->af->id,
+        'appel_fonds_id' => $this->af->id,
         'coproprietaire_id' => $this->copro->id,
-        'montant_du'       => 1000,
-        'montant_paye'     => 0,
-        'statut'           => 'impaye',
+        'montant_du' => 1000,
+        'montant_paye' => 0,
+        'statut' => 'impaye',
     ]);
 
     $this->token = $this->gestionnaire->createToken('test')->plainTextToken;
@@ -63,9 +65,9 @@ it('records a partial payment and sets ligne statut to partiel', function () {
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->postJson('/api/gestionnaire/paiements', [
             'appel_fonds_ligne_id' => $this->ligne->id,
-            'montant'              => 500,
-            'mode'                 => 'virement',
-            'date_paiement'        => Carbon::today()->toDateString(),
+            'montant' => 500,
+            'mode' => 'virement',
+            'date_paiement' => Carbon::today()->toDateString(),
         ])
         ->assertStatus(201)
         ->assertJsonPath('status', 'success');
@@ -79,10 +81,10 @@ it('records full payment and sets ligne statut to paye', function () {
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->postJson('/api/gestionnaire/paiements', [
             'appel_fonds_ligne_id' => $this->ligne->id,
-            'montant'              => 1000,
-            'mode'                 => 'cheque',
-            'date_paiement'        => Carbon::today()->toDateString(),
-            'reference'            => 'CHQ-001',
+            'montant' => 1000,
+            'mode' => 'cheque',
+            'date_paiement' => Carbon::today()->toDateString(),
+            'reference' => 'CHQ-001',
         ])
         ->assertStatus(201);
 
@@ -95,9 +97,9 @@ it('updates appel de fonds statut to solde when all lines paid', function () {
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->postJson('/api/gestionnaire/paiements', [
             'appel_fonds_ligne_id' => $this->ligne->id,
-            'montant'              => 1000,
-            'mode'                 => 'especes',
-            'date_paiement'        => Carbon::today()->toDateString(),
+            'montant' => 1000,
+            'mode' => 'especes',
+            'date_paiement' => Carbon::today()->toDateString(),
         ]);
 
     expect($this->af->fresh()->statut)->toBe('solde');
@@ -109,9 +111,9 @@ it('rejects payment on already paid ligne', function () {
     $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
         ->postJson('/api/gestionnaire/paiements', [
             'appel_fonds_ligne_id' => $this->ligne->id,
-            'montant'              => 100,
-            'mode'                 => 'virement',
-            'date_paiement'        => Carbon::today()->toDateString(),
+            'montant' => 100,
+            'mode' => 'virement',
+            'date_paiement' => Carbon::today()->toDateString(),
         ])
         ->assertStatus(422);
 });

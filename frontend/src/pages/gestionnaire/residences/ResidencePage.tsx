@@ -34,12 +34,14 @@ import {
   storeGroupeHabitation,
   updateGroupeHabitation,
   deleteGroupeHabitation,
+  getCategoriesLot,
   type CreateResidenceInput,
   type Lot,
   type Immeuble,
   type GroupeHabitation,
 } from '@/services/gestionnaire.service'
 import { ResidenceOverviewTab } from '@/components/gestionnaire/ResidenceOverviewTab'
+import { CategoriesLotTab } from '@/components/gestionnaire/CategoriesLotTab'
 import { ResidenceBankAccountsTab } from '@/components/gestionnaire/ResidenceBankAccountsTab'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { DataTable, type Column } from '@/components/shared/DataTable'
@@ -73,6 +75,7 @@ type Tab =
   | 'tranches'
   | 'immeubles'
   | 'encaissement'
+  | 'categories'
 
 const LOT_TYPES = [
   'appartement',
@@ -91,6 +94,7 @@ type LotForm = {
   tantieme: string
   titre_foncier: string
   immeuble_id: string
+  categorie_lot_id: string
 }
 
 const EMPTY_FORM: LotForm = {
@@ -101,6 +105,7 @@ const EMPTY_FORM: LotForm = {
   tantieme: '',
   titre_foncier: '',
   immeuble_id: '',
+  categorie_lot_id: '',
 }
 
 type ImmeubleForm = {
@@ -175,6 +180,14 @@ export function ResidencePage() {
     queryKey: ['lots', residenceId],
     queryFn: () => getLots(residenceId),
     enabled: !!residenceId && activeTab === 'lots',
+  })
+
+  // Catégories de lot (KAN-93) — pour le rattachement dans le formulaire de lot.
+  const isModeCategorie = residence?.mode_cotisation === 'categorie'
+  const { data: categoriesLot = [] } = useQuery({
+    queryKey: ['categories-lot', residenceId],
+    queryFn: () => getCategoriesLot(residenceId),
+    enabled: !!residenceId && isModeCategorie,
   })
 
   // ── Residence Mutations ────────────────────────────────────────────────────
@@ -415,6 +428,7 @@ export function ResidencePage() {
       tantieme: String(lot.tantieme),
       titre_foncier: lot.titre_foncier ?? '',
       immeuble_id: String(lot.immeuble_id ?? ''),
+      categorie_lot_id: String(lot.categorie_lot_id ?? ''),
     })
     setLotDialogOpen(true)
   }
@@ -427,6 +441,13 @@ export function ResidencePage() {
       superficie: Number(form.superficie),
       tantieme: Number(form.tantieme),
       titre_foncier: form.titre_foncier.trim(),
+      ...(isModeCategorie
+        ? {
+            categorie_lot_id: form.categorie_lot_id
+              ? Number(form.categorie_lot_id)
+              : null,
+          }
+        : {}),
     }
     if (editingLot) {
       const payload: Parameters<typeof updateLot>[2] = {
@@ -550,6 +571,16 @@ export function ResidencePage() {
       header: t('gestionnaire.residence.colTantieme'),
       sortable: true,
       renderCell: (r) => <span className="tabular-nums">{r.tantieme}</span>,
+    },
+    {
+      key: 'titre_foncier',
+      header: t('gestionnaire.residence.colTitreFoncier'),
+      renderCell: (r) =>
+        r.titre_foncier ? (
+          <span>{r.titre_foncier}</span>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
     {
       key: 'coproprietaire',
@@ -823,6 +854,16 @@ export function ResidencePage() {
       key: 'encaissement',
       label: t('gestionnaire.residence.tabEncaissement'),
     },
+    ...(isModeCategorie
+      ? [
+          {
+            key: 'categories' as const,
+            label: t('gestionnaire.residence.tabCategories', {
+              defaultValue: 'Catégories',
+            }),
+          },
+        ]
+      : []),
   ]
 
   const isMutating = storeMutation.isPending || updateMutation.isPending
@@ -1071,6 +1112,10 @@ export function ResidencePage() {
         <ResidenceBankAccountsTab residenceId={residenceId} />
       )}
 
+      {activeTab === 'categories' && (
+        <CategoriesLotTab residenceId={residenceId} />
+      )}
+
       {/* Lot form dialog */}
       <Dialog open={lotDialogOpen} onOpenChange={setLotDialogOpen}>
         <DialogContent className="max-w-md">
@@ -1193,6 +1238,45 @@ export function ResidencePage() {
                 aria-invalid={form.titre_foncier.trim() === ''}
               />
             </div>
+
+            {isModeCategorie && (
+              <div className="space-y-1">
+                <Label>
+                  {t('gestionnaire.residence.categorieLot', {
+                    defaultValue: 'Catégorie de lot',
+                  })}
+                </Label>
+                <Select
+                  value={form.categorie_lot_id || 'none'}
+                  onValueChange={(v) =>
+                    setForm((f) => ({
+                      ...f,
+                      categorie_lot_id: v === 'none' ? '' : v,
+                    }))
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue
+                      placeholder={t('gestionnaire.residence.categorieLotPh', {
+                        defaultValue: 'Choisir une catégorie',
+                      })}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">
+                      {t('gestionnaire.residence.categorieLotNone', {
+                        defaultValue: 'Aucune',
+                      })}
+                    </SelectItem>
+                    {categoriesLot.map((cat) => (
+                      <SelectItem key={cat.id} value={String(cat.id)}>
+                        {cat.nom}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           <DialogFooter>

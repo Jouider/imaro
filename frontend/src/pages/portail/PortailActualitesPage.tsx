@@ -11,10 +11,9 @@ import {
   ChevronUp,
   ChevronLeft,
   ChevronRight,
-  Image as ImageIcon,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { MediaGallery } from '@/components/shared'
+import { AnnoncePostCard } from '@/components/portail/AnnoncePostCard'
 import {
   getAnnonces,
   getAssembleesPortail,
@@ -429,8 +428,6 @@ function AnnoncesTab({
   isLoading: boolean
   t: (key: string, opts?: Record<string, unknown>) => string
 }) {
-  const [expandedId, setExpandedId] = useState<number | null>(null)
-
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -454,82 +451,12 @@ function AnnoncesTab({
     )
   }
 
+  // Même style « post » que l'accueil : médias en haut, contenu complet, like.
   return (
     <div className="space-y-3">
-      {annonces.map((a) => {
-        const isUrgente = a.priorite === 'urgente'
-        const isExpanded = expandedId === a.id
-        const dateStr = new Date(a.date).toLocaleDateString('fr-FR', {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric',
-        })
-
-        return (
-          <div
-            key={a.id}
-            className={cn(
-              'rounded-xl border bg-card overflow-hidden transition-shadow',
-              isUrgente && 'border-l-4 border-l-red-400',
-              isExpanded && 'shadow-sm',
-            )}
-          >
-            <button
-              className="w-full p-4 text-left"
-              onClick={() => setExpandedId(isExpanded ? null : a.id)}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                    {isUrgente && (
-                      <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
-                        {t('portail.actualites.urgente', {
-                          defaultValue: 'Urgent',
-                        })}
-                      </span>
-                    )}
-                    <span className="text-xs text-muted-foreground">
-                      {dateStr}
-                    </span>
-                    {a.media && a.media.length > 0 && (
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <ImageIcon className="size-3" />
-                        {a.media.length}
-                      </span>
-                    )}
-                  </div>
-                  <p className="font-semibold text-sm leading-snug">
-                    {a.titre}
-                  </p>
-                  {!isExpanded && (
-                    <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                      {a.contenu}
-                    </p>
-                  )}
-                </div>
-                <span className="shrink-0 text-muted-foreground mt-0.5">
-                  {isExpanded ? (
-                    <ChevronUp className="size-4" />
-                  ) : (
-                    <ChevronDown className="size-4" />
-                  )}
-                </span>
-              </div>
-            </button>
-
-            {isExpanded && (
-              <div className="border-t px-4 pb-4 pt-3 space-y-3">
-                <p className="text-sm leading-relaxed whitespace-pre-line">
-                  {a.contenu}
-                </p>
-                {a.media && a.media.length > 0 && (
-                  <MediaGallery media={a.media} />
-                )}
-              </div>
-            )}
-          </div>
-        )
-      })}
+      {annonces.map((a) => (
+        <AnnoncePostCard key={a.id} annonce={a} />
+      ))}
     </div>
   )
 }

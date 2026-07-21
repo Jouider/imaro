@@ -51,7 +51,6 @@ import { cn } from '@/lib/utils'
 import { getResidences, getLots } from '@/services/gestionnaire.service'
 import {
   getVisites,
-  getVisitesStats,
   createVisite,
   cancelVisite,
   scanVisite,
@@ -146,14 +145,33 @@ export function VisitesPage() {
     enabled: residenceId !== null,
   })
 
-  const statsQ = useQuery({
-    queryKey: ['visites-stats', residenceId],
-    queryFn: () => getVisitesStats(residenceId as number),
-    enabled: residenceId !== null,
-  })
+  const visites = useMemo(() => visitesQ.data ?? [], [visitesQ.data])
 
-  const visites = visitesQ.data ?? []
-  const stats = statsQ.data
+  // KAN-134 : les KPI sont dérivés de la liste chargée (source de vérité affichée
+  // dans le tableau) plutôt que d'un endpoint /stats séparé qui ne renvoyait rien
+  // → les compteurs restaient à 0.
+  const stats = useMemo(() => {
+    const isToday = (iso?: string | null) => {
+      if (!iso) return false
+      const d = new Date(iso)
+      const n = new Date()
+      return (
+        d.getFullYear() === n.getFullYear() &&
+        d.getMonth() === n.getMonth() &&
+        d.getDate() === n.getDate()
+      )
+    }
+    return {
+      today: visites.filter(
+        (v) => isToday(v.planned_at) || isToday(v.arrived_at),
+      ).length,
+      currently_inside: visites.filter((v) => v.status === 'arrived').length,
+      planned: visites.filter((v) => v.status === 'planned').length,
+      expired_today: visites.filter(
+        (v) => v.status === 'expired' && isToday(v.planned_at),
+      ).length,
+    }
+  }, [visites])
 
   const filtered = visites.filter((v) => {
     if (statusFilter !== 'all' && v.status !== statusFilter) return false
@@ -427,10 +445,8 @@ export function VisitesPage() {
         onCreated={(v) => {
           setCreateOpen(false)
           setDetail(v)
+          // Les KPI dérivent de ['visites'] → une seule invalidation suffit.
           void qc.invalidateQueries({ queryKey: ['visites', residenceId] })
-          void qc.invalidateQueries({
-            queryKey: ['visites-stats', residenceId],
-          })
         }}
       />
 
@@ -439,9 +455,6 @@ export function VisitesPage() {
         onOpenChange={setScanOpen}
         onScanned={() => {
           void qc.invalidateQueries({ queryKey: ['visites', residenceId] })
-          void qc.invalidateQueries({
-            queryKey: ['visites-stats', residenceId],
-          })
         }}
       />
 
@@ -480,10 +493,12 @@ function CreateVisiteDialog({
   const [isRecurring, setIsRecurring] = useState(false)
   const [recurrence, setRecurrence] = useState('')
 
+  // KAN-132 : `!!residenceId` excluait la résidence 0 (fallback dev) → la liste
+  // des lots/hôtes restait vide. Aligné sur le reste de la page (`!== null`).
   const lotsQ = useQuery({
     queryKey: ['lots', residenceId],
     queryFn: () => getLots(residenceId as number),
-    enabled: !!residenceId && open,
+    enabled: residenceId !== null && open,
   })
 
   const mut = useMutation({

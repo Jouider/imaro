@@ -79,7 +79,7 @@
       "codeSubtitle": "Enter the code provided by your syndic for +212 {{digits}}",
       "codeLabel": "Access code",
       "codePlaceholder": "Code provided by your syndic",
-      "codeHint": "This code was sent to you by your manager via WhatsApp.",
+      "codeHint": "This code was given to you by your manager.",
       "codeSubmit": "Access my space",
       "codeVerifying": "Verifying…",
       "activateTitle": "Create your personal code",
@@ -155,7 +155,9 @@
     "save": "Save",
     "close": "Close",
     "show": "Show",
-    "hide": "Hide"
+    "hide": "Hide",
+    "continue": "Continue",
+    "back": "Back"
   },
   "portail": {
     "nav": {
@@ -204,7 +206,11 @@
       "payer": "Pay →",
       "convoquee": "Convened",
       "inviteVisitor": "Invite a visitor",
-      "inviteVisitorDesc": "Generate a single-use QR for a relative, courier or contractor."
+      "inviteVisitorDesc": "Generate a single-use QR for a relative, courier or contractor.",
+      "urgent": "Urgent",
+      "like": "Like",
+      "unlike": "Unlike",
+      "likeError": "Couldn't complete, try again"
     },
     "actualites": {
       "title": "News",
@@ -323,7 +329,8 @@
         "interphone": "Intercom / Access",
         "degat_eaux": "Water damage",
         "autre": "Other"
-      }
+      },
+      "sujetMin": "Subject too short (5 characters minimum)"
     },
     "profil": {
       "title": "My profile",
@@ -367,7 +374,7 @@
       "emptyDesc": "Create your first invitation — your visitor will get a link to scan at the entrance.",
       "form": {
         "title": "New invitation",
-        "desc": "The QR is sent directly by WhatsApp / SMS to the visitor.",
+        "desc": "The QR is sent directly to the visitor (share or email).",
         "shareLater": "You'll be able to share it after creation.",
         "submit": "Create & share",
         "submitting": "Creating…",
@@ -396,6 +403,37 @@
       "settingDesc": "Face ID / fingerprint when opening the app.",
       "enabled": "Biometric unlock enabled.",
       "enableFailed": "Biometric authentication failed."
+    },
+    "bonsPaiement": {
+      "title": "Payment vouchers",
+      "subtitle": "Issue a payment order to the syndic and find your history.",
+      "entryDesc": "Issue a payment order and view history",
+      "empty": "No payment voucher",
+      "new": "New voucher",
+      "from": "Source account",
+      "to": "Beneficiary",
+      "montant": "Amount",
+      "motif": "Reason",
+      "motifPlaceholder": "e.g. Q1 2026 funds call",
+      "delaiNotice": "Validation by the syndic is possible after a 24h delay.",
+      "validableLe": "Validatable on",
+      "validatedWithTicket": "Validated. Tracking ticket",
+      "download": "Download",
+      "downloadPending": "Available after validation",
+      "step1": "Sender & beneficiary",
+      "step2": "Amount",
+      "step3": "Reason",
+      "step4": "Confirmation",
+      "stepOf": "Step {{current}} of {{total}}",
+      "emit": "Issue voucher",
+      "created": "Payment voucher issued",
+      "createError": "Issuance failed, try again",
+      "statut": {
+        "en_attente": "Pending",
+        "valide": "Validated",
+        "rejete": "Rejected",
+        "expire": "Expired"
+      }
     }
   },
   "home": {
@@ -472,7 +510,7 @@
       },
       "step2": {
         "title": "Invite your owners",
-        "desc": "They get WhatsApp access to their personal portal"
+        "desc": "They get access to their personal portal"
       },
       "step3": {
         "title": "Manage in real time",
@@ -891,7 +929,8 @@
     "actions": {
       "menu": "More options",
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "sendCredentials": "Send credentials"
     },
     "permissions": {
       "residences": "Buildings",
@@ -969,7 +1008,13 @@
         "deleteFailed": "Deletion failed",
         "toggled": "Status updated",
         "toggleFailed": "Status change failed",
-        "copyFailed": "Could not copy"
+        "copyFailed": "Could not copy",
+        "credentialsSent": "Credentials sent by email",
+        "credentialsFailed": "Failed to send credentials"
+      },
+      "credentials": {
+        "title": "Credentials sent",
+        "desc": "An email with the credentials was sent to {{email}}. You can also copy the temporary password below to share it manually."
       }
     },
     "personnel": {
@@ -1011,7 +1056,7 @@
         "residencePh": "Choose a building",
         "phone": "Phone",
         "permissions": "Granted permissions",
-        "phoneHint": "The access code will be generated and sent to this number via WhatsApp / SMS."
+        "phoneHint": "The access code will be generated and sent to the member automatically."
       },
       "toast": {
         "created": "Staff added",
@@ -1026,7 +1071,7 @@
       "credentialsSent": {
         "title": "Credentials sent",
         "desc": "{{name}}'s account was created and their access code was sent.",
-        "sentVia": "Code sent via WhatsApp / SMS to {{phone}}.",
+        "sentVia": "Code sent to {{phone}}.",
         "codeLabel": "Access code",
         "note": "Share this code with the staff member. They must change it on first login.",
         "deliveredConfirmed": "Code sent via {{channel}} to {{phone}} — delivery confirmed.",
@@ -1038,9 +1083,7 @@
         "resendError": "Failed to send the code",
         "copyError": "Couldn't copy the code"
       }
-    },
-    "cin": "National ID",
-    "cinPlaceholder": "e.g. AB123456"
+    }
   },
   "gestionnaire": {
     "pointage": {
@@ -1159,7 +1202,7 @@
         },
         "relance": {
           "title": "Amicable reminder",
-          "desc": "Graduated reminders by SMS, WhatsApp and email to obtain an amicable settlement."
+          "desc": "Graduated reminders by email to obtain an amicable settlement."
         },
         "miseEnDemeure": {
           "title": "Formal notice",
@@ -1190,7 +1233,7 @@
           "desc": "Amicable collection handled for you, up to the formal notice.",
           "features": [
             "Automated funds calls and reminders",
-            "Multichannel reminders (SMS, WhatsApp, email)",
+            "Email reminders",
             "Official formal notice",
             "Monthly tracking of unpaid amounts"
           ]
@@ -1309,7 +1352,9 @@
       "addLotError": "Error adding the unit",
       "modifyError": "Error during update",
       "delete": {
-        "intro": "Deleting a building is permanent and erases its units, owners and entries. For security reasons, a validation code will be sent to you.",
+        "intro": "Deleting a building is permanent and erases its units, owners and entries. To prevent accidental deletion, type the building's exact name below.",
+        "typeToConfirm": "To confirm, type the building name:",
+        "error": "Deletion failed. Please try again.",
         "sendCode": "Send the code",
         "codeSent": "Validation code sent",
         "codeError": "Failed to send the code",
@@ -1500,7 +1545,7 @@
       "createdSuccess": "The owner was created successfully.",
       "accessCode": "Access code:",
       "copyCodeAria": "Copy the code",
-      "codeAutoSent": "The access code was automatically sent to the owner by SMS, WhatsApp and email. The code above remains shown as a backup, in case you need to communicate it verbally.",
+      "codeAutoSent": "The access code was automatically sent to the owner by email. The code above remains shown as a backup, in case you need to communicate it verbally.",
       "createLotPrompt": "Would you like to create a unit for this new owner?",
       "yesCreateLot": "Yes, create a unit",
       "noFinish": "No, finish",
@@ -1532,7 +1577,7 @@
       },
       "envoyer": "Send",
       "envoyerConfirm": "Send the funds call to the owners?",
-      "envoyerDesc": "This action will send a WhatsApp notification to all owners.",
+      "envoyerDesc": "This action will send a notification (app + email) to all owners.",
       "envoyerSuccess": "Funds call sent",
       "form": {
         "titre": "Title",
@@ -1629,7 +1674,7 @@
       "allStatuses": "All statuses",
       "calcRepartition": "Calculating the breakdown…",
       "sendAppelTitle": "Send the funds call",
-      "sendAppelDesc": "This action will send a WhatsApp notification to all owners.",
+      "sendAppelDesc": "This action will send a notification (app + email) to all owners.",
       "saveError": "Error while saving",
       "relancesSent": "{{n}} reminder(s) sent",
       "noAppel": "No funds call",
@@ -1640,7 +1685,9 @@
       "colLot": "Unit",
       "encaisserPaiement": "Record a payment",
       "envoyerRappels": "Send reminders",
-      "decompteEmpty": "Enter a name and click Generate to display the individual statement"
+      "decompteEmpty": "Enter a name and click Generate to display the individual statement",
+      "relanceAllConfirm": "Send a reminder to {{count}} owner(s) with unpaid dues?",
+      "relanceAllAction": "Send reminders"
     },
     "tickets": {
       "title": "Tickets",
@@ -1685,7 +1732,8 @@
         "lot": "Unit",
         "selectLot": "Unit",
         "categorie": "Category",
-        "descPlaceholder": "Describe the problem…"
+        "descPlaceholder": "Describe the problem…",
+        "descMin": "The description must be at least 10 characters"
       },
       "audit": {
         "tab": "Audit by building",
@@ -1694,6 +1742,21 @@
         "total": "Total",
         "most": "Most",
         "least": "Least"
+      },
+      "categories": {
+        "parties_communes": "Common areas",
+        "ascenseur": "Elevator",
+        "plomberie": "Water / Plumbing",
+        "electricite": "Electricity",
+        "chauffage": "Heating / Air conditioning",
+        "securite": "Security",
+        "proprete": "Cleanliness",
+        "nuisances": "Noise nuisance",
+        "espaces_verts": "Green areas",
+        "parking": "Parking / Garage",
+        "interphone": "Intercom / Access",
+        "degat_eaux": "Water damage",
+        "autre": "Other"
       }
     },
     "dashboard": {
@@ -1884,7 +1947,8 @@
         "actif": "Active",
         "blackliste": "Blacklisted",
         "expire": "Expired",
-        "resilie": "Terminated"
+        "resilie": "Terminated",
+        "inactif": "Ended"
       },
       "specialite": {
         "ascenseurs": "Elevators",
@@ -1922,7 +1986,15 @@
       "emptyContrats": "No contract",
       "emptyContratsDesc": "Create your first maintenance contract.",
       "toastCreated": "Provider created",
-      "toastContratCreated": "Contract created"
+      "toastContratCreated": "Contract created",
+      "toastUpdated": "Provider updated",
+      "toastStatut": "Status updated",
+      "toastDeleted": "Provider deleted",
+      "markTermine": "Mark as ended",
+      "markActif": "Reactivate",
+      "editPrestataire": "Edit provider",
+      "deleteTitle": "Delete provider?",
+      "deleteDesc": "This action is permanent. A provider linked to expenses or contracts cannot be deleted — set it to “Ended” instead."
     },
     "budgets": {
       "title": "Budgets",
@@ -2055,7 +2127,10 @@
       "exercice": "Fiscal year",
       "statut": {
         "ouvert": "Open",
-        "clos": "Closed 🔒"
+        "clos": "Closed 🔒",
+        "actif": "Active",
+        "cloture": "Closed 🔒",
+        "archive": "Archived"
       },
       "tabs": {
         "dashboard": "Dashboard",
@@ -2101,6 +2176,7 @@
       "grandLivre": {
         "title": "GL account",
         "selectCompte": "Select an account...",
+        "noCompte": "No account found.",
         "hint": "Select a GL account to display the entry detail."
       },
       "depenses": {
@@ -2165,7 +2241,13 @@
         "confirmMsg": "This action is irreversible. All entries will be locked. Continue?",
         "warning": "Warning — after closing, no entry can be edited.",
         "already_clos": "Fiscal year closed",
-        "clos_msg": "This fiscal year was closed on"
+        "clos_msg": "This fiscal year was closed on",
+        "clos_msg_range": "Fiscal year closed — period from",
+        "reopen": "Reopen fiscal year",
+        "reopenTitle": "Reopen fiscal year?",
+        "reopenMsg": "The fiscal year will become editable again. Only one fiscal year can be active at a time: close the current one first if needed.",
+        "toastReopened": "Fiscal year reopened",
+        "reopenError": "Could not reopen the fiscal year"
       },
       "export": {
         "title": "Export",
@@ -2229,7 +2311,16 @@
       "journalLabel": "Accounting journal",
       "grandLivreLabel": "General ledger",
       "legalNote": "This report is prepared in accordance with Law 18-00 (Dahir no. 1-02-298 of 3 October 2002) on the status of co-ownership of built properties. Any owner may request a copy from the syndic under article 8 of that law. The generated documents are informational and certified by the co-ownership manager.",
-      "filterTo": "To"
+      "filterTo": "To",
+      "exercices": {
+        "newTitle": "New fiscal year",
+        "editTitle": "Edit fiscal year",
+        "annee": "Year",
+        "dateDebut": "Start date",
+        "dateFin": "End date",
+        "toastCreated": "Fiscal year created",
+        "toastUpdated": "Fiscal year updated"
+      }
     },
     "depenses": {
       "title": "Expenses",
@@ -2512,7 +2603,12 @@
       "prescriptionBanner": "Co-ownership charge debts lapse after 5 years without interruption. Immediate legal action is required for critical-status debts.",
       "colEcheance": "Due date",
       "colJoursRestants": "Days left",
-      "colOrigine": "Origin"
+      "colOrigine": "Origin",
+      "relance": {
+        "canaux": {
+          "email": "Email"
+        }
+      }
     },
     "equipements": {
       "toastAdded": "Equipment added",
@@ -2588,6 +2684,15 @@
       "totalEvents": "Total events",
       "searchPlaceholder": "Search action, user, target...",
       "exportCsv": "Export CSV",
+      "exportEmpty": "No rows to export",
+      "exportDone": "CSV export downloaded",
+      "view": "View",
+      "colDate": "Date",
+      "colCategory": "Category",
+      "colAction": "Action",
+      "colSeverity": "Severity",
+      "colUser": "User",
+      "colTarget": "Target",
       "sensitiveActions": "Sensitive actions",
       "errorRate": "Error rate",
       "categoryLabels": {
@@ -2695,8 +2800,8 @@
       "upgradePro": "Upgrade to Pro →",
       "comingSoon": "Feature coming soon",
       "notifSection": "Notification preferences",
-      "notifHint": "Choose the WhatsApp alerts you want to receive",
-      "notifMaster": "Enable WhatsApp notifications",
+      "notifHint": "Choose the alerts you want to receive",
+      "notifMaster": "Enable notifications",
       "notifPaiementLabel": "New payment received",
       "notifPaiementDesc": "An owner makes a payment",
       "notifTicketLabel": "New incident ticket",
@@ -2726,12 +2831,11 @@
     },
     "occupants": {
       "title": "Occupants",
-      "subtitle": "Register of occupants by unit — owners, tenants, usufructuaries",
+      "subtitle": "Register of occupants by unit — resident owners, usufructuaries",
       "toastAdded": "Occupant added",
       "toastUpdated": "Occupant updated",
       "toastDeleted": "Occupant deleted",
       "kpiOwners": "Resident owners",
-      "kpiTenants": "Tenants",
       "kpiOthers": "Usufructuaries / others",
       "bannerTitle": "Art. 11 Law 18-00",
       "bannerBody": "— The occupant register must be up to date for meeting notices and charge communications. Only one active 'resident owner' per unit at a time.",
@@ -2745,7 +2849,6 @@
       "dateFinOptional": "End date (optional)",
       "type": {
         "proprietaire_occupant": "Resident owner",
-        "locataire": "Tenant",
         "usufruitier": "Usufructuary",
         "autre": "Other"
       }
@@ -2826,6 +2929,7 @@
       "complementaires": "Additional annexes",
       "regenerate": "Regenerate",
       "downloaded": "Annexe {{num}} downloaded",
+      "preview": "Preview",
       "obligatoires": "Mandatory annexes",
       "exerciceClos": "Fiscal year ended 31 December {{year}}",
       "title": "Accounting annexes",
@@ -3253,7 +3357,8 @@
     "media": {
       "playVideo": "Play video",
       "viewImage": "View image"
-    }
+    },
+    "to": "to"
   },
   "public": {
     "visitorPass": {
@@ -3347,5 +3452,10 @@
       "install": "Install",
       "later": "Later"
     }
+  },
+  "errors": {
+    "title": "Something went wrong",
+    "message": "An unexpected error occurred. Please reload the page.",
+    "reload": "Reload"
   }
 }

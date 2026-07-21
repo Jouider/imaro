@@ -45,6 +45,13 @@ export type Encaissement = {
   est_avance: boolean
   recu_path: string | null
   est_rapproche: boolean
+  /**
+   * Statut du paiement (KAN-85). `cheque_rejete` = chèque marqué impayé.
+   * Optionnel : non encore exposé par GET /gestionnaire/encaissements.
+   */
+  statut?: 'valide' | 'cheque_rejete'
+  cheque_rejete_at?: string | null
+  motif_rejet?: string | null
 }
 
 export type VirementMethode = 'virement' | 'versement' | 'cheque' | 'especes'
@@ -59,10 +66,17 @@ export type VirementDeclare = {
   /** Méthode déclarée par le copropriétaire. */
   methode: VirementMethode
   reference: string
+  /** URL publique complète du justificatif (aperçu « Voir ») — KAN-117. */
   justificatif_path: string | null
   statut: 'en_attente' | 'valide' | 'rejete'
   valide_par: string | null
   date_validation: string | null
+  /**
+   * Paiement réel créé lors de la validation (KAN-117). Permet, pour un chèque
+   * validé, de le marquer payé/impayé via `markChequeImpaye(paiement_id)`.
+   */
+  paiement_id?: number | null
+  paiement_statut?: 'valide' | 'cheque_rejete' | null
 }
 
 export type Decompte = {
@@ -333,7 +347,8 @@ const MOCK_VIREMENTS: VirementDeclare[] = [
     date_declaration: '2026-05-05',
     methode: 'versement',
     reference: 'VIR-ATW-2026-0089',
-    justificatif_path: 'virement-zineb.pdf',
+    justificatif_path:
+      'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=800',
     statut: 'valide',
     valide_par: 'Admin Gestionnaire',
     date_validation: '2026-05-06',
@@ -351,6 +366,39 @@ const MOCK_VIREMENTS: VirementDeclare[] = [
     statut: 'rejete',
     valide_par: 'Admin Gestionnaire',
     date_validation: '2026-04-30',
+  },
+  {
+    id: 4,
+    coproprietaire_id: 13,
+    coproprietaire_nom: 'Nadia El Amrani',
+    lot_numero: 'B-04',
+    montant: 720,
+    date_declaration: '2026-05-02',
+    methode: 'cheque',
+    reference: 'CHQ-CIH-2026-3391',
+    justificatif_path:
+      'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800',
+    statut: 'valide',
+    valide_par: 'Admin Gestionnaire',
+    date_validation: '2026-05-03',
+    paiement_id: 5001,
+    paiement_statut: 'valide',
+  },
+  {
+    id: 5,
+    coproprietaire_id: 14,
+    coproprietaire_nom: 'Omar Fassi',
+    lot_numero: 'B-05',
+    montant: 540,
+    date_declaration: '2026-04-20',
+    methode: 'cheque',
+    reference: 'CHQ-BMCE-2026-2210',
+    justificatif_path: null,
+    statut: 'valide',
+    valide_par: 'Admin Gestionnaire',
+    date_validation: '2026-04-21',
+    paiement_id: 5002,
+    paiement_statut: 'cheque_rejete',
   },
 ]
 
@@ -578,4 +626,19 @@ export async function relancerTout(): Promise<{ nb_envoye: number }> {
     },
     { nb_envoye: MOCK_CREANCES.filter((c) => c.statut === 'en_retard').length },
   )
+}
+
+/**
+ * Marque un paiement par chèque comme impayé/rejeté par la banque (KAN-85).
+ * 422 si le paiement n'est pas en mode chèque ou est déjà rejeté.
+ * Effet backend : annule la ligne d'appel de fonds, régularise le solde,
+ * notifie le résident et passe une contre-passation comptable.
+ */
+export async function markChequeImpaye(
+  paiementId: number,
+  motif?: string,
+): Promise<void> {
+  await api.post(`/gestionnaire/paiements/${paiementId}/cheque-impaye`, {
+    motif: motif?.trim() || undefined,
+  })
 }

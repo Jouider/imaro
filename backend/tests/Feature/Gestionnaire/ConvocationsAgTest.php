@@ -10,6 +10,7 @@ use App\Models\Residence;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
@@ -39,11 +40,26 @@ beforeEach(function () {
 it('POST convocations → 202 accepted + count, dispatch du Job, statut pending', function () {
     $this->withHeaders($this->auth)->postJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations")
         ->assertStatus(202)
-        ->assertJsonPath('status', 'accepted')
-        ->assertJsonPath('count', 1);
+        ->assertJsonPath('status', 'success')
+        ->assertJsonPath('data.status', 'accepted')
+        ->assertJsonPath('data.count', 1);
 
     Queue::assertPushed(GenerateConvocationsJob::class);
     expect($this->assemblee->fresh()->convocations_status)->toBe('pending');
+});
+
+it('POST count compte aussi les lots sans copro assigné ("Non assigné")', function () {
+    // Régression : le count annoncé doit matcher ce que le Job génère réellement
+    // (un lot par lot, copro assigné ou pas), pas seulement whereHas('coproprietairePrincipal').
+    $imm = Immeuble::withoutGlobalScope('tenant')->first();
+    Lot::withoutGlobalScope('tenant')->create([
+        'tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'immeuble_id' => $imm->id,
+        'numero' => 'A2', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 1,
+    ]);
+
+    $this->withHeaders($this->auth)->postJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations")
+        ->assertStatus(202)
+        ->assertJsonPath('data.count', 2);
 });
 
 it('le Job génère une convocation par copro + le PDF fusionné', function () {
@@ -63,14 +79,67 @@ it('le Job génère une convocation par copro + le PDF fusionné', function () {
     Storage::disk('public')->assertExists($a->convocations_merged_path);
 });
 
+it('POST régénère : vide merged_url/generated_at de l\'ancienne génération (sinon GET montre du stale pendant "pending")', function () {
+    Storage::fake('public');
+    (new GenerateConvocationsJob($this->assemblee->id))->handle();
+    expect($this->assemblee->fresh()->convocations_merged_path)->not->toBeNull();
+
+    $this->withHeaders($this->auth)->postJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations")
+        ->assertStatus(202);
+
+    $a = $this->assemblee->fresh();
+    expect($a->convocations_status)->toBe('pending')
+        ->and($a->convocations_merged_path)->toBeNull()
+        ->and($a->convocations_generated_at)->toBeNull();
+});
+
+it('POST ignore un re-déclenchement tant que le précédent est "pending" (évite les doublons)', function () {
+    // Régression : un double-clic / retry frontend dispatchait un 2e Job
+    // concurrent qui bouclait sur les mêmes lots → convocations dupliquées.
+    $this->withHeaders($this->auth)->postJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations")->assertStatus(202);
+    expect($this->assemblee->fresh()->convocations_status)->toBe('pending');
+
+    $this->withHeaders($this->auth)->postJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations")->assertStatus(202);
+
+    Queue::assertPushed(GenerateConvocationsJob::class, 1);
+});
+
+it('le Job ignore une exécution concurrente pour la même assemblée (lock) — pas de doublons', function () {
+    Storage::fake('public');
+    $this->withHeaders($this->auth)->postJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations");
+
+    $lock = Cache::lock("convocations-gen-{$this->assemblee->id}", 600);
+    $lock->get(); // simule le Job 1 déjà en cours (lock détenu)
+
+    (new GenerateConvocationsJob($this->assemblee->id))->handle(); // Job 2 concurrent
+
+    expect(Convocation::where('assemblee_id', $this->assemblee->id)->count())->toBe(0)
+        ->and($this->assemblee->fresh()->convocations_status)->toBe('pending');
+
+    $lock->release();
+});
+
+it('GET sur une AG jamais générée ne renvoie pas "pending" (sinon spinner infini, bouton Générer masqué)', function () {
+    // Régression : convocations_status = null (aucune génération lancée) était
+    // mappé en "pending" → le front affichait « Génération en cours… » à l'infini
+    // alors que rien ne tournait, sans jamais montrer le bouton « Générer ».
+    expect($this->assemblee->convocations_status)->toBeNull();
+
+    $this->withHeaders($this->auth)->getJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations")
+        ->assertStatus(200)
+        ->assertJsonPath('data.status', 'ready')
+        ->assertJsonPath('data.convocations', []);
+});
+
 it('GET convocations → ready + merged_url + liste', function () {
     Storage::fake('public');
     (new GenerateConvocationsJob($this->assemblee->id))->handle();
 
     $this->withHeaders($this->auth)->getJson("/api/gestionnaire/assemblees/{$this->assemblee->id}/convocations")
         ->assertStatus(200)
-        ->assertJsonPath('status', 'ready')
-        ->assertJsonPath('convocations.0.lot', 'A1')
-        ->assertJsonPath('convocations.0.tantieme', 350)
-        ->assertJsonStructure(['status', 'generated_at', 'merged_url', 'convocations' => [['id', 'coproprietaire_nom', 'lot', 'tantieme', 'url']]]);
+        ->assertJsonPath('status', 'success')
+        ->assertJsonPath('data.status', 'ready')
+        ->assertJsonPath('data.convocations.0.lot', 'A1')
+        ->assertJsonPath('data.convocations.0.tantieme', 350)
+        ->assertJsonStructure(['status', 'data' => ['status', 'generated_at', 'merged_url', 'convocations' => [['id', 'coproprietaire_nom', 'lot', 'tantieme', 'url']]]]);
 });

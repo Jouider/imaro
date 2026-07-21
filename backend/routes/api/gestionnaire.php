@@ -42,9 +42,11 @@ use App\Http\Controllers\Api\Gestionnaire\PointageController;
 use App\Http\Controllers\Api\Gestionnaire\PrestataireController;
 use App\Http\Controllers\Api\Gestionnaire\ProfilController;
 use App\Http\Controllers\Api\Gestionnaire\RecouvrementController;
+use App\Http\Controllers\Api\Gestionnaire\RelanceScenarioController;
 use App\Http\Controllers\Api\Gestionnaire\RemboursementController;
 use App\Http\Controllers\Api\Gestionnaire\ResidenceController;
 use App\Http\Controllers\Api\Gestionnaire\TicketController;
+use App\Http\Controllers\Api\Gestionnaire\TicketSlaConfigController;
 use App\Http\Controllers\Api\Gestionnaire\TravauxExceptionnelController;
 use App\Http\Controllers\Api\Gestionnaire\VirementDeclareController;
 use App\Http\Controllers\Api\Gestionnaire\VisiteController;
@@ -54,7 +56,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/dashboard', [DashboardController::class, 'index']);
 
 // Assistant EMARO — FAQ syndic (KAN-107)
-Route::get('/assistant/faq', [AssistantController::class, 'faq']);
+Route::get('/assistant/faq', [AssistantController::class, 'faq'])->middleware('feature.ia');
 
 // Assistance recouvrement (service optionnel — demande d'accompagnement) — #179
 Route::post('/assistance-recouvrement', [AssistanceRecouvrementController::class, 'store']);
@@ -86,6 +88,9 @@ Route::prefix('residences/{residence}')->group(function () {
     Route::get('/exercices', [ExerciceController::class, 'index']);
     Route::post('/exercices', [ExerciceController::class, 'store']);
     Route::post('/exercices/{exercice}/cloture', [ExerciceController::class, 'cloture']);
+    // KAN-87 — scénario de relance de recouvrement (config par résidence)
+    Route::get('/relance-scenario', [RelanceScenarioController::class, 'show']);
+    Route::put('/relance-scenario', [RelanceScenarioController::class, 'update']);
     // Budget Annexe 5 (per exercice)
     Route::get('/exercices/{exercice}/budget-annexe5', [BudgetAnnexe5Controller::class, 'show']);
     Route::get('/exercices/{exercice}/budget', [BudgetAnnexe5Controller::class, 'showSimple']);
@@ -140,6 +145,11 @@ Route::middleware(['app.permission:recouvrement,finances'])->group(function () {
 });
 
 // Tickets (KAN-21)
+// KAN-89 — config SLA des tickets (rappel auto par gravité). Avant la resource
+// pour que /tickets/sla-config ne soit pas capté par /tickets/{ticket}.
+Route::get('tickets/sla-config', [TicketSlaConfigController::class, 'show']);
+Route::put('tickets/sla-config', [TicketSlaConfigController::class, 'update']);
+
 Route::apiResource('tickets', TicketController::class)->only(['index', 'store', 'show', 'update']);
 Route::post('tickets/{ticket}/clos', [TicketController::class, 'clos']);
 // KAN-88 — assignation d'un ticket à un gestionnaire
@@ -173,6 +183,7 @@ Route::get('/prestataires', [PrestataireController::class, 'index']);
 Route::post('/prestataires/bulk', [PrestataireController::class, 'bulkStore']);
 Route::post('/prestataires', [PrestataireController::class, 'store']);
 Route::put('/prestataires/{prestataire}', [PrestataireController::class, 'update']);
+Route::delete('/prestataires/{prestataire}', [PrestataireController::class, 'destroy']);
 
 Route::get('/contrats', [ContratController::class, 'index']);
 Route::post('/contrats', [ContratController::class, 'store']);
@@ -195,7 +206,7 @@ Route::middleware(['app.permission:finances'])->group(function () {
     Route::post('/budgets/{budget}/soumettre-ag', [BudgetAnnexe5Controller::class, 'soumettreAg']);
     Route::post('/budgets/{budget}/verrouiller', [BudgetAnnexe5Controller::class, 'verrouiller']);
     Route::get('/budgets/{budget}/simulation', [BudgetAnnexe5Controller::class, 'simulation']);
-    Route::get('/budgets/{budget}/suggestions-ia', [BudgetAnnexe5Controller::class, 'suggestionsIa']);
+    Route::get('/budgets/{budget}/suggestions-ia', [BudgetAnnexe5Controller::class, 'suggestionsIa'])->middleware('feature.ia');
 });
 
 // Documents (Sprint 2)
@@ -359,6 +370,9 @@ Route::prefix('comptabilite/exercices/{exercice}')->group(function () {
 // Frontend calls /residences/{id}/comptabilite/exercices
 Route::get('/residences/{residence}/comptabilite/exercices', [ExerciceController::class, 'index']);
 Route::post('/residences/{residence}/comptabilite/exercices', [ExerciceController::class, 'store']);
+// KAN-148 — modification des dates/année + réouverture d'un exercice clôturé
+Route::put('/residences/{residence}/comptabilite/exercices/{exercice}', [ExerciceController::class, 'update']);
+Route::post('/residences/{residence}/comptabilite/exercices/{exercice}/reopen', [ExerciceController::class, 'reopen']);
 
 // Créances (frontend calls /creances)
 Route::middleware(['app.permission:recouvrement,finances'])->group(function () {
@@ -374,7 +388,7 @@ Route::middleware(['app.permission:depenses,finances'])->group(function () {
     Route::get('/depenses-finance/stats', [DepenseFinanceController::class, 'stats']);
     Route::get('/depenses-finance/recurrentes', [DepenseFinanceController::class, 'recurrentes']);
     Route::post('/depenses-finance/recurrentes', [DepenseFinanceController::class, 'storeRecurrente']);
-    Route::post('/depenses-finance/import-ia', [DepenseFinanceController::class, 'importIa']);
+    Route::post('/depenses-finance/import-ia', [DepenseFinanceController::class, 'importIa'])->middleware('feature.ia');
     Route::post('/depenses-finance/recurrentes/{id}/toggle', [DepenseFinanceController::class, 'toggleRecurrente']);
     Route::post('/depenses-finance/{depense}/approuver', [DepenseFinanceController::class, 'approuver']);
     Route::post('/depenses-finance/{depense}/rejeter', [DepenseFinanceController::class, 'rejeter']);
@@ -399,7 +413,7 @@ Route::middleware(['app.permission:finances'])->group(function () {
 Route::delete('/comptabilite/depenses/{depense}', [ComptabiliteController::class, 'depensesDestroy']);
 
 // Import IA comptabilite
-Route::post('/comptabilite/exercices/{exercice}/import-ia', [ComptabiliteController::class, 'importIa']);
+Route::post('/comptabilite/exercices/{exercice}/import-ia', [ComptabiliteController::class, 'importIa'])->middleware('feature.ia');
 
 // ========================================
 // Onboarding wizard (manager-only — enforced in controller)
@@ -416,6 +430,7 @@ Route::middleware(['app.permission:personnel'])->group(function () {
     Route::get('/equipe/utilisateurs', [EquipeUtilisateurController::class, 'index']);
     Route::post('/equipe/utilisateurs', [EquipeUtilisateurController::class, 'store']);
     Route::put('/equipe/utilisateurs/{id}', [EquipeUtilisateurController::class, 'update']);
+    Route::post('/equipe/utilisateurs/{id}/send-credentials', [EquipeUtilisateurController::class, 'sendCredentials']);
     Route::delete('/equipe/utilisateurs/{id}', [EquipeUtilisateurController::class, 'destroy']);
 
     Route::get('/equipe/personnel', [EquipePersonnelController::class, 'index']);

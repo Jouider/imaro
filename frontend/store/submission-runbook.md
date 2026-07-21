@@ -49,6 +49,7 @@ Run everything from `frontend/`. Apple Team ID: **6U4S82LM57**.
 8. **Submit for Review**.
 
 **Caveats**
+
 - Push only functions once the APNs backend (KAN-68) is live; the capability can ship now.
 - Universal Links verify only once `apple-app-site-association` is served at imaro.ma (KAN-71). Until then links open in-browser — harmless.
 
@@ -100,17 +101,17 @@ Run everything from `frontend/`. Apple Team ID: **6U4S82LM57**.
 
 ## Status
 
-| Item | State |
-|---|---|
-| iOS camera purpose string | ✅ shipped |
-| iOS aps-environment = production | ✅ shipped |
-| Android CAMERA permission | ✅ shipped |
-| Android release signing config | ✅ shipped (needs your keystore) |
-| Privacy policy page (loi 09-08) | ✅ shipped at /confidentialite |
-| Store listings FR/AR/EN | ✅ drafted (`listings.md`) |
-| Privacy labels / Data safety | ✅ drafted (`data-safety.md`) |
-| Screenshots | ⬜ capture on device |
-| Demo review account | ⬜ backend (Abdellah) |
-| AASA / assetlinks on imaro.ma | ⬜ backend KAN-71 |
-| APNs / FCM backend (push) | ⬜ backend KAN-68 |
-| Archive + upload + submit | ⬜ you (accounts ready) |
+| Item                             | State                            |
+| -------------------------------- | -------------------------------- |
+| iOS camera purpose string        | ✅ shipped                       |
+| iOS aps-environment = production | ✅ shipped                       |
+| Android CAMERA permission        | ✅ shipped                       |
+| Android release signing config   | ✅ shipped (needs your keystore) |
+| Privacy policy page (loi 09-08)  | ✅ shipped at /confidentialite   |
+| Store listings FR/AR/EN          | ✅ drafted (`listings.md`)       |
+| Privacy labels / Data safety     | ✅ drafted (`data-safety.md`)    |
+| Screenshots                      | ⬜ capture on device             |
+| Demo review account              | ⬜ backend (Abdellah)            |
+| AASA / assetlinks on imaro.ma    | ⬜ backend KAN-71                |
+| APNs / FCM backend (push)        | ⬜ backend KAN-68                |
+| Archive + upload + submit        | ⬜ you (accounts ready)          |

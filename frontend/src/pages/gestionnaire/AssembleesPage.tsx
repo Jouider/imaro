@@ -487,6 +487,10 @@ export function AssembleesPage() {
           <DialogContent
             className={cn(
               detailAG.type === 'ordinaire' ? 'sm:max-w-3xl' : 'max-w-lg',
+              // La liste des convocations peut être longue (1 par lot) : on cape
+              // la hauteur et on rend la modale scrollable au lieu de déborder
+              // hors de l'écran.
+              'max-h-[90vh] overflow-y-auto',
             )}
           >
             <DialogHeader>

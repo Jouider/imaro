@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/authStore'
 import { canAccessRoute } from '@/lib/navAccess'
+import { AI_FEATURES_ENABLED } from '@/lib/features'
 import {
   LayoutDashboard,
   Sparkles,
   Building2,
   Users,
-  UserSquare,
   Wrench,
   Upload,
   Wallet,
@@ -97,14 +97,19 @@ export function CommandPalette() {
       icon: LayoutDashboard,
       to: '/gestionnaire/dashboard',
     },
-    {
-      key: 'nav-ia',
-      group: 'nav',
-      label: t('gestionnaire.nav.ia'),
-      icon: Sparkles,
-      to: '/gestionnaire/ia',
-      hint: 'Audit · OCR · Budget',
-    },
+    // IA masquée temporairement (KAN-111)
+    ...(AI_FEATURES_ENABLED
+      ? [
+          {
+            key: 'nav-ia',
+            group: 'nav' as const,
+            label: t('gestionnaire.nav.ia'),
+            icon: Sparkles,
+            to: '/gestionnaire/ia',
+            hint: 'Audit · OCR · Budget',
+          },
+        ]
+      : []),
     {
       key: 'nav-residences',
       group: 'nav',
@@ -118,13 +123,6 @@ export function CommandPalette() {
       label: t('gestionnaire.nav.coproprietaires'),
       icon: Users,
       to: '/gestionnaire/coproprietaires',
-    },
-    {
-      key: 'nav-occupants',
-      group: 'nav',
-      label: t('gestionnaire.nav.occupants'),
-      icon: UserSquare,
-      to: '/gestionnaire/occupants',
     },
     {
       key: 'nav-prestataires',
@@ -326,14 +324,19 @@ export function CommandPalette() {
       to: '/gestionnaire/paiements',
       shortcut: 'P',
     },
-    {
-      key: 'action-run-audit',
-      group: 'actions',
-      label: t('gestionnaire.cmdk.runAudit'),
-      icon: Sparkles,
-      to: '/gestionnaire/ia',
-      shortcut: 'I',
-    },
+    // Audit IA masqué temporairement (KAN-111)
+    ...(AI_FEATURES_ENABLED
+      ? [
+          {
+            key: 'action-run-audit',
+            group: 'actions' as const,
+            label: t('gestionnaire.cmdk.runAudit'),
+            icon: Sparkles,
+            to: '/gestionnaire/ia',
+            shortcut: 'I',
+          },
+        ]
+      : []),
     {
       key: 'action-new-annexe',
       group: 'actions',

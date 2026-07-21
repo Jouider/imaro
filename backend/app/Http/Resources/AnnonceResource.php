@@ -25,6 +25,7 @@ class AnnonceResource extends JsonResource
             'publiee_at' => $this->publiee_at?->toIso8601String(),
             'date' => ($this->publiee_at ?? $this->created_at)?->toIso8601String(),
             'nb_lectures' => 0,  // TODO: implémenter table lectures_annonce (sprint 3)
+            'likes_count' => (int) ($this->likes_count ?? 0),  // requiert ->withCount('likes')
             'created_at' => $this->created_at?->toIso8601String(),
             'residence' => $this->when($this->relationLoaded('residence') && $this->residence, fn () => [
                 'id' => $this->residence->id,

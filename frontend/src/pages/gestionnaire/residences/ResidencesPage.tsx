@@ -85,10 +85,14 @@ export function ResidencesPage() {
 
   const storeMutation = useMutation({
     mutationFn: (data: CreateResidenceInput) => storeResidence(data),
-    onSuccess: () => {
+    onSuccess: (residence) => {
       void qc.invalidateQueries({ queryKey: ['residences'] })
       setFormOpen(false)
       toast.success(t('gestionnaire.residences.toast.created'))
+      // KAN-113 : enchaîner sur la complétion (immeubles / lots / copropriétaires)
+      // en ouvrant la fiche de la résidence, comme lors de la 1ère création
+      // (onboarding), au lieu de rester sur la liste.
+      navigate(`/gestionnaire/residences/${residence.id}`)
     },
     onError: () => toast.error(t('gestionnaire.residences.toast.createError')),
   })

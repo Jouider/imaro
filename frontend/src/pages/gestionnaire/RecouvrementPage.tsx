@@ -35,6 +35,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
+import { RelanceScenarioCard } from '@/components/gestionnaire/RelanceScenarioCard'
 import { getResidences } from '@/services/gestionnaire.service'
 import {
   getRecouvrement,
@@ -247,6 +248,9 @@ export function RecouvrementPage() {
           </Button>
         </div>
       </div>
+
+      {/* Scénario de relance (KAN-87) */}
+      {residenceId && <RelanceScenarioCard residenceId={residenceId} />}
 
       {/* Penalty configuration form */}
       {showConfig && draftConfig && (

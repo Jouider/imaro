@@ -12,6 +12,7 @@ use App\Models\Residence;
 use App\Models\Tenant;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Models\Visite;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Spatie\Permission\Models\Role;
@@ -73,4 +74,62 @@ it('clore un ticket déclenche un push à l\'auteur', function () {
     $this->withHeaders($this->auth)->postJson("/api/gestionnaire/tickets/{$ticket->id}/clos")->assertStatus(200);
 
     Queue::assertPushed(SendNativePushJob::class, fn ($job) => $job->userId === $this->resident->id && $job->data['route'] === '/portail/reclamations');
+});
+
+it('un walk-in notifie l\'hôte de l\'arrivée du visiteur (KAN-135)', function () {
+    $this->withHeaders($this->auth)->postJson('/api/visites/walk-in', [
+        'residence_id' => $this->residence->id,
+        'visitor_name' => 'Livreur Amazon',
+        'visitor_phone' => '+212622222222',
+        'type' => 'delivery',
+        'host_lot_id' => $this->lot->id,
+    ])->assertStatus(201);
+
+    Queue::assertPushed(SendNativePushJob::class, fn ($job) => $job->userId === $this->resident->id && $job->data['route'] === '/portail');
+});
+
+it('scanner un laissez-passer à l\'arrivée notifie l\'hôte (KAN-135)', function () {
+    $visite = Visite::create([
+        'tenant_id' => $this->tenant->id,
+        'residence_id' => $this->residence->id,
+        'qr_token' => Visite::generateToken(),
+        'visitor_name' => 'Plombier',
+        'visitor_phone' => '+212633333333',
+        'type' => 'contractor',
+        'host_lot_id' => $this->lot->id,
+        'status' => 'planned',
+        'planned_at' => null,
+    ]);
+
+    $this->withHeaders($this->auth)->postJson('/api/visites/scan', ['token' => $visite->qr_token])->assertStatus(200);
+
+    Queue::assertPushed(SendNativePushJob::class, fn ($job) => $job->userId === $this->resident->id && $job->data['route'] === '/portail');
+});
+
+it('un walk-in sans hôte rattaché ne pousse aucune notification (KAN-135)', function () {
+    $this->withHeaders($this->auth)->postJson('/api/visites/walk-in', [
+        'residence_id' => $this->residence->id,
+        'visitor_name' => 'Anonyme',
+        'visitor_phone' => '+212644444444',
+        'type' => 'visitor',
+    ])->assertStatus(201);
+
+    Queue::assertNotPushed(SendNativePushJob::class);
+});
+
+it('publier une annonce crée aussi une notification in-app (KAN-133)', function () {
+    $annonce = Annonce::create([
+        'tenant_id' => $this->tenant->id, 'residence_id' => $this->residence->id, 'created_by' => $this->manager->id,
+        'titre' => 'Coupure eau', 'contenu' => 'Demain matin', 'priorite' => 'urgente', 'statut' => 'brouillon',
+    ]);
+
+    $this->withHeaders($this->auth)->postJson("/api/gestionnaire/annonces/{$annonce->id}/publier")->assertStatus(200);
+
+    // Le push est best-effort (no-op sans FCM/APNs) mais la notification in-app
+    // doit toujours être persistée pour alimenter le centre de notifications.
+    $this->assertDatabaseHas('notifications', [
+        'user_id' => $this->resident->id,
+        'type' => 'info',
+        'read' => false,
+    ]);
 });

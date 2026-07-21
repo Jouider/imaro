@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useResidenceStore } from '@/stores/residenceStore'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { FileText, Download, RefreshCw, Check, Lock } from 'lucide-react'
+import { FileText, Download, Eye, RefreshCw, Check, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -31,6 +31,7 @@ import {
   generateAnnexe131Pdf,
   generateAnnexe132Pdf,
   generateAnnexePdf,
+  setAnnexeOutputMode,
   type Annexe10Row,
 } from '@/lib/annexes-pdf'
 
@@ -195,8 +196,9 @@ export function AnnexesPage() {
     }
   }
 
-  const handleDownload = async (annexeNum: string) => {
+  const handleDownload = async (annexeNum: string, preview = false) => {
     if (!residenceId) return
+    setAnnexeOutputMode(preview ? 'preview' : 'download')
     try {
       // For the 3 required annexes, fetch real data from Abdellah's backend.
       // Fall back to client-aggregates / zero defaults on error.
@@ -271,13 +273,16 @@ export function AnnexesPage() {
         // Annexes 3, 4, 5, 6, 7, 8, 9, 11, 12 — backend not ready yet
         await generateAnnexePdf(annexeNum, commonCtx)
       }
-      toast.success(t('gestionnaire.annexes.downloaded', { num: annexeNum }))
+      if (!preview)
+        toast.success(t('gestionnaire.annexes.downloaded', { num: annexeNum }))
     } catch (err) {
       toast.error(
         err instanceof Error
           ? err.message
           : `Impossible de générer l'annexe ${annexeNum}`,
       )
+    } finally {
+      setAnnexeOutputMode('download')
     }
   }
 
@@ -374,6 +379,7 @@ export function AnnexesPage() {
               required
               onRegenerate={() => regenMut.mutate(a.num)}
               onDownload={() => handleDownload(a.num)}
+              onPreview={() => handleDownload(a.num, true)}
               loading={regenMut.isPending && regenMut.variables === a.num}
             />
           ))}
@@ -395,6 +401,7 @@ export function AnnexesPage() {
               lastGenerated={a.last_generated}
               onRegenerate={() => regenMut.mutate(a.num)}
               onDownload={() => handleDownload(a.num)}
+              onPreview={() => handleDownload(a.num, true)}
               loading={regenMut.isPending && regenMut.variables === a.num}
             />
           ))}
@@ -411,6 +418,7 @@ function AnnexeCard({
   required,
   onRegenerate,
   onDownload,
+  onPreview,
   loading,
 }: {
   num: string
@@ -420,6 +428,7 @@ function AnnexeCard({
   required?: boolean
   onRegenerate: () => void
   onDownload: () => void
+  onPreview: () => void
   loading: boolean
 }) {
   const { t } = useTranslation()
@@ -472,6 +481,16 @@ function AnnexeCard({
         >
           <RefreshCw className={cn('size-3.5', loading && 'animate-spin')} />
           {t('gestionnaire.annexes.regenerate')}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5"
+          disabled={!available}
+          onClick={onPreview}
+        >
+          <Eye className="size-3.5" />
+          {t('gestionnaire.annexes.preview', { defaultValue: 'Aperçu' })}
         </Button>
         <Button
           variant="default"

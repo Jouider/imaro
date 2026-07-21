@@ -8,15 +8,10 @@ use App\Models\Ticket;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class PortailReclamationController extends Controller
 {
-    /** Catégorie → libellé affiché (la table tickets n'a pas de colonne titre). */
-    private const LABELS = [
-        'plomberie' => 'Plomberie', 'electricite' => 'Électricité', 'ascenseur' => 'Ascenseur',
-        'proprete' => 'Propreté', 'securite' => 'Sécurité', 'autre' => 'Réclamation',
-    ];
-
     /** Priorité front (basse/normale/haute/urgente) → enum tickets (faible/normal/urgent). */
     private const PRIORITE_MAP = [
         'basse' => 'faible', 'faible' => 'faible',
@@ -41,11 +36,15 @@ class PortailReclamationController extends Controller
                     // Référence persistée et partagée avec le gestionnaire (KAN-105).
                     'reference' => $t->reference ?? 'TKT-'.($t->created_at?->format('Y') ?? date('Y')).'-'.str_pad((string) $t->id, 3, '0', STR_PAD_LEFT),
                     'categorie' => $t->categorie,
-                    'sujet' => $sujet !== '' ? Str::limit($sujet, 80) : (self::LABELS[$t->categorie] ?? 'Réclamation'),
+                    'sujet' => $sujet !== '' ? Str::limit($sujet, 80) : (Ticket::CATEGORIE_LABELS[$t->categorie] ?? 'Réclamation'),
                     'statut' => $t->statut,
                     'priorite' => $t->priorite,
                     'created_at' => $t->created_at?->toIso8601String(),
                     'nb_photos' => is_array($t->images) ? count($t->images) : 0,
+                    // Avis de satisfaction déjà donné (KAN-90) : note >= 3 → satisfait.
+                    'rating' => $t->note_satisfaction === null
+                        ? null
+                        : ($t->note_satisfaction >= 3 ? 'satisfait' : 'insatisfait'),
                 ];
             });
 
@@ -58,7 +57,7 @@ class PortailReclamationController extends Controller
             'titre' => 'nullable|string|max:255',
             'sujet' => 'nullable|string|max:255',
             'description' => 'required|string',
-            'categorie' => 'nullable|in:plomberie,electricite,ascenseur,proprete,securite,autre',
+            'categorie' => ['nullable', Rule::in(Ticket::CATEGORIES)],
             'priorite' => 'nullable|string',
         ]);
 
@@ -86,5 +85,33 @@ class PortailReclamationController extends Controller
             'message' => 'Réclamation envoyée.',
             'data' => ['id' => $ticket->id],
         ], 201);
+    }
+
+    /**
+     * PATCH /api/portail/reclamations/{id}/rating (KAN-90)
+     * Avis de satisfaction du résident après résolution. Binaire côté front
+     * (satisfait/insatisfait) → stocké dans note_satisfaction (5 / 1).
+     */
+    public function rating(Request $request, int $id): JsonResponse
+    {
+        $data = $request->validate([
+            'rating' => ['required', Rule::in(['satisfait', 'insatisfait'])],
+        ]);
+
+        // findOrFail scoping sur user_id : un 404 couvre "introuvable" et "pas le sien".
+        $ticket = Ticket::where('user_id', $request->user()->id)->findOrFail($id);
+        abort_unless(
+            in_array($ticket->statut, ['resolu', 'clos'], true),
+            422,
+            'La réclamation doit être traitée avant de pouvoir être évaluée.'
+        );
+
+        $ticket->update(['note_satisfaction' => $data['rating'] === 'satisfait' ? 5 : 1]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Merci pour votre retour.',
+            'data' => ['rating' => $data['rating']],
+        ]);
     }
 }

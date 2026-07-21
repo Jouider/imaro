@@ -9,6 +9,8 @@ import {
   Wallet,
   AlertCircle,
   Plus,
+  Pencil,
+  RotateCcw,
   Download,
   Sparkles,
   BookOpen,
@@ -23,6 +25,8 @@ import {
   ChevronRight,
   ArrowDownToLine,
   ArrowUpFromLine,
+  Check,
+  ChevronsUpDown,
 } from 'lucide-react'
 import {
   BarChart,
@@ -48,7 +52,12 @@ import {
   storeEncaissement,
   importFactureIa,
   cloturerExercice,
+  createExercice,
+  updateExercice,
+  reopenExercice,
   getComptesPcg,
+  exportComptabilite,
+  type ExportComptableFormat,
   type ExerciceComptable,
   type EcritureComptable,
   type Depense,
@@ -65,6 +74,7 @@ import {
   generateBalancePdf,
   generateGrandLivrePdf,
 } from '@/lib/pdf-reports'
+import { getPrestataires } from '@/services/prestataires.service'
 import { ResidenceFilter } from '@/components/shared'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { KpiCard } from '@/components/shared/KpiCard'
@@ -76,6 +86,19 @@ import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -93,6 +116,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { AI_FEATURES_ENABLED } from '@/lib/features'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -105,6 +129,22 @@ const TYPE_BADGE_STYLES: Record<EcritureComptable['type'], string> = {
   virement: 'bg-blue-100 text-blue-700',
   cloture: 'bg-gray-100 text-gray-600',
   report: 'bg-purple-100 text-purple-700',
+}
+
+/**
+ * Le backend (`StoreDepenseRequest`) exige `description` + `categorie` ; le
+ * formulaire comptable travaille avec un compte PCG (`compte_charge`). On
+ * reconstruit la catégorie à partir du compte pour que la création passe la
+ * validation ET que la ventilation au journal reste correcte (KAN-124).
+ */
+const COMPTE_TO_CATEGORIE: Record<string, string> = {
+  '6135': 'entretien',
+  '6138': 'gardiennage',
+  '6131': 'nettoyage',
+  '6136': 'assurance',
+  '6171': 'administratif',
+  '6134': 'travaux',
+  '6188': 'autre',
 }
 
 const MODE_BADGE_STYLES: Record<Depense['mode_paiement'], string> = {
@@ -227,6 +267,13 @@ function NouvelleDepenseModal({
     queryFn: () => getComptesPcg(),
   })
 
+  // Liste des prestataires pour l'autocomplétion (KAN-120).
+  const { data: prestataires = [] } = useQuery({
+    queryKey: ['prestataires'],
+    queryFn: () => getPrestataires(),
+    enabled: open,
+  })
+
   const compteClasse6 = comptes.filter(
     (c) =>
       c.classe === 6 &&
@@ -236,10 +283,13 @@ function NouvelleDepenseModal({
   const mutation = useMutation({
     mutationFn: () => {
       const fd = new FormData()
+      // Champs attendus par le backend : `description` + `categorie`.
       fd.append('titre', form.titre)
+      fd.append('description', form.titre)
       fd.append('montant', form.montant)
       fd.append('date', form.date)
       fd.append('compte_charge', form.compte_charge)
+      fd.append('categorie', COMPTE_TO_CATEGORIE[form.compte_charge] ?? 'autre')
       fd.append('mode_paiement', form.mode_paiement)
       if (form.prestataire) fd.append('prestataire', form.prestataire)
       if (form.justificatif) fd.append('justificatif', form.justificatif)
@@ -301,18 +351,21 @@ function NouvelleDepenseModal({
                 defaultValue: 'Nouvelle dépense',
               })}
             </DialogTitle>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setShowIa((v) => !v)}
-              className="flex items-center gap-1.5 text-xs"
-            >
-              <Sparkles className="size-3.5 text-purple-500" />
-              {t('gestionnaire.comptabilite.depenses.form.importIa', {
-                defaultValue: 'Import IA',
-              })}
-            </Button>
+            {/* Import IA masqué temporairement (KAN-111) */}
+            {AI_FEATURES_ENABLED && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowIa((v) => !v)}
+                className="flex items-center gap-1.5 text-xs"
+              >
+                <Sparkles className="size-3.5 text-purple-500" />
+                {t('gestionnaire.comptabilite.depenses.form.importIa', {
+                  defaultValue: 'Import IA',
+                })}
+              </Button>
+            )}
           </div>
         </DialogHeader>
 
@@ -534,10 +587,16 @@ function NouvelleDepenseModal({
               onChange={(e) =>
                 setForm((f) => ({ ...f, prestataire: e.target.value }))
               }
+              list="depense-prestataires"
               placeholder={t(
                 'gestionnaire.comptabilite.prestataireNamePlaceholder',
               )}
             />
+            <datalist id="depense-prestataires">
+              {prestataires.map((p) => (
+                <option key={p.id} value={p.name} />
+              ))}
+            </datalist>
           </div>
 
           <div className="space-y-1">
@@ -876,47 +935,106 @@ function EncaisserModal({
 
 // ─── ExportDropdown ───────────────────────────────────────────────────────────
 
-function ExportDropdown() {
+function ExportDropdown({
+  exerciceId,
+  annee,
+  hasEcritures,
+}: {
+  exerciceId: number
+  annee?: number
+  hasEcritures: boolean
+}) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
+  const [pending, setPending] = useState<ExportComptableFormat | null>(null)
 
-  const items = [
+  const items: {
+    icon: string
+    format: ExportComptableFormat
+    label: string
+  }[] = [
     {
       icon: '📊',
+      format: 'journal-xlsx',
       label: t('gestionnaire.comptabilite.export.excelJournal', {
         defaultValue: 'Excel — Journal complet',
       }),
     },
     {
       icon: '📊',
+      format: 'grand-livre-xlsx',
       label: t('gestionnaire.comptabilite.export.excelGrandLivre', {
         defaultValue: 'Excel — Grand-Livre',
       }),
     },
     {
       icon: '📋',
+      format: 'fec',
       label: t('gestionnaire.comptabilite.export.sageFec', {
         defaultValue: 'Sage FEC',
       }),
     },
     {
       icon: '📄',
+      format: 'journal-pdf',
       label: t('gestionnaire.comptabilite.export.pdfJournal', {
         defaultValue: 'PDF — Journal',
       }),
     },
     {
       icon: '📄',
+      format: 'balance-pdf',
       label: t('gestionnaire.comptabilite.export.pdfBalance', {
         defaultValue: 'PDF — Balance',
       }),
     },
   ]
 
+  async function handleExport(format: ExportComptableFormat) {
+    setPending(format)
+    const toastId = toast.loading(t('common.exportInProgress'))
+    try {
+      const filename = await exportComptabilite(exerciceId, format, annee)
+      toast.success(
+        t('gestionnaire.comptabilite.export.success', {
+          defaultValue: 'Export téléchargé : {{filename}}',
+          filename,
+        }),
+        { id: toastId },
+      )
+      setOpen(false)
+    } catch {
+      toast.error(
+        t('gestionnaire.comptabilite.export.error', {
+          defaultValue: "Échec de l'export. Veuillez réessayer.",
+        }),
+        { id: toastId },
+      )
+    } finally {
+      setPending(null)
+    }
+  }
+
   return (
     <div className="relative">
-      <Button variant="outline" size="sm" onClick={() => setOpen((v) => !v)}>
-        <Download className="me-1.5 size-4" />
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setOpen((v) => !v)}
+        disabled={!hasEcritures || pending !== null}
+        title={
+          hasEcritures
+            ? undefined
+            : t('gestionnaire.comptabilite.export.empty', {
+                defaultValue: 'Aucune écriture à exporter pour cet exercice',
+              })
+        }
+      >
+        {pending !== null ? (
+          <Loader2 className="me-1.5 size-4 animate-spin" />
+        ) : (
+          <Download className="me-1.5 size-4" />
+        )}
         {t('gestionnaire.comptabilite.export.title', {
           defaultValue: 'Exporter',
         })}
@@ -933,15 +1051,17 @@ function ExportDropdown() {
           <div className="absolute end-0 top-full z-20 mt-1 w-56 rounded-lg border bg-white p-1 shadow-lg dark:bg-card">
             {items.map((item) => (
               <button
-                key={item.label}
+                key={item.format}
                 type="button"
-                onClick={() => {
-                  setOpen(false)
-                  toast.success(t('common.exportInProgress'))
-                }}
-                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-muted"
+                disabled={pending !== null}
+                onClick={() => void handleExport(item.format)}
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <span>{item.icon}</span>
+                {pending === item.format ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <span>{item.icon}</span>
+                )}
                 {item.label}
               </button>
             ))}
@@ -1428,24 +1548,20 @@ type GrandLivreLigne = GrandLivreCompte['lignes'][number]
 function TabGrandLivre({ exerciceId }: { exerciceId: number }) {
   const { t } = useTranslation()
   const [selectedCompte, setSelectedCompte] = useState<string>('')
-  const [compteSearch, setCompteSearch] = useState('')
+  const [comboOpen, setComboOpen] = useState(false)
 
   const { data: comptes = [] } = useQuery({
     queryKey: ['comptes-pcg'],
     queryFn: () => getComptesPcg(),
   })
 
+  const selectedCompteObj = comptes.find((c) => c.numero === selectedCompte)
+
   const { data: grandLivre, isLoading } = useQuery({
     queryKey: ['grand-livre', exerciceId, selectedCompte],
     queryFn: () => getGrandLivre(exerciceId, selectedCompte),
     enabled: !!selectedCompte,
   })
-
-  const filteredComptes = comptes.filter(
-    (c) =>
-      c.numero.includes(compteSearch) ||
-      c.libelle.toLowerCase().includes(compteSearch.toLowerCase()),
-  )
 
   const glColumns: Column<GrandLivreLigne>[] = [
     {
@@ -1509,31 +1625,64 @@ function TabGrandLivre({ exerciceId }: { exerciceId: number }) {
               defaultValue: 'Compte PCG',
             })}
           </Label>
-          <Input
-            value={compteSearch}
-            onChange={(e) => setCompteSearch(e.target.value)}
-            placeholder={t('gestionnaire.comptabilite.filterAccounts')}
-            className="mb-1 w-52"
-          />
-          <Select value={selectedCompte} onValueChange={setSelectedCompte}>
-            <SelectTrigger className="w-72">
-              <SelectValue
-                placeholder={t(
-                  'gestionnaire.comptabilite.grandLivre.selectCompte',
-                  {
-                    defaultValue: 'Sélectionner un compte...',
-                  },
-                )}
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {filteredComptes.map((c) => (
-                <SelectItem key={c.numero} value={c.numero}>
-                  {c.numero} — {c.libelle}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Combobox recherchable : le filtre est intégré au menu (KAN-126). */}
+          <Popover open={comboOpen} onOpenChange={setComboOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={comboOpen}
+                className="w-72 justify-between font-normal"
+              >
+                <span className="truncate">
+                  {selectedCompteObj
+                    ? `${selectedCompteObj.numero} — ${selectedCompteObj.libelle}`
+                    : t('gestionnaire.comptabilite.grandLivre.selectCompte', {
+                        defaultValue: 'Sélectionner un compte...',
+                      })}
+                </span>
+                <ChevronsUpDown className="ms-2 size-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72 p-0" align="start">
+              <Command>
+                <CommandInput
+                  placeholder={t('gestionnaire.comptabilite.filterAccounts')}
+                />
+                <CommandList>
+                  <CommandEmpty>
+                    {t('gestionnaire.comptabilite.grandLivre.noCompte', {
+                      defaultValue: 'Aucun compte trouvé.',
+                    })}
+                  </CommandEmpty>
+                  <CommandGroup>
+                    {comptes.map((c) => (
+                      <CommandItem
+                        key={c.numero}
+                        value={`${c.numero} ${c.libelle}`}
+                        onSelect={() => {
+                          setSelectedCompte(c.numero)
+                          setComboOpen(false)
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            'me-2 size-4',
+                            selectedCompte === c.numero
+                              ? 'opacity-100'
+                              : 'opacity-0',
+                          )}
+                        />
+                        <span className="truncate">
+                          {c.numero} — {c.libelle}
+                        </span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
@@ -2101,13 +2250,38 @@ function CheckItem({ ok, label }: { ok: boolean; label: string }) {
 function TabCloture({
   exercice,
   exerciceId,
+  residenceId,
 }: {
   exercice: ExerciceComptable | undefined
   exerciceId: number
+  residenceId: number
 }) {
   const { t } = useTranslation()
   const qc = useQueryClient()
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [reopenOpen, setReopenOpen] = useState(false)
+
+  const reopenMutation = useMutation({
+    mutationFn: () => reopenExercice(residenceId, exerciceId),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['exercices-comptabilite'] })
+      setReopenOpen(false)
+      toast.success(
+        t('gestionnaire.comptabilite.cloture.toastReopened', {
+          defaultValue: 'Exercice rouvert',
+        }),
+      )
+    },
+    onError: (err: unknown) => {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ??
+        t('gestionnaire.comptabilite.cloture.reopenError', {
+          defaultValue: "Impossible de rouvrir l'exercice",
+        })
+      toast.error(message)
+    },
+  })
 
   const { data: ecritures = [] } = useQuery({
     queryKey: ['journal', exerciceId],
@@ -2137,26 +2311,61 @@ function TabCloture({
   const hasEcritures = ecritures.length > 0
   const allChecksPass = isBalanced && hasClasse6 && hasClasse7 && hasEcritures
 
-  if (exercice?.statut === 'clos') {
+  if (exercice && exercice.statut !== 'actif') {
     return (
-      <Card className="border-green-200 bg-green-50 dark:bg-green-950/20">
-        <CardContent className="pt-6">
-          <div className="flex flex-col items-center gap-3 text-center">
-            <CheckCircle2 className="size-12 text-green-600" />
-            <p className="text-lg font-semibold text-green-800 dark:text-green-200">
-              {t('gestionnaire.comptabilite.cloture.already_clos', {
-                defaultValue: 'Exercice clôturé',
-              })}
-            </p>
-            <p className="text-sm text-green-700 dark:text-green-300">
-              {t('gestionnaire.comptabilite.cloture.clos_msg', {
-                defaultValue: 'Cet exercice a été clôturé le',
-              })}{' '}
-              <strong>{exercice.date_cloture ?? '—'}</strong>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <>
+        <Card className="border-green-200 bg-green-50 dark:bg-green-950/20">
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center gap-3 text-center">
+              <CheckCircle2 className="size-12 text-green-600" />
+              <p className="text-lg font-semibold text-green-800 dark:text-green-200">
+                {t('gestionnaire.comptabilite.cloture.already_clos', {
+                  defaultValue: 'Exercice clôturé',
+                })}
+              </p>
+              <p className="text-sm text-green-700 dark:text-green-300">
+                {t('gestionnaire.comptabilite.cloture.clos_msg_range', {
+                  defaultValue: 'Exercice clôturé — période du',
+                })}{' '}
+                <strong>{exercice.date_debut}</strong>{' '}
+                {t('common.to', { defaultValue: 'au' })}{' '}
+                <strong>{exercice.date_fin}</strong>.
+              </p>
+              {/* Réouverture (KAN-148) — corrections après clôture */}
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={() => setReopenOpen(true)}
+                disabled={reopenMutation.isPending}
+              >
+                <RotateCcw className="me-1.5 size-4" />
+                {t('gestionnaire.comptabilite.cloture.reopen', {
+                  defaultValue: "Rouvrir l'exercice",
+                })}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <ConfirmModal
+          open={reopenOpen}
+          onOpenChange={setReopenOpen}
+          title={t('gestionnaire.comptabilite.cloture.reopenTitle', {
+            defaultValue: "Rouvrir l'exercice ?",
+          })}
+          description={t('gestionnaire.comptabilite.cloture.reopenMsg', {
+            defaultValue:
+              "L'exercice redeviendra modifiable. Un seul exercice peut être actif à la fois : clôturez l'exercice courant au préalable si nécessaire.",
+          })}
+          confirmLabel={t('gestionnaire.comptabilite.cloture.reopen', {
+            defaultValue: "Rouvrir l'exercice",
+          })}
+          variant="default"
+          onConfirm={() => reopenMutation.mutate()}
+          isLoading={reopenMutation.isPending}
+        />
+      </>
     )
   }
 
@@ -2491,9 +2700,153 @@ function TabRapports({
 
 // ─── ComptabilitePage ─────────────────────────────────────────────────────────
 
+// ─── Exercice — création / modification (KAN-148) ─────────────────────────────
+
+function ExerciceFormModal({
+  open,
+  onOpenChange,
+  residenceId,
+  exercice,
+}: {
+  open: boolean
+  onOpenChange: (o: boolean) => void
+  residenceId: number
+  exercice?: ExerciceComptable
+}) {
+  const { t } = useTranslation()
+  const qc = useQueryClient()
+  const isEdit = !!exercice
+  const thisYear = new Date().getFullYear()
+  const [annee, setAnnee] = useState(String(exercice?.annee ?? thisYear))
+  const [dateDebut, setDateDebut] = useState(
+    exercice?.date_debut ?? `${thisYear}-01-01`,
+  )
+  const [dateFin, setDateFin] = useState(
+    exercice?.date_fin ?? `${thisYear}-12-31`,
+  )
+
+  const mutation = useMutation({
+    mutationFn: () => {
+      const payload = {
+        annee: Number(annee),
+        date_debut: dateDebut,
+        date_fin: dateFin,
+      }
+      return isEdit
+        ? updateExercice(residenceId, exercice.id, payload)
+        : createExercice(residenceId, payload)
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['exercices-comptabilite'] })
+      onOpenChange(false)
+      toast.success(
+        isEdit
+          ? t('gestionnaire.comptabilite.exercices.toastUpdated', {
+              defaultValue: 'Exercice mis à jour',
+            })
+          : t('gestionnaire.comptabilite.exercices.toastCreated', {
+              defaultValue: 'Exercice créé',
+            }),
+      )
+    },
+    onError: (err: unknown) => {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? t('common.error')
+      toast.error(message)
+    },
+  })
+
+  const valid =
+    Number(annee) >= 2000 &&
+    Number(annee) <= 2100 &&
+    !!dateDebut &&
+    !!dateFin &&
+    dateFin > dateDebut
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>
+            {isEdit
+              ? t('gestionnaire.comptabilite.exercices.editTitle', {
+                  defaultValue: "Modifier l'exercice",
+                })
+              : t('gestionnaire.comptabilite.exercices.newTitle', {
+                  defaultValue: 'Nouvel exercice',
+                })}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3 py-2">
+          <div className="space-y-1">
+            <Label>
+              {t('gestionnaire.comptabilite.exercices.annee', {
+                defaultValue: 'Année',
+              })}
+            </Label>
+            <Input
+              type="number"
+              min={2000}
+              max={2100}
+              value={annee}
+              onChange={(e) => setAnnee(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label>
+              {t('gestionnaire.comptabilite.exercices.dateDebut', {
+                defaultValue: 'Date de début',
+              })}
+            </Label>
+            <Input
+              type="date"
+              value={dateDebut}
+              onChange={(e) => setDateDebut(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label>
+              {t('gestionnaire.comptabilite.exercices.dateFin', {
+                defaultValue: 'Date de fin',
+              })}
+            </Label>
+            <Input
+              type="date"
+              value={dateFin}
+              onChange={(e) => setDateFin(e.target.value)}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={mutation.isPending}
+          >
+            {t('actions.cancel', { defaultValue: 'Annuler' })}
+          </Button>
+          <Button
+            onClick={() => mutation.mutate()}
+            disabled={!valid || mutation.isPending}
+          >
+            {mutation.isPending
+              ? t('actions.loading', { defaultValue: '…' })
+              : t('actions.save', { defaultValue: 'Enregistrer' })}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export function ComptabilitePage() {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard')
+  // Exercice lifecycle modal (KAN-148) — 'create' | edit target.
+  const [exerciceModal, setExerciceModal] = useState<
+    { mode: 'create' } | { mode: 'edit'; exercice: ExerciceComptable } | null
+  >(null)
   const [depenseModalOpen, setDepenseModalOpen] = useState(false)
   const [encaisserModalOpen, setEncaisserModalOpen] = useState(false)
 
@@ -2514,16 +2867,25 @@ export function ComptabilitePage() {
     queryFn: () => getExercicesComptabilite(residenceId),
   })
 
-  // Default to first open exercice, else first one
+  // Default to the active exercice, else the most recent one
   const defaultExercice =
-    exercices.find((e) => e.statut === 'ouvert') ?? exercices[0]
+    exercices.find((e) => e.statut === 'actif') ?? exercices[0]
   const [selectedExerciceId, setSelectedExerciceId] = useState<number | null>(
     null,
   )
 
   const exerciceId = selectedExerciceId ?? defaultExercice?.id ?? 1
   const currentExercice = exercices.find((e) => e.id === exerciceId)
-  const exerciceClos = currentExercice?.statut === 'clos'
+  const exerciceClos = currentExercice?.statut !== 'actif'
+
+  // Lightweight check so the Export button can be disabled when there is
+  // nothing to export (KAN-101). Reuses the same cache key as the Rapports tab.
+  const { data: journalEcritures = [] } = useQuery({
+    queryKey: ['journal', exerciceId],
+    queryFn: () => getJournal(exerciceId),
+    enabled: exerciceId > 0,
+  })
+  const hasEcritures = journalEcritures.length > 0
 
   const currentResidence = residences.find((r) => r.id === residenceId)
   const residenceName =
@@ -2616,21 +2978,28 @@ export function ComptabilitePage() {
                 defaultValue: 'Encaisser',
               })}
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="border-purple-300 text-purple-700 hover:bg-purple-50"
-              onClick={() => {
-                setDepenseModalOpen(true)
-              }}
-              disabled={exerciceClos}
-            >
-              <Sparkles className="me-1.5 size-4" />
-              {t('gestionnaire.comptabilite.depenses.form.importIa', {
-                defaultValue: 'Import IA',
-              })}
-            </Button>
-            <ExportDropdown />
+            {/* Bouton « Import IA » masqué temporairement (KAN-111) */}
+            {AI_FEATURES_ENABLED && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-purple-300 text-purple-700 hover:bg-purple-50"
+                onClick={() => {
+                  setDepenseModalOpen(true)
+                }}
+                disabled={exerciceClos}
+              >
+                <Sparkles className="me-1.5 size-4" />
+                {t('gestionnaire.comptabilite.depenses.form.importIa', {
+                  defaultValue: 'Import IA',
+                })}
+              </Button>
+            )}
+            <ExportDropdown
+              exerciceId={exerciceId}
+              annee={currentExercice?.annee}
+              hasEcritures={hasEcritures}
+            />
           </div>
         }
       />
@@ -2665,6 +3034,32 @@ export function ComptabilitePage() {
             ))}
           </SelectContent>
         </Select>
+
+        {/* Gestion du cycle de vie de l'exercice (KAN-148) */}
+        {currentExercice && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8"
+            onClick={() =>
+              setExerciceModal({ mode: 'edit', exercice: currentExercice })
+            }
+          >
+            <Pencil className="me-1.5 size-3.5" />
+            {t('actions.edit', { defaultValue: 'Modifier' })}
+          </Button>
+        )}
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8"
+          onClick={() => setExerciceModal({ mode: 'create' })}
+        >
+          <Plus className="me-1.5 size-3.5" />
+          {t('gestionnaire.comptabilite.exercices.newTitle', {
+            defaultValue: 'Nouvel exercice',
+          })}
+        </Button>
 
         {/* Residence is scoped globally via the sidebar selector (KAN-47). */}
       </div>
@@ -2717,7 +3112,11 @@ export function ComptabilitePage() {
         />
       )}
       {activeTab === 'cloture' && (
-        <TabCloture exercice={currentExercice} exerciceId={exerciceId} />
+        <TabCloture
+          exercice={currentExercice}
+          exerciceId={exerciceId}
+          residenceId={residenceId}
+        />
       )}
 
       {/* Modals */}
@@ -2732,6 +3131,23 @@ export function ComptabilitePage() {
         onOpenChange={setEncaisserModalOpen}
         exerciceId={exerciceId}
       />
+      {/* Création / modification d'exercice (KAN-148) — remount via key pour
+          réinitialiser les champs selon le mode/l'exercice ciblé. */}
+      {exerciceModal && (
+        <ExerciceFormModal
+          key={
+            exerciceModal.mode === 'edit'
+              ? `edit-${exerciceModal.exercice.id}`
+              : 'create'
+          }
+          open
+          onOpenChange={(o) => !o && setExerciceModal(null)}
+          residenceId={residenceId}
+          exercice={
+            exerciceModal.mode === 'edit' ? exerciceModal.exercice : undefined
+          }
+        />
+      )}
     </div>
   )
 }

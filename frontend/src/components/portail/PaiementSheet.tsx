@@ -11,9 +11,11 @@ import {
   Loader2,
   QrCode,
   Upload,
+  Sparkles,
 } from 'lucide-react'
 import {
   declarePaiement,
+  analyserJustificatifOcr,
   getMyResidenceBankAccounts,
   type PaiementMethode,
   type PortailBankAccount,
@@ -84,7 +86,58 @@ export function PaiementSheet({
   const [methode, setMethode] = useState<PaiementMethode>('virement')
   const [reference, setReference] = useState('')
   const [justificatif, setJustificatif] = useState<File | null>(null)
+  const [ocrLoading, setOcrLoading] = useState(false)
   const [wasOpen, setWasOpen] = useState(false)
+
+  const VALID_METHODES: PaiementMethode[] = [
+    'virement',
+    'versement',
+    'cheque',
+    'especes',
+  ]
+
+  // Analyse OCR du justificatif (KAN-84) : préremplit les champs vides détectés.
+  // Best-effort : aucune valeur inventée, l'utilisateur vérifie/corrige.
+  async function handleJustificatifChange(file: File | null) {
+    setJustificatif(file)
+    if (!file) return
+    setOcrLoading(true)
+    try {
+      const { ocr_ok, champs } = await analyserJustificatifOcr(file)
+      if (!ocr_ok) return
+      let prefilled = false
+      if (champs.montant != null && montant.trim() === '') {
+        setMontant(String(champs.montant))
+        prefilled = true
+      }
+      if (champs.date) {
+        setDate(champs.date)
+        prefilled = true
+      }
+      if (
+        champs.methode &&
+        VALID_METHODES.includes(champs.methode as PaiementMethode)
+      ) {
+        setMethode(champs.methode as PaiementMethode)
+        prefilled = true
+      }
+      if (champs.reference && reference.trim() === '') {
+        setReference(champs.reference)
+        prefilled = true
+      }
+      if (prefilled) {
+        toast.success(
+          t('portail.paiement.ocr.prefilled', {
+            defaultValue: 'Champs pré-remplis depuis le justificatif',
+          }),
+        )
+      }
+    } catch {
+      // Best-effort : on ignore, saisie manuelle.
+    } finally {
+      setOcrLoading(false)
+    }
+  }
 
   const { data: accounts = [], isLoading } = useQuery({
     queryKey: ['portail-bank-accounts'],
@@ -392,15 +445,22 @@ export function PaiementSheet({
               type="file"
               accept="image/*,application/pdf"
               className="hidden"
-              onChange={(e) => setJustificatif(e.target.files?.[0] ?? null)}
+              onChange={(e) =>
+                void handleJustificatifChange(e.target.files?.[0] ?? null)
+              }
             />
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="flex w-full items-center gap-3 rounded-xl border border-dashed px-4 py-3 text-start text-sm hover:border-[var(--color-imaro-primary)]/50"
+              disabled={ocrLoading}
+              className="flex w-full items-center gap-3 rounded-xl border border-dashed px-4 py-3 text-start text-sm hover:border-[var(--color-imaro-primary)]/50 disabled:opacity-70"
             >
               <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-imaro-primary-tint)] text-[var(--color-imaro-primary)]">
-                <Upload className="size-5" />
+                {ocrLoading ? (
+                  <Loader2 className="size-5 animate-spin" />
+                ) : (
+                  <Upload className="size-5" />
+                )}
               </span>
               <span className="min-w-0 flex-1">
                 {justificatif ? (
@@ -414,6 +474,14 @@ export function PaiementSheet({
                 )}
               </span>
             </button>
+            {ocrLoading && (
+              <p className="flex items-center gap-1.5 text-xs text-[var(--color-imaro-primary)]">
+                <Sparkles className="size-3.5" />
+                {t('portail.paiement.ocr.analyzing', {
+                  defaultValue: 'Analyse du justificatif…',
+                })}
+              </p>
+            )}
           </div>
 
           <Button

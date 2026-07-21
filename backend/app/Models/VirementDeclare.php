@@ -21,7 +21,7 @@ class VirementDeclare extends Model
     protected function casts(): array
     {
         return [
-            'montant'         => 'float',
+            'montant' => 'float',
             'date_declaration' => 'date',
             'date_validation' => 'datetime',
         ];
@@ -40,5 +40,10 @@ class VirementDeclare extends Model
     public function validePar(): BelongsTo
     {
         return $this->belongsTo(User::class, 'valide_par');
+    }
+
+    public function paiement(): BelongsTo
+    {
+        return $this->belongsTo(Paiement::class);
     }
 }

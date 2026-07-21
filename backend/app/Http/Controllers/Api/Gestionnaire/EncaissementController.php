@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Gestionnaire;
 
+use App\Http\Controllers\Api\Gestionnaire\Concerns\GuardsClosedExercice;
 use App\Http\Controllers\Controller;
 use App\Jobs\GenerateRecuPaiementJob;
 use App\Models\AppelFondsLigne;
@@ -12,6 +13,8 @@ use Illuminate\Http\Request;
 
 class EncaissementController extends Controller
 {
+    use GuardsClosedExercice;
+
     /**
      * GET /api/gestionnaire/encaissements
      */
@@ -48,6 +51,11 @@ class EncaissementController extends Controller
             'est_avance' => false,
             'recu_path' => null,
             'est_rapproche' => false,
+            // Suivi chèque impayé (KAN-85 / #338) — mêmes champs que PaiementResource,
+            // pour que le badge « Chèque rejeté » persiste après refetch.
+            'statut' => $p->statut ?? 'valide',
+            'cheque_rejete_at' => $p->cheque_rejete_at?->toIso8601String(),
+            'motif_rejet' => $p->motif_rejet,
         ]);
 
         return response()->json([
@@ -76,6 +84,8 @@ class EncaissementController extends Controller
             $ligne = AppelFondsLigne::with('appelFonds')->find($validated['creance_id']);
         }
 
+        $this->abortIfExerciceCloture($ligne?->appelFonds?->exercice_id);
+
         $paiement = Paiement::create([
             'tenant_id' => config('app.tenant_id'),
             'coproprietaire_id' => $ligne?->coproprietaire_id ?? $request->input('coproprietaire_id'),
@@ -98,9 +108,16 @@ class EncaissementController extends Controller
         }
 
         // Rafraîchit le solde du copropriétaire + génère le reçu PDF (async).
+        // Best-effort (KAN-116) : un échec du recalcul de solde ou de la file de
+        // génération du reçu ne doit PAS faire échouer l'encaissement lui-même
+        // (le paiement est déjà enregistré). On journalise et on continue.
         if ($paiement->coproprietaire_id) {
-            Coproprietaire::find($paiement->coproprietaire_id)?->recalculerSolde();
-            GenerateRecuPaiementJob::dispatch($paiement->id);
+            try {
+                Coproprietaire::find($paiement->coproprietaire_id)?->recalculerSolde();
+                GenerateRecuPaiementJob::dispatch($paiement->id);
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         $paiement->load(['coproprietaire.user:id,name', 'coproprietaire.lot:id,numero']);

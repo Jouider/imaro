@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ComptabiliteController extends Controller
 {
@@ -125,7 +126,7 @@ class ComptabiliteController extends Controller
         $ecritures = collect();
         $seqId = 1;
         foreach ($rawEntries as $e) {
-            $type = str_starts_with($e['id'], 'P') ? 'encaissement' : 'depense';
+            $type = $e['type'] ?? (str_starts_with($e['id'], 'P') ? 'encaissement' : 'depense');
 
             // Debit line
             $ecritures->push([
@@ -353,7 +354,7 @@ class ComptabiliteController extends Controller
                     'compte_charge' => $compte,
                     'libelle_compte' => $libellesCompte[$compte] ?? 'Charges diverses',
                     'mode_paiement' => $d->statut === 'paye' ? 'virement' : 'autre',
-                    'justificatif_path' => null,
+                    'justificatif_path' => $d->facture_path ? Storage::url($d->facture_path) : null,
                     'ecriture_id' => $d->id,
                 ];
             });
@@ -372,6 +373,12 @@ class ComptabiliteController extends Controller
         $this->authorizeExercice($request, $exercice);
         abort_if($exercice->statut === 'cloture', 422, 'Exercice clôturé.');
 
+        // Stocke la pièce justificative uploadée (KAN-125) — même convention que
+        // DepenseFinanceController (disque public, dossier depenses/{tenant}).
+        $facturePath = $request->hasFile('justificatif')
+            ? $request->file('justificatif')->store("depenses/{$request->user()->tenant_id}", 'public')
+            : null;
+
         $depense = Depense::create([
             'tenant_id' => $request->user()->tenant_id,
             'exercice_id' => $exercice->id,
@@ -383,6 +390,7 @@ class ComptabiliteController extends Controller
             'montant' => $request->montant,
             'date' => $request->date,
             'statut' => $request->statut ?? 'en_attente',
+            'facture_path' => $facturePath,
         ]);
 
         return response()->json([
@@ -395,9 +403,10 @@ class ComptabiliteController extends Controller
                     'description' => $depense->description,
                     'categorie' => $depense->categorie,
                     'montant' => round($depense->montant, 2),
-                    'prestataire' => $depense->prestataire?->name ?? $depense->description,
+                    'prestataire' => $depense->prestataire?->nom ?? $depense->description,
                     'statut' => $depense->statut,
                     'exercice_id' => $depense->exercice_id,
+                    'justificatif_path' => $facturePath ? Storage::url($facturePath) : null,
                 ],
             ],
         ], 201);
@@ -460,10 +469,16 @@ class ComptabiliteController extends Controller
                 $ligne->save();
             }
 
-            $copro->recalculerSolde();
-
             return $paiement;
         });
+
+        // Best-effort hors transaction (KAN-116) : un échec du recalcul de solde
+        // ne doit pas faire échouer (ni annuler) l'encaissement déjà enregistré.
+        try {
+            $copro->recalculerSolde();
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return response()->json([
             'status' => 'success',

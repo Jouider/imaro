@@ -79,7 +79,7 @@
       "codeSubtitle": "Entrez le code fourni par votre syndic pour +212 {{digits}}",
       "codeLabel": "Code d'accès",
       "codePlaceholder": "Code fourni par votre syndic",
-      "codeHint": "Ce code vous a été communiqué par votre gestionnaire via WhatsApp.",
+      "codeHint": "Ce code vous a été communiqué par votre gestionnaire.",
       "codeSubmit": "Accéder à mon espace",
       "codeVerifying": "Vérification…",
       "activateTitle": "Créez votre code personnel",
@@ -155,7 +155,9 @@
     "save": "Enregistrer",
     "close": "Fermer",
     "show": "Afficher",
-    "hide": "Masquer"
+    "hide": "Masquer",
+    "continue": "Continuer",
+    "back": "Retour"
   },
   "portail": {
     "nav": {
@@ -204,7 +206,11 @@
       "payer": "Payer →",
       "convoquee": "Convoquée",
       "inviteVisitor": "Inviter un visiteur",
-      "inviteVisitorDesc": "Générez un QR à usage unique pour un proche, un livreur ou un intervenant."
+      "inviteVisitorDesc": "Générez un QR à usage unique pour un proche, un livreur ou un intervenant.",
+      "urgent": "Urgent",
+      "like": "J'aime",
+      "unlike": "Je n'aime plus",
+      "likeError": "Action impossible, réessayez"
     },
     "actualites": {
       "title": "Actualités",
@@ -285,7 +291,11 @@
         "declared": "Paiement déclaré. Votre syndic va le vérifier.",
         "error": "Une erreur est survenue. Réessayez."
       },
-      "referenceRequired": "La référence est obligatoire (ex. n° de virement ou bordereau)."
+      "referenceRequired": "La référence est obligatoire (ex. n° de virement ou bordereau).",
+      "ocr": {
+        "analyzing": "Analyse du justificatif…",
+        "prefilled": "Champs pré-remplis depuis le justificatif"
+      }
     },
     "reclamations": {
       "title": "Mes réclamations",
@@ -325,7 +335,8 @@
         "interphone": "Interphone / Accès",
         "degat_eaux": "Dégât des eaux",
         "autre": "Autre"
-      }
+      },
+      "sujetMin": "Sujet trop court (5 caractères minimum)"
     },
     "profil": {
       "title": "Mon profil",
@@ -369,7 +380,7 @@
       "emptyDesc": "Créez votre première invitation — votre visiteur recevra un lien à scanner à l'entrée.",
       "form": {
         "title": "Nouvelle invitation",
-        "desc": "Le QR est envoyé directement par WhatsApp / SMS au visiteur.",
+        "desc": "Le QR est envoyé directement au visiteur (partage ou e-mail).",
         "shareLater": "Vous pourrez le partager après création.",
         "submit": "Créer & partager",
         "submitting": "Création…",
@@ -400,6 +411,37 @@
       "settingDesc": "Face ID / empreinte à l'ouverture de l'application.",
       "enabled": "Déverrouillage biométrique activé.",
       "enableFailed": "Authentification biométrique échouée."
+    },
+    "bonsPaiement": {
+      "title": "Bons de paiement",
+      "subtitle": "Émettez un ordre de paiement vers le syndic et retrouvez votre historique.",
+      "entryDesc": "Émettre un ordre de paiement et voir l’historique",
+      "empty": "Aucun bon de paiement",
+      "new": "Nouveau bon",
+      "from": "Compte émetteur",
+      "to": "Bénéficiaire",
+      "montant": "Montant",
+      "motif": "Motif",
+      "motifPlaceholder": "Ex. Appel de fonds T1 2026",
+      "delaiNotice": "Validation par le syndic possible après un délai de 24 h.",
+      "validableLe": "Validable le",
+      "validatedWithTicket": "Validé. Ticket de suivi",
+      "download": "Télécharger",
+      "downloadPending": "Disponible après validation",
+      "step1": "Émetteur & bénéficiaire",
+      "step2": "Montant",
+      "step3": "Motif",
+      "step4": "Confirmation",
+      "stepOf": "Étape {{current}} sur {{total}}",
+      "emit": "Émettre le bon",
+      "created": "Bon de paiement émis",
+      "createError": "L’émission a échoué, réessayez",
+      "statut": {
+        "en_attente": "En attente",
+        "valide": "Validé",
+        "rejete": "Rejeté",
+        "expire": "Expiré"
+      }
     }
   },
   "home": {
@@ -476,7 +518,7 @@
       },
       "step2": {
         "title": "Invitez vos copropriétaires",
-        "desc": "Ils reçoivent un accès WhatsApp à leur portail personnel"
+        "desc": "Ils reçoivent un accès à leur portail personnel"
       },
       "step3": {
         "title": "Gérez en temps réel",
@@ -895,7 +937,8 @@
     "actions": {
       "menu": "Plus d'options",
       "edit": "Modifier",
-      "delete": "Supprimer"
+      "delete": "Supprimer",
+      "sendCredentials": "Envoyer les identifiants"
     },
     "permissions": {
       "residences": "Résidences",
@@ -973,7 +1016,13 @@
         "deleteFailed": "Échec de la suppression",
         "toggled": "Statut mis à jour",
         "toggleFailed": "Échec du changement de statut",
-        "copyFailed": "Impossible de copier"
+        "copyFailed": "Impossible de copier",
+        "credentialsSent": "Identifiants envoyés par email",
+        "credentialsFailed": "Échec de l'envoi des identifiants"
+      },
+      "credentials": {
+        "title": "Identifiants envoyés",
+        "desc": "Un email contenant les identifiants a été envoyé à {{email}}. Vous pouvez aussi copier le mot de passe temporaire ci-dessous pour le communiquer manuellement."
       }
     },
     "personnel": {
@@ -1015,7 +1064,7 @@
         "residencePh": "Choisir une résidence",
         "phone": "Téléphone",
         "permissions": "Permissions accordées",
-        "phoneHint": "Le code d'accès sera généré et envoyé à ce numéro par WhatsApp / SMS."
+        "phoneHint": "Le code d'accès sera généré et communiqué automatiquement au membre."
       },
       "toast": {
         "created": "Personnel ajouté",
@@ -1030,7 +1079,7 @@
       "credentialsSent": {
         "title": "Identifiants envoyés",
         "desc": "Le compte de {{name}} a été créé et son code d’accès lui a été envoyé.",
-        "sentVia": "Code envoyé par WhatsApp / SMS au {{phone}}.",
+        "sentVia": "Code envoyé au {{phone}}.",
         "codeLabel": "Code d'accès",
         "note": "Communiquez ce code au membre du personnel. Il devra le changer à sa première connexion.",
         "deliveredConfirmed": "Code envoyé via {{channel}} au {{phone}} — livraison confirmée.",
@@ -1042,9 +1091,7 @@
         "resendError": "Échec de l'envoi du code",
         "copyError": "Impossible de copier le code"
       }
-    },
-    "cin": "CIN",
-    "cinPlaceholder": "Ex. AB123456"
+    }
   },
   "gestionnaire": {
     "pointage": {
@@ -1163,7 +1210,7 @@
         },
         "relance": {
           "title": "Relance amiable",
-          "desc": "Relances graduées par SMS, WhatsApp et e-mail pour obtenir un règlement à l'amiable."
+          "desc": "Relances graduées par e-mail pour obtenir un règlement à l'amiable."
         },
         "miseEnDemeure": {
           "title": "Mise en demeure",
@@ -1194,7 +1241,7 @@
           "desc": "Le recouvrement amiable géré pour vous, jusqu'à la mise en demeure.",
           "features": [
             "Appels de fonds et relances automatisées",
-            "Relances multicanal (SMS, WhatsApp, e-mail)",
+            "Relances par e-mail",
             "Mise en demeure officielle",
             "Suivi mensuel des impayés"
           ]
@@ -1298,11 +1345,36 @@
         "city": "Ville",
         "cityPlaceholder": "ex : Casablanca",
         "jourEcheance": "Jour d'échéance",
+        "dateAnniversaire": "Date de création / anniversaire",
+        "dateAnniversaireHint": "L'exercice (12 mois glissants) et l'AG démarrent à cette date. À défaut : 1er janvier.",
         "modeCotisation": "Mode de cotisation",
         "modeTantieme": "Au tantième",
         "modeFixe": "Montant fixe",
+        "modeCategorie": "Par catégorie de lot",
+        "categorieHint": "Créez les catégories (libellé + cotisation) dans l'onglet « Catégories » de la résidence, puis rattachez chaque lot à une catégorie.",
         "montantFixe": "Montant fixe (DH)",
+        "periodicite": "Périodicité de cotisation",
+        "periodicites": {
+          "mensuel": "Mensuel",
+          "trimestriel": "Trimestriel",
+          "semestriel": "Semestriel",
+          "annuel": "Annuel"
+        },
         "createSubmit": "Créer la résidence"
+      },
+      "categories": {
+        "subtitle": "Définissez la cotisation par catégorie de lot, puis rattachez chaque lot à une catégorie.",
+        "add": "Nouvelle catégorie",
+        "editTitle": "Modifier la catégorie",
+        "nom": "Libellé",
+        "cotisation": "Cotisation (DH / période)",
+        "nbLots": "{{count}} lot(s) rattaché(s)",
+        "saved": "Catégorie enregistrée",
+        "deleted": "Catégorie supprimée",
+        "empty": "Aucune catégorie",
+        "emptyDesc": "Créez une première catégorie de lot.",
+        "deleteTitle": "Supprimer la catégorie",
+        "deleteDesc": "Les lots rattachés seront détachés de cette catégorie. Continuer ?"
       },
       "toastLotAdded": "Lot ajouté",
       "toastLotUpdated": "Lot modifié",
@@ -1313,7 +1385,9 @@
       "addLotError": "Erreur lors de l'ajout du lot",
       "modifyError": "Erreur lors de la modification",
       "delete": {
-        "intro": "La suppression d'une résidence est définitive et efface ses lots, copropriétaires et écritures. Pour des raisons de sécurité, un code de validation va vous être envoyé.",
+        "intro": "La suppression d'une résidence est définitive et efface ses lots, copropriétaires et écritures. Pour éviter toute suppression par erreur, saisissez le nom exact de la résidence ci-dessous.",
+        "typeToConfirm": "Pour confirmer, saisissez le nom de la résidence :",
+        "error": "Échec de la suppression. Veuillez réessayer.",
         "sendCode": "Envoyer le code",
         "codeSent": "Code de validation envoyé",
         "codeError": "Échec de l'envoi du code",
@@ -1335,6 +1409,10 @@
       "tabImmeubles": "Immeubles",
       "tabTranches": "Tranches",
       "tabEncaissement": "Encaissement",
+      "tabCategories": "Catégories",
+      "categorieLot": "Catégorie de lot",
+      "categorieLotPh": "Choisir une catégorie",
+      "categorieLotNone": "Aucune",
       "tranches": {
         "add": "Ajouter une tranche",
         "edit": "Modifier la tranche",
@@ -1504,7 +1582,7 @@
       "createdSuccess": "Le copropriétaire a été créé avec succès.",
       "accessCode": "Code d'accès :",
       "copyCodeAria": "Copier le code",
-      "codeAutoSent": "Le code d'accès a été envoyé automatiquement au copropriétaire par SMS, WhatsApp et e-mail. Le code ci-dessus reste affiché en secours, si besoin de le communiquer oralement.",
+      "codeAutoSent": "Le code d'accès a été envoyé automatiquement au copropriétaire par e-mail. Le code ci-dessus reste affiché en secours, si besoin de le communiquer oralement.",
       "createLotPrompt": "Souhaitez-vous créer un lot pour ce nouveau propriétaire ?",
       "yesCreateLot": "Oui, créer un lot",
       "noFinish": "Non, terminer",
@@ -1536,7 +1614,7 @@
       },
       "envoyer": "Envoyer",
       "envoyerConfirm": "Envoyer l'appel de fonds aux copropriétaires ?",
-      "envoyerDesc": "Cette action enverra une notification WhatsApp à tous les copropriétaires.",
+      "envoyerDesc": "Cette action enverra une notification (application + e-mail) à tous les copropriétaires.",
       "envoyerSuccess": "Appel de fonds envoyé",
       "form": {
         "titre": "Titre",
@@ -1622,6 +1700,17 @@
         "totalPaye": "Total payé",
         "solde": "Solde"
       },
+      "chequeImpaye": {
+        "title": "Marquer le chèque comme impayé",
+        "action": "Marquer impayé",
+        "confirm": "Marquer impayé",
+        "badge": "Chèque rejeté",
+        "motif": "Motif (optionnel)",
+        "motifPlaceholder": "Ex. chèque sans provision",
+        "warning": "Le solde du copropriétaire sera ré-augmenté et il sera notifié. Une contre-passation comptable sera enregistrée.",
+        "success": "Chèque marqué comme impayé",
+        "error": "Impossible de marquer ce chèque comme impayé"
+      },
       "repartitionTantieme": "Répartition par tantième",
       "notePlaceholder": "Ex : Référence incorrecte...",
       "searchPlaceholder": "Rechercher copropriétaire ou lot...",
@@ -1633,7 +1722,7 @@
       "allStatuses": "Tous les statuts",
       "calcRepartition": "Calcul de la répartition…",
       "sendAppelTitle": "Envoyer l'appel de fonds",
-      "sendAppelDesc": "Cette action enverra une notification WhatsApp à tous les copropriétaires.",
+      "sendAppelDesc": "Cette action enverra une notification (application + e-mail) à tous les copropriétaires.",
       "saveError": "Erreur lors de l'enregistrement",
       "relancesSent": "{{n}} relance(s) envoyée(s)",
       "noAppel": "Aucun appel de fonds",
@@ -1644,11 +1733,14 @@
       "colLot": "Lot",
       "encaisserPaiement": "Encaisser un paiement",
       "envoyerRappels": "Envoyer rappels",
-      "decompteEmpty": "Saisissez un nom et cliquez sur Générer pour afficher le décompte individuel"
+      "decompteEmpty": "Saisissez un nom et cliquez sur Générer pour afficher le décompte individuel",
+      "relanceAllConfirm": "Envoyer une relance à {{count}} copropriétaire(s) avec des créances impayées ?",
+      "relanceAllAction": "Envoyer les relances"
     },
     "tickets": {
       "title": "Tickets",
       "subtitle": "Suivi des réclamations et interventions",
+      "searchPlaceholder": "Rechercher par référence (TKT-…) ou description",
       "colRef": "Référence",
       "colTitre": "Description",
       "colResidence": "Résidence",
@@ -1692,14 +1784,6 @@
         "descPlaceholder": "Décrivez le problème…",
         "descMin": "La description doit contenir au moins 10 caractères"
       },
-      "categories": {
-        "plomberie": "Plomberie",
-        "electricite": "Électricité",
-        "ascenseur": "Ascenseur",
-        "proprete": "Propreté / Nettoyage",
-        "securite": "Sécurité",
-        "autre": "Autre"
-      },
       "audit": {
         "tab": "Audit par résidence",
         "title": "Réclamations par résidence",
@@ -1707,6 +1791,21 @@
         "total": "Total",
         "most": "Le plus",
         "least": "Le moins"
+      },
+      "categories": {
+        "parties_communes": "Parties communes",
+        "ascenseur": "Ascenseur",
+        "plomberie": "Eau / Plomberie",
+        "electricite": "Électricité",
+        "chauffage": "Chauffage / Climatisation",
+        "securite": "Sécurité",
+        "proprete": "Propreté / Nettoyage",
+        "nuisances": "Nuisances sonores",
+        "espaces_verts": "Espaces verts",
+        "parking": "Parking / Garage",
+        "interphone": "Interphone / Accès",
+        "degat_eaux": "Dégât des eaux",
+        "autre": "Autre"
       }
     },
     "dashboard": {
@@ -1921,7 +2020,8 @@
         "actif": "Actif",
         "blackliste": "Blacklisté",
         "expire": "Expiré",
-        "resilie": "Résilié"
+        "resilie": "Résilié",
+        "inactif": "Terminé"
       },
       "specialite": {
         "ascenseurs": "Ascenseurs",
@@ -1959,7 +2059,15 @@
       "emptyContrats": "Aucun contrat",
       "emptyContratsDesc": "Créez votre premier contrat de maintenance.",
       "toastCreated": "Prestataire créé",
-      "toastContratCreated": "Contrat créé"
+      "toastContratCreated": "Contrat créé",
+      "toastUpdated": "Prestataire mis à jour",
+      "toastStatut": "Statut mis à jour",
+      "toastDeleted": "Prestataire supprimé",
+      "markTermine": "Marquer terminé",
+      "markActif": "Réactiver",
+      "editPrestataire": "Modifier le prestataire",
+      "deleteTitle": "Supprimer le prestataire ?",
+      "deleteDesc": "Cette action est définitive. Un prestataire lié à des dépenses ou contrats ne peut pas être supprimé — passez-le plutôt en « Terminé »."
     },
     "budgets": {
       "title": "Budgets",
@@ -2092,7 +2200,10 @@
       "exercice": "Exercice",
       "statut": {
         "ouvert": "Ouvert",
-        "clos": "Clôturé 🔒"
+        "clos": "Clôturé 🔒",
+        "actif": "Actif",
+        "cloture": "Clôturé 🔒",
+        "archive": "Archivé"
       },
       "tabs": {
         "dashboard": "Tableau de bord",
@@ -2138,6 +2249,7 @@
       "grandLivre": {
         "title": "Compte PCG",
         "selectCompte": "Sélectionner un compte...",
+        "noCompte": "Aucun compte trouvé.",
         "hint": "Sélectionnez un compte PCG pour afficher le détail des écritures."
       },
       "depenses": {
@@ -2202,7 +2314,13 @@
         "confirmMsg": "Cette action est irréversible. Toutes les écritures seront verrouillées. Continuer ?",
         "warning": "Attention — après clôture, aucune écriture ne peut être modifiée.",
         "already_clos": "Exercice clôturé",
-        "clos_msg": "Cet exercice a été clôturé le"
+        "clos_msg": "Cet exercice a été clôturé le",
+        "clos_msg_range": "Exercice clôturé — période du",
+        "reopen": "Rouvrir l'exercice",
+        "reopenTitle": "Rouvrir l'exercice ?",
+        "reopenMsg": "L'exercice redeviendra modifiable. Un seul exercice peut être actif à la fois : clôturez l'exercice courant au préalable si nécessaire.",
+        "toastReopened": "Exercice rouvert",
+        "reopenError": "Impossible de rouvrir l'exercice"
       },
       "export": {
         "title": "Exporter",
@@ -2210,7 +2328,10 @@
         "excelGrandLivre": "Excel — Grand-Livre",
         "sageFec": "Sage FEC",
         "pdfJournal": "PDF — Journal",
-        "pdfBalance": "PDF — Balance"
+        "pdfBalance": "PDF — Balance",
+        "success": "Export téléchargé : {{filename}}",
+        "error": "Échec de l'export. Veuillez réessayer.",
+        "empty": "Aucune écriture à exporter pour cet exercice"
       },
       "seuil": {
         "label": "Seuil comptable",
@@ -2266,7 +2387,16 @@
       "journalLabel": "Journal comptable",
       "grandLivreLabel": "Grand-Livre",
       "legalNote": "Ce rapport est établi conformément à la Loi 18-00 (Dahir n° 1-02-298 du 3 octobre 2002) relative au statut de la copropriété des immeubles bâtis. Tout copropriétaire peut en demander copie au syndic selon l'article 8 de ladite loi. Les documents générés ont valeur informative et sont certifiés par le gestionnaire de la copropriété.",
-      "filterTo": "Au"
+      "filterTo": "Au",
+      "exercices": {
+        "newTitle": "Nouvel exercice",
+        "editTitle": "Modifier l'exercice",
+        "annee": "Année",
+        "dateDebut": "Date de début",
+        "dateFin": "Date de fin",
+        "toastCreated": "Exercice créé",
+        "toastUpdated": "Exercice mis à jour"
+      }
     },
     "depenses": {
       "title": "Dépenses",
@@ -2514,6 +2644,26 @@
       "colOrganisme": "Organisme"
     },
     "recouvrement": {
+      "relance": {
+        "title": "Scénario de relance",
+        "subtitle": "Étapes automatiques après échéance : délai, canal et escalade vers mise en demeure.",
+        "auto": "Automatique",
+        "empty": "Aucune étape. Ajoutez une première relance.",
+        "delai": "Délai (J+)",
+        "canal": "Canal",
+        "type": "Type",
+        "addStep": "Ajouter une étape",
+        "saved": "Scénario de relance enregistré",
+        "canaux": {
+          "whatsapp": "WhatsApp",
+          "sms": "SMS",
+          "email": "E-mail"
+        },
+        "types": {
+          "relance": "Relance",
+          "mise_en_demeure": "Mise en demeure"
+        }
+      },
       "toastConfigSaved": "Configuration enregistrée",
       "recalcError": "Échec du recalcul",
       "penaltyType": "Type de pénalité",
@@ -2625,6 +2775,15 @@
       "totalEvents": "Total événements",
       "searchPlaceholder": "Rechercher action, utilisateur, cible...",
       "exportCsv": "Exporter CSV",
+      "exportEmpty": "Aucune ligne à exporter",
+      "exportDone": "Export CSV téléchargé",
+      "view": "Voir",
+      "colDate": "Date",
+      "colCategory": "Catégorie",
+      "colAction": "Action",
+      "colSeverity": "Sévérité",
+      "colUser": "Utilisateur",
+      "colTarget": "Cible",
       "sensitiveActions": "Actions sensibles",
       "errorRate": "Taux d'erreur",
       "categoryLabels": {
@@ -2732,8 +2891,8 @@
       "upgradePro": "Passer au Pro →",
       "comingSoon": "Fonctionnalité bientôt disponible",
       "notifSection": "Préférences de Notification",
-      "notifHint": "Choisissez les alertes WhatsApp que vous souhaitez recevoir",
-      "notifMaster": "Activer les notifications WhatsApp",
+      "notifHint": "Choisissez les alertes que vous souhaitez recevoir",
+      "notifMaster": "Activer les notifications",
       "notifPaiementLabel": "Nouveau paiement reçu",
       "notifPaiementDesc": "Un copropriétaire effectue un paiement",
       "notifTicketLabel": "Nouveau ticket d'incident",
@@ -2763,12 +2922,11 @@
     },
     "occupants": {
       "title": "Occupants",
-      "subtitle": "Registre des occupants par lot — propriétaires, locataires, usufruitiers",
+      "subtitle": "Registre des occupants par lot — propriétaires occupants, usufruitiers",
       "toastAdded": "Occupant ajouté",
       "toastUpdated": "Occupant mis à jour",
       "toastDeleted": "Occupant supprimé",
       "kpiOwners": "Propriétaires occupants",
-      "kpiTenants": "Locataires",
       "kpiOthers": "Usufruitiers / autres",
       "bannerTitle": "Art. 11 Loi 18-00",
       "bannerBody": "— Le registre des occupants doit être à jour pour la convocation des AG et la communication des charges. Un seul «propriétaire occupant» actif par lot à la fois.",
@@ -2782,7 +2940,6 @@
       "dateFinOptional": "Date de fin (optionnelle)",
       "type": {
         "proprietaire_occupant": "Propriétaire occupant",
-        "locataire": "Locataire",
         "usufruitier": "Usufruitier",
         "autre": "Autre"
       }
@@ -2863,6 +3020,7 @@
       "complementaires": "Annexes complémentaires",
       "regenerate": "Régénérer",
       "downloaded": "Annexe {{num}} téléchargée",
+      "preview": "Aperçu",
       "obligatoires": "Annexes obligatoires",
       "exerciceClos": "Exercice clos le 31 décembre {{year}}",
       "title": "Annexes Comptables",
@@ -3290,7 +3448,8 @@
     "media": {
       "playVideo": "Lire la vidéo",
       "viewImage": "Voir l'image"
-    }
+    },
+    "to": "au"
   },
   "public": {
     "visitorPass": {
@@ -3485,5 +3644,10 @@
       "install": "Installer",
       "later": "Plus tard"
     }
+  },
+  "errors": {
+    "title": "Une erreur est survenue",
+    "message": "Quelque chose s'est mal passé. Réessayez en rechargeant la page.",
+    "reload": "Recharger"
   }
 }

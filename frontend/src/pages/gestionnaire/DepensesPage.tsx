@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { AxiosError } from 'axios'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -75,6 +75,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { AI_FEATURES_ENABLED } from '@/lib/features'
 
 // ─── Colors ───────────────────────────────────────────────────────────────────
 
@@ -238,6 +239,19 @@ function NouvelleDepenseModal({
   const montantNum = Number(form.montant) || 0
   const needsApproval = montantNum > 5000
 
+  // KAN-121: aperçu du justificatif sélectionné (avant enregistrement) via une
+  // URL objet locale — révoquée quand le fichier change / à la fermeture.
+  const justificatifPreview = useMemo(
+    () => (form.justificatif ? URL.createObjectURL(form.justificatif) : null),
+    [form.justificatif],
+  )
+  useEffect(() => {
+    return () => {
+      if (justificatifPreview) URL.revokeObjectURL(justificatifPreview)
+    }
+  }, [justificatifPreview])
+  const justificatifIsImage = form.justificatif?.type.startsWith('image/')
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
@@ -250,77 +264,80 @@ function NouvelleDepenseModal({
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          {/* IA Section */}
-          <div className="rounded-lg border border-dashed border-muted-foreground/30">
-            <button
-              type="button"
-              onClick={() => setIaExpanded((v) => !v)}
-              className="flex w-full items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Sparkles className="size-4 text-amber-500" />
-              {t('gestionnaire.depenses.form.scanner', {
-                defaultValue: "Analyser avec l'IA",
-              })}
-            </button>
+          {/* Analyse IA masquée temporairement (KAN-111) */}
+          {AI_FEATURES_ENABLED && (
+            <div className="rounded-lg border border-dashed border-muted-foreground/30">
+              <button
+                type="button"
+                onClick={() => setIaExpanded((v) => !v)}
+                className="flex w-full items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Sparkles className="size-4 text-amber-500" />
+                {t('gestionnaire.depenses.form.scanner', {
+                  defaultValue: "Analyser avec l'IA",
+                })}
+              </button>
 
-            {iaExpanded && (
-              <div className="border-t px-4 pb-4 pt-3 space-y-3">
-                <div className="flex gap-2">
-                  <Input
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={(e) => setIaFile(e.target.files?.[0] ?? null)}
-                    className="flex-1"
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleAnalyseIa}
-                    disabled={!iaFile || iaLoading}
-                  >
-                    {iaLoading ? (
-                      <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                      'Analyser'
-                    )}
-                  </Button>
-                </div>
-
-                {iaResult && (
-                  <div className="rounded-md bg-muted/40 p-3 space-y-1.5 text-sm">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{iaResult.titre}</span>
-                      <Badge
-                        className={cn(
-                          'border-0 text-xs',
-                          iaResult.confiance === 'haute'
-                            ? 'bg-green-100 text-green-800'
-                            : iaResult.confiance === 'moyenne'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-red-100 text-red-800',
-                        )}
-                      >
-                        {iaResult.confiance}
-                      </Badge>
-                    </div>
-                    <p className="text-muted-foreground">
-                      {iaResult.montant.toLocaleString('fr-MA')} MAD ·{' '}
-                      {iaResult.date} · Compte {iaResult.compte_charge_suggere}
-                    </p>
+              {iaExpanded && (
+                <div className="border-t px-4 pb-4 pt-3 space-y-3">
+                  <div className="flex gap-2">
+                    <Input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={(e) => setIaFile(e.target.files?.[0] ?? null)}
+                      className="flex-1"
+                    />
                     <Button
                       size="sm"
-                      className="w-full mt-2"
-                      onClick={handleUseIaData}
+                      variant="outline"
+                      onClick={handleAnalyseIa}
+                      disabled={!iaFile || iaLoading}
                     >
-                      {t('gestionnaire.depenses.form.utiliser', {
-                        defaultValue: 'Utiliser ces données',
-                      })}
+                      {iaLoading ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        'Analyser'
+                      )}
                     </Button>
                   </div>
-                )}
-              </div>
-            )}
-          </div>
+
+                  {iaResult && (
+                    <div className="rounded-md bg-muted/40 p-3 space-y-1.5 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{iaResult.titre}</span>
+                        <Badge
+                          className={cn(
+                            'border-0 text-xs',
+                            iaResult.confiance === 'haute'
+                              ? 'bg-green-100 text-green-800'
+                              : iaResult.confiance === 'moyenne'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-red-100 text-red-800',
+                          )}
+                        >
+                          {iaResult.confiance}
+                        </Badge>
+                      </div>
+                      <p className="text-muted-foreground">
+                        {iaResult.montant.toLocaleString('fr-MA')} MAD ·{' '}
+                        {iaResult.date} · Compte{' '}
+                        {iaResult.compte_charge_suggere}
+                      </p>
+                      <Button
+                        size="sm"
+                        className="w-full mt-2"
+                        onClick={handleUseIaData}
+                      >
+                        {t('gestionnaire.depenses.form.utiliser', {
+                          defaultValue: 'Utiliser ces données',
+                        })}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {needsApproval && (
             <div className="flex items-start gap-2 rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-sm text-orange-800">
@@ -519,6 +536,37 @@ function NouvelleDepenseModal({
                 }))
               }
             />
+            {/* Aperçu du justificatif sélectionné (KAN-121) */}
+            {justificatifPreview && (
+              <div className="mt-2 flex items-center gap-3 rounded-md border bg-muted/30 p-2">
+                {justificatifIsImage ? (
+                  <img
+                    src={justificatifPreview}
+                    alt={form.justificatif?.name ?? ''}
+                    className="size-14 rounded object-cover"
+                  />
+                ) : (
+                  <div className="flex size-14 items-center justify-center rounded bg-background">
+                    <Receipt className="size-6 text-muted-foreground" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-medium">
+                    {form.justificatif?.name}
+                  </p>
+                  <a
+                    href={justificatifPreview}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-medium text-[var(--color-imaro-primary)] hover:underline"
+                  >
+                    {t('gestionnaire.depenses.form.previewJustificatif', {
+                      defaultValue: 'Ouvrir l’aperçu',
+                    })}
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -584,6 +632,14 @@ function ModelesRecurrentsModal({
     enabled: open,
   })
   const compteClasse6 = comptes.filter((c) => c.classe === 6)
+
+  // KAN-119: prestataires existants proposés en autocomplétion (texte libre
+  // toujours autorisé), pour pouvoir rattacher un prestataire au modèle récurrent.
+  const { data: prestataires = [] } = useQuery({
+    queryKey: ['prestataires', 'actif'],
+    queryFn: () => getPrestataires({ statut: 'actif' }),
+    enabled: open,
+  })
 
   const toggleMutation = useMutation({
     mutationFn: (id: number) => toggleModeleRecurrent(id),
@@ -752,6 +808,29 @@ function ModelesRecurrentsModal({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-1">
+              <Label>
+                {t('gestionnaire.depenses.form.prestataire', {
+                  defaultValue: 'Prestataire',
+                })}
+              </Label>
+              <Input
+                list="modele-prestataires"
+                value={form.prestataire_nom}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, prestataire_nom: e.target.value }))
+                }
+                placeholder={t('gestionnaire.depenses.form.prestatairePh', {
+                  defaultValue: 'Nom du prestataire (optionnel)',
+                })}
+              />
+              {/* Prestataires existants proposés — texte libre autorisé (KAN-119). */}
+              <datalist id="modele-prestataires">
+                {prestataires.map((p) => (
+                  <option key={p.id} value={p.name} />
+                ))}
+              </datalist>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
@@ -999,16 +1078,42 @@ export function DepensesPage() {
     {
       key: 'justificatif_path',
       header: 'Justificatif',
+      // KAN-121 : ouvrir l'aperçu du justificatif dans un nouvel onglet quand le
+      // backend fournit `justificatif_url`. Sinon bouton désactivé (fichier pas
+      // encore servi côté API).
       renderCell: (r) =>
         r.justificatif_path ? (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-6 px-2"
-            onClick={() => toast.info(t('gestionnaire.depenses.downloading'))}
-          >
-            <Download className="size-3.5" />
-          </Button>
+          r.justificatif_url ? (
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2"
+              title={t('gestionnaire.depenses.form.previewJustificatif', {
+                defaultValue: 'Ouvrir l’aperçu',
+              })}
+            >
+              <a
+                href={r.justificatif_url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Download className="size-3.5" />
+              </a>
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2"
+              disabled
+              title={t('gestionnaire.depenses.justificatifUnavailable', {
+                defaultValue: 'Aperçu indisponible',
+              })}
+            >
+              <Download className="size-3.5" />
+            </Button>
+          )
         ) : (
           <span className="text-muted-foreground">—</span>
         ),
@@ -1083,19 +1188,22 @@ export function DepensesPage() {
         actions={
           <div className="flex gap-2">
             <ResidenceFilter />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                toast.info(t('gestionnaire.depenses.importIa'))
-                setAddOpen(true)
-              }}
-            >
-              <Sparkles className="me-1.5 size-4 text-amber-500" />
-              {t('gestionnaire.depenses.importIa', {
-                defaultValue: 'Import IA',
-              })}
-            </Button>
+            {/* Import IA masqué temporairement (KAN-111) */}
+            {AI_FEATURES_ENABLED && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  toast.info(t('gestionnaire.depenses.importIa'))
+                  setAddOpen(true)
+                }}
+              >
+                <Sparkles className="me-1.5 size-4 text-amber-500" />
+                {t('gestionnaire.depenses.importIa', {
+                  defaultValue: 'Import IA',
+                })}
+              </Button>
+            )}
             <Button size="sm" onClick={() => setAddOpen(true)}>
               <Receipt className="me-1.5 size-4" />
               {t('gestionnaire.depenses.add', {

@@ -3,23 +3,52 @@
 namespace App\Models;
 
 use App\Models\Traits\LogsActivity;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Residence extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'tenant_id', 'gestionnaire_id', 'name', 'address',
         'city', 'photo', 'total_tantieme', 'nb_lots', 'status',
-        'mode_cotisation', 'cotisation_mensuelle', 'jour_echeance',
+        'mode_cotisation', 'cotisation_mensuelle', 'jour_echeance', 'periodicite_cotisation',
+        'date_anniversaire',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'date_anniversaire' => 'date',
+        ];
+    }
+
+    /**
+     * Fenêtre d'exercice (12 mois glissants) pour une année donnée (KAN-95) :
+     * démarre au jour/mois de la date d'anniversaire ; à défaut, 1er janvier.
+     *
+     * @return array{0: string, 1: string} [date_debut, date_fin] (Y-m-d)
+     */
+    public function exerciceWindow(int $annee): array
+    {
+        if ($this->date_anniversaire) {
+            $debut = $this->date_anniversaire->copy()->year($annee);
+            $fin = $debut->copy()->addYear()->subDay();
+        } else {
+            $debut = Carbon::create($annee, 1, 1);
+            $fin = Carbon::create($annee, 12, 31);
+        }
+
+        return [$debut->toDateString(), $fin->toDateString()];
+    }
 
     protected static function booted(): void
     {
@@ -45,7 +74,7 @@ class Residence extends Model
         return $this->hasMany(Exercice::class);
     }
 
-    public function exerciceActif(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function exerciceActif(): HasOne
     {
         return $this->hasOne(Exercice::class)->where('statut', 'actif')->latestOfMany('annee');
     }

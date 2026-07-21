@@ -20,6 +20,18 @@ export type ChatReply = {
   citations?: LegalCitation[]
 }
 
+// ─── FAQ EMARO (KAN-107) ──────────────────────────────────────────────────────
+
+export type FaqItem = {
+  key: string
+  /** Libellé de la question clé. */
+  question: string
+  /** Réponse figée (markdown). */
+  answer: string
+  /** Références légales (ex. « Loi 18-00 art. 25 »). */
+  refs: string[]
+}
+
 // Backend contract (not yet available — see GitHub issue #198 for KAN-53):
 //   POST /api/ia/chat
 //   Body: { messages: ChatMessage[], residence_id?: number, language: string }
@@ -155,4 +167,52 @@ export async function sendChatMessage(
     language: options.language,
   })
   return res.data.data
+}
+
+// FAQ figée des 4 questions clés (dev fallback), alignée sur MOCK_REPLIES_FR.
+const MOCK_FAQ: FaqItem[] = [
+  {
+    key: 'penalites_retard',
+    question: 'Comment calculer les pénalités de retard ?',
+    answer: MOCK_REPLIES_FR[0].content,
+    refs: ['Loi 18-00 art. 25'],
+  },
+  {
+    key: 'annexes',
+    question: 'Quelles annexes dois-je générer ?',
+    answer: MOCK_REPLIES_FR[1].content,
+    refs: ['Décret 2.23.700'],
+  },
+  {
+    key: 'delai_convocation_ag',
+    question: "Quel est le délai légal de convocation d'une AG ?",
+    answer: MOCK_REPLIES_FR[2].content,
+    refs: ['Loi 18-00 art. 16quinquies', 'art. 18', 'art. 19'],
+  },
+  {
+    key: 'cloture_exercice',
+    question: "Comment clôturer l'exercice comptable ?",
+    answer: MOCK_REPLIES_FR[3].content,
+    refs: ['Décret 2.23.700'],
+  },
+]
+
+/**
+ * Renvoie les 4 réponses figées de l'assistant EMARO (KAN-107).
+ * GET /api/gestionnaire/assistant/faq — `residence_id` enrichit pénalités / AG.
+ */
+export async function getAssistantFaq(
+  residenceId?: number,
+): Promise<FaqItem[]> {
+  const useMock = import.meta.env.DEV || import.meta.env.VITE_SHOW_DEV_BYPASS
+  try {
+    const res = await api.get<{ data: { questions: FaqItem[] } }>(
+      '/gestionnaire/assistant/faq',
+      { params: residenceId ? { residence_id: residenceId } : undefined },
+    )
+    return res.data.data.questions
+  } catch (err) {
+    if (useMock) return MOCK_FAQ
+    throw err
+  }
 }

@@ -22,6 +22,8 @@ class UpdateResidenceRequest extends FormRequest
             'mode_cotisation' => ['sometimes', 'in:tantieme,fixe,categorie'],
             'montant_fixe' => ['sometimes', 'nullable', 'numeric', 'min:0'],
             'jour_echeance' => ['sometimes', 'nullable', 'integer', 'between:1,28'],
+            'periodicite_cotisation' => ['sometimes', 'in:mensuel,trimestriel,semestriel,annuel'],
+            'date_anniversaire' => ['sometimes', 'nullable', 'date'],
         ];
     }
 

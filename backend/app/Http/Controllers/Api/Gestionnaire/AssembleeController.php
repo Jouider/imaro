@@ -76,15 +76,46 @@ class AssembleeController extends Controller
     {
         $this->authorizeAssemblee($request, $assemblee);
 
+        // Un clic répété (ou un retry frontend) pendant qu'une génération tourne
+        // déjà déclenchait un 2e Job concurrent : les deux bouclaient sur les
+        // mêmes lots → convocations dupliquées tant que l'un des deux n'avait
+        // pas fini sa purge. On ignore le re-déclenchement tant que c'est "pending".
+        if ($assemblee->convocations_status === 'pending') {
+            $count = Lot::withoutGlobalScope('tenant')
+                ->where('residence_id', $assemblee->residence_id)
+                ->count();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Génération déjà en cours',
+                'data' => ['status' => 'accepted', 'count' => $count],
+            ], 202);
+        }
+
+        // Le job génère une convocation par lot, copro assigné ou non
+        // ("Non assigné") : le count annoncé doit refléter ça (pas seulement
+        // les lots avec coproprietairePrincipal, sinon "accepted count:0"
+        // alors que N convocations seront bien créées).
         $count = Lot::withoutGlobalScope('tenant')
             ->where('residence_id', $assemblee->residence_id)
-            ->whereHas('coproprietairePrincipal')
             ->count();
 
-        $assemblee->update(['convocations_status' => 'pending']);
+        // On vide aussi le PDF fusionné/la date de la génération précédente :
+        // sinon, pendant que le job tourne (statut "pending"), le GET renvoie
+        // encore l'ancien merged_url/generated_at, ce qui laisse croire au
+        // frontend qu'une génération (obsolète) est déjà prête.
+        $assemblee->update([
+            'convocations_status' => 'pending',
+            'convocations_merged_path' => null,
+            'convocations_generated_at' => null,
+        ]);
         GenerateConvocationsJob::dispatch($assemblee->id);
 
-        return response()->json(['status' => 'accepted', 'count' => $count], 202);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Génération des convocations lancée',
+            'data' => ['status' => 'accepted', 'count' => $count],
+        ], 202);
     }
 
     /**
@@ -105,12 +136,20 @@ class AssembleeController extends Controller
             ]);
 
         return response()->json([
-            'status' => $assemblee->convocations_status === 'ready' ? 'ready' : 'pending',
-            'generated_at' => $assemblee->convocations_generated_at?->toIso8601String(),
-            'merged_url' => $assemblee->convocations_merged_path
-                ? Storage::disk('public')->url($assemblee->convocations_merged_path)
-                : null,
-            'convocations' => $list,
+            'status' => 'success',
+            'data' => [
+                // On ne renvoie "pending" QUE si une génération tourne réellement.
+                // Sinon (null = jamais générée, ou "ready"), on renvoie "ready" :
+                // le front affiche alors la liste si elle existe, ou l'état vide
+                // avec le bouton « Générer ». Mapper null → "pending" bloquait
+                // une AG jamais générée sur un spinner infini (bouton masqué).
+                'status' => $assemblee->convocations_status === 'pending' ? 'pending' : 'ready',
+                'generated_at' => $assemblee->convocations_generated_at?->toIso8601String(),
+                'merged_url' => $assemblee->convocations_merged_path
+                    ? Storage::disk('public')->url($assemblee->convocations_merged_path)
+                    : null,
+                'convocations' => $list,
+            ],
         ]);
     }
 

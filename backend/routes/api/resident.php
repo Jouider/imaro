@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Resident\PortailAnnonceController;
+use App\Http\Controllers\Api\Resident\PortailAnnonceLikeController;
 use App\Http\Controllers\Api\Resident\PortailAssembleeController;
 use App\Http\Controllers\Api\Resident\PortailBankAccountController;
 use App\Http\Controllers\Api\Resident\PortailDashboardController;
@@ -17,11 +18,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/dashboard', PortailDashboardController::class);
 Route::get('/operations', PortailOperationsController::class);
 Route::get('/annonces', PortailAnnonceController::class);
+Route::post('/annonces/{annonce}/like', PortailAnnonceLikeController::class);
 Route::get('/assemblees', PortailAssembleeController::class);
 Route::get('/documents', PortailDocumentController::class);
 
 Route::get('/reclamations', [PortailReclamationController::class, 'index']);
 Route::post('/reclamations', [PortailReclamationController::class, 'store']);
+// Avis de satisfaction après résolution (KAN-90)
+Route::patch('/reclamations/{id}/rating', [PortailReclamationController::class, 'rating']);
 
 Route::get('/profil', [PortailProfilController::class, 'show']);
 Route::put('/profil', [PortailProfilController::class, 'update']);
@@ -31,7 +35,11 @@ Route::get('/visites', [PortailVisiteController::class, 'index']);
 Route::post('/visites', [PortailVisiteController::class, 'store']);
 
 Route::get('/comptes-bancaires', PortailBankAccountController::class);
+// Paiements déclarés par le résident : déclaration + liste/détail (statut, reçu après validation)
+Route::get('/paiements', [PortailPaiementController::class, 'index']);
 Route::post('/paiements', [PortailPaiementController::class, 'store']);
+// OCR offline d'un justificatif → préremplissage du formulaire (KAN-100)
+Route::post('/paiements/ocr', [PortailPaiementController::class, 'ocr']);
 // Paiement en ligne (passerelle) — KAN-72 / #251 ; le retour est public (cf. web.php)
 Route::post('/paiement/initier', [PortailPaiementOnlineController::class, 'initier']);
 
