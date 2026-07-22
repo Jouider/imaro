@@ -44,10 +44,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup PHP 8.3
+      # 8.4 = version de la production (le VPS tourne en php8.4). composer.json
+      # annonce ^8.3, mais le composer.lock résolu exige >= 8.4 : la CI doit
+      # refléter ce qui est déployé, pas ce que la doc annonce.
+      - name: Setup PHP 8.4
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           # gd : requis par PhpSpreadsheet (exports comptables).
           extensions: mbstring, pdo_mysql, redis, gd, bcmath, intl
           coverage: none
