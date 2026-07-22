@@ -33,7 +33,11 @@ jobs:
             cd /var/www/imaro-staging
 
             echo "🧹 Clean stale locks..."
-            rm -f .git/index.lock
+            sudo rm -f .git/index.lock
+            if [ -e .git/index.lock ]; then
+              echo "::error::Impossible de supprimer .git/index.lock — déploiement interrompu."
+              exit 1
+            fi
 
             echo "📦 Pull latest code..."
             git fetch origin develop
