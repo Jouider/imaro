@@ -45,7 +45,13 @@ jobs:
             rm -rf node_modules
             npm ci
 
+            # NB : le front principal attend une URL COMPLÈTE, suffixe /api inclus
+            # (cf. frontend/.env.example) — contrairement au back-office qui, lui,
+            # concatène `VITE_API_URL + /api`. Valeur en dur plutôt qu'en secret :
+            # un secret mal renseigné est invisible en relecture, et c'est
+            # exactement ce qui a cassé la connexion en prod (appels vers
+            # api.imaro.ma/auth/login → 404 sans en-tête CORS).
             echo "🔨 Build..."
-            VITE_API_URL=${{ secrets.VITE_API_URL }} npm run build
+            VITE_API_URL=https://api.imaro.ma/api npm run build
 
             echo "✅ Frontend deployed successfully!"
