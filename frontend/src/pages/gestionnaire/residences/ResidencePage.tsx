@@ -1227,7 +1227,9 @@ export function ResidencePage() {
             <div className="space-y-1">
               <Label>
                 {t('gestionnaire.residence.colTitreFoncier')}{' '}
-                <span className="text-[var(--color-imaro-danger)]">*</span>
+                <span className="text-[var(--color-imaro-muted)]">
+                  ({t('common.optional', { defaultValue: 'optionnel' })})
+                </span>
               </Label>
               <Input
                 value={form.titre_foncier}
@@ -1235,7 +1237,6 @@ export function ResidencePage() {
                   setForm((f) => ({ ...f, titre_foncier: e.target.value }))
                 }
                 placeholder={t('gestionnaire.residence.titreFoncierPh')}
-                aria-invalid={form.titre_foncier.trim() === ''}
               />
             </div>
 
@@ -1287,10 +1288,7 @@ export function ResidencePage() {
             >
               {t('actions.cancel')}
             </Button>
-            <Button
-              onClick={handleSubmitLot}
-              disabled={isMutating || !form.titre_foncier.trim()}
-            >
+            <Button onClick={handleSubmitLot} disabled={isMutating}>
               {isMutating ? t('actions.loading') : t('actions.save')}
             </Button>
           </DialogFooter>

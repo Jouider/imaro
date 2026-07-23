@@ -33,8 +33,12 @@ class StoreLotRequest extends FormRequest
                 // Unicité autoritaire par résidence (KAN-40).
                 Rule::unique('lots', 'numero')->where(fn ($q) => $q->where('residence_id', $residenceId)),
             ],
-            // KAN-94 — titre foncier obligatoire.
-            'titre_foncier' => ['required', 'string', 'max:100'],
+            // KAN-94 avait rendu le titre foncier obligatoire, ce qui bloquait la
+            // génération de lots (KAN-150) : on ne connaît pas les références
+            // foncières au moment où l'on crée la structure d'une résidence. La
+            // colonne est nullable et aucun lot existant n'en porte — le champ se
+            // renseigne lot par lot ensuite. Facultatif à la création.
+            'titre_foncier' => ['nullable', 'string', 'max:100'],
             // KAN-93 — catégorie de lot (obligatoire en mode « par catégorie »).
             'categorie_lot_id' => [$categorieRequis ? 'required' : 'nullable', Rule::exists('categories_lot', 'id')->where('residence_id', $residenceId)],
             'type' => ['required', 'in:appartement,local_commercial,commerce,parking,cave,bureau,autre'],
