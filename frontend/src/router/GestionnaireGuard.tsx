@@ -32,13 +32,18 @@ export function GestionnaireGuard({ children }: Props) {
 
   useEffect(() => {
     if (!isAuthorised) {
-      void navigate('/login', { replace: true })
+      // Un membre du personnel connecté file vers son écran de scan plutôt que
+      // vers le login (KAN-149 — confiné à /gardien, sans accès aux modules
+      // gestionnaire).
+      const target =
+        token && user?.role === 'personnel' ? '/gardien' : '/login'
+      void navigate(target, { replace: true })
       return
     }
     if (needsOnboarding && pathname !== ONBOARDING_PATH) {
       void navigate(ONBOARDING_PATH, { replace: true })
     }
-  }, [isAuthorised, needsOnboarding, pathname, navigate])
+  }, [isAuthorised, needsOnboarding, pathname, navigate, token, user])
 
   if (!isAuthorised) return null
   // Avoid flashing the requested page before the onboarding redirect lands.
