@@ -219,7 +219,8 @@ class LotController extends Controller
         $request->validate([
             'lots' => ['required', 'array', 'min:1', 'max:50'],
             'lots.*.numero' => ['required', 'string', 'max:20'],
-            'lots.*.titre_foncier' => ['required', 'string', 'max:100'],
+            // Facultatif : cf. StoreLotRequest — se complète après génération (KAN-150).
+            'lots.*.titre_foncier' => ['nullable', 'string', 'max:100'],
             'lots.*.categorie_lot_id' => [$residence->mode_cotisation === 'categorie' ? 'required' : 'nullable', Rule::exists('categories_lot', 'id')->where('residence_id', $residence->id)],
             'lots.*.type' => ['required', 'in:appartement,local_commercial,commerce,parking,cave,bureau,autre'],
             'lots.*.etage' => ['nullable', 'integer', 'min:-5', 'max:50'],
@@ -267,7 +268,7 @@ class LotController extends Controller
                     'immeuble_id' => $immeuble->id,
                     'categorie_lot_id' => $data['categorie_lot_id'] ?? null,
                     'numero' => $data['numero'],
-                    'titre_foncier' => $data['titre_foncier'],
+                    'titre_foncier' => $data['titre_foncier'] ?? null,
                     'type' => $data['type'],
                     'etage' => $data['etage'] ?? 0,
                     'superficie' => $data['superficie'] ?? null,

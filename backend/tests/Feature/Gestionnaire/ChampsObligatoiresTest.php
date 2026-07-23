@@ -42,16 +42,20 @@ beforeEach(function () {
     $this->auth = ['Authorization' => 'Bearer '.$this->manager->createToken('t')->plainTextToken];
 });
 
-// ── KAN-94 : titre foncier obligatoire sur les lots ──────────────────────────
+// ── KAN-94 / KAN-150 : titre foncier facultatif à la création ────────────────
+//
+// KAN-94 l'avait rendu obligatoire, ce qui bloquait la génération de lots
+// (KAN-150) : on ne connaît pas les références foncières au moment de créer la
+// structure d'une résidence. Il se renseigne lot par lot ensuite.
 
-it('KAN-94 — rejette (422) la création d\'un lot sans titre foncier', function () {
+it('KAN-150 — crée un lot SANS titre foncier (facultatif)', function () {
     $this->withHeaders($this->auth)
         ->postJson("/api/gestionnaire/residences/{$this->residence->id}/lots", [
             'numero' => 'A01', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 100,
             'immeuble_id' => $this->immeuble->id,
         ])
-        ->assertStatus(422)
-        ->assertJsonValidationErrors('titre_foncier');
+        ->assertStatus(201)
+        ->assertJsonPath('data.lot.titre_foncier', null);
 });
 
 it('KAN-94 — crée un lot avec titre foncier et le renvoie dans la liste', function () {
@@ -69,13 +73,15 @@ it('KAN-94 — crée un lot avec titre foncier et le renvoie dans la liste', fun
         ->assertJsonPath('data.lots.0.titre_foncier', 'TF-12345/C');
 });
 
-it('KAN-94 — rejette (422) un import bulk sans titre foncier', function () {
-    $this->withHeaders($this->auth)
+it('KAN-150 — génère en masse SANS titre foncier', function () {
+    $res = $this->withHeaders($this->auth)
         ->postJson("/api/gestionnaire/residences/{$this->residence->id}/lots/bulk", [
             'lots' => [['numero' => 'A01', 'type' => 'appartement', 'etage' => 1, 'tantieme' => 100]],
         ])
-        ->assertStatus(422)
-        ->assertJsonValidationErrors('lots.0.titre_foncier');
+        ->assertStatus(200);
+
+    expect($res->json('data.created'))->toBe(1);
+    expect($res->json('data.errors'))->toBe([]);
 });
 
 // ── KAN-92 : CIN obligatoire (utilisateurs d'équipe + personnel) ─────────────
