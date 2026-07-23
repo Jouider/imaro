@@ -64,14 +64,6 @@ jobs:
             sudo -u www-data php artisan route:cache
             sudo -u www-data php artisan view:cache
 
-            # Recharge php-fpm pour vider l'opcache : sans ça, le worker web
-            # continue de servir le bytecode mis en cache et renvoie des 500
-            # pendant ~30 s le temps que l'opcache expire (des clients réels
-            # prenaient ces 500 à chaque déploiement). `reload` = cutover
-            # gracieux, sans coupure. api.imaro.ma passe par php8.4-fpm.
-            echo "♻️  Reload php-fpm (purge opcache)..."
-            sudo systemctl reload php8.4-fpm
-
             echo "🔄 Restart Horizon..."
             sudo supervisorctl restart horizon
 
@@ -87,13 +79,15 @@ jobs:
             fi
 
             # L'API répond-elle vraiment ? (401 attendu : route protégée, donc
-            # routes chargées + framework debout. 404/500 = déploiement cassé.)
-            # On réessaie : juste après le rechargement des caches et le
-            # redémarrage de Horizon, l'application peut renvoyer 500 pendant
-            # une poignée de secondes sans que le déploiement soit en cause.
+            # routes chargées + framework debout.) Le header Accept est
+            # OBLIGATOIRE : sans lui, une requête non authentifiée n'est pas
+            # traitée comme de l'API, Laravel tente de rediriger vers la route
+            # web `login` (inexistante) et renvoie 500 — pas un déploiement
+            # cassé, juste un mauvais test (ce qui a produit de faux échecs).
             CODE=""
-            for i in 1 2 3 4 5 6; do
-              CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 https://api.imaro.ma/api/auth/me || echo "000")
+            for i in 1 2 3; do
+              CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 \
+                -H "Accept: application/json" https://api.imaro.ma/api/auth/me || echo "000")
               [ "$CODE" = "401" ] && break
               echo "   tentative $i : HTTP $CODE — nouvelle tentative dans 5s..."
               sleep 5
