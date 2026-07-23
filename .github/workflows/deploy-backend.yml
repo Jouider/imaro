@@ -36,8 +36,16 @@ jobs:
             set -e
             cd /var/www/imaro
 
+            # `rm -f` échoue en silence si le lock appartient à un autre
+            # utilisateur (www-data) : le 21/07/2026 le déploiement est mort ici,
+            # laissant la prod avec le code à jour mais 19 migrations en attente
+            # et des caches figés depuis 3 semaines. On force, puis on vérifie.
             echo "🧹 Clean stale locks..."
-            rm -f .git/index.lock
+            sudo rm -f .git/index.lock
+            if [ -e .git/index.lock ]; then
+              echo "::error::Impossible de supprimer .git/index.lock — déploiement interrompu."
+              exit 1
+            fi
 
             echo "📦 Pull latest code..."
             git fetch origin main
@@ -59,4 +67,33 @@ jobs:
             echo "🔄 Restart Horizon..."
             sudo supervisorctl restart horizon
 
-            echo "✅ Backend deployed successfully!"
+            # Vérification post-déploiement : un déploiement à moitié appliqué
+            # ne doit plus jamais passer pour un succès. L'app mobile tape sur
+            # cette API — une régression ici est visible par les clients.
+            echo "🔍 Vérification post-déploiement..."
+
+            PENDING=$(sudo -u www-data php artisan migrate:status 2>/dev/null | grep -ci "pending" || true)
+            if [ "$PENDING" != "0" ]; then
+              echo "::error::$PENDING migration(s) encore en attente après le déploiement."
+              exit 1
+            fi
+
+            # L'API répond-elle vraiment ? (401 attendu : route protégée, donc
+            # routes chargées + framework debout. 404/500 = déploiement cassé.)
+            # On réessaie : juste après le rechargement des caches et le
+            # redémarrage de Horizon, l'application peut renvoyer 500 pendant
+            # une poignée de secondes sans que le déploiement soit en cause.
+            CODE=""
+            for i in 1 2 3 4 5 6; do
+              CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 https://api.imaro.ma/api/auth/me || echo "000")
+              [ "$CODE" = "401" ] && break
+              echo "   tentative $i : HTTP $CODE — nouvelle tentative dans 5s..."
+              sleep 5
+            done
+
+            if [ "$CODE" != "401" ]; then
+              echo "::error::L'API ne répond pas correctement après 6 tentatives (HTTP $CODE au lieu de 401)."
+              exit 1
+            fi
+
+            echo "✅ Backend deployed successfully! (0 migration en attente, API OK)"

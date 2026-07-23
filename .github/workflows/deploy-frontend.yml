@@ -32,8 +32,14 @@ jobs:
             set -e
             cd /var/www/imaro
 
+            # `rm -f` échoue en silence si le lock appartient à un autre
+            # utilisateur : c'est ce qui a fait échouer le déploiement du 21/07.
             echo "🧹 Clean stale locks..."
-            rm -f .git/index.lock
+            sudo rm -f .git/index.lock
+            if [ -e .git/index.lock ]; then
+              echo "::error::Impossible de supprimer .git/index.lock — déploiement interrompu."
+              exit 1
+            fi
 
             echo "📦 Pull latest code..."
             git fetch origin main
@@ -54,4 +60,18 @@ jobs:
             echo "🔨 Build..."
             VITE_API_URL=https://api.imaro.ma/api npm run build
 
-            echo "✅ Frontend deployed successfully!"
+            # Vérification post-build : l'URL d'API doit être présente ET complète
+            # dans le bundle produit. Une URL sans /api renvoie 404 sans en-tête
+            # CORS, ce que le navigateur signale comme une erreur d'origine — un
+            # symptôme trompeur qui a coûté du temps le 22/07/2026.
+            echo "🔍 Vérification de l'URL d'API compilée..."
+            if ! grep -rq "https://api.imaro.ma/api" dist/assets/*.js; then
+              echo "::error::L'URL d'API attendue est absente du bundle — build à ne pas publier."
+              exit 1
+            fi
+            if grep -rqE '"https://api\.imaro\.ma"' dist/assets/*.js; then
+              echo "::error::Le bundle contient l'URL sans suffixe /api — la connexion serait cassée."
+              exit 1
+            fi
+
+            echo "✅ Frontend deployed successfully! (URL d'API vérifiée)"

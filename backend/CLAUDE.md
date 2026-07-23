@@ -8,7 +8,7 @@ My first output every morning: update `docs/api.md` before writing any code.
 ## Project
 imaro — SaaS B2B multi-tenant — condo management for Morocco (by Digitoyou).
 Competitor: SyndicConnect (app.syndicconnect.ma) — we surpass on UX, security, features.
-Stack: Laravel 11 · MySQL 8 · Redis · PHP 8.3
+Stack: Laravel 11 · MySQL 8 · Redis · PHP 8.4
 
 ## Mono-repo structure
 ```
@@ -22,7 +22,7 @@ imaro/              ← root (I manage this)
 ```
 
 ## My stack
-- PHP 8.3 + Laravel 11
+- PHP 8.4 + Laravel 11 (le VPS tourne en 8.4 ; composer.lock exige >= 8.4)
 - MySQL 8 (main DB) + Redis (cache + queues)
 - Laravel Sanctum (token auth)
 - Laravel Horizon (queue dashboard)

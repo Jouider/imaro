@@ -17,6 +17,7 @@ import {
   X,
 } from 'lucide-react'
 import { logout } from '../lib/api'
+import { NotificationBell } from './NotificationBell'
 
 const nav = [
   { to: '/', label: 'Tableau de bord', icon: LayoutDashboard, end: true },
@@ -37,23 +38,7 @@ export function Layout() {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="flex min-h-full">
-      {/* Barre supérieure — mobile uniquement */}
-      <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center gap-3 bg-primary px-4 text-white md:hidden">
-        <button
-          onClick={() => setOpen(true)}
-          aria-label="Ouvrir le menu"
-          className="rounded-lg p-1 hover:bg-white/10"
-        >
-          <Menu className="size-5" />
-        </button>
-        <img
-          src="/logo-horizontal-inverted.png"
-          alt="imaro back-office"
-          className="h-6 w-auto object-contain"
-        />
-      </header>
-
+    <div className="flex min-h-dvh">
       {/* Voile derrière le tiroir mobile */}
       {open && (
         <div
@@ -63,9 +48,11 @@ export function Layout() {
         />
       )}
 
-      {/* Sidebar — tiroir sur mobile, colonne fixe dès md */}
+      {/* Sidebar — tiroir sur mobile, colonne collée en haut dès md.
+          md:sticky + md:h-dvh : le menu reste visible quand le contenu défile
+          (auparavant md:static → il défilait avec la page). */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-60 flex-col bg-primary text-white transition-transform duration-200 md:static md:z-auto md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-60 flex-col bg-primary text-white transition-transform duration-200 md:sticky md:top-0 md:z-auto md:h-dvh md:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -115,11 +102,27 @@ export function Layout() {
         </button>
       </aside>
 
-      <main className="flex-1 overflow-auto pt-14 md:pt-0">
-        <div className="mx-auto max-w-6xl p-4 sm:p-6">
-          <Outlet />
-        </div>
-      </main>
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* En-tête : bouton menu (mobile) + cloche de notifications (toujours).
+            Collé en haut pour rester accessible pendant le défilement. */}
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-slate-200 bg-white px-4">
+          <button
+            onClick={() => setOpen(true)}
+            aria-label="Ouvrir le menu"
+            className="rounded-lg p-1 text-slate-600 hover:bg-slate-100 md:hidden"
+          >
+            <Menu className="size-5" />
+          </button>
+          <div className="flex-1" />
+          <NotificationBell />
+        </header>
+
+        <main className="flex-1 overflow-auto">
+          <div className="mx-auto max-w-6xl p-4 sm:p-6">
+            <Outlet />
+          </div>
+        </main>
+      </div>
     </div>
   )
 }
