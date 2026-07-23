@@ -56,11 +56,6 @@ jobs:
             sudo -u www-data php artisan route:cache
             sudo -u www-data php artisan view:cache
 
-            # Purge l'opcache (sinon 500 le temps qu'il expire). Reload gracieux,
-            # sans coupure. NB : staging et prod partagent le pool php8.4-fpm.
-            echo "♻️  Reload php-fpm (purge opcache)..."
-            sudo systemctl reload php8.4-fpm
-
             echo "🔄 Restart Horizon..."
             sudo supervisorctl restart horizon-staging
 
