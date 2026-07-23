@@ -64,6 +64,14 @@ jobs:
             sudo -u www-data php artisan route:cache
             sudo -u www-data php artisan view:cache
 
+            # Recharge php-fpm pour vider l'opcache : sans ça, le worker web
+            # continue de servir le bytecode mis en cache et renvoie des 500
+            # pendant ~30 s le temps que l'opcache expire (des clients réels
+            # prenaient ces 500 à chaque déploiement). `reload` = cutover
+            # gracieux, sans coupure. api.imaro.ma passe par php8.4-fpm.
+            echo "♻️  Reload php-fpm (purge opcache)..."
+            sudo systemctl reload php8.4-fpm
+
             echo "🔄 Restart Horizon..."
             sudo supervisorctl restart horizon
 
