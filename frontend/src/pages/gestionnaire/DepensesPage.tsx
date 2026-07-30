@@ -75,6 +75,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { resolveStorageUrl } from '@/lib/files'
 import { AI_FEATURES_ENABLED } from '@/lib/features'
 
 // ─── Colors ───────────────────────────────────────────────────────────────────
@@ -1078,45 +1079,33 @@ export function DepensesPage() {
     {
       key: 'justificatif_path',
       header: 'Justificatif',
-      // KAN-121 : ouvrir l'aperçu du justificatif dans un nouvel onglet quand le
-      // backend fournit `justificatif_url`. Sinon bouton désactivé (fichier pas
-      // encore servi côté API).
-      renderCell: (r) =>
-        r.justificatif_path ? (
-          r.justificatif_url ? (
-            <Button
-              asChild
-              variant="ghost"
-              size="sm"
-              className="h-6 px-2"
-              title={t('gestionnaire.depenses.form.previewJustificatif', {
-                defaultValue: 'Ouvrir l’aperçu',
-              })}
-            >
-              <a
-                href={r.justificatif_url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Download className="size-3.5" />
-              </a>
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 px-2"
-              disabled
-              title={t('gestionnaire.depenses.justificatifUnavailable', {
-                defaultValue: 'Aperçu indisponible',
-              })}
-            >
+      // KAN-121 : ouvrir l'aperçu du justificatif dans un nouvel onglet. Le backend
+      // renvoie déjà l'URL servable dans `justificatif_path` (Storage::url) — il ne
+      // faut donc PAS la re-préfixer par /storage/. `resolveStorageUrl` absolutise
+      // une URL racine-relative contre l'origine du backend. (`justificatif_url`
+      // gardé en repli si un jour l'API l'expose.)
+      renderCell: (r) => {
+        const href = resolveStorageUrl(
+          r.justificatif_url ?? r.justificatif_path,
+        )
+        return href ? (
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="h-6 px-2"
+            title={t('gestionnaire.depenses.form.previewJustificatif', {
+              defaultValue: 'Ouvrir l’aperçu',
+            })}
+          >
+            <a href={href} target="_blank" rel="noopener noreferrer">
               <Download className="size-3.5" />
-            </Button>
-          )
+            </a>
+          </Button>
         ) : (
           <span className="text-muted-foreground">—</span>
-        ),
+        )
+      },
     },
     {
       key: 'statut_approbation',

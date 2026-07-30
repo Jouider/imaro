@@ -1,0 +1,135 @@
+name: CI
+
+# Filet de sécurité avant fusion. Jusqu'ici le dépôt n'avait QUE des workflows de
+# déploiement : rien ne validait une PR, et du code rouge pouvait atteindre
+# develop puis la production sans qu'aucun signal ne se déclenche.
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend — Pest + Pint
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || contains(join(github.event.pull_request.labels.*.name), 'skip-ci') == false
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: secret
+          MYSQL_DATABASE: imaro_test
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -psecret"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+
+      redis:
+        image: redis:7
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # 8.4 = version de la production (le VPS tourne en php8.4). composer.json
+      # annonce ^8.3, mais le composer.lock résolu exige >= 8.4 : la CI doit
+      # refléter ce qui est déployé, pas ce que la doc annonce.
+      - name: Setup PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          # gd : requis par PhpSpreadsheet (exports comptables).
+          extensions: mbstring, pdo_mysql, redis, gd, bcmath, intl
+          coverage: none
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: backend/vendor
+          key: composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+        env:
+          DB_CONNECTION: mysql
+
+      - name: Run migrations
+        run: php artisan migrate --force
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: imaro_test
+          DB_USERNAME: root
+          DB_PASSWORD: secret
+
+      # Les tests d'abord : c'est la barrière qui compte. Si Pint passait avant
+      # et échouait, Pest ne tournait jamais — on perdait le signal utile.
+      - name: Pest (tests)
+        run: php -d memory_limit=1024M ./vendor/bin/pest --parallel
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: imaro_test
+          DB_USERNAME: root
+          DB_PASSWORD: secret
+          REDIS_HOST: 127.0.0.1
+          CACHE_STORE: redis
+          QUEUE_CONNECTION: sync
+
+      # Pint signale mais ne bloque pas encore : le style n'avait jamais ete
+      # verifie en CI, et ~40 fichiers preexistants sortent non conformes.
+      # Bloquer dessus imposerait un reformatage massif au milieu d'un
+      # correctif urgent. A repasser en bloquant une fois la dette resorbee.
+      - name: Pint (style — informatif)
+        continue-on-error: true
+        run: ./vendor/bin/pint --test
+
+  frontend:
+    name: Front — typecheck + build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [frontend, backoffice]
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.app }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: ${{ matrix.app }}/package-lock.json
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck --if-present
+
+      - name: Build
+        run: npm run build

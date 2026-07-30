@@ -45,15 +45,42 @@ class LotController extends Controller
     /**
      * POST /api/gestionnaire/residences/{residence}/lots
      */
+    /**
+     * Immeuble porteur par défaut d'une résidence (KAN-150).
+     *
+     * Toutes les copropriétés ne sont pas découpées en bâtiments, et l'assistant
+     * de création permet de sauter cette étape. Or `lots.immeuble_id` est NOT NULL :
+     * sans immeuble, aucun lot n'était créable — la génération renvoyait 0 ligne
+     * créée, sans erreur visible côté utilisateur. On matérialise donc un bâtiment
+     * unique à la demande, transparent pour l'utilisateur.
+     */
+    private function immeubleParDefaut(Residence $residence): Immeuble
+    {
+        $immeuble = $residence->immeubles()->first();
+        if ($immeuble) {
+            return $immeuble;
+        }
+
+        return Immeuble::create([
+            'tenant_id' => config('app.tenant_id'),
+            'residence_id' => $residence->id,
+            'nom' => $residence->name,
+            'nb_etages' => 0,
+            'nb_lots' => 0,
+        ]);
+    }
+
     public function store(StoreLotRequest $request, Residence $residence): JsonResponse
     {
         $this->authorizeResidence($request, $residence);
 
-        // Résoudre l'immeuble cible
-        $immeubleId = $request->immeuble_id;
-        $immeuble = Immeuble::where('id', $immeubleId)
-            ->where('residence_id', $residence->id)
-            ->firstOrFail();
+        // Résoudre l'immeuble cible. Un id explicite doit exister ; sans id, on
+        // retombe sur l'immeuble par défaut de la résidence (créé au besoin).
+        $immeuble = $request->immeuble_id
+            ? Immeuble::where('id', $request->immeuble_id)
+                ->where('residence_id', $residence->id)
+                ->firstOrFail()
+            : $this->immeubleParDefaut($residence);
 
         // Validation tantième uniquement en mode tantieme
         $newTantieme = $request->tantieme ?? 0;
@@ -201,7 +228,7 @@ class LotController extends Controller
             'lots.*.immeuble_id' => ['nullable', 'integer'],
         ]);
 
-        $defaultImmeuble = $residence->immeubles()->first();
+        $defaultImmeuble = $this->immeubleParDefaut($residence);
         $created = 0;
         $errors = [];
 

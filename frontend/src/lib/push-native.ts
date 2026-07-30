@@ -6,6 +6,7 @@ import {
   type PushNotificationSchema,
 } from '@capacitor/push-notifications'
 import { api } from '@/lib/axios'
+import { env } from '@/lib/env'
 import { useNotifStore } from '@/stores/notifStore'
 import type { NotifType } from '@/stores/notifStore'
 
@@ -32,6 +33,11 @@ let lastToken: string | null = null
 export async function initNativePush(navigate: NavigateFn): Promise<void> {
   if (!Capacitor.isNativePlatform()) return
 
+  // Log the backend the app actually targets — a wrong VITE_API_URL baked into
+  // a store build (e.g. localhost) is the usual cause of "no device token
+  // reaches the server". Visible in Xcode / logcat. (KAN-133)
+  console.info('[push-native] init — API base =', env.apiBase)
+
   const { receive } = await PushNotifications.requestPermissions()
   if (receive !== 'granted') return
 
@@ -52,8 +58,22 @@ export async function initNativePush(navigate: NavigateFn): Promise<void> {
             token: token.value,
             platform,
           })
-        } catch {
-          // Non-fatal: push will still arrive, but backend won't target this device.
+          console.info('[push-native] device registered', { platform })
+        } catch (err) {
+          // ⚠️ If this fails the device is NOT registered server-side and will
+          // receive NO push. Surface status + body so a 401/404 is diagnosable
+          // instead of being swallowed silently (KAN-133).
+          const e = err as {
+            response?: { status?: number; data?: unknown }
+            message?: string
+          }
+          console.error(
+            '[push-native] register-device FAILED — this device will NOT receive pushes.',
+            'status:',
+            e.response?.status ?? '(no response — network/URL?)',
+            'body:',
+            e.response?.data ?? e.message,
+          )
         }
       },
     )

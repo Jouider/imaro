@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\Notifications\TenantOwnerWelcomeNotifier;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 /**
  * Onboarding d'un cabinet : crée le compte responsable (manager) avec un mot de
@@ -35,6 +36,11 @@ class TenantOnboarding
             'status' => 'active',
             'must_change_password' => true,
         ]);
+        // Rôle Spatie créé à la demande (idempotent) : la conversion d'un lead
+        // peut viser un environnement où les rôles n'ont pas été semés, et un
+        // assignRole() sur un rôle absent lève RoleDoesNotExist → 500 sur un
+        // parcours commercial. Même idiome que EquipePersonnelController.
+        Role::firstOrCreate(['name' => 'manager', 'guard_name' => 'web']);
         $user->assignRole('manager');
 
         $this->notifier->send($user, $tenant, $password);

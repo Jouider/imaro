@@ -116,6 +116,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { resolveStorageUrl } from '@/lib/files'
 import { AI_FEATURES_ENABLED } from '@/lib/features'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -1460,16 +1461,15 @@ function TabJournal({ exerciceId }: { exerciceId: number }) {
       header: t('gestionnaire.comptabilite.journal.piece', {
         defaultValue: 'Pièce',
       }),
+      // `piece_justificative` du journal est une RÉFÉRENCE de pièce comptable
+      // (ex. DEP-123, PAY-45) renvoyée par l'API — pas un fichier téléchargeable.
+      // On l'affiche telle quelle. L'aperçu du justificatif fichier se fait dans
+      // la sous-table « Dépenses » (colonne justificatif_path) ci-dessous.
       renderCell: (r) =>
         r.piece_justificative ? (
-          <a
-            href={`/storage/${r.piece_justificative}`}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1 text-blue-600 hover:underline"
-          >
-            <Download className="size-3.5" />
-          </a>
+          <span className="font-mono text-xs text-muted-foreground">
+            {r.piece_justificative}
+          </span>
         ) : (
           <span className="text-muted-foreground">—</span>
         ),
@@ -2156,10 +2156,14 @@ function TabDepenses({
     {
       key: 'justificatif_path',
       header: t('common.piece'),
-      renderCell: (r) =>
-        r.justificatif_path ? (
+      // KAN-124/125 : le backend renvoie déjà l'URL servable dans
+      // `justificatif_path` (Storage::url). On ne re-préfixe donc PAS par /storage/
+      // (bug du double préfixe → 404). resolveStorageUrl absolutise si besoin.
+      renderCell: (r) => {
+        const href = resolveStorageUrl(r.justificatif_path)
+        return href ? (
           <a
-            href={`/storage/${r.justificatif_path}`}
+            href={href}
             target="_blank"
             rel="noreferrer"
             className="text-blue-600 hover:underline"
@@ -2168,7 +2172,8 @@ function TabDepenses({
           </a>
         ) : (
           <span className="text-muted-foreground">—</span>
-        ),
+        )
+      },
     },
     {
       key: 'id',
