@@ -1,11 +1,12 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Home, Wallet, MessageSquare, User, Bell, QrCode } from 'lucide-react'
+import { Home, Wallet, MessageSquare, User, QrCode } from 'lucide-react'
 import { Wordmark } from '@/components/Wordmark'
 import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { useThemeStore } from '@/stores/themeStore'
 import { UnreadBadge } from '@/components/portail/UnreadBadge'
+import { NotificationCenter } from '@/components/shared/NotificationCenter'
 import { InstallPrompt } from '@/components/portail/InstallPrompt'
 import { useNativePush } from '@/hooks/useNativePush'
 import { cn } from '@/lib/utils'
@@ -19,10 +20,11 @@ type NavItem = {
   unread?: number
 }
 
-// Mock unread counts — Phase 3 will wire to real notification store
-const MOCK_UNREAD = { finances: 2, reclamations: 1 }
-
 // Two tabs each side of the raised center QR button (kenzup-style, KAN-59).
+// Tab unread badges are intentionally left unset — there is no real per-tab
+// unread source yet, and hardcoded mock counts (previously 2 / 1) showed as
+// phantom badges on real devices. `UnreadBadge` renders nothing when unset, so
+// the plumbing stays ready for real data without faking it.
 const LEFT_ITEMS: NavItem[] = [
   {
     to: '/portail',
@@ -34,7 +36,6 @@ const LEFT_ITEMS: NavItem[] = [
     to: '/portail/finances',
     icon: <Wallet className="size-[22px]" aria-hidden="true" />,
     labelKey: 'portail.nav.finances',
-    unread: MOCK_UNREAD.finances,
   },
 ]
 
@@ -43,7 +44,6 @@ const RIGHT_ITEMS: NavItem[] = [
     to: '/portail/reclamations',
     icon: <MessageSquare className="size-[22px]" aria-hidden="true" />,
     labelKey: 'portail.nav.reclamations',
-    unread: MOCK_UNREAD.reclamations,
   },
   {
     to: '/portail/profil',
@@ -107,8 +107,6 @@ export function PortailLayout() {
   const { t } = useTranslation()
   const theme = useThemeStore((s) => s.theme)
   useNativePush()
-  const totalUnread =
-    (MOCK_UNREAD.finances ?? 0) + (MOCK_UNREAD.reclamations ?? 0)
 
   return (
     <div className="flex min-h-svh flex-col bg-[var(--color-imaro-surface)] dark:bg-background">
@@ -120,14 +118,10 @@ export function PortailLayout() {
         <div className="flex items-center justify-between px-4 py-2">
           <Wordmark inverted={theme === 'dark'} className="h-9 w-32" />
           <div className="flex items-center gap-0.5">
-            <button
-              type="button"
-              aria-label={t('portail.nav.notifications')}
-              className="relative flex size-10 items-center justify-center rounded-full text-[var(--primary)] hover:bg-[var(--color-imaro-primary-tint)]"
-            >
-              <Bell className="size-[22px]" aria-hidden="true" />
-              <UnreadBadge count={totalUnread} />
-            </button>
+            <NotificationCenter
+              triggerClassName="size-10 rounded-full text-[var(--primary)] hover:bg-[var(--color-imaro-primary-tint)]"
+              iconClassName="size-[22px]"
+            />
             <LanguageSwitcher />
             <ThemeToggle />
           </div>

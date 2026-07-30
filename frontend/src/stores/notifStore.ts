@@ -14,68 +14,11 @@ export type Notif = {
   read: boolean
 }
 
-// ─── Mock seed data ───────────────────────────────────────────────────────────
-
-const now = new Date()
-const minsAgo = (m: number) =>
-  new Date(now.getTime() - m * 60_000).toISOString()
-const hoursAgo = (h: number) =>
-  new Date(now.getTime() - h * 3_600_000).toISOString()
-const daysAgo = (d: number) =>
-  new Date(now.getTime() - d * 86_400_000).toISOString()
-
-const SEED_NOTIFS: Notif[] = [
-  {
-    id: 'n1',
-    type: 'paiement',
-    title: 'Paiement reçu',
-    message: 'Youssef El Mansouri a réglé 1 500 MAD — Lot B3',
-    time: minsAgo(12),
-    read: false,
-  },
-  {
-    id: 'n2',
-    type: 'ticket',
-    title: 'Nouveau ticket',
-    message: "Fuite d'eau signalée au 3ème étage — Bât. A",
-    time: minsAgo(45),
-    read: false,
-  },
-  {
-    id: 'n3',
-    type: 'retard',
-    title: 'Retard de paiement',
-    message: 'Sara Alaoui — Lot C1 — échéance dépassée de 5 jours',
-    time: hoursAgo(3),
-    read: false,
-  },
-  {
-    id: 'n4',
-    type: 'assemblee',
-    title: 'Assemblée programmée',
-    message: 'AG ordinaire le 25 mai 2026 à 18h — Salle de réunion',
-    time: hoursAgo(7),
-    read: true,
-  },
-  {
-    id: 'n5',
-    type: 'info',
-    title: 'Document ajouté',
-    message: "PV AG 2025 disponible dans l'espace Documents",
-    time: daysAgo(1),
-    read: true,
-  },
-  {
-    id: 'n6',
-    type: 'paiement',
-    title: 'Paiement reçu',
-    message: 'Karim Benali a réglé 2 200 MAD — Lot A7',
-    time: daysAgo(2),
-    read: true,
-  },
-]
-
-// ─── Store ───────────────────────────────────────────────────────────────────
+// ─── Store ─────────────────────────────────────────────────────────────────
+// Notifications are real, not seeded: they arrive via native push
+// (`push-native.ts` → addNotif) and controller events. Previously the store
+// shipped with 6 mock notifications, which surfaced as phantom "unread" badges
+// on real devices even when nothing had happened (KAN-133 follow-up).
 
 type NotifState = {
   notifs: Notif[]
@@ -88,7 +31,7 @@ type NotifState = {
 export const useNotifStore = create<NotifState>()(
   persist(
     (set) => ({
-      notifs: SEED_NOTIFS,
+      notifs: [],
 
       markRead: (id) =>
         set((s) => ({
@@ -115,6 +58,16 @@ export const useNotifStore = create<NotifState>()(
           ],
         })),
     }),
-    { name: 'imaro.notifs' },
+    {
+      name: 'imaro.notifs',
+      // v0 shipped 6 mock notifications persisted on-device. Bump the version so
+      // existing installs (which already cached the seed) are wiped to an empty
+      // list on upgrade — otherwise the phantom "unread" badges survive.
+      version: 1,
+      migrate: (persisted, version) => {
+        if (version < 1) return { notifs: [] } as Partial<NotifState>
+        return persisted as Partial<NotifState>
+      },
+    },
   ),
 )
