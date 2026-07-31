@@ -20,9 +20,10 @@ export function ConfidentialitePage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-imaro-surface)]">
-      {/* Header */}
+      {/* Header — sticky so the back button stays reachable while scrolling, and
+          padded for the notch/Dynamic Island so it isn't clipped (KAN-153 area). */}
       <header
-        className="px-4 py-3 text-white sm:px-6"
+        className="sticky top-0 z-20 px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] text-white sm:px-6"
         style={{
           background:
             'linear-gradient(135deg, var(--color-imaro-primary) 0%, var(--color-imaro-primary-dark, #154360) 100%)',
@@ -31,8 +32,12 @@ export function ConfidentialitePage() {
         <div className="mx-auto flex max-w-2xl items-center justify-between">
           <button
             type="button"
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+            // Go back if there's history; otherwise (deep-linked / cold start on
+            // this public page) fall back to a safe route instead of dead-ending.
+            onClick={() =>
+              window.history.length > 1 ? navigate(-1) : navigate('/portail')
+            }
+            className="-ms-2 flex min-h-[44px] items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
           >
             <ArrowLeft className="size-4 rtl:rotate-180" />
             {t('public.confidentialite.back')}
@@ -43,7 +48,7 @@ export function ConfidentialitePage() {
       </header>
 
       {/* Body */}
-      <main className="mx-auto max-w-2xl px-4 py-6 sm:px-6 sm:py-10">
+      <main className="mx-auto max-w-2xl px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 sm:pt-10">
         <div className="mb-6 flex items-start gap-3">
           <ShieldCheck className="mt-1 size-7 shrink-0 text-[var(--color-imaro-primary)]" />
           <div>
