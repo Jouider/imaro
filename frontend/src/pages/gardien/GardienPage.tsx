@@ -108,8 +108,8 @@ export function GardienPage() {
           'linear-gradient(160deg, var(--color-imaro-primary) 0%, var(--color-imaro-primary-dark, #154360) 100%)',
       }}
     >
-      {/* Top bar */}
-      <header className="flex items-center justify-between p-4">
+      {/* Top bar — respect the notch/Dynamic Island so it isn't clipped (KAN-153) */}
+      <header className="flex items-center justify-between px-4 pb-4 pt-[calc(1rem+env(safe-area-inset-top))]">
         <Wordmark inverted className="h-9 w-32" />
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
@@ -125,7 +125,7 @@ export function GardienPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-md space-y-5 px-4 pb-10">
+      <main className="mx-auto max-w-md space-y-5 px-4 pb-[calc(2.5rem+env(safe-area-inset-bottom))]">
         {/* Title */}
         <div className="text-center">
           <h1 className="font-display text-3xl">{t('gardien.title')}</h1>

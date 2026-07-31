@@ -50,8 +50,14 @@ export function QrScanner({
         onDecode(result.data)
       },
       {
-        highlightScanRegion: true,
-        highlightCodeOutline: true,
+        // Keep the library's own highlight overlays OFF. They inject a second,
+        // separately-positioned canvas/div over the video; with our `object-cover`
+        // square video their computed region doesn't line up with the cropped
+        // feed, so it renders offset AND on top of our own centered frame — the
+        // "décalage / chevauchement" reported on the scan page (KAN-153). Our
+        // static frame below is always centred via flexbox, so it never drifts.
+        highlightScanRegion: false,
+        highlightCodeOutline: false,
         preferredCamera: facingFront ? 'user' : 'environment',
         maxScansPerSecond: 4,
       },
