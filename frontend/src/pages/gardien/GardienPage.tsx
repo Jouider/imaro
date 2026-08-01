@@ -32,6 +32,7 @@ import {
   type Visite,
 } from '@/services/visites.service'
 import { cn } from '@/lib/utils'
+import { ConfirmModal } from '@/components/shared/ConfirmModal'
 import { WalkInDialog } from './WalkInDialog'
 import { ManualTokenDialog } from './ManualTokenDialog'
 
@@ -57,6 +58,9 @@ export function GardienPage() {
   const qc = useQueryClient()
   const { user, clear } = useAuthStore()
   const [view, setView] = useState<ViewState>({ kind: 'home' })
+  // Visitor pending a confirmed force-exit (KAN-157): a tap on the inside list
+  // must NOT silently validate anything — the gardien confirms first.
+  const [pendingExit, setPendingExit] = useState<Visite | null>(null)
 
   // Visitors currently inside (status='arrived') — tap one to force check-out.
   const activeQ = useQuery({
@@ -207,7 +211,7 @@ export function GardienPage() {
                     <button
                       key={v.id}
                       type="button"
-                      onClick={() => scanMut.mutate(v.qr_token)}
+                      onClick={() => setPendingExit(v)}
                       disabled={scanMut.isPending}
                       className="flex w-full items-center gap-3 rounded-xl bg-white/95 px-3 py-2.5 text-left text-foreground shadow-sm transition-transform active:scale-[0.98]"
                     >
@@ -321,6 +325,23 @@ export function GardienPage() {
         open={view.kind === 'manual'}
         onOpenChange={(v) => !v && setView({ kind: 'scan' })}
         onSubmit={(tok) => scanMut.mutate(tok)}
+      />
+
+      {/* Force-exit confirmation (KAN-157) — a tap on the inside list opens this
+          instead of validating directly, so nothing is "scanned" by a click. */}
+      <ConfirmModal
+        open={pendingExit !== null}
+        onOpenChange={(o) => !o && setPendingExit(null)}
+        title={t('gardien.forceExit.confirmTitle')}
+        description={t('gardien.forceExit.confirmDesc', {
+          name: pendingExit?.visitor_name ?? '',
+        })}
+        confirmLabel={t('gardien.forceExit.confirmBtn')}
+        isLoading={scanMut.isPending}
+        onConfirm={() => {
+          if (pendingExit) scanMut.mutate(pendingExit.qr_token)
+          setPendingExit(null)
+        }}
       />
     </div>
   )
