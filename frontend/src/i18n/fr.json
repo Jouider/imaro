@@ -335,8 +335,7 @@
         "interphone": "Interphone / Accès",
         "degat_eaux": "Dégât des eaux",
         "autre": "Autre"
-      },
-      "sujetMin": "Sujet trop court (5 caractères minimum)"
+      }
     },
     "profil": {
       "title": "Mon profil",
@@ -3643,6 +3642,11 @@
       "desc": "Ajoutez à l'écran d'accueil pour un accès rapide hors-ligne.",
       "install": "Installer",
       "later": "Plus tard"
+    },
+    "forceExit": {
+      "confirmTitle": "Forcer la sortie ?",
+      "confirmDesc": "Enregistrer la sortie de {{name}} sans scan ? À utiliser uniquement si le visiteur quitte les lieux sans présenter son QR.",
+      "confirmBtn": "Forcer la sortie"
     }
   },
   "errors": {
