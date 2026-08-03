@@ -11,6 +11,7 @@ import {
   LogOut,
   Users,
   ArrowRight,
+  ArrowLeft,
   Building2,
   Clock,
   Download,
@@ -104,6 +105,16 @@ export function GardienPage() {
     },
   })
 
+  // A dedicated security agent (`personnel`) is intentionally confined to Guard
+  // mode — logout is their only exit. But a manager/gestionnaire who opens Guard
+  // mode must be able to return to their app instead of being trapped with only
+  // a logout button (KAN-152).
+  const canGoBack = !!user && user.role !== 'personnel'
+  const goBack = () => {
+    if (window.history.length > 1) navigate(-1)
+    else navigate('/gestionnaire/dashboard')
+  }
+
   return (
     <div
       className="min-h-screen text-white"
@@ -114,7 +125,20 @@ export function GardienPage() {
     >
       {/* Top bar — respect the notch/Dynamic Island so it isn't clipped (KAN-153) */}
       <header className="flex items-center justify-between px-4 pb-4 pt-[calc(1rem+env(safe-area-inset-top))]">
-        <Wordmark inverted className="h-9 w-32" />
+        <div className="flex items-center gap-1">
+          {canGoBack && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="min-h-[44px] gap-1 px-2 text-white/80 hover:bg-white/10 hover:text-white"
+              onClick={goBack}
+              aria-label={t('actions.back')}
+            >
+              <ArrowLeft className="size-4 rtl:rotate-180" />
+            </Button>
+          )}
+          <Wordmark inverted className="h-9 w-32" />
+        </div>
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
           <Button
