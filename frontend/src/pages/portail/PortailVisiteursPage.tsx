@@ -52,6 +52,7 @@ import {
 } from '@/services/visites.service'
 import { canShare, shareContent } from '@/lib/native-actions'
 import { cn } from '@/lib/utils'
+import { visitorPassUrl } from '@/lib/visitor-pass'
 
 const TYPE_ICON: Record<VisiteType, typeof UserCheck> = {
   visitor: UserCheck,
@@ -87,10 +88,6 @@ const dtFmt = new Intl.DateTimeFormat('fr-MA', {
   hour: '2-digit',
   minute: '2-digit',
 })
-
-function visitorPassUrl(token: string): string {
-  return `${window.location.origin}/v/${token}`
-}
 
 export function PortailVisiteursPage() {
   const { t } = useTranslation()
