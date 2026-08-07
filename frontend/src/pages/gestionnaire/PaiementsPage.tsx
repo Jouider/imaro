@@ -351,7 +351,17 @@ function EncaisserModal({
       )
       onOpenChange(false)
     },
-    onError: () => toast.error(t('gestionnaire.paiements.saveError')),
+    // KAN-116 : remonter le message d'erreur réel du backend (au lieu d'un
+    // « Erreur » générique) — indispensable pour diagnostiquer un échec
+    // d'encaissement (500/422) côté staging.
+    onError: (err) => {
+      const e = err as {
+        response?: { data?: { message?: string } }
+      }
+      toast.error(
+        e?.response?.data?.message ?? t('gestionnaire.paiements.saveError'),
+      )
+    },
   })
 
   const handleSelectCreance = (c: Creance) => {
