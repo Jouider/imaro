@@ -48,6 +48,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { visitorPassUrl } from '@/lib/visitor-pass'
 import { getResidences, getLots } from '@/services/gestionnaire.service'
 import {
   getVisites,
@@ -114,10 +115,6 @@ const dtLongFmt = new Intl.DateTimeFormat('fr-MA', {
   hour: '2-digit',
   minute: '2-digit',
 })
-
-function visitorPassUrl(token: string): string {
-  return `${window.location.origin}/v/${token}`
-}
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
